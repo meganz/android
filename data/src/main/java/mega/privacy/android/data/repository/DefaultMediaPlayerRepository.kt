@@ -9,13 +9,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.model.MimeTypeList
@@ -43,8 +41,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val megaApiFolder: MegaApiFolderGateway,
     private val dbHandler: DatabaseHandler,
     private val nodeMapper: NodeMapper,
-    private val cacheFolder: CacheFolderGateway,
-    private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val fileGateway: FileGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val appPreferencesGateway: AppPreferencesGateway,
@@ -520,6 +516,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 megaContactDB.nickname.isNullOrEmpty().not() -> {
                     megaContactDB.nickname
                 }
+
                 megaContactDB.firstName.isNullOrEmpty().not() -> {
                     if (megaContactDB.lastName.isNullOrEmpty().not()) {
                         "${megaContactDB.firstName} ${megaContactDB.lastName}"
@@ -527,9 +524,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                         megaContactDB.firstName
                     }
                 }
+
                 megaContactDB.lastName.isNullOrEmpty().not() -> {
                     megaContactDB.lastName
                 }
+
                 else -> {
                     megaContactDB.email
                 }
@@ -539,15 +538,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolder::getThumbnailCacheFolder,
-            cacheFolder::getPreviewCacheFolder,
-            cacheFolder::getFullSizeCacheFolder,
-            megaApi::hasVersion,
-            megaApi::getNumChildFolders,
-            megaApi::getNumChildFiles,
-            fileTypeInfoMapper,
-            megaApi::isPendingShare,
-            megaApi::isInRubbish,
         )
 
 

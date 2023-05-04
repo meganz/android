@@ -4,21 +4,35 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.node.FolderNodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeMapperTest {
-    private var underTest = NodeMapper()
+    private lateinit var underTest: NodeMapper
+
+    private val megaApiGateway = mock<MegaApiGateway> {
+        onBlocking { hasVersion(any()) }.thenReturn(false)
+        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
+        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
+        onBlocking { isInRubbish(any()) }.thenReturn(false)
+        onBlocking { isPendingShare(any()) }.thenReturn(false)
+    }
 
     private val expectedName = "testName"
     private val expectedSize = 1000L
@@ -32,21 +46,24 @@ class NodeMapperTest {
     private val expectedPublicLink = "publicLink"
     private val expectedPublicLinkCreationTime = 456L
 
+    @BeforeEach
+    internal fun setUp() {
+        underTest = NodeMapper(
+            fileNodeMapper = FileNodeMapper(
+                cacheFolderGateway = mock(),
+                megaApiGateway = megaApiGateway,
+                fileTypeInfoMapper = { PdfFileTypeInfo }
+            ),
+            folderNodeMapper = FolderNodeMapper(megaApiGateway = megaApiGateway)
+        )
+    }
+
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
         val actual =
             underTest(
                 megaNode = megaNode,
-                thumbnailPath = { null },
-                previewPath = { null },
-                fullSizePath = { null },
-                hasVersion = { false },
-                numberOfChildFolders = { 0 },
-                numberOfChildFiles = { 1 },
-                isInRubbish = { false },
-                fileTypeInfoMapper = { PdfFileTypeInfo },
-                isPendingShare = { false },
             )
 
         assertThat(actual).isInstanceOf(DefaultFileNode::class.java)
@@ -58,15 +75,6 @@ class NodeMapperTest {
         val actual =
             underTest(
                 megaNode = megaNode,
-                thumbnailPath = { null },
-                previewPath = { null },
-                fullSizePath = { null },
-                hasVersion = { false },
-                numberOfChildFolders = { 0 },
-                numberOfChildFiles = { 1 },
-                isInRubbish = { false },
-                fileTypeInfoMapper = { PdfFileTypeInfo },
-                isPendingShare = { false },
             )
 
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
@@ -78,7 +86,7 @@ class NodeMapperTest {
         val expectedHasVersion = true
         val expectedNumChildFolders = 2
         val expectedNumChildFiles = 3
-        val gateway = mock<MegaApiGateway> {
+        megaApiGateway.stub {
             onBlocking { hasVersion(node) }.thenReturn(expectedHasVersion)
             onBlocking { getNumChildFolders(node) }.thenReturn(expectedNumChildFolders)
             onBlocking { getNumChildFiles(node) }.thenReturn(expectedNumChildFiles)
@@ -88,15 +96,6 @@ class NodeMapperTest {
 
         val actual = underTest(
             megaNode = node,
-            thumbnailPath = { null },
-            previewPath = { null },
-            fullSizePath = { null },
-            hasVersion = gateway::hasVersion,
-            numberOfChildFolders = gateway::getNumChildFolders,
-            numberOfChildFiles = gateway::getNumChildFiles,
-            isInRubbish = gateway::isInRubbish,
-            fileTypeInfoMapper = { PdfFileTypeInfo },
-            isPendingShare = gateway::isPendingShare,
         )
 
         assertThat(actual.name).isEqualTo(expectedName)
@@ -149,15 +148,6 @@ class NodeMapperTest {
 
         private suspend fun mappedNode(megaNode: MegaNode) = underTest(
             megaNode = megaNode,
-            thumbnailPath = { null },
-            previewPath = { null },
-            fullSizePath = { null },
-            hasVersion = { false },
-            numberOfChildFolders = { 0 },
-            numberOfChildFiles = { 1 },
-            isInRubbish = { false },
-            fileTypeInfoMapper = { PdfFileTypeInfo },
-            isPendingShare = { false },
         )
 
         private fun megaNode(exported: Boolean) = getMockNode(

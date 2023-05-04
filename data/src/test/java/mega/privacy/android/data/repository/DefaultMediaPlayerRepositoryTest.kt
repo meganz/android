@@ -15,7 +15,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
@@ -93,8 +93,6 @@ class DefaultMediaPlayerRepositoryTest {
             megaApiFolder = megaApiFolder,
             dbHandler = dbHandler,
             nodeMapper = nodeMapper,
-            cacheFolder = cacheFolder,
-            fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             appPreferencesGateway = appPreferencesGateway,
@@ -112,15 +110,6 @@ class DefaultMediaPlayerRepositoryTest {
         whenever(
             nodeMapper(
                 any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
             )
         ).thenReturn(
             expectedTypedNode
@@ -160,15 +149,6 @@ class DefaultMediaPlayerRepositoryTest {
         whenever(
             nodeMapper(
                 any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
             )
         ).thenReturn(
             expectedTypedNode

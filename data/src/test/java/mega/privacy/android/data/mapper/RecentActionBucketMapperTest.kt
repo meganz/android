@@ -3,8 +3,8 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -51,15 +51,6 @@ class RecentActionBucketMapperTest {
     fun `test that mapper returns correct value`() = runTest {
         val actual = underTest.invoke(
             recentActionBucket,
-            thumbnailPath = { null },
-            previewPath = { null },
-            fullSizePath = { null },
-            hasVersion = { false },
-            numberOfChildFolders = { 0 },
-            numberOfChildFiles = { 1 },
-            isInRubbish = { false },
-            fileTypeInfoMapper = { PdfFileTypeInfo },
-            isPendingShare = { false },
         )
         assertThat(actual).isInstanceOf(RecentActionBucketUnTyped::class.java)
         assertThat(actual.timestamp).isEqualTo(recentActionBucket.timestamp)

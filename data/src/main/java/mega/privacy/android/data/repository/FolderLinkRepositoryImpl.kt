@@ -3,14 +3,12 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -33,8 +31,6 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private val folderLoginStatusMapper: FolderLoginStatusMapper,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val nodeMapper: NodeMapper,
-    private val cacheFolderGateway: CacheFolderGateway,
-    private val fileTypeInfoMapper: FileTypeInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {
 
@@ -53,12 +49,15 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
                                 )
                             )
                         }
+
                         MegaError.API_EBLOCKED -> {
                             continuation.resumeWith(Result.failure(FetchFolderNodesException.LinkRemoved()))
                         }
+
                         MegaError.API_ETOOMANY -> {
                             continuation.resumeWith(Result.failure(FetchFolderNodesException.AccountTerminated()))
                         }
+
                         else -> {
                             continuation.resumeWith(Result.failure(FetchFolderNodesException.GenericError()))
                         }
@@ -125,14 +124,5 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolderGateway::getThumbnailCacheFolder,
-            cacheFolderGateway::getPreviewCacheFolder,
-            cacheFolderGateway::getFullSizeCacheFolder,
-            { false },
-            megaApiFolderGateway::getNumChildFolders,
-            megaApiFolderGateway::getNumChildFiles,
-            fileTypeInfoMapper,
-            { false },
-            { false }
         )
 }

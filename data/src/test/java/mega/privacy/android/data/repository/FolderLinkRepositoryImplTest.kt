@@ -9,14 +9,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -42,8 +40,6 @@ class FolderLinkRepositoryImplTest {
     private val megaApiGateway: MegaApiGateway = mock()
     private val folderLoginStatusMapper = mock<FolderLoginStatusMapper>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
-    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
     private val untypedNode = mock<UnTypedNode>()
     private val nodeMapper: NodeMapper = mock()
 
@@ -57,8 +53,6 @@ class FolderLinkRepositoryImplTest {
                 folderLoginStatusMapper = folderLoginStatusMapper,
                 megaLocalStorageGateway = megaLocalStorageGateway,
                 nodeMapper = nodeMapper,
-                cacheFolderGateway = cacheFolderGateway,
-                fileTypeInfoMapper = fileTypeInfoMapper,
                 ioDispatcher = UnconfinedTestDispatcher()
             )
     }
@@ -116,7 +110,7 @@ class FolderLinkRepositoryImplTest {
         val parentNode = mock<MegaNode>()
         whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
         whenever(megaApiFolderGateway.getParentNode(megaNode)).thenReturn(parentNode)
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(nodeMapper(any())).thenReturn(
             untypedNode
         )
         assertThat(underTest.getParentNode(nodeId)).isEqualTo(untypedNode)
@@ -141,7 +135,7 @@ class FolderLinkRepositoryImplTest {
         val megaNode = mock<MegaNode>()
         whenever(megaApiGateway.base64ToHandle(base64Handle)).thenReturn(handle)
         whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(nodeMapper(any())).thenReturn(
             untypedNode
         )
         assertThat(underTest.getFolderLinkNode(base64Handle)).isEqualTo(untypedNode)

@@ -16,10 +16,12 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.node.FolderNodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -68,7 +70,6 @@ class NodeRepositoryImplTest {
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheFolderGateway: CacheFolderGateway = mock()
-    private val nodeMapper: NodeMapper = NodeMapper()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
     private val fileGateway: FileGateway = mock()
@@ -78,6 +79,14 @@ class NodeRepositoryImplTest {
     private val folderNode: TypedFolderNode = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
+    private val nodeMapper: NodeMapper = NodeMapper(
+        fileNodeMapper = FileNodeMapper(
+            cacheFolderGateway = cacheFolderGateway,
+            megaApiGateway = megaApiGateway,
+            fileTypeInfoMapper = fileTypeInfoMapper
+        ),
+        folderNodeMapper = FolderNodeMapper(megaApiGateway = megaApiGateway)
+    )
 
     @BeforeAll
     fun setup() {

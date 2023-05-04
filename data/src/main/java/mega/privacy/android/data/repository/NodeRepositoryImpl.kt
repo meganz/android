@@ -23,7 +23,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -294,15 +294,6 @@ internal class NodeRepositoryImpl @Inject constructor(
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolderGateway::getThumbnailCacheFolder,
-            cacheFolderGateway::getPreviewCacheFolder,
-            cacheFolderGateway::getFullSizeCacheFolder,
-            megaApiGateway::hasVersion,
-            megaApiGateway::getNumChildFolders,
-            megaApiGateway::getNumChildFiles,
-            fileTypeInfoMapper,
-            megaApiGateway::isPendingShare,
-            megaApiGateway::isInRubbish,
         )
 
     override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {

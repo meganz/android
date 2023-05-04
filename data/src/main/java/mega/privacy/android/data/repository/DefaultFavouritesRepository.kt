@@ -3,11 +3,9 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -26,8 +24,6 @@ internal class DefaultFavouritesRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val nodeMapper: NodeMapper,
-    private val cacheFolder: CacheFolderGateway,
-    private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) : FavouritesRepository {
 
     override suspend fun getAllFavorites(): List<UnTypedNode> =
@@ -77,15 +73,6 @@ internal class DefaultFavouritesRepository @Inject constructor(
         nodes.map { megaNode ->
             nodeMapper(
                 megaNode,
-                cacheFolder::getThumbnailCacheFolder,
-                cacheFolder::getPreviewCacheFolder,
-                cacheFolder::getFullSizeCacheFolder,
-                megaApiGateway::hasVersion,
-                megaApiGateway::getNumChildFolders,
-                megaApiGateway::getNumChildFiles,
-                fileTypeInfoMapper,
-                megaApiGateway::isPendingShare,
-                megaApiGateway::isInRubbish,
             )
         }
 }

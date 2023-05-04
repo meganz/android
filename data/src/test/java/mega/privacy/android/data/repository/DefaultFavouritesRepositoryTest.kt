@@ -5,9 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.NodeMapper
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
@@ -29,7 +27,6 @@ class DefaultFavouritesRepositoryTest {
     private lateinit var underTest: FavouritesRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
 
     private val node = mock<MegaNode> {
         on { handle }.thenReturn(1L)
@@ -48,8 +45,6 @@ class DefaultFavouritesRepositoryTest {
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             nodeMapper = nodeMapper,
-            cacheFolder = mock(),
-            fileTypeInfoMapper = fileTypeInfoMapper
         )
     }
 
@@ -80,15 +75,6 @@ class DefaultFavouritesRepositoryTest {
         whenever(
             nodeMapper(
                 any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
             )
         ).thenReturn(
             favouriteInfo
@@ -126,15 +112,6 @@ class DefaultFavouritesRepositoryTest {
         whenever(
             nodeMapper(
                 any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
             )
         ).thenReturn(
             favouriteInfo

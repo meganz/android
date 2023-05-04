@@ -4,10 +4,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
@@ -24,10 +22,8 @@ import javax.inject.Inject
  */
 internal class DefaultRecentActionsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val cacheFolderGateway: CacheFolderGateway,
     private val recentActionsMapper: RecentActionsMapper,
     private val recentActionBucketMapper: RecentActionBucketMapper,
-    private val fileTypeInfoMapper: FileTypeInfoMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
 
@@ -36,15 +32,6 @@ internal class DefaultRecentActionsRepository @Inject constructor(
             val list = getMegaRecentAction().map {
                 recentActionBucketMapper.invoke(
                     it,
-                    cacheFolderGateway::getThumbnailCacheFolder,
-                    cacheFolderGateway::getPreviewCacheFolder,
-                    cacheFolderGateway::getFullSizeCacheFolder,
-                    megaApiGateway::hasVersion,
-                    megaApiGateway::getNumChildFolders,
-                    megaApiGateway::getNumChildFiles,
-                    fileTypeInfoMapper,
-                    megaApiGateway::isPendingShare,
-                    megaApiGateway::isInRubbish,
                 )
             }
             return@withContext list

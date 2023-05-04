@@ -4,9 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
@@ -35,18 +33,12 @@ class DefaultRecentActionsRepositoryTest {
 
     private val recentActionBucketMapper = mock<RecentActionBucketMapper>()
 
-    private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
-
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
-
     @Before
     fun setUp() {
         underTest = DefaultRecentActionsRepository(
             megaApiGateway = megaApiGateway,
             recentActionsMapper = recentActionsMapper,
             recentActionBucketMapper = recentActionBucketMapper,
-            fileTypeInfoMapper = fileTypeInfoMapper,
-            cacheFolderGateway = cacheFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -80,15 +72,6 @@ class DefaultRecentActionsRepositoryTest {
         whenever(
             recentActionBucketMapper.invoke(
                 mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock(),
-                mock()
             )
         ).thenReturn(recentActionBucket)
 
