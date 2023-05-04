@@ -609,7 +609,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun stopCameraUploadSyncHeartbeatWorkers() = withContext(ioDispatcher) {
-        workerGateway.stopCameraUploadSyncHeartbeatWorkers()
+        workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }
 
     @Deprecated(

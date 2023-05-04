@@ -1,13 +1,13 @@
 package mega.privacy.android.app.cameraupload.facade
 
-import android.content.Context
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import dagger.hilt.android.qualifiers.ApplicationContext
+import androidx.work.await
 import kotlinx.coroutines.delay
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.worker.EXTRA_ABORTED
@@ -42,7 +42,7 @@ private const val CU_RESCHEDULE_INTERVAL: Long = 5000 // Milliseconds
  * To be moved to data layer once Worker is moved to data layer
  */
 class WorkerFacade @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val workManager: WorkManager,
 ) : WorkerGateway {
 
     /**
@@ -52,23 +52,34 @@ class WorkerFacade @Inject constructor(
      * @return The result of the job
      */
     override suspend fun fireCameraUploadJob() {
-        val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
-            StartCameraUploadWorker::class.java
-        )
-            .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-            .build()
-        WorkManager.getInstance(context)
-            .enqueueUniqueWork(
-                SINGLE_CAMERA_UPLOAD_TAG,
-                ExistingWorkPolicy.KEEP,
-                cameraUploadWorkRequest
+        // Check if CU periodic worker is working. If yes, then don't start a single one
+        if (!checkWorkerRunning(CAMERA_UPLOAD_TAG)) {
+            Timber.d("No CU periodic process currently running, proceed with one time request")
+            val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
+                StartCameraUploadWorker::class.java
             )
-        Timber.d(
-            "CameraUpload Single Job Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG)
-            }"
-        )
-        Timber.d("fireCameraUploadJob() SUCCESS")
+                .addTag(SINGLE_CAMERA_UPLOAD_TAG)
+                .build()
+
+            workManager
+                .enqueueUniqueWork(
+                    SINGLE_CAMERA_UPLOAD_TAG,
+                    ExistingWorkPolicy.KEEP,
+                    cameraUploadWorkRequest
+                )
+            Timber.d(
+                "CameraUpload Single Job Work Status: ${
+                    workManager.getWorkInfosByTag(SINGLE_CAMERA_UPLOAD_TAG)
+                }"
+            )
+            // If no CU periodic worker are currently running, cancel the worker
+            // It will be rescheduled at the end of the one time request
+            cancelPeriodicCameraUploadWorkRequest()
+            Timber.d("fireCameraUploadJob() SUCCESS")
+        } else {
+            Timber.d("CU periodic process currently running, cannot proceed with one time request")
+            Timber.d("fireCameraUploadJob() FAIL")
+        }
     }
 
     /**
@@ -87,7 +98,7 @@ class WorkerFacade @Inject constructor(
                     .build()
             )
             .build()
-        WorkManager.getInstance(context)
+        workManager
             .enqueueUniqueWork(
                 STOP_CAMERA_UPLOAD_TAG,
                 ExistingWorkPolicy.KEEP,
@@ -95,7 +106,7 @@ class WorkerFacade @Inject constructor(
             )
         Timber.d(
             "CameraUpload Stop Job Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG)
+                workManager.getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG)
             }"
         )
         Timber.d("fireStopCameraUploadJob() SUCCESS")
@@ -118,7 +129,7 @@ class WorkerFacade @Inject constructor(
         )
             .addTag(CAMERA_UPLOAD_TAG)
             .build()
-        WorkManager.getInstance(context)
+        workManager
             .enqueueUniquePeriodicWork(
                 CAMERA_UPLOAD_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -126,7 +137,7 @@ class WorkerFacade @Inject constructor(
             )
         Timber.d(
             "CameraUpload Schedule Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(CAMERA_UPLOAD_TAG)
+                workManager.getWorkInfosByTag(CAMERA_UPLOAD_TAG)
             }"
         )
         Timber.d("scheduleCameraUploadJob() SUCCESS")
@@ -148,7 +159,7 @@ class WorkerFacade @Inject constructor(
         )
             .addTag(SINGLE_CAMERA_UPLOAD_TAG)
             .build()
-        WorkManager.getInstance(context)
+        workManager
             .beginWith(stopCameraUploadRequest)
             .then(startCameraUploadRequest)
             .enqueue()
@@ -169,7 +180,7 @@ class WorkerFacade @Inject constructor(
         )
             .addTag(HEART_BEAT_TAG)
             .build()
-        WorkManager.getInstance(context)
+        workManager
             .enqueueUniquePeriodicWork(
                 HEART_BEAT_TAG,
                 ExistingPeriodicWorkPolicy.KEEP,
@@ -177,7 +188,7 @@ class WorkerFacade @Inject constructor(
             )
         Timber.d(
             "CameraUpload Schedule Heartbeat Work Status: ${
-                WorkManager.getInstance(context).getWorkInfosByTag(HEART_BEAT_TAG)
+                workManager.getWorkInfosByTag(HEART_BEAT_TAG)
             }"
         )
         Timber.d("scheduleCameraUploadSyncActiveHeartbeat() SUCCESS")
@@ -193,20 +204,40 @@ class WorkerFacade @Inject constructor(
     }
 
     /**
-     * Stop the camera upload work by tag.
-     * Stop regular camera upload sync heartbeat work by tag.
-     *
+     * Cancel all camera upload workers.
+     * Cancel all camera upload sync heartbeat workers.
      */
-    override suspend fun stopCameraUploadSyncHeartbeatWorkers() {
-        val manager = WorkManager.getInstance(context)
+    override suspend fun cancelCameraUploadAndHeartbeatWorkRequest() {
         listOf(
             CAMERA_UPLOAD_TAG,
             SINGLE_CAMERA_UPLOAD_TAG,
             HEART_BEAT_TAG,
             SINGLE_HEART_BEAT_TAG
         ).forEach {
-            manager.cancelAllWorkByTag(it)
+            workManager.cancelAllWorkByTag(it)
         }
-        Timber.d("stopCameraUploadSyncHeartbeatWorkers() SUCCESS")
+        Timber.d("cancelCameraUploadAndHeartbeatWorkRequest() SUCCESS")
     }
+
+    /**
+     * Cancel the Camera Upload periodic worker
+     */
+    private fun cancelPeriodicCameraUploadWorkRequest() {
+        workManager
+            .cancelAllWorkByTag(CAMERA_UPLOAD_TAG)
+        Timber.d("cancelPeriodicCameraUploadWorkRequest() SUCCESS")
+    }
+
+    /**
+     * Check if a worker is currently running given his tag
+     *
+     * @param tag
+     */
+    private suspend fun checkWorkerRunning(tag: String): Boolean {
+        return workManager.getWorkInfosByTag(tag).await()
+            ?.map { workInfo -> workInfo.state == WorkInfo.State.RUNNING }
+            ?.contains(true)
+            ?: false
+    }
+
 }

@@ -39,9 +39,8 @@ interface WorkerGateway {
     suspend fun rescheduleCameraUpload()
 
     /**
-     * Stop the camera upload work by tag.
-     * Stop regular camera upload sync heartbeat work by tag.
-     *
+     * Cancel all camera upload workers.
+     * Cancel all camera upload sync heartbeat workers.
      */
-    suspend fun stopCameraUploadSyncHeartbeatWorkers()
+    suspend fun cancelCameraUploadAndHeartbeatWorkRequest()
 }

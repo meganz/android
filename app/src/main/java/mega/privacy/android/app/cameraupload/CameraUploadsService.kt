@@ -1409,6 +1409,7 @@ class CameraUploadsService : LifecycleService() {
         totalToUpload = 0
         reportUploadFinish()
         stopActiveHeartbeat()
+        scheduleCameraUploadUseCase()
         endService()
     }
 

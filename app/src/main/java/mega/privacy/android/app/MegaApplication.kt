@@ -5,12 +5,10 @@ import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
-import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -75,7 +73,6 @@ import javax.inject.Provider
  * @property crashReporter
  * @property performanceReporter
  * @property getCallSoundsUseCase
- * @property workerFactory
  * @property themeModeState
  * @property transfersManagement
  * @property activityLifecycleHandler
@@ -91,7 +88,7 @@ import javax.inject.Provider
  * @property globalNetworkStateHandler
  */
 @HiltAndroidApp
-class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver,
+class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     ImageLoaderFactory {
     @MegaApi
     @Inject
@@ -125,9 +122,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
 
     @Inject
     lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
 
     @Inject
     lateinit var themeModeState: ThemeModeState
@@ -303,14 +297,6 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             }
         }
     }
-
-    /**
-     * Get work manager configuration
-     *
-     */
-    override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder()
-        .setWorkerFactory(workerFactory)
-        .build()
 
     /**
      * Disable mega chat api

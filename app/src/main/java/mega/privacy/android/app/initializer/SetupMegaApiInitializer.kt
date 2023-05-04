@@ -112,6 +112,6 @@ class SetupMegaApiInitializer : Initializer<Unit> {
      *
      */
     override fun dependencies(): List<Class<out Initializer<*>>> =
-        listOf(LoggerInitializer::class.java)
+        listOf(LoggerInitializer::class.java, WorkManagerInitializer::class.java)
 
 }
