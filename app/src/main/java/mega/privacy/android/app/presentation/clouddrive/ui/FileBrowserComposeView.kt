@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param onMenuClick
  * @param sortOrder
  * @param onSortOrderClick
+ * @param onChangeViewTypeClick
  */
 @Composable
 fun FileBrowserComposeView(
@@ -36,6 +37,7 @@ fun FileBrowserComposeView(
     onMenuClick: (NodeUIItem) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit
 ) {
     if (uiState.nodesList.isNotEmpty()) {
         NodesView(
@@ -49,7 +51,7 @@ fun FileBrowserComposeView(
             sortOrder = sortOrder,
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = onSortOrderClick,
-            onChangeViewTypeClick = {},
+            onChangeViewTypeClick = onChangeViewTypeClick,
         )
     } else {
         MegaEmptyView(

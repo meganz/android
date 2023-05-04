@@ -26,6 +26,8 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
 import java.util.Stack
 import javax.inject.Inject
@@ -41,6 +43,8 @@ import javax.inject.Inject
  * @param getIsNodeInRubbish To get current node is in rubbish
  * @param getFileBrowserChildrenUseCase [GetFileBrowserChildrenUseCase]
  * @param getCloudSortOrder [GetCloudSortOrder]
+ * @param monitorViewType [MonitorViewType] check view type
+ * @param setViewType [SetViewType] to set view type
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -52,6 +56,8 @@ class FileBrowserViewModel @Inject constructor(
     private val getIsNodeInRubbish: IsNodeInRubbish,
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val monitorViewType: MonitorViewType,
+    private val setViewType: SetViewType,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -71,6 +77,7 @@ class FileBrowserViewModel @Inject constructor(
         monitorMediaDiscovery()
         refreshNodes()
         monitorFileBrowserChildrenNodes()
+        checkViewType()
     }
 
     /**
@@ -86,6 +93,17 @@ class FileBrowserViewModel @Inject constructor(
                             ?: MediaDiscoveryViewSettings.INITIAL.ordinal
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * This method will monitor view type and update it on state
+     */
+    private fun checkViewType() {
+        viewModelScope.launch {
+            monitorViewType().collect { viewType ->
+                _state.update { it.copy(currentViewType = viewType) }
             }
         }
     }
@@ -390,5 +408,17 @@ class FileBrowserViewModel @Inject constructor(
             totalSelectedFileNode = _state.value.selectedFileNodes - 1
         }
         return Pair(totalSelectedFileNode, totalSelectedFolderNode)
+    }
+
+    /**
+     * This method will toggle view type
+     */
+    fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            when (_state.value.currentViewType) {
+                ViewType.LIST -> setViewType(ViewType.GRID)
+                ViewType.GRID -> setViewType(ViewType.LIST)
+            }
+        }
     }
 }

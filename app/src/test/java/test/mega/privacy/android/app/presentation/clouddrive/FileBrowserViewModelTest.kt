@@ -28,6 +28,8 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -55,6 +57,8 @@ class FileBrowserViewModelTest {
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val monitorViewType: MonitorViewType = mock()
+    private val setViewType: SetViewType = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -75,6 +79,8 @@ class FileBrowserViewModelTest {
             getIsNodeInRubbish = isNodeInRubbish,
             getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
             getCloudSortOrder = getCloudSortOrder,
+            setViewType = setViewType,
+            monitorViewType = monitorViewType
         )
     }
 
@@ -149,8 +155,8 @@ class FileBrowserViewModelTest {
             whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
             underTest.setBrowserParentHandle(newValue)
             Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
-            verify(getBrowserChildrenNode, times(1)).invoke(newValue)
-            verify(getFileBrowserChildrenUseCase, times(1)).invoke(newValue)
+            verify(getBrowserChildrenNode).invoke(newValue)
+            verify(getFileBrowserChildrenUseCase).invoke(newValue)
         }
 
     @Test
@@ -249,8 +255,8 @@ class FileBrowserViewModelTest {
             )
             underTest.setBrowserParentHandle(newValue)
             underTest.onBackPressed()
-            verify(getBrowserChildrenNode, times(1)).invoke(newValue)
-            verify(getFileBrowserChildrenUseCase, times(1)).invoke(newValue)
+            verify(getBrowserChildrenNode).invoke(newValue)
+            verify(getFileBrowserChildrenUseCase).invoke(newValue)
         }
 
     @Test
@@ -373,5 +379,12 @@ class FileBrowserViewModelTest {
                 Truth.assertThat(state.selectedFileNodes).isEqualTo(1)
                 Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(2)
             }
+        }
+
+    @Test
+    fun `test that on clicking on change view type to Grid it calls setViewType atleast once`() =
+        runTest {
+            underTest.onChangeViewTypeClicked()
+            verify(setViewType).invoke(ViewType.GRID)
         }
 }

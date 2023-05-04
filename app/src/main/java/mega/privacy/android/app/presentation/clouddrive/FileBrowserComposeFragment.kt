@@ -82,7 +82,8 @@ class FileBrowserComposeFragment : Fragment() {
                             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                 ?: R.string.sortby_name
                         ),
-                        onSortOrderClick = { showSortByPanel() }
+                        onSortOrderClick = { showSortByPanel() },
+                        onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
                     )
                 }
             }
