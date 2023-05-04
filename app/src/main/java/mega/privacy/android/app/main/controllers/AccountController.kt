@@ -277,7 +277,7 @@ class AccountController @Inject constructor(
             return rKBitmap
         }
 
-        showAlert(context as ManagerActivity, context.getString(R.string.general_text_error), null)
+        showAlert(context, context.getString(R.string.general_text_error), null)
         return null
     }
 
