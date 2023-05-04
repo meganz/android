@@ -716,6 +716,11 @@ class MegaExplorerAdapter(
                 itemView.setOnClickListener(::clickItem)
 
                 binding.fileGridTakenDown.isVisible = node.isTakenDown
+                binding.fileExplorerGridLayout.background =
+                    ContextCompat.getDrawable(
+                        context,
+                        R.drawable.background_item_grid
+                    )
             } else {
                 binding.fileExplorerGridFolderLayout.isVisible = false
                 binding.fileExplorerGridFileLayout.isVisible = true

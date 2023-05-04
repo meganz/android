@@ -529,22 +529,16 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      */
     fun itemClick(position: Int) {
         Timber.d("Position: $position")
-        val clickNodes = mutableListOf<MegaNode?>()
         if (searchNodes.isNotEmpty()) {
-            clickNodes.addAll(searchNodes)
             shouldResetNodes = false
             (requireActivity() as FileExplorerActivity).let {
                 it.setQueryAfterSearch()
                 it.collapseSearchView()
             }
-        } else {
-            clickNodes.addAll(nodes)
         }
 
-        if (position < 0 || position >= clickNodes.size) return
-
         (requireActivity() as FileExplorerActivity).let { activity ->
-            clickNodes[position]?.let { node ->
+            adapter.getItem(position)?.let { node ->
                 if (node.isFolder) {
                     searchNodes.clear()
                     activity.shouldRestartSearch = false
@@ -696,7 +690,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         data.toList().let {
             nodes.clear()
             adapter.setNodes(it)
-            nodes.addAll(adapter.getNodes())
+            nodes.addAll(it)
             updateView()
         }
     }

@@ -1031,8 +1031,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         hideTabs(false, INCOMING_FRAGMENT)
                         iSharesExplorer?.closeSearch(collapsedByClick)
                     }
-
-                    invalidateOptionsMenu()
                 } else {
                     hideTabs(false, CHAT_FRAGMENT)
                     chatExplorer = chatExplorerFragment
