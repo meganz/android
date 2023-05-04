@@ -25,19 +25,14 @@ enum class StartCameraUploadsState {
     BELOW_DEVICE_BATTERY_LEVEL,
 
     /**
-     * The Camera Uploads local path does not exist
-     */
-    MISSING_LOCAL_PATH,
-
-    /**
      * The User does not meet certain Internet conditions
      */
     UNSATISFIED_WIFI_CONSTRAINT,
 
     /**
-     * The Primary Folder does not exist
+     * The Primary Folder does not exist or is invalid
      */
-    MISSING_PRIMARY_FOLDER,
+    INVALID_PRIMARY_FOLDER,
 
     /**
      * The local Secondary Folder does not exist

@@ -31,7 +31,6 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -40,7 +39,6 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
@@ -121,11 +119,12 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
@@ -177,16 +176,16 @@ class CameraUploadsService : LifecycleService() {
     lateinit var megaApi: MegaApiAndroid
 
     /**
-     * GetCameraUploadLocalPath
+     * [GetPrimaryFolderPathUseCase]
      */
     @Inject
-    lateinit var localPath: GetCameraUploadLocalPath
+    lateinit var getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase
 
     /**
-     * [IsPrimaryFolderSetUseCase]
+     * [IsPrimaryFolderPathValidUseCase]
      */
     @Inject
-    lateinit var isPrimaryFolderSetUseCase: IsPrimaryFolderSetUseCase
+    lateinit var isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase
 
     /**
      * IsLocalSecondaryFolderSet
@@ -355,12 +354,6 @@ class CameraUploadsService : LifecycleService() {
      */
     @Inject
     lateinit var getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase
-
-    /**
-     * LegacyDatabaseHandler
-     */
-    @Inject
-    lateinit var tempDbHandler: LegacyDatabaseHandler
 
     /**
      * AreAllUploadTransfersPaused
@@ -829,7 +822,7 @@ class CameraUploadsService : LifecycleService() {
      * notifications if they exist
      */
     private suspend fun hideFolderPathNotifications() {
-        if (hasPrimaryFolder()) notificationManager?.cancel(FOLDER_REMINDER_PRIMARY)
+        if (isPrimaryFolderValid()) notificationManager?.cancel(FOLDER_REMINDER_PRIMARY)
         if (hasLocalSecondaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
     }
 
@@ -838,15 +831,14 @@ class CameraUploadsService : LifecycleService() {
      *
      * 1. The Preferences exist - [preferencesExist],
      * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
-     * 4. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
-     * 5. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
-     * 6. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
-     * 7. The Primary Folder exists - [hasPrimaryFolder],
-     * 8. The local Secondary Folder exists - [hasLocalSecondaryFolder],
-     * 9. The user is logged in - [isUserLoggedIn],
-     * 10. The user Camera Uploads attribute exists - [missingAttributesChecked],
-     * 11. The Primary Folder exists - [areFoldersEstablished],
-     * 12. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
+     * 3. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
+     * 4. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
+     * 5. The Primary Folder exists and is valid - [isPrimaryFolderValid],
+     * 6. The local Secondary Folder exists - [hasLocalSecondaryFolder],
+     * 7. The user is logged in - [isUserLoggedIn],
+     * 8. The user Camera Uploads attribute exists - [missingAttributesChecked],
+     * 9. The Primary Folder exists - [areFoldersEstablished],
+     * 10. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
      *
      * If all conditions are met, [StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS] is returned.
      * Otherwise, a specific [StartCameraUploadsState] is returned depending on what condition has failed
@@ -859,8 +851,7 @@ class CameraUploadsService : LifecycleService() {
             !cameraUploadsSyncEnabled() -> StartCameraUploadsState.DISABLED_SYNC
             !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
-            !hasCameraUploadsLocalPath() -> StartCameraUploadsState.MISSING_LOCAL_PATH
-            !hasPrimaryFolder() -> StartCameraUploadsState.MISSING_PRIMARY_FOLDER
+            !isPrimaryFolderValid() -> StartCameraUploadsState.INVALID_PRIMARY_FOLDER
             !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
             !isUserLoggedIn() -> StartCameraUploadsState.LOGGED_OUT_USER
             !missingAttributesChecked -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
@@ -880,15 +871,14 @@ class CameraUploadsService : LifecycleService() {
             StartCameraUploadsState.MISSING_PREFERENCES,
             StartCameraUploadsState.DISABLED_SYNC,
             StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL,
-            StartCameraUploadsState.MISSING_LOCAL_PATH,
             StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
             -> {
                 Timber.e("Stop Camera Uploads due to $state")
                 endService(aborted = true)
             }
 
-            StartCameraUploadsState.MISSING_PRIMARY_FOLDER -> {
-                Timber.e("Primary Folder is disabled. Stop Camera Uploads")
+            StartCameraUploadsState.INVALID_PRIMARY_FOLDER -> {
+                Timber.e("Primary Folder is invalid. Stop Camera Uploads")
                 handlePrimaryFolderDisabled()
                 endService(aborted = true)
             }
@@ -957,16 +947,6 @@ class CameraUploadsService : LifecycleService() {
         }
 
     /**
-     * Checks if the Camera Uploads local path from [localPath] exists
-     *
-     * @return true if the Camera Uploads local path exists, and false if otherwise
-     */
-    private suspend fun hasCameraUploadsLocalPath(): Boolean =
-        !localPath().isNullOrBlank().also {
-            if (it) Timber.w("Camera Uploads local path is empty")
-        }
-
-    /**
      * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfiedUseCase] is satisfied
      *
      * @return true if the Wi-Fi constraint is satisfied, and false if otherwise
@@ -977,13 +957,13 @@ class CameraUploadsService : LifecycleService() {
         }
 
     /**
-     * Checks if the Primary Folder from [isPrimaryFolderSetUseCase] exists
+     * Checks if the Primary Folder exists and is valid
      *
-     * @return true if it exists, and false if otherwise
+     * @return true if the Primary Folder exists and is valid, and false if otherwise
      */
-    private suspend fun hasPrimaryFolder(): Boolean =
-        isPrimaryFolderSetUseCase().also {
-            if (!it) Timber.w("Primary Folder is not set")
+    private suspend fun isPrimaryFolderValid(): Boolean =
+        isPrimaryFolderPathValidUseCase(getPrimaryFolderPathUseCase()).also {
+            if (!it) Timber.w("The Primary Folder does not exist or is invalid")
         }
 
     /**
