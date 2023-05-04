@@ -197,13 +197,17 @@ class SlideshowFragment : Fragment() {
                     yield()
                     delay(speed.duration * 1000L)
                     tween<Float>(600)
-                    pagerState.animateScrollToPage(
-                        page = if (pagerState.canScrollForward) {
-                            pagerState.currentPage + 1
-                        } else {
-                            0
-                        },
-                    )
+                    try {
+                        pagerState.animateScrollToPage(
+                            page = if (pagerState.canScrollForward) {
+                                pagerState.currentPage + 1
+                            } else {
+                                0
+                            },
+                        )
+                    } catch (e: Exception) {
+                        Timber.d("Slideshow animateScrollToPage+$e")
+                    }
                 }
             } else {
                 this@SlideshowFragment.view?.keepScreenOn = false
