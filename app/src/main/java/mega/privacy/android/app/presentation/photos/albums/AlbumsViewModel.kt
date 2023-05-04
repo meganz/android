@@ -180,7 +180,7 @@ class AlbumsViewModel @Inject constructor(
                 (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
             }
             uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum)
-        }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
 
         systemUIAlbums + updatedUserUIAlbums
     }

@@ -312,11 +312,11 @@ class AlbumsViewModelTest {
     @Test
     fun `test that user albums collect is working and the sorting order is correct`() = runTest {
         val newAlbum1 =
-            createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L)
+            createUserAlbum(id = AlbumId(1L), title = "Album 1", creationTime = 100L)
         val newAlbum2 =
-            createUserAlbum(id = AlbumId(2L), title = "Album 2", modificationTime = 200L)
+            createUserAlbum(id = AlbumId(2L), title = "Album 2", creationTime = 200L)
         val newAlbum3 =
-            createUserAlbum(id = AlbumId(3L), title = "Album 3", modificationTime = 300L)
+            createUserAlbum(id = AlbumId(3L), title = "Album 3", creationTime = 300L)
 
         whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
             UIAlbum(
@@ -358,9 +358,9 @@ class AlbumsViewModelTest {
         whenever(getAlbumPhotos(AlbumId(any()))).thenReturn(flowOf(listOf()))
 
         val expectedUserAlbums = listOf(
-            createUserAlbum(id = AlbumId(3L), title = "Album 3", modificationTime = 300L),
-            createUserAlbum(id = AlbumId(2L), title = "Album 2", modificationTime = 200L),
-            createUserAlbum(id = AlbumId(1L), title = "Album 1", modificationTime = 100L),
+            createUserAlbum(id = AlbumId(3L), title = "Album 3", creationTime = 300L),
+            createUserAlbum(id = AlbumId(2L), title = "Album 2", creationTime = 200L),
+            createUserAlbum(id = AlbumId(1L), title = "Album 1", creationTime = 100L),
         )
 
         underTest.state.drop(1).test {
