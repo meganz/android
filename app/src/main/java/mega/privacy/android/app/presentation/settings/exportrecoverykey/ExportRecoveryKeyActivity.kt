@@ -63,6 +63,9 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (shouldRefreshSessionDueToSDK(true)) return
+
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)

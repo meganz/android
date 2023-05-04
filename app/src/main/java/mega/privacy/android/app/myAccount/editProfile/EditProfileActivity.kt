@@ -114,6 +114,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (shouldRefreshSessionDueToSDK(true)) return
 
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)

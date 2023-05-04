@@ -139,6 +139,8 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (shouldRefreshSessionDueToSDK(true)) return
+
         setTitle(R.string.section_photo_sync)
         settingsFragment = SettingsCameraUploadsFragment().also {
             replaceFragment(it)

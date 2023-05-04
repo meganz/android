@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentResultListener
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
@@ -21,7 +21,7 @@ import javax.inject.Inject
 private const val TITLE_TAG = "settingsActivityTitle"
 
 @AndroidEntryPoint
-class SettingsActivity : AppCompatActivity(),
+class SettingsActivity : BaseActivity(),
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     @Inject
@@ -29,6 +29,7 @@ class SettingsActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (shouldRefreshSessionDueToSDK(true)) return
         setContentView(R.layout.settings_activity)
         setSupportActionBar(findViewById(R.id.settings_toolbar))
         if (savedInstanceState == null) {
