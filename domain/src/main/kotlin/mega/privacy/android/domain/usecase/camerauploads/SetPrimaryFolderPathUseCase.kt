@@ -18,18 +18,19 @@ class SetPrimaryFolderPathUseCase @Inject constructor(
      * Invocation function
      *
      * @param newFolderPath The new Primary Folder path
+     * @param isPrimaryFolderInSDCard true if the Primary Folder is now located in the SD Card, and
+     * false if otherwise
      */
-    suspend operator fun invoke(newFolderPath: String) {
+    suspend operator fun invoke(newFolderPath: String, isPrimaryFolderInSDCard: Boolean) {
         cameraUploadRepository.let {
-            val isInSDCard = it.isPrimaryFolderInSDCard()
-            it.setPrimaryFolderInSDCard(isInSDCard)
-            setPrimaryFolderLocalPathUseCase(
-                if (isInSDCard) {
-                    it.getPrimaryFolderSDCardUriPath()
-                } else {
-                    newFolderPath
-                }
-            )
+            it.setPrimaryFolderInSDCard(isPrimaryFolderInSDCard)
+            if (isPrimaryFolderInSDCard) {
+                it.setPrimaryFolderSDCardUriPath(newFolderPath)
+                setPrimaryFolderLocalPathUseCase("")
+            } else {
+                it.setPrimaryFolderSDCardUriPath("")
+                setPrimaryFolderLocalPathUseCase(newFolderPath)
+            }
         }
     }
 }

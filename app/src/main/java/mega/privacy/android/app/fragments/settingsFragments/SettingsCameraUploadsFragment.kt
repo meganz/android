@@ -493,8 +493,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         when (requestCode) {
             REQUEST_CAMERA_FOLDER -> {
                 val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                val isPrimaryFolderInSDCard =
+                    intent.getBooleanExtra(
+                        FileStorageActivity.EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD,
+                        false,
+                    )
+
                 with(viewModel) {
-                    changePrimaryFolderPath(newPrimaryFolderPath)
+                    changePrimaryFolderPath(
+                        newPath = newPrimaryFolderPath,
+                        isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+                    )
                     resetTimestampsAndCacheDirectory()
                     rescheduleCameraUpload()
                 }

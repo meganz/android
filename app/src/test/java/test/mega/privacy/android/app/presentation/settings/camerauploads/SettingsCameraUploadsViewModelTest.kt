@@ -36,10 +36,11 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsNewPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
@@ -84,7 +85,7 @@ class SettingsCameraUploadsViewModelTest {
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
         mock<IsChargingRequiredForVideoCompressionUseCase>()
-    private val isNewPrimaryFolderPathValidUseCase = mock<IsNewPrimaryFolderPathValidUseCase>()
+    private val isPrimaryFolderPathValidUseCase = mock<IsPrimaryFolderPathValidUseCase>()
     private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
@@ -93,6 +94,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
+    private val setDefaultPrimaryFolderPathUseCase = mock<SetDefaultPrimaryFolderPathUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setPrimaryFolderPathUseCase = mock<SetPrimaryFolderPathUseCase>()
     private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
@@ -122,7 +124,7 @@ class SettingsCameraUploadsViewModelTest {
      * Initializes [SettingsCameraUploadsViewModel] for testing
      */
     private fun setupUnderTest(
-        isNewPrimaryFolderPathValid: IsNewPrimaryFolderPathValidUseCase = isNewPrimaryFolderPathValidUseCase,
+        isPrimaryFolderPathValid: IsPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
     ) {
         underTest = SettingsCameraUploadsViewModel(
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
@@ -137,7 +139,7 @@ class SettingsCameraUploadsViewModelTest {
             getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
-            isNewPrimaryFolderPathValidUseCase = isNewPrimaryFolderPathValid,
+            isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValid,
             monitorConnectivityUseCase = mock(),
             preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
@@ -146,6 +148,7 @@ class SettingsCameraUploadsViewModelTest {
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
+            setDefaultPrimaryFolderPathUseCase = setDefaultPrimaryFolderPathUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setPrimaryFolderPathUseCase = setPrimaryFolderPathUseCase,
             setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
@@ -508,15 +511,22 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that the new primary folder path is set`() = runTest {
         val testPath = "test/new/folder/path"
+        val isPrimaryFolderInSDCard = false
 
-        whenever(isNewPrimaryFolderPathValidUseCase(any())).thenReturn(true)
+        whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(true)
         whenever(getPrimaryFolderPathUseCase()).thenReturn(testPath)
 
         setupUnderTest()
 
-        underTest.changePrimaryFolderPath(testPath)
+        underTest.changePrimaryFolderPath(
+            newPath = testPath,
+            isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+        )
 
-        verify(setPrimaryFolderPathUseCase, times(1)).invoke(testPath)
+        verify(setPrimaryFolderPathUseCase).invoke(
+            newFolderPath = testPath,
+            isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+        )
         underTest.state.test {
             assertThat(awaitItem().primaryFolderPath).isEqualTo(testPath)
         }
@@ -525,10 +535,16 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that the invalid folder selected prompt is shown if the new primary folder path is invalid`() =
         runTest {
-            whenever(isNewPrimaryFolderPathValidUseCase(any())).thenReturn(false)
+            val testPath = "test/invalid/folder/path"
+            val isPrimaryFolderInSDCard = false
+
+            whenever(isPrimaryFolderPathValidUseCase(any())).thenReturn(false)
             setupUnderTest()
 
-            underTest.changePrimaryFolderPath("test/invalid/folder/path")
+            underTest.changePrimaryFolderPath(
+                testPath,
+                isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+            )
             underTest.state.test {
                 assertThat(awaitItem().invalidFolderSelectedTextId).isEqualTo(R.string.error_invalid_folder_selected)
             }
@@ -537,10 +553,15 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that the invalid folder selected prompt is shown if the new primary folder path is null`() =
         runTest {
-            val isNewPrimaryFolderPathValidSpy = Mockito.spy(isNewPrimaryFolderPathValidUseCase)
-            setupUnderTest(isNewPrimaryFolderPathValid = isNewPrimaryFolderPathValidSpy)
+            val isPrimaryFolderInSDCard = false
+            val isNewPrimaryFolderPathValidSpy = Mockito.spy(isPrimaryFolderPathValidUseCase)
 
-            underTest.changePrimaryFolderPath(null)
+            setupUnderTest(isPrimaryFolderPathValid = isNewPrimaryFolderPathValidSpy)
+
+            underTest.changePrimaryFolderPath(
+                newPath = null,
+                isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+            )
             underTest.state.test {
                 assertThat(awaitItem().invalidFolderSelectedTextId).isEqualTo(R.string.error_invalid_folder_selected)
             }

@@ -42,10 +42,11 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsNewPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
@@ -75,8 +76,7 @@ import javax.inject.Inject
  * @property getVideoCompressionSizeLimitUseCase Retrieves the maximum video file size that can be compressed
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isChargingRequiredForVideoCompressionUseCase Checks whether compressing videos require the device to be charged or not
- * @property isNewPrimaryFolderPathValidUseCase Checks whether the newly selected Primary Folder
- * path from the File Explorer is valid or not
+ * @property isPrimaryFolderPathValidUseCase Checks whether the Primary Folder path is valid or not
  * @property monitorConnectivityUseCase Monitors the device online status
  * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property resetCameraUploadTimeStamps Resets the Primary and Secondary Timestamps
@@ -85,6 +85,7 @@ import javax.inject.Inject
  * @property restoreSecondaryTimestamps Restores the Secondary Timestamps
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether compressing videos require the device to be charged or not
+ * @property setDefaultPrimaryFolderPathUseCase Sets the default Primary Folder path
  * @property setLocationTagsEnabledUseCase Sets whether Location Tags should be embedded in each Photo to be uploaded or not
  * @property setPrimaryFolderPathUseCase Sets the new Primary Folder path
  * @property setUploadFileNamesKeptUseCase Sets whether the File Names of files to be uploaded will be kept or not
@@ -114,7 +115,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
-    private val isNewPrimaryFolderPathValidUseCase: IsNewPrimaryFolderPathValidUseCase,
+    private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
@@ -123,6 +124,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
+    private val setDefaultPrimaryFolderPathUseCase: SetDefaultPrimaryFolderPathUseCase,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
     private val setPrimaryFolderPathUseCase: SetPrimaryFolderPathUseCase,
     private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
@@ -439,15 +441,23 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Sets the new Primary Folder path, once a Folder has been selected from the File Explorer
      *
      * @param newPath The new Primary Folder path, which may be nullable
+     * @param isPrimaryFolderInSDCard true if the Primary Folder is now located in the SD Card, and
+     * false if otherwise
      */
-    fun changePrimaryFolderPath(newPath: String?) = viewModelScope.launch {
-        if (isNewPrimaryFolderPathValidUseCase(newPath)) {
-            newPath?.let { setPrimaryFolderPathUseCase(it) }
-            refreshPrimaryFolderPath()
-        } else {
-            setInvalidFolderSelectedPromptShown(true)
+    fun changePrimaryFolderPath(newPath: String?, isPrimaryFolderInSDCard: Boolean) =
+        viewModelScope.launch {
+            if (isPrimaryFolderPathValidUseCase(newPath)) {
+                newPath?.let {
+                    setPrimaryFolderPathUseCase(
+                        newFolderPath = it,
+                        isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
+                    )
+                }
+                refreshPrimaryFolderPath()
+            } else {
+                setInvalidFolderSelectedPromptShown(true)
+            }
         }
-    }
 
     /**
      * Shows / hides the Invalid Folder Selected prompt by updating the

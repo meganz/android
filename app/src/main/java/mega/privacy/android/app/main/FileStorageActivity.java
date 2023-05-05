@@ -62,7 +62,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.data.model.MegaPreferences;
 import timber.log.Timber;
 
 public class FileStorageActivity extends PasscodeActivity implements Scrollable {
@@ -96,8 +95,10 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     public static final String EXTRA_DOCUMENT_HASHES = "document_hash";
     public static final String EXTRA_SAVE_RECOVERY_KEY = "save_recovery_key";
     public static final String EXTRA_PATH = "filepath";
-    public static final String EXTRA_FILES = "fileslist";
+    public static final String EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD = "is_primary_folder_in_sd_card";
     public static final String EXTRA_PROMPT = "prompt";
+
+    private Boolean isPrimaryFolderInSDCard = false;
 
     // Pick modes
     public enum Mode {
@@ -124,8 +125,6 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
             }
         }
     }
-
-    private MegaPreferences prefs;
     private Mode mode;
     private File path;
     private File root;
@@ -272,8 +271,6 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         }
 
         lastPositionStack = new Stack<>();
-
-        prefs = dbH.getPreferences();
 
         if (mode == Mode.BROWSE_FILES) {
             if (intent.getExtras() != null) {
@@ -481,6 +478,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
     private void finishPickFolder() {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
+        intent.putExtra(EXTRA_IS_PRIMARY_FOLDER_IN_SD_CARD, isPrimaryFolderInSDCard);
         intent.putExtra(EXTRA_DOCUMENT_HASHES, documentHashes);
         intent.putStringArrayListExtra(EXTRA_SERIALIZED_NODES, serializedNodes);
         intent.putExtra(EXTRA_URL, url);
@@ -562,7 +560,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         }
 
         Uri uri = intent.getData();
-        boolean isPrimary;
+        boolean isFolderInPrimaryStorage;
 
         switch (requestCode) {
             case REQUEST_SAVE_RK:
@@ -573,26 +571,26 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
             case REQUEST_PICK_CU_FOLDER:
                 Timber.d("Folder picked from system picker");
                 getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                isPrimary = setPathAndCheckIfIsPrimary(uri);
-
-                if (!isPrimary) {
-                    if (pickFolderType.equals(PickFolderType.CU_FOLDER)) {
-                        dbH.setCameraFolderExternalSDCard(true);
-                        dbH.setUriExternalSDCard(uri.toString());
-                    } else if (pickFolderType.equals(PickFolderType.MU_FOLDER)) {
-                        dbH.setMediaFolderExternalSdCard(true);
-                        dbH.setUriMediaExternalSdCard(uri.toString());
+                isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri);
+                if (!isFolderInPrimaryStorage) {
+                    switch (pickFolderType) {
+                        case CU_FOLDER:
+                            isPrimaryFolderInSDCard = true;
+                            break;
+                        case MU_FOLDER:
+                            dbH.setMediaFolderExternalSdCard(true);
+                            dbH.setUriMediaExternalSdCard(uri.toString());
+                            break;
                     }
                 }
-
                 finishPickFolder();
                 break;
 
             case REQUEST_PICK_DOWNLOAD_FOLDER:
                 getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                isPrimary = setPathAndCheckIfIsPrimary(uri);
+                isFolderInPrimaryStorage = setPathAndCheckIfIsPrimary(uri);
 
-                if (!isPrimary) {
+                if (!isFolderInPrimaryStorage) {
                     dbH.setSdCardUri(uri.toString());
                 }
 

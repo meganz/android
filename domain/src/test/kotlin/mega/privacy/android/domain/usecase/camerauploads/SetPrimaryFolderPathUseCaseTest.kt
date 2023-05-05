@@ -10,9 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 /**
  * Test class for [SetPrimaryFolderPathUseCase]
@@ -45,22 +44,18 @@ class SetPrimaryFolderPathUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that the new primary folder path is set`(isInSDCard: Boolean) = runTest {
         val testPath = "test/new/primary/folder/path"
-        val testSDCardURIPath = "test/sd/card/uri/path"
-
-        cameraUploadRepository.stub {
-            onBlocking { isPrimaryFolderInSDCard() }.thenReturn(isInSDCard)
-            onBlocking { getPrimaryFolderSDCardUriPath() }.thenReturn(testSDCardURIPath)
-        }
-
-        underTest(testPath)
-
-        verify(cameraUploadRepository, times(1)).setPrimaryFolderInSDCard(isInSDCard)
+        whenever(cameraUploadRepository.isPrimaryFolderInSDCard()).thenReturn(isInSDCard)
+        underTest(
+            newFolderPath = testPath,
+            isPrimaryFolderInSDCard = isInSDCard,
+        )
+        verify(cameraUploadRepository).setPrimaryFolderInSDCard(isInSDCard)
         if (isInSDCard) {
-            verify(cameraUploadRepository, times(1)).getPrimaryFolderSDCardUriPath()
-            verify(setPrimaryFolderLocalPathUseCase, times(1)).invoke(testSDCardURIPath)
+            verify(cameraUploadRepository).setPrimaryFolderSDCardUriPath(testPath)
+            verify(setPrimaryFolderLocalPathUseCase).invoke("")
         } else {
-            verify(cameraUploadRepository, times(0)).getPrimaryFolderSDCardUriPath()
-            verify(setPrimaryFolderLocalPathUseCase, times(1)).invoke(testPath)
+            verify(cameraUploadRepository).setPrimaryFolderSDCardUriPath("")
+            verify(setPrimaryFolderLocalPathUseCase).invoke(testPath)
         }
     }
 }
