@@ -1428,6 +1428,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         transfersFragment?.checkSelectModeAfterChangeTabOrDrawerItem()
                     }
                 }
+                transfersViewModel.setCurrentSelectedTab(selectedTab)
             }
 
             override fun onPageScrollStateChanged(state: Int) {}
@@ -4161,6 +4162,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         MegaApplication.setRecentChatVisible(false)
         Util.resetActionBar(supportActionBar)
         updateTransfersWidget()
+        if (drawerItem == DrawerItem.TRANSFERS) {
+            transfersViewModel.resetSelectedTab()
+        } else {
+            transfersViewModel.clearSelectedTab()
+        }
         setCallWidget()
         if (item !== DrawerItem.CHAT) {
             //remove recent chat fragment as its life cycle get triggered unexpectedly, e.g. rotate device while not on recent chat page
@@ -4337,7 +4343,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
             }
             DrawerItem.TRANSFERS -> {
-                transfersManagement.setAreFailedTransfers(false)
                 showHideBottomNavigationView(true)
                 supportActionBar?.subtitle = null
                 selectDrawerItemTransfers()

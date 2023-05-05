@@ -88,6 +88,22 @@ open class TransfersBaseFragment : RotatableFragment() {
         return binding.root
     }
 
+    /**
+     * override onPause to inform viewModel
+     */
+    override fun onPause() {
+        super.onPause()
+        viewModel.clearSelectedTab()
+    }
+
+    /**
+     * override onResume to inform viewModel
+     */
+    override fun onResume() {
+        super.onResume()
+        viewModel.resetSelectedTab()
+    }
+
     private fun setupFlow() {
         viewModel.activeState.flowWithLifecycle(
             lifecycle = viewLifecycleOwner.lifecycle,

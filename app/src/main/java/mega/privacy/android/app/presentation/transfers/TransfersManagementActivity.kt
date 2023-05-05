@@ -252,6 +252,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
     }
 
     private fun onWidgetClick() {
+        transfersManagement.setAreFailedTransfers(false)
         if (this is ManagerActivity) {
             drawerItem = DrawerItem.TRANSFERS
             selectDrawerItem(this.drawerItem)
