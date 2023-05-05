@@ -352,4 +352,9 @@ interface DatabaseHandler {
      * @param backup [Backup]
      */
     fun updateBackup(backup: Backup)
+
+    /**
+     * Deletes the oldest completed transfers
+     */
+    fun deleteOldestCompletedTransfers()
 }

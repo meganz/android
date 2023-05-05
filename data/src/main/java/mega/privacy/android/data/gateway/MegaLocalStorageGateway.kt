@@ -775,4 +775,9 @@ interface MegaLocalStorageGateway {
      * @param backup [Backup]
      */
     suspend fun updateBackup(backup: Backup)
+
+    /**
+     * Delete oldest completed transfers
+     */
+    suspend fun deleteOldestCompletedTransfers()
 }

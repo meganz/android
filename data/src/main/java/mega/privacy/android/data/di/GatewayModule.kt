@@ -25,6 +25,7 @@ import mega.privacy.android.data.facade.SDCardFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.facade.VideoCompressionFacade
+import mega.privacy.android.data.facade.WorkManagerFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
@@ -48,6 +49,7 @@ import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -240,4 +242,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindMegaLocalRoomGateway(implementation: MegaLocalRoomFacade): MegaLocalRoomGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindWorkManagerGateway(implementation: WorkManagerFacade): WorkManagerGateway
 }

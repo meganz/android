@@ -188,4 +188,9 @@ interface TransferRepository {
      * @param transfer
      */
     suspend fun addCompletedTransfer(transfer: CompletedTransfer)
+
+    /**
+     * Delete oldest completed transfers
+     */
+    suspend fun deleteOldestCompletedTransfers()
 }

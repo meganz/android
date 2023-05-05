@@ -286,7 +286,7 @@ class TransfersViewModel @Inject constructor(
     /**
      * Set the completed transfers
      */
-    fun setCompletedTransfers() {
+    private fun setCompletedTransfers() {
         completedTransfers.clear()
         completedTransfers.addAll(dbH.completedTransfers)
         _completedState.update {
@@ -301,7 +301,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun completedTransferFinished(transfer: AndroidCompletedTransfer) {
         completedTransfers.add(0, transfer)
-        if (completedTransfers.size >= MAX_TRANSFERS) {
+        if (completedTransfers.size > MAX_TRANSFERS) {
             completedTransfers.removeAt(completedTransfers.size - 1)
         }
         _completedState.update {
@@ -381,9 +381,7 @@ class TransfersViewModel @Inject constructor(
      */
     fun clearCompletedTransfers() = viewModelScope.launch(ioDispatcher) {
         dbH.failedOrCancelledTransfers.mapNotNull { transfer ->
-            transfer?.let {
-                it.originalPath?.let { path -> File(path) }
-            }
+            transfer.originalPath?.let { path -> File(path) }
         }.forEach { cacheFile ->
             if (cacheFile.exists()) {
                 if (cacheFile.delete()) {

@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -110,6 +111,7 @@ import javax.inject.Inject
  * @property monitorUserUpdates
  * @property startCameraUploadUseCase
  * @property stopCameraUploadUseCase
+ * @property deleteOldestCompletedTransfersUseCase
  *
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
@@ -154,6 +156,7 @@ class ManagerViewModel @Inject constructor(
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     private val createShareKey: CreateShareKey,
+    private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
@@ -254,6 +257,7 @@ class ManagerViewModel @Inject constructor(
         }
         viewModelScope.launch {
             listenToNewMediaUseCase()
+            deleteOldestCompletedTransfersUseCase()
         }
         viewModelScope.launch {
             monitorUserUpdates()

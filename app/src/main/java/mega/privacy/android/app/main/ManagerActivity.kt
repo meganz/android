@@ -9997,7 +9997,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @return A list with the failed and cancelled transfers.
      */
-    private val failedAndCancelledTransfers: ArrayList<AndroidCompletedTransfer?>
+    private val failedAndCancelledTransfers: ArrayList<AndroidCompletedTransfer>
         get() = dbH.failedOrCancelledTransfers
 
     /**
@@ -10005,7 +10005,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun retryAllTransfers() {
         dbH.removeFailedOrCancelledTransfers()
-        for (transfer in failedAndCancelledTransfers.filterNotNull()) {
+        for (transfer in failedAndCancelledTransfers) {
             if (isTransfersCompletedAdded) {
                 completedTransfersFragment?.transferRemoved(transfer, false)
             }

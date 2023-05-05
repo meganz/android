@@ -2056,18 +2056,31 @@ class SqliteDatabaseHandler @Inject constructor(
         }
 
         db.insert(TABLE_COMPLETED_TRANSFERS, null, values)
-        if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
-            deleteOldestTransfer()
-        }
     }
 
     /**
-     * Deletes the oldest completed transfer.
+     * Deletes the oldest completed transfers
      */
-    private fun deleteOldestTransfer() {
-        val completedTransfers = completedTransfers
-        if (completedTransfers.isNotEmpty()) {
-            deleteTransfer((completedTransfers[0] ?: return).id)
+    override fun deleteOldestCompletedTransfers() {
+        Timber.d("Delete oldest completed transfers")
+        db.beginTransaction()
+        try {
+            if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
+                val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
+                val transfers = getCompletedTransfers(selectQuery)
+                val ids = transfers.apply {
+                    sortWith(compareByDescending { it.timeStamp })
+                }
+                    .filterIndexed { index, _ -> index >= MAX_TRANSFERS }
+                    .map { it.id }
+                    .joinToString(separator = ",")
+
+                val query = "DELETE FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID IN ($ids)"
+                db.execSQL(query)
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
         }
     }
 
@@ -2111,17 +2124,17 @@ class SqliteDatabaseHandler @Inject constructor(
         val id = cursor.getString(0).toInt().toLong()
         val filename = decrypt(cursor.getString(1))
         val type = decrypt(cursor.getString(2))
-        val typeInt = type!!.toInt()
+        val typeInt = type?.toInt() ?: -1
         val state = decrypt(cursor.getString(3))
-        val stateInt = state!!.toInt()
+        val stateInt = state?.toInt() ?: -1
         val size = decrypt(cursor.getString(4))
         val nodeHandle = decrypt(cursor.getString(5))
         val path = decrypt(cursor.getString(6))
         val offline = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(7)))
-        val timeStamp = decrypt(cursor.getString(8))!!.toLong()
+        val timeStamp = decrypt(cursor.getString(8))?.toLong() ?: -1
         val error = decrypt(cursor.getString(9))
         val originalPath = decrypt(cursor.getString(10))
-        val parentHandle = decrypt(cursor.getString(11))!!.toLong()
+        val parentHandle = decrypt(cursor.getString(11))?.toLong() ?: -1
         return AndroidCompletedTransfer(
             id, filename, typeInt, stateInt, size, nodeHandle, path,
             offline, timeStamp, error, originalPath, parentHandle
@@ -2145,9 +2158,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
 
         val id = db.insert(TABLE_COMPLETED_TRANSFERS, null, values)
-        if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
-            deleteOldestTransfer()
-        }
         return id
     }
 
@@ -2195,18 +2205,17 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Gets the completed transfers.
+     * Gets the size = MAX_TRANSFERS completed transfers
+     * order by timestamp descendant
      *
-     * @return The list with the completed transfers.
+     * @return The list of the completed transfers
      */
     override val completedTransfers: List<AndroidCompletedTransfer?>
         get() {
             val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
-            val transfers = getCompletedTransfers(selectQuery)
-            transfers.sortWith { transfer1: AndroidCompletedTransfer?, transfer2: AndroidCompletedTransfer? ->
-                transfer1!!.timeStamp.compareTo(transfer2!!.timeStamp)
-            }
-            transfers.reverse()
+            val transfers = getCompletedTransfers(selectQuery).apply {
+                sortWith(compareByDescending { it.timeStamp })
+            }.take(MAX_TRANSFERS)
             return transfers
         }
 
@@ -2215,7 +2224,7 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @return The list the cancelled or failed transfers.
      */
-    override val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer?>
+    override val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer>
         get() {
             val stateCancelled = encrypt(MegaTransfer.STATE_CANCELLED.toString())
             val stateFailed = encrypt(MegaTransfer.STATE_FAILED.toString())
@@ -2241,8 +2250,8 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param selectQuery the query which selects specific completed transfers
      * @return The list with the completed transfers.
      */
-    override fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer?> {
-        val cTs = ArrayList<AndroidCompletedTransfer?>()
+    override fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer> {
+        val cTs = ArrayList<AndroidCompletedTransfer>()
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToLast()) {

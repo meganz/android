@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
@@ -194,6 +195,8 @@ class ManagerViewModelTest {
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
     private val createShareKey = mock<CreateShareKey>()
+    private val deleteOldestCompletedTransfersUseCase =
+        mock<DeleteOldestCompletedTransfersUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -239,7 +242,8 @@ class ManagerViewModelTest {
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
             createShareKey = createShareKey,
-            saveContactByEmailUseCase = mock()
+            saveContactByEmailUseCase = mock(),
+            deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
         )
     }
 
@@ -562,5 +566,12 @@ class ManagerViewModelTest {
             underTest.stopCameraUpload()
             testScheduler.advanceUntilIdle()
             verify(stopCameraUploadUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that deletion of oldest completed transfers is triggered on init`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(deleteOldestCompletedTransfersUseCase).invoke()
         }
 }

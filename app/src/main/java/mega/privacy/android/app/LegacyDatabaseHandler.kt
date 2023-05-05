@@ -32,7 +32,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      *
      * @return The list the cancelled or failed transfers.
      */
-    val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer?>
+    val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer>
 
     val offlineFiles: ArrayList<MegaOffline>
 
@@ -71,7 +71,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      * @param selectQuery the query which selects specific completed transfers
      * @return The list with the completed transfers.
      */
-    fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer?>
+    fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer>
     fun setOfflineFile(offline: MegaOffline): Long
     fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long
     fun setOfflineFileOld(offline: MegaOffline): Long

@@ -3,13 +3,13 @@ package mega.privacy.android.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
@@ -46,6 +46,7 @@ class DefaultTransfersRepositoryTest {
     private val appEventGateway: AppEventGateway = mock()
     private val transferMapper: TransferMapper = mock()
     private val localStorageGateway: MegaLocalStorageGateway = mock()
+    private val workerManagerGateway = mock<WorkManagerGateway>()
 
     @Before
     fun setUp() {
@@ -57,7 +58,8 @@ class DefaultTransfersRepositoryTest {
             appEventGateway = appEventGateway,
             transferMapper = transferMapper,
             localStorageGateway = localStorageGateway,
-            )
+            workerManagerGateway = workerManagerGateway,
+        )
     }
 
     private fun mockStartUpload() = megaApiGateway.startUpload(
