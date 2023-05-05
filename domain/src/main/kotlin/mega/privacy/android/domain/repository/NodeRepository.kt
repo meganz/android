@@ -257,4 +257,14 @@ interface NodeRepository {
      */
     suspend fun getDefaultNodeHandle(folderName: String): NodeId?
 
+
+    /**
+     * Checks if node can be moved to target node
+     *
+     * @param nodeId
+     * @param targetNodeId
+     *
+     * @return true or false
+     */
+    suspend fun checkNodeCanBeMovedToTargetNode(nodeId: NodeId, targetNodeId: NodeId): Boolean
 }

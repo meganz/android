@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import android.view.MenuItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,10 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
+import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -58,6 +62,8 @@ class FileBrowserViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorViewType: MonitorViewType,
     private val setViewType: SetViewType,
+    private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper,
+    private val handleOptionClickMapper: HandleOptionClickMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -291,7 +297,60 @@ class FileBrowserViewModel @Inject constructor(
      * Select all [NodeUIItem]
      */
     fun selectAllNodes() {
+        val selectedNodeList = selectAllNodesUiList()
+        var totalFolderNode = 0
+        var totalFileNode = 0
+        val selectedNodeHandle = mutableListOf<Long>()
+        selectedNodeList.forEach {
+            if (it.node is FileNode) totalFolderNode++
+            if (it.node is FolderNode) totalFileNode++
+            selectedNodeHandle.add(it.node.id.longValue)
+        }
+        _state.update {
+            it.copy(
+                nodesList = selectedNodeList,
+                isInSelection = true,
+                selectedFolderNodes = totalFolderNode,
+                selectedFileNodes = totalFileNode,
+                selectedNodeHandles = selectedNodeHandle
+            )
+        }
+    }
 
+    /**
+     * Returns list of all selected Nodes
+     */
+    private fun selectAllNodesUiList(): List<NodeUIItem> {
+        return _state.value.nodesList.map {
+            it.copy(isSelected = true)
+        }
+    }
+
+    /**
+     * Clear All [NodeUIItem]
+     */
+    fun clearAllNodes() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    nodesList = clearNodeUiItemList(),
+                    selectedFileNodes = 0,
+                    selectedFolderNodes = 0,
+                    isInSelection = false,
+                    selectedNodeHandles = emptyList(),
+                    optionsItemInfo = null
+                )
+            }
+        }
+    }
+
+    /**
+     * Clear the selections of items from NodesUiList
+     */
+    private fun clearNodeUiItemList(): List<NodeUIItem> {
+        return _state.value.nodesList.map {
+            it.copy(isSelected = false)
+        }
     }
 
     /**
@@ -418,6 +477,35 @@ class FileBrowserViewModel @Inject constructor(
             when (_state.value.currentViewType) {
                 ViewType.LIST -> setViewType(ViewType.GRID)
                 ViewType.GRID -> setViewType(ViewType.LIST)
+            }
+        }
+    }
+
+    /**
+     * Prepares toolbar to show options for selected nodes
+     * @return [CloudStorageOptionControlUtil.Control]
+     */
+    fun prepareForGetOptionsForToolbar() = runBlocking {
+        getOptionsForToolbarMapper(
+            selectedNodeHandleList = state.value.selectedNodeHandles,
+            totalNodes = state.value.nodesList.size
+        )
+    }
+
+    /**
+     * Handles option info based on [MenuItem]
+     * @param item [MenuItem]
+     */
+    fun onOptionItemClicked(item: MenuItem) {
+        viewModelScope.launch {
+            val optionsItemInfo = handleOptionClickMapper(
+                item = item,
+                selectedNodeHandle = state.value.selectedNodeHandles
+            )
+            _state.update {
+                it.copy(
+                    optionsItemInfo = optionsItemInfo
+                )
             }
         }
     }

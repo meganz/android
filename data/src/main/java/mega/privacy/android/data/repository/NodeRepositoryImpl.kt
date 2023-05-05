@@ -381,4 +381,25 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getNodeByPath(folderName, megaApiGateway.getRootNode())
             ?.takeIf { it.isFolder && megaApiGateway.isInRubbish(it) }?.let { NodeId(it.handle) }
     }
+
+    override suspend fun checkNodeCanBeMovedToTargetNode(
+        nodeId: NodeId,
+        targetNodeId: NodeId,
+    ): Boolean {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+        val targetNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+
+        return withContext(ioDispatcher) {
+            if (node != null && targetNode != null) {
+                megaExceptionMapper(
+                    megaApiGateway.checkMoveErrorExtended(
+                        node,
+                        targetNode
+                    )
+                ).errorCode != MegaError.API_OK
+            } else {
+                false
+            }
+        }
+    }
 }

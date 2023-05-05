@@ -642,6 +642,9 @@ internal class MegaApiFacade @Inject constructor(
     override fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError =
         megaApi.checkAccessErrorExtended(node, level)
 
+    override fun checkMoveErrorExtended(node: MegaNode, targetNode: MegaNode): MegaError =
+        megaApi.checkMoveErrorExtended(node, targetNode)
+
     override fun getPricing(listener: MegaRequestListenerInterface?) {
         megaApi.getPricing(listener)
     }

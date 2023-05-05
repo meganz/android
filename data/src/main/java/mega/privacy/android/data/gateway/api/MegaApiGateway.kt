@@ -1013,6 +1013,22 @@ interface MegaApiGateway {
     fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaError
 
     /**
+     * Checks if node can be moved to target node
+     *
+     * @param node
+     * @param targetNode
+     *
+     * - [MegaShare.ACCESS_UNKNOWN]
+     * - [MegaShare.ACCESS_READ]
+     * - [MegaShare.ACCESS_READWRITE]
+     * - [MegaShare.ACCESS_FULL]
+     * - [MegaShare.ACCESS_OWNER]
+     *
+     * @return success or failed
+     */
+    fun checkMoveErrorExtended(node: MegaNode, targetNode: MegaNode): MegaError
+
+    /**
      * Checks whether the user's Business Account is currently active or not
      *
      * @return True if the user's Business Account is currently active, or

@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.clouddrive
 
+import android.view.MenuItem
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
@@ -15,7 +16,11 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
+import mega.privacy.android.app.presentation.clouddrive.OptionItems
+import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
+import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -57,6 +62,8 @@ class FileBrowserViewModelTest {
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper = mock()
+    private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val setViewType: SetViewType = mock()
 
@@ -80,7 +87,9 @@ class FileBrowserViewModelTest {
             getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
             getCloudSortOrder = getCloudSortOrder,
             setViewType = setViewType,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            getOptionsForToolbarMapper = getOptionsForToolbarMapper,
+            handleOptionClickMapper = handleOptionClickMapper
         )
     }
 
@@ -387,4 +396,47 @@ class FileBrowserViewModelTest {
             underTest.onChangeViewTypeClicked()
             verify(setViewType).invoke(ViewType.GRID)
         }
+
+    @Test
+    fun `test that when select all nodes clicked size of node items and equal to size of selected nodes`() =
+        runTest {
+            whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+            Truth.assertThat(underTest.state.value.nodesList.size)
+                .isEqualTo(underTest.state.value.selectedNodeHandles.size)
+        }
+
+    @Test
+    fun `test that when clear all nodes clicked, size of selected nodes is empty`() = runTest {
+        underTest.clearAllNodes()
+        Truth.assertThat(underTest.state.value.selectedNodeHandles).isEmpty()
+    }
+
+    @Test
+    fun `test that when prepare options menu clicked it invokes getOptionsForToolbarMapper`() =
+        runTest {
+            underTest.prepareForGetOptionsForToolbar()
+            verify(getOptionsForToolbarMapper).invoke(emptyList(), 0)
+        }
+
+    @Test
+    fun `test that when onOptionItemClicked then it invokes handleOptionClickMapper`() = runTest {
+        val menuItem: MenuItem = mock()
+        whenever(handleOptionClickMapper.invoke(menuItem, emptyList())).thenReturn(
+            OptionsItemInfo(
+                optionClickedType = OptionItems.MOVE_CLICKED,
+                selectedNode = emptyList(),
+                selectedMegaNode = emptyList()
+            )
+        )
+        underTest.onOptionItemClicked(item = menuItem)
+        verify(handleOptionClickMapper).invoke(menuItem, emptyList())
+    }
 }
