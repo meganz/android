@@ -18,9 +18,9 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderVersionInfo
 import mega.privacy.android.domain.entity.SortOrder
@@ -316,6 +316,10 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiFolderGateway.authorizeNode(handle)
     }
 
+    @Deprecated(
+        message = "getPublicLinks MegaNode implementation has been deprecated. Use untyped node implementation",
+        replaceWith = ReplaceWith("mega.privacy.android.domain.repository.filemanagement.ShareRepository#getPublicLinks(SortOrder)")
+    )
     override suspend fun getPublicLinks(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getPublicLinks(sortOrderIntMapper(order))
