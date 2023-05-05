@@ -256,14 +256,19 @@ class ImageViewerPageFragment : Fragment() {
                 .setControllerListener(controllerListener)
                 .setAutoPlayAnimations(true)
                 .build()
-            val zoomableController =
-                binding.image.zoomableController as AbstractAnimatedZoomableController
-            zoomableController.transform = transform
+            attachTransform()
 
             if (imageResult.isVideo) {
                 binding.image.post { showVideoButton() }
             }
         }
+    }
+
+    //Attach ZoomableDraweeView's transform to latest value in order to Retain Current Offset and Zoom
+    private fun attachTransform() {
+        val zoomableController =
+            binding.image.zoomableController as AbstractAnimatedZoomableController
+        zoomableController.transform = transform
     }
 
     private fun buildImageControllerListener() = object : BaseControllerListener<ImageInfo>() {
@@ -290,6 +295,7 @@ class ImageViewerPageFragment : Fragment() {
             binding.image.controller = Fresco.newDraweeControllerBuilder()
                 .setImageRequest(imageResult.previewUri?.toUri()?.toImageRequest(false))
                 .build()
+            attachTransform()
 
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
