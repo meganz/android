@@ -61,7 +61,8 @@ class SyncViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             selectedLocalFolder = folderPair.localFolderPath,
-                            selectedMegaFolder = folderPair.remoteFolder
+                            selectedMegaFolder = folderPair.remoteFolder,
+                            status = folderPair.state
                         )
                     }
                 }

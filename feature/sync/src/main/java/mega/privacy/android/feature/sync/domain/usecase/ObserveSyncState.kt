@@ -10,5 +10,5 @@ import javax.inject.Inject
  */
 fun interface ObserveSyncState {
 
-    suspend operator fun invoke(): Flow<FolderPairState>
+    operator fun invoke(): Flow<FolderPairState>
 }
