@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.AndroidCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
@@ -92,6 +93,8 @@ class TransfersViewModel @Inject constructor(
 
     private var completedTransfers = mutableListOf<AndroidCompletedTransfer?>()
     private var transferCallback = 0L
+    private var currentTab = TransfersTab.NONE
+    private var previousTab = TransfersTab.NONE
 
     init {
         getAllActiveTransfers()
@@ -205,6 +208,29 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
+     * Set the current active transfers tab
+     */
+    fun setCurrentSelectedTab(tab: TransfersTab) = viewModelScope.launch {
+        if (tab == TransfersTab.NONE && currentTab != TransfersTab.NONE) {
+            previousTab = currentTab
+        }
+        currentTab = tab
+        if (currentTab == TransfersTab.COMPLETED_TAB) {
+            transfersManagement.setAreFailedTransfers(false)
+        }
+    }
+
+    /**
+     * clears the current selected tab, because the full section is not visible for instance
+     */
+    fun clearSelectedTab() = setCurrentSelectedTab(TransfersTab.NONE)
+
+    /**
+     * resets the selected tab when the section is visible again
+     */
+    fun resetSelectedTab() = setCurrentSelectedTab(previousTab)
+
+    /**
      * Updates the UI in consequence after a transfer movement.
      * The update depends on if the movement finished with or without success.
      * If it finished with success, simply update the transfer in the transfers list and in adapter.
@@ -306,6 +332,9 @@ class TransfersViewModel @Inject constructor(
         }
         _completedState.update {
             CompletedTransfersState.TransferFinishUpdated(completedTransfers.toList())
+        }
+        if (currentTab == TransfersTab.COMPLETED_TAB) {
+            transfersManagement.setAreFailedTransfers(false)
         }
     }
 
