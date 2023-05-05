@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.node
 
+import mega.privacy.android.domain.entity.SortOrder
+
 
 /**
  * Folder Node
@@ -34,4 +36,9 @@ interface FolderNode : UnTypedNode {
      * Number of child files
      */
     val childFileCount: Int
+
+    /**
+     * Fetch children
+     */
+    val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>
 }

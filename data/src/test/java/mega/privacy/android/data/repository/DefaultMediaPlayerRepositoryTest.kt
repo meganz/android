@@ -15,9 +15,9 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -355,6 +355,7 @@ class DefaultMediaPlayerRepositoryTest {
         device = expectedDevice,
         isNodeKeyDecrypted = isNodeKetDecrypted,
         creationTime = expectedCreationTime,
+        fetchChildren = mock(),
     )
 
     private fun createTypedFileNode() = DefaultFileNode(

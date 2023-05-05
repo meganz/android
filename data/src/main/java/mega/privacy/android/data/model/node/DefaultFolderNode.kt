@@ -1,8 +1,10 @@
 package mega.privacy.android.data.model.node
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.UnTypedNode
 
 internal data class DefaultFolderNode(
     override val id: NodeId,
@@ -23,4 +25,5 @@ internal data class DefaultFolderNode(
     override val device: String?,
     override val isNodeKeyDecrypted: Boolean,
     override val creationTime: Long,
+    override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode>,
 ) : FolderNode

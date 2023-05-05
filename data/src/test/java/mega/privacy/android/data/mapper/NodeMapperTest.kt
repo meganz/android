@@ -54,7 +54,10 @@ class NodeMapperTest {
                 megaApiGateway = megaApiGateway,
                 fileTypeInfoMapper = { PdfFileTypeInfo }
             ),
-            folderNodeMapper = FolderNodeMapper(megaApiGateway = megaApiGateway)
+            folderNodeMapper = FolderNodeMapper(
+                megaApiGateway = megaApiGateway,
+                fetChildrenMapper = mock { on { invoke(any()) }.thenReturn { emptyList() } }
+            )
         )
     }
 

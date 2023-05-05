@@ -85,7 +85,10 @@ class NodeRepositoryImplTest {
             megaApiGateway = megaApiGateway,
             fileTypeInfoMapper = fileTypeInfoMapper
         ),
-        folderNodeMapper = FolderNodeMapper(megaApiGateway = megaApiGateway)
+        folderNodeMapper = FolderNodeMapper(
+            megaApiGateway = megaApiGateway,
+            fetChildrenMapper = mock()
+        )
     )
 
     @BeforeAll

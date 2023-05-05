@@ -16,6 +16,7 @@ import javax.inject.Inject
  */
 internal class FolderNodeMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val fetChildrenMapper: FetchChildrenMapper,
 ) {
     /**
      * Invoke
@@ -44,5 +45,6 @@ internal class FolderNodeMapper @Inject constructor(
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         creationTime = megaNode.creationTime,
+        fetchChildren = fetChildrenMapper(megaNode),
     )
 }
