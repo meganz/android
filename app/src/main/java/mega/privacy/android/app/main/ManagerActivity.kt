@@ -347,6 +347,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.IsRequestPhoneNumberShownUseCase
 import mega.privacy.android.domain.usecase.SetRequestPhoneNumberShownUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
@@ -470,6 +471,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val subscriptions = CompositeDisposable()
 
@@ -2534,16 +2538,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Checks if RubbishBinCompose enabled from [AppFeatures.RubbishBinCompose]
      */
-    private fun isRubbishBinComposeEnabled(): Boolean {
-        return isFeatureEnabled(AppFeatures.RubbishBinCompose)
-    }
+    private fun isRubbishBinComposeEnabled(): Boolean =
+        isFeatureEnabled(AppFeatures.RubbishBinCompose)
 
     /**
      * Checks if ileBrowserCompose enabled from [AppFeatures.FileBrowserCompose]
      */
-    private fun isFileBrowserComposeEnabled(): Boolean {
-        return isFeatureEnabled(AppFeatures.FileBrowserCompose)
-    }
+    private fun isFileBrowserComposeEnabled(): Boolean =
+        fileBrowserComposeFragment != null
 
     /**
      * Checks if some business warning has to be shown due to the status of the account.
@@ -3364,18 +3366,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         tabLayoutTransfers.visibility = View.GONE
         viewPagerTransfers.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
-        if (isFileBrowserComposeEnabled()) {
-            fileBrowserComposeFragment =
-                (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
-                    ?: FileBrowserComposeFragment.newInstance()).also {
-                    replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
-                }
-        } else {
-            fileBrowserFragment =
+
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.FileBrowserCompose)) {
+                fileBrowserComposeFragment =
+                    (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
+                        ?: FileBrowserComposeFragment.newInstance()).also {
+                        replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
+                    }
+            } else {
                 (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
                     ?: FileBrowserFragment.newInstance()).also {
                     replaceFragment(it, FragmentTag.CLOUD_DRIVE.tag)
                 }
+            }
         }
     }
 
@@ -9682,7 +9686,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun showKeyboardForSearch() {
         if (searchView != null) {
-            searchView?.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.let { showKeyboardDelayed(it) }
+            searchView?.findViewById<View>(androidx.appcompat.R.id.search_src_text)
+                ?.let { showKeyboardDelayed(it) }
             searchView?.requestFocus()
         }
     }
