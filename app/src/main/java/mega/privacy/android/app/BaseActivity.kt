@@ -89,7 +89,7 @@ import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.LAUNCH_ACTIVITY
+import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
@@ -1252,7 +1252,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
         if (keepCurrentActivity) {
-            intent.putExtra(LAUNCH_ACTIVITY, this::class.java)
+            intent.putExtra(LAUNCH_INTENT, this.intent)
         }
         startActivity(intent)
     }

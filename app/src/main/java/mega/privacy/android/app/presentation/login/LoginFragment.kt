@@ -54,7 +54,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.messageId
-import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -69,7 +69,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.LAUNCH_ACTIVITY
+import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
@@ -1099,8 +1099,8 @@ class LoginFragment : Fragment() {
                     loginActivity.finish()
                 } else {
                     var intent: Intent?
-                    val refreshActivityClass =
-                        requireActivity().intent.serializable<Class<*>>(LAUNCH_ACTIVITY)
+                    val refreshActivityIntent =
+                        requireActivity().intent.parcelable<Intent>(LAUNCH_INTENT)
                     if (uiState.isAlreadyLoggedIn) {
                         intent = Intent(requireContext(), ManagerActivity::class.java)
                         setStartScreenTimeStamp(requireContext())
@@ -1117,10 +1117,8 @@ class LoginFragment : Fragment() {
                                 }
                             }
 
-                            else -> intent = if (refreshActivityClass != null) Intent(
-                                requireContext(),
-                                refreshActivityClass
-                            ) else handleLinkNavigation(loginActivity)
+                            else -> intent =
+                                refreshActivityIntent ?: handleLinkNavigation(loginActivity)
                         }
                         if (uiState.isFirstTime) {
                             Timber.d("First time")

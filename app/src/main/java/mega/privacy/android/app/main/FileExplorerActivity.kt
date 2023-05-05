@@ -383,8 +383,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     override fun onCreate(savedInstanceState: Bundle?) {
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
-
         super.onCreate(savedInstanceState)
+        credentials = dbH.credentials
+        if (credentials != null && shouldRefreshSessionDueToSDK(true)) return
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         createChatLauncher =
@@ -525,8 +526,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         } else {
             java.lang.Boolean.parseBoolean(prefs?.preferredViewList)
         }
-
-        credentials = dbH.credentials
 
         if (credentials == null) {
             Timber.w("User credentials NULL")
