@@ -1,6 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 
 
 /**
@@ -13,5 +13,5 @@ interface GetRubbishBinChildren {
      * @param parentHandle
      * @return Children nodes of the parent handle, null if cannot be retrieved
      */
-    suspend operator fun invoke(parentHandle: Long): List<Node>
+    suspend operator fun invoke(parentHandle: Long): List<TypedNode>
 }

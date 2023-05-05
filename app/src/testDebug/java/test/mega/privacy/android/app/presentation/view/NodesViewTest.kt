@@ -16,7 +16,7 @@ import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
 import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
 import mega.privacy.android.domain.entity.node.ExportedData
-import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,7 +35,7 @@ class NodesViewTest {
 
     @Test
     fun `test when list item is selected then is shows selected image`() = runTest {
-        val node: FolderNode = mock()
+        val node: TypedFolderNode = mock()
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
@@ -67,7 +67,7 @@ class NodesViewTest {
 
     @Test
     fun `test when list item is favorite and exported then it shows favorite icon`() = runTest {
-        val node: FolderNode = mock()
+        val node: TypedFolderNode = mock()
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
@@ -103,7 +103,7 @@ class NodesViewTest {
 
     @Test
     fun `test when list item is exported then it shows folder exported icon`() = runTest {
-        val node: FolderNode = mock()
+        val node: TypedFolderNode = mock()
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
@@ -139,7 +139,7 @@ class NodesViewTest {
     @Test
     fun `test when list item is taken down favorite and exported then it shows favorite, exported and taken down icon`() =
         runTest {
-            val node: FolderNode = mock()
+            val node: TypedFolderNode = mock()
             whenever(node.name).thenReturn("Some name")
             whenever(node.childFileCount).thenReturn(1)
             whenever(node.childFolderCount).thenReturn(2)
@@ -176,7 +176,7 @@ class NodesViewTest {
 
     @Test
     fun `test when grid item is folder info then it does not show info text`() = runTest {
-        val node: FolderNode = mock()
+        val node: TypedFolderNode = mock()
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)

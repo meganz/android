@@ -1,8 +1,9 @@
 package mega.privacy.android.app.domain.usecase
 
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import javax.inject.Inject
 
@@ -17,8 +18,9 @@ class DefaultGetRubbishBinChildren @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getRubbishBinFolder: GetRubbishBinFolder,
+    private val addNodeType: AddNodeType,
 ) : GetRubbishBinChildren {
-    override suspend fun invoke(parentHandle: Long): List<Node> {
+    override suspend fun invoke(parentHandle: Long): List<TypedNode> {
         val nodeID = if (parentHandle == nodeRepository.getInvalidHandle()) {
             getRubbishBinFolder()?.let {
                 NodeId(longValue = it.handle)
@@ -28,6 +30,7 @@ class DefaultGetRubbishBinChildren @Inject constructor(
         } else {
             NodeId(longValue = parentHandle)
         }
-        return nodeRepository.getNodeChildren(nodeId = nodeID, order = getCloudSortOrder())
+        val nodes = nodeRepository.getNodeChildren(nodeId = nodeID, order = getCloudSortOrder())
+        return nodes.map { addNodeType(it) }
     }
 }

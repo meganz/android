@@ -23,11 +23,11 @@ import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -287,8 +287,8 @@ class FileBrowserViewModelTest {
     @Test
     fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
         runTest {
-            val nodesListItem1 = mock<FolderNode>()
-            val nodesListItem2 = mock<FileNode>()
+            val nodesListItem1 = mock<TypedFolderNode>()
+            val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
@@ -317,8 +317,8 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that when item is clicked and some items are already selected on list then checked index gets decremented by 1`() =
         runTest {
-            val nodesListItem1 = mock<FolderNode>()
-            val nodesListItem2 = mock<FileNode>()
+            val nodesListItem1 = mock<TypedFolderNode>()
+            val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
@@ -355,8 +355,8 @@ class FileBrowserViewModelTest {
     @Test
     fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
         runTest {
-            val nodesListItem1 = mock<FileNode>()
-            val nodesListItem2 = mock<FolderNode>()
+            val nodesListItem1 = mock<TypedFileNode>()
+            val nodesListItem2 = mock<TypedFolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(

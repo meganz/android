@@ -9,6 +9,7 @@ import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import nz.mega.sdk.MegaNode
 import org.junit.Before
@@ -26,6 +27,7 @@ class GetFileBrowserChildrenUseCaseTest {
     private val getRootFolder: GetRootFolder = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val nodeRepository: NodeRepository = mock()
+    private val addNodeType: AddNodeType = mock()
 
     @Before
     fun setUp() {
@@ -33,7 +35,8 @@ class GetFileBrowserChildrenUseCaseTest {
             getNodeByHandle = getNodeByHandle,
             getRootFolder = getRootFolder,
             getCloudSortOrder = getCloudSortOrder,
-            nodeRepository = nodeRepository
+            nodeRepository = nodeRepository,
+            addNodeType = addNodeType,
         )
     }
 

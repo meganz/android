@@ -9,6 +9,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import org.junit.Before
 import org.junit.Test
@@ -23,13 +24,15 @@ class DefaultGetRubbishBinChildrenTest {
     private val nodeRepository: NodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val getRubbishBinFolder: GetRubbishBinFolder = mock()
+    private val addNodeType: AddNodeType = mock()
 
     @Before
     fun setUp() {
         underTest = DefaultGetRubbishBinChildren(
             nodeRepository = nodeRepository,
             getCloudSortOrder = getCloudSortOrder,
-            getRubbishBinFolder = getRubbishBinFolder
+            getRubbishBinFolder = getRubbishBinFolder,
+            addNodeType = addNodeType
         )
     }
 
