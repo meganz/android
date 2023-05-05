@@ -859,12 +859,6 @@ class DefaultCameraUploadRepositoryTest {
         }
 
         @Test
-        fun `test that the worker is called to restart camera uploads`() = runTest {
-            underTest.fireRestartCameraUploadJob()
-            verify(workerGateway, times(1)).fireRestartCameraUploadJob()
-        }
-
-        @Test
         fun `test that the worker is called to reschedule camera uploads`() = runTest {
             underTest.rescheduleCameraUpload()
             verify(workerGateway, times(1)).rescheduleCameraUpload()

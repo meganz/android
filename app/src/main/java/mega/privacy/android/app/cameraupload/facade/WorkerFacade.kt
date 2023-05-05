@@ -144,28 +144,6 @@ class WorkerFacade @Inject constructor(
     }
 
     /**
-     * Restart Camera Uploads by executing [StopCameraUploadWorker] and [StartCameraUploadWorker]
-     * sequentially through Work Chaining
-     *
-     */
-    override suspend fun fireRestartCameraUploadJob() {
-        val stopCameraUploadRequest = OneTimeWorkRequest.Builder(
-            StopCameraUploadWorker::class.java
-        )
-            .addTag(STOP_CAMERA_UPLOAD_TAG)
-            .build()
-        val startCameraUploadRequest = OneTimeWorkRequest.Builder(
-            StartCameraUploadWorker::class.java
-        )
-            .addTag(SINGLE_CAMERA_UPLOAD_TAG)
-            .build()
-        workManager
-            .beginWith(stopCameraUploadRequest)
-            .then(startCameraUploadRequest)
-            .enqueue()
-    }
-
-    /**
      * Schedule job of camera upload active heartbeat
      *
      */

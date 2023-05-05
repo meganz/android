@@ -589,13 +589,6 @@ interface CameraUploadRepository {
     suspend fun scheduleCameraUploadJob()
 
     /**
-     * Restart Camera Uploads by executing StopCameraUploadWorker and StartCameraUploadWorker
-     * sequentially through Work Chaining
-     *
-     */
-    suspend fun fireRestartCameraUploadJob()
-
-    /**
      * Reschedule Camera Upload with time interval
      */
     suspend fun rescheduleCameraUpload()
