@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -82,7 +84,9 @@ class FavouritesViewModel @Inject constructor(
                 selected,
                 monitorConnectivityUseCase(),
                 ::mapToFavourite
-            ).collectLatest { newState ->
+            ).catch {
+                Timber.e(it)
+            }.collectLatest { newState ->
                 _state.update { newState }
             }
         }
