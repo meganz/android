@@ -328,6 +328,7 @@ public class Constants {
     public static final String INTENT_EXTRA_COLLISION_RESULTS = "INTENT_EXTRA_COLLISION_RESULTS";
     public static final String INTENT_EXTRA_SINGLE_COLLISION_RESULT = "INTENT_EXTRA_SINGLE_COLLISION_RESULT";
 
+    public static final String INTENT_EXTRA_KEY_CONTACTS_SELECTED = "INTENT_EXTRA_KEY_CONTACTS_SELECTED";
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
     public static final int RUBBISH_BIN_ADAPTER = 2002;
@@ -943,5 +944,5 @@ public class Constants {
 
     public static final int MAX_TITLE_SIZE = 30;
 
-    public static final int MAX_DESCRIPTION_SIZE = 4000;
+    public static final int MAX_DESCRIPTION_SIZE = 3000;
 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.model
 
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property currentCallAudioStatus                     True, if audio is on. False, if audio is off.
  * @property currentCallVideoStatus                     True, if video is on. False, if video is off.
  * @property isPushNotificationSettingsUpdatedEvent     Push notification settings updated event
+ * @property scheduledMeeting                            Scheduled Meeting.
  */
 data class ChatState(
     val chatId: Long = -1L,
@@ -29,4 +31,5 @@ data class ChatState(
     val currentCallAudioStatus: Boolean = false,
     val currentCallVideoStatus: Boolean = false,
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
+    val scheduledMeeting: ChatScheduledMeeting? = null,
 )

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="24dp"
-    android:layout_marginStart="16dp"
     android:layout_marginEnd="36dp"
     android:layout_marginBottom="20dp">
 
@@ -14,49 +13,67 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/scheduled_meeting_info_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="72dp"
+            android:layout_marginBottom="50dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/scheduled_meeting_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1.Medium" />
+
+            <TextView
+                android:id="@+id/scheduled_meeting_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/scheduled_meeting_title"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey87White87" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/mega_info_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/scheduled_meeting_info_layout"
+            android:layout_marginStart="72dp"
+            android:layout_marginBottom="20dp"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/mega_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_mega_info_empty_screen"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mega_title"
+                android:text="@string/mega_info_empty_screen"
+                android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/confidentiality_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/mega_info_layout"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="56dp">
-
-                <TextView
-                    android:id="@+id/mega_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/title_mega_info_empty_screen"
-                    android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
-
-                <TextView
-                    android:id="@+id/mega_info"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/mega_title"
-                    android:text="@string/mega_info_empty_screen"
-                    android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
-
-            </RelativeLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/confidentiality_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@+id/mega_info_layout"
-            android:layout_marginBottom="20dp">
-
-            <RelativeLayout
                 android:id="@+id/confidentiality_icon_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="24dp">
 
                 <ImageView
                     android:id="@+id/confidentiality_icon_image"
@@ -64,14 +81,15 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_confidentiality"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"
+                    tools:ignore="ContentDescription" />
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp">
+                android:layout_marginStart="72dp">
 
                 <TextView
                     android:id="@+id/confidentiality_title"
@@ -81,28 +99,29 @@
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle1" />
 
                 <TextView
-                    android:id="@+id/confidentiality_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/mega_confidentiality_empty_screen"
                     android:layout_below="@+id/confidentiality_title"
+                    android:text="@string/mega_confidentiality_empty_screen"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/authenticity_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_below="@+id/confidentiality_info">
+            android:layout_below="@+id/confidentiality_info"
+            android:orientation="horizontal">
 
             <RelativeLayout
                 android:id="@+id/authenticity_icon_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="24dp">
 
                 <ImageView
                     android:id="@+id/authenticity_icon_image"
@@ -110,14 +129,15 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_authenticity"
-                    app:tint="?android:attr/textColorSecondary" />
+                    app:tint="?android:attr/textColorSecondary"
+                    tools:ignore="ContentDescription" />
 
             </RelativeLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp">
+                android:layout_marginStart="72dp">
 
                 <TextView
                     android:id="@+id/authenticity_title"
@@ -130,13 +150,13 @@
                     android:id="@+id/authenticity_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/mega_authenticity_empty_screen"
                     android:layout_below="@+id/authenticity_title"
+                    android:text="@string/mega_authenticity_empty_screen"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
 
             </RelativeLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
     </RelativeLayout>
 
@@ -144,7 +164,9 @@
         android:id="@+id/loading_messages_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:src="@drawable/loading_chat_messages"
-        app:tint="@color/grey_005_white_008" />
+        app:tint="@color/grey_005_white_008"
+        tools:ignore="ContentDescription" />
 
 </RelativeLayout>

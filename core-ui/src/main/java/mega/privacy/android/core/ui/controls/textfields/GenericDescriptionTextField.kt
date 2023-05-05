@@ -124,7 +124,10 @@ fun GenericDescriptionTextField(
                         textFieldColors
                     ),
                 onValueChange = onValueChange,
-                textStyle = MaterialTheme.typography.subtitle2,
+                textStyle = MaterialTheme.typography.subtitle2.copy(
+                    color = MaterialTheme.colors.onPrimary,
+                    textAlign = TextAlign.Start
+                ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
                 keyboardOptions = keyboardOption,
                 keyboardActions = KeyboardActions.Default,

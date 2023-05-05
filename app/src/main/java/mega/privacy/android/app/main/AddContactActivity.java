@@ -9,6 +9,11 @@ import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE;
+import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.INVITE_CONTACT;
 import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
@@ -158,6 +163,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private DisplayMetrics outMetrics;
 
     private int contactType = 0;
+
+    private ArrayList<String> emailsContactsSelected = new ArrayList<>();
+
     // Determine if open this page from meeting
     private boolean isFromMeeting;
     private int multipleSelectIntent;
@@ -380,7 +388,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         @Override
         protected void onPostExecute(Void aVoid) {
             Timber.d("onPostExecute: GetPhoneContactsTask");
-
             if (inProgressPosition != INVALID_POSITION) {
                 filteredContactsShare.remove(inProgressPosition);
             }
@@ -394,7 +401,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         @Override
         protected Void doInBackground(Void... voids) {
-
             if (contactType == CONTACT_TYPE_MEGA) {
                 getVisibleMEGAContacts();
                 if (newGroup) {
@@ -466,7 +472,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     }
                 }
             }
-
             return null;
         }
 
@@ -586,7 +591,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     }
                 }
             }
-
             return null;
         }
 
@@ -811,7 +815,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
         @Override
         protected Integer doInBackground(Boolean... booleans) {
-
             showDialog = booleans[0];
 
             if (contactType == CONTACT_TYPE_DEVICE) {
@@ -1154,6 +1157,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 recyclerViewList.setVisibility(View.VISIBLE);
                 setEmptyStateVisibility(false);
             }
+
+            addSelectedContactMEGA();
         }
     }
 
@@ -1203,8 +1208,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private void setSendInvitationVisibility() {
         if (fabButton != null) {
-            if (contactType == CONTACT_TYPE_MEGA && !onNewGroup && (createNewGroup
-                    || (comesFromChat && adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0))) {
+            if (contactType == CONTACT_TYPE_MEGA && !onNewGroup &&
+                    (createNewGroup || (comesFromChat &&
+                            ((adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0) ||
+                                    (!emailsContactsSelected.isEmpty()))))) {
                 fabButton.show();
             } else if (contactType == CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
                 fabButton.show();
@@ -1522,8 +1529,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Timber.d("onCreate");
-
         super.onCreate(savedInstanceState);
 
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
@@ -1531,9 +1536,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         }
 
         if (getIntent() != null) {
-            contactType = getIntent().getIntExtra("contactType", CONTACT_TYPE_MEGA);
+            contactType = getIntent().getIntExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA);
+            emailsContactsSelected = getIntent().getStringArrayListExtra(INTENT_EXTRA_KEY_CONTACTS_SELECTED);
             isFromMeeting = getIntent().getBooleanExtra(INTENT_EXTRA_IS_FROM_MEETING, false);
-            chatId = getIntent().getLongExtra("chatId", -1);
+            chatId = getIntent().getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, -1);
             newGroup = getIntent().getBooleanExtra("newGroup", false);
             comesFromRecent = getIntent().getBooleanExtra(FROM_RECENT, false);
             if (newGroup) {
@@ -1544,9 +1550,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             if (fromAchievements) {
                 mailsFromAchievements = getIntent().getStringArrayListExtra(EXTRA_CONTACTS);
             }
-            comesFromChat = getIntent().getBooleanExtra("chat", false);
+            comesFromChat = getIntent().getBooleanExtra(INTENT_EXTRA_KEY_CHAT, false);
             if (comesFromChat) {
-                title = getIntent().getStringExtra("aBtitle");
+                title = getIntent().getStringExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE);
             }
             onlyCreateGroup = getIntent().getBooleanExtra(EXTRA_ONLY_CREATE_GROUP, false);
             isStartConversation = getIntent().getBooleanExtra(EXTRA_IS_START_CONVERSATION, false);
@@ -2007,6 +2013,27 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         refreshKeyboard();
     }
 
+    /**
+     * Method that selects the initially selected participants
+     */
+    private void addSelectedContactMEGA() {
+        for (String email : emailsContactsSelected) {
+            if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
+                for (int i = 0; i < filteredContactMEGA.size(); i++) {
+                    MegaContactAdapter contact = filteredContactMEGA.get(i);
+                    if (contact != null) {
+                        if (getMegaContactMail(contact).equals(email)) {
+                            contact.setSelected(true);
+                            addContactMEGA(contact);
+                            adapterMEGA.setContacts(filteredContactMEGA);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void addContactMEGA(MegaContactAdapter contact) {
         Timber.d("Contact: %s", contact.getFullName());
 
@@ -2184,7 +2211,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private void addMEGAFilteredContact(MegaContactAdapter contact) {
-
         filteredContactMEGA.add(contact);
         Collections.sort(filteredContactMEGA, new Comparator<MegaContactAdapter>() {
 
@@ -2718,7 +2744,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private void itemClick(View view, int position) {
-        Timber.d("on item click");
         if (searchExpand) {
             if (searchAutoComplete != null) {
                 inputString = searchAutoComplete.getText().toString();
@@ -2863,7 +2888,6 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     showSnackbar(getString(R.string.error_creating_group_and_attaching_file));
                     return;
                 }
-
                 setResultContacts(addedContactsMEGA, true);
             } else {
                 shareWith(addedContactsShare);

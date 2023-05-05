@@ -59,6 +59,7 @@ import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
 import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
 import static mega.privacy.android.app.utils.PreviewUtils.resizeBitmapUpload;
 import static mega.privacy.android.app.utils.PreviewUtils.setPreviewCache;
+import static mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.replaceFormatChatMessages;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
@@ -124,6 +125,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.compose.ui.platform.ComposeView;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
@@ -173,6 +175,7 @@ import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
 import mega.privacy.android.app.objects.GifData;
+import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
@@ -180,6 +183,7 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -254,6 +258,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private Handler handlerVoiceNotes;
     private Runnable runnableVC;
     ChatController cC;
+
+    private ChatViewModel viewModel;
 
     private long myUserHandle = -1;
 
@@ -624,7 +630,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                            ArrayList<MessageVoiceClip> _messagesPlaying,
                            ArrayList<RemovedMessage> _removedMessages,
                            RecyclerView _listView, InviteContactUseCase inviteContactUseCase,
-                           GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase) {
+                           GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase, ChatViewModel viewModel) {
         Timber.d("New adapter");
         this.context = _context;
         this.messages = _messages;
@@ -635,6 +641,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.inviteContactUseCase = inviteContactUseCase;
         this.getAvatarUseCase = getAvatarUseCase;
         this.getNodeUseCase = getNodeUseCase;
+        this.viewModel =  viewModel;
 
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
@@ -919,17 +926,22 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         RelativeLayout firstMessage;
+        RelativeLayout scheduledMeetingLayout;
+        TextView scheduledMeetingTitle;
+        TextView scheduledMeetingMessage;
         ImageView loadingMessages;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
-            Timber.d("Create header");
             View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.header_item_chat, parent, false);
             ViewHolderHeaderChat holder = new ViewHolderHeaderChat(v);
 
             holder.firstMessage = v.findViewById(R.id.first_message_chat);
+            holder.scheduledMeetingLayout = v.findViewById(R.id.scheduled_meeting_info_layout);
+            holder.scheduledMeetingTitle = v.findViewById(R.id.scheduled_meeting_title);
+            holder.scheduledMeetingMessage = v.findViewById(R.id.scheduled_meeting_info);
             holder.loadingMessages = v.findViewById(R.id.loading_messages_image);
 
             return holder;
@@ -1467,6 +1479,16 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             boolean isFullHistoryLoaded = megaChatApi.isFullHistoryLoaded(chatRoom.getChatId());
             holderHeaderChat.firstMessage.setVisibility(isFullHistoryLoaded ? View.VISIBLE : View.GONE);
+
+            ChatScheduledMeeting scheduledMeeting = viewModel.getMeeting();
+            if (scheduledMeeting != null) {
+                holderHeaderChat.scheduledMeetingLayout.setVisibility(View.VISIBLE);
+                holderHeaderChat.scheduledMeetingMessage.setText(getAppropriateStringForScheduledMeetingDate(context, viewModel.is24HourFormat(), scheduledMeeting));
+                holderHeaderChat.scheduledMeetingTitle.setText(scheduledMeeting.getTitle());
+            } else {
+                holderHeaderChat.scheduledMeetingLayout.setVisibility(View.GONE);
+            }
+
             holderHeaderChat.loadingMessages.setVisibility(isFullHistoryLoaded ? View.GONE : View.VISIBLE);
             holderHeaderChat.loadingMessages.setImageDrawable(ContextCompat.getDrawable(context,
                     isScreenInPortrait(context) ? R.drawable.loading_chat_messages : R.drawable.loading_chat_messages_landscape));

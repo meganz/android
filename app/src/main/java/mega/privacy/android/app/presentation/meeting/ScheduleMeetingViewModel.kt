@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -96,21 +97,25 @@ class ScheduleMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Invite participants to the chat room
+     * Add selected contacts as participants
      *
-     * @param contacts list of contacts
+     * @param contacts list of contacts selected
      */
     fun addContactsSelected(contacts: ArrayList<String>) {
-        Timber.d("Invite participants")
+        _state.update {
+            it.copy(
+                numOfParticipants = contacts.size + 1,
+                allowAddParticipants = contacts.isEmpty()
+            )
+        }
         viewModelScope.launch {
-            val list = mutableListOf<Long>()
+            val list = mutableListOf<ContactItem>()
             contacts.forEach { email ->
                 runCatching {
                     getContactFromEmailUseCase(email, isOnline())
                 }.onSuccess { contactItem ->
                     contactItem?.let {
-                        val handle = it.handle
-                        list.add(handle)
+                        list.add(it)
                     }
                 }
             }
@@ -118,8 +123,8 @@ class ScheduleMeetingViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     participantItemList = list,
-                    numOfParticipants = list.size + 1,
-                    snackBar = R.string.number_of_participants
+                    allowAddParticipants = true,
+                    snackBar = if (list.isEmpty()) null else R.string.number_of_participants
                 )
             }
         }
@@ -231,8 +236,11 @@ class ScheduleMeetingViewModel @Inject constructor(
      * Schedule meeting option
      */
     fun onScheduleMeetingTap() {
-        if (!state.value.isMeetingTitleTooLong()) {
-            Timber.d("Meeting title too long")
+        if (!state.value.isMeetingTitleRightSize()) {
+            return
+        }
+
+        if (state.value.isMeetingDescriptionTooLong()) {
             return
         }
 
@@ -250,7 +258,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                         )
 
                         createChatroomAndSchedMeetingUseCase(
-                            peerList = it.participantItemList,
+                            peerList = it.getParticipantsIds(),
                             isMeeting = true,
                             publicChat = true,
                             title = it.meetingTitle,
@@ -292,6 +300,11 @@ class ScheduleMeetingViewModel @Inject constructor(
             state.copy(chatIdToOpenInfoScreen = chatId)
         }
     }
+
+    /**
+     * Get participants emails
+     */
+    fun getEmails(): ArrayList<String> = ArrayList(_state.value.getParticipantsEmails())
 
     /**
      * Create meeting link

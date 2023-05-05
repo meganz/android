@@ -66,8 +66,8 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (openAddContact, openInfoScreen) ->
-                    openInfoScreen?.let {
+                viewModel.state.collect { (openAddContact, chatIdToOpenInfoScreen) ->
+                    chatIdToOpenInfoScreen?.let {
                         viewModel.openInfo(null)
                         openScheduleMeetingInfo(it)
                     }
@@ -84,6 +84,10 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                                     .putExtra(
                                         Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
                                         Constants.CONTACT_TYPE_MEGA
+                                    )
+                                    .putStringArrayListExtra(
+                                        Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
+                                        viewModel.getEmails()
                                     )
                                     .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
                                     .putExtra(
@@ -162,6 +166,8 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         }
 
         MaterialDatePicker.Builder.datePicker()
+            .setPositiveButtonText(getString(R.string.general_ok))
+            .setNegativeButtonText(getString(R.string.button_cancel))
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
             .setSelection(currentDate.toEpochMilli())
             .setCalendarConstraints(
@@ -196,6 +202,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             )
             .setHour(currentDate.hour)
             .setMinute(currentDate.minute)
+            .setPositiveButtonText(getString(R.string.general_ok))
+            .setNegativeButtonText(getString(R.string.button_cancel))
+            .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog).uppercase())
             .build()
             .apply {
                 addOnPositiveButtonClickListener {

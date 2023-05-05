@@ -25,9 +25,11 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
@@ -68,6 +70,7 @@ import javax.inject.Inject
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property isConnected True if the app has some network connection, false otherwise.
  * @property monitorUpdatePushNotificationSettingsUseCase monitors push notification settings update
+ * @property deviceGateway                      [DeviceGateway]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -89,6 +92,7 @@ class ChatViewModel @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
+    private val deviceGateway: DeviceGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -98,6 +102,8 @@ class ChatViewModel @Inject constructor(
      * Flow of [ChatState]
      */
     val state = _state.asStateFlow()
+
+    val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     /**
      * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
@@ -158,9 +164,7 @@ class ChatViewModel @Inject constructor(
      *
      * @return True, if the chat has been initialised. False, otherwise.
      */
-    fun isChatInitialised(): Boolean {
-        return state.value.isChatInitialised
-    }
+    fun isChatInitialised(): Boolean = state.value.isChatInitialised
 
     /**
      * Sets chat id
@@ -214,11 +218,13 @@ class ChatViewModel @Inject constructor(
                                     }
                                 }
                             }
+
                             _state.update {
                                 it.copy(
                                     schedId = scheduledMeetReceived.schedId,
                                     schedIsPending = !scheduledMeetReceived.isPast(),
-                                    scheduledMeetingStatus = scheduledMeetingStatus
+                                    scheduledMeetingStatus = scheduledMeetingStatus,
+                                    scheduledMeeting = scheduledMeetReceived
                                 )
                             }
                             return@forEach
@@ -454,4 +460,12 @@ class ChatViewModel @Inject constructor(
             _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
     }
+
+    /**
+     * Get scheduled meeting
+     *
+     * @return  [ChatScheduledMeeting]
+     */
+    fun getMeeting(): ChatScheduledMeeting? =
+        _state.value.scheduledMeeting
 }

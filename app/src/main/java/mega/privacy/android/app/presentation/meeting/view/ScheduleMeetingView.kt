@@ -299,7 +299,9 @@ private fun ActionButton(
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            onButtonClicked(action)
+            if (action != ScheduleMeetingAction.AddParticipants || state.allowAddParticipants) {
+                onButtonClicked(action)
+            }
         }) {
         if (action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription) {
             ActionOption(
@@ -470,7 +472,7 @@ private fun ActionOption(
                     ScheduleMeetingAction.MeetingLink -> action.description?.let { description ->
                         subtitle = stringResource(id = description)
                     }
-                    ScheduleMeetingAction.AddParticipants -> if (state.participantItemList.isNotEmpty()) subtitle =
+                    ScheduleMeetingAction.AddParticipants -> if (state.numOfParticipants > 1) subtitle =
                         stringResource(
                             id = R.string.number_of_participants,
                             state.numOfParticipants

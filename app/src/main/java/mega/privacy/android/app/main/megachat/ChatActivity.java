@@ -2056,6 +2056,11 @@ public class ChatActivity extends PasscodeActivity
                 viewModel.onConsumePushNotificationSettingsUpdateEvent();
             }
 
+            Long schedId = chatState.getSchedId();
+            if (schedId != null && schedId != MEGACHAT_INVALID_HANDLE) {
+                adapter.notifyItemChanged(0);
+            }
+
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
 
             if (chatRoom != null && chatRoom.isActive() && !chatRoom.isArchived() && (schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ||
@@ -7120,7 +7125,7 @@ public class ChatActivity extends PasscodeActivity
                 if (adapter == null) {
                     adapter = new MegaChatAdapter(this, chatRoom, messages,
                             messagesPlaying, removedMessages, listView, inviteContactUseCase,
-                            getAvatarUseCase, getNodeUseCase);
+                            getAvatarUseCase, getNodeUseCase, viewModel);
 
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
@@ -8115,7 +8120,7 @@ public class ChatActivity extends PasscodeActivity
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatAdapter(this, chatRoom, messages, messagesPlaying,
-                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase);
+                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase, viewModel);
 
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);

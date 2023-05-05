@@ -15,6 +15,7 @@ import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.usecase.call.EndCallUseCase
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -56,6 +57,7 @@ class ChatViewModelTest {
     private val monitorChatCallUpdates: MonitorChatCallUpdates = mock()
     private val endCallUseCase: EndCallUseCase = mock()
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
+    private val deviceGateway: DeviceGateway = mock()
     private val monitorUpdatePushNotificationSettingsUseCase =
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
             onBlocking { invoke() }.thenReturn(flowOf(true))
@@ -72,6 +74,7 @@ class ChatViewModelTest {
             answerChatCall = answerChatCall,
             passcodeManagement = passcodeManagement,
             cameraGateway = cameraGateway,
+            deviceGateway = deviceGateway,
             chatManagement = chatManagement,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
             startChatCallNoRinging = startChatCallNoRinging,

@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.ScheduleMeetingViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -28,6 +29,7 @@ import java.time.temporal.ChronoUnit
  * @property isEditingDescription                   True, if is editing description. False, if not.
  * @property descriptionText                        Description text.
  * @property isEmptyTitleError                      True, if an attempt has been made to create a meeting without a title. False, if not.
+ * @property allowAddParticipants                   True, if can add participants. False, if not.
  */
 data class ScheduleMeetingState constructor(
     val openAddContact: Boolean? = null,
@@ -36,7 +38,7 @@ data class ScheduleMeetingState constructor(
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val startDate: Instant = Instant.now(),
     val endDate: Instant = Instant.now().plus(1, ChronoUnit.HOURS),
-    val participantItemList: List<Long> = emptyList(),
+    val participantItemList: List<ContactItem> = emptyList(),
     val enabledMeetingLinkOption: Boolean = false,
     val enabledAllowAddParticipantsOption: Boolean = true,
     val enabledSendCalendarInviteOption: Boolean = false,
@@ -48,15 +50,41 @@ data class ScheduleMeetingState constructor(
     val numOfParticipants: Int = 1,
     val isEditingDescription: Boolean = false,
     val isEmptyTitleError: Boolean = false,
+    val allowAddParticipants: Boolean = true,
 ) {
     /**
      * Check if it's valid title
      */
     fun isValidMeetingTitle(): Boolean =
-        meetingTitle.isNotBlank() && isMeetingTitleTooLong()
+        meetingTitle.isNotBlank() && isMeetingTitleRightSize()
 
     /**
      * Check if meeting title has the right length
      */
-    fun isMeetingTitleTooLong(): Boolean = meetingTitle.length <= Constants.MAX_TITLE_SIZE
+    fun isMeetingTitleRightSize(): Boolean = meetingTitle.length <= Constants.MAX_TITLE_SIZE
+
+    /**
+     * Check if meeting description has the right length
+     */
+    fun isMeetingDescriptionTooLong(): Boolean =
+        descriptionText.length > Constants.MAX_DESCRIPTION_SIZE
+
+    /**
+     * Get list of participants ids
+     */
+    fun getParticipantsIds(): List<Long> = mutableListOf<Long>().apply {
+        participantItemList.forEach {
+            add(it.handle)
+        }
+    }
+
+    /**
+     * Get list of participants emails
+     */
+    fun getParticipantsEmails(): List<String> =
+        mutableListOf<String>().apply {
+            participantItemList.forEach {
+                add(it.email)
+            }
+        }
 }
