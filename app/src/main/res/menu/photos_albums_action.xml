@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_menu_get_link"
-        android:icon="@drawable/ic_link"
+        android:icon="@drawable/ic_link_white"
         android:orderInCategory="0"
         app:iconTint="?attr/colorSecondary"
         app:showAsAction="always" />

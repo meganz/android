@@ -43,12 +43,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -69,6 +66,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
@@ -107,15 +105,20 @@ fun AlbumsView(
     deleteAlbums: (albumIds: List<AlbumId>) -> Unit = {},
     lazyGridState: LazyGridState = LazyGridState(),
     isUserAlbumsEnabled: suspend () -> Boolean,
+    isAlbumSharingEnabled: suspend () -> Boolean = { false },
 ) {
     val isLight = MaterialTheme.colors.isLight
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val grids = 3.takeIf { isPortrait } ?: 4
-    val openDialog = rememberSaveable { mutableStateOf(false) }
 
     val displayFAB by produceState(initialValue = false) {
         value = isUserAlbumsEnabled()
     }
+
+    val displayLinkIcon by produceState(initialValue = false) {
+        value = isAlbumSharingEnabled()
+    }
+
     val scaffoldState = rememberScaffoldState()
 
     if (albumsViewState.albumDeletedMessage.isNotEmpty()) {
@@ -254,8 +257,10 @@ fun AlbumsView(
                                     .clip(RoundedCornerShape(10.dp))
                                     .aspectRatio(1f)
                                     .then(
-                                        if (isAlbumSelected(album,
-                                                albumsViewState.selectedAlbumIds)
+                                        if (isAlbumSelected(
+                                                album,
+                                                albumsViewState.selectedAlbumIds
+                                            )
                                         )
                                             Modifier.border(
                                                 BorderStroke(
@@ -306,6 +311,18 @@ fun AlbumsView(
                                 tint = Color.Unspecified,
                             )
                         }
+
+                        if (displayLinkIcon && isAlbumExported(album)) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_link_white),
+                                contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(all = 8.dp),
+                                tint = white,
+                            )
+                        }
+
                     }
                 }
             }
@@ -349,7 +366,6 @@ fun AlbumsView(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DeleteAlbumsConfirmationDialog(
     selectedAlbumIds: List<AlbumId>,
@@ -482,3 +498,7 @@ private fun isAlbumSelected(
     album: UIAlbum,
     selectedAlbumIds: Set<AlbumId>,
 ): Boolean = album.id is Album.UserAlbum && album.id.id in selectedAlbumIds
+
+private fun isAlbumExported(
+    album: UIAlbum
+): Boolean = album.id is Album.UserAlbum && album.id.isExported

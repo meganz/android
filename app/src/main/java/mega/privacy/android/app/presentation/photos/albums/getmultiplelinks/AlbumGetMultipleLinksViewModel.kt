@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -21,12 +20,14 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperAct
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -40,6 +41,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     private val getUserAlbumUseCase: GetUserAlbum,
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
     private val downloadThumbnailUseCase: DownloadThumbnail,
+    private val exportAlbumsUseCase: ExportAlbumsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -94,21 +96,19 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
         savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, null)
             .filterNotNull()
             .map(::getAlbumLinks)
-            .filterNotNull()
-            .onEach(::updateAlbumLinks)
             .catch { exception -> Timber.e(exception) }
             .launchIn(viewModelScope)
 
-    private suspend fun getAlbumLinks(ids: LongArray): Map<AlbumId, String> {
-        delay(5000L)
-        return ids.associate {
-            AlbumId(it) to "https://mega.nz/folder/yhMQkSaB#ndFn_kn1WY6l74Lzdm4VJQ"
+    private suspend fun getAlbumLinks(ids: LongArray) = withContext(defaultDispatcher) {
+        val links = exportAlbumsUseCase(ids.toList().map { AlbumId(it) }).associate {
+            it.first to it.second
         }
-    }
-
-    private fun updateAlbumLinks(links: Map<AlbumId, String>) {
         state.update {
-            it.copy(albumLinks = links)
+            it.copy(
+                albumLinks = links,
+                albumLinksList = links.values.map { albumLink -> albumLink.link }.toList()
+
+            )
         }
     }
 

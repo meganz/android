@@ -93,8 +93,10 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                     AlbumScreen.AlbumGetMultipleLinksScreen -> {
                         AlbumGetMultipleLinksScreen(
                             onBack = ::finish,
-                            onShareLinks = { links ->
-                                val linksString = links.joinToString(System.lineSeparator())
+                            onShareLinks = { albumLinks ->
+                                val linksString = albumLinks.joinToString(System.lineSeparator()) {
+                                    it.link
+                                }
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
                                     putExtra(Intent.EXTRA_TEXT, linksString)

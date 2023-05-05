@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomAppBar
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -70,6 +69,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 
 private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) -> Unit
@@ -78,7 +78,7 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 fun AlbumGetMultipleLinksScreen(
     viewModel: AlbumGetMultipleLinksViewModel = viewModel(),
     onBack: () -> Unit,
-    onShareLinks: (List<String>) -> Unit,
+    onShareLinks: (List<AlbumLink>) -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -120,6 +120,7 @@ fun AlbumGetMultipleLinksScreen(
                 modifier = Modifier.padding(paddingValues = contentPadding).fillMaxSize(),
                 albumSummaries = albumSummaries,
                 links = albumLinks,
+                albumLinksList = state.albumLinksList,
                 onDownloadImage = viewModel::downloadImage,
                 scaffoldState = scaffoldState,
             )
@@ -130,7 +131,7 @@ fun AlbumGetMultipleLinksScreen(
 @Composable
 private fun AlbumGetMultipleLinksTopBar(
     modifier: Modifier = Modifier,
-    links: List<String> = emptyList(),
+    links: List<AlbumLink> = emptyList(),
     onBack: () -> Unit = {},
     onShareLink: () -> Unit = {},
 ) {
@@ -181,7 +182,8 @@ private fun AlbumGetMultipleLinksTopBar(
 private fun AlbumGetMultipleLinksContent(
     modifier: Modifier = Modifier,
     albumSummaries: Map<AlbumId, AlbumSummary>,
-    links: Map<AlbumId, String>,
+    links: Map<AlbumId, AlbumLink>,
+    albumLinksList: List<String>,
     onDownloadImage: ImageDownloader,
     scaffoldState: ScaffoldState,
 ) {
@@ -222,7 +224,7 @@ private fun AlbumGetMultipleLinksContent(
                     it.id
                 }
             ) { albumId ->
-                val link = links[albumId] ?: ""
+                val link = links[albumId]?.link ?: ""
                 val summary = albumSummaries[albumId]
 
                 AlbumGetLinkRowItem(
@@ -243,7 +245,7 @@ private fun AlbumGetMultipleLinksContent(
 
         if (links.isNotEmpty()) {
             AlbumGetMultipleLinksBottomBar(
-                links = links.values.toList(),
+                albumLinksList = albumLinksList,
                 onButtonClick = { albumsLinks ->
                     clipboardManager.setText(AnnotatedString(albumsLinks))
 
@@ -265,13 +267,13 @@ private fun AlbumGetMultipleLinksContent(
 @Composable
 private fun AlbumGetMultipleLinksBottomBar(
     modifier: Modifier = Modifier,
-    links: List<String>,
+    albumLinksList: List<String>,
     onButtonClick: (String) -> Unit,
 ) {
     Surface(modifier = modifier) {
         OutlinedButton(
             modifier = Modifier.padding(all = 16.dp),
-            onClick = { onButtonClick(links.joinToString(System.lineSeparator())) },
+            onClick = { onButtonClick(albumLinksList.joinToString(System.lineSeparator())) },
             shape = RoundedCornerShape(4.dp),
             border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
         ) {

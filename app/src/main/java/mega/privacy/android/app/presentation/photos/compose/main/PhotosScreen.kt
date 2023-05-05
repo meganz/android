@@ -155,8 +155,9 @@ fun PhotosScreen(
                     albumsViewModel.updateAlbumDeletedMessage(message)
                 },
                 lazyGridState = albumsLazyGridState,
+                isUserAlbumsEnabled = { getFeatureFlagUseCase(AppFeatures.UserAlbums) }
             ) {
-                getFeatureFlagUseCase(AppFeatures.UserAlbums)
+                getFeatureFlagUseCase(AppFeatures.AlbumSharing)
             }
         },
         timelineViewState = timelineViewState,
