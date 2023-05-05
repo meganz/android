@@ -7,8 +7,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderInSDCardUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetDefaultPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -33,8 +32,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
-    private val setPrimaryFolderInSDCardUseCase = mock<SetPrimaryFolderInSDCardUseCase>()
-    private val setPrimaryFolderLocalPathUseCase = mock<SetPrimaryFolderLocalPathUseCase>()
+    private val setDefaultPrimaryFolderPathUseCase = mock<SetDefaultPrimaryFolderPathUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
 
@@ -45,8 +43,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
             settingsRepository = settingsRepository,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
-            setPrimaryFolderInSDCardUseCase = setPrimaryFolderInSDCardUseCase,
-            setPrimaryFolderLocalPathUseCase = setPrimaryFolderLocalPathUseCase,
+            setDefaultPrimaryFolderPathUseCase = setDefaultPrimaryFolderPathUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
         )
@@ -59,8 +56,7 @@ class EnableCameraUploadsInPhotosUseCaseTest {
             settingsRepository,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
-            setPrimaryFolderInSDCardUseCase,
-            setPrimaryFolderLocalPathUseCase,
+            setDefaultPrimaryFolderPathUseCase,
             setUploadVideoQualityUseCase,
             setVideoCompressionSizeLimitUseCase,
         )
@@ -68,14 +64,12 @@ class EnableCameraUploadsInPhotosUseCaseTest {
 
     @Test
     fun `test that the process of enabling camera uploads is done in order`() = runTest {
-        val expectedPrimaryFolderLocalPath = "test/primary/folder/path"
         val expectedShouldSyncVideos = true
         val expectedShouldUseWiFiOnly = true
         val expectedVideoCompressionSizeLimit = 200
         val expectedVideoUploadQuality = VideoQuality.HIGH
 
         underTest(
-            primaryFolderLocalPath = expectedPrimaryFolderLocalPath,
             shouldSyncVideos = expectedShouldSyncVideos,
             shouldUseWiFiOnly = expectedShouldUseWiFiOnly,
             videoCompressionSizeLimit = expectedVideoCompressionSizeLimit,
@@ -87,16 +81,14 @@ class EnableCameraUploadsInPhotosUseCaseTest {
             settingsRepository,
             setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase,
-            setPrimaryFolderInSDCardUseCase,
-            setPrimaryFolderLocalPathUseCase,
+            setDefaultPrimaryFolderPathUseCase,
             setUploadVideoQualityUseCase,
             setVideoCompressionSizeLimitUseCase,
         )
 
-        inOrder.verify(setPrimaryFolderLocalPathUseCase).invoke(expectedPrimaryFolderLocalPath)
+        inOrder.verify(setDefaultPrimaryFolderPathUseCase).invoke()
         inOrder.verify(setCameraUploadsByWifiUseCase).invoke(expectedShouldUseWiFiOnly)
         inOrder.verify(settingsRepository).setCameraUploadFileType(expectedShouldSyncVideos)
-        inOrder.verify(setPrimaryFolderInSDCardUseCase).invoke(false)
         inOrder.verify(setUploadVideoQualityUseCase).invoke(expectedVideoUploadQuality)
         inOrder.verify(setChargingRequiredForVideoCompressionUseCase).invoke(true)
         inOrder.verify(setVideoCompressionSizeLimitUseCase)

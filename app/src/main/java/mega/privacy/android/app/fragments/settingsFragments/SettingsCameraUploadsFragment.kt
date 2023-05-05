@@ -254,44 +254,33 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
 
-        if (prefs == null || prefs.camSyncEnabled == null) {
-            if (prefs == null) {
-                with(dbH) {
-                    setFirstTime(false)
-                    setSecondaryUploadEnabled(false)
-                }
-            }
-            dbH.setCamSyncEnabled(false)
-            cameraUpload = false
-        } else {
-            cameraUpload = prefs.camSyncEnabled.toBoolean()
-            val tempHandle = prefs.camSyncHandle
-            if (tempHandle != null) {
-                camSyncHandle = tempHandle.toLongOrNull()
-                if (camSyncHandle != MegaApiJava.INVALID_HANDLE) {
-                    camSyncMegaNode = camSyncHandle?.let { megaApi.getNodeByHandle(it) }
-                    if (camSyncMegaNode != null) {
-                        camSyncMegaPath = camSyncMegaNode?.name ?: ""
-                    } else {
-                        nodeForCameraSyncDoesNotExist()
-                    }
+        cameraUpload = prefs.camSyncEnabled.toBoolean()
+        val tempHandle = prefs.camSyncHandle
+        if (tempHandle != null) {
+            camSyncHandle = tempHandle.toLongOrNull()
+            if (camSyncHandle != MegaApiJava.INVALID_HANDLE) {
+                camSyncMegaNode = camSyncHandle?.let { megaApi.getNodeByHandle(it) }
+                if (camSyncMegaNode != null) {
+                    camSyncMegaPath = camSyncMegaNode?.name ?: ""
                 } else {
-                    camSyncMegaPath = getString(R.string.section_photo_sync)
+                    nodeForCameraSyncDoesNotExist()
                 }
             } else {
-                nodeForCameraSyncDoesNotExist()
+                camSyncMegaPath = getString(R.string.section_photo_sync)
             }
-
-            // Setting up the Secondary Folder path
-            if (prefs.secondaryMediaFolderEnabled == null) {
-                dbH.setSecondaryUploadEnabled(false)
-                secondaryUpload = false
-            } else {
-                secondaryUpload = prefs.secondaryMediaFolderEnabled.toBoolean()
-                Timber.d("Secondary is: %s", secondaryUpload)
-            }
-            isExternalSDCardMU = dbH.mediaFolderExternalSdCard
+        } else {
+            nodeForCameraSyncDoesNotExist()
         }
+
+        // Setting up the Secondary Folder path
+        if (prefs.secondaryMediaFolderEnabled == null) {
+            dbH.setSecondaryUploadEnabled(false)
+            secondaryUpload = false
+        } else {
+            secondaryUpload = prefs.secondaryMediaFolderEnabled.toBoolean()
+            Timber.d("Secondary is: %s", secondaryUpload)
+        }
+        isExternalSDCardMU = dbH.mediaFolderExternalSdCard
         if (cameraUpload) {
             Timber.d("Camera Uploads ON")
             cameraUploadOnOff?.isChecked = true

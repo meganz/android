@@ -38,7 +38,6 @@ import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -64,7 +63,6 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @property mainDispatcher
  * @property checkEnableCameraUploadsStatus
- * @property getPrimaryFolderPathUseCase
  * @property stopCameraUploadAndHeartbeatUseCase
  * @param monitorCameraUploadProgress
  */
@@ -81,7 +79,6 @@ class TimelineViewModel @Inject constructor(
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
-    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
@@ -318,7 +315,6 @@ class TimelineViewModel @Inject constructor(
 
         viewModelScope.launch(ioDispatcher) {
             enableCameraUploadsInPhotosUseCase(
-                primaryFolderLocalPath = getPrimaryFolderPathUseCase(),
                 shouldSyncVideos = _state.value.cuUploadsVideos,
                 shouldUseWiFiOnly = _state.value.cuUseCellularConnection.not(),
                 videoCompressionSizeLimit = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE,
