@@ -274,21 +274,14 @@ object PermissionUtils {
         }
 
     /**
-     * Get list of call permissions by version
+     * Get list of mandatory call permissions by version
      *
-     * @return List of required permissions
+     * @return List of mandatory permissions
      */
     private fun getMandatoryListCallPermissionsByVersion() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                getBluetoothConnectPermission(),
-                getRecordAudioPermission()
-            )
-        } else {
-            arrayOf(
-                getRecordAudioPermission(),
-            )
-        }
+        arrayOf(
+            getRecordAudioPermission()
+        )
 
     /**
      * Displays the Notification Permission Rationale
