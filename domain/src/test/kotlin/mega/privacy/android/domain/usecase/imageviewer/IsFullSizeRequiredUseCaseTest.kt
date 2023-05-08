@@ -5,8 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import org.junit.jupiter.api.Assertions.*
@@ -21,7 +21,7 @@ class IsFullSizeRequiredUseCaseTest {
 
     private val networkRepository = mock<NetworkRepository>()
     private val settingsRepository = mock<SettingsRepository>()
-    private val node = mock<DefaultTypedFileNode> {
+    private val node = mock<TypedFileNode> {
         on { id }.thenReturn(NodeId(1L))
     }
     private val fullSize = true

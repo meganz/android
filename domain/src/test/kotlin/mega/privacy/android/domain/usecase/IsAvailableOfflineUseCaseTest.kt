@@ -3,9 +3,9 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
-import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
@@ -24,11 +24,11 @@ class IsAvailableOfflineUseCaseTest {
     private val file = mock<File>()
     private val nodeId = NodeId(34)
     private val nodeModifiedDateInSeconds = 10L
-    private val fileNode = mock<DefaultTypedFileNode> {
+    private val fileNode = mock<TypedFileNode> {
         on { id }.thenReturn(nodeId)
         on { modificationTime }.thenReturn(nodeModifiedDateInSeconds)
     }
-    private val folderNode = mock<DefaultTypedFolderNode> {
+    private val folderNode = mock<TypedFolderNode> {
         on { id }.thenReturn(nodeId)
     }
     private val offlineNodeInformation = mock<IncomingShareOfflineNodeInformation>()
@@ -51,7 +51,7 @@ class IsAvailableOfflineUseCaseTest {
 
     @Test
     fun `test that false is returned if no offline information is found for the node`() = runTest {
-        val node = mock<DefaultTypedFileNode> {
+        val node = mock<TypedFileNode> {
             on { id }.thenReturn(NodeId(56))
         }
         assertThat(underTest(node)).isFalse()

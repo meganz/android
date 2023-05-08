@@ -4,8 +4,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -28,7 +28,7 @@ class FetchFolderNodesUseCaseTest {
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val unTypeNode = mock<FolderNode>()
     private val typedFolderNode = mock<TypedFolderNode>()
-    private val typedNode = mock<DefaultTypedFileNode>()
+    private val typedNode = mock<TypedFileNode>()
     private val typedNodeList = mock<List<TypedFolderNode>>()
 
     @Before

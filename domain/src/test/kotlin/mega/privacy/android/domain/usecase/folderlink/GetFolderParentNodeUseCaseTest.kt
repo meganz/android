@@ -4,9 +4,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -24,7 +24,7 @@ class GetFolderParentNodeUseCaseTest {
     private val addNodeType: AddNodeType = mock()
     private val typedFolderNode = mock<TypedFolderNode>()
     private val unTypeNode = mock<FolderNode>()
-    private val typedNode = mock<DefaultTypedFileNode>()
+    private val typedNode = mock<TypedFileNode>()
 
     @Before
     fun setUp() {
