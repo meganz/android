@@ -349,6 +349,7 @@ import mega.privacy.android.domain.usecase.IsRequestPhoneNumberShownUseCase
 import mega.privacy.android.domain.usecase.SetRequestPhoneNumberShownUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
+import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -474,6 +475,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var syncNavigator: SyncNavigator
 
     private val subscriptions = CompositeDisposable()
 
@@ -2373,6 +2377,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             )
             if (managerState.enabledFlags.contains(AppFeatures.AndroidSync)) {
                 syncSection.visibility = View.VISIBLE
+                syncNavigator.startSyncService(this)
             }
             if (managerState.nodeUpdateReceived) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""

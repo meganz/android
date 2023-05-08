@@ -10,6 +10,7 @@ import mega.privacy.android.app.di.AppModule
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.feature.sync.data.service.ApplicationLoggingInSetter
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import org.mockito.kotlin.mock
@@ -37,4 +38,7 @@ object TestAppModule {
     @Provides
     fun provideGetThemeModePreference(): GetThemeMode =
         mock { on { invoke() }.thenReturn(emptyFlow()) }
+
+    @Provides
+    fun provideApplicationLoggingInSetter(): ApplicationLoggingInSetter = mock()
 }
