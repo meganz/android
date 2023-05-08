@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact
+package mega.privacy.android.app.presentation.contactinfo
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -28,7 +28,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.presentation.contact.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.getState

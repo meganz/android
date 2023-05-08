@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.contactinfo
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -59,6 +59,7 @@ import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -69,9 +70,8 @@ import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
-import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.contact.model.ContactInfoState
+import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isValid
@@ -87,7 +87,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util

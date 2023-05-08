@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.ContactInfoActivity;
-import mega.privacy.android.app.presentation.contact.ContactInfoViewModel;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel;
 
 import static mega.privacy.android.app.utils.Constants.*;
 

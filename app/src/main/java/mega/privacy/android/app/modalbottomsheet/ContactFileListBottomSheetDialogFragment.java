@@ -35,7 +35,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.interfaces.ActionNodeCallback;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.main.ContactFileListActivity;
-import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;

@@ -22,9 +22,9 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
-import mega.privacy.android.app.main.ContactInfoActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
-import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil

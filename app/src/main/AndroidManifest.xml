@@ -354,7 +354,7 @@
         <activity
             android:name=".main.megachat.ArchivedChatsActivity" />
         <activity
-            android:name=".main.ContactInfoActivity" />
+            android:name=".presentation.contactinfo.ContactInfoActivity" />
         <activity
             android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity

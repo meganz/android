@@ -78,7 +78,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.main.AddContactActivity;
-import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;

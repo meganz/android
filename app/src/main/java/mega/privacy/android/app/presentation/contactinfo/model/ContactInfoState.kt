@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.contact.model
+package mega.privacy.android.app.presentation.contactinfo.model
 
 import android.graphics.Bitmap
 import mega.privacy.android.app.R

@@ -14,25 +14,16 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Base64;
 
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaStringList;
-import nz.mega.sdk.MegaStringMap;
 import nz.mega.sdk.MegaUser;
-import timber.log.Timber;
 
 public class ContactUtil {
 

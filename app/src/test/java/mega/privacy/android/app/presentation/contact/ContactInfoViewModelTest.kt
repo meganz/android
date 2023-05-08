@@ -20,6 +20,7 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway

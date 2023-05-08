@@ -353,7 +353,7 @@ import mega.privacy.android.app.listeners.InviteToChatRoomListener;
 import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
-import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
