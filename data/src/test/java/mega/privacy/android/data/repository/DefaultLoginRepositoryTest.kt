@@ -2,9 +2,14 @@ package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -32,6 +37,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -50,6 +56,8 @@ class DefaultLoginRepositoryTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val fetchNodesUpdateMapper = mock<FetchNodesUpdateMapper>()
+    private val testScope = CoroutineScope(UnconfinedTestDispatcher())
+
 
     private val email = "test@email.com"
     private val password = "testPassword"
@@ -58,6 +66,7 @@ class DefaultLoginRepositoryTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(StandardTestDispatcher())
         underTest = DefaultLoginRepository(
             megaApiGateway = megaApiGateway,
             megaApiFolderGateway = megaApiFolderGateway,
@@ -65,7 +74,13 @@ class DefaultLoginRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
             fetchNodesUpdateMapper = fetchNodesUpdateMapper,
+            applicationScope = testScope
         )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test(expected = ChatNotInitializedErrorStatus::class)
@@ -607,9 +622,8 @@ class DefaultLoginRepositoryTest {
 
             underTest.fetchNodesFlow().test {
                 verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestTemporaryError(mock(), request, error)
-                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                listenerCaptor.firstValue.onRequestTemporaryError(mock(), request, error)
+                assertThat(awaitItem()).isEqualTo(expectedUpdate.copy(temporaryError = null))
                 assertThat(expectedUpdate.progress).isEqualTo(expectedProgress)
                 assertThat(expectedUpdate.temporaryError)
                     .isEqualTo(FetchNodesTemporaryError.ServerIssues)

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
@@ -66,8 +67,9 @@ class LoginViewTest {
 
     @Test
     fun `test that email error is shown if login is required and the error exists`() {
-        setupRule(LoginState(isLoginRequired = true, emailError = LoginError.EmptyEmail))
-        composeRule.onNodeWithText(fromId(R.string.error_enter_email)).assertExists()
+        val emailError = LoginError.EmptyEmail
+        setupRule(LoginState(isLoginRequired = true, emailError = emailError))
+        composeRule.onNodeWithText(fromId(emailError.error)).assertExists()
     }
 
     @Test
@@ -78,8 +80,9 @@ class LoginViewTest {
 
     @Test
     fun `test that password error is shown if login is required and the error exists`() {
-        setupRule(LoginState(isLoginRequired = true, passwordError = LoginError.EmptyPassword))
-        composeRule.onNodeWithText(fromId(R.string.error_enter_password)).assertExists()
+        val passwordError = LoginError.EmptyPassword
+        setupRule(LoginState(isLoginRequired = true, passwordError = passwordError))
+        composeRule.onNodeWithText(fromId(passwordError.error)).assertExists()
     }
 
     @Test

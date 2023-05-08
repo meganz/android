@@ -19,12 +19,16 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
+import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
@@ -34,8 +38,10 @@ import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
+import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.usecase.ClearPsa
@@ -134,7 +140,8 @@ class LoginViewModel @Inject constructor(
                             isAccountConfirmed = false,
                             pressedBackWhileLogin = false,
                             isFirstTime = session == null,
-                            isAlreadyLoggedIn = session != null
+                            isAlreadyLoggedIn = session != null,
+                            isLoginRequired = session == null,
                         )
                     }
                 },
@@ -173,6 +180,8 @@ class LoginViewModel @Inject constructor(
         }
 
         viewModelScope.launch { resetChatSettingsUseCase() }
+
+        checkTemporalCredentials()
     }
 
     /**
@@ -211,19 +220,6 @@ class LoginViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * Updates pressBackWhileLogin value in state.
-     */
-    fun updatePressedBackWhileLogin(pressedBackWhileLogin: Boolean) {
-        _state.update { it.copy(pressedBackWhileLogin = pressedBackWhileLogin) }
-    }
-
-    /**
-     * Sets querySignupLinkResult as null in state.
-     */
-    fun setQuerySignupLinkResultConsumed() =
-        _state.update { it.copy(querySignupLinkResult = null) }
 
     /**
      * Stops logging in.
@@ -265,13 +261,6 @@ class LoginViewModel @Inject constructor(
         _state.update { it.copy(loginException = null) }
     }
 
-    /**
-     * Updates fetch nodes error value in state as consumed.
-     */
-    fun setFetchNodesErrorConsumed() {
-        _state.update { it.copy(fetchNodesException = null) }
-    }
-
     private fun UserCredentials.updateCredentials() {
         val accountSession = state.value.accountSession
         _state.update {
@@ -292,7 +281,7 @@ class LoginViewModel @Inject constructor(
     /**
      * True if there is a not null email and a not null password, false otherwise.
      */
-    fun checkTemporalCredentials() = with(state.value) {
+    private fun checkTemporalCredentials() = with(state.value) {
         if (temporalEmail != null && temporalPassword != null) {
             performLogin(temporalEmail, temporalPassword)
         }
@@ -353,22 +342,29 @@ class LoginViewModel @Inject constructor(
         }
         viewModelScope.launch {
             val result = runCatching { querySignupLinkUseCase(link) }
+            var accountConfirmed: Boolean? = null
+            val messageId = if (result.isSuccess) {
+                accountConfirmed = true
+                R.string.account_confirmed
+            } else {
+                (result.exceptionOrNull() as QuerySignupLinkException).messageId
+            }
+
             _state.update { state ->
+                val isAccountConfirmed =
+                    if (accountConfirmed == true) true else state.isAccountConfirmed
+
                 state.copy(
                     isLoginRequired = true,
                     isLoginInProgress = false,
-                    querySignupLinkResult = result,
+                    isAccountConfirmed = isAccountConfirmed,
                     intentState = LoginIntentState.AlreadySet,
-                    isCheckingSignupLink = false
+                    isCheckingSignupLink = false,
+                    snackbarMessage = messageId?.let { triggered(it) } ?: consumed()
                 )
             }
         }
     }
-
-    /**
-     * Cancels all transfers, uploads and downloads.
-     */
-    fun launchCancelTransfers() = viewModelScope.launch { cancelTransfersUseCase() }
 
     /**
      * Update email in state.
@@ -378,7 +374,11 @@ class LoginViewModel @Inject constructor(
             ?: AccountSession(email = typedEmail)
 
         _state.update { state ->
-            state.copy(accountSession = newAccountSession, emailError = null)
+            state.copy(
+                accountSession = newAccountSession,
+                emailError = null,
+                snackbarMessage = consumed()
+            )
         }
     }
 
@@ -386,13 +386,17 @@ class LoginViewModel @Inject constructor(
      * Update password in state.
      */
     fun onPasswordChanged(typedPassword: String) = _state.update { state ->
-        state.copy(password = typedPassword, passwordError = null)
+        state.copy(password = typedPassword, passwordError = null, snackbarMessage = consumed())
     }
 
     /**
      * Check typed values before perform login.
      */
-    fun onLoginClicked() {
+    fun onLoginClicked(cancelTransfers: Boolean) {
+        if (cancelTransfers) {
+            viewModelScope.launch { cancelTransfersUseCase() }
+        }
+
         with(state.value) {
             val typedEmail = accountSession?.email
             val emailError = when {
@@ -400,26 +404,28 @@ class LoginViewModel @Inject constructor(
                 !Constants.EMAIL_ADDRESS.matcher(typedEmail).matches() -> LoginError.NotValidEmail
                 else -> null
             }
-            val passwordError = if (password.isNullOrEmpty()) LoginError.EmptyPassword else null
+            val passwordError = LoginError.EmptyPassword.takeUnless { !password.isNullOrEmpty() }
 
             if (emailError != null || passwordError != null) {
                 _state.update { state ->
                     state.copy(
                         emailError = emailError,
-                        passwordError = passwordError
+                        passwordError = passwordError,
+                        pressedBackWhileLogin = false,
                     )
                 }
             } else {
                 viewModelScope.launch {
                     when {
                         ongoingTransfersExistUseCase() -> _state.update { state ->
-                            state.copy(ongoingTransfersExist = true)
+                            state.copy(ongoingTransfersExist = true, pressedBackWhileLogin = false)
                         }
 
                         !isConnected -> _state.update { state ->
                             state.copy(
                                 isLoginRequired = true,
                                 ongoingTransfersExist = null,
+                                pressedBackWhileLogin = false,
                                 snackbarMessage = triggered(R.string.error_server_connection_problem)
                             )
                         }
@@ -434,7 +440,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Login.
      */
-    fun performLogin(typedEmail: String? = null, typedPassword: String? = null) {
+    private fun performLogin(typedEmail: String? = null, typedPassword: String? = null) {
         if (MegaApplication.isLoggingIn) {
             return
         }
@@ -495,8 +501,9 @@ class LoginViewModel @Inject constructor(
     /**
      * Login with 2FA.
      */
-    fun performLoginWith2FA(pin2FA: String) = viewModelScope.launch {
+    private fun performLoginWith2FA(pin2FA: String) = viewModelScope.launch {
         MegaApplication.isLoggingIn = true
+        _state.update { state -> state.copy(multiFactorAuthState = MultiFactorAuthState.Checking) }
 
         with(state.value) {
             runCatching {
@@ -569,16 +576,21 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun LoginException.loginFailed(is2FARequest: Boolean = false) = _state.update {
-        it.copy(
-            isLoginInProgress = false,
-            isLoginRequired = true,
-            is2FAEnabled = is2FARequest,
-            is2FARequired = false,
+    private fun LoginException.loginFailed(is2FARequest: Boolean = false) =
+        _state.update { loginState ->
             //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-            loginException = this.takeUnless { exception -> exception is LoginBlockedAccount }
-        )
-    }
+            //If LoginLoggedOutFromOtherLocation will be handled in the Activity
+            val error = this.error
+                .takeUnless { this is LoginLoggedOutFromOtherLocation || this is LoginBlockedAccount }
+            loginState.copy(
+                isLoginInProgress = false,
+                isLoginRequired = true,
+                is2FAEnabled = is2FARequest,
+                is2FARequired = false,
+                loginException = this.takeIf { exception -> exception is LoginLoggedOutFromOtherLocation },
+                snackbarMessage = error?.let { triggered(it) } ?: consumed()
+            )
+        }
 
     private fun LoginStatus.checkStatus(isFastLogin: Boolean = false) = when (this) {
         LoginStatus.LoginStarted -> {
@@ -594,7 +606,8 @@ class LoginViewModel @Inject constructor(
                         isLoginRequired = false,
                         is2FARequired = false,
                         isAlreadyLoggedIn = true,
-                        fetchNodesUpdate = cleanFetchNodesUpdate
+                        fetchNodesUpdate = cleanFetchNodesUpdate,
+                        multiFactorAuthState = null
                     )
                 }
             }
@@ -646,27 +659,23 @@ class LoginViewModel @Inject constructor(
                     _state.update { it.copy(fetchNodesUpdate = update) }
                 }
             }
-        }.onFailure {
+        }.onFailure { exception ->
             MegaApplication.isLoggingIn = false
-            if (it !is FetchNodesException) return@launch
+            if (exception !is FetchNodesException) return@launch
 
             _state.update { state ->
+                val messageId =
+                    exception.takeUnless { exception is FetchNodesErrorAccess || state.pressedBackWhileLogin }
+
                 state.copy(
                     isLoginInProgress = false,
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false,
-                    fetchNodesException = it.takeUnless { it is FetchNodesErrorAccess || state.pressedBackWhileLogin }
+                    snackbarMessage = messageId?.let { triggered(exception.error) } ?: consumed()
                 )
             }
         }
-    }
-
-    /**
-     * Checks if there are ongoing transfers.
-     */
-    fun checkOngoingTransfers() = viewModelScope.launch {
-        _state.update { state -> state.copy(ongoingTransfersExist = ongoingTransfersExistUseCase()) }
     }
 
     /**
@@ -674,19 +683,6 @@ class LoginViewModel @Inject constructor(
      */
     fun resetOngoingTransfers() =
         _state.update { state -> state.copy(ongoingTransfersExist = null) }
-
-    /**
-     * Checks and updates 2FA error.
-     */
-    fun checkAndUpdate2FAState() = state.value.multiFactorAuthState?.apply {
-        _state.update { state ->
-            state.copy(
-                multiFactorAuthState =
-                if (this == MultiFactorAuthState.Failed) MultiFactorAuthState.Fixed
-                else null
-            )
-        }
-    }
 
     /**
      * Intent set.
@@ -707,12 +703,6 @@ class LoginViewModel @Inject constructor(
      */
     fun isFeatureEnabled(feature: Feature) = state.value.enabledFlags.contains(feature)
 
-    /**
-     * Sets snackbarMessage in state.
-     */
-    fun setSnackbarMessage(@StringRes messageId: Int) =
-        _state.update { state -> state.copy(snackbarMessage = triggered(messageId)) }
-
 
     /**
      * Sets snackbarMessage in state as consumed.
@@ -729,6 +719,43 @@ class LoginViewModel @Inject constructor(
      * Stop camera upload
      */
     fun stopCameraUpload() = viewModelScope.launch { stopCameraUploadUseCase() }
+
+    /**
+     * Updates a pin of the 2FA code in state.
+     */
+    fun on2FAPinChanged(pin: String, index: Int) {
+        val updated2FA =
+            state.value.twoFAPin.getUpdatedTwoFactorAuthentication(pin = pin, index = index)
+
+        updateTwoFAState(updated2FA)
+        updated2FA.getTwoFactorAuthentication()?.apply {
+            performLoginWith2FA(this)
+        }
+    }
+
+    /**
+     * Updates 2FA code in state.
+     */
+    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.apply {
+        updateTwoFAState(this)
+        performLoginWith2FA(twoFA)
+    }
+
+    private fun updateTwoFAState(twoFA: List<String>) {
+        _state.update { state ->
+            state.copy(
+                twoFAPin = twoFA,
+                multiFactorAuthState = MultiFactorAuthState.Fixed
+                    .takeUnless { state.multiFactorAuthState == MultiFactorAuthState.Failed }
+            )
+        }
+    }
+
+    /**
+     * Updates the state to show a message.
+     */
+    fun setSnackbarMessageId(@StringRes messageId: Int) =
+        _state.update { state -> state.copy(snackbarMessage = triggered(messageId)) }
 
     companion object {
         /**

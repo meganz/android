@@ -6,13 +6,11 @@ import android.content.pm.ActivityInfo
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
-import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,6 +27,7 @@ import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -69,16 +68,10 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         override fun handleOnBackPressed() {
             Timber.d("onBackPressed")
             retryConnectionsAndSignalPresence()
-            var valueReturn = -1
 
             when (visibleFragment) {
-                Constants.LOGIN_FRAGMENT -> valueReturn = loginFragment?.onBackPressed() ?: 0
                 Constants.CREATE_ACCOUNT_FRAGMENT -> showFragment(Constants.TOUR_FRAGMENT)
-                Constants.TOUR_FRAGMENT, Constants.CONFIRM_EMAIL_FRAGMENT -> valueReturn = 0
-            }
-
-            if (valueReturn == 0) {
-                finish()
+                Constants.TOUR_FRAGMENT, Constants.CONFIRM_EMAIL_FRAGMENT -> finish()
             }
         }
     }
@@ -110,8 +103,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         chatRequestHandler.setIsLoggingRunning(true)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        hideAB()
 
         if (savedInstanceState != null) {
             Timber.d("Bundle is NOT NULL")
@@ -148,19 +139,16 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                         showFragment(isPendingToShowFragment.toConstant())
                         viewModel.isPendingToShowFragmentConsumed()
                     }
+
+                    loginException != null -> {
+                        if (loginException is LoginLoggedOutFromOtherLocation) {
+                            showAlertLoggedOut()
+                            viewModel.setLoginErrorConsumed()
+                        }
+                    }
                 }
             }
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home && visibleFragment == Constants.LOGIN_FRAGMENT
-            && loginFragment?.isAdded == true
-        ) {
-            onBackPressedDispatcher.onBackPressed()
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     /**
@@ -197,6 +185,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
                 Util.setDrawUnderStatusBar(this, false)
             }
+
             Constants.CREATE_ACCOUNT_FRAGMENT -> {
                 Timber.d("Show CREATE_ACCOUNT_FRAGMENT")
                 if (createAccountFragment == null || cancelledConfirmationProcess) {
@@ -210,6 +199,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
                 Util.setDrawUnderStatusBar(this, false)
             }
+
             Constants.TOUR_FRAGMENT -> {
                 Timber.d("Show TOUR_FRAGMENT")
                 tourFragment =
@@ -217,9 +207,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                         Constants.ACTION_RESET_PASS == intent?.action -> {
                             TourFragment.newInstance(intent?.dataString, null)
                         }
+
                         Constants.ACTION_PARK_ACCOUNT == intent?.action -> {
                             TourFragment.newInstance(null, intent?.dataString)
                         }
+
                         else -> {
                             TourFragment.newInstance(null, null)
                         }
@@ -230,6 +222,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
                 Util.setDrawUnderStatusBar(this, true)
             }
+
             Constants.CONFIRM_EMAIL_FRAGMENT -> {
                 val confirmEmailFragment = ConfirmEmailFragment()
 
@@ -278,7 +271,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     /**
      * Shows a warning informing the account has been logged out.
      */
-    fun showAlertLoggedOut() {
+    private fun showAlertLoggedOut() {
         Timber.d("showAlertLoggedOut")
         (application as MegaApplication).isEsid = false
 
@@ -396,24 +389,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     }
 
     /**
-     * Shows the action bar.
-     */
-    fun showAB(tB: Toolbar?) {
-        setSupportActionBar(tB)
-        supportActionBar?.let {
-            with(it) {
-                show()
-                setHomeButtonEnabled(true)
-                setDisplayHomeAsUpEnabled(true)
-            }
-        }
-
-        if (visibleFragment == Constants.LOGIN_FRAGMENT) {
-            Util.setDrawUnderStatusBar(this, false)
-        }
-    }
-
-    /**
      * Sets [OnKeyboardVisibilityListener].
      *
      * @param onKeyboardVisibilityListener The listener.
@@ -451,11 +426,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             }
         })
     }
-
-    /**
-     * Hides the action bar.
-     */
-    fun hideAB() = supportActionBar?.hide()
 
     /**
      * Sets temporal data for account creation.

@@ -22,7 +22,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -35,6 +37,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.autofill
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
@@ -48,8 +51,9 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
  * @param modifier        [Modifier]
  * @param text            Typed text.
  * @param errorText       Error to show if any.
+ * @param isEmail         True if the input text should be an email, false otherwise.
  */
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LabelTextField(
     onTextChange: (String) -> Unit,
@@ -59,6 +63,7 @@ fun LabelTextField(
     modifier: Modifier = Modifier,
     text: String = "",
     errorText: String? = null,
+    isEmail: Boolean = false,
 ) = Column(modifier = modifier) {
     val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
@@ -88,11 +93,15 @@ fun LabelTextField(
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth()
-                .onFocusChanged { isFocused = it.isFocused },
+                .onFocusChanged { isFocused = it.isFocused }
+                .autofill(
+                    autofillTypes = if (isEmail) listOf(AutofillType.EmailAddress) else emptyList(),
+                    onAutoFilled = onTextChange
+                ),
             textStyle = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onPrimary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
+                keyboardType = if (isEmail) KeyboardType.Email else KeyboardType.Text,
                 imeAction = imeAction
             ),
             keyboardActions = keyboardActions,

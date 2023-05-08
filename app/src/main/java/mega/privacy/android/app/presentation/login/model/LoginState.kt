@@ -6,7 +6,6 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.LoginException
-import mega.privacy.android.domain.exception.login.FetchNodesException
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
@@ -36,9 +35,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
  * @property isLoginRequired            True if should ask for login, false otherwise.
  * @property isLoginInProgress          True if a login is in progress, false otherwise.
  * @property loginException             [LoginException].
- * @property fetchNodesException        [FetchNodesException].
  * @property ongoingTransfersExist      True if exist ongoing transfers, false if not. Null if pending to check.
- * @property querySignupLinkResult      Result of query signup link.
  * @property isPendingToFinishActivity  True if should finish the activity, false otherwise.
  * @property isPendingToShowFragment    [LoginFragmentType] if pending, null otherwise.
  * @property enabledFlags               Enabled Feature Flags
@@ -71,9 +68,7 @@ data class LoginState(
     val isLoginRequired: Boolean = false,
     val isLoginInProgress: Boolean = false,
     val loginException: LoginException? = null,
-    val fetchNodesException: FetchNodesException? = null,
     val ongoingTransfersExist: Boolean? = null,
-    val querySignupLinkResult: Result<String>? = null,
     val isPendingToFinishActivity: Boolean = false,
     val isPendingToShowFragment: LoginFragmentType? = null,
     val enabledFlags: Set<Feature> = emptySet(),

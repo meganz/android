@@ -1,10 +1,14 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -33,6 +37,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoginRepository
 import nz.mega.sdk.MegaChatApi
@@ -59,6 +64,7 @@ internal class DefaultLoginRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
     private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -79,9 +85,11 @@ internal class DefaultLoginRepository @Inject constructor(
                                 continuation.resumeWith(Result.failure(exception))
                                 return@suspendCoroutine
                             }
+
                             else -> Timber.d("Chat correctly initialized")
                         }
                     }
+
                     MegaChatApi.INIT_TERMINATED -> {
                         Timber.w("Chat with terminated state, a logout is in progress.")
                         continuation.resumeWith(Result.failure(ChatLoggingOutException()))
@@ -199,11 +207,13 @@ internal class DefaultLoginRepository @Inject constructor(
                         MegaChatApi.INIT_WAITING_NEW_SESSION -> {
                             continuation.resumeWith(Result.success(Unit))
                         }
+
                         MegaChatApi.INIT_ERROR -> {
                             val exception = ChatNotInitializedErrorStatus()
                             Timber.e("Init chat error: ${exception.message}. Logout...")
                             continuation.resumeWith(Result.failure(exception))
                         }
+
                         else -> {
                             continuation.resumeWith(
                                 Result.failure(ChatNotInitializedUnknownStatus())
@@ -226,34 +236,42 @@ internal class DefaultLoginRepository @Inject constructor(
                             trySend(LoginStatus.LoginSucceed)
                             close()
                         }
+
                         MegaError.API_ESID -> {
                             Timber.w("Logged out from other location.")
                             close(LoginLoggedOutFromOtherLocation())
                         }
+
                         MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
                             Timber.w("Wrong 2FA code.")
                             close(LoginWrongMultiFactorAuth())
                         }
+
                         MegaError.API_EMFAREQUIRED -> {
                             Timber.w("Require 2FA.")
                             close(LoginMultiFactorAuthRequired())
                         }
+
                         MegaError.API_ENOENT -> {
                             Timber.w("Wrong email or password")
                             close(LoginWrongEmailOrPassword())
                         }
+
                         MegaError.API_ETOOMANY -> {
                             Timber.w("Too many attempts")
                             close(LoginTooManyAttempts())
                         }
+
                         MegaError.API_EINCOMPLETE -> {
                             Timber.w("Account not validated")
                             close(LoginRequireValidation())
                         }
+
                         MegaError.API_EBLOCKED -> {
                             Timber.w("Blocked account")
                             close(LoginBlockedAccount())
                         }
+
                         else -> {
                             Timber.w("MegaRequest.TYPE_LOGIN error $error")
                             close(LoginUnknownStatus(error.toException("loginRequest")))
@@ -284,14 +302,23 @@ internal class DefaultLoginRepository @Inject constructor(
         loginRequest { megaApiGateway.fastLogin(session, it) }
 
     override fun fetchNodesFlow(): Flow<FetchNodesUpdate> = callbackFlow {
+        var timerJob: Job? = null
         val listener = OptionalMegaRequestListenerInterface(
             onRequestStart = { Timber.d("onRequestStart: Fetch nodes") },
             onRequestUpdate = { request ->
+                timerJob?.cancel()
                 trySend(fetchNodesUpdateMapper(request, null))
             },
             onRequestTemporaryError = { request, error ->
                 Timber.w("onRequestTemporaryError: %s%d", request.requestString, error.errorCode)
-                trySend(fetchNodesUpdateMapper(request, error))
+                val temporaryError = fetchNodesUpdateMapper(request, error)
+                trySend(temporaryError.copy(temporaryError = null))
+                timerJob = applicationScope.launch {
+                    runCatching {
+                        delay(FETCH_NODES_ERROR_TIMER)
+                        trySend(temporaryError)
+                    }
+                }
             },
             onRequestFinish = { request, error ->
                 when (error.errorCode) {
@@ -299,14 +326,17 @@ internal class DefaultLoginRepository @Inject constructor(
                         trySend(fetchNodesUpdateMapper(null, null))
                         close()
                     }
+
                     MegaError.API_EACCESS -> {
                         Timber.e("Error API_EACCESS")
                         close(FetchNodesErrorAccess(error.toException("fetchNodesFlow")))
                     }
+
                     MegaError.API_EBLOCKED -> {
                         Timber.w("Suspended account - Reason: ${request.number}")
                         close(FetchNodesBlockedAccount())
                     }
+
                     else -> {
                         close(FetchNodesUnknownStatus(error.toException("fetchNodesFlow")))
                     }
@@ -326,4 +356,8 @@ internal class DefaultLoginRepository @Inject constructor(
     override fun monitorAccountUpdate() = appEventGateway.monitorAccountUpdate()
 
     override suspend fun broadcastAccountUpdate() = appEventGateway.broadcastAccountUpdate()
+
+    companion object {
+        internal const val FETCH_NODES_ERROR_TIMER = 10000L
+    }
 }

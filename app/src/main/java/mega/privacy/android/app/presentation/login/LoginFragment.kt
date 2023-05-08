@@ -1,39 +1,30 @@
 package mega.privacy.android.app.presentation.login
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
 import android.util.Base64
 import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
-import android.view.ViewConfiguration
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
@@ -43,28 +34,23 @@ import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
-import mega.privacy.android.app.databinding.FragmentLoginBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.error
-import mega.privacy.android.app.presentation.extensions.messageId
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.setStartScreenTimeStamp
 import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
-import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
@@ -74,431 +60,152 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces
-import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
-import mega.privacy.android.domain.exception.QuerySignupLinkException
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaError
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Login fragment.
+ *
+ * @property getThemeMode [GetThemeMode]
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
-    private val viewModel: LoginViewModel by activityViewModels()
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
 
-    private var _binding: FragmentLoginBinding? = null
-    private val binding get() = _binding!!
+    private val viewModel: LoginViewModel by activityViewModels()
 
     private var insertMKDialog: AlertDialog? = null
     private var changeApiServerDialog: AlertDialog? = null
     private var confirmLogoutDialog: AlertDialog? = null
 
-    private var loginTitleBoundaries: Rect? = null
-    private var timer: CountDownTimer? = null
     private var intentExtras: Bundle? = null
     private var intentData: Uri? = null
     private var intentAction: String? = null
     private var intentDataString: String? = null
     private var intentParentHandle: Long = -1
     private var intentShareInfo: ArrayList<ShareInfo>? = null
-    private val sb by lazy { StringBuilder() }
-    private val pin2FAColor by lazy {
-        ContextCompat.getColor(requireContext(), R.color.grey_087_white_087)
-    }
-    private val pin2FAErrorColor by lazy {
-        ContextCompat.getColor(requireContext(), R.color.red_600_red_300)
-    }
-
-    private var was2FAErrorShown = false
-    private var isPinLongClick = false
-    private var pendingClicksKarere = CLICKS_TO_ENABLE_LOGS
-    private var pendingClicksSDK = CLICKS_TO_ENABLE_LOGS
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        Timber.d("onCreateView")
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding.root
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent { LoginView() }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onDestroy() {
+        confirmLogoutDialog?.dismiss()
+        changeApiServerDialog?.dismiss()
+        super.onDestroy()
+    }
+
+    @Composable
+    private fun LoginView() {
+        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
+
+        with(uiState) {
+            intentState?.apply {
+                when (this) {
+                    LoginIntentState.ReadyForInitialSetup -> finishSetupIntent(uiState)
+                    LoginIntentState.ReadyForFinalSetup -> readyToFinish(uiState)
+                    else -> { /* Nothing to update */
+                    }
+                }
+            }
+
+            if (isLoginRequired) confirmLogoutDialog?.dismiss()
+
+            if (ongoingTransfersExist == true) showCancelTransfersDialog()
+        }
+
+        AndroidTheme(isDark = themeMode.isDarkMode()) {
+            LoginView(
+                state = uiState,
+                onEmailChanged = viewModel::onEmailChanged,
+                onPasswordChanged = viewModel::onPasswordChanged,
+                onLoginClicked = {
+                    LoginActivity.isBackFromLoginPage = false
+                    viewModel.onLoginClicked(false)
+                },
+                onForgotPassword = { onForgotPassword(uiState.accountSession?.email) },
+                onCreateAccount = ::onCreateAccount,
+                onSnackbarMessageConsumed = viewModel::onSnackbarMessageConsumed,
+                on2FAPinChanged = viewModel::on2FAPinChanged,
+                on2FAChanged = viewModel::on2FAChanged,
+                onLostAuthenticatorDevice = ::onLostAuthenticationDevice,
+                onBackPressed = { onBackPressed(uiState) },
+                onUpdateKarereLogs = { viewModel.checkAndUpdateKarereLogs(requireActivity()) },
+                onUpdateSdkLogs = { viewModel.checkAndUpdateSDKLogs(requireActivity()) },
+                onChangeApiServer = ::showChangeApiServerDialog
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.setupInitialState()
-        setupView()
         setupIntent()
-        setupObservers()
-    }
-
-    private fun setupObservers() = with(viewModel) {
-        viewLifecycleOwner.collectFlow(state) { uiState ->
-            with(uiState) {
-                intentState?.apply {
-                    when (this) {
-                        LoginIntentState.ReadyForInitialSetup -> finishSetupIntent(uiState)
-                        LoginIntentState.ReadyForFinalSetup -> readyToFinish(uiState)
-                        else -> { /* Nothing to update */
-                        }
-                    }
-                }
-
-                when {
-                    querySignupLinkResult != null -> {
-                        showQuerySignupLinkResult(querySignupLinkResult)
-                    }
-
-                    ongoingTransfersExist != null -> {
-                        if (ongoingTransfersExist) {
-                            showCancelTransfersDialog()
-                        } else {
-                            loginClicked()
-                        }
-                    }
-
-                    isLoginInProgress -> {
-                        showLoginInProgress(false)
-                    }
-
-                    isLoginRequired -> {
-                        confirmLogoutDialog?.dismiss()
-                        returnToLogin()
-                    }
-
-                    fetchNodesUpdate != null -> {
-                        with(fetchNodesUpdate) {
-                            if (temporaryError == null
-                                && (progress == null || progress?.floatValue == 0F)
-                            ) {
-                                if (is2FAEnabled) {
-                                    binding.login2fa.isVisible = false
-                                    (requireActivity() as LoginActivity).hideAB()
-                                }
-                                showLoginInProgress()
-                            } else {
-                                showFetchNodesProgress(progress)
-
-                                temporaryError?.let {
-                                    showFetchNodesTemporaryError(it.messageId)
-                                } ?: timer?.apply {
-                                    cancel()
-                                    binding.loginServersBusyText.isVisible = false
-                                }
-                            }
-                        }
-                    }
-
-                    multiFactorAuthState != null -> {
-                        if (multiFactorAuthState == MultiFactorAuthState.Failed) {
-                            binding.progressbarVerify2fa.isVisible = false
-                            show2FAError()
-                        } else {
-                            hide2FAError()
-                        }
-                    }
-
-                    is2FARequired -> {
-                        show2FAScreen()
-                    }
-                }
-
-                if (isLocalLogoutInProgress) disableLoginButton() else enableLoginButton()
-
-                loginException?.apply {
-                    when (this) {
-                        is LoginLoggedOutFromOtherLocation -> {
-                            (requireActivity() as LoginActivity).showAlertLoggedOut()
-                        }
-
-                        else -> (requireActivity() as LoginActivity).showSnackbar(getString(error))
-                    }
-
-                    setLoginErrorConsumed()
-                }
-
-                fetchNodesException?.apply {
-                    (requireActivity() as LoginActivity).showSnackbar(getString(error))
-                    setFetchNodesErrorConsumed()
-                }
-            }
-        }
-    }
-
-    private fun showFetchNodesProgress(progress: Progress?) = with(binding) {
-        progress?.let {
-            with(it.floatValue) {
-                val newProgress = (this * 100).toInt()
-                loginFetchingNodesBar.apply {
-                    isVisible = true
-                    setProgress(newProgress, true)
-                    loginPrepareNodesText.isVisible = true
-                    loginProgressBar.isVisible = true
-                }
-            }
-        }
-    }
-
-    private fun showFetchNodesTemporaryError(@StringRes stringId: Int) {
-        timer = object : CountDownTimer(10000, 2000) {
-            override fun onTick(millisUntilFinished: Long) {
-                Timber.d("TemporaryError one more")
-            }
-
-            override fun onFinish() {
-                Timber.d("The timer finished, message shown")
-                binding.loginServersBusyText.apply {
-                    text = getString(stringId)
-                    isVisible = true
-                }
-            }
-        }.start()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun setupView() = with(binding) {
-        loginTextView.apply {
-            text = getString(R.string.login_to_mega)
-            setOnClickListener { clickKarereLogs() }
-            val onLongPress = Runnable {
-                if (!isAlertDialogShown(changeApiServerDialog)) {
-                    changeApiServerDialog = showChangeApiServerDialog(requireActivity())
-                }
-            }
-            val onTap = Runnable {
-                handler.postDelayed(
-                    onLongPress,
-                    LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout()
-                )
-            }
-            setOnTouchListener { view, event ->
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        loginTitleBoundaries = Rect(view.left, view.top, view.right, view.bottom)
-                        handler.postDelayed(onTap, ViewConfiguration.getTapTimeout().toLong())
-                    }
-
-                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                        handler.removeCallbacks(onLongPress)
-                        handler.removeCallbacks(onTap)
-                    }
-
-                    MotionEvent.ACTION_MOVE -> if (loginTitleBoundaries != null && !loginTitleBoundaries!!.contains(
-                            view.left + event.x.toInt(),
-                            view.top + event.y.toInt()
-                        )
-                    ) {
-                        handler.removeCallbacks(onLongPress)
-                        handler.removeCallbacks(onTap)
-                    }
-                }
-                false
-            }
-        }
-
-        loginEmailTextErrorIcon.isVisible = false
-
-        loginEmailText.apply {
-            isCursorVisible = true
-            background.clearColorFilter()
-            requestFocus()
-            doAfterTextChanged { quitError(this) }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (!hasFocus) {
-                    removeLeadingAndTrailingSpaces()
-                }
-            }
-        }
-
-        loginPasswordTextLayout.isEndIconVisible = false
-        loginPasswordTextErrorIcon.isVisible = false
-
-        loginPasswordText.apply {
-            isCursorVisible = true
-            background.clearColorFilter()
-            setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    checkTypedValues()
-                    return@OnEditorActionListener true
-                }
-                false
-            })
-            doAfterTextChanged { quitError(this) }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                loginPasswordTextLayout.isEndIconVisible = hasFocus
-            }
-        }
-
-        buttonLogin.apply {
-            text = getString(R.string.login_text)
-            setOnClickListener {
-                Timber.d("Click on button_login_login")
-                viewModel.updatePressedBackWhileLogin(false)
-                LoginActivity.isBackFromLoginPage = false
-                loginEmailText.removeLeadingAndTrailingSpaces()
-                checkTypedValues()
-            }
-        }
-
-        buttonForgotPass.setOnClickListener {
-            Timber.d("Click on button_forgot_pass")
-            try {
-                val openTermsIntent = Intent(requireContext(), WebViewActivity::class.java)
-                openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-
-                if (loginEmailText.text.toString().isNotEmpty()) {
-                    val typedEmail = loginEmailText.text.toString()
-                    var encodedEmail =
-                        Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
-                    encodedEmail = encodedEmail.replace("\n", "")
-                    openTermsIntent.data = Uri.parse(RECOVERY_URL_EMAIL + encodedEmail)
-                } else {
-                    openTermsIntent.data = Uri.parse(RECOVERY_URL)
-                }
-                startActivity(openTermsIntent)
-            } catch (e: Exception) {
-                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(RECOVERY_URL)))
-            }
-        }
-
-        textNewToMega.setOnClickListener { clickSDKLogs() }
-
-        buttonCreateAccountLogin.setOnClickListener {
-            Timber.d("Click on button_create_account_login")
-            (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
-        }
-
-        showLoginScreen()
-
-        lostAuthenticationDevice.setOnClickListener {
-            try {
-                startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    data = Uri.parse(RECOVERY_URL)
-                })
-            } catch (e: Exception) {
-                val viewIntent = Intent(Intent.ACTION_VIEW)
-                viewIntent.data = Uri.parse(RECOVERY_URL)
-                startActivity(viewIntent)
-            }
-        }
-
-        pin2faErrorLogin.isVisible = false
-
-        addEditTextPintListeners(pinFirstLogin)
-        addEditTextPintListeners(pinSecondLogin)
-        addEditTextPintListeners(pinThirdLogin)
-        addEditTextPintListeners(pinFourthLogin)
-        addEditTextPintListeners(pinFifthLogin)
-        addEditTextPintListeners(pinSixthLogin)
-
-        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
-
-        pinSecondLogin.previousDigitEditText = pinFirstLogin
-        pinThirdLogin.previousDigitEditText = pinSecondLogin
-        pinFourthLogin.previousDigitEditText = pinThirdLogin
-        pinFifthLogin.previousDigitEditText = pinFourthLogin
-        pinSixthLogin.previousDigitEditText = pinFifthLogin
-
-        viewModel.checkTemporalCredentials()
-    }
-
-    private fun clickKarereLogs() {
-        pendingClicksKarere = if (pendingClicksKarere == 1) {
-            viewModel.checkAndUpdateKarereLogs(requireActivity())
-            CLICKS_TO_ENABLE_LOGS
-        } else {
-            pendingClicksKarere - 1
-        }
-    }
-
-    private fun clickSDKLogs() {
-        pendingClicksSDK = if (pendingClicksSDK == 1) {
-            viewModel.checkAndUpdateSDKLogs(requireActivity())
-            CLICKS_TO_ENABLE_LOGS
-        } else {
-            pendingClicksSDK - 1
-        }
     }
 
     /**
-     * Adds long click, focus change, and after text change listeners to the 2FA fields.
-     *
-     * @param editTextPIN The field.
+     * Gets data from the intent and performs the corresponding action if necessary.
      */
-    private fun addEditTextPintListeners(editTextPIN: EditTextPIN) {
-        editTextPIN.apply {
-            setOnLongClickListener {
-                isPinLongClick = true
-                requestFocus()
-                return@setOnLongClickListener false
-            }
-            onFocusChangeListener = View.OnFocusChangeListener { _: View?, hasFocus: Boolean ->
-                if (hasFocus) setText("")
-            }
-            doAfterTextChanged {
-                if (length() != 0) {
-                    requestEditTextPinFocus(with(binding) {
-                        when (id) {
-                            R.id.pin_first_login -> pinSecondLogin
-                            R.id.pin_second_login -> pinThirdLogin
-                            R.id.pin_third_login -> pinFourthLogin
-                            R.id.pin_fourth_login -> pinFifthLogin
-                            else -> pinSixthLogin
-                        }
-                    })
+    private fun setupIntent() = (requireActivity() as LoginActivity).intent?.let { intent ->
+        intentAction = intent.action
 
-                    if (id == R.id.pin_sixth_login) hideKeyboard()
+        intentAction?.let { action ->
+            Timber.d("action is: %s", action)
+            when (action) {
+                Constants.ACTION_CONFIRM -> {
+                    handleConfirmationIntent(intent)
+                    return
+                }
 
-                    when {
-                        areAllFieldsFilled() -> verify2FA()
-                        !was2FAErrorShown && !isPinLongClick -> clear2FAFields(id)
-                        isPinLongClick -> pasteClipboard()
+                Constants.ACTION_RESET_PASS -> {
+                    val link = intent.dataString
+                    if (link != null) {
+                        Timber.d("Link to resetPass: %s", link)
+                        showDialogInsertMKToChangePass(link)
+                        viewModel.intentSet()
+                        return
                     }
-                } else {
-                    viewModel.checkAndUpdate2FAState()
+                }
+
+                Constants.ACTION_PASS_CHANGED -> {
+                    when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
+                        MegaError.API_OK -> viewModel.setSnackbarMessageId(R.string.pass_changed_alert)
+                        MegaError.API_EKEY -> showAlertIncorrectRK()
+                        MegaError.API_EBLOCKED -> viewModel.setSnackbarMessageId(R.string.error_reset_account_blocked)
+                        else -> viewModel.setSnackbarMessageId(R.string.general_text_error)
+                    }
+                    viewModel.intentSet()
+                    return
+                }
+
+                Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
+                    val accountBlockedString =
+                        intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
+                    if (!TextUtil.isTextEmpty(accountBlockedString)) {
+                        Util.showErrorAlertDialog(accountBlockedString, false, activity)
+                    }
+                }
+
+                ACTION_FORCE_RELOAD_ACCOUNT -> {
+                    viewModel.setForceReloadAccountAsPendingAction()
+                    return
                 }
             }
-        }
-    }
-
-    /**
-     * Clears 2FA fields depending on the current field focus.
-     *
-     * @param fieldId Current field id.
-     */
-    private fun clear2FAFields(fieldId: Int) = with(binding) {
-        if (fieldId == R.id.pin_sixth_login) return
-        pinSixthLogin.setText("")
-        if (fieldId == R.id.pin_fifth_login) return
-        pinFifthLogin.setText("")
-        if (fieldId == R.id.pin_fourth_login) return
-        pinFourthLogin.setText("")
-        if (fieldId == R.id.pin_third_login) return
-        pinThirdLogin.setText("")
-        if (fieldId == R.id.pin_second_login) return
-        pinSecondLogin.setText("")
-    }
-
-    /**
-     * Requests the focus for 2FA fields.
-     *
-     * @param editTextPIN The field.
-     */
-    private fun requestEditTextPinFocus(editTextPIN: EditTextPIN) = editTextPIN.apply {
-        requestFocus()
-        isCursorVisible = true
-    }
+        } ?: Timber.w("ACTION NULL")
+    } ?: Timber.w("No INTENT")
 
     private fun finishSetupIntent(uiState: LoginState) {
         (requireActivity() as LoginActivity).intent?.apply {
@@ -689,7 +396,7 @@ class LoginFragment : Fragment() {
                     }
 
                     Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
-                        showMessage(R.string.login_before_share)
+                        viewModel.setSnackbarMessageId(R.string.login_before_share)
                     }
 
                     Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
@@ -703,291 +410,29 @@ class LoginFragment : Fragment() {
     }
 
     /**
-     * Gets data from the intent and performs the corresponding action if necessary.
-     */
-    private fun setupIntent() = (requireActivity() as LoginActivity).intent?.let { intent ->
-        intentAction = intent.action
-
-        intentAction?.let { action ->
-            Timber.d("action is: %s", action)
-            when (action) {
-                Constants.ACTION_CONFIRM -> {
-                    handleConfirmationIntent(intent)
-                    return
-                }
-
-                Constants.ACTION_RESET_PASS -> {
-                    val link = intent.dataString
-                    if (link != null) {
-                        Timber.d("Link to resetPass: %s", link)
-                        showDialogInsertMKToChangePass(link)
-                        viewModel.intentSet()
-                        return
-                    }
-                }
-
-                Constants.ACTION_PASS_CHANGED -> {
-                    when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
-                        MegaError.API_OK -> showMessage(R.string.pass_changed_alert)
-                        MegaError.API_EKEY -> showAlertIncorrectRK()
-                        MegaError.API_EBLOCKED -> showMessage(R.string.error_reset_account_blocked)
-                        else -> showMessage(R.string.general_text_error)
-                    }
-                    viewModel.intentSet()
-                    return
-                }
-
-                Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
-                    val accountBlockedString =
-                        intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
-                    if (!TextUtil.isTextEmpty(accountBlockedString)) {
-                        Util.showErrorAlertDialog(accountBlockedString, false, activity)
-                    }
-                }
-
-                ACTION_FORCE_RELOAD_ACCOUNT -> {
-                    viewModel.setForceReloadAccountAsPendingAction()
-                    return
-                }
-            }
-        } ?: Timber.w("ACTION NULL")
-
-        Timber.d("et_user.getText(): %s", binding.loginEmailText.text)
-    } ?: Timber.w("No INTENT")
-
-    /**
-     * Shows login in progress screen.
-     */
-    private fun showLoginInProgress(isAlreadyFetchingNodes: Boolean = true) = with(binding) {
-        loginLayout.isVisible = false
-        loginLoggingInLayout.isVisible = true
-        loginProgressBar.isVisible = true
-        loginFetchingNodesBar.isVisible = false
-        loginLoggingInText.isVisible = true
-        loginFetchNodesText.isVisible = isAlreadyFetchingNodes
-        loginPrepareNodesText.isVisible = false
-        loginServersBusyText.isVisible = false
-        loginCreateAccountLayout.isVisible = false
-        loginQuerySignupLinkText.isVisible = false
-        loginConfirmAccountText.isVisible = false
-        loginGeneratingKeysText.isVisible = false
-    }
-
-    /**
-     * Shows the login screen.
-     */
-    private fun returnToLogin() {
-        (requireActivity() as LoginActivity).hideAB()
-        showLoginScreen()
-    }
-
-    /**
-     * Shows the login screen.
-     */
-    private fun showLoginScreen() = with(binding) {
-        loginLayout.isVisible = true
-        loginLoggingInLayout.isVisible = false
-        loginProgressBar.isVisible = false
-        loginFetchingNodesBar.isVisible = false
-        loginLoggingInText.isVisible = false
-        loginFetchNodesText.isVisible = false
-        loginPrepareNodesText.isVisible = false
-        loginServersBusyText.isVisible = false
-        loginCreateAccountLayout.isVisible = true
-        loginQuerySignupLinkText.isVisible = false
-        loginConfirmAccountText.isVisible = false
-        loginGeneratingKeysText.isVisible = false
-        login2fa.isVisible = false
-    }
-
-    private fun show2FAScreen() = with(binding) {
-        (requireActivity() as LoginActivity).showAB(toolbarLogin)
-        loginLayout.isVisible = false
-        loginLoggingInLayout.isVisible = false
-        loginProgressBar.isVisible = false
-        loginFetchingNodesBar.isVisible = false
-        loginLoggingInText.isVisible = false
-        loginFetchNodesText.isVisible = false
-        loginPrepareNodesText.isVisible = false
-        loginServersBusyText.isVisible = false
-        loginCreateAccountLayout.isVisible = false
-        loginQuerySignupLinkText.isVisible = false
-        loginConfirmAccountText.isVisible = false
-        loginGeneratingKeysText.isVisible = false
-        login2fa.isVisible = true
-        requestEditTextPinFocus(pinFirstLogin)
-    }
-
-    /**
-     * Hides UI errors.
-     */
-    private fun hide2FAError() = with(binding) {
-        viewModel.checkAndUpdate2FAState()
-        pin2faErrorLogin.isVisible = false
-        listOf(
-            pinFirstLogin,
-            pinSecondLogin,
-            pinThirdLogin,
-            pinFourthLogin,
-            pinFifthLogin,
-            pinSixthLogin
-        ).forEach { it.setTextColor(pin2FAColor) }
-    }
-
-    /**
-     * Shows UI errors.
-     */
-    private fun show2FAError() = with(binding) {
-        was2FAErrorShown = true
-        pin2faErrorLogin.isVisible = true
-        listOf(
-            pinFirstLogin,
-            pinSecondLogin,
-            pinThirdLogin,
-            pinFourthLogin,
-            pinFifthLogin,
-            pinSixthLogin
-        ).forEach { it.setTextColor(pin2FAErrorColor) }
-    }
-
-
-    /**
-     * Checks if all the 2FA fields are filled.
-     *
-     * @return True if all fields are already filled, false otherwise.
-     */
-    private fun areAllFieldsFilled() = with(binding) {
-        pinFirstLogin.length() == 1 && pinSecondLogin.length() == 1 && pinThirdLogin.length() == 1 && pinFourthLogin.length() == 1 && pinFifthLogin.length() == 1 && pinSixthLogin.length() == 1
-    }
-
-    /**
-     * Verifies if the typed 2FA is correct.
-     */
-    private fun verify2FA() = with(binding) {
-        Util.hideKeyboard(requireActivity(), 0)
-        if (sb.isNotEmpty()) {
-            sb.delete(0, sb.length)
-        }
-        sb.append(pinFirstLogin.text)
-        sb.append(pinSecondLogin.text)
-        sb.append(pinThirdLogin.text)
-        sb.append(pinFourthLogin.text)
-        sb.append(pinFifthLogin.text)
-        sb.append(pinSixthLogin.text)
-        val twoFAPin = sb.toString()
-
-        if (!pin2faErrorLogin.isVisible) {
-            Timber.d("Login with factor login")
-            progressbarVerify2fa.isVisible = true
-            viewModel.performLoginWith2FA(twoFAPin)
-        }
-    }
-
-    private fun startFastLogin() {
-        Timber.d("startFastLogin")
-        viewModel.fastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
-    }
-
-    /**
-     * Updates the UI for logging.
-     */
-    private fun loginClicked() = with(binding) {
-        loginEmailText.hideKeyboard()
-
-        if (!isConnected()) {
-            viewModel.resetOngoingTransfers()
-            return
-        }
-
-        val typedEmail = loginEmailText.text.toString().lowercase().trim { it <= ' ' }
-        val typedPassword = loginPasswordText.text.toString()
-        Timber.d("Generating keys")
-
-        viewModel.performLogin(typedEmail, typedPassword)
-    }
-
-    /**
-     * Checks if there is a typed email and if has the correct format.
-     * Gets the error string if not.
-     */
-    private val emailError: String?
-        get() {
-            val value = binding.loginEmailText.text.toString()
-            return when {
-                value.isEmpty() -> getString(R.string.error_enter_email)
-                !Constants.EMAIL_ADDRESS.matcher(value)
-                    .matches() -> getString(R.string.error_invalid_email)
-
-                else -> null
-            }
-        }
-
-    /**
-     * Checks if there is a typed email.
-     * Gets the error string if not.
-     */
-    private val passwordError: String?
-        get() {
-            return if (binding.loginPasswordText.text?.isEmpty() == true) {
-                getString(R.string.error_enter_password)
-            } else null
-        }
-
-    /**
-     * Checks if the email and password are typed and has the correct format.
-     * Shows errors if not.
-     */
-    private fun checkTypedValues() {
-        val emailError = emailError
-        val passwordError = passwordError
-        setError(binding.loginEmailText, emailError)
-        setError(binding.loginPasswordText, passwordError)
-
-        when {
-            emailError != null -> binding.loginEmailText.requestFocus()
-            passwordError != null -> binding.loginPasswordText.requestFocus()
-            else -> viewModel.checkOngoingTransfers()
-        }
-    }
-
-    /**
-     * Disables login button.
-     */
-    private fun disableLoginButton() = with(binding) {
-        Timber.d("Disable login button")
-        //disable login button
-        buttonLogin.isEnabled = false
-        //display login info
-        pbLoginInProgress.isVisible = true
-        textLoginTip.apply {
-            isVisible = true
-            text = getString(R.string.login_in_progress)
-        }
-    }
-
-    /**
-     * Enables login button.
-     */
-    private fun enableLoginButton() = with(binding) {
-        Timber.d("Enable login button")
-        buttonLogin.isEnabled = true
-        pbLoginInProgress.isVisible = false
-        textLoginTip.isVisible = false
-    }
-
-    /**
      * Handles intent from confirmation email.
      *
      * @param intent Intent.
      */
     private fun handleConfirmationIntent(intent: Intent) {
         if (!viewModel.isConnected) {
-            showMessage(R.string.error_server_connection_problem)
+            viewModel.setSnackbarMessageId(R.string.error_server_connection_problem)
             return
         }
 
         Timber.d("querySignupLink")
         intent.getStringExtra(Constants.EXTRA_CONFIRMATION)?.let { viewModel.checkSignupLink(it) }
+    }
+
+    private fun showChangeApiServerDialog() {
+        if (changeApiServerDialog == null || changeApiServerDialog?.isShowing == false) {
+            changeApiServerDialog = showChangeApiServerDialog(requireActivity())
+        }
+    }
+
+    private fun startFastLogin() {
+        Timber.d("startFastLogin")
+        viewModel.fastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
     }
 
     /**
@@ -1319,12 +764,6 @@ class LoginFragment : Fragment() {
         }
     }
 
-    override fun onDestroy() {
-        confirmLogoutDialog?.dismiss()
-        changeApiServerDialog?.dismiss()
-        super.onDestroy()
-    }
-
     /**
      * Shows a confirmation dialog before cancelling the current in progress login.
      */
@@ -1332,128 +771,26 @@ class LoginFragment : Fragment() {
         confirmLogoutDialog = MaterialAlertDialogBuilder(requireContext())
             .setCancelable(true)
             .setMessage(getString(R.string.confirm_cancel_login))
-            .setPositiveButton(getString(R.string.general_positive_button)) { _, _ ->
-                viewModel.stopLogin()
-            }.setNegativeButton(getString(R.string.general_negative_button), null)
+            .setPositiveButton(getString(R.string.general_positive_button)) { _, _ -> viewModel.stopLogin() }
+            .setNegativeButton(getString(R.string.general_negative_button), null)
             .show()
     }
 
     /**
      * Performs on back pressed.
      */
-    fun onBackPressed(): Int {
+    fun onBackPressed(uiState: LoginState) {
         Timber.d("onBackPressed")
         //refresh, point to staging server, enable chat. block the back button
         if (Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction) {
-            return -1
-        }
-
-        return if (isLoggingIn || binding.loginProgressBar.isVisible || binding.login2fa.isVisible) {
-            showConfirmLogoutDialog()
-            2
-        } else {
-            LoginActivity.isBackFromLoginPage = true
-            (requireActivity() as LoginActivity).showFragment(Constants.TOUR_FRAGMENT)
-            1
-        }
-    }
-
-    /**
-     * Shows an error in some field.
-     *
-     * @param editText The field in which the error has to be shown.
-     * @param error    The error to show.
-     */
-    private fun setError(editText: EditText, error: String?) {
-        if (error.isNullOrEmpty()) {
             return
         }
 
-        with(binding) {
-            when (editText.id) {
-                R.id.login_email_text -> {
-                    loginEmailTextLayout.apply {
-                        setError(error)
-                        setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
-                    }
-                    loginEmailTextErrorIcon.isVisible = true
-                }
-
-                R.id.login_password_text -> {
-                    loginPasswordTextLayout.apply {
-                        setError(error)
-                        setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
-                    }
-                    loginPasswordTextErrorIcon.isVisible = true
-                }
-            }
-        }
-    }
-
-    /**
-     * Hides the error from some field.
-     *
-     * @param editText The field in which the error has to be hidden.
-     */
-    private fun quitError(editText: EditText) = with(binding) {
-        when (editText.id) {
-            R.id.login_email_text -> {
-                loginEmailTextLayout.apply {
-                    error = null
-                    setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
-                }
-                loginEmailTextErrorIcon.isVisible = false
-            }
-
-            R.id.login_password_text -> {
-                loginPasswordTextLayout.apply {
-                    error = null
-                    setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
-                }
-                loginPasswordTextErrorIcon.isVisible = false
-            }
-        }
-    }
-
-    /**
-     * Pastes a code for 2FA.
-     */
-    private fun pasteClipboard() {
-        Timber.d("pasteClipboard")
-        isPinLongClick = false
-        val clipboard =
-            requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-
-        clipboard.primaryClip?.let {
-            val code = it.getItemAt(0).text.toString()
-            Timber.d("code: %s", code)
-            if (code.length == 6) {
-                var areDigits = true
-                for (i in 0..5) {
-                    if (!Character.isDigit(code[i])) {
-                        areDigits = false
-                        break
-                    }
-                }
-
-                with(binding) {
-                    if (areDigits) {
-                        pinFirstLogin.setText(code[0].toString())
-                        pinSecondLogin.setText(code[1].toString())
-                        pinThirdLogin.setText(code[2].toString())
-                        pinFourthLogin.setText(code[3].toString())
-                        pinFifthLogin.setText(code[4].toString())
-                        pinSixthLogin.setText(code[5].toString())
-                    } else {
-                        pinFirstLogin.setText("")
-                        pinSecondLogin.setText("")
-                        pinThirdLogin.setText("")
-                        pinFourthLogin.setText("")
-                        pinFifthLogin.setText("")
-                        pinSixthLogin.setText("")
-                    }
-                }
-            }
+        if (isLoggingIn || uiState.isLoginInProgress || uiState.is2FARequired || uiState.multiFactorAuthState != null) {
+            showConfirmLogoutDialog()
+        } else {
+            LoginActivity.isBackFromLoginPage = true
+            (requireActivity() as LoginActivity).showFragment(Constants.TOUR_FRAGMENT)
         }
     }
 
@@ -1462,10 +799,7 @@ class LoginFragment : Fragment() {
      */
     private fun showCancelTransfersDialog() = AlertDialog.Builder(requireContext()).apply {
         setMessage(R.string.login_warning_abort_transfers)
-        setPositiveButton(R.string.login_text) { _, _ ->
-            viewModel.launchCancelTransfers()
-            loginClicked()
-        }
+        setPositiveButton(R.string.login_text) { _, _ -> viewModel.onLoginClicked(true) }
         setNegativeButton(R.string.general_cancel) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()
@@ -1516,39 +850,6 @@ class LoginFragment : Fragment() {
             .show()
     }
 
-    private fun showMessage(stringId: Int) =
-        (requireActivity() as LoginActivity).showSnackbar(getString(stringId))
-
-    private fun isConnected(): Boolean = if (!viewModel.isConnected) {
-        showLoginScreen()
-        showMessage(R.string.error_server_connection_problem)
-        false
-    } else true
-
-    private fun showQuerySignupLinkResult(result: Result<String>) {
-        showLoginScreen()
-        binding.buttonForgotPass.isInvisible = true
-
-        if (result.isSuccess) {
-            with(binding) {
-                buttonForgotPass.isInvisible = false
-                loginProgressBar.isVisible = false
-                loginTextView.text = getString(R.string.login_to_mega)
-                buttonLogin.text = getString(R.string.login_text)
-                loginEmailText.setText(result.getOrNull())
-                loginPasswordText.requestFocus()
-            }
-            showMessage(R.string.account_confirmed)
-            viewModel.updateIsAccountConfirmed(true)
-        } else {
-            (result.exceptionOrNull() as QuerySignupLinkException).messageId?.let {
-                showMessage(it)
-            }
-        }
-
-        viewModel.setQuerySignupLinkResultConsumed()
-    }
-
     private fun getFolderLinkIntent(): Intent {
         return if (viewModel.isFeatureEnabled(AppFeatures.FolderLinkCompose))
             Intent(requireContext(), FolderLinkComposeActivity::class.java)
@@ -1582,12 +883,18 @@ class LoginFragment : Fragment() {
         (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
     }
 
-    companion object {
-        private const val LONG_CLICK_DELAY: Long = 5000
-
-        /**
-         * Necessary times to click in a view to enable or disable logs.
-         */
-        const val CLICKS_TO_ENABLE_LOGS = 5
+    private fun onLostAuthenticationDevice() {
+        try {
+            startActivity(Intent(requireContext(), WebViewActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                data = Uri.parse(RECOVERY_URL)
+            })
+        } catch (e: Exception) {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(RECOVERY_URL)))
+            } catch (e: Exception) {
+                Timber.w("Exception trying to open installed browser apps", e)
+            }
+        }
     }
 }

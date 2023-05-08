@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.isDigitsOnly
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.body2medium
@@ -311,9 +311,9 @@ private fun PreviewTwoFactorAuthenticationField() {
                 isError = twoFAPin.none { it.isEmpty() }
             },
             on2FAChanged = { newTwoFA ->
-                if (newTwoFA.length <= NUMBER_PINS && newTwoFA.isDigitsOnly()) {
-                    twoFAPin = newTwoFA.split("").filter { it.isNotEmpty() }
-                    isError = newTwoFA.length == NUMBER_PINS
+                newTwoFA.getTwoFactorAuthentication()?.apply {
+                    twoFAPin = this
+                    isError = true
                 }
             },
             isError = isError,

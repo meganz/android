@@ -52,7 +52,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-internal class TestLoginViewModelTest {
+internal class LoginViewModelTest {
 
     private lateinit var underTest: LoginViewModel
 
@@ -150,9 +150,7 @@ internal class TestLoginViewModelTest {
                 assertThat(isLoginRequired).isFalse()
                 assertThat(isLoginInProgress).isFalse()
                 assertThat(loginException).isNull()
-                assertThat(fetchNodesException).isNull()
                 assertThat(ongoingTransfersExist).isNull()
-                assertThat(querySignupLinkResult).isNull()
                 assertThat(isPendingToFinishActivity).isFalse()
                 assertThat(isPendingToShowFragment).isNull()
                 assertThat(enabledFlags).isEmpty()
@@ -167,7 +165,7 @@ internal class TestLoginViewModelTest {
         with(underTest) {
             state.map { it.emailError }.test {
                 assertThat(awaitItem()).isNull()
-                onLoginClicked()
+                onLoginClicked(false)
                 assertThat(awaitItem()).isEqualTo(LoginError.EmptyEmail)
             }
         }
@@ -180,7 +178,7 @@ internal class TestLoginViewModelTest {
                 .test {
                     assertThat(awaitItem()).isNull()
                     onEmailChanged("wrongEmail")
-                    onLoginClicked()
+                    onLoginClicked(false)
                     assertThat(awaitItem()).isEqualTo(LoginError.NotValidEmail)
                 }
         }
@@ -191,7 +189,7 @@ internal class TestLoginViewModelTest {
         with(underTest) {
             state.map { it.passwordError }.test {
                 assertThat(awaitItem()).isNull()
-                onLoginClicked()
+                onLoginClicked(false)
                 assertThat(awaitItem()).isEqualTo(LoginError.EmptyPassword)
             }
         }
@@ -208,7 +206,7 @@ internal class TestLoginViewModelTest {
                         onEmailChanged("test@test.com")
                         onPasswordChanged("Password")
                         assertThat(awaitItem()).isNull()
-                        onLoginClicked()
+                        onLoginClicked(false)
                         assertThat(awaitItem()).isTrue()
                     }
             }
@@ -225,8 +223,10 @@ internal class TestLoginViewModelTest {
                     .test {
                         assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
                         onEmailChanged("test@test.com")
+                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
                         onPasswordChanged("Password")
-                        onLoginClicked()
+                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
+                        onLoginClicked(false)
                         assertThat(awaitItem()).isInstanceOf(triggered(R.string.error_server_connection_problem).javaClass)
                     }
             }
@@ -241,7 +241,7 @@ internal class TestLoginViewModelTest {
             state.test {
                 onEmailChanged("test@test.com")
                 onPasswordChanged("Password")
-                onLoginClicked()
+                onLoginClicked(false)
                 advanceUntilIdle()
                 assertThat(awaitItem().emailError).isNull()
                 assertThat(awaitItem().passwordError).isNull()
