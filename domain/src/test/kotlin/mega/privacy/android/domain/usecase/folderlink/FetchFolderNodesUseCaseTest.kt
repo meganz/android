@@ -4,9 +4,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
+import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -26,10 +26,10 @@ class FetchFolderNodesUseCaseTest {
     private val repository: FolderLinkRepository = mock()
     private val addNodeType: AddNodeType = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
-    private val unTypeNode = mock<UnTypedNode>()
+    private val unTypeNode = mock<FolderNode>()
     private val typedFolderNode = mock<TypedFolderNode>()
-    private val typedNode = mock<TypedNode>()
-    private val typedNodeList = mock<List<TypedNode>>()
+    private val typedNode = mock<DefaultTypedFileNode>()
+    private val typedNodeList = mock<List<TypedFolderNode>>()
 
     @Before
     fun setUp() {
@@ -46,7 +46,12 @@ class FetchFolderNodesUseCaseTest {
             whenever(repository.fetchNodes()).thenReturn(result)
             whenever(repository.getRootNode()).thenReturn(unTypeNode)
             whenever(addNodeType(unTypeNode)).thenReturn(typedFolderNode)
-            whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(typedNodeList)
+            whenever(
+                getFolderLinkChildrenNodesUseCase(
+                    any(),
+                    anyOrNull()
+                )
+            ).thenReturn(typedNodeList)
 
             underTest(folderSubHandle)
             verify(repository).updateLastPublicHandle(nodeHandle)

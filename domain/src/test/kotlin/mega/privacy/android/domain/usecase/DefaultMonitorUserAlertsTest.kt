@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.repository.NotificationsRepository
 import org.junit.Before
@@ -24,7 +25,7 @@ class DefaultMonitorUserAlertsTest {
 
     @Test
     fun `test that current items are returned`() = runTest {
-        val expected = listOf(mock<UserAlert>())
+        val expected = listOf(mock<IncomingPendingContactRequestAlert>())
         whenever(notificationsRepository.getUserAlerts()).thenReturn(expected)
         whenever(notificationsRepository.monitorUserAlerts()).thenReturn(flowOf())
 
@@ -36,12 +37,12 @@ class DefaultMonitorUserAlertsTest {
 
     @Test
     fun `test that new events that already exist replace the existing alert`() = runTest {
-        val alert1 = mock<UserAlert> {
+        val alert1 = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
         }
-        val alert2 = mock<UserAlert> { on { id }.thenReturn(2L) }
+        val alert2 = mock<IncomingPendingContactRequestAlert> { on { id }.thenReturn(2L) }
 
-        val alert1Update = mock<UserAlert> {
+        val alert1Update = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
         }
 
@@ -57,16 +58,16 @@ class DefaultMonitorUserAlertsTest {
 
     @Test
     fun `test that subsequent updates retain previous updates`() = runTest {
-        val alert1 = mock<UserAlert> {
+        val alert1 = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
         }
-        val alert2 = mock<UserAlert> { on { id }.thenReturn(2L) }
+        val alert2 = mock<IncomingPendingContactRequestAlert> { on { id }.thenReturn(2L) }
 
-        val alert1Update = mock<UserAlert> {
+        val alert1Update = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
         }
 
-        val alert2Update = mock<UserAlert> { on { id }.thenReturn(2L) }
+        val alert2Update = mock<IncomingPendingContactRequestAlert> { on { id }.thenReturn(2L) }
 
         whenever(notificationsRepository.getUserAlerts()).thenReturn(listOf(alert1, alert2))
         whenever(notificationsRepository.monitorUserAlerts()).thenReturn(flowOf(listOf(alert1Update),
@@ -83,7 +84,7 @@ class DefaultMonitorUserAlertsTest {
     @Test
     fun `test that events are returned in reverse chronological order`() = runTest {
         val alerts = (1L..5L).map { value ->
-            mock<UserAlert> {
+            mock<IncomingPendingContactRequestAlert> {
                 on { id }.thenReturn(value)
                 on { createdTime }.thenReturn(
                     value
@@ -104,12 +105,12 @@ class DefaultMonitorUserAlertsTest {
 
     @Test
     fun `test that own changed updates are ignored`() = runTest {
-        val alert1 = mock<UserAlert> {
+        val alert1 = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
         }
-        val alert2 = mock<UserAlert> { on { id }.thenReturn(2L) }
+        val alert2 = mock<IncomingPendingContactRequestAlert> { on { id }.thenReturn(2L) }
 
-        val alert1Update = mock<UserAlert> {
+        val alert1Update = mock<IncomingPendingContactRequestAlert> {
             on { id }.thenReturn(1L)
             on { isOwnChange }.thenReturn(true)
         }

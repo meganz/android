@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.imageviewer
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
@@ -25,7 +25,7 @@ class GetImageByOfflineNodeHandleUseCaseTest {
 
     private val nodeHandle = 1L
     private val highPriority = false
-    private val offlineNodeInformation = mock<OfflineNodeInformation>()
+    private val offlineNodeInformation = mock<IncomingShareOfflineNodeInformation>()
 
     @Before
     fun setUp() {

@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.filenode
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -17,7 +17,7 @@ internal class DefaultCanTextFileBeOpenedInternallyTest {
 
     @Test
     fun `test that nodes smaller than the max size returns true`() = runTest {
-        val node = mock<TypedFileNode> {
+        val node = mock<DefaultTypedFileNode> {
             on { size }.thenReturn(DefaultCanTextFileBeOpenedInternally.maxOpenableSizeBytes - 1)
         }
         assertThat(underTest(node)).isTrue()
@@ -25,7 +25,7 @@ internal class DefaultCanTextFileBeOpenedInternallyTest {
 
     @Test
     fun `test that nodes exactly the same as the max size returns true`() = runTest {
-        val node = mock<TypedFileNode> {
+        val node = mock<DefaultTypedFileNode> {
             on { size }.thenReturn(DefaultCanTextFileBeOpenedInternally.maxOpenableSizeBytes)
         }
         assertThat(underTest(node)).isTrue()
@@ -33,7 +33,7 @@ internal class DefaultCanTextFileBeOpenedInternallyTest {
 
     @Test
     fun `test that nodes bigger than the max size returns false`() = runTest {
-        val node = mock<TypedFileNode> {
+        val node = mock<DefaultTypedFileNode> {
             on { size }.thenReturn(DefaultCanTextFileBeOpenedInternally.maxOpenableSizeBytes + 1)
         }
         assertThat(underTest(node)).isFalse()

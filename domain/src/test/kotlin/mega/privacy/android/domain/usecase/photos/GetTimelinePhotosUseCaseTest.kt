@@ -27,7 +27,7 @@ class GetTimelinePhotosUseCaseTest {
 
     @Test
     fun `test that current photos are returned`() = runTest {
-        val photo = mock<Photo>()
+        val photo = mock<Photo.Image>()
         val expected = listOf(photo)
 
         whenever(photosRepository.monitorPhotos()).thenReturn(

@@ -31,7 +31,7 @@ class DefaultFilterCloudDrivePhotosTest {
 
     @Test
     fun `test that photos in camera upload folder are filtered out`() = runTest {
-        val photo = mock<Photo> {
+        val photo = mock<Photo.Image> {
             on { parentId }.thenReturn(cameraUploadFolderId)
         }
         assertThat(underTest(listOf(photo))).isEmpty()
@@ -39,7 +39,7 @@ class DefaultFilterCloudDrivePhotosTest {
 
     @Test
     fun `test that photos in media upload folder are filtered out`() = runTest {
-        val photo = mock<Photo> {
+        val photo = mock<Photo.Image> {
             on { parentId }.thenReturn(mediaUploadFolderId)
         }
         assertThat(underTest(listOf(photo))).isEmpty()
@@ -47,7 +47,7 @@ class DefaultFilterCloudDrivePhotosTest {
 
     @Test
     fun `test that photos in neither folder are returned`() = runTest {
-        val photo = mock<Photo> {
+        val photo = mock<Photo.Image> {
             on { parentId }.thenReturn(3L)
         }
         assertThat(underTest(listOf(photo))).containsExactly(photo)
@@ -55,13 +55,13 @@ class DefaultFilterCloudDrivePhotosTest {
 
     @Test
     fun `test that non filtered values are returned`() = runTest {
-        val mediaUploadPhoto = mock<Photo> {
+        val mediaUploadPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(mediaUploadFolderId)
         }
-        val cameraUploadPhoto = mock<Photo> {
+        val cameraUploadPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(cameraUploadFolderId)
         }
-        val expectedPhoto = mock<Photo> {
+        val expectedPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(3L)
         }
         assertThat(underTest(listOf(mediaUploadPhoto,
@@ -71,13 +71,13 @@ class DefaultFilterCloudDrivePhotosTest {
 
     @Test
     fun `test that folder ids are fetched only once`() = runTest {
-        val mediaUploadPhoto = mock<Photo> {
+        val mediaUploadPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(mediaUploadFolderId)
         }
-        val cameraUploadPhoto = mock<Photo> {
+        val cameraUploadPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(cameraUploadFolderId)
         }
-        val filteredPhoto = mock<Photo> {
+        val filteredPhoto = mock<Photo.Image> {
             on { parentId }.thenReturn(3L)
         }
         underTest(listOf(mediaUploadPhoto,

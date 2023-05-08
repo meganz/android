@@ -2,7 +2,8 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.Assert.*
 import org.junit.Before
@@ -18,8 +19,8 @@ class GetNodesByHandlesUseCaseTest {
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
-    private val unTypeNodeOne = mock<UnTypedNode>()
-    private val unTypeNodeTwo = mock<UnTypedNode>()
+    private val unTypeNodeOne = mock<FolderNode>()
+    private val unTypeNodeTwo = mock<FileNode>()
     private val unTypedNodeList = listOf(unTypeNodeOne, unTypeNodeTwo)
 
     @Before

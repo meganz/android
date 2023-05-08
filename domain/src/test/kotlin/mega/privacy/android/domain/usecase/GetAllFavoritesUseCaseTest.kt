@@ -5,9 +5,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
@@ -24,7 +24,7 @@ class GetAllFavoritesUseCaseTest {
     private val favouritesRepository = mock<FavouritesRepository>()
 
     private val addNodeType = mock<AddNodeType> {
-        val typedNode = mock<TypedNode>()
+        val typedNode = mock<TypedFolderNode>()
         onBlocking { invoke(any()) }.thenReturn(typedNode)
     }
 
@@ -48,7 +48,7 @@ class GetAllFavoritesUseCaseTest {
     @Test
     fun `test that favourites is not empty`() {
         runTest {
-            val list = listOf(mock<UnTypedNode>())
+            val list = listOf(mock<FolderNode>())
             whenever(favouritesRepository.getAllFavorites()).thenReturn(
                 list
             )

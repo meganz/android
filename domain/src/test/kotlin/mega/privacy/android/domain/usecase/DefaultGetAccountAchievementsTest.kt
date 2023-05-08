@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
@@ -20,7 +20,7 @@ class DefaultGetAccountAchievementsTest {
 
     private lateinit var underTest: GetAccountAchievements
     private val accountRepository = mock<AccountRepository>()
-    private val achievement = mock<MegaAchievement>()
+    private val achievement = mock<DefaultMegaAchievement>()
 
     @Before
     fun setUp() {

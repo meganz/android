@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Before
@@ -28,7 +28,7 @@ class DefaultGetTypedNodesFromFolderTest {
 
     private val nodeRepository = mock<NodeRepository>()
 
-    private val addNodeType = mock<AddNodeType> { onBlocking { invoke(any()) }.thenReturn(mock()) }
+    private val addNodeType = mock<AddNodeType> { onBlocking { invoke(any()) }.thenReturn(mock<TypedFolderNode>()) }
 
     @Before
     fun setUp() {
@@ -75,7 +75,7 @@ class DefaultGetTypedNodesFromFolderTest {
     @Test
     fun `test that folder child is not empty`() {
         runTest {
-            val list = listOf(mock<UnTypedNode> { on { id }.thenReturn(NodeId(22L)) })
+            val list = listOf(mock<FolderNode> { on { id }.thenReturn(NodeId(22L)) })
             val folderNode = mock<FolderNode>()
             val nodeId = NodeId(1)
             whenever(nodeRepository.getNodeById(nodeId)).thenReturn(folderNode)

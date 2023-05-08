@@ -4,8 +4,8 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.jupiter.api.BeforeEach
@@ -102,8 +102,9 @@ internal class DefaultDeleteNodeVersionsByHandleJunit5ExampleTest {
         private val versionIds = (10L..15L).map { NodeId(it) }
         private val versions = versionIds.map { createVersionNodeMock(it) }
 
-        private fun createVersionNodeMock(id: NodeId): UnTypedNode = mock<UnTypedNode>().also {
-            whenever(it.id).thenReturn(id)
-        }
+        private fun createVersionNodeMock(id: NodeId): FolderNode =
+            mock<FolderNode>().also {
+                whenever(it.id).thenReturn(id)
+            }
     }
 }

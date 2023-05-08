@@ -3,9 +3,10 @@ package mega.privacy.android.domain.usecase.node
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
+import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.NodeAction
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -25,8 +26,8 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetAvailableNodeActionsUseCaseTest {
 
-    private val fileNode = mock<TypedFileNode>()
-    private val folderNode = mock<TypedFolderNode>()
+    private val fileNode = mock<DefaultTypedFileNode>()
+    private val folderNode = mock<DefaultTypedFolderNode>()
 
     private val parentNode = mock<TypedFolderNode> {
         on { id }.thenReturn(parentId)

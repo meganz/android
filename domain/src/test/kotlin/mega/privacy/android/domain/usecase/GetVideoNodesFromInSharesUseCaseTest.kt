@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.Before
 import org.junit.Test
@@ -18,8 +18,8 @@ class GetVideoNodesFromInSharesUseCaseTest {
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
-    private val unTypeNodeOne = mock<UnTypedNode>()
-    private val unTypeNodeTwo = mock<UnTypedNode>()
+    private val unTypeNodeOne = mock<FileNode>()
+    private val unTypeNodeTwo = mock<FileNode>()
     private val unTypedNodeList = listOf(unTypeNodeOne, unTypeNodeTwo)
 
     @Before
