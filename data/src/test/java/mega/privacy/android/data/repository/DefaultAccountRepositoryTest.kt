@@ -36,7 +36,7 @@ import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
-import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -277,7 +277,7 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that account achievement data is successfully returned`() = runTest {
         val megaAchievementsDetails = mock<MegaAchievementsDetails>()
-        val megaAchievement = mock<MegaAchievement>()
+        val megaAchievement = mock<DefaultMegaAchievement>()
 
         whenever(
             megaAchievementMapper(

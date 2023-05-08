@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.NodeMapper
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaApiJava
@@ -35,7 +35,7 @@ class DefaultFavouritesRepositoryTest {
         on { label }.thenReturn(MegaNode.NODE_LBL_RED)
     }
 
-    private val favouriteInfo = mock<UnTypedNode>()
+    private val favouriteInfo = mock<FolderNode>()
 
     private val nodeMapper: NodeMapper = mock()
 

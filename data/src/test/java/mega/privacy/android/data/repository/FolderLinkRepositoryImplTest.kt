@@ -16,8 +16,8 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.SynchronisationException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -40,7 +40,7 @@ class FolderLinkRepositoryImplTest {
     private val megaApiGateway: MegaApiGateway = mock()
     private val folderLoginStatusMapper = mock<FolderLoginStatusMapper>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val untypedNode = mock<UnTypedNode>()
+    private val untypedNode = mock<FolderNode>()
     private val nodeMapper: NodeMapper = mock()
 
     @Before
