@@ -393,8 +393,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
                     }
-
-                    INBOX_MODE -> Timber.d("show My Backups bottom sheet")
+                    INBOX_MODE -> {
+                        Timber.d("show My Backups bottom sheet")
+                        counterModify--
+                        optionRestoreFromRubbish.visibility = View.GONE
+                    }
                     RUBBISH_BIN_MODE -> {
                         Timber.d("show Rubbish bottom sheet")
                         optionEdit.visibility = View.GONE
