@@ -42,7 +42,11 @@ class FeedBackDialog : DialogFragment() {
         rateAppCheck.setOnClickListener {
             Timber.d("Rate the app")
             //Rate the app option:
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
+            runCatching {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(RATE_APP_URL)))
+            }.onFailure {
+                Timber.d("Can not handle action Intent.ACTION_VIEW")
+            }
             dismiss()
         }
 

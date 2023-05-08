@@ -1307,7 +1307,11 @@ public class Util {
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
         cameraIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         cameraIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        activity.startActivityForResult(cameraIntent, option);
+        try {
+            activity.startActivityForResult(cameraIntent, option);
+        } catch (Exception e) {
+            Timber.d("Can not handle action MediaStore.ACTION_IMAGE_CAPTURE");
+        }
     }
 
     /**

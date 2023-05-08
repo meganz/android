@@ -538,7 +538,11 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             Timber.d("Is URL - launch browser intent")
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = Uri.parse(it)
-            startActivity(intent)
+            runCatching {
+                startActivity(intent)
+            }.onFailure {
+                Timber.d("Can not handle action Intent.ACTION_VIEW")
+            }
         })
 
         viewModel.urlFileOpenAsFile.observe(viewLifecycleOwner, EventObserver {

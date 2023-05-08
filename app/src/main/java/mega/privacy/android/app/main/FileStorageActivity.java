@@ -292,11 +292,15 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
         defaultDownloadDir.mkdirs();
         Uri initialUri = Uri.parse(defaultDownloadDir.getAbsolutePath());
 
-        startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .addCategory(Intent.CATEGORY_OPENABLE)
-                .setType(TYPE_TEXT_PLAIN)
-                .putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
-                .putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName(this)), REQUEST_SAVE_RK);
+        try {
+            startActivityForResult(new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    .setType(TYPE_TEXT_PLAIN)
+                    .putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
+                    .putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName(this)), REQUEST_SAVE_RK);
+        } catch (Exception e) {
+            Timber.d("Can not handle action Intent.ACTION_CREATE_DOCUMENT");
+        }
     }
 
     /**
