@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.FileNode
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,7 +45,7 @@ internal class FetchChildrenMapperTest {
             megaApiGateway.stub {
                 onBlocking { getChildren(megaNode, expectedOrder) }.thenReturn(listOf(child))
             }
-            val expected = mock<UnTypedNode>()
+            val expected = mock<FileNode>()
             whenever(nodeMapper(child)).thenReturn(expected)
 
 
