@@ -363,6 +363,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     }
 
     private fun showScanOrCopyLayout() {
+        hideKeyboard()
         scanOrCopyIsShown = true
         with(binding) {
             listOf(
@@ -539,7 +540,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 scrollContainerVerify.setBackgroundColor(Color.TRANSPARENT)
                 container2faEnabled.visibility = View.GONE
                 passFirst.requestFocus()
-                showKeyboard(passFifth)
+                showKeyboard(passFirst)
                 clearAllPins()
             }
             listOf(containerRk2fa, buttonExportRk).forEach {
@@ -601,7 +602,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             currentPin.doAfterTextChanged {
                 if (currentPin.length() != 0) {
                     currentPin.isCursorVisible = true
-                    Util.hideKeyboard(this@TwoFactorAuthenticationActivity, 0)
+                    hideKeyboard()
                     if (pinLongClick) {
                         pasteClipboard()
                     } else {
@@ -634,6 +635,10 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     private fun showKeyboard(view: View) {
         imm?.showSoftInput(view, InputMethodManager.RESULT_UNCHANGED_SHOWN)
+    }
+
+    private fun hideKeyboard() {
+        Util.hideKeyboard(this, 0)
     }
 
     private fun quitError() {
@@ -709,10 +714,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 } else allPinsHasOneCharacter = true
             }
             if (confirm2FAIsShown && allPinsHasOneCharacter) {
-                Util.hideKeyboard(
-                    this@TwoFactorAuthenticationActivity,
-                    0
-                )
+                hideKeyboard()
                 if (sb.isNotEmpty()) {
                     sb.delete(0, sb.length)
                 }
