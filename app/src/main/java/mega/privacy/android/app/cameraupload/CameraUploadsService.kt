@@ -132,6 +132,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -433,7 +434,7 @@ class CameraUploadsService : LifecycleService() {
      * Cancel Transfer
      */
     @Inject
-    lateinit var cancelTransfer: CancelTransfer
+    lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
 
     /**
      * Cancel All Upload Transfers
@@ -758,7 +759,7 @@ class CameraUploadsService : LifecycleService() {
      * @param transfer the [MegaTransfer] to be cancelled
      */
     private suspend fun cancelPendingTransfer(transfer: MegaTransfer) {
-        runCatching { cancelTransfer(transfer) }
+        runCatching { cancelTransferByTagUseCase(transfer.tag) }
             .onSuccess {
                 Timber.d("Transfer cancellation successful")
                 resetTotalUploads()
