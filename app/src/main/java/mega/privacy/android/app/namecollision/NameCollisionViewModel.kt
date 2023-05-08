@@ -9,7 +9,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -88,13 +91,16 @@ class NameCollisionViewModel @Inject constructor(
         viewModelScope.launch {
             monitorUserUpdates()
                 .filter { it == UserChanges.DisableVersions }
-                .collect {
+                .map {
                     getFileVersionsOption(true)
+                }
+                .onStart {
+                    getFileVersionsOption(true)
+                }
+                .catch { Timber.e(it) }
+                .collect {
                     updateFileVersioningInfo()
                 }
-        }
-        viewModelScope.launch {
-            getFileVersionsOption(true)
         }
     }
 
@@ -215,15 +221,18 @@ class NameCollisionViewModel @Inject constructor(
     /**
      * Updates file versioning info.
      */
-    fun updateFileVersioningInfo() {
+    private fun updateFileVersioningInfo() {
         val currentCollision = currentCollision.value ?: return
         viewModelScope.launch {
-            fileVersioningInfo.value =
-                Triple(
-                    getFileVersionsOption(false).not(),
-                    getCollisionType(),
-                    currentCollision.nameCollision.isFile
-                )
+            runCatching { getFileVersionsOption(false) }
+                .onSuccess { isFileDisable ->
+                    fileVersioningInfo.value =
+                        Triple(
+                            isFileDisable.not(),
+                            getCollisionType(),
+                            currentCollision.nameCollision.isFile
+                        )
+                }
         }
     }
 

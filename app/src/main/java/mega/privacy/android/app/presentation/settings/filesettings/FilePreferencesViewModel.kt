@@ -13,9 +13,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import javax.inject.Inject
 
@@ -68,8 +68,10 @@ class FilePreferencesViewModel @Inject constructor(
 
     private fun getFileVersionOption() {
         viewModelScope.launch {
-            val shouldEnableFileVersioning = !getFileVersionsOption(forceRefresh = true)
-            _state.update { it.copy(isFileVersioningEnabled = shouldEnableFileVersioning) }
+            runCatching { getFileVersionsOption(forceRefresh = true) }
+                .onSuccess { isDisableFileVersions ->
+                    _state.update { it.copy(isFileVersioningEnabled = isDisableFileVersions.not()) }
+                }
         }
     }
 
