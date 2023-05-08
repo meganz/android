@@ -246,7 +246,7 @@ interface MegaApiGateway {
     /**
      * Sdk version
      */
-    suspend fun getSdkVersion(): String
+    suspend fun getSdkVersion(): String?
 
     /**
      * Global updates

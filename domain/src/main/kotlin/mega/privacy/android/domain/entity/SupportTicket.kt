@@ -16,7 +16,7 @@ package mega.privacy.android.domain.entity
  */
 data class SupportTicket(
     val androidAppVersion: String,
-    val sdkVersion: String,
+    val sdkVersion: String?,
     val device: String,
     val currentLanguage: String,
     val accountEmail: String,

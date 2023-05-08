@@ -8,5 +8,5 @@ package mega.privacy.android.domain.entity
  */
 data class AppInfo(
     val appVersion: String,
-    val sdkVersion: String,
+    val sdkVersion: String?,
 )
