@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.verification.SMSVerificationViewMod
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
+import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
@@ -138,7 +139,7 @@ class SMSVerificationViewModelTest {
             getInitialState().copy(isUserLocked = false, bonusStorageSMS = bonusStorage)
         whenever(smsVerificationTextMapper(any())).thenReturn(expected)
         whenever(areAccountAchievementsEnabled()).thenReturn(true)
-        whenever(getAccountAchievements(any(), any())).thenReturn(mock())
+        whenever(getAccountAchievements(any(), any())).thenReturn(mock<DefaultMegaAchievement>())
         whenever(stringUtilWrapper.getSizeString(any(), any())).thenReturn(bonusStorage)
         underTest.setIsUserLocked(false, mock())
         advanceUntilIdle()

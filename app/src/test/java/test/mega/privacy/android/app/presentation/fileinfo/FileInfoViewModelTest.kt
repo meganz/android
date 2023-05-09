@@ -109,7 +109,6 @@ internal class FileInfoViewModelTest {
     private val deleteNodeByHandle: DeleteNodeByHandle = mock()
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
     private val node: MegaNode = mock()
-    private val nameCollision: NameCollision = mock()
     private val getPreview: GetPreview = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val getNodeById: GetNodeById = mock()
@@ -828,12 +827,12 @@ internal class FileInfoViewModelTest {
 
     private suspend fun mockCollisionCopying() {
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
-            .thenReturn(nameCollision)
+            .thenReturn(mock<NameCollision.Copy>())
     }
 
     private suspend fun mockCollisionMoving() {
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
-            .thenReturn(nameCollision)
+            .thenReturn(mock<NameCollision.Movement>())
     }
 
     private suspend fun mockCopySuccess() {

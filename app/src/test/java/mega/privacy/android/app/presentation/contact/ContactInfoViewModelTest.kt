@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -449,7 +450,7 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when node update is triggered state is updated`() = runTest {
-        val unTypedNodeNew = mock<UnTypedNode> {
+        val unTypedNodeNew = mock<FolderNode> {
             on { parentId.longValue }.thenReturn(-1L)
         }
         val node = mock<Node> {

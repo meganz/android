@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.achievements.AchievementsViewModel
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievement
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import org.junit.After
@@ -29,7 +30,7 @@ class AchievementsViewModelTest {
     private lateinit var underTest: AchievementsViewModel
     private val getAccountAchievements = mock<GetAccountAchievements>()
     private val uiMegaAchievementMapper = mock<UIMegaAchievementMapper>()
-    private val megaAchievement = mock<MegaAchievement>()
+    private val megaAchievement = mock<DefaultMegaAchievement>()
 
     @Before
     fun setUp() {

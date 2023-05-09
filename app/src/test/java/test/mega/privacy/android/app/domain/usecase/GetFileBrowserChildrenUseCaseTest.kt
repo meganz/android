@@ -7,6 +7,7 @@ import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -80,7 +81,7 @@ class GetFileBrowserChildrenUseCaseTest {
                     nodeId = NodeId(handle),
                     getCloudSortOrder()
                 )
-            ).thenReturn(listOf(mock()))
+            ).thenReturn(listOf<FolderNode>(mock()))
             val list = underTest(handle)
             Truth.assertThat(list).isNotEmpty()
         }

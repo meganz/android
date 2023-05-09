@@ -121,7 +121,7 @@ class AlbumsViewTest {
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 setDialogInputPlaceholder = setDialogInputPlaceholder,
                 isUserAlbumsEnabled = isUserAlbumsEnabled,
-                allPhotos = listOf(mock()),
+                allPhotos = listOf<Photo.Image>(mock()),
                 openPhotosSelectionActivity = openPhotosSelectionActivity,
             )
         }

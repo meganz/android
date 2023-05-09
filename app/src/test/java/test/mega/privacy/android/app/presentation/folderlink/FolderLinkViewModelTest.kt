@@ -27,6 +27,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -271,8 +272,8 @@ class FolderLinkViewModelTest {
         val rootNodeName = "RootNode"
         val rootNode = mock<TypedFolderNode>()
         val parentNode = mock<TypedFolderNode>()
-        val node1 = mock<TypedNode>()
-        val node2 = mock<TypedNode>()
+        val node1 = mock<TypedFolderNode>()
+        val node2 = mock<TypedFolderNode>()
         val childrenNodes = listOf(node1, node2)
         val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
 
@@ -293,7 +294,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that onItemLongClick selects the clicked nodes`() = runTest {
         val base64Handle = "1234"
-        val childNode = mock<TypedNode>()
+        val childNode = mock<TypedFolderNode>()
         val childrenNodes = listOf(childNode)
         val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
         val nodeUIItem = NodeUIItem(childNode, isSelected = false, isInvisible = false)
@@ -312,7 +313,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that onSelectAllClicked selects all the nodes`() = runTest {
         val base64Handle = "1234"
-        val childrenNodes = listOf<TypedNode>(mock(), mock())
+        val childrenNodes = listOf<TypedFolderNode>(mock(), mock())
         val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
@@ -331,7 +332,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that onClearAllClicked unselects all the nodes`() = runTest {
         val base64Handle = "1234"
-        val childrenNodes = listOf<TypedNode>(mock(), mock())
+        val childrenNodes = listOf<TypedFolderNode>(mock(), mock())
         val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
@@ -360,8 +361,8 @@ class FolderLinkViewModelTest {
         val newParentNodeName = "New Parent"
         val oldParentNode = mock<TypedFolderNode>()
         val newParentNode = mock<TypedFolderNode>()
-        val oldChildNode = mock<TypedNode>()
-        val newChildNode = mock<TypedNode>()
+        val oldChildNode = mock<TypedFileNode>()
+        val newChildNode = mock<TypedFileNode>()
         val oldChildrenNodes = listOf(oldChildNode)
         val newChildrenNodes = listOf(newChildNode)
         val fetchFolderNodeResult =
@@ -432,9 +433,9 @@ class FolderLinkViewModelTest {
         val base64Handle = "1234"
         val rootNodeName = "RootNode"
         val rootNode = mock<TypedFolderNode>()
-        val childNode = mock<TypedNode>()
+        val childNode = mock<TypedFileNode>()
         val childrenNodes = listOf(childNode)
-        val node = NodeUIItem(mock(), isSelected = false, isInvisible = false)
+        val node = NodeUIItem(mock<TypedFolderNode>(), isSelected = false, isInvisible = false)
         val fetchFolderNodeResult =
             FetchFolderNodesResult(rootNode, mock(), childrenNodes)
 

@@ -16,6 +16,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.notification.NotificationViewModel
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.SchedMeetingNotification
+import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
+import mega.privacy.android.domain.entity.IncomingPendingContactRequestAlert
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
@@ -85,7 +87,7 @@ class NotificationViewModelTest {
             separatorMargin = { 0 },
         ) {}
 
-        val alert = mock<UserAlert>()
+        val alert = mock<IncomingPendingContactRequestAlert>()
         whenever(monitorUserAlerts()).thenReturn(flowOf(listOf(alert)))
         whenever(notificationMapper(alert)).thenReturn(expected)
 
@@ -99,8 +101,8 @@ class NotificationViewModelTest {
 
     @Test
     fun `test that should scroll is updated to true if new items appear`() = runTest {
-        val initialAlert = mock<UserAlert>()
-        val newAlert = mock<UserAlert>()
+        val initialAlert = mock<IncomingPendingContactRequestAlert>()
+        val newAlert = mock<ContactChangeContactEstablishedAlert>()
         val initialNotification = Notification(
             sectionTitle = { "" },
             sectionColour = 0,

@@ -8,6 +8,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -32,7 +33,7 @@ class GetNodeLocationInfoTest {
     private val nodeRepository = mock<NodeRepository>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
 
-    private val node = mock<TypedNode> {
+    private val node = mock<TypedFolderNode> {
         on { id }.thenReturn(nodeId)
     }
 

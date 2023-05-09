@@ -144,7 +144,7 @@ class FileBrowserViewModelTest {
                 listOf(mock(), mock())
             )
             whenever(getFileBrowserChildrenUseCase(newValue)).thenReturn(
-                listOf(mock(), mock())
+                listOf<TypedFolderNode>(mock(), mock())
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             val update = mapOf<Node, List<NodeChanges>>(
@@ -260,7 +260,7 @@ class FileBrowserViewModelTest {
             val newValue = 123456789L
             // to update handles fileBrowserHandle
             whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(
-                listOf(mock(), mock())
+                listOf<TypedFolderNode>(mock(), mock())
             )
             underTest.setBrowserParentHandle(newValue)
             underTest.onBackPressed()
@@ -404,7 +404,7 @@ class FileBrowserViewModelTest {
                 listOf(mock(), mock())
             )
             whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
-                listOf(mock(), mock())
+                listOf<TypedFolderNode>(mock(), mock())
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()

@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
@@ -274,7 +275,7 @@ class FavouritesViewModelTest {
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
-            underTest.itemSelected(mock { on { typedNode }.thenReturn(expected) })
+            underTest.itemSelected(mock<FavouriteFile> { on { typedNode }.thenReturn(expected) })
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactly(
                 expected.id
             )
@@ -292,7 +293,7 @@ class FavouritesViewModelTest {
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
-            val selected = mock<Favourite> { on { typedNode }.thenReturn(expected) }
+            val selected = mock<FavouriteFile> { on { typedNode }.thenReturn(expected) }
             underTest.itemSelected(selected)
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactly(
                 expected.id

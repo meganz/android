@@ -117,7 +117,7 @@ class RubbishBinViewModelTest {
                 )
             )
             whenever(getRubbishBinChildren(newValue)).thenReturn(
-                listOf(mock(), mock())
+                listOf<TypedFolderNode>(mock(), mock())
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
 

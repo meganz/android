@@ -15,9 +15,11 @@ import mega.privacy.android.app.presentation.favourites.FavouriteFolderViewModel
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
 import nz.mega.sdk.MegaNode
@@ -57,7 +59,7 @@ class FavouriteFolderViewModelTest {
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()
 
-    private val favourite = mock<TypedNode>()
+    private val favourite = mock<TypedFolderNode>()
 
     private val list = listOf(favourite)
     private val rootHandle: Long = -1
@@ -115,7 +117,7 @@ class FavouriteFolderViewModelTest {
                     )
                 )
             )
-            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             whenever(
                 megaUtilWrapper.availableOffline(
@@ -145,7 +147,7 @@ class FavouriteFolderViewModelTest {
                     )
                 )
             )
-            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
+            whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock<FavouriteFolder>())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
             whenever(
                 megaUtilWrapper.availableOffline(

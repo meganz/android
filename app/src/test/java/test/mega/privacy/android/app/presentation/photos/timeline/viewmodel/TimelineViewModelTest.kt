@@ -182,7 +182,7 @@ class TimelineViewModelTest {
     @Test
     fun `test that a single photo returned is returned by the state`() = runTest {
         val expectedDate = LocalDateTime.now()
-        val photo = mock<Photo> { on { modificationTime }.thenReturn(expectedDate) }
+        val photo = mock<Photo.Image> { on { modificationTime }.thenReturn(expectedDate) }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
 
         underTest.state.drop(1).test {
@@ -303,7 +303,12 @@ class TimelineViewModelTest {
         runTest {
             val progress = flowOf(mock<Pair<Int, Int>>())
 
-            underTest.setSelectedPhotos(listOf(mock()))
+            val selectedPhoto = mock<Photo.Image> { on { id }.thenReturn(1L) }
+            underTest.setSelectedPhotos(listOf(mock<PhotoListItem.PhotoGridItem> {
+                on { photo }.thenReturn(
+                    selectedPhoto
+                )
+            }))
             whenever(monitorCameraUploadProgress()).thenReturn(progress)
 
             advanceUntilIdle()

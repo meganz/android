@@ -7,6 +7,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -60,7 +61,7 @@ class DefaultGetRubbishBinChildrenTest {
         val sortOrder = SortOrder.ORDER_DEFAULT_ASC
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
         whenever(nodeRepository.getNodeChildren(nodeId, sortOrder)).thenReturn(
-            listOf(
+            listOf<FolderNode>(
                 mock(),
                 mock()
             )
