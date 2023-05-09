@@ -9,11 +9,12 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +31,7 @@ internal class MonitorPublicLinksUseCaseTest {
     private val shareRepository = mock<ShareRepository>()
 
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase> {
-        onBlocking { invoke(any(), anyOrNull()) }.thenReturn(mock())
+        onBlocking { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
     }
 
     private val nodeRepository = mock<NodeRepository> {
@@ -49,7 +50,7 @@ internal class MonitorPublicLinksUseCaseTest {
 
     @Test
     internal fun `test that folder link nodes are returned`() = runTest {
-        val untypedNodes = listOf<UnTypedNode>(mock(), mock())
+        val untypedNodes = listOf<FolderNode>(mock(), mock())
         shareRepository.stub {
             onBlocking { getPublicLinks(any()) }.thenReturn(
                 untypedNodes
@@ -65,7 +66,7 @@ internal class MonitorPublicLinksUseCaseTest {
     @Test
     internal fun `test that new items are emitted if a node update of type PublicLink is emitted`() =
         runTest {
-            val untypedNodes = listOf<UnTypedNode>(mock(), mock())
+            val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
                 onBlocking { getPublicLinks(any()) }.thenReturn(
                     emptyList(),
@@ -89,7 +90,7 @@ internal class MonitorPublicLinksUseCaseTest {
     @Test
     internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`() =
         runTest {
-            val untypedNodes = listOf<UnTypedNode>(mock(), mock())
+            val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
                 onBlocking { getPublicLinks(any()) }.thenReturn(
                     emptyList(),
@@ -113,7 +114,7 @@ internal class MonitorPublicLinksUseCaseTest {
     internal fun `test that new items are emitted if a non PublicLink update for an existing public node is emitted`() =
         runTest {
             val nodeId = NodeId(42)
-            val untypedNodes = listOf<UnTypedNode>(mock(), mock { on { id }.thenReturn(nodeId) })
+            val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
                 onBlocking { getPublicLinks(any()) }.thenReturn(
                     untypedNodes,
@@ -147,7 +148,7 @@ internal class MonitorPublicLinksUseCaseTest {
     internal fun `test that only the latest ids are considered when node update is emitted`() =
         runTest {
             val nodeId = NodeId(42)
-            val untypedNodes = listOf<UnTypedNode>(mock(), mock { on { id }.thenReturn(nodeId) })
+            val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
                 onBlocking { getPublicLinks(any()) }.thenReturn(
                     untypedNodes,
