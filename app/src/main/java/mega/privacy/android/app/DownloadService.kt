@@ -35,18 +35,8 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES
-import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW
-import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER
-import mega.privacy.android.app.constants.BroadcastConstants.DOWNLOAD_TRANSFER_OPEN
-import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
-import mega.privacy.android.app.constants.BroadcastConstants.NODE_HANDLE
-import mega.privacy.android.app.constants.BroadcastConstants.NODE_LOCAL_PATH
-import mega.privacy.android.app.constants.BroadcastConstants.NODE_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
-import mega.privacy.android.app.constants.BroadcastConstants.OFFLINE_AVAILABLE
-import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
@@ -77,11 +67,14 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
+import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -148,6 +141,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
+    @Inject
+    lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -608,33 +604,37 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             val totalDownloads = megaApi.totalDownloads - backgroundTransfers.size
             if (totalDownloads == 1 && autoPlayInfo != null && downloadForPreview) {
                 // If the file is Microsoft file, send the corresponding broadcast
-                sendBroadcast(
-                    Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                        .putExtra(TRANSFER_TYPE, DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW)
-                        .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
-                        .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
-                        .putExtra(NUMBER_FILES, 1)
-                        .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
-                        .putExtra(IS_OPEN_WITH, downloadByOpenWith)
+                TransfersFinishedState(
+                    type = TransferFinishType.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW,
+                    nodeName = autoPlayInfo?.nodeName,
+                    nodeId = autoPlayInfo?.nodeHandle,
+                    nodeLocalPath = autoPlayInfo?.localPath,
+                    isOpenWith = downloadByOpenWith
                 )
-            } else if (totalDownloads == 1 && java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled) && autoPlayInfo != null) {
-                sendBroadcast(
-                    Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                        .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
-                        .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
-                        .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
-                        .putExtra(NUMBER_FILES, 1)
-                        .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
+            } else if (totalDownloads == 1 && java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled)
+                && autoPlayInfo != null
+            ) {
+                TransfersFinishedState(
+                    type = TransferFinishType.DOWNLOAD_AND_OPEN,
+                    nodeName = autoPlayInfo?.nodeName,
+                    nodeId = autoPlayInfo?.nodeHandle,
+                    nodeLocalPath = autoPlayInfo?.localPath
                 )
             } else if (totalDownloads > 0) {
-                val intent: Intent = Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                    .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
-                    .putExtra(NUMBER_FILES, totalDownloads)
-                if (isDownloadForOffline) {
-                    intent.putExtra(OFFLINE_AVAILABLE, true)
+                TransfersFinishedState(
+                    type =
+                    if (isDownloadForOffline) TransferFinishType.DOWNLOAD_OFFLINE
+                    else TransferFinishType.DOWNLOAD,
+                    numberFiles = totalDownloads
+                )
+            } else {
+                null
+            }?.let { transfersFinishState ->
+                applicationScope.launch {
+                    broadcastTransfersFinishedUseCase(transfersFinishState)
                 }
-                sendBroadcast(intent)
             }
+
             megaApi.resetTotalDownloads()
             backgroundTransfers.clear()
             errorEBlocked = 0

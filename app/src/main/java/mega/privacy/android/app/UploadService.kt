@@ -34,12 +34,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
-import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
-import mega.privacy.android.app.constants.BroadcastConstants.TRANSFER_TYPE
-import mega.privacy.android.app.constants.BroadcastConstants.UPLOAD_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
@@ -63,7 +59,10 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -117,6 +116,9 @@ class UploadService : Service() {
      */
     @Inject
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
+    @Inject
+    lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
 
     @Inject
     @ApplicationScope
@@ -520,11 +522,14 @@ class UploadService : Service() {
     private fun getTransferredByte(map: HashMap<Int, MegaTransfer>?): Long =
         map?.values?.sumOf { it.transferredBytes } ?: 0
 
-    private fun sendUploadFinishBroadcast() = sendBroadcast(
-        Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-            .putExtra(TRANSFER_TYPE, UPLOAD_TRANSFER)
-            .putExtra(NUMBER_FILES, uploadCount)
-    )
+    private fun sendUploadFinishBroadcast() = applicationScope.launch {
+        broadcastTransfersFinishedUseCase(
+            TransfersFinishedState(
+                type = TransferFinishType.UPLOAD,
+                numberFiles = uploadCount
+            )
+        )
+    }
 
     /**
      * Show complete success notification.

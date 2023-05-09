@@ -63,7 +63,10 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -114,6 +117,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
+    @Inject
+    lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -690,11 +696,15 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
         if (fileExplorerUpload) {
             fileExplorerUpload = false
-            sendBroadcast(
-                Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                    .putExtra(BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD, true)
-                    .putExtra(Constants.CHAT_ID, snackbarChatHandle)
-            )
+            sharingScope.launch {
+                broadcastTransfersFinishedUseCase(
+                    TransfersFinishedState(
+                        type = TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD,
+                        chatId = snackbarChatHandle
+                    )
+                )
+            }
+
             snackbarChatHandle = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         }
 

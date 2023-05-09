@@ -44,7 +44,6 @@ import mega.privacy.android.app.activities.settingsActivities.FileManagementPref
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.constants.BroadcastConstants.IS_OPEN_WITH
 import mega.privacy.android.app.databinding.TransferOverquotaLayoutBinding
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -57,6 +56,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.base.BaseViewModel
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -83,7 +83,6 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
@@ -123,6 +122,8 @@ import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferOverQuota
@@ -194,6 +195,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
     protected val billingViewModel by viewModels<BillingViewModel>()
+    private val viewModel by viewModels<BaseViewModel>()
 
     @JvmField
     protected var app: MegaApplication = MegaApplication.getInstance()
@@ -342,84 +344,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     }
 
     /**
-     * Broadcast to show a snackbar when all the transfers finish
-     */
-    private val transferFinishedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null || isActivityInBackground) {
-                return
-            }
-            if (intent.getBooleanExtra(BroadcastConstants.FILE_EXPLORER_CHAT_UPLOAD, false)) {
-                Util.showSnackbar(
-                    this@BaseActivity,
-                    MESSAGE_SNACKBAR_TYPE,
-                    null,
-                    intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
-                )
-                return
-            }
-            val numTransfers = intent.getIntExtra(BroadcastConstants.NUMBER_FILES, 1)
-            var message: String
-            message = if (intent.getBooleanExtra(BroadcastConstants.OFFLINE_AVAILABLE, false)) {
-                getString(R.string.file_available_offline)
-            } else {
-                resources.getQuantityString(
-                    R.plurals.download_finish, numTransfers, numTransfers
-                )
-            }
-            when (intent.getStringExtra(BroadcastConstants.TRANSFER_TYPE)) {
-                BroadcastConstants.DOWNLOAD_TRANSFER -> Util.showSnackbar(
-                    this@BaseActivity,
-                    message
-                )
-                BroadcastConstants.UPLOAD_TRANSFER -> {
-                    message = resources.getQuantityString(
-                        R.plurals.upload_finish,
-                        numTransfers,
-                        numTransfers
-                    )
-                    Util.showSnackbar(this@BaseActivity, message)
-                }
-                BroadcastConstants.DOWNLOAD_TRANSFER_OPEN -> {
-                    autoPlayInfo = AutoPlayInfo(
-                        intent.getStringExtra(BroadcastConstants.NODE_NAME) ?: return,
-                        intent.getLongExtra(BroadcastConstants.NODE_HANDLE, INVALID_VALUE.toLong()),
-                        intent.getStringExtra(BroadcastConstants.NODE_LOCAL_PATH) ?: return,
-                        true
-                    )
-
-                    showSnackbar(OPEN_FILE_SNACKBAR_TYPE, message, MEGACHAT_INVALID_HANDLE)
-                }
-                BroadcastConstants.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW -> {
-                    autoPlayInfo = AutoPlayInfo(
-                        intent.getStringExtra(BroadcastConstants.NODE_NAME) ?: return,
-                        intent.getLongExtra(
-                            BroadcastConstants.NODE_HANDLE,
-                            INVALID_VALUE.toLong()
-                        ),
-                        intent.getStringExtra(BroadcastConstants.NODE_LOCAL_PATH) ?: return,
-                        true
-                    )
-                    autoPlayInfo?.let {
-                        // After downloaded, if it's open with, open the file by third-party library.
-                        // If not, open the file directly
-                        if (intent.getBooleanExtra(IS_OPEN_WITH, false))
-                            MegaNodeUtil.launchActionView(
-                                this@BaseActivity,
-                                it.nodeName,
-                                it.localPath,
-                                this@BaseActivity,
-                                this@BaseActivity
-                            )
-                        else
-                            openDownloadedFile()
-                    } ?: openDownloadedFile()
-                }
-            }
-        }
-    }
-
-    /**
      * Broadcast to show a Snackbar with the received text.
      */
     private val showSnackbarReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -491,6 +415,17 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
         }
 
+        collectFlow(viewModel.state) { uiState ->
+            with(uiState) {
+                transfersFinished?.apply {
+                    if (isActivityInForeground) {
+                        checkTransfersFinishedState(this)
+                    }
+                    viewModel.onTransfersFinishedConsumed()
+                }
+            }
+        }
+
         registerReceiver(
             sslErrorReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED)
@@ -514,11 +449,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         registerReceiver(
             takenDownFilesReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES)
-        )
-
-        registerReceiver(
-            transferFinishedReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
         )
 
         registerReceiver(
@@ -677,7 +607,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         unregisterReceiver(accountBlockedReceiver)
         unregisterReceiver(businessExpiredReceiver)
         unregisterReceiver(takenDownFilesReceiver)
-        unregisterReceiver(transferFinishedReceiver)
         unregisterReceiver(showSnackbarReceiver)
         unregisterReceiver(resumeTransfersReceiver)
         unregisterReceiver(cookieSettingsReceiver)
@@ -1600,6 +1529,84 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * @return true if handled and skip default behavior otherwise false
      */
     protected open fun handlePurchased(purchaseType: PurchaseType): Boolean = false
+
+    private fun checkTransfersFinishedState(transfersFinishedState: TransfersFinishedState) =
+        with(transfersFinishedState) {
+            val generalDownloadMessage = resources.getQuantityString(
+                R.plurals.download_finish,
+                numberFiles,
+                numberFiles
+            )
+            when (type) {
+                TransferFinishType.DOWNLOAD -> {
+                    Util.showSnackbar(this@BaseActivity, generalDownloadMessage)
+                }
+
+                TransferFinishType.DOWNLOAD_OFFLINE -> {
+                    Util.showSnackbar(
+                        this@BaseActivity,
+                        getString(R.string.file_available_offline)
+                    )
+                }
+
+                TransferFinishType.DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW -> {
+                    autoPlayInfo = AutoPlayInfo(
+                        nodeName ?: return,
+                        nodeId ?: return,
+                        nodeLocalPath ?: return,
+                        true
+                    ).apply {
+                        // After downloaded, if it's open with, open the file by third-party library.
+                        // If not, open the file directly
+                        if (isOpenWith) {
+                            MegaNodeUtil.launchActionView(
+                                this@BaseActivity,
+                                nodeName,
+                                localPath,
+                                this@BaseActivity,
+                                this@BaseActivity
+                            )
+                        } else {
+                            openDownloadedFile()
+                        }
+                    }
+                }
+
+                TransferFinishType.DOWNLOAD_AND_OPEN -> {
+                    autoPlayInfo = AutoPlayInfo(
+                        nodeName ?: return,
+                        nodeId ?: return,
+                        nodeLocalPath ?: return,
+                        true
+                    )
+
+                    showSnackbar(
+                        OPEN_FILE_SNACKBAR_TYPE,
+                        generalDownloadMessage,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                }
+
+                TransferFinishType.UPLOAD -> {
+                    Util.showSnackbar(
+                        this@BaseActivity, resources.getQuantityString(
+                            R.plurals.upload_finish,
+                            numberFiles,
+                            numberFiles
+                        )
+                    )
+                }
+
+                TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD -> {
+                    Util.showSnackbar(
+                        this@BaseActivity,
+                        MESSAGE_SNACKBAR_TYPE,
+                        null,
+                        chatId ?: MEGACHAT_INVALID_HANDLE
+                    )
+                }
+            }
+        }
 
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
