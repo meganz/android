@@ -27,10 +27,12 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -74,6 +76,9 @@ class RubbishBinComposeFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -111,9 +116,42 @@ class RubbishBinComposeFragment : Fragment() {
                     fileCount = uiState.selectedFileNodes,
                     folderCount = uiState.selectedFolderNodes
                 )
-                restoreMegaNode(uiState.selectedMegaNodes)
+                handleRestoreBehavior(
+                    restoreType = uiState.restoreType,
+                    selectedNodes = uiState.selectedMegaNodes,
+                    selectedNodeHandles = uiState.selectedNodeHandles,
+                )
                 itemClickedEvenReceived(uiState.currFileNode)
             }
+        }
+    }
+
+    /**
+     * Handles the "Restore" functionality
+     *
+     * @param restoreType The behavior when the "Restore" button is clicked
+     * @param selectedNodes The list of Nodes selected by the User
+     * @param selectedNodeHandles The list of Node Handles selected by the User
+     */
+    private fun handleRestoreBehavior(
+        restoreType: RestoreType?,
+        selectedNodes: List<MegaNode>?,
+        selectedNodeHandles: List<Long>,
+    ) {
+        restoreType?.let { it ->
+            when (it) {
+                RestoreType.MOVE -> {
+                    NodeController(requireActivity()).chooseLocationToMoveNodes(selectedNodeHandles)
+                }
+                RestoreType.RESTORE -> {
+                    selectedNodes?.let {
+                        ((requireActivity()) as ManagerActivity).restoreFromRubbish(it)
+                    }
+                }
+            }
+            actionMode?.finish()
+            // Notify the ViewModel that the "Restore" behavior has been handled
+            viewModel.onRestoreHandled()
         }
     }
 
@@ -137,6 +175,9 @@ class RubbishBinComposeFragment : Fragment() {
         }
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObserver()
@@ -185,17 +226,6 @@ class RubbishBinComposeFragment : Fragment() {
                     chatId = -1,
                 )
             }
-        }
-    }
-
-    /**
-     * Restore mega node from RubbishBin
-     */
-    private fun restoreMegaNode(selectedMegaNodes: List<MegaNode>?) {
-        selectedMegaNodes?.let {
-            ((requireActivity()) as ManagerActivity).restoreFromRubbish(it)
-            viewModel.clearAllSelectedNodes()
-            actionMode?.finish()
         }
     }
 
@@ -322,7 +352,7 @@ class RubbishBinComposeFragment : Fragment() {
             .distinctUntilChanged()) {
             requireActivity().invalidateOptionsMenu()
         }
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver{
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.refreshNodes()
         })
     }

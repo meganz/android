@@ -4,6 +4,9 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -15,15 +18,18 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -38,6 +44,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor node updates
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
+ * @param isNodeDeletedFromBackupsUseCase Checks whether the deleted Node came from Backups or not
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
  * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
@@ -49,6 +56,7 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
     private val getRubbishBinChildren: GetRubbishBinChildren,
+    private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -350,19 +358,15 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * Clear the selections of items from NodesUiList and reset count of other Nodes
      */
-    fun clearAllSelectedNodes() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    nodeList = clearNodeUiItemList(),
-                    selectedFileNodes = 0,
-                    selectedFolderNodes = 0,
-                    isInSelection = false,
-                    selectedNodeHandles = emptyList(),
-                    selectedMegaNodes = null
-                )
-            }
-        }
+    fun clearAllSelectedNodes() = _state.update {
+        it.copy(
+            nodeList = clearNodeUiItemList(),
+            selectedFileNodes = 0,
+            selectedFolderNodes = 0,
+            isInSelection = false,
+            selectedNodeHandles = emptyList(),
+            selectedMegaNodes = null,
+        )
     }
 
     /**
@@ -375,9 +379,9 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
-     * This method will get List of [MegaNode] from handle to restore data
+     * Given a list of Node Handles, this retrieves the list of Nodes that were selected by the User
      */
-    fun onRestoreClicked() {
+    fun retrieveSelectedMegaNodes() {
         val megaNodeList = mutableListOf<MegaNode>()
         _state.value.selectedNodeHandles.forEach {
             val selectedMegaNode = state.value.nodes.find { megaNode -> megaNode.handle == it }
@@ -385,21 +389,45 @@ class RubbishBinViewModel @Inject constructor(
                 megaNodeList.add(megaNode)
             }
         }
-        updateSelectedMegaNode(megaNodeList)
+        updateSelectedMegaNodes(megaNodeList)
     }
 
     /**
-     * Update selected mega node to state
+     * Updates the selected Nodes to [RubbishBinState.selectedMegaNodes]
      */
-    private fun updateSelectedMegaNode(selectedMegaNode: List<MegaNode>?) {
-        viewModelScope.launch {
+    private fun updateSelectedMegaNodes(selectedMegaNodes: List<MegaNode>?) = _state.update {
+        it.copy(selectedMegaNodes = selectedMegaNodes)
+    }
+
+    /**
+     * Restores the list of selected Nodes when the "Restore" button is clicked
+     *
+     * If any of the Nodes is a Backup Node, the "Move" command is executed and will prompt the user
+     * to select a destination to restore the list of Nodes
+     *
+     * Otherwise, the list of Nodes will be restored back to where they came from
+     */
+    fun onRestoreClicked() = viewModelScope.launch {
+        retrieveSelectedMegaNodes()
+        val selectedNodes = _state.value.selectedMegaNodes ?: emptyList()
+        if (selectedNodes.isNotEmpty()) {
+            val deferredResults = mutableListOf<Deferred<Boolean>>()
+            for (node in selectedNodes) {
+                deferredResults += async { isNodeDeletedFromBackupsUseCase(NodeId(node.handle)) }
+            }
+            val hasBackupNodes = deferredResults.awaitAll().contains(true)
             _state.update {
                 it.copy(
-                    selectedMegaNodes = selectedMegaNode
+                    restoreType = if (hasBackupNodes) RestoreType.MOVE else RestoreType.RESTORE,
                 )
             }
         }
     }
+
+    /**
+     * Acknowledges that the "Restore" behavior has been handled
+     */
+    fun onRestoreHandled() = _state.update { it.copy(restoreType = null) }
 
     private fun setPendingRefreshNodes() {
         _state.update { it.copy(isPendingRefresh = true) }

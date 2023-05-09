@@ -16,15 +16,20 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -32,6 +37,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -47,6 +53,7 @@ class RubbishBinViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
+    private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
@@ -68,6 +75,7 @@ class RubbishBinViewModelTest {
             monitorNodeUpdates = monitorNodeUpdates,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
             getRubbishBinChildren = getRubbishBinChildren,
+            isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             getCloudSortOrder = getCloudSortOrder,
@@ -82,6 +90,20 @@ class RubbishBinViewModelTest {
             val initial = awaitItem()
             Truth.assertThat(initial.rubbishBinHandle).isEqualTo(-1L)
             Truth.assertThat(initial.nodes).isEmpty()
+            Truth.assertThat(initial.parentHandle).isNull()
+            Truth.assertThat(initial.nodeList).isEmpty()
+            Truth.assertThat(initial.selectedFileNodes).isEqualTo(0)
+            Truth.assertThat(initial.selectedFolderNodes).isEqualTo(0)
+            Truth.assertThat(initial.isInSelection).isFalse()
+            Truth.assertThat(initial.currFileNode).isNull()
+            Truth.assertThat(initial.itemIndex).isEqualTo(-1)
+            Truth.assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
+            Truth.assertThat(initial.sortOrder).isEqualTo(SortOrder.ORDER_NONE)
+            Truth.assertThat(initial.selectedNodeHandles).isEmpty()
+            Truth.assertThat(initial.selectedMegaNodes).isNull()
+            Truth.assertThat(initial.isPendingRefresh).isFalse()
+            Truth.assertThat(initial.isRubbishBinEmpty).isFalse()
+            Truth.assertThat(initial.restoreType).isNull()
         }
     }
 
@@ -373,7 +395,7 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.selectAllNodes()
-            underTest.onRestoreClicked()
+            underTest.retrieveSelectedMegaNodes()
             Truth.assertThat(underTest.state.value.selectedNodeHandles.size)
                 .isEqualTo(underTest.state.value.selectedMegaNodes?.size)
         }
@@ -407,6 +429,103 @@ class RubbishBinViewModelTest {
             )
             Truth.assertThat(underTest.state.value.currFileNode).isNotNull()
             Truth.assertThat(underTest.state.value.itemIndex).isNotEqualTo(-1)
+        }
+
+    @Test
+    fun `test that restoring nodes will execute the move functionality when backup nodes are selected`() =
+        runTest {
+            val nodesListItem1 = mock<TypedFolderNode>()
+            val nodesListItem2 = mock<TypedFileNode>()
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(megaNode1.handle).thenReturn(1L)
+            whenever(megaNode2.handle).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(megaNode1, megaNode2)
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(true)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+            underTest.onRestoreClicked()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().restoreType).isEqualTo(RestoreType.MOVE)
+            }
+        }
+
+    @Test
+    fun `test that restoring nodes will execute the move functionality when backup and non backup nodes are selected`() =
+        runTest {
+            val nodesListItem1 = mock<TypedFolderNode>()
+            val nodesListItem2 = mock<TypedFileNode>()
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(megaNode1.handle).thenReturn(1L)
+            whenever(megaNode2.handle).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(megaNode1, megaNode2)
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(isNodeDeletedFromBackupsUseCase(NodeId(1L))).thenReturn(true)
+            whenever(isNodeDeletedFromBackupsUseCase(NodeId(2L))).thenReturn(false)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+            underTest.onRestoreClicked()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().restoreType).isEqualTo(RestoreType.MOVE)
+            }
+        }
+
+    @Test
+    fun `test that restoring nodes will execute the restore functionality when non backup nodes are selected`() =
+        runTest {
+            val nodesListItem1 = mock<TypedFolderNode>()
+            val nodesListItem2 = mock<TypedFileNode>()
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(megaNode1.handle).thenReturn(1L)
+            whenever(megaNode2.handle).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(megaNode1, megaNode2)
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(false)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+            underTest.onRestoreClicked()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().restoreType).isEqualTo(RestoreType.RESTORE)
+            }
+        }
+
+    @Test
+    fun `test that acknowledging the restore functionality will reset the restore type`() =
+        runTest {
+            underTest.onRestoreHandled()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().restoreType).isNull()
+            }
         }
 
     @After
