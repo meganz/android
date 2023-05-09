@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaNode
  *  @property selectedNodeHandles List of selected node handles
  *  @property selectedMegaNodes List of selected [MegaNode]
  *  @property isRubbishBinEmpty If parent rubbish is empty or not
+ *  @property restoreType Determines the specific "Restore" behavior
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -38,5 +39,6 @@ data class RubbishBinState(
     val selectedNodeHandles: List<Long> = emptyList(),
     val selectedMegaNodes: List<MegaNode>? = null,
     val isPendingRefresh: Boolean = false,
-    val isRubbishBinEmpty: Boolean = false
+    val isRubbishBinEmpty: Boolean = false,
+    val restoreType: RestoreType? = null,
 )
