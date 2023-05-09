@@ -5,6 +5,7 @@ import nz.mega.sdk.MegaNode
 
 /**
  * Get children nodes of a parent node
+ * We recommend using the new {@link mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase} UseCase
  */
 fun interface GetChildrenNode {
     /**

@@ -39,7 +39,6 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
@@ -79,6 +78,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -131,6 +131,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -318,7 +319,7 @@ class CameraUploadsService : LifecycleService() {
      * GetChildrenNode
      */
     @Inject
-    lateinit var getChildrenNode: GetChildrenNode
+    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * ProcessMediaForUpload
@@ -1210,7 +1211,6 @@ class CameraUploadsService : LifecycleService() {
                                 )
                             })
                         }
-
                     }
 
                 }
@@ -1219,10 +1219,10 @@ class CameraUploadsService : LifecycleService() {
                 if ((toUpload != null) && toUpload.exists()) {
                     // compare size
                     val node = checkExistBySize(parent, toUpload.length())
-                    if (node != null && node.originalFingerprint == null) {
+                    if (node != null && node.fingerprint == null) {
                         Timber.d(
                             "Node with handle: %d already exists, delete record from database.",
-                            node.handle
+                            node.id.longValue
                         )
                         path?.let {
                             deleteSyncRecord(it, isSecondary)
@@ -1388,10 +1388,11 @@ class CameraUploadsService : LifecycleService() {
 
     }
 
-    private suspend fun checkExistBySize(parent: MegaNode, size: Long): MegaNode? {
-        val nodeList = getChildrenNode(parent, SortOrder.ORDER_ALPHABETICAL_ASC)
+    private suspend fun checkExistBySize(parent: MegaNode, size: Long): FileNode? {
+        val nodeList =
+            getTypedChildrenNodeUseCase(NodeId(parent.handle), SortOrder.ORDER_ALPHABETICAL_ASC)
         for (node in nodeList) {
-            if (node.size == size) {
+            if (node is FileNode && node.size == size) {
                 return node
             }
         }
