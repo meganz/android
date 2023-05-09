@@ -2378,8 +2378,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (isConnected) {
                 showOnlineMode()
             } else {
-                //stop cu process
-                viewModel.stopCameraUpload()
                 showOfflineMode()
             }
         }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.cameraupload
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,26 +8,28 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.IBinder
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.LifecycleService
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CancellationException
+import androidx.hilt.work.HiltWorker
+import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
+import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.retryWhen
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,11 +69,10 @@ import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.data.worker.ACTION_STOP
-import mega.privacy.android.data.worker.EXTRA_ABORTED
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
@@ -99,6 +101,7 @@ import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
@@ -140,18 +143,24 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+
 /**
- * Service to handle upload of photos and videos
+ * Worker to run Camera Uploads
  */
-@AndroidEntryPoint
-class CameraUploadsService : LifecycleService() {
+@HiltWorker
+class CameraUploadsWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted workerParams: WorkerParameters,
+    private val permissionsGateway: PermissionGateway,
+    private val isNotEnoughQuota: IsNotEnoughQuota,
+) : CoroutineWorker(context, workerParams) {
 
     companion object {
-
         private const val FOLDER_REMINDER_PRIMARY = 1908
         private const val LOCAL_FOLDER_REMINDER_SECONDARY = 1909
         private const val OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "OVER_QUOTA_NOTIFICATION"
@@ -160,11 +169,6 @@ class CameraUploadsService : LifecycleService() {
         private const val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
         private const val notificationChannelName =
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
-
-        /**
-         * Get a new intent to the Camera Upload Service
-         */
-        fun newIntent(context: Context) = Intent(context, CameraUploadsService::class.java)
     }
 
     /**
@@ -562,11 +566,6 @@ class CameraUploadsService : LifecycleService() {
     lateinit var setCoordinatesUseCase: SetCoordinatesUseCase
 
     /**
-     * Coroutine Scope for camera upload work
-     */
-    private var coroutineScope: CoroutineScope? = null
-
-    /**
      * True if the camera uploads attributes have already been requested
      * from the server
      */
@@ -575,7 +574,9 @@ class CameraUploadsService : LifecycleService() {
     /**
      * Notification manager used to display notifications
      */
-    private var notificationManager: NotificationManager? = null
+    private val notificationManager: NotificationManager by lazy {
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
 
     /**
      * True if the battery level of the device is above
@@ -621,8 +622,94 @@ class CameraUploadsService : LifecycleService() {
      */
     private var totalVideoSize = 0L
 
+    /**
+     * Reference to the CoroutineWorker coroutine scope
+     */
+    private var scope: CoroutineScope? = null
+
+    /**
+     * Job to monitor upload pause flow
+     */
+    private var monitorUploadPauseStatusJob: Job? = null
+
+    /**
+     * Job to monitor connectivity status flow
+     */
+    private var monitorConnectivityStatusJob: Job? = null
+
+    /**
+     * Job to monitor battery level status flow
+     */
+    private var monitorBatteryLevelStatusJob: Job? = null
+
+    /**
+     * Job to monitor charging stopped status flow
+     */
+    private var monitorChargingStoppedStatusJob: Job? = null
+
+    override suspend fun doWork() = coroutineScope {
+        Timber.d("Start CU Worker")
+        try {
+            scope = this
+
+            createDefaultNotificationPendingIntent()
+            setForegroundAsync(getForegroundInfo())
+
+            val isNotEnoughQuota = isNotEnoughQuota()
+            val hasMediaPermissions =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    permissionsGateway.hasPermissions(
+                        Manifest.permission.POST_NOTIFICATIONS,
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                    )
+                } else {
+                    permissionsGateway.hasPermissions(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                    )
+                }
+            Timber.d("isNotEnoughQuota: $isNotEnoughQuota, hasMediaPermissions: $hasMediaPermissions")
+            if (!isNotEnoughQuota && hasMediaPermissions) {
+                Timber.d("No active process, start service")
+                withContext(ioDispatcher) {
+                    initService()
+                    performCompleteFastLogin()
+                }
+                Result.success()
+            } else {
+                Timber.d("Finished CU with Failure")
+                Result.failure()
+            }
+        } catch (throwable: Throwable) {
+            Timber.e(throwable)
+            endService(aborted = true)
+            Result.failure()
+        }
+    }
+
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        val notification = createNotification(
+            title = context.getString(R.string.section_photo_sync),
+            content = context.getString(R.string.settings_camera_notif_initializing_title),
+            intent = null,
+            isAutoCancel = false
+        )
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                notificationId,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(
+                notificationId,
+                notification
+            )
+        }
+    }
+
     private fun monitorUploadPauseStatus() {
-        coroutineScope?.launch {
+        monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
             monitorCameraUploadPauseState().collect {
                 updateProgressNotification()
             }
@@ -630,7 +717,7 @@ class CameraUploadsService : LifecycleService() {
     }
 
     private fun monitorConnectivityStatus() {
-        coroutineScope?.launch {
+        monitorConnectivityStatusJob = scope?.launch(ioDispatcher) {
             monitorConnectivityUseCase().collect {
                 if (!it || isWifiNotSatisfiedUseCase()) {
                     endService(
@@ -643,7 +730,7 @@ class CameraUploadsService : LifecycleService() {
     }
 
     private fun monitorBatteryLevelStatus() {
-        coroutineScope?.launch {
+        monitorBatteryLevelStatusJob = scope?.launch(ioDispatcher) {
             monitorBatteryInfo().collect {
                 deviceAboveMinimumBatteryLevel = (it.level > LOW_BATTERY_LEVEL || it.isCharging)
                 if (!deviceAboveMinimumBatteryLevel) {
@@ -657,7 +744,7 @@ class CameraUploadsService : LifecycleService() {
     }
 
     private fun monitorChargingStoppedStatus() {
-        coroutineScope?.launch {
+        monitorChargingStoppedStatusJob = scope?.launch(ioDispatcher) {
             monitorChargingStoppedState().collect {
                 if (isChargingRequired(totalVideoSize)) {
                     Timber.d("Detected device stops charging.")
@@ -667,75 +754,6 @@ class CameraUploadsService : LifecycleService() {
         }
     }
 
-    /**
-     * Service starts
-     */
-    override fun onCreate() {
-        super.onCreate()
-        createDefaultNotificationPendingIntent()
-        startForegroundNotification()
-    }
-
-    /**
-     * Service ends
-     */
-    override fun onDestroy() {
-        Timber.d("Service destroys.")
-        stopActiveHeartbeat()
-        stopWakeAndWifiLocks()
-        coroutineScope?.cancel()
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        cancelNotification()
-        super.onDestroy()
-    }
-
-    /**
-     * Bind service
-     */
-    override fun onBind(intent: Intent): IBinder? {
-        super.onBind(intent)
-        return null
-    }
-
-    /**
-     * Start service work
-     */
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        Timber.d("Starting CameraUpload service (flags: %d, startId: %d)", flags, startId)
-
-        when (intent?.action) {
-            ACTION_STOP -> {
-                Timber.d("Received Stop CU service command")
-                if (coroutineScope?.isActive == true) {
-                    Timber.d("active process, stop service")
-                    coroutineScope?.launch {
-                        val aborted = intent.getBooleanExtra(EXTRA_ABORTED, false)
-                        endService(
-                            cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
-                            aborted = aborted
-                        )
-                    }
-                } else {
-                    finishService()
-                }
-            }
-
-            else -> {
-                Timber.d("Received Start CU service command")
-                if (coroutineScope?.isActive != true) {
-                    Timber.d("No active process, start service")
-                    coroutineScope = CoroutineScope(ioDispatcher)
-                    coroutineScope?.launch {
-                        initService()
-                        performCompleteFastLogin()
-                    }
-                }
-            }
-        }
-
-        return START_NOT_STICKY
-    }
 
     /**
      * Cancels a pending [MegaTransfer] through [CancelTransfer],
@@ -764,24 +782,7 @@ class CameraUploadsService : LifecycleService() {
                 resetTotalUploads()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-    }
 
-    /**
-     * Show a foreground notification.
-     * It's a requirement of Android system for foreground service.
-     * Should call this both when "onCreate" and "onStartCommand".
-     */
-    private fun startForegroundNotification() {
-        if (notificationManager == null) {
-            notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        }
-        val notification = createNotification(
-            getString(R.string.section_photo_sync),
-            getString(R.string.settings_camera_notif_initializing_title),
-            null,
-            false
-        )
-        startForeground(notificationId, notification)
     }
 
     /**
@@ -809,8 +810,8 @@ class CameraUploadsService : LifecycleService() {
      * notifications if they exist
      */
     private suspend fun hideFolderPathNotifications() {
-        if (isPrimaryFolderValid()) notificationManager?.cancel(FOLDER_REMINDER_PRIMARY)
-        if (hasLocalSecondaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
+        if (isPrimaryFolderValid()) notificationManager.cancel(FOLDER_REMINDER_PRIMARY)
+        if (hasLocalSecondaryFolder()) notificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
     }
 
     /**
@@ -1031,8 +1032,8 @@ class CameraUploadsService : LifecycleService() {
 
     private suspend fun startCameraUploads() {
         showNotification(
-            getString(R.string.section_photo_sync),
-            getString(R.string.settings_camera_notif_checking_title),
+            context.getString(R.string.section_photo_sync),
+            context.getString(R.string.settings_camera_notif_checking_title),
             defaultPendingIntent,
             false
         )
@@ -1066,7 +1067,6 @@ class CameraUploadsService : LifecycleService() {
                 startVideoCompression()
             } else {
                 Timber.d("Nothing to upload.")
-                scheduleCameraUploadUseCase()
                 endService()
                 deleteCameraUploadsTemporaryRootDirectoryUseCase()
             }
@@ -1077,11 +1077,11 @@ class CameraUploadsService : LifecycleService() {
     }
 
     private fun showNotEnoughStorageNotification() {
-        val title = getString(R.string.title_out_of_space)
-        val message = getString(R.string.error_not_enough_free_space)
-        val intent = Intent(this, ManagerActivity::class.java)
+        val title = context.getString(R.string.title_out_of_space)
+        val message = context.getString(R.string.error_not_enough_free_space)
+        val intent = Intent(context, ManagerActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-            this,
+            context,
             0,
             intent,
             PendingIntent.FLAG_IMMUTABLE
@@ -1375,7 +1375,6 @@ class CameraUploadsService : LifecycleService() {
         totalToUpload = 0
         reportUploadFinish()
         stopActiveHeartbeat()
-        scheduleCameraUploadUseCase()
         endService()
     }
 
@@ -1391,7 +1390,7 @@ class CameraUploadsService : LifecycleService() {
         setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment
-        sendBroadcast(Intent(BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING))
+        context.sendBroadcast(Intent(BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING))
     }
 
     /**
@@ -1406,7 +1405,7 @@ class CameraUploadsService : LifecycleService() {
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
         setSecondaryFolderLocalPathUseCase(SettingsConstants.INVALID_PATH)
-        sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
+        context.sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
     }
 
     /**
@@ -1449,21 +1448,19 @@ class CameraUploadsService : LifecycleService() {
      */
     private fun displayFolderUnavailableNotification(resId: Int, notificationId: Int) {
         var isShowing = false
-        notificationManager?.let {
-            for (notification in it.activeNotifications) {
-                if (notification.id == notificationId) {
-                    isShowing = true
-                }
+        for (notification in notificationManager.activeNotifications) {
+            if (notification.id == notificationId) {
+                isShowing = true
             }
         }
         if (!isShowing) {
             val notification = createNotification(
-                getString(R.string.section_photo_sync),
-                getString(resId),
+                context.getString(R.string.section_photo_sync),
+                context.getString(resId),
                 null,
                 false
             )
-            notificationManager?.notify(notificationId, notification)
+            notificationManager.notify(notificationId, notification)
         }
     }
 
@@ -1473,7 +1470,7 @@ class CameraUploadsService : LifecycleService() {
      * @return the Primary Folder handle
      */
     private suspend fun getPrimaryFolderHandle(): Long =
-        getDefaultNodeHandleUseCase(getString(R.string.section_photo_sync))
+        getDefaultNodeHandleUseCase(context.getString(R.string.section_photo_sync))
 
     /**
      * Gets the Secondary Folder handle
@@ -1485,7 +1482,7 @@ class CameraUploadsService : LifecycleService() {
         val secondarySyncHandle = getSecondarySyncHandleUseCase()
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByHandle(secondarySyncHandle) == null) {
             // if it's invalid or deleted then return the default value
-            return getDefaultNodeHandleUseCase(getString(R.string.section_secondary_media_uploads))
+            return getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
         }
         return secondarySyncHandle
     }
@@ -1497,7 +1494,7 @@ class CameraUploadsService : LifecycleService() {
      * @throws Exception if the creation of the primary upload folder failed
      */
     private suspend fun createAndSetupPrimaryUploadFolder() {
-        createCameraUploadFolder(getString(R.string.section_photo_sync))?.let {
+        createCameraUploadFolder(context.getString(R.string.section_photo_sync))?.let {
             Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
             setupPrimaryFolder(it)
         } ?: throw Exception("Failed to create primary upload folder")
@@ -1510,7 +1507,7 @@ class CameraUploadsService : LifecycleService() {
      * @throws Exception if the creation of the secondary upload folder failed
      */
     private suspend fun createAndSetupSecondaryUploadFolder() {
-        createCameraUploadFolder(getString(R.string.section_secondary_media_uploads))?.let {
+        createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads))?.let {
             Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
             setupSecondaryFolder(it)
         } ?: throw Exception("Failed to create secondary upload folder")
@@ -1531,9 +1528,6 @@ class CameraUploadsService : LifecycleService() {
         totalToUpload = 0
         missingAttributesChecked = false
 
-        // Display notification
-        startForegroundNotification()
-
         // Create temp root folder
         runCatching { tempRoot = createCameraUploadTemporaryRootDirectory() }
             .onFailure {
@@ -1550,18 +1544,18 @@ class CameraUploadsService : LifecycleService() {
      * that will redirect to the manager activity with a [Constants.ACTION_CANCEL_CAM_SYNC] action
      */
     private fun createDefaultNotificationPendingIntent() {
-        val intent = Intent(this, ManagerActivity::class.java).apply {
+        val intent = Intent(context, ManagerActivity::class.java).apply {
             action = Constants.ACTION_CANCEL_CAM_SYNC
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
         }
         defaultPendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
 
     /**
-     * When [CameraUploadsService] is initialized, start the Wake and Wifi Locks
+     * When [CameraUploadsWorker] is initialized, start the Wake and Wifi Locks
      */
     private fun startWakeAndWifiLocks() {
         cameraServiceWakeLockHandler.startWakeLock()
@@ -1569,7 +1563,7 @@ class CameraUploadsService : LifecycleService() {
     }
 
     /**
-     * When [CameraUploadsService] ends, Stop both Wake and Wifi Locks
+     * When [CameraUploadsWorker] ends, Stop both Wake and Wifi Locks
      */
     private fun stopWakeAndWifiLocks() {
         cameraServiceWakeLockHandler.stopWakeLock()
@@ -1589,22 +1583,31 @@ class CameraUploadsService : LifecycleService() {
     ) = withContext(NonCancellable) {
         Timber.d("Finish Camera upload process: $cancelMessage")
 
-        if (coroutineScope?.isActive == true) {
-            sendStatusToBackupCenter(aborted = aborted)
-            cancelAllPendingTransfers()
-            broadcastProgress(100, 0)
-            videoCompressionJob?.cancel()
-            coroutineScope?.cancel(CancellationException(cancelMessage))
+        sendStatusToBackupCenter(aborted = aborted)
+        cancelAllPendingTransfers()
+        broadcastProgress(100, 0)
+        stopActiveHeartbeat()
+        stopWakeAndWifiLocks()
+        cancelNotification()
+
+        // isStopped signals means that the worker has been cancelled from the WorkManager
+        // If the process has been stopped for another reason, we can re-schedule the worker
+        // to perform at a later time
+        if (!isStopped) {
+            Timber.d("Schedule Camera Upload")
+            scheduleCameraUploadUseCase()
         }
 
-        finishService()
-    }
-
-    /**
-     *  Stop the service
-     */
-    private fun finishService() {
-        stopSelf()
+        if (aborted) {
+            Timber.d("Camera Upload stopped prematurely, cancel all running coroutines")
+            scope?.coroutineContext?.cancelChildren(CancellationException(cancelMessage))
+        } else {
+            Timber.d("Camera Upload finished normally, cancel all flow monitoring")
+            monitorUploadPauseStatusJob?.cancel()
+            monitorConnectivityStatusJob?.cancel()
+            monitorBatteryLevelStatusJob?.cancel()
+            monitorChargingStoppedStatusJob?.cancel()
+        }
     }
 
     /**
@@ -1652,18 +1655,14 @@ class CameraUploadsService : LifecycleService() {
     }
 
     private fun cancelNotification() {
-        notificationManager?.let {
-            Timber.d("Cancelling notification ID is %s", notificationId)
-            it.cancel(notificationId)
-            return
-        }
-        Timber.w("No notification to cancel")
+        Timber.d("Cancelling notification ID is %s", notificationId)
+        notificationManager.cancel(notificationId)
     }
 
     private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
         val path = transfer.path
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
-            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, this)
+            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, context)
             addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
         }
 
@@ -1695,12 +1694,12 @@ class CameraUploadsService : LifecycleService() {
                 val src = record.localPath?.let { File(it) }
                 if (src != null && src.exists()) {
                     Timber.d("Creating preview")
-                    val previewDir = PreviewUtils.getPreviewFolder(this)
+                    val previewDir = PreviewUtils.getPreviewFolder(context)
                     val preview = File(
                         previewDir,
                         MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
                     )
-                    val thumbDir = ThumbnailUtils.getThumbFolder(this)
+                    val thumbDir = ThumbnailUtils.getThumbFolder(context)
                     val thumb = File(
                         thumbDir,
                         MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
@@ -1709,7 +1708,7 @@ class CameraUploadsService : LifecycleService() {
                         val img = record.localPath?.let { File(it) }
                         if (!preview.exists()) {
                             ImageProcessor.createVideoPreview(
-                                this@CameraUploadsService,
+                                context,
                                 img,
                                 preview
                             )
@@ -1854,15 +1853,15 @@ class CameraUploadsService : LifecycleService() {
 
     @SuppressLint("StringFormatInvalid")
     private suspend fun showVideoCompressionErrorNotification() {
-        val intent = Intent(this, ManagerActivity::class.java)
+        val intent = Intent(context, ManagerActivity::class.java)
         intent.action = Constants.ACTION_SHOW_SETTINGS
         val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val title = getString(R.string.title_compression_size_over_limit)
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val title = context.getString(R.string.title_compression_size_over_limit)
         val size = getVideoCompressionSizeLimitUseCase()
-        val message = getString(
+        val message = context.getString(
             R.string.message_compression_size_over_limit,
-            getString(R.string.label_file_size_mega_byte, size.toString())
+            context.getString(R.string.label_file_size_mega_byte, size.toString())
         )
         showNotification(title, message, pendingIntent, true)
     }
@@ -1871,7 +1870,7 @@ class CameraUploadsService : LifecycleService() {
         records.sumOf { it.localPath?.let { path -> File(path).length() } ?: 0 } / (1024 * 1024)
 
     private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
-        if (isChargingRequired(queueSize) && !Util.isCharging(this)) {
+        if (isChargingRequired(queueSize) && !Util.isCharging(context)) {
             Timber.d("Should not start video compression.")
             return false
         }
@@ -1895,8 +1894,8 @@ class CameraUploadsService : LifecycleService() {
         currentFileIndex: Int,
         totalCount: Int,
     ) {
-        val message = getString(R.string.message_compress_video, "$progress%")
-        val subText = getString(
+        val message = context.getString(R.string.message_compress_video, "$progress%")
+        val subText = context.getString(
             R.string.title_compress_video,
             currentFileIndex,
             totalCount
@@ -1981,7 +1980,7 @@ class CameraUploadsService : LifecycleService() {
         }
         val message: String
         if (totalTransfers == 0) {
-            message = getString(R.string.download_preparing_files)
+            message = context.getString(R.string.download_preparing_files)
         } else {
             val inProgress = if (pendingTransfers == 0) {
                 totalTransfers
@@ -1992,13 +1991,13 @@ class CameraUploadsService : LifecycleService() {
             broadcastProgress(progressPercent, pendingTransfers)
 
             message = if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                getString(
+                context.getString(
                     R.string.upload_service_notification_paused,
                     inProgress,
                     totalTransfers
                 )
             } else {
-                getString(
+                context.getString(
                     R.string.upload_service_notification,
                     inProgress,
                     totalTransfers
@@ -2007,14 +2006,14 @@ class CameraUploadsService : LifecycleService() {
         }
 
         val info =
-            Util.getProgressSize(this, totalSizeTransferred, totalSizePendingTransfer)
+            Util.getProgressSize(context, totalSizeTransferred, totalSizePendingTransfer)
 
         showProgressNotification(
             progressPercent,
             defaultPendingIntent,
             message,
             info,
-            getString(R.string.settings_camera_notif_title)
+            context.getString(R.string.settings_camera_notif_title)
         )
     }
 
@@ -2032,10 +2031,10 @@ class CameraUploadsService : LifecycleService() {
             )
             channel.setShowBadge(false)
             channel.setSound(null, null)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
         }
 
-        val builder = NotificationCompat.Builder(this, notificationChannelId)
+        val builder = NotificationCompat.Builder(context, notificationChannelId)
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
             .setOngoing(false)
             .setContentTitle(title)
@@ -2056,7 +2055,7 @@ class CameraUploadsService : LifecycleService() {
         isAutoCancel: Boolean,
     ) {
         val notification = createNotification(title, content, intent, isAutoCancel)
-        notificationManager?.notify(notificationId, notification)
+        notificationManager.notify(notificationId, notification)
     }
 
     private fun showProgressNotification(
@@ -2066,7 +2065,7 @@ class CameraUploadsService : LifecycleService() {
         subText: String,
         contentText: String,
     ) {
-        val builder = NotificationCompat.Builder(this, notificationChannelId)
+        val builder = NotificationCompat.Builder(context, notificationChannelId)
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
             .setProgress(100, progressPercent, false)
             .setContentIntent(pendingIntent)
@@ -2085,23 +2084,23 @@ class CameraUploadsService : LifecycleService() {
             )
             channel.setShowBadge(true)
             channel.setSound(null, null)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
         }
-        notificationManager?.notify(notificationId, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
     private fun showStorageOverQuotaNotification() {
         Timber.d("Show storage over quota notification.")
-        val contentText = getString(R.string.download_show_info)
-        val message = getString(R.string.overquota_alert_title)
-        val intent = Intent(this, ManagerActivity::class.java)
+        val contentText = context.getString(R.string.download_show_info)
+        val message = context.getString(R.string.overquota_alert_title)
+        val intent = Intent(context, ManagerActivity::class.java)
         intent.action = Constants.ACTION_OVERQUOTA_STORAGE
 
-        val builder = NotificationCompat.Builder(this, OVER_QUOTA_NOTIFICATION_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, OVER_QUOTA_NOTIFICATION_CHANNEL_ID)
         builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
             .setContentIntent(
                 PendingIntent.getActivity(
-                    this,
+                    context,
                     0,
                     intent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -2121,17 +2120,17 @@ class CameraUploadsService : LifecycleService() {
             )
             channel.setShowBadge(true)
             channel.setSound(null, null)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager.createNotificationChannel(channel)
         }
-        notificationManager?.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
+        notificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }
 
     private fun showOutOfSpaceNotification() {
-        val intent = Intent(this, ManagerActivity::class.java)
+        val intent = Intent(context, ManagerActivity::class.java)
         val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val title = resources.getString(R.string.title_out_of_space)
-        val message = resources.getString(R.string.message_out_of_space)
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val title = context.getString(R.string.title_out_of_space)
+        val message = context.getString(R.string.message_out_of_space)
         showNotification(title, message, pendingIntent, true)
     }
 }

@@ -497,6 +497,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
          * Is logging in
          */
         @JvmStatic
+        @Volatile
         var isLoggingIn = false
             set(loggingIn) {
                 field = loggingIn

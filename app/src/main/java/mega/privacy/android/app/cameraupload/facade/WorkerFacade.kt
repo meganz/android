@@ -1,6 +1,5 @@
 package mega.privacy.android.app.cameraupload.facade
 
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -9,10 +8,8 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.await
 import kotlinx.coroutines.delay
+import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.data.gateway.WorkerGateway
-import mega.privacy.android.data.worker.EXTRA_ABORTED
-import mega.privacy.android.data.worker.StartCameraUploadWorker
-import mega.privacy.android.data.worker.StopCameraUploadWorker
 import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -25,14 +22,13 @@ private const val CAMERA_UPLOAD_TAG = "CAMERA_UPLOAD_TAG"
 private const val SINGLE_CAMERA_UPLOAD_TAG = "MEGA_SINGLE_CAMERA_UPLOAD_TAG"
 private const val HEART_BEAT_TAG = "HEART_BEAT_TAG"
 private const val SINGLE_HEART_BEAT_TAG = "SINGLE_HEART_BEAT_TAG"
-private const val STOP_CAMERA_UPLOAD_TAG = "STOP_CAMERA_UPLOAD_TAG"
 
 /**
  * Job time periods
  */
 private const val UP_TO_DATE_HEARTBEAT_INTERVAL: Long = 30 // Minutes
 private const val HEARTBEAT_FLEX_INTERVAL: Long = 20 // Minutes
-private const val CU_SCHEDULER_INTERVAL: Long = 1 // Hour
+private const val CU_SCHEDULER_INTERVAL: Long = 60 // Minutes
 private const val SCHEDULER_FLEX_INTERVAL: Long = 50 // Minutes
 private const val CU_RESCHEDULE_INTERVAL: Long = 5000 // Milliseconds
 
@@ -56,7 +52,7 @@ class WorkerFacade @Inject constructor(
         if (!checkWorkerRunning(CAMERA_UPLOAD_TAG)) {
             Timber.d("No CU periodic process currently running, proceed with one time request")
             val cameraUploadWorkRequest = OneTimeWorkRequest.Builder(
-                StartCameraUploadWorker::class.java
+                CameraUploadsWorker::class.java
             )
                 .addTag(SINGLE_CAMERA_UPLOAD_TAG)
                 .build()
@@ -88,27 +84,14 @@ class WorkerFacade @Inject constructor(
      * @param aborted true if the Camera Uploads has been aborted prematurely
      */
     override suspend fun fireStopCameraUploadJob(aborted: Boolean) {
-        val stopUploadWorkRequest = OneTimeWorkRequest.Builder(
-            StopCameraUploadWorker::class.java
-        )
-            .addTag(STOP_CAMERA_UPLOAD_TAG)
-            .setInputData(
-                Data.Builder()
-                    .putBoolean(EXTRA_ABORTED, aborted)
-                    .build()
-            )
-            .build()
-        workManager
-            .enqueueUniqueWork(
-                STOP_CAMERA_UPLOAD_TAG,
-                ExistingWorkPolicy.KEEP,
-                stopUploadWorkRequest
-            )
-        Timber.d(
-            "CameraUpload Stop Job Work Status: ${
-                workManager.getWorkInfosByTag(STOP_CAMERA_UPLOAD_TAG)
-            }"
-        )
+        cancelUniqueCameraUploadWorkRequest()
+        cancelPeriodicCameraUploadWorkRequest()
+
+        // Reschedule the Camera Upload to launch in a later time
+        // This case only happens if the user cancel all transfers without disabling the Camera Uploads
+        if (!aborted) {
+            scheduleCameraUploadJob()
+        }
         Timber.d("fireStopCameraUploadJob() SUCCESS")
     }
 
@@ -121,9 +104,9 @@ class WorkerFacade @Inject constructor(
         scheduleCameraUploadSyncActiveHeartbeat()
         // periodic work that runs during the last 10 minutes of every one hour period
         val cameraUploadWorkRequest = PeriodicWorkRequest.Builder(
-            StartCameraUploadWorker::class.java,
+            CameraUploadsWorker::class.java,
             CU_SCHEDULER_INTERVAL,
-            TimeUnit.HOURS,
+            TimeUnit.MINUTES,
             SCHEDULER_FLEX_INTERVAL,
             TimeUnit.MINUTES
         )
@@ -195,6 +178,15 @@ class WorkerFacade @Inject constructor(
             workManager.cancelAllWorkByTag(it)
         }
         Timber.d("cancelCameraUploadAndHeartbeatWorkRequest() SUCCESS")
+    }
+
+    /**
+     * Cancel the Camera Upload unique worker
+     */
+    private fun cancelUniqueCameraUploadWorkRequest() {
+        workManager
+            .cancelAllWorkByTag(SINGLE_CAMERA_UPLOAD_TAG)
+        Timber.d("cancelUniqueCameraUploadWorkRequest() SUCCESS")
     }
 
     /**
