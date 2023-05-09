@@ -69,7 +69,7 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun initMegaChat(session: String) =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
                 var state = megaChatApiGateway.initState
 
                 when (state) {
@@ -83,7 +83,7 @@ internal class DefaultLoginRepository @Inject constructor(
                                 Timber.e("Init chat error: ${exception.message}. Logout...")
                                 megaChatApiGateway.logout(null)
                                 continuation.resumeWith(Result.failure(exception))
-                                return@suspendCoroutine
+                                return@suspendCancellableCoroutine
                             }
 
                             else -> Timber.d("Chat correctly initialized")
@@ -93,7 +93,7 @@ internal class DefaultLoginRepository @Inject constructor(
                     MegaChatApi.INIT_TERMINATED -> {
                         Timber.w("Chat with terminated state, a logout is in progress.")
                         continuation.resumeWith(Result.failure(ChatLoggingOutException()))
-                        return@suspendCoroutine
+                        return@suspendCancellableCoroutine
                     }
                 }
 
@@ -102,18 +102,22 @@ internal class DefaultLoginRepository @Inject constructor(
         }
 
 
-    override suspend fun fastLogin(session: String) =
+    override suspend fun fastLogin(session: String) {
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
                 Timber.d("Fast login allowed.")
+                val listener =
+                    continuation.getRequestListener("fastLogin") { onFastLoginFinish(continuation) }
                 megaApiGateway.fastLogin(
                     session,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onFastLoginFinish(continuation)
-                    )
+                    listener
                 )
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
+    }
 
     private fun onFastLoginFinish(continuation: Continuation<Unit>) =
         { _: MegaRequest, error: MegaError ->
@@ -127,17 +131,19 @@ internal class DefaultLoginRepository @Inject constructor(
             }
         }
 
-    override suspend fun fetchNodes() =
+    override suspend fun fetchNodes() {
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
                 Timber.d("Fetch nodes allowed.")
-                megaApiGateway.fetchNodes(
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onFetchNodesFinish(continuation)
-                    )
-                )
+                val listener =
+                    continuation.getRequestListener("fetchNodes") { onFetchNodesFinish(continuation) }
+                megaApiGateway.fetchNodes(listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
+    }
 
     private fun onFetchNodesFinish(continuation: Continuation<Unit>) =
         { _: MegaRequest, error: MegaError ->

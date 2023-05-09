@@ -49,6 +49,7 @@ class VideoCompressionFacadeTest {
         underTest.start().test {
             val event = awaitItem()
             assertThat(event.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
+            awaitComplete()
         }
         assertThat(underTest.isRunning()).isFalse()
     }

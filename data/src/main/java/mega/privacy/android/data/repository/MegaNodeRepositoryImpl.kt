@@ -84,21 +84,18 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         newNodeParent: MegaNode,
         newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
+            val listener =
+                continuation.getRequestListener("copyNode") { request -> NodeId(request.nodeHandle) }
             megaApiGateway.copyNode(
                 nodeToCopy = nodeToCopy,
                 newNodeParent = newNodeParent,
                 newNodeName = newNodeName,
-                listener = OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_COPY) {
-                            continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
-                        } else {
-                            continuation.failWithError(error, "copyNode")
-                        }
-                    }
-                )
+                listener = listener
             )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
         }
     }
 
@@ -284,20 +281,16 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun setOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setOriginalFingerprint") {}
                 megaApiGateway.setOriginalFingerprint(
                     node = node,
                     originalFingerprint = originalFingerprint,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request, error ->
-                            if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_SET_ATTR_NODE) {
-                                continuation.resumeWith(Result.success(Unit))
-                            } else {
-                                continuation.failWithError(error, "setOriginalFingerprint")
-                            }
-                        }
-                    )
+                    listener = listener
                 )
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
     }

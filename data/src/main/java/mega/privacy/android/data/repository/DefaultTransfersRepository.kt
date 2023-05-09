@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -30,10 +31,8 @@ import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default [TransferRepository] implementation.
@@ -57,22 +56,18 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val workerManagerGateway: WorkManagerGateway,
 ) : TransfersRepository, TransferRepository {
 
-    override suspend fun cancelTransfer(transfer: MegaTransfer) = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
-            megaApiGateway.cancelTransfer(
-                transfer = transfer,
-                listener = OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (request.type == MegaRequest.TYPE_CANCEL_TRANSFER) {
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(Unit))
-                            } else {
-                                continuation.failWithError(error, "cancelTransfer")
-                            }
-                        }
-                    }
+    override suspend fun cancelTransfer(transfer: MegaTransfer) {
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("cancelTransfer") {}
+                megaApiGateway.cancelTransfer(
+                    transfer = transfer,
+                    listener = listener
                 )
-            )
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
         }
     }
 
@@ -105,6 +100,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaApiGateway.removeTransferListener(listener)
         }
     }
+        .flowOn(ioDispatcher)
+        .cancellable()
 
     private fun uploadListener(
         channel: SendChannel<GlobalTransfer>,
@@ -114,6 +111,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         },
         onTransferFinish = { transfer, error ->
             channel.trySend(GlobalTransfer.OnTransferFinish(transfer, error))
+            channel.close()
         },
         onTransferUpdate = { transfer ->
             channel.trySend(GlobalTransfer.OnTransferUpdate(transfer))
@@ -127,18 +125,12 @@ internal class DefaultTransfersRepository @Inject constructor(
     )
 
     override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
-            megaApiGateway.cancelAllUploadTransfers(OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
-                        if (error.errorCode == MegaError.API_OK) {
-                            continuation.resumeWith(Result.success(Unit))
-                        } else {
-                            continuation.failWithError(error, "cancelAllUploadTransfers")
-                        }
-                    }
-                }
-            ))
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cancelAllUploadTransfers") {}
+            megaApiGateway.cancelAllUploadTransfers(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
         }
     }
 

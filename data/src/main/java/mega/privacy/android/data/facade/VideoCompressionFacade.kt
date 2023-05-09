@@ -119,7 +119,8 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             send(VideoCompressionState.Failed())
         }
         send(VideoCompressionState.Finished)
-        awaitClose { config.isRunning = false }
+        config.isRunning = false
+        channel.close()
     }.cancellable()
 
     override fun addItems(videoAttachments: List<VideoAttachment>) {
