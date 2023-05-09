@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
 /**
  * Transfer repository of Domain Module
@@ -193,4 +194,14 @@ interface TransferRepository {
      * Delete oldest completed transfers
      */
     suspend fun deleteOldestCompletedTransfers()
+
+    /**
+     * Monitors transfers finished.
+     */
+    fun monitorTransfersFinished(): Flow<TransfersFinishedState>
+
+    /**
+     * Broadcasts transfers finished.
+     */
+    suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
 }

@@ -26,6 +26,7 @@ import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaCancelToken
@@ -291,4 +292,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {
         workerManagerGateway.enqueueDeleteOldestCompletedTransfersWorkRequest()
     }
+
+    override fun monitorTransfersFinished() = appEventGateway.monitorTransfersFinished()
+
+    override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
+        appEventGateway.broadcastTransfersFinished(transfersFinishedState)
 }

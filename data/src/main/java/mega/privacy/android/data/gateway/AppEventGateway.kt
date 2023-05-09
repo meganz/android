@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
 internal interface AppEventGateway {
 
@@ -151,7 +152,31 @@ internal interface AppEventGateway {
      */
     suspend fun broadcastCompletedTransfer(transfer: CompletedTransfer)
 
+    /**
+     * Monitor account update.
+     *
+     * @return Flow of [MyAccountUpdate]
+     */
     fun monitorMyAccountUpdate(): Flow<MyAccountUpdate>
 
+    /**
+     * Broadcast account update.
+     *
+     * @param data [MyAccountUpdate]
+     */
     suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate)
+
+    /**
+     * Monitor transfers finished.
+     *
+     * @return Flow of [TransfersFinishedState]
+     */
+    fun monitorTransfersFinished(): Flow<TransfersFinishedState>
+
+    /**
+     * Broadcast transfers finished.
+     *
+     * @param transfersFinishedState [TransfersFinishedState]
+     */
+    suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
 }

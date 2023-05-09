@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ internal class AppEventFacade @Inject constructor(
     private val accountUpdate = MutableSharedFlow<Boolean>()
     private val pausedTransfers = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
+    private val transfersFinished = MutableSharedFlow<TransfersFinishedState>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
     private val myAccountUpdate = MutableSharedFlow<MyAccountUpdate>()
 
@@ -113,6 +115,12 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate) =
         myAccountUpdate.emit(data)
+
+    override fun monitorTransfersFinished(): Flow<TransfersFinishedState> =
+        transfersFinished.toSharedFlow(appScope)
+
+    override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
+        transfersFinished.emit(transfersFinishedState)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
