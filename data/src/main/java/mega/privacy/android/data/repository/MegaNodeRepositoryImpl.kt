@@ -79,43 +79,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val getLinksSortOrder: GetLinksSortOrder,
 ) : MegaNodeRepository {
 
-    override suspend fun copyNode(
-        nodeToCopy: MegaNode,
-        newNodeParent: MegaNode,
-        newNodeName: String?,
-    ): NodeId = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener =
-                continuation.getRequestListener("copyNode") { request -> NodeId(request.nodeHandle) }
-            megaApiGateway.copyNode(
-                nodeToCopy = nodeToCopy,
-                newNodeParent = newNodeParent,
-                newNodeName = newNodeName,
-                listener = listener
-            )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    @Throws(IllegalArgumentException::class)
-    override suspend fun copyNodeByHandle(
-        nodeToCopy: NodeId,
-        newNodeParent: NodeId,
-        newNodeName: String?,
-    ): NodeId = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToCopy.longValue)
-        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
-        if (node == null) {
-            throw IllegalArgumentException("Node to copy with handle $nodeToCopy not found")
-        }
-        if (parent == null) {
-            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
-        }
-        copyNode(node, parent, newNodeName)
-    }
-
     override suspend fun moveNode(
         nodeToMove: MegaNode,
         newNodeParent: MegaNode,

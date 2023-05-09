@@ -23,10 +23,10 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
@@ -399,6 +399,29 @@ internal class NodeRepositoryImpl @Inject constructor(
                 ).errorCode != MegaError.API_OK
             } else {
                 false
+            }
+        }
+    }
+
+    override suspend fun copyNode(
+        nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToCopy.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        requireNotNull(node) { "Node to copy with handle $nodeToCopy not found" }
+        requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("copyNode") { NodeId(it.nodeHandle) }
+            megaApiGateway.copyNode(
+                nodeToCopy = node,
+                newNodeParent = parent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
             }
         }
     }

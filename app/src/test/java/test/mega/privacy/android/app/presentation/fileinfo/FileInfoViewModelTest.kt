@@ -58,7 +58,6 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -66,6 +65,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -105,7 +105,7 @@ internal class FileInfoViewModelTest {
     private val checkNameCollision: CheckNameCollision = mock()
     private val moveNodeByHandle: MoveNodeByHandle = mock()
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle = mock()
-    private val copyNodeByHandle: CopyNodeByHandle = mock()
+    private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val deleteNodeByHandle: DeleteNodeByHandle = mock()
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
     private val node: MegaNode = mock()
@@ -160,7 +160,7 @@ internal class FileInfoViewModelTest {
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
             moveNodeByHandle = moveNodeByHandle,
-            copyNodeByHandle = copyNodeByHandle,
+            copyNodeUseCase = copyNodeUseCase,
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
             deleteNodeByHandle = deleteNodeByHandle,
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
@@ -836,7 +836,13 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockCopySuccess() {
-        whenever(copyNodeByHandle.invoke(nodeId, parentId)).thenReturn(nodeId)
+        whenever(
+            copyNodeUseCase.invoke(
+                nodeToCopy = nodeId,
+                newNodeParent = parentId,
+                newNodeName = null
+            )
+        ).thenReturn(nodeId)
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
@@ -848,7 +854,13 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockCopyFailure() {
-        whenever(copyNodeByHandle.invoke(nodeId, parentId))
+        whenever(
+            copyNodeUseCase.invoke(
+                nodeToCopy = nodeId,
+                newNodeParent = parentId,
+                newNodeName = null
+            )
+        )
             .thenThrow(RuntimeException("fake exception"))
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)

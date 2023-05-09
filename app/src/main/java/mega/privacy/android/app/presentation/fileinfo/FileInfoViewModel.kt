@@ -58,7 +58,6 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -66,6 +65,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -92,7 +92,7 @@ class FileInfoViewModel @Inject constructor(
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
     private val moveNodeByHandle: MoveNodeByHandle,
-    private val copyNodeByHandle: CopyNodeByHandle,
+    private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val deleteNodeByHandle: DeleteNodeByHandle,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
@@ -225,7 +225,11 @@ class FileInfoViewModel @Inject constructor(
         performBlockSettingProgress(FileInfoJobInProgressState.Copying) {
             if (checkCollision(parentHandle, NameCollisionType.COPY)) {
                 runCatching {
-                    copyNodeByHandle(typedNode.id, parentHandle)
+                    copyNodeUseCase(
+                        nodeToCopy = typedNode.id,
+                        newNodeParent = parentHandle,
+                        newNodeName = null
+                    )
                 }
             } else {
                 null
@@ -459,6 +463,7 @@ class FileInfoViewModel @Inject constructor(
                                 _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
                             }
                         }
+
                         Name -> updateTitle()
                         Owner -> updateOwner()
                         Inshare -> updateAccessPermission()
@@ -470,11 +475,13 @@ class FileInfoViewModel @Inject constructor(
                                 // maybe it's moved, or a new version is created, etc. let's update all to be safe
                                 return@any true
                             }
+
                         Timestamp -> updateTimeStamp()
                         Outshare -> {
                             updateOutShares()
                             updateIcon()
                         }
+
                         Public_link -> return@any true //will update only public link, for now update everything
                         else -> return@any false
                     }

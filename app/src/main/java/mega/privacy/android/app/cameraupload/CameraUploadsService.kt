@@ -38,7 +38,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
-import mega.privacy.android.app.domain.usecase.CopyNode
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
@@ -447,7 +447,7 @@ class CameraUploadsService : LifecycleService() {
      * Copy Node
      */
     @Inject
-    lateinit var copyNode: CopyNode
+    lateinit var copyNodeUseCase: CopyNodeUseCase
 
     /**
      * Set Original Fingerprint
@@ -1346,7 +1346,7 @@ class CameraUploadsService : LifecycleService() {
     }
 
     /**
-     * Perform a copy operation through [CopyNode]
+     * Perform a copy operation through [CopyNodeUseCase]
      *
      * @param nodeToCopy The [MegaNode] to be copied
      * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
@@ -1358,9 +1358,9 @@ class CameraUploadsService : LifecycleService() {
         newNodeName: String,
     ) {
         runCatching {
-            copyNode(
-                nodeToCopy = nodeToCopy,
-                newNodeParent = newNodeParent,
+            copyNodeUseCase(
+                nodeToCopy = NodeId(nodeToCopy.handle),
+                newNodeParent = NodeId(newNodeParent.handle),
                 newNodeName = newNodeName,
             )
         }.onSuccess { nodeId ->
