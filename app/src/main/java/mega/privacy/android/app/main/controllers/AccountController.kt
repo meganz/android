@@ -205,47 +205,6 @@ class AccountController @Inject constructor(
         oldFile.renameTo(newRKFile)
     }
 
-    fun copyMK(logout: Boolean, sharingScope: CoroutineScope) {
-        Timber.d("copyMK")
-        val megaApi = MegaApplication.getInstance().megaApi
-        val key = megaApi.exportMasterKey()
-
-        if (context is ManagerActivity) {
-            if (key != null) {
-                megaApi.masterKeyExported(context)
-                val clipboard =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Copied Text", key)
-                clipboard.setPrimaryClip(clip)
-
-                if (logout) {
-                    showConfirmDialogRecoveryKeySaved(sharingScope)
-                } else {
-                    showAlert(context, context.getString(R.string.copy_MK_confirmation), null)
-                }
-            } else {
-                showAlert(context, context.getString(R.string.general_text_error), null)
-            }
-        }
-    }
-
-    fun copyRkToClipboard(sharingScope: CoroutineScope) {
-        Timber.d("copyRkToClipboard")
-        when (context) {
-            is ManagerActivity -> {
-                copyMK(false, sharingScope)
-            }
-            is TwoFactorAuthenticationActivity -> {
-                val intent = Intent(context, ManagerActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                intent.action = Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD
-                intent.putExtra("logout", false)
-                context.startActivity(intent)
-                context.finish()
-            }
-        }
-    }
-
     private fun createRkBitmap(): Bitmap? {
         Timber.d("createRkBitmap")
         val rKBitmap = Bitmap.createBitmap(1000, 1000, Bitmap.Config.ARGB_8888)

@@ -3151,14 +3151,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         ac.exportMK(parentPath)
                     }
                 }
-                Constants.ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD -> {
-                    val ac = AccountController(this)
-                    if (intent.getBooleanExtra("logout", false)) {
-                        ac.copyMK(true, sharingScope)
-                    } else {
-                        ac.copyMK(false, sharingScope)
-                    }
-                }
                 Constants.ACTION_OPEN_FOLDER -> {
                     Timber.d("Open after LauncherFileExplorerActivity ")
                     val handleIntent: Long =
