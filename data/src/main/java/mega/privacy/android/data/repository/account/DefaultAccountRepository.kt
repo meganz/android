@@ -618,7 +618,6 @@ internal class DefaultAccountRepository @Inject constructor(
             clearNonContacts()
             clearChatItems()
             clearCompletedTransfers()
-            clearPendingMessages()
             clearAttributes()
             deleteAllSyncRecordsTypeAny()
             clearChatSettings()

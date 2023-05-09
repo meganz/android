@@ -395,8 +395,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearCompletedTransfers() = dbHandler.clearCompletedTransfers()
 
-    override suspend fun clearPendingMessages() = dbHandler.clearPendingMessage()
-
     override suspend fun clearAttributes() = dbHandler.clearAttributes()
 
     override suspend fun deleteAllSyncRecordsTypeAny() = dbHandler.deleteAllSyncRecordsTypeAny()

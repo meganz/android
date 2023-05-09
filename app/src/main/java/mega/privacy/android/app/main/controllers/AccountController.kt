@@ -47,11 +47,9 @@ import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAu
 import mega.privacy.android.app.psa.PsaManager.stopChecking
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
 import mega.privacy.android.app.utils.ChatUtil.removeEmojisSharedPreferences
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders
 import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
@@ -296,7 +294,6 @@ class AccountController @Inject constructor(
             dbH.clearNonContacts()
             dbH.clearChatItems()
             dbH.clearCompletedTransfers()
-            dbH.clearPendingMessage()
             dbH.clearAttributes()
             dbH.deleteAllSyncRecordsTypeAny()
             dbH.clearChatSettings()

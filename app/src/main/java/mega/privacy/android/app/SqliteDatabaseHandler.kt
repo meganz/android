@@ -230,29 +230,6 @@ class SqliteDatabaseHandler @Inject constructor(
                 "$KEY_LAST_NAME TEXT)"
         db.execSQL(CREATE_EPHEMERAL)
 
-        val CREATE_PENDING_MSG_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_PENDING_MSG(" +
-                "$KEY_ID INTEGER PRIMARY KEY," +
-                "$KEY_ID_CHAT TEXT, " +
-                "$KEY_MSG_TIMESTAMP TEXT, " +
-                "$KEY_ID_TEMP_KARERE TEXT, " +
-                "$KEY_STATE INTEGER)"
-        db.execSQL(CREATE_PENDING_MSG_TABLE)
-
-        val CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_MSG_NODES(" +
-                "$KEY_ID INTEGER PRIMARY KEY," +
-                "$KEY_ID_PENDING_MSG INTEGER, " +
-                "$KEY_ID_NODE INTEGER)"
-        db.execSQL(CREATE_MSG_NODE_TABLE)
-
-        val CREATE_NODE_ATTACHMENTS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_NODE_ATTACHMENTS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY," +
-                    "$KEY_FILE_PATH TEXT, " +
-                    "$KEY_FILE_NAME TEXT, " +
-                    "$KEY_FILE_FINGERPRINT TEXT, " +
-                    "$KEY_NODE_HANDLE TEXT)"
-        db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE)
-
         val CREATE_NEW_PENDING_MSG_TABLE =
             "CREATE TABLE IF NOT EXISTS $TABLE_PENDING_MSG_SINGLE(" +
                     "$KEY_ID INTEGER PRIMARY KEY," +
@@ -478,30 +455,6 @@ class SqliteDatabaseHandler @Inject constructor(
                     "$KEY_FIRST_NAME TEXT, " +
                     "$KEY_LAST_NAME TEXT)"
             db.execSQL(CREATE_EPHEMERAL)
-        }
-        if (oldVersion <= 32) {
-            val CREATE_PENDING_MSG_TABLE = ("CREATE TABLE IF NOT EXISTS $TABLE_PENDING_MSG(" +
-                    "$KEY_ID INTEGER PRIMARY KEY," +
-                    "$KEY_ID_CHAT TEXT, " +
-                    "$KEY_MSG_TIMESTAMP TEXT, " +
-                    "$KEY_ID_TEMP_KARERE TEXT, " +
-                    "$KEY_STATE INTEGER)")
-            db.execSQL(CREATE_PENDING_MSG_TABLE)
-
-            val CREATE_MSG_NODE_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_MSG_NODES(" +
-                    "$KEY_ID INTEGER PRIMARY KEY," +
-                    "$KEY_ID_PENDING_MSG INTEGER, " +
-                    "$KEY_ID_NODE INTEGER)"
-            db.execSQL(CREATE_MSG_NODE_TABLE)
-
-            val CREATE_NODE_ATTACHMENTS_TABLE =
-                "CREATE TABLE IF NOT EXISTS $TABLE_NODE_ATTACHMENTS(" +
-                        "$KEY_ID INTEGER PRIMARY KEY," +
-                        "$KEY_FILE_PATH TEXT, " +
-                        "$KEY_FILE_NAME TEXT, " +
-                        "$KEY_FILE_FINGERPRINT TEXT, " +
-                        "$KEY_NODE_HANDLE TEXT)"
-            db.execSQL(CREATE_NODE_ATTACHMENTS_TABLE)
         }
         if (oldVersion <= 34) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_USE_HTTPS_ONLY TEXT;")
@@ -4183,11 +4136,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun clearCompletedTransfers() {
         db.execSQL("DROP TABLE IF EXISTS $TABLE_COMPLETED_TRANSFERS")
-        onCreate(db)
-    }
-
-    override fun clearPendingMessage() {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_PENDING_MSG")
         onCreate(db)
     }
 

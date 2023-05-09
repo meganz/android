@@ -710,11 +710,6 @@ interface MegaLocalStorageGateway {
     suspend fun clearCompletedTransfers()
 
     /**
-     * Clears pending messages.
-     */
-    suspend fun clearPendingMessages()
-
-    /**
      * clears attributes.
      */
     suspend fun clearAttributes()

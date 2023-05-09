@@ -267,8 +267,6 @@ interface DatabaseHandler {
     fun clearOffline(db: SQLiteDatabase)
     fun clearOffline()
     fun clearCompletedTransfers()
-    fun clearPendingMessage()
-
 
     /**
      * Updates a pending message.
