@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import timber.log.Timber
 import javax.inject.Inject
@@ -45,7 +46,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val monitorAccountDetail: MonitorAccountDetail,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
-    private val monitorVerifiedPhoneNumber: MonitorVerifiedPhoneNumber,
+    private val monitorVerificationStatus: MonitorVerificationStatus,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
@@ -105,11 +106,12 @@ class MyAccountHomeViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            flow {
-                emitAll(monitorVerifiedPhoneNumber())
-            }.collectLatest { verifiedPhoneNumber ->
+            monitorVerificationStatus().collectLatest { status ->
                 _uiState.update {
-                    it.copy(verifiedPhoneNumber = (verifiedPhoneNumber as? VerifiedPhoneNumber.PhoneNumber)?.phoneNumberString)
+                    it.copy(
+                        verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)?.phoneNumberString,
+                        canVerifyPhoneNumber = status.canRequestOptInVerification
+                    )
                 }
             }
         }

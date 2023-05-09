@@ -20,6 +20,8 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.verification.VerificationStatus
+import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -34,6 +36,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -56,7 +59,13 @@ class MyAccountHomeViewModelTest {
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val myAvatarFileFlow = MutableStateFlow<File?>(null)
     private val verifiedPhoneNumberFlow =
-        MutableStateFlow(VerifiedPhoneNumber.PhoneNumber("123"))
+        MutableStateFlow(
+            Verified(
+                phoneNumber = VerifiedPhoneNumber.PhoneNumber("123"),
+                canRequestUnblockSms = true,
+                canRequestOptInVerification = true
+            )
+        )
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow(UserChanges.Firstname)
 
@@ -68,7 +77,7 @@ class MyAccountHomeViewModelTest {
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock {
         onBlocking { invoke() }.thenReturn(myAvatarFileFlow)
     }
-    private val monitorVerifiedPhoneNumber: MonitorVerifiedPhoneNumber = mock {
+    private val monitorVerificationStatus: MonitorVerificationStatus = mock {
         onBlocking { invoke() }.thenReturn(verifiedPhoneNumberFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
@@ -94,7 +103,7 @@ class MyAccountHomeViewModelTest {
             getAccountDetailsUseCase,
             monitorAccountDetail,
             monitorMyAvatarFile,
-            monitorVerifiedPhoneNumber,
+            monitorVerificationStatus,
             monitorConnectivityUseCase,
             monitorUserUpdates,
             getVisibleContactsUseCase,
@@ -174,13 +183,22 @@ class MyAccountHomeViewModelTest {
     fun `test that verifiedPhoneNumber should be updated when monitorVerifiedPhoneNumber emits phone number`() =
         runTest {
             val number = Random.nextInt(10000, 100000).toString()
-            val expected = VerifiedPhoneNumber.PhoneNumber(number)
-            verifiedPhoneNumberFlow.emit(expected)
+            val expectedPhoneNumber = VerifiedPhoneNumber.PhoneNumber(number)
+            val expectedVerification = Random.nextBoolean()
+            verifiedPhoneNumberFlow.emit(
+                Verified(
+                    phoneNumber = VerifiedPhoneNumber.PhoneNumber(number),
+                    canRequestUnblockSms = true,
+                    canRequestOptInVerification = expectedVerification
+                )
+            )
 
             advanceUntilIdle()
 
             underTest.uiState.test {
-                assertThat(awaitItem().verifiedPhoneNumber).isEqualTo(expected.phoneNumberString)
+                val state = awaitItem()
+                assertThat(state.verifiedPhoneNumber).isEqualTo(expectedPhoneNumber.phoneNumberString)
+                assertThat(state.canVerifyPhoneNumber).isEqualTo(expectedVerification)
             }
         }
 
