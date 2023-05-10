@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.fileinfo.view
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -22,7 +23,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = "something",
                 iconResource = null,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW).assertExists()
@@ -34,7 +39,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = null,
                 iconResource = null,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_PREVIEW).assertDoesNotExist()
@@ -46,7 +55,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = null,
                 iconResource = android.R.drawable.ic_menu_more,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON).assertExists()
@@ -58,7 +71,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = null,
                 iconResource = null,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON).assertDoesNotExist()
@@ -70,7 +87,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = "something",
                 iconResource = android.R.drawable.ic_menu_more,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ICON).assertDoesNotExist()
@@ -82,7 +103,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = null,
                 iconResource = null,
-                accessPermissionDescription = android.R.string.ok
+                accessPermissionDescription = android.R.string.ok,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ACCESS).assertExists()
@@ -94,7 +119,11 @@ class FileInfoHeaderTest {
             FileInfoHeader(
                 previewUri = null,
                 iconResource = null,
-                accessPermissionDescription = null
+                accessPermissionDescription = null,
+                backgroundAlpha = 1f,
+                tintColor = Color.White,
+                title = "Title",
+                titleAlpha = 1f,
             )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_ACCESS).assertDoesNotExist()

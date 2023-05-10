@@ -27,7 +27,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
@@ -36,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
@@ -78,12 +76,6 @@ internal fun FileInfoScreen(
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(
-        color = Color.Transparent,
-        darkIcons = systemUiController.statusBarDarkContentEnabled
-    )
-
     val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current.density
@@ -96,7 +88,18 @@ internal fun FileInfoScreen(
                     .coerceAtLeast(headerMinHeight(statusBarHeight))
             }
         }
-        val alpha by remember {
+        val titleDisplacement by remember {
+            derivedStateOf {
+                ((headerHeight - headerGoneHeight(statusBarHeight)) * 0.5f).coerceAtLeast(0f)
+            }
+        }
+        val longTitleAlpha by remember {
+            derivedStateOf {
+                (titleDisplacement / (appBarHeight / 2)).coerceIn(0f, 1f)
+            }
+        }
+
+        val headerBackgroundAlpha by remember {
             derivedStateOf {
                 ((headerHeight - headerGoneHeight(statusBarHeight))
                         / (headerStartGoneHeight(statusBarHeight) - headerGoneHeight(statusBarHeight)))
@@ -113,19 +116,23 @@ internal fun FileInfoScreen(
         val tintColor by remember(viewState.hasPreview) {
             derivedStateOf {
                 if (viewState.hasPreview) {
-                    lerp(tintColorBase, white, alpha)
+                    lerp(tintColorBase, white, headerBackgroundAlpha)
                 } else {
                     tintColorBase
                 }
             }
         }
         FileInfoHeader(
+            title = viewState.title,
+            titleAlpha = longTitleAlpha,
+            titleDisplacement = titleDisplacement.dp,
+            tintColor = tintColor,
+            backgroundAlpha = headerBackgroundAlpha,
             previewUri = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview },
             iconResource = viewState.iconResource,
             accessPermissionDescription = viewState.accessPermission.description()
                 ?.takeIf { viewState.isIncomingSharedNode },
             modifier = Modifier
-                .alpha(alpha)
                 .height(headerHeight.dp),
             statusBarHeight = statusBarHeight.dp,
         )
@@ -146,6 +153,8 @@ internal fun FileInfoScreen(
                             title = viewState.title,
                             actions = viewState.actions,
                             tintColor = tintColor,
+                            titleDisplacement = titleDisplacement.dp,
+                            titleAlpha = 1 - longTitleAlpha,
                             opacityTransitionDelta = topBarOpacityTransitionDelta,
                             onBackPressed = onBackPressed,
                             onActionClick = onMenuActionClick,
@@ -245,11 +254,11 @@ private fun FileInfoScreenPreview(
     }
 }
 
-private const val appBarHeight = 44f
+internal const val appBarHeight = 56f
 private fun headerMinHeight(statusBarHeight: Float) = appBarHeight + statusBarHeight
-private fun headerMaxHeight(statusBarHeight: Float) = 140f + statusBarHeight
-private fun headerStartGoneHeight(statusBarHeight: Float) = 110f + statusBarHeight
-private fun headerGoneHeight(statusBarHeight: Float) = 66f + statusBarHeight
+private fun headerMaxHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 96f
+private fun headerStartGoneHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 76f
+private fun headerGoneHeight(statusBarHeight: Float) = headerMinHeight(statusBarHeight) + 18f
 private fun spacerHeight(statusBarHeight: Float) =
     headerMaxHeight(statusBarHeight) - appBarHeight - statusBarHeight
 

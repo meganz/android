@@ -11,8 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
@@ -29,6 +31,11 @@ internal fun FileInfoSelectActionModeTopBar(
     onActionClick: (FileInfoMenuAction) -> Unit,
 ) {
     val tintColor = MaterialTheme.colors.secondary
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        color = Color.Transparent,
+        darkIcons = systemUiController.statusBarDarkContentEnabled
+    )
     TopAppBar(
         title = {
             Text(
