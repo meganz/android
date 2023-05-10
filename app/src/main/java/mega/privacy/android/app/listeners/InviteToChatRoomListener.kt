@@ -73,11 +73,11 @@ class InviteToChatRoomListener(context: Context) : ChatBaseListener(context) {
         val megaChatApi = MegaApplication.getInstance().megaChatApi
 
         for (contact in contactsData.indices) {
-            val user: MegaUser = megaApi.getContact(contactsData[contact])
+            val user: MegaUser? = megaApi.getContact(contactsData[contact])
 
             megaChatApi.inviteToChat(
                 chatId,
-                user.handle,
+                user?.handle ?: MEGACHAT_INVALID_HANDLE,
                 MegaChatPeerList.PRIV_STANDARD,
                 this
             )

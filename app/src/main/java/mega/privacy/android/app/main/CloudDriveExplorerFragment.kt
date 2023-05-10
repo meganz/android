@@ -273,7 +273,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             selectFile = it.isSelectFile
             parentHandle = it.parentHandleCloud
 
-            if (parentHandle != INVALID_HANDLE && megaApi.rootNode != null && parentHandle != megaApi.rootNode.handle) {
+            if (parentHandle != INVALID_HANDLE && megaApi.rootNode != null && parentHandle != megaApi.rootNode?.handle) {
                 it.hideTabs(true, CLOUD_FRAGMENT)
             }
         }
@@ -300,12 +300,13 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             parentHandle == INVALID_HANDLE -> {
                 val latestTargetPathTab =
                     (requireActivity() as FileExplorerActivity).latestTargetPathTab
-                var targetPath = megaApi.rootNode.handle
+                val rootHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
+                var targetPath = rootHandle
                 if (latestTargetPathTab == FileExplorerActivity.CLOUD_TAB && (modeCloud == FileExplorerActivity.COPY || modeCloud == FileExplorerActivity.MOVE)) {
                     targetPath = fileExplorerActivity.latestTargetPath?.let {
                         fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
                         it
-                    } ?: megaApi.rootNode.handle
+                    } ?: rootHandle
                 }
                 setParentHandle(targetPath)
             }
@@ -443,7 +444,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * Update empty view
      */
     private fun updateEmptyScreen() {
-        megaApi.rootNode.handle.let { rootHandle ->
+        megaApi.rootNode?.handle.let { rootHandle ->
             binding.fileListEmptyImage.setImageResource(
                 if (rootHandle == parentHandle) {
                     if (isScreenInPortrait(requireContext())) {
@@ -783,7 +784,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             return
         }
         if (parentHandle == INVALID_HANDLE)
-            setParentHandle(megaApi.rootNode.handle)
+            setParentHandle(megaApi.rootNode?.handle ?: INVALID_HANDLE)
 
         megaApi.getNodeByHandle(parentHandle)?.let {
             searchCancelToken = initNewSearch()

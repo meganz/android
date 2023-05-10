@@ -709,7 +709,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         }
 
                         menu.findItem(R.id.move_to_trash).isVisible =
-                            node.parentHandle != megaApi.rubbishNode.handle
+                            node.parentHandle != megaApi.rubbishNode?.handle
                                     && (access == MegaShare.ACCESS_FULL || access == MegaShare.ACCESS_OWNER)
 
                         menu.findItem(R.id.copy).isVisible = adapterType != FOLDER_LINK_ADAPTER

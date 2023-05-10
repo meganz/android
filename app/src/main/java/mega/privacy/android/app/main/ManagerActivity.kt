@@ -354,6 +354,7 @@ import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -1674,21 +1675,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 )
                             } else {
                                 when (intent.getLongExtra("fragmentHandle", -1)) {
-                                    megaApi.rootNode.handle -> {
+                                    megaApi.rootNode?.handle -> {
                                         drawerItem = DrawerItem.CLOUD_DRIVE
                                         fileBrowserViewModel.setBrowserParentHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
 
-                                    megaApi.rubbishNode.handle -> {
+                                    megaApi.rubbishNode?.handle -> {
                                         drawerItem = DrawerItem.RUBBISH_BIN
                                         rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
 
-                                    megaApi.inboxNode.handle -> {
+                                    megaApi.inboxNode?.handle -> {
                                         drawerItem = DrawerItem.INBOX
                                         inboxViewModel.updateInboxHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
@@ -2906,7 +2907,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (!nf.areNotificationsEnabled()) {
                 Timber.d("OFF")
                 if (dbH.showNotifOff == null || dbH.showNotifOff == "true") {
-                    if (megaApi.contacts.size >= 1 || megaChatApi.chatListItems.size >= 1) {
+                    if (megaApi.contacts.isNotEmpty() ||
+                        megaChatApi.chatListItems.isNotEmpty()
+                    ) {
                         setTurnOnNotificationsFragment()
                     }
                 }
@@ -3525,7 +3528,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     megaApi.getNodeByHandle(this@ManagerActivity.fileBrowserState().fileBrowserHandle)
                 if (parentNode != null) {
                     if (megaApi.rootNode != null) {
-                        if ((parentNode.handle == megaApi.rootNode.handle
+                        if ((parentNode.handle == megaApi.rootNode?.handle
                                     || this@ManagerActivity.fileBrowserState().fileBrowserHandle == -1L)
                             && !isInMDMode
                         ) {
@@ -3541,7 +3544,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     if (megaApi.rootNode != null) {
                         fileBrowserViewModel.setBrowserParentHandle(
-                            megaApi.rootNode.handle
+                            megaApi.rootNode?.handle ?: INVALID_HANDLE
                         )
                         supportActionBar?.title = getString(R.string.title_mega_info_empty_screen)
                         viewModel.setIsFirstNavigationLevel(true)
@@ -6456,7 +6459,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             var parentHandle: Long = -1
             when (drawerItem) {
                 DrawerItem.HOMEPAGE ->                 // For home page, its parent is always the root of cloud drive.
-                    parentHandle = megaApi.rootNode.handle
+                    parentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
 
                 DrawerItem.CLOUD_DRIVE -> parentHandle =
                     fileBrowserViewModel.getSafeBrowserParentHandle()
@@ -9374,7 +9377,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         comesFromNotificationChildNodeHandleList = childNodeHandleList
         val parent: MegaNode? = nodeController.getParent(node)
         when (parent?.handle) {
-            megaApi.rootNode.handle -> {
+            megaApi.rootNode?.handle -> {
                 //Cloud Drive
                 drawerItem = DrawerItem.CLOUD_DRIVE
                 openFolderRefresh = true
@@ -9384,7 +9387,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 selectDrawerItem(drawerItem)
             }
 
-            megaApi.rubbishNode.handle -> {
+            megaApi.rubbishNode?.handle -> {
                 //Rubbish
                 drawerItem = DrawerItem.RUBBISH_BIN
                 openFolderRefresh = true
@@ -9394,7 +9397,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 selectDrawerItem(drawerItem)
             }
 
-            megaApi.inboxNode.handle -> {
+            megaApi.inboxNode?.handle -> {
                 //Inbox
                 drawerItem = DrawerItem.INBOX
                 openFolderRefresh = true
@@ -10261,11 +10264,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun viewNodeInFolder(node: MegaNode) {
         val parentNode = megaApi.getRootParentNode(node)
         viewInFolderNode = node
-        if (parentNode.handle == megaApi.rootNode.handle) {
+        if (parentNode.handle == megaApi.rootNode?.handle) {
             fileBrowserViewModel.setBrowserParentHandle(node.parentHandle)
             refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             selectDrawerItem(DrawerItem.CLOUD_DRIVE)
-        } else if (parentNode.handle == megaApi.rubbishNode.handle) {
+        } else if (parentNode.handle == megaApi.rubbishNode?.handle) {
             rubbishBinViewModel.setRubbishBinHandle(node.parentHandle)
             refreshFragment(FragmentTag.RUBBISH_BIN.tag)
             selectDrawerItem(DrawerItem.RUBBISH_BIN)
@@ -10281,7 +10284,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewPagerShares.currentItem = viewModel.state.value.sharesTab.position
             refreshSharesPageAdapter()
             selectDrawerItem(DrawerItem.SHARED_ITEMS)
-        } else if (parentNode.handle == megaApi.inboxNode.handle) {
+        } else if (parentNode.handle == megaApi.inboxNode?.handle) {
             refreshFragment(FragmentTag.INBOX.tag)
             selectDrawerItem(DrawerItem.INBOX)
         }

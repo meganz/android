@@ -154,7 +154,7 @@ class ContactListViewModel @Inject constructor(
     fun getMegaUser(userHandle: Long): LiveData<MegaUser> =
         getContact(userHandle).switchMap { user ->
             val result = MutableLiveData<MegaUser>()
-            getContactsUseCase.getMegaUser(user!!.email)
+            getContactsUseCase.getMegaUser(user?.email)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

@@ -29,6 +29,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -106,7 +107,7 @@ class QRCodeSaveBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     { handle: Long ->
                         val list = ArrayList<NameCollision>()
                         list.add(
-                            getUploadCollision(handle, qrFile, parentNode.handle, requireContext())
+                            getUploadCollision(handle, qrFile, parentNode?.handle, requireContext())
                         )
                         (requireActivity() as QRCodeActivity).nameCollisionActivityContract?.launch(
                             list
@@ -127,7 +128,7 @@ class QRCodeSaveBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         checkNotificationsPermission(requireActivity())
                         val text = getString(R.string.save_qr_cloud_drive, qrFile.name)
                         val uploadDisposable =
-                            uploadUseCase.upload(requireActivity(), info, null, parentNode.handle)
+                            uploadUseCase.upload(requireActivity(), info, null, parentNode?.handle)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe({

@@ -182,10 +182,10 @@ object MegaNodeUtil {
         }
 
         return when {
-            rootParent!!.handle == megaApi.rootNode.handle -> {
+            rootParent!!.handle == megaApi.rootNode?.handle -> {
                 return app.getString(R.string.section_cloud_drive) + path
             }
-            rootParent.handle == megaApi.rubbishNode.handle -> {
+            rootParent.handle == megaApi.rubbishNode?.handle -> {
                 return app.getString(R.string.section_rubbish_bin) +
                         path?.replace("bin$SEPARATOR", "")
             }
@@ -1245,9 +1245,9 @@ object MegaNodeUtil {
             val parent = megaApi.getParentNode(node)
             val topAncestor = megaApi.getRootParentNode(node)
 
-            val inCloudDrive = topAncestor.handle == megaApi.rootNode.handle
-                    || topAncestor.handle == megaApi.rubbishNode.handle
-            val inBackups = topAncestor.handle == megaApi.inboxNode.handle
+            val inCloudDrive = topAncestor.handle == megaApi.rootNode?.handle
+                    || topAncestor.handle == megaApi.rubbishNode?.handle
+            val inBackups = topAncestor.handle == megaApi.inboxNode?.handle
 
             val location = when {
                 fromIncomingShare -> {
@@ -1346,10 +1346,10 @@ object MegaNodeUtil {
         parent: MegaNode,
         context: Context,
     ): String {
-        return when (parent.handle) {
-            megaApi.rootNode.handle -> context.getString(R.string.section_cloud_drive)
-            megaApi.rubbishNode.handle -> context.getString(R.string.section_rubbish_bin)
-            megaApi.inboxNode.handle -> context.getString(R.string.home_side_menu_backups_title)
+        return when {
+            parent.handle == megaApi.rootNode?.handle -> context.getString(R.string.section_cloud_drive)
+            parent.handle == megaApi.rubbishNode?.handle -> context.getString(R.string.section_rubbish_bin)
+            parent.handle == megaApi.inboxNode?.handle -> context.getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }
     }
@@ -1840,7 +1840,7 @@ object MegaNodeUtil {
 
             when (node?.parentHandle) {
                 // the nodes in the handleList belong to the root node
-                megaApi.rootNode.handle -> {
+                megaApi.rootNode?.handle -> {
                     // Check if handleList contains backup root node
                     return handleList.firstOrNull {
                         isRootBackupFolder(megaApi.getNodeByHandle(it))

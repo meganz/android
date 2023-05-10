@@ -1268,7 +1268,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         CLOUD_FRAGMENT -> {
                             if (cDriveExplorer != null) {
                                 if (cDriveExplorer?.parentHandle == INVALID_HANDLE
-                                    || cDriveExplorer?.parentHandle == megaApi.rootNode.handle
+                                    || cDriveExplorer?.parentHandle == megaApi.rootNode?.handle
                                 ) {
                                     setRootTitle()
                                     supportActionBar?.setSubtitle(R.string.general_select_to_download)
@@ -1287,7 +1287,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }
             } else {
                 if (cDriveExplorer != null) {
-                    if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode.handle) {
+                    if (cDriveExplorer?.parentHandle == -1L || cDriveExplorer?.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
                         supportActionBar?.setTitle(
@@ -1317,7 +1317,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         tabShown = CLOUD_TAB
                     }
 
-                    if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode.handle) {
+                    if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
                         supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
@@ -1341,7 +1341,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         tabShown = CLOUD_TAB
                     }
 
-                    if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode.handle) {
+                    if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode?.handle) {
                         setRootTitle()
                     } else {
                         supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
@@ -1752,7 +1752,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             MOVE -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                 val intent = Intent()
-                intent.putExtra("MOVE_TO", parentNode.handle)
+                intent.putExtra("MOVE_TO", parentNode?.handle)
                 intent.putExtra("MOVE_HANDLES", moveFromHandles)
                 setResult(RESULT_OK, intent)
                 Timber.d("finish!")
@@ -1762,7 +1762,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             COPY -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                 val intent = Intent()
-                intent.putExtra("COPY_TO", parentNode.handle)
+                intent.putExtra("COPY_TO", parentNode?.handle)
                 intent.putExtra("COPY_HANDLES", copyFromHandles)
                 setResult(RESULT_OK, intent)
                 Timber.d("finish!")
@@ -1799,13 +1799,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
 
                 if (tabShown == CLOUD_TAB) {
-                    fragmentHandle = megaApi.rootNode.handle
+                    fragmentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
                 } else if (tabShown == INCOMING_TAB) {
                     fragmentHandle = -1
                 }
 
                 val intent = Intent()
-                intent.putExtra("IMPORT_TO", parentNode.handle)
+                intent.putExtra("IMPORT_TO", parentNode?.handle)
                 intent.putExtra("fragmentH", fragmentHandle)
 
                 if (importChatHandles != null) {
@@ -1827,7 +1827,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 } else {
                     val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                     val intent = Intent()
-                    intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode.handle)
+                    intent.putExtra(EXTRA_SELECTED_FOLDER, parentNode?.handle)
                     intent.putStringArrayListExtra(Constants.SELECTED_CONTACTS, selectedContacts)
                     setResult(RESULT_OK, intent)
                     finishAndRemoveTask()
@@ -1837,7 +1837,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             SELECT_CAMERA_FOLDER -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                 val intent = Intent()
-                intent.putExtra("SELECT_MEGA_FOLDER", parentNode.handle)
+                intent.putExtra("SELECT_MEGA_FOLDER", parentNode?.handle)
                 setResult(RESULT_OK, intent)
                 finishAndRemoveTask()
             }
@@ -1908,7 +1908,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             return
         }
 
-        parentHandle = parentNode?.handle ?: megaApi.rootNode.handle
+        parentHandle = parentNode?.handle ?: megaApi.rootNode?.handle ?: INVALID_HANDLE
         checkNameCollisionUseCase.check(file.name, parentNode)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -2130,7 +2130,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     cDriveExplorer.recyclerView.invalidate()
                 } else {
                     if (megaApi.rootNode != null) {
-                        parentHandle = megaApi.rootNode.handle
+                        parentHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
                         nodes =
                             megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.parentHandle))
                         nodes?.let {

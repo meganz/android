@@ -344,7 +344,7 @@ class RubbishBinFragment : Fragment() {
             emptyImageView.visibility = View.VISIBLE
             emptyTextView.visibility = View.VISIBLE
 
-            if (megaApi.rubbishNode.handle == rubbishBinViewModel.state.value.rubbishBinHandle ||
+            if (megaApi.rubbishNode?.handle == rubbishBinViewModel.state.value.rubbishBinHandle ||
                 rubbishBinViewModel.state.value.rubbishBinHandle == -1L
             ) {
                 if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {

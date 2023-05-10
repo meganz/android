@@ -26,7 +26,7 @@ sealed class NameCollision : Serializable {
     abstract val size: Long?
     abstract val folderContent: String?
     abstract val lastModified: Long
-    abstract val parentHandle: Long
+    abstract val parentHandle: Long?
     abstract val isFile: Boolean
 
     /**
@@ -48,7 +48,7 @@ sealed class NameCollision : Serializable {
         override val size: Long? = null,
         override val folderContent: String? = null,
         override val lastModified: Long,
-        override val parentHandle: Long,
+        override val parentHandle: Long?,
         override val isFile: Boolean = true,
     ) : NameCollision() {
 
@@ -65,7 +65,7 @@ sealed class NameCollision : Serializable {
             fun getUploadCollision(
                 collisionHandle: Long,
                 file: File,
-                parentHandle: Long,
+                parentHandle: Long?,
                 context: Context,
             ): Upload =
                 Upload(

@@ -617,7 +617,7 @@ class NameCollisionViewModel @Inject constructor(
                 onSuccess = { result ->
                     setCopyResult(
                         result,
-                        list[0].nameCollision.parentHandle
+                        list[0].nameCollision.parentHandle ?: -1
                     )
                 },
                 onError = { error ->

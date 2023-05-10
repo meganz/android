@@ -1153,7 +1153,7 @@ class FileBrowserFragment : RotatableFragment() {
      */
     private fun changeInformationDisplay(nodeHandle: Long?) {
         if (itemCount == 0) {
-            if (megaApi.rootNode != null && megaApi.rootNode.handle == nodeHandle) {
+            if (megaApi.rootNode != null && megaApi.rootNode?.handle == nodeHandle) {
                 emptyListImageView?.setImageResource(R.drawable.empty_cloud_drive_portrait)
                 runCatching {
                     emptyListTextView?.text = Html.fromHtml(

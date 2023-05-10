@@ -102,7 +102,7 @@ class UploadUseCase @Inject constructor(
         context: Context,
         shareInfo: ShareInfo,
         renameName: String? = null,
-        parentHandle: Long
+        parentHandle: Long?
     ): Completable =
         upload(
             context = context,

@@ -148,7 +148,7 @@ class CopyNodeUseCase @Inject constructor(
             }
 
             val parentNode = getNodeUseCase
-                .get(collisionResult.nameCollision.parentHandle).blockingGetOrNull()
+                .get(collisionResult.nameCollision.parentHandle ?: -1).blockingGetOrNull()
 
             if (parentNode == null) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())

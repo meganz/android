@@ -405,7 +405,7 @@ class SearchFragment : RotatableFragment() {
                         parent = megaApi.getParentNode(parent)
                     }
 
-                    if (parent?.handle != megaApi.rubbishNode.handle) {
+                    if (parent?.handle != megaApi.rubbishNode?.handle) {
                         trashIcon?.title = getString(R.string.context_move_to_trash)
                     } else {
                         trashIcon?.title = getString(R.string.context_remove)
@@ -420,7 +420,7 @@ class SearchFragment : RotatableFragment() {
                         while (megaApi.getParentNode(parent) != null) {
                             parent = megaApi.getParentNode(parent)
                         }
-                        if (parent?.handle != megaApi.rubbishNode.handle) {
+                        if (parent?.handle != megaApi.rubbishNode?.handle) {
                             itemsSelected = true
                         }
                     }
@@ -686,7 +686,7 @@ class SearchFragment : RotatableFragment() {
                     emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
                 }
                 emptyTextViewFirst.setText(R.string.no_results_found)
-            } else if (megaApi.rootNode.handle == state().searchParentHandle) {
+            } else if (megaApi.rootNode?.handle == state().searchParentHandle) {
                 if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.cloud_empty_landscape)
                 } else {

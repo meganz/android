@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -254,10 +255,11 @@ class GetContactsUseCase @Inject constructor(
      * Get MegaUser from email
      *
      * @param userEmail     Email to retrieve
-     * @return              Single containing MegaUser
+     * @return              Maybe containing MegaUser
+     * @see [Maybe]
      */
-    fun getMegaUser(userEmail: String): Single<MegaUser> =
-        Single.fromCallable { megaApi.getContact(userEmail) }
+    fun getMegaUser(userEmail: String?): Maybe<MegaUser> =
+        Maybe.create { megaApi.getContact(userEmail) }
 
     /**
      * Build ContactItem.Data from MegaUser object

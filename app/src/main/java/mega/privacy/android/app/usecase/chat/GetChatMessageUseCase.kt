@@ -34,7 +34,7 @@ class GetChatMessageUseCase @Inject constructor(
             val chatMessage = get(chatRoomId, messageId).blockingGet()
             val node = chatMessage.megaNodeList[0]
             if (chatRoom.isPreview) {
-                megaApi.authorizeChatNode(node, chatRoom.authorizationToken)
+                megaApi.authorizeChatNode(node, chatRoom.authorizationToken) ?: node
             } else {
                 node
             }
@@ -80,6 +80,7 @@ class GetChatMessageUseCase @Inject constructor(
                 nodes.add(
                     if (chat.isPreview) {
                         megaApi.authorizeChatNode(attachments.get(i), chat.authorizationToken)
+                            ?: attachments.get(i)
                     } else {
                         attachments.get(i)
                     }

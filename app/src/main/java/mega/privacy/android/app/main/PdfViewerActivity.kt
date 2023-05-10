@@ -870,7 +870,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 while (megaApi.getParentNode(parent) != null) {
                     parent = megaApi.getParentNode(parent)
                 }
-                if (parent?.handle != megaApi.rubbishNode.handle) {
+                if (parent?.handle != megaApi.rubbishNode?.handle) {
                     moveToTrashMenuItem.isVisible = true
                     removeMenuItem.isVisible = false
                 } else {

@@ -69,10 +69,10 @@ class InviteContactUseCase @Inject constructor(
                             databaseHandler.setLastPublicHandleTimeStamp()
                             databaseHandler.lastPublicHandleType = AFFILIATE_TYPE_CONTACT
 
-                            val isContact = megaApi.contacts.any { contact ->
+                            val isContact = megaApi.contacts?.any { contact ->
                                 contact.email == request.email
                                         && contact.visibility == MegaUser.VISIBILITY_VISIBLE
-                            }
+                            } ?: false
 
                             emitter.onSuccess(
                                 ContactLinkResult(

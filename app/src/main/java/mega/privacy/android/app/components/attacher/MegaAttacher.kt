@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.Constants.USER_HANDLES
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaHandleList
@@ -318,7 +319,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
 
         for (email in contactEmails) {
             val contact = megaApi.getContact(email)
-            val chatRoom = megaChatApi.getChatRoomByUser(contact.handle)
+            val chatRoom = megaChatApi.getChatRoomByUser(contact?.handle ?: MEGACHAT_INVALID_HANDLE)
             if (chatRoom != null) {
                 chatIds.add(chatRoom.chatId)
                 contactsWithChatRoom.add(email)

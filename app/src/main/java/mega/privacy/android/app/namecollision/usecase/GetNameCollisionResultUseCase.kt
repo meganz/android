@@ -312,7 +312,7 @@ class GetNameCollisionResultUseCase @Inject constructor(
         Single.create { emitter ->
             val parentNode =
                 if (collision.parentHandle == INVALID_HANDLE) megaApi.rootNode
-                else getNodeUseCase.get(collision.parentHandle).blockingGetOrNull()
+                else getNodeUseCase.get(collision.parentHandle ?: -1).blockingGetOrNull()
 
             if (parentNode == null) {
                 emitter.onError(MegaNodeException.ParentDoesNotExistException())

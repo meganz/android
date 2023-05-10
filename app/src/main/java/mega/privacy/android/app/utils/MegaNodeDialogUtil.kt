@@ -666,7 +666,7 @@ object MegaNodeDialogUtil {
         val node = megaApi.getNodeByHandle(handle) ?: return
         val rubbishNode = megaApi.rubbishNode
 
-        if (rubbishNode.handle != megaApi.getRootParentNode(node).handle) {
+        if (rubbishNode?.handle != megaApi.getRootParentNode(node).handle) {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                 .setMessage(activity.getString(R.string.confirmation_move_to_rubbish))
                 .setPositiveButton(activity.getString(R.string.general_move)) { _, _ ->

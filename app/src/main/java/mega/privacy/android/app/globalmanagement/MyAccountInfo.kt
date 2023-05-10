@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -129,7 +130,8 @@ class MyAccountInfo @Inject constructor(
 
             //Check size of the different nodes
             if (megaApi.rootNode != null) {
-                usedCloudDrive = accountInfo.getStorageUsed(megaApi.rootNode.handle)
+                usedCloudDrive =
+                    accountInfo.getStorageUsed(megaApi.rootNode?.handle ?: INVALID_HANDLE)
                 formattedUsedCloud = getSizeString(usedCloudDrive, context)
             }
 
@@ -148,7 +150,8 @@ class MyAccountInfo @Inject constructor(
             )
 
             if (megaApi.rubbishNode != null) {
-                usedRubbish = accountInfo.getStorageUsed(megaApi.rubbishNode.handle)
+                usedRubbish =
+                    accountInfo.getStorageUsed(megaApi.rubbishNode?.handle ?: INVALID_HANDLE)
                 formattedUsedRubbish = getSizeString(usedRubbish, context)
             }
 

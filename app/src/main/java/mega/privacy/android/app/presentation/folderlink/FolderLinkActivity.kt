@@ -900,19 +900,19 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                 } else {
                                     parentHandle = rootNode.handle
                                     nodes = megaApiFolder.getChildren(rootNode)
-                                    supportActionBar?.title = megaApiFolder.rootNode.name
+                                    supportActionBar?.title = megaApiFolder.rootNode?.name
                                     invalidateOptionsMenu()
                                 }
                             } ?: kotlin.run {
                                 parentHandle = rootNode.handle
                                 nodes = megaApiFolder.getChildren(rootNode)
-                                supportActionBar?.title = megaApiFolder.rootNode.name
+                                supportActionBar?.title = megaApiFolder.rootNode?.name
                                 invalidateOptionsMenu()
                             }
                         } else {
                             parentHandle = rootNode.handle
                             nodes = megaApiFolder.getChildren(rootNode)
-                            supportActionBar?.title = megaApiFolder.rootNode.name
+                            supportActionBar?.title = megaApiFolder.rootNode?.name
                             invalidateOptionsMenu()
                         }
                         setupRecyclerViewAdapter()

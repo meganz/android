@@ -330,7 +330,8 @@ class TextEditorViewModel @Inject constructor(
                     val authorizedNode = megaApiFolder.authorizeNode(node)
                     textEditorData.value?.let {
                         it.node = authorizedNode
-                        it.viewerNode = ViewerNode.FolderLinkNode(authorizedNode.handle)
+                        it.viewerNode =
+                            ViewerNode.FolderLinkNode(authorizedNode?.handle ?: INVALID_HANDLE)
                     }
                 }
             }
