@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
@@ -74,20 +72,6 @@ internal fun getPainter(nodeUIItem: FolderNode): Painter {
     } else {
         painterResource(id = R.drawable.ic_folder_list)
     }
-}
-
-/**
- * This method will create menu item image
- * @param onMenuClick click listener of menu item
- * @param nodeUIItem Node on which click has been performed
- */
-@Composable
-internal fun MenuItem(onMenuClick: (NodeUIItem) -> Unit, nodeUIItem: NodeUIItem) {
-    Image(
-        painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
-        contentDescription = "3 dots",
-        modifier = Modifier.clickable { onMenuClick.invoke(nodeUIItem) }
-    )
 }
 
 /**
