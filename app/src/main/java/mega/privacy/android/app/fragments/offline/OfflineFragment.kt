@@ -33,8 +33,11 @@ import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.LegacyDatabaseHandler
+import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -52,6 +55,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -86,12 +90,13 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * [Fragment] to display Offline Nodes
  */
 @AndroidEntryPoint
-class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
+class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Scrollable {
 
     companion object {
         /**
@@ -104,6 +109,9 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
          */
         const val SHOW_OFFLINE_WARNING = "SHOW_OFFLINE_WARNING"
     }
+
+    @Inject
+    lateinit var databaseHandler: LegacyDatabaseHandler
 
     private val args: OfflineFragmentArgs by navArgs()
     private var binding by autoCleared<FragmentOfflineBinding>()
@@ -257,20 +265,22 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 callManager { it.saveOfflineNodesToDevice(viewModel.getSelectedNodes()) }
                 viewModel.clearSelection()
             }
+
             R.id.cab_menu_share_out -> {
                 OfflineUtils.shareOfflineNodes(requireContext(), viewModel.getSelectedNodes())
                 viewModel.clearSelection()
             }
+
             R.id.cab_menu_delete -> {
-                callManager {
-                    it.showConfirmationRemoveSomeFromOffline(viewModel.getSelectedNodes()) {
-                        viewModel.clearSelection()
-                    }
+                showConfirmationRemoveOfflineNodes(viewModel.getSelectedNodes()) {
+                    viewModel.clearSelection()
                 }
             }
+
             R.id.cab_menu_select_all -> {
                 viewModel.selectAll()
             }
+
             R.id.cab_menu_clear_selection -> {
                 viewModel.clearSelection()
             }
@@ -525,9 +535,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
         })
 
         viewModel.showOptionsPanel.observe(viewLifecycleOwner, EventObserver {
-            callManager { manager ->
-                manager.showOptionsPanel(it)
-            }
+            showOptionsPanel(it)
         })
 
         viewModel.nodeToOpen.observe(viewLifecycleOwner, EventObserver {
@@ -727,18 +735,21 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                             thumbnail.layoutParams = param
                             thumbnail
                         }
+
                         OfflineAdapter.TYPE_GRID_FOLDER -> {
                             itemView.background = ContextCompat.getDrawable(
                                 requireContext(), R.drawable.background_item_grid_selected
                             )
                             itemView.findViewById(R.id.icon)
                         }
+
                         OfflineAdapter.TYPE_GRID_FILE -> {
                             itemView.background = ContextCompat.getDrawable(
                                 requireContext(), R.drawable.background_item_grid_selected
                             )
                             itemView.findViewById(R.id.ic_selected)
                         }
+
                         else -> null
                     }
 
@@ -774,6 +785,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 Timber.d("MimeTypeList ZIP")
                 ZipBrowserActivity.start(requireActivity(), file.path)
             }
+
             mime.isImage -> {
                 val handles =
                     (adapter ?: return).getOfflineNodes().map { it.handle.toLong() }.toLongArray()
@@ -792,6 +804,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                 startActivity(intent)
                 requireActivity().overridePendingTransition(0, 0)
             }
+
             mime.isVideoMimeType || mime.isAudio -> {
                 Timber.d("Video/Audio file")
 
@@ -871,6 +884,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     }
                 }
             }
+
             mime.isPdf -> {
                 Timber.d("PDF file")
 
@@ -900,10 +914,12 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                     requireActivity().overridePendingTransition(0, 0)
                 }
             }
+
             mime.isURL -> {
                 Timber.d("Is URL file")
                 viewModel.processUrlFile(file)
             }
+
             mime.isOpenableTextFile(file.length()) -> {
                 startActivity(
                     Intent(requireContext(), TextEditorActivity::class.java)
@@ -912,6 +928,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
                         .putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                 )
             }
+
             else -> {
                 openFile(file)
             }
@@ -1020,5 +1037,39 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
      */
     fun refreshActionBarTitle() {
         viewModel.refreshActionBarTitle()
+    }
+
+    override fun showConfirmationRemoveOfflineNode(offline: MegaOffline) {
+        showConfirmationRemoveOfflineNodes(listOf(offline))
+    }
+
+    private fun showConfirmationRemoveOfflineNodes(
+        documents: List<MegaOffline>,
+        onConfirmed: () -> Unit = {},
+    ) {
+        Timber.d("showConfirmationRemoveSomeFromOffline")
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(R.string.confirmation_delete_from_save_for_offline)
+            .setPositiveButton(R.string.general_remove) { _, _ ->
+                for (node in documents) {
+                    OfflineUtils.removeOffline(
+                        node,
+                        databaseHandler,
+                        requireContext().applicationContext
+                    )
+                }
+                refreshNodes()
+                onConfirmed()
+            }
+            .setNegativeButton(R.string.general_cancel, null)
+            .show()
+    }
+
+    private fun showOptionsPanel(node: MegaOffline) {
+        Timber.d("showNodeOptionsPanel-Offline")
+        if (childFragmentManager.findFragmentByTag("OfflineOptionsBottomSheetDialogFragment") != null) return
+        OfflineOptionsBottomSheetDialogFragment.newInstance(node).show(
+            childFragmentManager, "OfflineOptionsBottomSheetDialogFragment"
+        )
     }
 }

@@ -109,7 +109,6 @@ import mega.privacy.android.app.OpenPasswordLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomViewPager
@@ -176,7 +175,6 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment
@@ -503,7 +501,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
     private var selectedTransfer: AndroidCompletedTransfer? = null
-    var selectedOfflineNode: MegaOffline? = null
 
     @JvmField
     var selectedChatItemId: Long = 0
@@ -7071,14 +7068,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
-    fun showOptionsPanel(sNode: MegaOffline?) {
-        Timber.d("showNodeOptionsPanel-Offline")
-        if (sNode == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedOfflineNode = sNode
-        bottomSheetDialogFragment = OfflineOptionsBottomSheetDialogFragment.newInstance(sNode)
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
-    }
-
     fun showNewSortByPanel(orderType: Int) {
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
             return
@@ -7088,12 +7077,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             supportFragmentManager,
             bottomSheetDialogFragment?.tag
         )
-    }
-
-    fun showOfflineFileInfo(node: MegaOffline) {
-        val offlineIntent = Intent(this, OfflineFileInfoActivity::class.java)
-        offlineIntent.putExtra(Constants.HANDLE, node.handle)
-        startActivity(offlineIntent)
     }
 
     fun showMeetingOptionsPanel(showSimpleList: Boolean) {
@@ -7492,49 +7475,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             checkIfShouldCloseSearchView(oldDrawerItem)
             selectDrawerItem(drawerItem)
         }
-    }
-
-    fun showConfirmationRemoveFromOffline(node: MegaOffline, onConfirmed: Runnable) {
-        Timber.d("showConfirmationRemoveFromOffline")
-        MaterialAlertDialogBuilder(this)
-            .setMessage(R.string.confirmation_delete_from_save_for_offline)
-            .setPositiveButton(
-                R.string.general_remove
-            ) { _, _ ->
-                OfflineUtils.removeOffline(node, dbH, this)
-                onConfirmed.run()
-                refreshOfflineNodes()
-                if (isCloudAdded) {
-                    node.handle.toLongOrNull()
-                        ?.let { fileBrowserViewModel.setBrowserParentHandle(it) }
-                }
-                onNodesSharedUpdate()
-                LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
-                Util.showSnackbar(
-                    this@ManagerActivity,
-                    resources.getString(R.string.file_removed_offline)
-                )
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-    }
-
-    fun showConfirmationRemoveSomeFromOffline(
-        documents: List<MegaOffline?>,
-        onConfirmed: Runnable,
-    ) {
-        Timber.d("showConfirmationRemoveSomeFromOffline")
-        MaterialAlertDialogBuilder(this)
-            .setMessage(R.string.confirmation_delete_from_save_for_offline)
-            .setPositiveButton(R.string.general_remove) { _, _ ->
-                for (node in documents) {
-                    OfflineUtils.removeOffline(node, dbH, this)
-                }
-                refreshOfflineNodes()
-                onConfirmed.run()
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
     }
 
     override fun manageCopyMoveException(throwable: Throwable?): Boolean {

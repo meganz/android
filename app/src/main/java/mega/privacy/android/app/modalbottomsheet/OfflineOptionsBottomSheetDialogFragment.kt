@@ -1,5 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +12,9 @@ import androidx.core.view.isGone
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.databinding.BottomSheetOfflineItemBinding
+import mega.privacy.android.app.fragments.offline.OfflineNodeListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.utils.Constants
@@ -25,7 +28,6 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
     private val nodeOffline: MegaOffline by lazy(LazyThreadSafetyMode.NONE) {
         requireNotNull(requireArguments().parcelable(EXTRA_OFFLINE))
     }
-
     private var _binding: BottomSheetOfflineItemBinding? = null
     val binding: BottomSheetOfflineItemBinding
         get() = _binding!!
@@ -106,9 +108,10 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
     override fun onClick(v: View) {
         when (v.id) {
             R.id.option_delete_offline_layout -> {
-                if (requireActivity() is ManagerActivity) {
-                    (requireActivity() as ManagerActivity)
-                        .showConfirmationRemoveFromOffline(nodeOffline) { setStateBottomSheetBehaviorHidden() }
+                if (parentFragment is OfflineNodeListener) {
+                    (parentFragment as OfflineNodeListener).showConfirmationRemoveOfflineNode(
+                        nodeOffline
+                    )
                 }
             }
 
@@ -131,7 +134,9 @@ internal class OfflineOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFr
             }
 
             R.id.option_properties_layout -> {
-                (requireActivity() as ManagerActivity).showOfflineFileInfo(nodeOffline)
+                val offlineIntent = Intent(requireContext(), OfflineFileInfoActivity::class.java)
+                offlineIntent.putExtra(Constants.HANDLE, nodeOffline.handle)
+                startActivity(offlineIntent)
             }
         }
         setStateBottomSheetBehaviorHidden()
