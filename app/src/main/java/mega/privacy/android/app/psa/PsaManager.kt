@@ -3,8 +3,13 @@ package mega.privacy.android.app.psa
 import android.annotation.SuppressLint
 import androidx.preference.PreferenceManager
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.di.CoroutineScopesModule
+import mega.privacy.android.app.di.CoroutinesDispatchersModule
+import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
+import nz.mega.sdk.MegaError
 
 /**
  * The ViewModel for PSA logic.
@@ -23,34 +28,38 @@ object PsaManager {
     private val application = MegaApplication.getInstance()
     private val megaApi = application.megaApi
 
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(application)
+    private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(application) }
     private var psa: Psa? = null
+    private val coroutineScope = CoroutineScopesModule
+        .provideCoroutineScope(CoroutinesDispatchersModule.providesIoDispatcher())
 
     /**
-     * Start checking PSA periodically.
+     * Check PSA from server
      */
-    fun startChecking() {
+    suspend fun checkPsa() = withContext(coroutineScope.coroutineContext) {
         val timeSinceLastCheck =
             System.currentTimeMillis() - preferences.getLong(LAST_PSA_CHECK_TIME_KEY, 0L)
-        var delay = GET_PSA_INTERVAL_MS - timeSinceLastCheck
 
-        if (delay < 0) delay = 0
-
-        AlarmReceiver.setAlarm(application.applicationContext, delay) {
-            preferences.edit()
-                .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
-                .apply()
-            psa = it
-            LiveEventBus.get(EVENT_PSA, Psa::class.java).post(it)
+        if (timeSinceLastCheck >= GET_PSA_INTERVAL_MS) {
+            megaApi.getPSAWithUrl(OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                preferences.edit()
+                    .putLong(LAST_PSA_CHECK_TIME_KEY, System.currentTimeMillis())
+                    .apply()
+                if (error.errorCode == MegaError.API_OK) {
+                    psa = Psa(
+                        request.number.toInt(), request.name, request.text, request.file,
+                        request.password, request.link, request.email
+                    )
+                    LiveEventBus.get(EVENT_PSA, Psa::class.java).post(psa)
+                }
+            }))
         }
     }
 
     /**
-     * Stop checking PSA periodically.
+     * Clean Psa Check timestamp from preferences
      */
-    fun stopChecking() {
-        doStopChecking()
-
+    suspend fun clearPsa() = withContext(coroutineScope.coroutineContext) {
         // If user logout while there is a PSA displaying (not shown yet), if we don't
         // reset psa, it will be displayed in LoginActivity again, which is not
         // desired.
@@ -58,9 +67,6 @@ object PsaManager {
         preferences.edit().remove(LAST_PSA_CHECK_TIME_KEY).apply()
     }
 
-    private fun doStopChecking() {
-        AlarmReceiver.cancelAlarm(application.applicationContext)
-    }
 
     /**
      * Dismiss the PSA.

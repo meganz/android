@@ -240,7 +240,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             localLogoutUseCase(
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                ClearPsa { PsaManager::stopChecking }
+                ClearPsa { PsaManager::clearPsa }
             )
             _state.update { it.copy(isLocalLogoutInProgress = false) }
             MegaApplication.isLoggingIn = false

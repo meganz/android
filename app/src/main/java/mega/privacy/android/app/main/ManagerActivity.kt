@@ -1190,7 +1190,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         updateAccountDetailsVisibleInfo()
         setContactStatus()
         checkInitialScreens()
-        PsaManager.startChecking()
+        lifecycleScope.launch {
+            PsaManager.checkPsa()
+        }
         uploadBottomSheetDialogActionHandler.onRestoreInstanceState(savedInstanceState)
         Timber.d("END onCreate")
         RatingHandlerImpl(this).showRatingBaseOnTransaction()

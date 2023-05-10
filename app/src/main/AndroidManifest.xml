@@ -61,10 +61,6 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
-    <!-- For apps targeting Android 12 (API level 31) and higher,
-    apps must have the Manifest.permission.SCHEDULE_EXACT_ALARM permission
-    in order to use any APIs for setting exact alarms -->
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <!-- For apps targeting Android 13 (API level 33) -->

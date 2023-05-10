@@ -44,7 +44,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
-import mega.privacy.android.app.psa.PsaManager.stopChecking
+import mega.privacy.android.app.psa.PsaManager.clearPsa
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
@@ -335,6 +335,7 @@ class AccountController @Inject constructor(
                     photosRepository().clearCache()
                     albumRepository().clearCache()
                     broadcastLogout()
+                    clearPsa()
                 }
             }
 
@@ -352,7 +353,6 @@ class AccountController @Inject constructor(
             LastShowSMSDialogTimeChecker(context).reset()
             stopAudioPlayer(context)
             clearSettings(context)
-            stopChecking()
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()

@@ -57,9 +57,6 @@ class PsaWebBrowser : Fragment() {
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
-                if (AlarmReceiver.wakeLock.isHeld) {
-                    AlarmReceiver.wakeLock.release()
-                }
             }
         }
 
