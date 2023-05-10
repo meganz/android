@@ -1646,7 +1646,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             var parentNode = megaApi.getNodeByHandle(parentHandle)
             if (parentNode == null) {
                 parentNode = megaApi.rootNode
-                parentHandle = parentNode.handle
+                parentHandle = parentNode?.handle ?: INVALID_HANDLE
             }
 
             checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
