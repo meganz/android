@@ -629,6 +629,7 @@ class PhotosFragment : Fragment() {
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = albumId,
+            isNewLink = true,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)

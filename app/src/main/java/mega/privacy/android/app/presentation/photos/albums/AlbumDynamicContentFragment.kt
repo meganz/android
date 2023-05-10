@@ -247,10 +247,10 @@ class AlbumDynamicContentFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_menu_get_link -> {
-                openAlbumGetLinkScreen()
+                openAlbumGetLinkScreen(isNewLink = true)
             }
             R.id.action_menu_manage_link -> {
-                openAlbumGetLinkScreen()
+                openAlbumGetLinkScreen(isNewLink = false)
             }
             R.id.action_menu_remove_link -> {
                 albumContentViewModel.showRemoveLinkConfirmation()
@@ -329,11 +329,12 @@ class AlbumDynamicContentFragment : Fragment() {
         albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)
     }
 
-    private fun openAlbumGetLinkScreen() {
+    private fun openAlbumGetLinkScreen(isNewLink: Boolean) {
         val album = albumsViewModel.state.value.currentUserAlbum ?: return
         val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
             context = requireContext(),
             albumId = album.id,
+            isNewLink = isNewLink,
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)

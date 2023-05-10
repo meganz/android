@@ -76,8 +76,9 @@ import mega.privacy.android.domain.entity.photos.Photo
 private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) -> Unit
 
 @Composable
-fun AlbumGetLinkScreen(
+internal fun AlbumGetLinkScreen(
     albumGetLinkViewModel: AlbumGetLinkViewModel = viewModel(),
+    isAlbumNewLink: Boolean,
     onBack: () -> Unit,
     onLearnMore: () -> Unit,
     onShareLink: (String) -> Unit,
@@ -128,6 +129,7 @@ fun AlbumGetLinkScreen(
         scaffoldState = scaffoldState,
         topBar = {
             AlbumGetLinkTopBar(
+                isAlbumNewLink = isAlbumNewLink,
                 link = state.link,
                 onBack = onBack,
                 onShareLink = {
@@ -147,7 +149,7 @@ fun AlbumGetLinkScreen(
                         snackbarData = snackbarData,
                         backgroundColor = grey_alpha_087.takeIf { isLight } ?: white,
                     )
-                }
+                },
             )
         },
         content = { innerPaddings ->
@@ -188,6 +190,7 @@ fun AlbumGetLinkScreen(
 @Composable
 private fun AlbumGetLinkTopBar(
     modifier: Modifier = Modifier,
+    isAlbumNewLink: Boolean,
     link: String,
     onBack: () -> Unit,
     onShareLink: () -> Unit,
@@ -197,7 +200,9 @@ private fun AlbumGetLinkTopBar(
     TopAppBar(
         title = {
             Text(
-                text = pluralStringResource(id = R.plurals.get_links, count = 1),
+                text = pluralStringResource(id = R.plurals.get_links, count = 1).takeIf {
+                    isAlbumNewLink
+                } ?: stringResource(id = R.string.edit_link_option),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
@@ -271,7 +276,7 @@ private fun AlbumGetLinkContent(
                 isSeparateKeyEnabled = isSeparateKeyEnabled,
                 link = link,
                 onSeparateKeyChecked = onSeparateKeyChecked,
-                onLearnMore = onLearnMore
+                onLearnMore = onLearnMore,
             )
 
             Divider(

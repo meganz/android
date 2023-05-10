@@ -39,6 +39,10 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         AlbumScreen.valueOf(intent.getStringExtra(ALBUM_SCREEN) ?: "")
     }
 
+    private val isAlbumNewLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
+        intent.getBooleanExtra(ALBUM_NEW_LINK, true)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -72,6 +76,7 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                     }
                     AlbumScreen.AlbumGetLinkScreen -> {
                         AlbumGetLinkScreen(
+                            isAlbumNewLink = isAlbumNewLink,
                             onBack = ::finish,
                             onLearnMore = {
                                 val intent = createAlbumDecryptionKeyScreen(this)
@@ -127,6 +132,8 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
 
         const val ALBUM_FLOW: String = "album_flow"
 
+        const val ALBUM_NEW_LINK: String = "album_new_link"
+
         const val NUM_PHOTOS: String = "num_photos"
 
         const val MESSAGE: String = "message"
@@ -152,9 +159,11 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         fun createAlbumGetLinkScreen(
             context: Context,
             albumId: AlbumId,
+            isNewLink: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetLinkScreen.name)
             putExtra(ALBUM_ID, albumId.id)
+            putExtra(ALBUM_NEW_LINK, isNewLink)
         }
 
         fun createAlbumGetMultipleLinksScreen(
