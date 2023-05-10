@@ -1,7 +1,9 @@
 package mega.privacy.android.domain.usecase.node.publiclink
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -14,6 +16,7 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.argWhere
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -30,11 +33,15 @@ internal class MapNodeToPublicLinkUseCaseTest {
         onBlocking { invoke(argWhere { it is FolderNode }) }.thenReturn(typedFolderNode)
     }
 
+    private val monitorPublicLinkFolderUseCase = mock<MonitorPublicLinkFolderUseCase>()
+
     @BeforeAll
     internal fun setUp() {
         underTest = MapNodeToPublicLinkUseCase(
             addNodeType = addNodeType,
-            getCloudSortOrder = mock { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) })
+            monitorPublicLinkFolderUseCase = monitorPublicLinkFolderUseCase,
+            getCloudSortOrder = mock { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) },
+        )
     }
 
     @Test
@@ -74,15 +81,22 @@ internal class MapNodeToPublicLinkUseCaseTest {
     @Test
     internal fun `test that fetching children return mapped public links`() = runTest {
         val children = listOf(mock<FileNode>(), mock<FolderNode>())
-        typedFolderNode.stub {
-            on { fetchChildren }.thenReturn { children }
+
+        monitorPublicLinkFolderUseCase.stub {
+            on { invoke(any()) }.thenReturn(flowOf(children))
         }
 
-        val folder = underTest(mock<FolderNode>(), null) as PublicLinkFolder
-        val actual = folder.getChildPublicLinkNodes()
+        val parent = mock<FolderNode> {
+            on { fetchChildren }.thenReturn { listOf(mock()) }
+        }
+        val folder = underTest(parent, null) as PublicLinkFolder
+        folder.children.test {
+            val actual = awaitItem()
+            assertThat(actual).hasSize(children.size)
+            assertThat(actual[0]).isInstanceOf(PublicLinkFile::class.java)
+            assertThat(actual[1]).isInstanceOf(PublicLinkFolder::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
 
-        assertThat(actual).hasSize(children.size)
-        assertThat(actual[0]).isInstanceOf(PublicLinkFile::class.java)
-        assertThat(actual[1]).isInstanceOf(PublicLinkFolder::class.java)
     }
 }

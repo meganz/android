@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.node.publiclink
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 
 /**
@@ -13,7 +14,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 class PublicLinkFolder(
     val node: TypedFolderNode,
     override val parent: PublicLinkFolder?,
-    fetchChildrenForParent: suspend (PublicLinkFolder) -> List<PublicLinkNode>,
+    monitorChildren: (PublicLinkFolder) -> Flow<List<PublicLinkNode>>,
 ) : PublicLinkNode, TypedFolderNode by node {
-    val getChildPublicLinkNodes = suspend { fetchChildrenForParent(this) }
+    val children = monitorChildren(this)
 }

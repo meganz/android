@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.node.publiclink
 
-import mega.privacy.android.domain.entity.SortOrder
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class MapNodeToPublicLinkUseCase @Inject constructor(
     private val addNodeType: AddNodeType,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val monitorPublicLinkFolderUseCase: MonitorPublicLinkFolderUseCase,
 ) {
     /**
      * Invoke
@@ -35,18 +37,19 @@ class MapNodeToPublicLinkUseCase @Inject constructor(
             is TypedFolderNode -> PublicLinkFolder(
                 node = typedNode,
                 parent = parent,
-                fetchChildrenForParent = getFetchMethod(typedNode.fetchChildren)
+                monitorChildren = getFetchMethod()
             )
         }
 
-    private fun getFetchMethod(fetchChildren: suspend (SortOrder) -> List<UnTypedNode>): suspend (PublicLinkFolder) -> List<PublicLinkNode> =
+    private fun getFetchMethod(): (PublicLinkFolder) -> Flow<List<PublicLinkNode>> =
         { parentFolder ->
-            val children = fetchChildren(getCloudSortOrder())
-            children.map {
-                invoke(
-                    node = it,
-                    parent = parentFolder
-                )
+            monitorPublicLinkFolderUseCase(parentFolder).map { children ->
+                children.map {
+                    invoke(
+                        node = it,
+                        parent = parentFolder
+                    )
+                }
             }
         }
 }
