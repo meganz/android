@@ -276,6 +276,7 @@ private fun AddDescriptionButton(
                     GenericDescriptionTextField(
                         value = state.descriptionText.ifEmpty { "" },
                         placeholderId = R.string.meetings_schedule_meeting_add_description_label,
+                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label,
                         onValueChange = { text ->
                             onValueChange(text)
                         },

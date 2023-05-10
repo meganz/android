@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
  * TextField Generic Description
@@ -58,6 +60,7 @@ fun GenericDescriptionTextField(
     modifier: Modifier = Modifier,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
+    @StringRes titleId: Int? = null,
     charLimit: Int,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -76,7 +79,7 @@ fun GenericDescriptionTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = MaterialTheme.colors.onPrimary,
+            textColor = if (isFocused) MaterialTheme.colors.onPrimary else MaterialTheme.colors.textColorSecondary,
             backgroundColor = Color.Transparent,
             cursorColor = MaterialTheme.colors.secondary,
             errorCursorColor = MaterialTheme.colors.error,
@@ -101,11 +104,26 @@ fun GenericDescriptionTextField(
 
         val isError = isCharLimitError
 
+        if (!isFocused && value.isNotEmpty()) {
+            titleId?.let { id ->
+                Text(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp),
+                    text = stringResource(id = id),
+                    style = MaterialTheme.typography.subtitle1.copy(
+                        color = MaterialTheme.colors.onPrimary,
+                        textAlign = TextAlign.Start
+                    )
+                )
+            }
+        }
+
         CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
             @OptIn(ExperimentalMaterialApi::class)
             (BasicTextField(
                 value = value,
-                modifier = Modifier
+                modifier = modifier
                     .defaultMinSize(
                         minWidth = TextFieldDefaults.MinWidth,
                         minHeight = 48.dp
@@ -125,7 +143,7 @@ fun GenericDescriptionTextField(
                     ),
                 onValueChange = onValueChange,
                 textStyle = MaterialTheme.typography.subtitle2.copy(
-                    color = MaterialTheme.colors.onPrimary,
+                    color = if (!isFocused && value.isNotEmpty()) MaterialTheme.colors.textColorSecondary else MaterialTheme.colors.onPrimary,
                     textAlign = TextAlign.Start
                 ),
                 cursorBrush = SolidColor(textFieldColors.cursorColor(isError).value),
@@ -153,7 +171,7 @@ fun GenericDescriptionTextField(
                         isError = isError,
                         interactionSource = interactionSource,
                         colors = textFieldColors,
-                        contentPadding = PaddingValues(top = if (value.isEmpty()) 13.dp else 15.dp),
+                        contentPadding = PaddingValues(0.dp)
                     )
                 }
             ))

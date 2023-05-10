@@ -166,8 +166,10 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         }
 
         MaterialDatePicker.Builder.datePicker()
+            .setTheme(R.style.MaterialCalendarTheme)
             .setPositiveButtonText(getString(R.string.general_ok))
             .setNegativeButtonText(getString(R.string.button_cancel))
+            .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
             .setSelection(currentDate.toEpochMilli())
             .setCalendarConstraints(
@@ -193,6 +195,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             .atZone(ZoneId.systemDefault())
 
         MaterialTimePicker.Builder()
+            .setTheme(R.style.MaterialTimerTheme)
             .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
             .setTimeFormat(
                 if (DateFormat.is24HourFormat(this))
@@ -204,7 +207,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             .setMinute(currentDate.minute)
             .setPositiveButtonText(getString(R.string.general_ok))
             .setNegativeButtonText(getString(R.string.button_cancel))
-            .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog).uppercase())
+            .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
             .build()
             .apply {
                 addOnPositiveButtonClickListener {

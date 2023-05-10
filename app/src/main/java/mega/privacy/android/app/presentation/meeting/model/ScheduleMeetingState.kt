@@ -37,7 +37,7 @@ data class ScheduleMeetingState constructor(
     val meetingTitle: String = "",
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val startDate: Instant = Instant.now(),
-    val endDate: Instant = Instant.now().plus(1, ChronoUnit.HOURS),
+    val endDate: Instant = Instant.now().plus(30, ChronoUnit.MINUTES),
     val participantItemList: List<ContactItem> = emptyList(),
     val enabledMeetingLinkOption: Boolean = false,
     val enabledAllowAddParticipantsOption: Boolean = true,

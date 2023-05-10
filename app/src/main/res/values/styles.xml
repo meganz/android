@@ -124,6 +124,27 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+    <style name="Widget.Mega.YearNavigationButton.Dialog" parent="@style/Widget.MaterialComponents.MaterialCalendar.YearNavigationButton">
+        <item name="android:textColor">@color/grey_054_white_054</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.Mega.ButtonOutlined.Dialog" parent="@style/Widget.MaterialComponents.TimePicker.Button">
+        <item name="strokeColor">@color/grey_012_white_012</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:colorControlNormal">?attr/colorSecondary</item>
+    </style>
+
+    <style name="Widget.Mega.SwitchInputIcon.Dialog" parent="@style/Widget.MaterialComponents.MaterialCalendar.HeaderToggleButton">
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="Widget.Mega.SelectedDate.Dialog" parent="@style/Widget.MaterialComponents.MaterialCalendar.HeaderSelection">
+        <item name="android:textColor">@color/white_black</item>
+        <item name="android:textAppearance">@color/white_black</item>
+
+    </style>
+
     <!-- Chip -->
     <style name="Widget.Mega.Chip.New" parent="Widget.MaterialComponents.Chip.Action">
         <item name="chipBackgroundColor">?colorSecondary</item>
@@ -784,4 +805,19 @@
         <item name="colorPrimary">?colorSecondary</item>
         <item name="colorOnPrimary">?colorOnSecondary</item>
     </style>
+
+    <style name="MaterialCalendarTheme" parent="@style/ThemeOverlay.Mega.DatePicker">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Mega.PositiveButton.Dialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Mega.NegativeButton.Dialog</item>
+        <item name="materialCalendarHeaderCancelButton">@style/Widget.Mega.NegativeButton.Dialog</item>
+        <item name="materialCalendarYearNavigationButton">@style/Widget.Mega.YearNavigationButton.Dialog</item>
+        <item name="materialCalendarHeaderToggleButton">@style/Widget.Mega.SwitchInputIcon.Dialog</item>
+    </style>
+
+    <style name="MaterialTimerTheme" parent="@style/ThemeOverlay.Mega.TimePicker">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.Mega.PositiveButton.Dialog</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.Mega.NegativeButton.Dialog</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Mega.ButtonOutlined.Dialog</item>
+    </style>
+
 </resources>
