@@ -220,7 +220,7 @@ class AlbumsViewModel @Inject constructor(
             } else {
                 uiAlbum
             }
-        }.sortedByDescending { (it.id as? Album.UserAlbum)?.modificationTime }
+        }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
 
         systemUIAlbums + updatedUserUIAlbums
     }
