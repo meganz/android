@@ -7096,7 +7096,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("showNodeOptionsPanel-Offline")
         if (sNode == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
         selectedOfflineNode = sNode
-        bottomSheetDialogFragment = OfflineOptionsBottomSheetDialogFragment()
+        bottomSheetDialogFragment = OfflineOptionsBottomSheetDialogFragment.newInstance(sNode)
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
