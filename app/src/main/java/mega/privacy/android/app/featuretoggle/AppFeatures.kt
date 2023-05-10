@@ -14,6 +14,14 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
     /**
+     * Shares compose
+     */
+    SharesCompose(
+        "Enable compose implementation of shares tabs",
+        false
+    ),
+
+    /**
      * Enable album sharing feature.
      */
     AlbumSharing(

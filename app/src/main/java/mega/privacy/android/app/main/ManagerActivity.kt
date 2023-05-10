@@ -881,6 +881,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Constants.REQUEST_UPLOAD_CONTACT -> {
                 uploadContactInfo(infoManager, parentNodeManager)
             }
+
             Constants.REQUEST_CAMERA -> {
                 if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
                     Timber.d("TAKE_PICTURE_OPTION")
@@ -898,11 +899,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             Constants.REQUEST_READ_WRITE_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     showUploadPanel()
                 }
             }
+
             Constants.REQUEST_WRITE_STORAGE -> {
                 if (viewModel.state.value.isFirstLogin) {
                     Timber.d("The first time")
@@ -940,11 +943,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 nodeSaver.handleRequestPermissionsResult(requestCode)
             }
+
             PermissionsFragment.PERMISSIONS_FRAGMENT -> {
                 if (getPermissionsFragment() != null) {
                     permissionsFragment?.setNextPermission()
                 }
             }
+
             Constants.REQUEST_BT_CONNECT -> {
                 Timber.d("get Bluetooth Connect permission")
                 if (permissions.isEmpty()) {
@@ -1198,6 +1203,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     fileBackupManager.actionBackupNodeCallback
                 )
             }
+
             BACKUP_DIALOG_SHOW_CONFIRM -> {
                 fileBackupManager.confirmationActionForBackup(
                     backupHandleList,
@@ -1207,6 +1213,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     fileBackupManager.defaultActionBackupNodeCallback
                 )
             }
+
             else -> {
                 Timber.d("Backup warning dialog is not show")
             }
@@ -1379,16 +1386,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else if (isLinksAdded) {
                         linksFragment?.hideActionMode()
                     }
+
                     SharesTab.OUTGOING_TAB -> if (isIncomingAdded) {
                         incomingSharesFragment?.hideActionMode()
                     } else if (isLinksAdded) {
                         linksFragment?.hideActionMode()
                     }
+
                     SharesTab.LINKS_TAB -> if (isIncomingAdded) {
                         incomingSharesFragment?.hideActionMode()
                     } else if (isOutgoingAdded) {
                         outgoingSharesFragment?.hideActionMode()
                     }
+
                     else -> {}
                 }
                 setToolbarTitle()
@@ -1670,18 +1680,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
+
                                     megaApi.rubbishNode.handle -> {
                                         drawerItem = DrawerItem.RUBBISH_BIN
                                         rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
+
                                     megaApi.inboxNode.handle -> {
                                         drawerItem = DrawerItem.INBOX
                                         inboxViewModel.updateInboxHandle(handleIntent)
                                         selectDrawerItem(drawerItem)
                                         selectDrawerItemPending = false
                                     }
+
                                     else -> {
                                         //Incoming
                                         drawerItem = DrawerItem.SHARED_ITEMS
@@ -2033,6 +2046,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OPEN_MEGA_LINK -> {
                 val fileLinkIntent = Intent(this, FileLinkActivity::class.java)
                 fileLinkIntent.putExtra(
@@ -2045,6 +2059,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(fileLinkIntent)
                 finish()
             }
+
             Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2054,6 +2069,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OPEN_CHAT_LINK -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2063,10 +2079,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_CANCEL_CAM_SYNC -> {
                 viewModel.stopCameraUpload()
                 finish()
             }
+
             Constants.ACTION_EXPORT_MASTER_KEY -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2075,6 +2093,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_SHOW_TRANSFERS -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2087,6 +2106,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_IPC -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2095,6 +2115,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_CHAT_NOTIFICATION_MESSAGE -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2103,6 +2124,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_CHAT_SUMMARY -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2111,6 +2133,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2119,6 +2142,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OPEN_HANDLE_NODE -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2128,6 +2152,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OVERQUOTA_TRANSFER -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2136,6 +2161,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OVERQUOTA_STORAGE -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2144,6 +2170,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                 Timber.d("Login")
                 val loginIntent = Intent(this, LoginActivity::class.java)
@@ -2157,6 +2184,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2165,6 +2193,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             Constants.ACTION_SHOW_UPGRADE_ACCOUNT -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
                 loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2173,6 +2202,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 startActivity(loginIntent)
                 finish()
             }
+
             else -> {
                 return false
             }
@@ -2543,7 +2573,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Checks if RubbishBinCompose enabled from [AppFeatures.RubbishBinCompose]
      */
-    private fun isRubbishBinComposeEnabled(): Boolean =
+    private fun isRubbishBinComposeEnabled() =
         isFeatureEnabled(AppFeatures.RubbishBinCompose)
 
     /**
@@ -2551,6 +2581,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun isFileBrowserComposeEnabled(): Boolean =
         fileBrowserComposeFragment != null
+
+    /**
+     * Checks if SharesCompose enabled from [AppFeatures.SharesCompose]
+     */
+    private suspend fun isSharesTabComposeEnabled() =
+        getFeatureFlagValueUseCase(AppFeatures.SharesCompose)
 
     /**
      * Checks if some business warning has to be shown due to the status of the account.
@@ -2695,16 +2731,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     when (result) {
                         InviteContactUseCase.InviteResult.SENT -> snackbarMessage =
                             getString(R.string.context_contact_request_sent, email)
+
                         InviteContactUseCase.InviteResult.RESENT -> snackbarMessage =
                             getString(R.string.context_contact_invitation_resent)
+
                         InviteContactUseCase.InviteResult.DELETED -> snackbarMessage =
                             getString(R.string.context_contact_invitation_deleted)
+
                         InviteContactUseCase.InviteResult.ALREADY_SENT -> snackbarMessage =
                             getString(R.string.invite_not_sent_already_sent, email)
+
                         InviteContactUseCase.InviteResult.ALREADY_CONTACT -> snackbarMessage =
                             getString(R.string.context_contact_already_exists, email)
+
                         InviteContactUseCase.InviteResult.INVALID_EMAIL -> snackbarMessage =
                             getString(R.string.error_own_email_as_contact)
+
                         else -> {}
                     }
                 }
@@ -2936,6 +2978,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                 DrawerItem.SHARED_ITEMS
             }
+
             else -> if (megaApi.isInRubbish(parentIntentN)) {
                 rubbishBinViewModel.setRubbishBinHandle(handleIntent)
                 DrawerItem.RUBBISH_BIN
@@ -3002,6 +3045,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         ZipBrowserActivity.start(this, it)
                     }
                 }
+
                 Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
                     Timber.d("ACTION_IMPORT_LINK_FETCH_NODES")
                     val loginIntent = Intent(this, LoginActivity::class.java)
@@ -3013,6 +3057,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     finish()
                     return
                 }
+
                 Constants.ACTION_OPEN_MEGA_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_LINK")
                     val fileLinkIntent =
@@ -3026,6 +3071,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     finish()
                     return
                 }
+
                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_FOLDER_LINK")
                     val intentFolderLink =
@@ -3041,6 +3087,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                     finish()
                 }
+
                 Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER -> {
                     fileBrowserViewModel.setBrowserParentHandle(
                         intent.getLongExtra(
@@ -3056,12 +3103,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     //Refresh Rubbish Fragment
                     refreshRubbishBin()
                 }
+
                 Constants.ACTION_OVERQUOTA_STORAGE -> {
                     showOverQuotaAlert(false)
                 }
+
                 Constants.ACTION_PRE_OVERQUOTA_STORAGE -> {
                     showOverQuotaAlert(true)
                 }
+
                 Constants.ACTION_CANCEL_CAM_SYNC -> {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC")
                     drawerItem = DrawerItem.TRANSFERS
@@ -3088,6 +3138,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         Timber.e(ex)
                     }
                 }
+
                 Constants.ACTION_SHOW_TRANSFERS -> {
                     if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
                         sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
@@ -3098,20 +3149,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                     selectDrawerItem(drawerItem)
                 }
+
                 Constants.ACTION_TAKE_SELFIE -> {
                     Timber.d("Intent take selfie")
                     Util.checkTakePicture(this, Constants.TAKE_PHOTO_CODE)
                 }
+
                 Constants.SHOW_REPEATED_UPLOAD -> {
                     Timber.d("Intent SHOW_REPEATED_UPLOAD")
                     val message = intent.getStringExtra("MESSAGE")
                     showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
                 }
+
                 Constants.ACTION_IPC -> {
                     Timber.d("IPC - go to received request in Contacts")
                     markNotificationsSeen(true)
                     navigateToContactRequests()
                 }
+
                 Constants.ACTION_CHAT_NOTIFICATION_MESSAGE -> {
                     Timber.d("ACTION_CHAT_NOTIFICATION_MESSAGE")
                     val chatId: Long = intent.getLongExtra(
@@ -3127,11 +3182,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
                 }
+
                 Constants.ACTION_CHAT_SUMMARY -> {
                     Timber.d("ACTION_CHAT_SUMMARY")
                     drawerItem = DrawerItem.CHAT
                     selectDrawerItem(drawerItem)
                 }
+
                 Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION -> {
                     Timber.d("ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION")
                     markNotificationsSeen(true)
@@ -3139,11 +3196,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewModel.setSharesTab(SharesTab.INCOMING_TAB)
                     selectDrawerItem(drawerItem)
                 }
+
                 Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                     Timber.d("ACTION_OPEN_CONTACTS_SECTION")
                     markNotificationsSeen(true)
                     openContactLink(intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
                 }
+
                 Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT -> {
                     val parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                     if (parentPath != null) {
@@ -3178,6 +3237,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     actionOpenFolder(handleIntent)
                     selectDrawerItem(drawerItem)
                 }
+
                 Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE -> {
                     val chatId: Long = intent.getLongExtra(
                         Constants.CHAT_ID,
@@ -3197,6 +3257,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarTitle()
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
             }
+
             DrawerItem.SHARED_ITEMS -> {
                 Timber.d("Case SHARED ITEMS")
                 setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
@@ -3209,6 +3270,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 setToolbarTitle()
             }
+
             DrawerItem.SEARCH -> {
                 if (searchExpand) {
                     return
@@ -3216,6 +3278,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 setToolbarTitle()
             }
+
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
                 if (recentChatsFragment?.isVisible == true) {
@@ -3224,9 +3287,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 MegaApplication.setRecentChatVisible(true)
             }
+
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
             }
+
             DrawerItem.NOTIFICATIONS -> {}
             DrawerItem.HOMEPAGE -> setBottomNavigationMenuItemChecked(HOME_BNV)
             else -> setBottomNavigationMenuItemChecked(HOME_BNV)
@@ -3486,11 +3551,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             DrawerItem.SYNC -> {
                 supportActionBar?.subtitle = null
                 supportActionBar?.title = "Sync"
                 viewModel.setIsFirstNavigationLevel(false)
             }
+
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
                 val node =
@@ -3507,9 +3574,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewModel.setIsFirstNavigationLevel(false)
                 }
             }
+
             DrawerItem.SHARED_ITEMS -> {
                 setToolbarForSharedItemsDrawerItem()
             }
+
             DrawerItem.INBOX -> {
                 supportActionBar?.subtitle = null
                 // If the Inbox Parent Handle is equal to the My Backups Folder Handle or is -1L,
@@ -3524,17 +3593,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewModel.setIsFirstNavigationLevel(false)
                 }
             }
+
             DrawerItem.NOTIFICATIONS -> {
                 supportActionBar?.subtitle = null
                 supportActionBar?.title =
                     getString(R.string.title_properties_chat_contact_notifications)
                 viewModel.setIsFirstNavigationLevel(true)
             }
+
             DrawerItem.CHAT -> {
                 appBarLayout.visibility = View.VISIBLE
                 supportActionBar?.title = getString(R.string.section_chat)
                 viewModel.setIsFirstNavigationLevel(true)
             }
+
             DrawerItem.SEARCH -> {
                 supportActionBar?.subtitle = null
                 if (searchViewModel.state.value.searchParentHandle == -1L) {
@@ -3559,11 +3631,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             DrawerItem.TRANSFERS -> {
                 supportActionBar?.subtitle = null
                 supportActionBar?.title = getString(R.string.section_transfers)
                 isFirstNavigationLevel = true
             }
+
             DrawerItem.PHOTOS -> {
                 supportActionBar?.subtitle = null
                 if (isInAlbumContent) {
@@ -3582,6 +3656,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         photosFragment?.isEnableCameraUploadsViewShown() == false || photosFragment?.doesAccountHavePhotos() == false
                 }
             }
+
             DrawerItem.HOMEPAGE -> {
                 run {
                     this.isFirstNavigationLevel = false
@@ -3596,6 +3671,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 RecentsBucketFragment::class.java
                             )?.setupToolbar()
                         }
+
                         else -> {}
                     }
                     if (titleId != -1) {
@@ -3604,6 +3680,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 run { Timber.d("Default GONE") }
             }
+
             else -> {
                 Timber.d("Default GONE")
             }
@@ -3636,6 +3713,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.d("selectDrawerItemSharedItems: inSFLol == null")
                 }
             }
+
             SharesTab.OUTGOING_TAB -> {
                 Timber.d("setToolbarTitle: OUTGOING TAB")
                 if (isOutgoingAdded) {
@@ -3650,6 +3728,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             SharesTab.LINKS_TAB -> if (isLinksAdded) {
                 if (this.linksState().linksHandle == MegaApiJava.INVALID_HANDLE) {
                     supportActionBar?.title = resources.getString(R.string.title_shared_items)
@@ -3661,6 +3740,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewModel.setIsFirstNavigationLevel(false)
                 }
             }
+
             else -> {
                 supportActionBar?.title = resources.getString(R.string.title_shared_items)
                 viewModel.setIsFirstNavigationLevel(true)
@@ -3848,21 +3928,27 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.CLOUD_DRIVE -> {
                 setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
             }
+
             DrawerItem.HOMEPAGE -> {
                 setBottomNavigationMenuItemChecked(HOME_BNV)
             }
+
             DrawerItem.PHOTOS -> {
                 setBottomNavigationMenuItemChecked(PHOTOS_BNV)
             }
+
             DrawerItem.SHARED_ITEMS -> {
                 setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
             }
+
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
             }
+
             DrawerItem.SEARCH, DrawerItem.TRANSFERS, DrawerItem.NOTIFICATIONS, DrawerItem.INBOX -> {
                 setBottomNavigationMenuItemChecked(NO_BNV)
             }
+
             else -> {}
         }
     }
@@ -3890,10 +3976,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     tab.setText(R.string.tab_incoming_shares)
                     tab.setIcon(R.drawable.ic_incoming_shares)
                 }
+
                 SharesTab.OUTGOING_TAB.position -> {
                     tab.setText(R.string.tab_outgoing_shares)
                     tab.setIcon(R.drawable.ic_outgoing_shares)
                 }
+
                 SharesTab.LINKS_TAB.position -> {
                     tab.setText(R.string.tab_links_shares)
                     tab.setIcon(R.drawable.link_ic)
@@ -3947,6 +4035,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)
                 viewPagerTransfers.currentItem = TransfersTab.COMPLETED_TAB.position
             }
+
             else -> {
                 refreshFragment(FragmentTag.TRANSFERS.tag)
                 viewPagerTransfers.currentItem = TransfersTab.PENDING_TAB.position
@@ -4017,11 +4106,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewPagerShares.visibility = View.VISIBLE
                 mShowAnyTabLayout = true
             }
+
             DrawerItem.TRANSFERS -> {
                 tabLayoutTransfers.visibility = View.VISIBLE
                 viewPagerTransfers.visibility = View.VISIBLE
                 mShowAnyTabLayout = true
             }
+
             DrawerItem.HOMEPAGE -> navHostView.visibility = View.VISIBLE
             else -> {
                 fragmentContainer.visibility = View.VISIBLE
@@ -4048,17 +4139,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     SharesTab.INCOMING_TAB -> if (!isIncomingAdded || !hide && this.incomingSharesState().incomingHandle != MegaApiJava.INVALID_HANDLE) {
                         return
                     }
+
                     SharesTab.OUTGOING_TAB -> if (!isOutgoingAdded || !hide && this.outgoingSharesState().outgoingHandle != MegaApiJava.INVALID_HANDLE) {
                         return
                     }
+
                     SharesTab.LINKS_TAB -> if (!isLinksAdded || !hide && this.linksState().linksHandle != MegaApiJava.INVALID_HANDLE) {
                         return
                     }
+
                     else -> {}
                 }
                 tabLayoutShares.visibility = visibility
                 viewPagerShares.isUserInputEnabled = !hide
             }
+
             DrawerItem.TRANSFERS -> {
                 if (currentTab === TransfersTab.PENDING_TAB && !isTransfersInProgressAdded) {
                     return
@@ -4066,6 +4161,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 tabLayoutTransfers.visibility = visibility
                 viewPagerTransfers.disableSwipe(hide)
             }
+
             else -> {}
         }
     }
@@ -4106,27 +4202,34 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setDrawerLockMode(false)
                     return@addOnDestinationChangedListener
                 }
+
                 R.id.favouritesFragment -> {
                     homepageScreen = HomepageScreen.FAVOURITES
                 }
+
                 R.id.documentsFragment -> {
                     homepageScreen = HomepageScreen.DOCUMENTS
                 }
+
                 R.id.audioFragment -> {
                     homepageScreen = HomepageScreen.AUDIO
                 }
+
                 R.id.videoFragment -> {
                     homepageScreen = HomepageScreen.VIDEO
                 }
+
                 R.id.fullscreen_offline -> {
                     homepageScreen = HomepageScreen.FULLSCREEN_OFFLINE
                 }
+
                 R.id.offline_file_info -> {
                     homepageScreen = HomepageScreen.OFFLINE_FILE_INFO
                     updatePsaViewVisibility()
                     appBarLayout.visibility = View.GONE
                     showHideBottomNavigationView(true)
                 }
+
                 R.id.recentBucketFragment -> {
                     homepageScreen = HomepageScreen.RECENT_BUCKET
                 }
@@ -4213,6 +4316,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 Timber.d("END for Cloud Drive")
             }
+
             DrawerItem.RUBBISH_BIN -> {
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
@@ -4243,6 +4347,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarTitle()
                 showFabButton()
             }
+
             DrawerItem.SYNC -> {
                 syncFragment =
                     supportFragmentManager.findFragmentByTag(FragmentTag.SYNC.tag) as? SyncFragment
@@ -4252,6 +4357,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 syncFragment?.let { replaceFragment(it, FragmentTag.SYNC.tag) }
             }
+
             DrawerItem.HOMEPAGE -> {
                 // Don't use fabButton.hide() here.
                 fabButton.visibility = View.GONE
@@ -4274,6 +4380,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     changeAppBarElevation(false)
                 }
             }
+
             DrawerItem.PHOTOS -> {
                 if (isInAlbumContent || isInFilterPage) {
                     showHideBottomNavigationView(true)
@@ -4296,6 +4403,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                 }
             }
+
             DrawerItem.INBOX -> {
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
@@ -4313,7 +4421,66 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarTitle()
                 showFabButton()
             }
+
             DrawerItem.SHARED_ITEMS -> {
+                onSelectSharedItemsDrawerItem()
+            }
+
+            DrawerItem.NOTIFICATIONS -> {
+                showHideBottomNavigationView(true)
+                selectDrawerItemNotifications()
+                supportInvalidateOptionsMenu()
+                showFabButton()
+            }
+
+            DrawerItem.SEARCH -> {
+                showHideBottomNavigationView(true)
+                setBottomNavigationMenuItemChecked(NO_BNV)
+                drawerItem = DrawerItem.SEARCH
+                if (getSearchFragment() == null) {
+                    searchFragment = SearchFragment.newInstance()
+                }
+                searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
+                showFabButton()
+            }
+
+            DrawerItem.TRANSFERS -> {
+                showHideBottomNavigationView(true)
+                supportActionBar?.subtitle = null
+                selectDrawerItemTransfers()
+                supportInvalidateOptionsMenu()
+                showFabButton()
+            }
+
+            DrawerItem.CHAT -> {
+                Timber.d("Chat selected")
+                selectDrawerItemChat()
+                supportInvalidateOptionsMenu()
+                showHideBottomNavigationView(false)
+                if (!comesFromNotifications) {
+                    bottomNavigationCurrentItem = CHAT_BNV
+                }
+                setBottomNavigationMenuItemChecked(CHAT_BNV)
+            }
+
+            else -> {}
+        }
+        setTabsVisibility()
+        checkScrollElevation()
+        viewModel.checkToShow2FADialog(newAccount, firstLogin)
+    }
+
+    private fun onSelectSharedItemsDrawerItem() {
+        lifecycleScope.launch {
+            if (isSharesTabComposeEnabled()) {
+
+                showFabButton()
+                showHideBottomNavigationView(false)
+                if (!comesFromNotifications) {
+                    bottomNavigationCurrentItem = SHARED_ITEMS_BNV
+                }
+                setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
+            } else {
                 selectDrawerItemSharedItems()
                 if (openFolderRefresh) {
                     onNodesSharedUpdate()
@@ -4327,44 +4494,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
             }
-            DrawerItem.NOTIFICATIONS -> {
-                showHideBottomNavigationView(true)
-                selectDrawerItemNotifications()
-                supportInvalidateOptionsMenu()
-                showFabButton()
-            }
-            DrawerItem.SEARCH -> {
-                showHideBottomNavigationView(true)
-                setBottomNavigationMenuItemChecked(NO_BNV)
-                drawerItem = DrawerItem.SEARCH
-                if (getSearchFragment() == null) {
-                    searchFragment = SearchFragment.newInstance()
-                }
-                searchFragment?.let { replaceFragment(it, FragmentTag.SEARCH.tag) }
-                showFabButton()
-            }
-            DrawerItem.TRANSFERS -> {
-                showHideBottomNavigationView(true)
-                supportActionBar?.subtitle = null
-                selectDrawerItemTransfers()
-                supportInvalidateOptionsMenu()
-                showFabButton()
-            }
-            DrawerItem.CHAT -> {
-                Timber.d("Chat selected")
-                selectDrawerItemChat()
-                supportInvalidateOptionsMenu()
-                showHideBottomNavigationView(false)
-                if (!comesFromNotifications) {
-                    bottomNavigationCurrentItem = CHAT_BNV
-                }
-                setBottomNavigationMenuItemChecked(CHAT_BNV)
-            }
-            else -> {}
         }
-        setTabsVisibility()
-        checkScrollElevation()
-        viewModel.checkToShow2FADialog(newAccount, firstLogin)
     }
 
     private fun navigateToSettingsActivity(targetPreference: TargetPreference?) {
@@ -4532,11 +4662,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     fileBrowserFragment?.checkScroll()
                 }
             }
+
             DrawerItem.HOMEPAGE -> {
                 if (fullscreenOfflineFragment != null) {
                     fullscreenOfflineFragment?.checkScroll()
                 }
             }
+
             DrawerItem.INBOX -> {
                 inboxFragment =
                     supportFragmentManager.findFragmentByTag(FragmentTag.INBOX.tag) as? InboxFragment
@@ -4544,30 +4676,31 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     inboxFragment?.checkScroll()
                 }
             }
+
             DrawerItem.SHARED_ITEMS -> {
-                when {
-                    tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded -> incomingSharesFragment?.checkScroll()
-                    tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded -> outgoingSharesFragment?.checkScroll()
-                    tabItemShares === SharesTab.LINKS_TAB && isLinksAdded -> linksFragment?.checkScroll()
-                }
+                checkScrollOnSharedItemsDrawerItem()
             }
+
             DrawerItem.SEARCH -> {
                 if (getSearchFragment() != null) {
                     searchFragment?.checkScroll()
                 }
             }
+
             DrawerItem.CHAT -> {
                 chatTabsFragment = chatsFragment
                 if (recentChatsFragment?.isVisible == true) {
                     recentChatsFragment?.checkScroll()
                 }
             }
+
             DrawerItem.RUBBISH_BIN -> {
                 rubbishBinFragment = getRubbishBinFragment()
                 if (rubbishBinFragment != null) {
                     rubbishBinFragment?.checkScroll()
                 }
             }
+
             DrawerItem.TRANSFERS -> {
                 if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded) {
                     transfersFragment?.updateElevation()
@@ -4575,7 +4708,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     completedTransfersFragment?.updateElevation()
                 }
             }
+
             else -> {}
+        }
+    }
+
+    private fun checkScrollOnSharedItemsDrawerItem() {
+        when {
+            tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded -> incomingSharesFragment?.checkScroll()
+            tabItemShares === SharesTab.OUTGOING_TAB && isOutgoingAdded -> outgoingSharesFragment?.checkScroll()
+            tabItemShares === SharesTab.LINKS_TAB && isLinksAdded -> linksFragment?.checkScroll()
         }
     }
 
@@ -4889,9 +5031,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         searchMenuItem?.isVisible = true
                     }
                 }
+
                 DrawerItem.HOMEPAGE -> if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
                     updateFullscreenOfflineFragmentOptionMenu(true)
                 }
+
                 DrawerItem.RUBBISH_BIN -> {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                     if (rubbishBinViewModel.state.value.nodes.isNotEmpty()) {
@@ -4899,6 +5043,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         searchMenuItem?.isVisible = true
                     }
                 }
+
                 DrawerItem.PHOTOS -> {}
                 DrawerItem.INBOX -> {
                     moreMenuItem.isVisible = false
@@ -4906,6 +5051,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         searchMenuItem?.isVisible = true
                     }
                 }
+
                 DrawerItem.SHARED_ITEMS -> {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                     if (tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded) {
@@ -4926,12 +5072,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
                 }
+
                 DrawerItem.SEARCH -> if (searchExpand) {
                     openSearchView()
                     searchFragment?.checkSelectMode()
                 } else {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                 }
+
                 DrawerItem.TRANSFERS -> if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded && transfersFragment?.isNotEmptyTransfer() == true) {
                     if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
                         || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
@@ -4946,6 +5094,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     clearCompletedTransfers?.isVisible = true
                     retryTransfers?.isVisible = thereAreFailedOrCancelledTransfers()
                 }
+
                 DrawerItem.CHAT -> if (searchExpand) {
                     openSearchView()
                 } else {
@@ -4955,6 +5104,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         searchMenuItem?.isVisible = true
                     }
                 }
+
                 DrawerItem.NOTIFICATIONS -> {}
                 else -> {}
             }
@@ -5125,23 +5275,28 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 true
             }
+
             R.id.action_search -> {
                 Timber.d("Action search selected")
                 hideItemsWhenSearchSelected()
                 true
             }
+
             R.id.action_open_link -> {
                 showOpenLinkDialog()
                 true
             }
+
             R.id.action_menu_cancel_all_transfers -> {
                 showConfirmationCancelAllTransfers()
                 true
             }
+
             R.id.action_menu_clear_completed_transfers -> {
                 showConfirmationClearCompletedTransfers()
                 true
             }
+
             R.id.action_pause -> {
                 if (drawerItem === DrawerItem.TRANSFERS) {
                     Timber.d("Click on action_pause - play visible")
@@ -5151,6 +5306,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 true
             }
+
             R.id.action_play -> {
                 Timber.d("Click on action_play - pause visible")
                 pauseTransfersMenuIcon!!.isVisible = true
@@ -5158,6 +5314,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 megaApi.pauseTransfers(false, this)
                 true
             }
+
             R.id.action_menu_do_not_disturb -> {
                 if (drawerItem === DrawerItem.CHAT) {
                     if (ChatUtil.getGeneralNotification() == Constants.NOTIFICATIONS_ENABLED) {
@@ -5172,6 +5329,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 true
             }
+
             R.id.action_select -> {
                 when (drawerItem) {
                     DrawerItem.CLOUD_DRIVE -> if (isCloudAdded) {
@@ -5181,6 +5339,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             fileBrowserFragment?.selectAll()
                         }
                     }
+
                     DrawerItem.RUBBISH_BIN -> {
                         if (getRubbishBinFragment() != null) {
                             getRubbishBinFragment()?.selectAll()
@@ -5189,59 +5348,60 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             rubbishBinViewModel.selectAllNodes()
                         }
                     }
-                    DrawerItem.SHARED_ITEMS -> when (tabItemShares) {
-                        SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
-                            incomingSharesFragment?.selectAll()
-                        }
-                        SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
-                            outgoingSharesFragment?.selectAll()
-                        }
-                        SharesTab.LINKS_TAB -> if (isLinksAdded) {
-                            linksFragment?.selectAll()
-                        }
-                        else -> {}
-                    }
+
+                    DrawerItem.SHARED_ITEMS -> onSelectAllSharedItems()
+
                     DrawerItem.HOMEPAGE -> if (fullscreenOfflineFragment != null) {
                         fullscreenOfflineFragment?.selectAll()
                     }
+
                     DrawerItem.CHAT -> if (recentChatsFragment?.isVisible == true) {
                         recentChatsFragment?.selectAll()
                     }
+
                     DrawerItem.INBOX -> if (getInboxFragment() != null) {
                         inboxFragment?.selectAll()
                     }
+
                     DrawerItem.SEARCH -> if (getSearchFragment() != null) {
                         searchFragment?.selectAll()
                     }
+
                     else -> {}
                 }
                 true
             }
+
             R.id.action_menu_clear_rubbish_bin -> {
                 showClearRubbishBinDialog()
                 true
             }
+
             R.id.action_scan_qr -> {
                 Timber.d("Action menu scan QR code pressed")
                 //Check if there is a in progress call:
                 checkBeforeOpeningQR(true)
                 true
             }
+
             R.id.action_return_call -> {
                 Timber.d("Action menu return to call in progress pressed")
                 returnCall()
                 true
             }
+
             R.id.action_menu_retry_transfers -> {
                 retryAllTransfers()
                 true
             }
+
             R.id.action_enable_select -> {
                 if (isTransfersInProgressAdded) {
                     transfersFragment?.activateActionMode()
                 }
                 true
             }
+
             R.id.action_more -> {
                 showNodeOptionsPanel(
                     getCurrentParentNode(
@@ -5251,8 +5411,33 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                 true
             }
+
             else -> {
                 super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    private fun onSelectAllSharedItems() {
+        lifecycleScope.launch {
+            if (isSharesTabComposeEnabled()) {
+
+            } else {
+                when (tabItemShares) {
+                    SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
+                        incomingSharesFragment?.selectAll()
+                    }
+
+                    SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
+                        outgoingSharesFragment?.selectAll()
+                    }
+
+                    SharesTab.LINKS_TAB -> if (isLinksAdded) {
+                        linksFragment?.selectAll()
+                    }
+
+                    else -> {}
+                }
             }
         }
     }
@@ -5438,18 +5623,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.NOTIFICATIONS) {
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
-            when (tabItemShares) {
-                SharesTab.INCOMING_TAB -> if (!isIncomingAdded || incomingSharesFragment?.onBackPressed() == 0) {
-                    performOnBack()
-                }
-                SharesTab.OUTGOING_TAB -> if (!isOutgoingAdded || outgoingSharesFragment?.onBackPressed() == 0) {
-                    performOnBack()
-                }
-                SharesTab.LINKS_TAB -> if (!isLinksAdded || linksFragment?.onBackPressed() == 0) {
-                    performOnBack()
-                }
-                else -> performOnBack()
-            }
+            onBackPressedInSharedItemsDrawerItem()
         } else if (drawerItem === DrawerItem.CHAT) {
             if (chatsFragment != null && isFabExpanded) {
                 collapseFab()
@@ -5488,6 +5662,30 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         } else {
             handleBackPressIfFullscreenOfflineFragmentOpened()
+        }
+    }
+
+    private fun onBackPressedInSharedItemsDrawerItem() {
+        lifecycleScope.launch {
+            if (isSharesTabComposeEnabled()) {
+
+            } else {
+                when (tabItemShares) {
+                    SharesTab.INCOMING_TAB -> if (!isIncomingAdded || incomingSharesFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
+
+                    SharesTab.OUTGOING_TAB -> if (!isOutgoingAdded || outgoingSharesFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
+
+                    SharesTab.LINKS_TAB -> if (!isLinksAdded || linksFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
+
+                    else -> performOnBack()
+                }
+            }
         }
     }
 
@@ -5627,6 +5825,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setBottomNavigationMenuItemChecked(CLOUD_DRIVE_BNV)
                 }
             }
+
             R.id.bottom_navigation_item_homepage -> {
                 drawerItem = DrawerItem.HOMEPAGE
                 if (fullscreenOfflineFragment != null) {
@@ -5636,6 +5835,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setBottomNavigationMenuItemChecked(HOME_BNV)
                 }
             }
+
             R.id.bottom_navigation_item_camera_uploads -> {
 
                 // if pre fragment is the same one, do nothing.
@@ -5644,6 +5844,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setBottomNavigationMenuItemChecked(PHOTOS_BNV)
                 }
             }
+
             R.id.bottom_navigation_item_shared_items -> {
                 if (drawerItem === DrawerItem.SHARED_ITEMS) {
                     if (tabItemShares === SharesTab.INCOMING_TAB && this.incomingSharesState().incomingHandle != MegaApiJava.INVALID_HANDLE) {
@@ -5662,6 +5863,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     setBottomNavigationMenuItemChecked(SHARED_ITEMS_BNV)
                 }
             }
+
             R.id.bottom_navigation_item_chat -> {
                 drawerItem = DrawerItem.CHAT
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
@@ -5879,10 +6081,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     fileBrowserViewModel.setBrowserParentHandle(oldParentHandle)
                     refreshCloudDrive()
                 }
+
                 DrawerItem.INBOX -> {
                     inboxViewModel.updateInboxHandle(oldParentHandle)
                     refreshInboxList()
                 }
+
                 DrawerItem.SHARED_ITEMS -> {
                     when (tabItemShares) {
                         SharesTab.INCOMING_TAB -> {
@@ -5891,6 +6095,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             )
                             refreshIncomingShares()
                         }
+
                         SharesTab.OUTGOING_TAB -> {
                             outgoingSharesViewModel.decreaseOutgoingTreeDepth(
                                 if (this.outgoingSharesState().outgoingTreeDepth == 0) MegaApiJava.INVALID_HANDLE else oldParentHandle
@@ -5900,6 +6105,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
                             refreshOutgoingShares()
                         }
+
                         SharesTab.LINKS_TAB -> {
                             linksViewModel.decreaseLinksTreeDepth(
                                 if (this.linksState().linksTreeDepth == 0) MegaApiJava.INVALID_HANDLE else oldParentHandle
@@ -5909,17 +6115,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
                             refreshLinks()
                         }
+
                         else -> {}
                     }
                     searchViewModel.setSearchParentHandle(if (searchViewModel.state.value.searchDepth > 0) oldParentHandle else MegaApiJava.INVALID_HANDLE)
                     searchViewModel.decreaseSearchDepth()
                     refreshSearch()
                 }
+
                 DrawerItem.SEARCH -> {
                     searchViewModel.setSearchParentHandle(if (searchViewModel.state.value.searchDepth > 0) oldParentHandle else MegaApiJava.INVALID_HANDLE)
                     searchViewModel.decreaseSearchDepth()
                     refreshSearch()
                 }
+
                 else -> {}
             }
             setToolbarTitle()
@@ -5954,6 +6163,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             openLinkErrorText?.setText(R.string.valid_chat_link)
                             openLinkOpenButton?.setText(R.string.action_open_chat_link)
                         }
+
                         Constants.CONTACT_LINK -> {
                             openLinkText?.setTextColor(
                                 ColorUtils.getThemeColor(
@@ -5964,6 +6174,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             openLinkErrorText?.setText(R.string.valid_contact_link)
                             openLinkOpenButton?.setText(R.string.action_open_contact_link)
                         }
+
                         Constants.ERROR_LINK -> {
                             openLinkErrorText?.setText(R.string.invalid_file_folder_link)
                         }
@@ -6022,6 +6233,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         )
                         dismissAlertDialogIfExists(openLinkDialog)
                     }
+
                     Constants.CONTACT_LINK -> {
                         Timber.d("Open contact link: correct contact link")
                         val s =
@@ -6040,6 +6252,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         Timber.d("Do nothing: correct file or folder link")
                         dismissAlertDialogIfExists(openLinkDialog)
                     }
+
                     Constants.CHAT_LINK, Constants.CONTACT_LINK, Constants.ERROR_LINK -> {
                         Timber.w("Show error: invalid link or correct chat or contact link")
                         showOpenLinkError(true, linkType)
@@ -6168,12 +6381,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             MegaChatApi.STATUS_ONLINE -> {
                 statusToShow = 0
             }
+
             MegaChatApi.STATUS_AWAY -> {
                 statusToShow = 1
             }
+
             MegaChatApi.STATUS_BUSY -> {
                 statusToShow = 2
             }
+
             MegaChatApi.STATUS_OFFLINE -> {
                 statusToShow = 3
             }
@@ -6184,12 +6400,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 0 -> {
                     megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this)
                 }
+
                 1 -> {
                     megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, this)
                 }
+
                 2 -> {
                     megaChatApi.setOnlineStatus(MegaChatApi.STATUS_BUSY, this)
                 }
+
                 3 -> {
                     megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, this)
                 }
@@ -6238,24 +6457,30 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             when (drawerItem) {
                 DrawerItem.HOMEPAGE ->                 // For home page, its parent is always the root of cloud drive.
                     parentHandle = megaApi.rootNode.handle
+
                 DrawerItem.CLOUD_DRIVE -> parentHandle =
                     fileBrowserViewModel.getSafeBrowserParentHandle()
+
                 DrawerItem.INBOX -> parentHandle = this.inboxState().inboxHandle
                 DrawerItem.RUBBISH_BIN -> parentHandle =
                     this@ManagerActivity.rubbishBinState().rubbishBinHandle
+
                 DrawerItem.SHARED_ITEMS -> {
                     when {
                         tabItemShares === SharesTab.INCOMING_TAB -> {
                             parentHandle = this.incomingSharesState().incomingHandle
                         }
+
                         tabItemShares === SharesTab.OUTGOING_TAB -> {
                             parentHandle = this.outgoingSharesState().outgoingHandle
                         }
+
                         tabItemShares === SharesTab.LINKS_TAB -> {
                             parentHandle = this.linksState().linksHandle
                         }
                     }
                 }
+
                 DrawerItem.SEARCH -> {
                     if (searchViewModel.state.value.searchParentHandle != -1L) {
                         parentHandle = searchViewModel.state.value.searchParentHandle
@@ -6263,19 +6488,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         when (searchViewModel.state.value.searchDrawerItem) {
                             DrawerItem.CLOUD_DRIVE -> parentHandle =
                                 fileBrowserViewModel.getSafeBrowserParentHandle()
+
                             DrawerItem.SHARED_ITEMS -> when (searchViewModel.state.value.searchSharesTab) {
                                 SharesTab.INCOMING_TAB -> parentHandle =
                                     this.incomingSharesState().incomingHandle
+
                                 SharesTab.OUTGOING_TAB -> parentHandle =
                                     this.outgoingSharesState().outgoingHandle
+
                                 SharesTab.LINKS_TAB -> parentHandle = this.linksState().linksHandle
                                 else -> {}
                             }
+
                             DrawerItem.INBOX -> parentHandle = this.inboxState().inboxHandle
                             else -> {}
                         }
                     }
                 }
+
                 else -> return parentHandle
             }
             return parentHandle
@@ -6993,8 +7223,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 StorageState.Green -> {}
                 StorageState.Orange -> colorString =
                     ColorUtils.getColorHexString(this, R.color.amber_600_amber_300)
+
                 StorageState.Red, StorageState.PayWall -> colorString =
                     ColorUtils.getColorHexString(this, R.color.red_600_red_300)
+
                 else -> {}
             }
             try {
@@ -7035,6 +7267,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             StorageState.Orange -> resId = R.drawable.custom_progress_bar_horizontal_warning
             StorageState.Red, StorageState.PayWall -> resId =
                 R.drawable.custom_progress_bar_horizontal_exceed
+
             else -> {}
         }
         val drawable = ResourcesCompat.getDrawable(resources, resId, null)
@@ -7181,15 +7414,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val intent = Intent(this, SMSVerificationActivity::class.java)
                 startActivity(intent)
             }
+
             R.id.btnLeft_cancel -> {
                 getProLayout.visibility = View.GONE
             }
+
             R.id.btnRight_upgrade -> {
 
                 //Add navigation to Upgrade Account
                 Timber.d("Click on Upgrade in pro panel!")
                 navigateToUpgradeAccount()
             }
+
             R.id.enable_2fa_button -> {
                 enable2FADialog?.dismiss()
                 isEnable2FADialogShown = false
@@ -7197,52 +7433,64 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 intent.putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
                 startActivity(intent)
             }
+
             R.id.skip_enable_2fa_button -> {
                 isEnable2FADialogShown = false
                 if (enable2FADialog != null) {
                     enable2FADialog?.dismiss()
                 }
             }
+
             R.id.navigation_drawer_account_section, R.id.my_account_section -> {
                 if (viewModel.isConnected && megaApi.rootNode != null) {
                     showMyAccount()
                 }
             }
+
             R.id.inbox_section -> {
                 sectionClicked = true
                 drawerItem = DrawerItem.INBOX
             }
+
             R.id.contacts_section -> {
                 navigateToContacts()
             }
+
             R.id.notifications_section -> {
                 sectionClicked = true
                 drawerItem = DrawerItem.NOTIFICATIONS
             }
+
             R.id.offline_section -> {
                 sectionClicked = true
                 bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
                 openFullscreenOfflineFragment(pathNavigationOffline)
             }
+
             R.id.transfers_section -> {
                 sectionClicked = true
                 drawerItem = DrawerItem.TRANSFERS
             }
+
             R.id.sync_section -> {
                 sectionClicked = true
                 drawerItem = DrawerItem.SYNC
             }
+
             R.id.rubbish_bin_section -> {
                 sectionClicked = true
                 drawerItem = DrawerItem.RUBBISH_BIN
             }
+
             R.id.settings_section -> {
                 sectionClicked = true
                 navigateToSettingsActivity(null)
             }
+
             R.id.upgrade_navigation_view -> {
                 navigateToUpgradeAccount()
             }
+
             R.id.lost_authentication_device -> {
                 try {
                     val openTermsIntent = Intent(this, WebViewActivity::class.java)
@@ -7255,6 +7503,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     startActivity(viewIntent)
                 }
             }
+
             R.id.call_in_progress_layout -> {
                 returnCall()
             }
@@ -7315,14 +7564,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 launchForeignNodeError()
                 true
             }
+
             is QuotaExceededMegaException -> {
                 showOverQuotaAlert(false)
                 true
             }
+
             is NotEnoughQuotaMegaException -> {
                 showOverQuotaAlert(true)
                 true
             }
+
             else -> false
         }
     }
@@ -7362,9 +7614,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
             }
+
             requestCode == Constants.REQUEST_CODE_GET_FOLDER -> {
                 UploadUtil.getFolder(this, resultCode, intent, currentParentHandle)
             }
+
             requestCode == Constants.REQUEST_CODE_GET_FOLDER_CONTENT -> {
                 if (intent != null && resultCode == Activity.RESULT_OK) {
                     val result = intent.getStringExtra(Constants.EXTRA_ACTION_RESULT)
@@ -7378,6 +7632,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             requestCode == Constants.WRITE_SD_CARD_REQUEST_CODE && resultCode == Activity.RESULT_OK -> {
                 if (!hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     requestPermission(
@@ -7410,6 +7665,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     startService(service)
                 }
             }
+
             requestCode == Constants.REQUEST_CODE_SELECT_FILE && resultCode == Activity.RESULT_OK -> {
                 Timber.d("requestCode == REQUEST_CODE_SELECT_FILE")
                 if (intent == null) {
@@ -7418,6 +7674,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 nodeAttacher.handleSelectFileResult(intent, this)
             }
+
             requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == Activity.RESULT_OK -> {
                 Timber.d("onActivityResult REQUEST_CODE_SELECT_CONTACT OK")
                 if (intent == null) {
@@ -7489,6 +7746,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     permissionsDialog?.show()
                 }
             }
+
             requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == Activity.RESULT_OK -> {
                 if (intent == null) {
                     Timber.d("Intent NULL")
@@ -7532,6 +7790,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
             }
+
             requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == Activity.RESULT_OK -> {
                 Timber.d("REQUEST_CODE_SELECT_COPY_FOLDER")
                 if (intent == null) {
@@ -7569,6 +7828,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
             }
+
             requestCode == Constants.REQUEST_CODE_REFRESH_API_SERVER && resultCode == Activity.RESULT_OK -> {
                 Timber.d("Refresh DONE")
                 if (intent == null) {
@@ -7583,6 +7843,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     refreshIncomingShares()
                 }
             }
+
             requestCode == Constants.TAKE_PHOTO_CODE -> {
                 Timber.d("TAKE_PHOTO_CODE")
                 if (resultCode == Activity.RESULT_OK) {
@@ -7625,6 +7886,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.w("TAKE_PHOTO_CODE--->ERROR!")
                 }
             }
+
             requestCode == Constants.REQUEST_CREATE_CHAT && resultCode == Activity.RESULT_OK -> {
                 Timber.d("REQUEST_CREATE_CHAT OK")
                 if (intent == null) {
@@ -7687,6 +7949,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             requestCode == Constants.REQUEST_INVITE_CONTACT_FROM_DEVICE && resultCode == Activity.RESULT_OK -> {
                 Timber.d("REQUEST_INVITE_CONTACT_FROM_DEVICE OK")
                 if (intent == null) {
@@ -7699,6 +7962,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     contactController.inviteMultipleContacts(contactsData)
                 }
             }
+
             requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK -> {
                 val parentPath = intent?.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (parentPath != null) {
@@ -7708,6 +7972,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     ac.exportMK(path)
                 }
             }
+
             requestCode == Constants.REQUEST_CODE_FILE_INFO && resultCode == Activity.RESULT_OK -> {
                 if (isCloudAdded) {
                     val handle = intent?.getLongExtra(FileInfoActivity.NODE_HANDLE, -1) ?: -1
@@ -7715,6 +7980,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 onNodesSharedUpdate()
             }
+
             requestCode == Constants.REQUEST_WRITE_STORAGE || requestCode == Constants.REQUEST_READ_WRITE_STORAGE -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     when (requestCode) {
@@ -7737,11 +8003,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             // General download scenario
                             nodeSaver.handleRequestPermissionsResult(requestCode)
                         }
+
                         Constants.REQUEST_READ_WRITE_STORAGE ->                         // Upload scenario
                             Handler(Looper.getMainLooper()).post { showUploadPanel() }
                     }
                 }
             }
+
             requestCode == Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY && resultCode == Activity.RESULT_OK -> {
                 if (!viewModel.isConnected) {
                     Util.showErrorAlertDialog(
@@ -7769,6 +8037,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             else -> {
                 Timber.w("No request code processed")
                 super.onActivityResult(requestCode, resultCode, intent)
@@ -8028,6 +8297,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 storageState = newStorageState
                 viewModel.startCameraUpload()
             }
+
             StorageState.Orange -> {
                 Timber.w("STORAGE STATE ORANGE")
                 uploadServiceIntent.action = Constants.ACTION_STORAGE_STATE_CHANGED
@@ -8047,6 +8317,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("Try to start CU, false.")
                 viewModel.startCameraUpload()
             }
+
             StorageState.Red -> {
                 Timber.w("STORAGE STATE RED")
                 if (onCreate && isStorageStatusDialogShown) {
@@ -8056,6 +8327,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     showStorageFullDialog()
                 }
             }
+
             StorageState.PayWall -> Timber.w("STORAGE STATE PAYWALL")
             else -> return
         }
@@ -8175,6 +8447,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("STORAGE STATE GREEN")
                 return
             }
+
             StorageState.Orange -> {
                 image.setImageResource(R.drawable.ic_storage_almost_full)
                 text.text = String.format(
@@ -8183,6 +8456,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     transferString
                 )
             }
+
             StorageState.Red -> {
                 image.setImageResource(R.drawable.ic_storage_full)
                 text.text = String.format(
@@ -8191,6 +8465,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     transferString
                 )
             }
+
             else -> {
                 Timber.w("STORAGE STATE INVALID VALUE: %d", storageState.ordinal)
                 return
@@ -8246,9 +8521,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         StorageState.Orange -> {
                             text.text = getString(R.string.text_almost_full_warning_pro3_account)
                         }
+
                         StorageState.Red -> {
                             text.text = getString(R.string.text_storage_full_warning_pro3_account)
                         }
+
                         else -> {}
                     }
                 }
@@ -8257,6 +8534,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 verticalActionButton.text = getString(R.string.button_custom_almost_full_warning)
                 verticalActionButton.setOnClickListener(customPlanClickListener)
             }
+
             MegaAccountDetails.ACCOUNT_TYPE_LITE, MegaAccountDetails.ACCOUNT_TYPE_PROI, MegaAccountDetails.ACCOUNT_TYPE_PROII -> {
                 Timber.d("Show storage status dialog for USER PRO")
                 if (!overQuotaAlert) {
@@ -8268,6 +8546,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 transferString
                             )
                         }
+
                         StorageState.Red -> {
                             text.text = String.format(
                                 getString(R.string.text_storage_full_warning_pro_account),
@@ -8275,6 +8554,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 transferString
                             )
                         }
+
                         else -> {}
                     }
                 }
@@ -8283,6 +8563,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 verticalActionButton.text = getString(R.string.my_account_upgrade_pro)
                 verticalActionButton.setOnClickListener(upgradeClickListener)
             }
+
             MegaAccountDetails.ACCOUNT_TYPE_FREE -> {
                 Timber.d("Show storage status dialog for FREE USER")
                 horizontalActionButton.text = getString(R.string.button_plans_almost_full_warning)
@@ -8290,6 +8571,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 verticalActionButton.text = getString(R.string.button_plans_almost_full_warning)
                 verticalActionButton.setOnClickListener(upgradeClickListener)
             }
+
             else -> {
                 Timber.d("Show storage status dialog for FREE USER")
                 horizontalActionButton.text = getString(R.string.button_plans_almost_full_warning)
@@ -8584,9 +8866,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 MegaChatError.ERROR_OK -> {
                     Timber.d("Status changed to: %s", request.number)
                 }
+
                 MegaChatError.ERROR_ARGS -> {
                     Timber.w("Status not changed, the chosen one is the same")
                 }
+
                 else -> {
                     Timber.e("ERROR WHEN TYPE_SET_ONLINE_STATUS %s", e.errorString)
                     showSnackbar(
@@ -8698,6 +8982,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_GET_ACHIEVEMENTS -> {
                 if (e.errorCode == MegaError.API_OK) {
                     myAccountInfo.bonusStorageSMS = Util.getSizeString(
@@ -8709,6 +8994,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showAddPhoneNumberInMenu()
                 checkBeforeShowSMSVerificationDialog()
             }
+
             MegaRequest.TYPE_SET_ATTR_USER -> {
                 if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
                     Timber.d("MK exported - USER_ATTR_PWD_REMINDER finished")
@@ -8717,6 +9003,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             MegaRequest.TYPE_GET_ATTR_USER -> {
                 if (request.paramType == MegaApiJava.USER_ATTR_GEOLOCATION) {
                     if (e.errorCode == MegaError.API_OK) {
@@ -8728,6 +9015,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             MegaRequest.TYPE_GET_CANCEL_LINK -> {
                 Timber.d("TYPE_GET_CANCEL_LINK")
                 Util.hideKeyboard(this, 0)
@@ -8751,6 +9039,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_REMOVE_CONTACT -> {
                 when (e.errorCode) {
                     MegaError.API_OK -> {
@@ -8760,6 +9049,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             -1
                         )
                     }
+
                     MegaError.API_EMASTERONLY -> {
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
@@ -8767,6 +9057,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             -1
                         )
                     }
+
                     else -> {
                         Timber.e("Error deleting contact")
                         showSnackbar(
@@ -8777,6 +9068,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             MegaRequest.TYPE_INVITE_CONTACT -> {
                 Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.number)
                 dismissAlertDialogIfExists(statusDialog)
@@ -8847,6 +9139,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             MegaRequest.TYPE_PAUSE_TRANSFERS -> {
                 Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS")
                 //force update the pause notification to prevent missed onTransferUpdate
@@ -8872,6 +9165,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+
             MegaRequest.TYPE_PAUSE_TRANSFER -> {
                 Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
                 if (e.errorCode == MegaError.API_OK) {
@@ -8888,6 +9182,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_CANCEL_TRANSFER -> {
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidget()
@@ -8900,6 +9195,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_CANCEL_TRANSFERS -> {
                 Timber.d("MegaRequest.TYPE_CANCEL_TRANSFERS")
                 //After cancelling all the transfers
@@ -8918,6 +9214,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_CREATE_FOLDER -> {
                 dismissAlertDialogIfExists(statusDialog)
                 if (e.errorCode == MegaError.API_OK) {
@@ -8938,12 +9235,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
                                 incomingSharesFragment?.navigateToFolder(folderNode)
                             }
+
                             SharesTab.OUTGOING_TAB -> if (isOutgoingAdded) {
                                 outgoingSharesFragment?.navigateToFolder(folderNode)
                             }
+
                             SharesTab.LINKS_TAB -> if (isLinksAdded) {
                                 linksFragment?.navigateToFolder(folderNode)
                             }
+
                             else -> {}
                         }
                     }
@@ -8956,6 +9256,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("PURCHASE CORRECT!")
@@ -8965,6 +9266,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.e("PURCHASE WRONG: %s (%d)", e.errorString, e.errorCode)
                 }
             }
+
             MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("FCM OK TOKEN MegaRequest.TYPE_REGISTER_PUSH_NOTIFICATION")
@@ -8976,6 +9278,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             }
+
             MegaRequest.TYPE_FOLDER_INFO -> {
                 if (e.errorCode == MegaError.API_OK) {
                     val info: MegaFolderInfo = request.megaFolderInfo
@@ -8989,6 +9292,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.e("ERROR requesting version info of the account")
                 }
             }
+
             MegaRequest.TYPE_REMOVE -> {
                 if (versionsToRemove > 0) {
                     Timber.d("Remove request finished")
@@ -9031,9 +9335,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         MegaError.API_OK -> {
                             finish()
                         }
+
                         MegaError.API_EMASTERONLY -> {
                             showSnackbar(Constants.SNACKBAR_TYPE, e.errorString, -1)
                         }
+
                         else -> {
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
@@ -9077,6 +9383,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 fileBrowserViewModel.setBrowserParentHandle(nodeHandle)
                 selectDrawerItem(drawerItem)
             }
+
             megaApi.rubbishNode.handle -> {
                 //Rubbish
                 drawerItem = DrawerItem.RUBBISH_BIN
@@ -9086,6 +9393,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 rubbishBinViewModel.setRubbishBinHandle(nodeHandle)
                 selectDrawerItem(drawerItem)
             }
+
             megaApi.inboxNode.handle -> {
                 //Inbox
                 drawerItem = DrawerItem.INBOX
@@ -9094,6 +9402,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 inboxViewModel.updateInboxHandle(nodeHandle)
                 selectDrawerItem(drawerItem)
             }
+
             else -> {
                 //Incoming Shares
                 drawerItem = DrawerItem.SHARED_ITEMS
@@ -9363,6 +9672,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.CLOUD_DRIVE -> if (!isInMDMode) {
                 updateFabAndShow()
             }
+
             DrawerItem.SHARED_ITEMS -> when (tabItemShares) {
                 SharesTab.INCOMING_TAB -> {
                     if (!isIncomingAdded) return
@@ -9377,6 +9687,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         MegaShare.ACCESS_READ -> hideFabButton()
                     }
                 }
+
                 SharesTab.OUTGOING_TAB -> {
                     if (!isOutgoingAdded) return
 
@@ -9395,6 +9706,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
                 }
+
                 SharesTab.LINKS_TAB -> {
                     if (!isLinksAdded) return
 
@@ -9413,8 +9725,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
                     }
                 }
+
                 else -> hideFabButton()
             }
+
             DrawerItem.CHAT -> updateFabAndShow()
             else -> hideFabButton()
         }
@@ -9727,10 +10041,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 fileBrowserViewModel.setBrowserParentHandle(node.handle)
                 refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             }
+
             DrawerItem.CLOUD_DRIVE -> {
                 fileBrowserViewModel.setBrowserParentHandle(node.handle)
                 refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
             }
+
             DrawerItem.SHARED_ITEMS -> {
                 if (tabItemShares === SharesTab.INCOMING_TAB) {
                     incomingSharesViewModel.increaseIncomingTreeDepth(node.handle)
@@ -9741,10 +10057,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 refreshSharesPageAdapter()
             }
+
             DrawerItem.INBOX -> {
                 inboxViewModel.updateInboxHandle(node.handle)
                 refreshFragment(FragmentTag.INBOX.tag)
             }
+
             else -> {}
         }
     }
@@ -10126,6 +10444,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 refreshIncomingShares()
                 refreshLinks()
             }
+
             DrawerItem.HOMEPAGE -> refreshOfflineNodes()
             else -> {}
         }
@@ -10471,6 +10790,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 updateAccountDetailsVisibleInfo()
                 return
             }
+
             Action.UPDATE_ACCOUNT_DETAILS -> {
                 Timber.d("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS")
                 if (isFinishing) {
