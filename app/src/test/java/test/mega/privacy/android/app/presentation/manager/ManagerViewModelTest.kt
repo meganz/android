@@ -47,7 +47,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -91,7 +91,7 @@ class ManagerViewModelTest {
     private val monitorContactRequestUpdates = MutableStateFlow(emptyList<ContactRequest>())
 
     private val initialIsFirsLoginValue = true
-    private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
+    private val sendStatisticsMediaDiscoveryUseCase = mock<SendStatisticsMediaDiscoveryUseCase>()
     private val savedStateHandle = SavedStateHandle(
         mapOf(
             ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
@@ -211,7 +211,7 @@ class ManagerViewModelTest {
             monitorContactRequestUpdates = { monitorContactRequestUpdates },
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
-            sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
+            sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
             savedStateHandle = savedStateHandle,
             getInboxNode = getInboxNode,
             monitorStorageStateEventUseCase = monitorStorageState,

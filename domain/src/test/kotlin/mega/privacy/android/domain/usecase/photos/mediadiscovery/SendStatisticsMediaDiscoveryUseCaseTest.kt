@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos.mediadiscovery
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -10,8 +10,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultSendStatisticsMediaDiscoveryTest {
-    private lateinit var underTest: SendStatisticsMediaDiscovery
+class SendStatisticsMediaDiscoveryUseCaseTest {
+    private lateinit var underTest: SendStatisticsMediaDiscoveryUseCase
 
     private val defaultMediaHandle = 1234L
 
@@ -30,7 +30,7 @@ class DefaultSendStatisticsMediaDiscoveryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultSendStatisticsMediaDiscovery(
+        underTest = SendStatisticsMediaDiscoveryUseCase(
             statisticsRepository = statisticsRepository,
         )
     }
@@ -39,7 +39,10 @@ class DefaultSendStatisticsMediaDiscoveryTest {
     fun `test that the basic click statistic event is fired`() = runTest {
         underTest(defaultMediaHandle)
 
-        verify(statisticsRepository).sendEvent(mediaDiscoveryClickedEventId, "Media Discovery Click")
+        verify(statisticsRepository).sendEvent(
+            mediaDiscoveryClickedEventId,
+            "Media Discovery Click"
+        )
     }
 
     @Test

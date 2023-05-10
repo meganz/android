@@ -55,7 +55,6 @@ import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -70,6 +69,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -90,7 +90,7 @@ import javax.inject.Inject
  * @property getInboxNode
  * @property getNumUnreadUserAlerts
  * @property hasInboxChildren
- * @property sendStatisticsMediaDiscovery
+ * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
  * @property monitorViewType
@@ -127,7 +127,7 @@ class ManagerViewModel @Inject constructor(
     private val getInboxNode: GetInboxNode,
     private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
     private val hasInboxChildren: HasInboxChildren,
-    private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
+    private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorViewType: MonitorViewType,
@@ -422,7 +422,7 @@ class ManagerViewModel @Inject constructor(
      */
     fun onMediaDiscoveryOpened(mediaHandle: Long) {
         viewModelScope.launch {
-            sendStatisticsMediaDiscovery(mediaHandle)
+            sendStatisticsMediaDiscoveryUseCase(mediaHandle)
         }
     }
 

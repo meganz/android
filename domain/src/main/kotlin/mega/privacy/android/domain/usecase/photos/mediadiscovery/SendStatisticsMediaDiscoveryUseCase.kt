@@ -1,21 +1,24 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos.mediadiscovery
 
 import mega.privacy.android.domain.repository.StatisticsRepository
 import javax.inject.Inject
 
 /**
- * Default implementation of Media Discovery statistics
+ * Send Statistics event for Media Discovery
  */
-class DefaultSendStatisticsMediaDiscovery @Inject constructor(
+class SendStatisticsMediaDiscoveryUseCase @Inject constructor(
     private val statisticsRepository: StatisticsRepository,
-) : SendStatisticsMediaDiscovery {
+) {
 
     private val mediaDiscoveryClickedEventId = 99200
     private val multiClickEventId = 99201
     private val sameFolderMultiClickEventId = 99202
 
-
-    override suspend fun invoke(mediaHandle: Long) {
+    /**
+     * Invoke the use case
+     *
+     **/
+    suspend operator fun invoke(mediaHandle: Long) {
         var clickCount = statisticsRepository.getMediaDiscoveryClickCount()
         var clickCountFolder = statisticsRepository.getMediaDiscoveryClickCountFolder(mediaHandle)
 
@@ -39,5 +42,4 @@ class DefaultSendStatisticsMediaDiscovery @Inject constructor(
             )
         }
     }
-
 }
