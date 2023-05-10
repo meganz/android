@@ -3477,7 +3477,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun observePsa() {
         LiveEventBus.get(Constants.EVENT_PSA, Psa::class.java)
             .observe(this) { psa: Psa ->
-                if (psa.url == null) {
+                if (psa.url.isNullOrEmpty()) {
                     showPsa(psa)
                 }
             }
