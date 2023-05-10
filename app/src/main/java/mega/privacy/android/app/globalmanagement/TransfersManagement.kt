@@ -14,22 +14,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
 import com.jeremyliao.liveeventbus.LiveEventBus
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.DownloadService
-import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
-import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.main.megachat.ChatUploadService
@@ -96,35 +86,6 @@ class TransfersManagement @Inject constructor(
             }
 
             return false
-        }
-
-        /**
-         * Adds the completed transfer to the DB and
-         * sends a broadcast to update the completed transfers tab.
-         *
-         * @param completedTransfer AndroidCompletedTransfer to add.
-         * @param dbH               DatabaseHandle to add the transfer.
-         */
-        @JvmStatic
-        fun addCompletedTransfer(
-            completedTransfer: AndroidCompletedTransfer,
-            dbH: LegacyDatabaseHandler,
-        ) {
-            Completable.create { emitter ->
-                completedTransfer.id = dbH.setCompletedTransfer(completedTransfer)
-                emitter.onComplete()
-            }.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        MegaApplication.getInstance().sendBroadcast(
-                            Intent(BROADCAST_ACTION_TRANSFER_FINISH)
-                                .putExtra(COMPLETED_TRANSFER, completedTransfer)
-                        )
-                    },
-                    onError = Timber::e
-                )
-                .addTo(CompositeDisposable())
         }
 
         /**

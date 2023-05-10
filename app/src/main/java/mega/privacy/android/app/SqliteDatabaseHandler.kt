@@ -2094,35 +2094,15 @@ class SqliteDatabaseHandler @Inject constructor(
         )
     }
 
-    @Deprecated("To be replaced by addCompletedTransfer")
-    override fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long {
-        val values = ContentValues().apply {
-            put(KEY_TRANSFER_FILENAME, encrypt(transfer.fileName))
-            put(KEY_TRANSFER_TYPE, encrypt(transfer.type.toString()))
-            put(KEY_TRANSFER_STATE, encrypt(transfer.state.toString()))
-            put(KEY_TRANSFER_SIZE, encrypt(transfer.size))
-            put(KEY_TRANSFER_HANDLE, encrypt(transfer.nodeHandle))
-            put(KEY_TRANSFER_PATH, encrypt(transfer.path))
-            put(KEY_TRANSFER_OFFLINE, encrypt(transfer.isOfflineFile.toString()))
-            put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.timeStamp.toString()))
-            put(KEY_TRANSFER_ERROR, encrypt(transfer.error))
-            put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.originalPath))
-            put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.parentHandle.toString()))
-        }
-
-        val id = db.insert(TABLE_COMPLETED_TRANSFERS, null, values)
-        return id
-    }
-
     /**
      * Checks if a completed transfer exists before add it to DB.
      * If so, does nothing. If not, adds the transfer to the DB.
      *
      * @param transfer The transfer to check and add.
      */
-    override fun setCompletedTransferWithCheck(transfer: AndroidCompletedTransfer) {
+    override fun addCompletedTransferWithCheck(transfer: CompletedTransfer) {
         if (!alreadyExistsAsCompletedTransfer(transfer)) {
-            setCompletedTransfer(transfer)
+            addCompletedTransfer(transfer)
         }
     }
 
@@ -2132,7 +2112,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param transfer The completed transfer to check.
      * @return True if the transfer already exists, false otherwise.
      */
-    private fun alreadyExistsAsCompletedTransfer(transfer: AndroidCompletedTransfer): Boolean {
+    private fun alreadyExistsAsCompletedTransfer(transfer: CompletedTransfer): Boolean {
         val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS " +
                 "WHERE $KEY_TRANSFER_FILENAME = '${encrypt(transfer.fileName)}' " +
                 "AND $KEY_TRANSFER_TYPE = '${encrypt(transfer.type.toString())}' " +

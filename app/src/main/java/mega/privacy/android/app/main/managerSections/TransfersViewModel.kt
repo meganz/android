@@ -325,7 +325,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer the transfer to add
      */
-    fun completedTransferFinished(transfer: AndroidCompletedTransfer) {
+    private fun completedTransferFinished(transfer: AndroidCompletedTransfer) {
         completedTransfers.add(0, transfer)
         if (completedTransfers.size > MAX_TRANSFERS) {
             completedTransfers.removeAt(completedTransfers.size - 1)

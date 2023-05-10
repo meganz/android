@@ -18,6 +18,8 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.objects.SDTransfer;
+import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper;
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
@@ -190,7 +192,9 @@ public class SDCardUtils {
                     Timber.e(e, "Error moving file to the sd card path");
                 }
 
-                dbH.setCompletedTransferWithCheck(new AndroidCompletedTransfer(sdtransfer, app));
+                AndroidCompletedTransfer androidCompletedTransfer = new AndroidCompletedTransfer(sdtransfer, app);
+                CompletedTransfer completedTransfer = new CompletedTransferMapper().invoke(androidCompletedTransfer);
+                dbH.addCompletedTransferWithCheck(completedTransfer);
             }
         }).start();
     }

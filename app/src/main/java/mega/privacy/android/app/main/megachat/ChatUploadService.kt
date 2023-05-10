@@ -30,6 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -39,8 +40,8 @@ import mega.privacy.android.app.VideoDownSampling
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result.OnTransferFinish
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result.OnTransferStart
@@ -66,6 +67,7 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
@@ -120,6 +122,12 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
+
+    @Inject
+    lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
+
+    @Inject
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     private var isForeground = false
     private var canceled = false
@@ -1082,8 +1090,10 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                         transfersCount--
                         totalUploadsCompleted++
                     }
-
-                    addCompletedTransfer(AndroidCompletedTransfer(transfer, error, this), dbH)
+                    val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
+                    runBlocking {
+                        addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                    }
                     mapProgressTransfers!![transfer.tag] = transfer
 
                     if (canceled) {

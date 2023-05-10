@@ -196,6 +196,14 @@ interface DatabaseHandler {
     fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
+     * Checks if a completed transfer exists before add it to DB.
+     * If so, does nothing. If not, adds the transfer to the DB.
+     *
+     * @param transfer The transfer to check and add.
+     */
+    fun addCompletedTransferWithCheck(transfer: CompletedTransfer)
+
+    /**
      * Deletes a completed transfer.
      *
      * @param id the identifier of the transfer to delete

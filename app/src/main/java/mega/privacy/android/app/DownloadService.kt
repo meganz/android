@@ -43,12 +43,12 @@ import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -73,6 +73,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
@@ -144,6 +145,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
+
+    @Inject
+    lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
+
+    @Inject
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -1307,7 +1314,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         if (!TextUtil.isTextEmpty(targetPath)) {
                             completedTransfer.path = targetPath
                         }
-                        addCompletedTransfer(completedTransfer, dbH)
+                        runBlocking {
+                            addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                        }
                     }
                     if (transfer.state == MegaTransfer.STATE_FAILED) {
                         transfersManagement.setAreFailedTransfers(true)

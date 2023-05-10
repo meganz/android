@@ -32,17 +32,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment
+import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
@@ -62,6 +63,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
@@ -119,6 +121,12 @@ class UploadService : Service() {
 
     @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
+
+    @Inject
+    lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
+
+    @Inject
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
     @ApplicationScope
@@ -768,7 +776,9 @@ class UploadService : Service() {
                 transfersManagement.checkScanningTransferOnFinish(transfer)
                 if (!transfer.isFolderTransfer) {
                     val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
-                    addCompletedTransfer(completedTransfer, dbH)
+                    runBlocking {
+                        addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                    }
                     val appData = transfer.appData
                     if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_TXT_FILE)) {
                         val message =

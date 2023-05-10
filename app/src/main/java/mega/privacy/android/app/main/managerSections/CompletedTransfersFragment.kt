@@ -96,15 +96,6 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
     }
 
     /**
-     * Adds new completed transfer.
-     *
-     * @param transfer the transfer to add
-     */
-    fun transferFinish(transfer: AndroidCompletedTransfer) =
-        viewModel.completedTransferFinished(transfer)
-
-
-    /**
      * Checks if there is any completed transfer.
      *
      * @return True if there is any completed transfer, false otherwise.

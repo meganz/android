@@ -124,8 +124,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
-import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -739,24 +737,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
 
-    /**
-     * Broadcast to update the completed transfers tab.
-     */
-    private val transferFinishReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (!isTransfersCompletedAdded) {
-                return
-            }
-            if (intent.action == null || intent.action != BROADCAST_ACTION_TRANSFER_FINISH
-            ) {
-                return
-            }
-            val completedTransfer: AndroidCompletedTransfer =
-                intent.getParcelableExtra(COMPLETED_TRANSFER)
-                    ?: return
-            completedTransfersFragment?.transferFinish(completedTransfer)
-        }
-    }
     private val chatArchivedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val title = intent.getStringExtra(Constants.CHAT_TITLE)
@@ -2232,11 +2212,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         registerCameraUploadAttributeChangedReceiver()
         registerOrderUpdatedReceiver()
         registerChatArchivedReceiver()
-        registerTransferFinishedReceiver()
-    }
-
-    private fun registerTransferFinishedReceiver() {
-        registerReceiver(transferFinishReceiver, IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH))
     }
 
     private fun registerChatArchivedReceiver() {
@@ -3357,7 +3332,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         unregisterReceiver(receiverUpdateOrder)
         unregisterReceiver(chatArchivedReceiver)
         unregisterReceiver(receiverCUAttrChanged)
-        unregisterReceiver(transferFinishReceiver)
         LiveEventBus.get(EVENT_REFRESH, Boolean::class.java)
             .removeObserver(refreshObserver)
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)

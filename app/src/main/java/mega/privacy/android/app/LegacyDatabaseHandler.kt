@@ -54,17 +54,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      */
     fun getCompletedTransfer(id: Long): AndroidCompletedTransfer?
 
-    @Deprecated("To be replaced by DatabaseHandler.addCompletedTransfer")
-    fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long
-
-    /**
-     * Checks if a completed transfer exists before add it to DB.
-     * If so, does nothing. If not, adds the transfer to the DB.
-     *
-     * @param transfer The transfer to check and add.
-     */
-    fun setCompletedTransferWithCheck(transfer: AndroidCompletedTransfer)
-
     /**
      * Gets a list with completed transfers depending on the query received by parameter.
      *
