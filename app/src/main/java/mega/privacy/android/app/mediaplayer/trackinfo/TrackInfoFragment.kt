@@ -61,22 +61,24 @@ class TrackInfoFragment : Fragment() {
             binding.duration.text = it.second
         }
 
-        viewModel.audioNodeInfo.observe(viewLifecycleOwner) {
-            if (it.thumbnail.exists()) {
-                binding.cover.setImageURI(Uri.fromFile(it.thumbnail))
-            }
+        viewModel.audioNodeInfo.observe(viewLifecycleOwner) { audioNodeInfo ->
+            audioNodeInfo?.let {
+                if (it.thumbnail.exists()) {
+                    binding.cover.setImageURI(Uri.fromFile(it.thumbnail))
+                }
 
-            val location = it.location
+                val location = it.location
 
-            binding.availableOfflineSwitch.isEnabled = true
-            binding.availableOfflineSwitch.isChecked = it.availableOffline
-            binding.sizeValue.text = it.size
-            binding.locationValue.text = location.location
-            binding.addedValue.text = it.added
-            binding.lastModifiedValue.text = it.lastModified
+                binding.availableOfflineSwitch.isEnabled = true
+                binding.availableOfflineSwitch.isChecked = it.availableOffline
+                binding.sizeValue.text = it.size
+                binding.locationValue.text = location.location
+                binding.addedValue.text = it.added
+                binding.lastModifiedValue.text = it.lastModified
 
-            binding.locationValue.setOnClickListener {
-                handleLocationClick(requireActivity(), args.adapterType, location)
+                binding.locationValue.setOnClickListener {
+                    handleLocationClick(requireActivity(), args.adapterType, location)
+                }
             }
         }
         viewModel.offlineRemoveSnackBarShow.observe(viewLifecycleOwner) {

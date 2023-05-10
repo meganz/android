@@ -53,8 +53,8 @@ class TrackInfoViewModel @Inject constructor(
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
 
-    private val _nodeInfo = MutableLiveData<AudioNodeInfo>()
-    val audioNodeInfo: LiveData<AudioNodeInfo> = _nodeInfo
+    private val _nodeInfo = MutableLiveData<AudioNodeInfo?>()
+    val audioNodeInfo: LiveData<AudioNodeInfo?> = _nodeInfo
 
     private var trackInfoArgs: TrackInfoFragmentArgs? = null
     private var metadataOnlyPlayer: Player? = null
