@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -65,6 +66,7 @@ class AlbumsViewModel @Inject constructor(
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+    private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -232,6 +234,20 @@ class AlbumsViewModel @Inject constructor(
         loadUserAlbums()
     }
 
+    /**
+     * Remove Album Links
+     */
+    fun removeAlbumsLinks() = viewModelScope.launch {
+        val removedLinksCount = disableExportAlbumsUseCase(_state.value.selectedAlbumIds.toList())
+        _state.update {
+            it.copy(
+                removedLinksCount = removedLinksCount,
+                showRemoveAlbumLinkDialog = false,
+                selectedAlbumIds = setOf()
+            )
+        }
+    }
+
     private fun removeAlbumIds(albumIds: List<AlbumId>) = viewModelScope.launch {
         try {
             removeAlbumsUseCase(albumIds)
@@ -261,6 +277,33 @@ class AlbumsViewModel @Inject constructor(
     fun closeDeleteAlbumsConfirmation() {
         _state.update {
             it.copy(showDeleteAlbumsConfirmation = false)
+        }
+    }
+
+    /**
+     * Show the Remove Link confirmation dialog
+     */
+    fun showRemoveLinkDialog() {
+        _state.update {
+            it.copy(showRemoveAlbumLinkDialog = true)
+        }
+    }
+
+    /**
+     * Close the Remove Link confirmation dialog
+     */
+    fun hideRemoveLinkDialog() {
+        _state.update {
+            it.copy(showRemoveAlbumLinkDialog = false)
+        }
+    }
+
+    /**
+     * Reset the Removed Links Count state value
+     */
+    fun resetRemovedLinksCount() {
+        _state.update {
+            it.copy(removedLinksCount = 0)
         }
     }
 

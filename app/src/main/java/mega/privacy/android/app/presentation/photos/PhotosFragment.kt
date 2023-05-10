@@ -84,6 +84,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getNotification
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -642,6 +643,20 @@ class PhotosFragment : Fragment() {
         )
         startActivity(intent)
         activity?.overridePendingTransition(0, 0)
+    }
+
+    /**
+     * Check if all of the selected albums are exported
+     */
+    fun isAllSelectedAlbumExported(): Boolean {
+        val selectedAlbumIds = albumsViewModel.state.value.selectedAlbumIds
+        val allAlbums = albumsViewModel.state.value.albums
+
+        val allExportedSelectedAlbums = allAlbums.filter {
+            it.id is Album.UserAlbum && it.id.id in selectedAlbumIds && it.id.isExported
+        }
+
+        return allExportedSelectedAlbums.size == selectedAlbumIds.size
     }
 
     /**

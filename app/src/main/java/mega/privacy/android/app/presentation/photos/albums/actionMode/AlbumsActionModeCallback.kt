@@ -29,6 +29,11 @@ class AlbumsActionModeCallback(
                 R.plurals.get_links, fragment.albumsViewModel.state.value.selectedAlbumIds.size
             )
         }
+
+        menu?.findItem(R.id.action_menu_remove_link)?.let {
+            it.isVisible = isAlbumSharingEnabled && fragment.isAllSelectedAlbumExported()
+            it.isEnabled = isAlbumSharingEnabled && fragment.isAllSelectedAlbumExported()
+        }
         updateSelectAllMenu(menu, fragment.albumsViewModel.state.value)
         return true
     }
@@ -46,6 +51,9 @@ class AlbumsActionModeCallback(
             }
             R.id.action_delete -> {
                 fragment.albumsViewModel.showDeleteAlbumsConfirmation()
+            }
+            R.id.action_menu_remove_link -> {
+                fragment.albumsViewModel.showRemoveLinkDialog()
             }
             R.id.action_context_select_all -> {
                 fragment.albumsViewModel.selectAllAlbums()

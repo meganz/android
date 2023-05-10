@@ -155,6 +155,9 @@ fun PhotosScreen(
                     albumsViewModel.updateAlbumDeletedMessage(message)
                 },
                 lazyGridState = albumsLazyGridState,
+                onRemoveLinkDialogConfirmClick = albumsViewModel::removeAlbumsLinks,
+                onRemoveLinkDialogCancelClick = albumsViewModel::hideRemoveLinkDialog,
+                resetRemovedLinksCount = albumsViewModel::resetRemovedLinksCount,
                 isUserAlbumsEnabled = { getFeatureFlagUseCase(AppFeatures.UserAlbums) }
             ) {
                 getFeatureFlagUseCase(AppFeatures.AlbumSharing)

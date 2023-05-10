@@ -16,14 +16,23 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_context_select_all"
+        android:id="@+id/action_menu_remove_link"
         android:orderInCategory="2"
+        android:title="@string/context_remove_link_menu"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_context_select_all"
+        android:orderInCategory="3"
         android:title="@string/action_select_all"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_context_clear_selection"
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         android:title="@string/action_unselect_all"
         app:showAsAction="never" />
+
+
 </menu>

@@ -12,6 +12,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -104,6 +105,9 @@ fun AlbumsView(
     closeDeleteAlbumsConfirmation: () -> Unit = {},
     deleteAlbums: (albumIds: List<AlbumId>) -> Unit = {},
     lazyGridState: LazyGridState = LazyGridState(),
+    onRemoveLinkDialogConfirmClick: () -> Unit = {},
+    onRemoveLinkDialogCancelClick: () -> Unit = {},
+    resetRemovedLinksCount: () -> Unit = {},
     isUserAlbumsEnabled: suspend () -> Boolean,
     isAlbumSharingEnabled: suspend () -> Boolean = { false },
 ) {
@@ -131,12 +135,35 @@ fun AlbumsView(
         }
     }
 
+    if (albumsViewState.removedLinksCount > 0) {
+        val snackbarMessage = pluralStringResource(
+            id = R.plurals.context_link_removal_success,
+            count = albumsViewState.removedLinksCount,
+        )
+        LaunchedEffect(Unit) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = snackbarMessage,
+            )
+            delay(3000L)
+            resetRemovedLinksCount()
+        }
+    }
+
     if (albumsViewState.showDeleteAlbumsConfirmation) {
         DeleteAlbumsConfirmationDialog(
             selectedAlbumIds = albumsViewState.selectedAlbumIds.toList(),
             onCancelClicked = closeDeleteAlbumsConfirmation,
             onDeleteClicked = deleteAlbums,
         )
+    }
+
+    if (albumsViewState.showRemoveAlbumLinkDialog) {
+        RemoveLinksConfirmationDialog(
+            numLinks = albumsViewState.selectedAlbumIds.size,
+            onCancel = onRemoveLinkDialogCancelClick,
+        ) {
+            onRemoveLinkDialogConfirmClick()
+        }
     }
 
     Scaffold(
@@ -313,6 +340,13 @@ fun AlbumsView(
                         }
 
                         if (displayLinkIcon && isAlbumExported(album)) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_overlay),
+                                contentScale = ContentScale.FillBounds,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .matchParentSize()
+                            )
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_link_white),
                                 contentDescription = "${(album.title as AlbumTitle.StringTitle).title} Exported",

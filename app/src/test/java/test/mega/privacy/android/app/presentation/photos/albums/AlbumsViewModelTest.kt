@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -66,6 +67,7 @@ class AlbumsViewModelTest {
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
     private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
+    private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase = mock()
     private val proscribedStrings =
         listOf("My albums", "Shared albums", "Favourites", "RAW", "GIFs")
 
@@ -88,6 +90,7 @@ class AlbumsViewModelTest {
             removeAlbumsUseCase = removeAlbumsUseCase,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             updateAlbumNameUseCase = updateAlbumNameUseCase,
+            disableExportAlbumsUseCase = disableExportAlbumsUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             getNextDefaultAlbumNameUseCase = GetNextDefaultAlbumNameUseCase(),
         )

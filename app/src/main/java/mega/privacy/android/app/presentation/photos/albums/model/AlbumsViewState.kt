@@ -25,6 +25,8 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property deletedAlbumIds
  * @property albumDeletedMessage
  * @property showDeleteAlbumsConfirmation
+ * @property showRemoveAlbumLinkDialog
+ * @property removedLinksCount
  * @property selectedAlbumIds
  * @property showAlbums
  * @property showRenameDialog
@@ -48,6 +50,8 @@ data class AlbumsViewState(
     val deletedAlbumIds: Set<AlbumId> = setOf(),
     val albumDeletedMessage: String = "",
     val showDeleteAlbumsConfirmation: Boolean = false,
+    val showRemoveAlbumLinkDialog: Boolean = false,
+    val removedLinksCount: Int = 0,
     val selectedAlbumIds: Set<AlbumId> = setOf(),
     val showAlbums: Boolean = false,
     val showRenameDialog: Boolean = false,
