@@ -413,11 +413,6 @@
     <string name="context_no_destination_folder">Please choose a destination folder</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Moved</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">Moved %d item</item>
-        <item quantity="other">Moved %d items</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
@@ -426,8 +421,6 @@
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Shared</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Error. %d shares were not completed</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Error. Share failed to remove</string>
     <!-- success message when removing a node from MEGA -->
@@ -440,8 +433,6 @@
     <string name="number_no_removed">%d items weren’t removed</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d folders left</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Share left</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d folders weren’t left</string>
     <!-- success message when sending multiple files -->
@@ -3877,10 +3868,6 @@
     <string name="calls_call_screen_waiting_for_participants">Waiting for others to join</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Start a meeting</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Start chatting now</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4129,8 +4116,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency">[A]%s updated[/A][B] the recurring meeting frequency[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->

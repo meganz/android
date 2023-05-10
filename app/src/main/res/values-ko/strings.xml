@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">대상 폴더를 선택하세요</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">옮겨짐</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">%d개 항목 이동함</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">항목 %d개가 옮겨지지 않았습니다</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">공유됨</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">오류. %d개의 공유가 완료되지 않았습니다</string>
     <!-- error message -->
     <string name="context_no_removed_shared">오류. 공유가 제거되지 않았습니다</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">항목 %d개가 제거되지 않음</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">폴더 %d개 남음</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">공유 떠남</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">폴더 %d개를 떠날 수 없습니다</string>
     <!-- success message when sending multiple files -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">다른 사람들이 참여하기를 기다리는 중</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]발견된[/B] [A]즐겨찾기[/A] [B]없음[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">회의 시작</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">전세계의 친구 및 동료들과 안전하고 비밀스럽게 음성 또는 영상 통화를 하세요.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">지금 대화 시작</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s 님이 되풀이 항목을 수정[/A][B]하였습니다[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s 님이 반복 회의 시간을 수정[/A][B]하였습니다[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency">[A]%s updated[/A][B] the recurring meeting frequency[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s[/A] 님이 [B]반복 회의를 취소하였습니다[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">%1$d개의 항목을 영구적으로 삭제하지 못 했습니다</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

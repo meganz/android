@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">กรุณาเลือกโฟลเดอร์ปลายทาง</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">ย้ายแล้ว</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">ย้ายแล้ว %d รายการ</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">มี %d รายการที่ไม่ได้ถูกย้าย</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">ผิดพลาด ยังไม่ได้ย้าย</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">แชร์เรียบร้อยแล้ว</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">ผิดพลาด แชร์ %d ไม่สำเร็จ</string>
     <!-- error message -->
     <string name="context_no_removed_shared">ผิดพลาด ลบการแชร์ไม่สำเร็จ</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">มี %d รายการที่ไม่ได้ถูกย้าย</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">ออกจากการแชร์แล้ว %d โฟลเดอร์</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">แชร์ที่เหลือ</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">ยังไม่ได้ออกจากแชร์ %d โฟลเดอร์</string>
     <!-- success message when sending multiple files -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">กำลังรอให้คนอื่นเข้าร่วม</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]ไม่[/B][B]พบ[/B][A]รายการโปรด[/A]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">เริ่มการประชุม</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">โทรด้วยเสียงหรือวิดีโอที่ปลอดภัยและเป็นส่วนตัวกับเพื่อนและเพื่อนร่วมงานทั่วโลก</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">เริ่มแชทได้เลย</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s อัปเดต[/A][B] เหตุการณ์ใหม่แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s อัปเดต[/A][B]เวลาการประชุมที่เป็นกิจวัตรใหม่แล้ว:[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s ยกเลิก[/A][B]การประชุมและเหตุการณ์อื่น ๆ ทั้งหมดแล้ว[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">และมีอีก %1$d รายการที่ไม่สามารถลบออกอย่างถาวรได้</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

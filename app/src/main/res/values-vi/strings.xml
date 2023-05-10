@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">Xin chọn thư mục đích</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Đã di&#160;chuyển</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">Đã di chuyển %d mục</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">Đã không di&#160;chuyển được %d mục</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Mục Chia Sẻ</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Phát sinh lỗi. %d mục chia sẻ chưa được hoàn tất</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Lỗi. Loại bỏ mục chia&#160;sẻ thất&#160;bại</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">Đã không loại&#160;bỏ được %d mục</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Đã rời&#160;khỏi %d thư&#160;mục</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Đã rời khỏi chia sẻ</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Đã không rời&#160;khỏi được %d thư&#160;mục</string>
     <!-- success message when sending multiple files -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">Đang chờ người khác tham gia</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Không có[/B] [A]mục ưa thích[/A] [B]nào[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Bắt&#160;đầu một cuộc&#160;họp</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Nói chuyện an toàn và riêng tư vớI gọi thoại hay gọi video với bạn bè và đồng nghiệp trên toàn cầu.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Bắt đầu trò chuyện ngay</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s đã cập&#160;nhật[/A][B] một thời&#160;điểm tái&#160;diễn của cuộc&#160;họp thành:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s đã cập&#160;nhật[/A][B] thời&#160;gian của cuộc&#160;họp định&#160;kỳ[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s đã hủy[/A][B] cuộc&#160;họp và các tái&#160;diễn trong tương&#160;lai[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4534,7 +4520,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Nhập ít hơn 30&#160;ký&#160;tự</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Nhập ít hơn 3 000&#160;ký&#160;tự</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Cuộc họp được lên lịch</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">không&#160;thể xóa vĩnh&#160;viễn %1$d&#160;mục</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Nhập thời&#160;gian</string>
 </resources>
