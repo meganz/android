@@ -58,6 +58,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
@@ -137,6 +138,7 @@ internal fun FolderLinkView(
     onResetMoreOptionNode: () -> Unit,
     onResetOpenMoreOption: () -> Unit,
     emptyViewString: String,
+    thumbnailViewModel: ThumbnailViewModel
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -255,7 +257,8 @@ internal fun FolderLinkView(
                     onChangeViewTypeClick = onChangeViewTypeClick,
                     showSortOrder = false,
                     listState = listState,
-                    gridState = gridState
+                    gridState = gridState,
+                    thumbnailViewModel = thumbnailViewModel
                 )
                 ImportDownloadView(
                     Modifier

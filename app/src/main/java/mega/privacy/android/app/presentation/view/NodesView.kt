@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -9,15 +11,23 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.domain.entity.node.FolderNode
+import java.io.File
 
 /**
  * Test tag for info text
@@ -82,6 +92,7 @@ internal fun getPainter(nodeUIItem: FolderNode): Painter {
  * @param onItemClicked
  * @param onLongClick
  * @param spanCount
+ * @param thumbnailViewModel
  */
 @Composable
 private fun NodeGridView(
@@ -96,6 +107,7 @@ private fun NodeGridView(
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
     gridState: LazyGridState,
+    thumbnailViewModel: ThumbnailViewModel?
 ) {
     LazyVerticalGrid(
         state = gridState,
@@ -127,12 +139,18 @@ private fun NodeGridView(
                     nodeUIItems[it].node.id.longValue
                 }
             }) {
+            val imageState = produceState<File?>(initialValue = null) {
+                thumbnailViewModel?.getThumbnail(handle = nodeUIItems[it].node.id.longValue) { file ->
+                    value = file
+                }
+            }
             NodeGridViewItem(
                 modifier = modifier,
                 nodeUIItem = nodeUIItems[it],
                 onMenuClick = onMenuClick,
                 onItemClicked = onItemClicked,
                 onLongClick = onLongClick,
+                imageState = imageState
             )
         }
     }
@@ -149,6 +167,7 @@ private fun NodeGridView(
  * @param sortOrder
  * @param onSortOrderClick
  * @param onChangeViewTypeClick
+ * @param thumbnailViewModel
  */
 @Composable
 private fun NodeListView(
@@ -163,6 +182,7 @@ private fun NodeListView(
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
     listState: LazyListState,
+    thumbnailViewModel: ThumbnailViewModel?
 ) {
     LazyColumn(state = listState, modifier = modifier) {
         item(
@@ -181,13 +201,19 @@ private fun NodeListView(
             key = {
                 nodeUIItemList[it].node.id.longValue
             }) {
+            val imageState = produceState<File?>(initialValue = null) {
+                thumbnailViewModel?.getThumbnail(handle = nodeUIItemList[it].node.id.longValue) { file ->
+                    value = file
+                }
+            }
             NodeListViewItem(
                 modifier = modifier,
                 nodeUIItem = nodeUIItemList[it],
                 stringUtilWrapper = stringUtilWrapper,
                 onMenuClick = onMenuClick,
                 onItemClicked = onItemClicked,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
+                imageState = imageState
             )
         }
     }
@@ -224,6 +250,7 @@ fun NodesView(
     showSortOrder: Boolean = true,
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
+    thumbnailViewModel: ThumbnailViewModel?
 ) {
     if (isListView) {
         NodeListView(
@@ -237,7 +264,8 @@ fun NodesView(
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
-            listState = listState
+            listState = listState,
+            thumbnailViewModel = thumbnailViewModel
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = spanCount)
@@ -252,7 +280,8 @@ fun NodesView(
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
-            gridState = gridState
+            gridState = gridState,
+            thumbnailViewModel = thumbnailViewModel
         )
     }
 }
@@ -283,3 +312,44 @@ private fun rememberNodeListForGrid(nodeUIItems: List<NodeUIItem>, spanCount: In
         }
         nodeUIItems
     }
+
+/**
+ * Thumbnail View for NodesView
+ * @param modifier [Modifier]
+ * @param imageFile File
+ * @param contentDescription Content Description for image,
+ * @param node [NodeUIItem]
+ * @param contentScale [ContentScale]
+ */
+@Composable
+fun ThumbnailView(
+    modifier: Modifier,
+    contentDescription: String?,
+    imageFile: File?,
+    node: NodeUIItem,
+    contentScale: ContentScale = ContentScale.Fit,
+) {
+    imageFile?.let {
+        Image(
+            modifier = modifier
+                .aspectRatio(1f),
+            painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(it)
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
+                error = painterResource(id = R.drawable.ic_image_thumbnail),
+            ),
+            contentDescription = contentDescription,
+            contentScale = contentScale,
+        )
+    } ?: run {
+        Image(
+            modifier = modifier,
+            painter = painterResource(id = MimeTypeList.typeForName(node.name).iconResourceId),
+            contentDescription = contentDescription,
+            contentScale = contentScale,
+        )
+    }
+}

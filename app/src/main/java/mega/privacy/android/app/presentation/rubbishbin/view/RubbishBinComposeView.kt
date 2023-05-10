@@ -8,6 +8,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param onChangeViewTypeClick
  * @param sortOrder
  * @param emptyState
+ * @param thumbnailViewModel
  */
 @Composable
 fun RubbishBinComposeView(
@@ -37,7 +39,8 @@ fun RubbishBinComposeView(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     sortOrder: String,
-    emptyState: Pair<Int, Int>
+    emptyState: Pair<Int, Int>,
+    thumbnailViewModel: ThumbnailViewModel
 ) {
     if (uiState.nodeList.isNotEmpty()) {
         NodesView(
@@ -52,6 +55,7 @@ fun RubbishBinComposeView(
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
+            thumbnailViewModel = thumbnailViewModel
         )
     } else {
         MegaEmptyView(

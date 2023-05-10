@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -25,7 +26,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
@@ -34,6 +34,7 @@ import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import java.io.File
 
 /**
  * Grid view item for file/folder info
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
  * @param onLongClick onLongItemClick
  * @param onItemClicked itemClick
  * @param onMenuClick three dots click
+ * @param imageState Thumbnail state to get Thumbnail
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -51,6 +53,7 @@ internal fun NodeGridViewItem(
     onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
+    imageState: State<File?>
 ) {
     if (nodeUIItem.node is FolderNode) {
         ConstraintLayout(
@@ -127,14 +130,15 @@ internal fun NodeGridViewItem(
                 )
         ) {
             Box(contentAlignment = Alignment.TopStart) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = nodeUIItem.node.thumbnailPath),
-                    contentDescription = "File",
-                    contentScale = ContentScale.FillHeight,
+                ThumbnailView(
                     modifier = Modifier
                         .height(172.dp)
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+                        .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
+                    contentDescription = "File",
+                    imageFile = imageState.value,
+                    node = nodeUIItem,
+                    contentScale = ContentScale.FillHeight,
                 )
                 if (nodeUIItem.isSelected) {
                     Image(
@@ -145,7 +149,8 @@ internal fun NodeGridViewItem(
                 }
             }
             ConstraintLayout(
-                modifier = Modifier.padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp)
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp)
                     .fillMaxWidth()
             ) {
                 val (menuImage, txtTitle) = createRefs()

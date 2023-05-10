@@ -16,6 +16,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +29,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -39,6 +40,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import java.io.File
 import java.text.DecimalFormat
 
 /**
@@ -49,6 +51,7 @@ import java.text.DecimalFormat
  * @param onLongClick onLongItemClick
  * @param onItemClicked itemClick
  * @param onMenuClick three dots click
+ * @param imageState Thumbnail state
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -59,6 +62,7 @@ internal fun NodeListViewItem(
     onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
+    imageState: State<File?>
 ) {
     Column(
         modifier = modifier
@@ -95,10 +99,12 @@ internal fun NodeListViewItem(
                         contentDescription = "Folder Thumbnail"
                     )
                 } else if (nodeUIItem.node is FileNode) {
-                    Image(
+                    imageState.value
+                    ThumbnailView(
                         modifier = thumbNailModifier
                             .testTag(FILE_TEST_TAG),
-                        painter = rememberAsyncImagePainter(model = nodeUIItem.node.thumbnailPath),
+                        imageFile = imageState.value,
+                        node = nodeUIItem,
                         contentDescription = "Thumbnail"
                     )
                 }

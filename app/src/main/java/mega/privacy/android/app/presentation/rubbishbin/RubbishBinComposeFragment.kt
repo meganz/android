@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +31,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
@@ -73,7 +75,7 @@ class RubbishBinComposeFragment : Fragment() {
     private val viewModel: RubbishBinViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
-
+    private val thumbnailViewModel: ThumbnailViewModel by viewModels()
     private var actionMode: ActionMode? = null
 
     /**
@@ -110,6 +112,7 @@ class RubbishBinComposeFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
+                        thumbnailViewModel = thumbnailViewModel
                     )
                 }
                 updateActionModeTitle(

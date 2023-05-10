@@ -57,7 +57,8 @@ class NodesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 isListView = false,
-                sortOrder = "Any Name"
+                sortOrder = "Any Name",
+                thumbnailViewModel = mock()
             )
         }
         composeTestRule.run {
@@ -91,7 +92,8 @@ class NodesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 isListView = false,
-                sortOrder = "Any Name"
+                sortOrder = "Any Name",
+                thumbnailViewModel = mock()
             )
         }
         composeTestRule.run {
@@ -126,7 +128,8 @@ class NodesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 isListView = false,
-                sortOrder = "Any Name"
+                sortOrder = "Any Name",
+                thumbnailViewModel = mock()
             )
         }
         composeTestRule.run {
@@ -164,7 +167,8 @@ class NodesViewTest {
                     onSortOrderClick = {},
                     onChangeViewTypeClick = {},
                     isListView = false,
-                    sortOrder = "Any Name"
+                    sortOrder = "Any Name",
+                    thumbnailViewModel = mock()
                 )
             }
             composeTestRule.run {
@@ -198,7 +202,8 @@ class NodesViewTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 isListView = true,
-                sortOrder = "Any Name"
+                sortOrder = "Any Name",
+                thumbnailViewModel = mock()
             )
         }
         composeTestRule.run {

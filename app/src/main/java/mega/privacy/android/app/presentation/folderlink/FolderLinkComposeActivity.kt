@@ -31,6 +31,7 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
@@ -64,6 +65,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     lateinit var stringUtilWrapper: StringUtilWrapper
 
     private val viewModel: FolderLinkViewModel by viewModels()
+    private val thumbnailViewModel: ThumbnailViewModel by viewModels()
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
@@ -170,7 +172,8 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onResetSnackbarMessage = viewModel::resetSnackbarMessage,
                 onResetMoreOptionNode = viewModel::resetMoreOptionNode,
                 onResetOpenMoreOption = viewModel::resetOpenMoreOption,
-                emptyViewString = getEmptyViewString()
+                emptyViewString = getEmptyViewString(),
+                thumbnailViewModel = thumbnailViewModel
             )
         }
     }

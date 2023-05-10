@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,6 +35,7 @@ import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -79,6 +81,7 @@ class FileBrowserComposeFragment : Fragment() {
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
+    private val thumbnailViewModel: ThumbnailViewModel by viewModels()
 
     override fun onAttach(context: Context) {
         Timber.d("onAttach")
@@ -130,6 +133,7 @@ class FileBrowserComposeFragment : Fragment() {
                         ),
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
+                        thumbnailViewModel = thumbnailViewModel
                     )
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)

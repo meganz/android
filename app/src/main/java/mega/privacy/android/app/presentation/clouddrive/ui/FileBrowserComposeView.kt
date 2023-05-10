@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param sortOrder
  * @param onSortOrderClick
  * @param onChangeViewTypeClick
+ * @param thumbnailViewModel
  */
 @Composable
 fun FileBrowserComposeView(
@@ -37,7 +39,8 @@ fun FileBrowserComposeView(
     onMenuClick: (NodeUIItem) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
-    onChangeViewTypeClick: () -> Unit
+    onChangeViewTypeClick: () -> Unit,
+    thumbnailViewModel: ThumbnailViewModel
 ) {
     if (uiState.nodesList.isNotEmpty()) {
         NodesView(
@@ -52,6 +55,7 @@ fun FileBrowserComposeView(
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
+            thumbnailViewModel = thumbnailViewModel
         )
     } else {
         MegaEmptyView(

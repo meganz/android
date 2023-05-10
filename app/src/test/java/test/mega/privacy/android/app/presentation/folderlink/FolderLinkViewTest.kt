@@ -58,7 +58,8 @@ class FolderLinkViewTest {
                 onResetSnackbarMessage = { },
                 onResetOpenMoreOption = { },
                 onResetMoreOptionNode = { },
-                emptyViewString = stringResource(id = R.string.file_browser_empty_folder)
+                emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
+                thumbnailViewModel = mock()
             )
         }
     }
