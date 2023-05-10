@@ -74,4 +74,13 @@ interface PhotosRepository {
      * @return photo
      */
     suspend fun getChatPhotoByMessageId(chatId: Long, messageId: Long): Photo?
+
+    /**
+     * Get Photos by public link
+     *
+     * @param link link
+     *
+     * @return photo
+     */
+    suspend fun getPhotoByPublicLink(link: String): Photo?
 }

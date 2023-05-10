@@ -22,8 +22,10 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,6 +42,8 @@ class SlideshowViewModel @Inject constructor(
     private val getImageByNodeHandleUseCase: GetImageByNodeHandleUseCase,
     private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase,
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase,
+    private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase,
+    private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase,
 ) : ViewModel() {
 
     /**
@@ -67,30 +71,31 @@ class SlideshowViewModel @Inject constructor(
         if (_state.value.slideshowItems.isNotEmpty())
             return
         viewModelScope.launch {
-            val slideshowItems = if (imageItems.first() is ImageItem.ChatNode) {
-                imageItems.mapNotNull {
-                    val chatMessageId = (it as ImageItem.ChatNode).chatMessageId
-                    val chatRoomId = (imageItems.first() as ImageItem.ChatNode).chatRoomId
-                    val photo = getChatPhotoByMessageIdUseCase(
-                        chatRoomId,
-                        chatMessageId
-                    )
-                    if (photo != null && photo is Photo.Image) {
-                        SlideshowItem.ChatItem(
-                            photo = photo,
-                            chatRoomId = chatRoomId,
-                            messageId = chatMessageId,
+            val slideshowItems = when (imageItems.first()) {
+                is ImageItem.ChatNode -> {
+                    imageItems.mapNotNull {
+                        val chatNode = it as ImageItem.ChatNode
+                        createChatItem(
+                            chatMessageId = chatNode.chatMessageId,
+                            chatRoomId = chatNode.chatRoomId
                         )
-                    } else {
-                        null
                     }
                 }
-            } else {
-                val ids = imageItems.map {
-                    it.getNodeHandle() ?: it.id
+
+                is ImageItem.PublicNode -> {
+                    imageItems.mapNotNull {
+                        val link = (it as ImageItem.PublicNode).nodePublicLink
+                        createLinkItem(link)
+                    }
                 }
-                getPhotosByIds(ids = ids.map { id -> NodeId(id) }).filterIsInstance<Photo.Image>()
-                    .map { SlideshowItem.DefaultItem(it) }
+
+                else -> {
+                    val ids = imageItems.map {
+                        it.getNodeHandle() ?: it.id
+                    }
+                    getPhotosByIds(ids = ids.map { id -> NodeId(id) }).filterIsInstance<Photo.Image>()
+                        .map { SlideshowItem.DefaultItem(it) }
+                }
             }
             val order = _state.value.order ?: SlideshowOrder.Shuffle
             val sortedItems = sortItems(slideshowItems, order)
@@ -100,6 +105,39 @@ class SlideshowViewModel @Inject constructor(
                     isPlaying = true
                 )
             }
+        }
+    }
+
+    private suspend fun createLinkItem(
+        link: String,
+    ): SlideshowItem.PublicLinkItem? {
+        val photo = getPhotoByPublicLinkUseCase(link)
+        return if (photo != null && photo is Photo.Image) {
+            SlideshowItem.PublicLinkItem(
+                photo = photo,
+                link = link,
+            )
+        } else {
+            null
+        }
+    }
+
+    private suspend fun createChatItem(
+        chatMessageId: Long,
+        chatRoomId: Long,
+    ): SlideshowItem.ChatItem? {
+        val photo = getChatPhotoByMessageIdUseCase(
+            chatRoomId,
+            chatMessageId
+        )
+        return if (photo != null && photo is Photo.Image) {
+            SlideshowItem.ChatItem(
+                photo = photo,
+                chatRoomId = chatRoomId,
+                messageId = chatMessageId,
+            )
+        } else {
+            null
         }
     }
 
@@ -120,6 +158,10 @@ class SlideshowViewModel @Inject constructor(
         is SlideshowItem.ChatItem -> getChatItemImage(
             chatRoomId = slideshowItem.chatRoomId,
             chatMessageId = slideshowItem.messageId
+        )
+
+        is SlideshowItem.PublicLinkItem -> getPublicLinkItemImage(
+            link = slideshowItem.link
         )
 
         is SlideshowItem.DefaultItem -> getDefaultItemImage(
@@ -148,6 +190,18 @@ class SlideshowViewModel @Inject constructor(
     ) = getImageForChatMessageUseCase(
         chatRoomId = chatRoomId,
         chatMessageId = chatMessageId,
+        fullSize = fullSize,
+        highPriority = highPriority,
+        resetDownloads = resetDownloads,
+    )
+
+    private suspend fun getPublicLinkItemImage(
+        link: String,
+        fullSize: Boolean = true,
+        highPriority: Boolean = false,
+        resetDownloads: () -> Unit = {},
+    ) = getImageByNodePublicLinkUseCase(
+        nodeFileLink = link,
         fullSize = fullSize,
         highPriority = highPriority,
         resetDownloads = resetDownloads,

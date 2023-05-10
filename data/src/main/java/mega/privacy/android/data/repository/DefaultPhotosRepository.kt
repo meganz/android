@@ -15,12 +15,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -44,10 +47,12 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resumeWithException
 
 /**
  * Default implementation of [PhotosRepository]
@@ -434,6 +439,35 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
             node?.let {
                 getPhotoFromCache(it)
+            }
+        }
+
+    override suspend fun getPhotoByPublicLink(link: String): Photo? =
+        withContext(ioDispatcher) {
+            var node = getPublicNode(link)
+            node?.let {
+                getPhotoFromCache(it)
+            }
+        }
+
+    private suspend fun getPublicNode(nodeFileLink: String): MegaNode? =
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        if (!request.flag) {
+                            continuation.resumeWith(Result.success(request.publicNode))
+                        } else {
+                            continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
+                        }
+                    } else {
+                        continuation.failWithException(error.toException("getPublicNode"))
+                    }
+                }
+            )
+            megaApiFacade.getPublicNode(nodeFileLink, listener)
+            continuation.invokeOnCancellation {
+                megaApiFacade.removeRequestListener(listener)
             }
         }
 

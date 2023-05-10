@@ -16,8 +16,10 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -35,6 +37,8 @@ class SlideshowViewModelTest {
     private val getImageByNodeHandleUseCase: GetImageByNodeHandleUseCase = mock()
     private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase = mock()
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase = mock()
+    private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase = mock()
+    private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase = mock()
 
     @Before
     fun setUp() {
@@ -57,7 +61,9 @@ class SlideshowViewModelTest {
         monitorSlideshowRepeatSettingUseCase = monitorSlideshowRepeatSettingUseCase,
         getImageByNodeHandleUseCase = getImageByNodeHandleUseCase,
         getImageForChatMessageUseCase = getImageForChatMessageUseCase,
-        getChatPhotoByMessageIdUseCase = getChatPhotoByMessageIdUseCase
+        getChatPhotoByMessageIdUseCase = getChatPhotoByMessageIdUseCase,
+        getImageByNodePublicLinkUseCase = getImageByNodePublicLinkUseCase,
+        getPhotoByPublicLinkUseCase = getPhotoByPublicLinkUseCase
     )
 
     @Test

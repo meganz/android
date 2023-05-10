@@ -4,11 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NetworkRepository
+import javax.inject.Inject
 
 /**
  * The use case to get Image Result given Node Public Link
  */
-class GetImageByNodePublicLinkUseCase(
+class GetImageByNodePublicLinkUseCase @Inject constructor(
     private val networkRepository: NetworkRepository,
     private val imageRepository: ImageRepository,
 ) {

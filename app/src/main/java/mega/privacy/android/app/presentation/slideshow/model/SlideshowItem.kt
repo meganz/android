@@ -17,6 +17,11 @@ sealed interface SlideshowItem {
         val chatRoomId: Long,
         val messageId: Long,
     ) : SlideshowItem
+
+    data class PublicLinkItem(
+        override val photo: Photo,
+        val link: String,
+    ) : SlideshowItem
 }
 
 
