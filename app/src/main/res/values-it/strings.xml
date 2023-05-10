@@ -422,12 +422,6 @@
     <string name="context_no_destination_folder">Per favore, scegli una cartella di destinazione</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Spostato</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">%d oggetto spostato</item>
-        <item quantity="many">%d di oggetti spostati</item>
-        <item quantity="other">%d oggetti spostati</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d oggetti non sono stati spostati</string>
     <!-- success message when moving a node -->
@@ -436,8 +430,6 @@
     <string name="context_no_moved">Errore. Spostamento fallito</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Condiviso</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Errore. %d condivisioni non sono state completate</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Errore. Condivisione non rimossa</string>
     <!-- success message when removing a node from MEGA -->
@@ -450,8 +442,6 @@
     <string name="number_no_removed">%d oggetti non sono stati rimossi</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d cartelle abbandonate</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Condivisione abbandonata</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d cartelle non sono state abbandonate</string>
     <!-- success message when sending multiple files -->
@@ -3981,10 +3971,6 @@
     <string name="calls_call_screen_waiting_for_participants">In attesa che si uniscano altre persone</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Nessun[/B] [A]preferito[/A] [B]trovato[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Inizia un meeting</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Parla in sicurezza e privatamente in chiamate audio o video con amici e colleghi da tutto il mondo.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Inizia a chattare ora</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4239,8 +4225,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s ha aggiornato[/A][B] un evento di:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s ha aggiornato[/A][B] l\’orario del meeting ricorrente[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s ha annullato[/A][B] il meeting e tutti gli eventi relativi[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -5003,4 +4987,6 @@
         <item quantity="many">impossibile rimuovere permanentemente %1$d di oggetti</item>
         <item quantity="other">impossibile rimuovere permanentemente %1$d oggetti</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

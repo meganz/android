@@ -422,12 +422,6 @@
     <string name="context_no_destination_folder">Te rugăm să selectezi un folder de destinație</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Moved</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">%d element a fost mutat</item>
-        <item quantity="few">%d elemente au fost mutate</item>
-        <item quantity="other">%d de elemente au fost mutate</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
@@ -436,8 +430,6 @@
     <string name="context_no_moved">Eroare. Nu a fost mutat</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Partajate</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Eroare. %d partajări nu au fost încheiate</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Eroare. Partajarea a eșuat să fie eliminată</string>
     <!-- success message when removing a node from MEGA -->
@@ -450,8 +442,6 @@
     <string name="number_no_removed">%d items weren’t removed</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d folders left</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Partajare părăsită</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d folders weren’t left</string>
     <!-- success message when sending multiple files -->
@@ -780,7 +770,7 @@
     <!--  -->
     <string name="backup_title">Fă backup cheii de recuperare</string>
     <!-- Subtitle of the screen to backup the master key -->
-    <string name="backup_subtitle">Parola îți deblochează cheia de recuperare</string>
+    <string name="backup_subtitle">Parola îți deblochează Cheia de recuperare</string>
     <!-- First paragraph of the screen to backup the master key -->
     <string name="backup_first_paragraph">Datele tale pot fi citite doar printr-un lanț de operații de decriptare care începe cu cheia principală de criptare, pe care o stocăm criptată cu parola ta. Acest lucru înseamnă că dacă îți pierzi parola, cheia de recuperare nu îți mai poate fi decriptată și nu mai poți să-ți decriptezi datele.</string>
     <!-- Summary of the preference Recovery key on Settings section -->
@@ -3972,10 +3962,6 @@
     <string name="calls_call_screen_waiting_for_participants">Se așteaptă ca alții să se alăture</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Niciun[/B] [A]favorit[/A] [B]găsit[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Începe o întâlnire</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Discută securizat și privat în apeluri audio sau video cu prieteni și colegi din întreaga lume.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Începe să chatuiești acum</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4229,8 +4215,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s a actualizat[/A][B] o ocurență:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s a actualizat[/A][B] ora întâlnirii periodice[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4968,4 +4952,6 @@
         <item quantity="one">couldn’t permanently remove %1$d item</item>
         <item quantity="other">couldn’t permanently remove %1$d items</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

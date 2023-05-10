@@ -449,15 +449,6 @@
     <string name="context_no_destination_folder">الرجاء اختيار وجهة المجلد</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">تم النقل</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="zero">تم نقل %d عنصر</item>
-        <item quantity="one">تم نقل %d عنصر</item>
-        <item quantity="two">تم نقل %d عنصرين</item>
-        <item quantity="few">تم نقل %d عناصر</item>
-        <item quantity="many">تم نقل %d عنصراً</item>
-        <item quantity="other">تم نقل %d عنصر</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">لم يتم نقل %d عنصر</string>
     <!-- success message when moving a node -->
@@ -466,8 +457,6 @@
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">مشاركة</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">خطأ. %d مشاركات لم تكتمل.</string>
     <!-- error message -->
     <string name="context_no_removed_shared">خطأ. فشل في إزالة المشاركة</string>
     <!-- success message when removing a node from MEGA -->
@@ -480,8 +469,6 @@
     <string name="number_no_removed">لم تتم إزالة  %d عنصر</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">تمت مغادرة %d ملف</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">تم مغادرة المشاركة</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">لم يتم مغادرة %d ملف</string>
     <!-- success message when sending multiple files -->
@@ -2151,7 +2138,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">هل ترغب في فتح متجر غوغل Google Play حتى تتمكن من تثبيت تطبيق المصادقة؟</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Google Play</string>
+    <string name="play_store_label">متجر غوغل Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">تحتاج الى تطبيق مصادقة لتفعيل المصادقة المزدوجة 2FA على ميغا MEGA. يمكنك تنزيل وتثبيت أحد التطبيقات Google Authenticator، Duo Mobile أو Microsoft Authenticator app على موبايلك أو جهازك اللوحي.</string>
     <!-- error message when importing multiple files from chat -->
@@ -4293,10 +4280,6 @@
     <string name="calls_call_screen_waiting_for_participants">في انتظار انضمام الآخرين&#8230;</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]لم يتم [/B] [B]العثور على أي [/B] [A]مفضلات[/A]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">ابدأ اجتماع</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">تحدث بأمان وخصوصية في مكالمات الصوت أو الفيديو مع الأصدقاء والزملاء في جميع أنحاء العالم.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">ابدأ المحادثة الآن</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4569,8 +4552,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">قام [A]%s بتحديث[/A][B] أحد التكرارات إلى: [/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">قام [A]%s بتحديث[/A][B] وقت الاجتماع المتكرر[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">قام [A]%s بإلغاء[/A][B] الاجتماع و كل تكراراته[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -5549,7 +5530,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">أدخل أقل من 30&#160;محرفاً</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">أدخل أقل من 3000&#160;محرفاً</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">تم تحديد موعد الاجتماع</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -5636,4 +5617,6 @@
         <item quantity="many">تعذرت إزالة %1$d عنصراً نهائيًا</item>
         <item quantity="other">تعذرت إزالة %1$d عنصر نهائيًا</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

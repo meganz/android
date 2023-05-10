@@ -431,13 +431,6 @@
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Перемещено</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">Перемещён %d элемент</item>
-        <item quantity="few">Перемещено %d элемента</item>
-        <item quantity="many">Перемещено %d элементов</item>
-        <item quantity="other">Перемещено %d элемента</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">Не удалось переместить элементы (%d)</string>
     <!-- success message when moving a node -->
@@ -446,8 +439,6 @@
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Общий доступ открыт</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Ошибка. Доступ не был открыт (%d)</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
@@ -460,8 +451,6 @@
     <string name="number_no_removed">Не удалось удалить элементы (%d)</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Папки оставлены (%d)</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Покинут общий элемент</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Папки не были оставлены (%d)</string>
     <!-- success message when sending multiple files -->
@@ -4085,10 +4074,6 @@
     <string name="calls_call_screen_waiting_for_participants">Ждем, пока остальные присоединятся</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B][/B][A]Избранное[/A] [B]не найдено[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Начните встречу</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Безопасно и конфиденциально разговаривайте в аудио- или видеозвонках с друзьями и коллегами по всему миру.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Начните общаться сейчас</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4349,8 +4334,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s изменил[/A][B] повторение на:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s изменил[/A][B] время повторяющейся встречи[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s отменил[/A][B] встречу и все её повторения[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -5214,4 +5197,6 @@
         <item quantity="many">%1$d элементов не удалось удалить</item>
         <item quantity="other">%1$d элемента не удалось удалить</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Введите время</string>
 </resources>

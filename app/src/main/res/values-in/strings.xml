@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">Silahkan pilih folder tujuan</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Dipindahkan</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">Memindahkan %d barang</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d barang tidak dipindahkan</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">Terjadi kesalahan. Belum dipindahkan</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Berbagi</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Terjadi kesalahan. %d berbagi belum diselesaikan</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Terjadi kesalahan. Gagal menghilangkan berbagi</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">%d item tidak dihapus</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d folder tersisa</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Berbagi ditinggalkan</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d folder tidak tersisa</string>
     <!-- success message when sending multiple files -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">Menunggu yang lain untuk bergabung</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Tidak ada[/B] [A]favorit[/A] [B]ditemukan[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Mulai rapat</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Bicaralah dengan aman dan pribadi di panggilan audio atau video dengan teman dan kolega di seluruh dunia.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Mulai mengobrol sekarang</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s diperbarui[/A][B] kejadian untuk:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s diperbarui[/A][B] waktu pertemuan berulang[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s dibatalkan[/A][B] pertemuan dan segala kejadiannya[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">tidak dapat hapus selamanya %1$d barang</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
 </resources>

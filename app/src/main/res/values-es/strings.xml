@@ -422,12 +422,6 @@
     <string name="context_no_destination_folder">Elige una carpeta de destino</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Movido</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">Se ha movido %d elemento</item>
-        <item quantity="many">Se ha movido %d de elementos</item>
-        <item quantity="other">Se han movido %d elementos</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">No se han podido mover %d elementos</string>
     <!-- success message when moving a node -->
@@ -436,8 +430,6 @@
     <string name="context_no_moved">Error. No se ha podido mover</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Compartido</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Error. No se han podido completar %d comparticiones</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Error. No se ha podido eliminar la compartición</string>
     <!-- success message when removing a node from MEGA -->
@@ -450,8 +442,6 @@
     <string name="number_no_removed">No se han podido eliminar %d elementos</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Se han abandonado %d carpetas</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Carpeta abandonada</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">No se han podido abandonar %d carpetas</string>
     <!-- success message when sending multiple files -->
@@ -3981,10 +3971,6 @@
     <string name="calls_call_screen_waiting_for_participants">Esperando a que otros se unan</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]No[/B] [B]hay[/B] [A]favoritos[/A]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Empezar una reunión</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Hable de forma segura y privada en llamadas y videollamadas con amigos y colegas de todo el mundo.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Empieza a chatear</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4239,8 +4225,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s ha actualizado[/A][B] un evento al:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s ha actualizado[/A][B] la hora de la reunión periódica[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s ha cancelado[/A][B] la reunión y todos los eventos correspondientes[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4940,7 +4924,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Introducir menos de 30&#160;caracteres</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Introducir menos de 3000&#160;caracteres</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Reunión programada</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -5003,4 +4987,6 @@
         <item quantity="many">no se han podido eliminar %1$d elementos</item>
         <item quantity="other">no se han podido eliminar %1$d elementos</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Introducir hora</string>
 </resources>

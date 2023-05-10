@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">移動しました</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">%d項目移動しました</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d個の項目は移動されませんでした</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">エラー。移動されませんでした</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">共有済み</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">エラー。%d件の共有は完了しませんでした</string>
     <!-- error message -->
     <string name="context_no_removed_shared">エラー。共有を削除できませんでした</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">%d個の項目は削除されませんでした</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d個のフォルダから離れました</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">共有が残りました</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d個のフォルダから離れませんでした</string>
     <!-- success message when sending multiple files -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">他の人が参加するのを待機中</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B][/B][A]お気に入り[/A][B]が見つかりません[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">ミーティングを開始</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">世界中の友人や同僚と、安全かつプライベートな音声通話やビデオ通話ができます。</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">今すぐチャットを開始</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[B]開催日時を[/B][A]%sさんが更新しました[/A]：</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[B]定期的なミーティングの時間を[/B][A]%sさんが更新しました[/A]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[B]以下のミーティングとそのすべての開催を[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">%1$d個の項目を恒久的に削除することはできませんでした</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">時間を入力してください</string>
 </resources>

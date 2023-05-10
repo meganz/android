@@ -422,12 +422,6 @@
     <string name="context_no_destination_folder">Escolha a pasta de destino</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Movido</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">%d item foi movido</item>
-        <item quantity="many">%d de itens foram movidos</item>
-        <item quantity="other">%d itens foram movidos</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d itens não foram movidos</string>
     <!-- success message when moving a node -->
@@ -436,8 +430,6 @@
     <string name="context_no_moved">Erro. Não foi movido</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Compartilhar</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Erro. %d compartilhamentos não foram concluídos</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Erro. Não foi possível remover o compartilhamento</string>
     <!-- success message when removing a node from MEGA -->
@@ -450,8 +442,6 @@
     <string name="number_no_removed">%d itens não foram eliminados</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Você saiu de %d pastas compartilhadas.</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Saiu do compartilhamento</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">Você não saiu de %d pastas compartilhadas.</string>
     <!-- success message when sending multiple files -->
@@ -481,7 +471,7 @@
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
-    <string name="context_share_correctly_removed">Compartilhamento removido corretamente</string>
+    <string name="context_share_correctly_removed">Compartilhamento removido</string>
     <!-- Menu option to create a new folder in the file manager. -->
     <string name="menu_new_folder">Nova pasta</string>
     <!-- Menu option to add a contact to your contact list. -->
@@ -3981,10 +3971,6 @@
     <string name="calls_call_screen_waiting_for_participants">Esperando que as outras pessoas se conectem</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Não[/B] [B]há[/B] [A]favoritos[/A]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Fazer uma reunião</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Converse com segurança e privacidade por meio de chamadas de áudio ou de vídeo com amigos e colegas do mundo inteiro.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Comece já a usar o chat</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4239,8 +4225,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s atualizou[/A][B] uma repetição para:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s atualizou[/A][B] a hora da reunião periódica[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelou[/A][B] a reunião e todas as suas repetições[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4940,7 +4924,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Digite menos de 30&#160;caracteres</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Digite menos de 3000&#160;caracteres</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Reunião agendada</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -5003,4 +4987,6 @@
         <item quantity="many">mas não foi possível eliminar permanentemente %1$d de itens</item>
         <item quantity="other">mas não foi possível eliminar permanentemente %1$d itens</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Digite a hora</string>
 </resources>

@@ -404,10 +404,6 @@
     <string name="context_no_destination_folder">请选择一个目标文件夹</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">已移动</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="other">已移动%d个项目</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d个项目移动失败</string>
     <!-- success message when moving a node -->
@@ -416,8 +412,6 @@
     <string name="context_no_moved">错误。未移动</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">共享</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">发生错误。%d个共享未完成</string>
     <!-- error message -->
     <string name="context_no_removed_shared">发生错误。移除共享失败</string>
     <!-- success message when removing a node from MEGA -->
@@ -430,8 +424,6 @@
     <string name="number_no_removed">%d个项目移除失败</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">已离开%d文件夹</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">已离开该共享</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d文件夹离开失败</string>
     <!-- success message when sending multiple files -->
@@ -2340,7 +2332,7 @@
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">链接已复制到剪贴板</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
-    <string name="type_month">%s/[A]月[/A] *[A]起[/A]</string>
+    <string name="type_month">%s/[A]月[/A] [A]起[/A]*</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
     <string name="upgrade_comment">* 续订日期到期前随时可取消续订服务。</string>
     <!-- Message shown when a call starts. -->
@@ -3773,10 +3765,6 @@
     <string name="calls_call_screen_waiting_for_participants">正在等待其他人加入</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">发起会议</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">使用语音或视频通话与全世界的朋友和同事进行安全私密沟通。</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">立即开始聊天</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4019,8 +4007,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s更新了[/A][B]一个事件到：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s更新了[/A][B]定期会议时间[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s取消了[/A][B]会议以及它所有事件[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4532,9 +4518,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">会议名称为必填项</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">输入少于30&#160;个字符</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">输入少于30&#160;个字符（15个中文字）</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">输入少于3,000&#160;个字符</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">输入少于3,000&#160;个字符（1,500个中文字）</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排会议</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4581,4 +4567,6 @@
     <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
         <item quantity="other">无法永久移除%1$d个项目</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">输入时间</string>
 </resources>

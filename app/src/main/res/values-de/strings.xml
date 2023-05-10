@@ -413,11 +413,6 @@
     <string name="context_no_destination_folder">Bitte wählen Sie einen Zielordner</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Verschoben</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">%d Element verschoben</item>
-        <item quantity="other">%d Elemente verschoben</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d Elemente wurden nicht verschoben</string>
     <!-- success message when moving a node -->
@@ -426,8 +421,6 @@
     <string name="context_no_moved">Fehler. Nicht verschoben</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Freigegeben</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Fehler. %d Ordnerfreigaben konnten nicht erstellt werden.</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Fehler. Freigabe konnte nicht entfernt werden.</string>
     <!-- success message when removing a node from MEGA -->
@@ -440,8 +433,6 @@
     <string name="number_no_removed">%d Elemente wurden nicht entfernt</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d Ordner verlassen</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Ordnerfreigabe verlassen</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d Ordner nicht verlassen</string>
     <!-- success message when sending multiple files -->
@@ -3877,10 +3868,6 @@
     <string name="calls_call_screen_waiting_for_participants">Warten auf weitere Teilnehmer</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Keine[/B] [A]Favoriten[/A] [B]gefunden[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Meeting starten</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Führen Sie sichere und private Audio- oder Videogespräche mit Freunden und Kollegen auf der ganzen Welt.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Jetzt chatten</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4129,8 +4116,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s [/A][B]hat einen Termin wie folgt geändert:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s [/A][B]hat die Uhrzeit des wiederkehrenden Meetings geändert[/B]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s [/A][B]hat alle Termine des wiederkehrenden Meetings abgesagt[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4792,4 +4777,6 @@
         <item quantity="one">%1$d Element konnte nicht unwiderruflich gelöscht werden</item>
         <item quantity="other">%1$d Elemente konnten nicht unwiderruflich gelöscht werden</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Uhrzeit eingeben</string>
 </resources>

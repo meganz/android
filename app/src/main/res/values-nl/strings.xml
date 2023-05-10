@@ -413,11 +413,6 @@
     <string name="context_no_destination_folder">Kies een bestemmingsmap</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Verplaatst</string>
-    <!-- success message when moving a node (file/folder) -->
-    <plurals name="number_correctly_moved">
-        <item quantity="one">Verplaatst %d item</item>
-        <item quantity="other">Verplaatst %d items</item>
-    </plurals>
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items waren niet verplaatst</string>
     <!-- success message when moving a node -->
@@ -426,8 +421,6 @@
     <string name="context_no_moved">Foutmelding. Niet verplaatst</string>
     <!-- success message when sharing a folder -->
     <string name="context_correctly_shared">Gedeeld</string>
-    <!-- error message when sharing a folder -->
-    <string name="context_no_shared_number">Fout. %d delingen waren niet voltooid</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Fout. Deling is mislukt te verwijderen</string>
     <!-- success message when removing a node from MEGA -->
@@ -440,8 +433,6 @@
     <string name="number_no_removed">%d items waren niet verplaatst</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">%d mappen verlaten</string>
-    <!-- Message shown when a share has been left -->
-    <string name="share_left">Deling is verlaten</string>
     <!-- error message when moving a node -->
     <string name="number_no_leaved">%d mappen waren niet verlaten</string>
     <!-- success message when sending multiple files -->
@@ -3877,10 +3868,6 @@
     <string name="calls_call_screen_waiting_for_participants">Wachten voor andere om aan te sluiten</string>
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Geen[/B] [A]favorieten[/A] [B]gevonden[/B]</string>
-    <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Begin vergadering</string>
-    <!--Description text from Meeting screen empty view-->
-    <string name="meetings_list_empty_description">Praat veilig en privé tijdens audio- of videogesprekken met vrienden en collega\’s over de hele wereld.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">Begin nu met chatten</string>
     <!--Description text from Recent Chat screen empty view-->
@@ -4129,8 +4116,6 @@
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%sheeft [B]een gebeurtenis [/B] bijgewerkt naar:[/A]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%sheeft de [B]herhalende vergadertijd [/B] bijgewerkt [/A]</string>
-    <!-- User Alert notification for scheduled recurring meeting frequency change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%sheeft [B]de vergadering en alle gebeurtenissen ervan [/B]geannuleerd[/A]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4792,4 +4777,6 @@
         <item quantity="one">Kon niet permanent  %1$d item verwijderen</item>
         <item quantity="other">kon niet permanent %1$d items verwijderen</item>
     </plurals>
+    <!-- The select time dialog in schedule meeting -->
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Voer tijd in</string>
 </resources>
