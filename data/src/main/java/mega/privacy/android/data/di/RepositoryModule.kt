@@ -48,6 +48,7 @@ import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
+import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -86,6 +87,7 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
+import mega.privacy.android.domain.repository.filemanagement.ShareRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -238,5 +240,7 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindBusinessRepository(implementation: BusinessRepositoryImpl): BusinessRepository
 
+    @Binds
+    abstract fun bindShareRepository(implementation: ShareRepositoryImpl): ShareRepository
 
 }

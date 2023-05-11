@@ -249,7 +249,7 @@ import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
 import mega.privacy.android.app.presentation.shares.SharesPageAdapter
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
-import mega.privacy.android.app.presentation.shares.links.LinksViewModel
+import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -407,7 +407,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val incomingSharesViewModel: IncomingSharesViewModel by viewModels()
     internal val outgoingSharesViewModel: OutgoingSharesViewModel by viewModels()
     internal val inboxViewModel: InboxViewModel by viewModels()
-    internal val linksViewModel: LinksViewModel by viewModels()
+    internal val legacyLinksViewModel: LegacyLinksViewModel by viewModels()
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
@@ -5830,7 +5830,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         outgoingSharesViewModel.resetOutgoingTreeDepth()
                         refreshOutgoingShares()
                     } else if (tabItemShares === SharesTab.LINKS_TAB && this.linksState().linksHandle != MegaApiJava.INVALID_HANDLE) {
-                        linksViewModel.resetLinksTreeDepth()
+                        legacyLinksViewModel.resetLinksTreeDepth()
                         refreshLinks()
                     }
                     refreshSharesPageAdapter()
@@ -6083,7 +6083,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         }
 
                         SharesTab.LINKS_TAB -> {
-                            linksViewModel.decreaseLinksTreeDepth(
+                            legacyLinksViewModel.decreaseLinksTreeDepth(
                                 if (this.linksState().linksTreeDepth == 0) MegaApiJava.INVALID_HANDLE else oldParentHandle
                             )
                             if (this.linksState().linksHandle == MegaApiJava.INVALID_HANDLE) {
@@ -9376,7 +9376,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun refreshLinks() {
-        linksViewModel.refreshLinksSharesNode()
+        legacyLinksViewModel.refreshLinksSharesNode()
     }
 
     fun refreshInboxList() {
@@ -9972,7 +9972,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else if (tabItemShares === SharesTab.OUTGOING_TAB) {
                     outgoingSharesViewModel.increaseOutgoingTreeDepth(node.handle)
                 } else if (tabItemShares === SharesTab.LINKS_TAB) {
-                    linksViewModel.increaseLinksTreeDepth(node.handle)
+                    legacyLinksViewModel.increaseLinksTreeDepth(node.handle)
                 }
                 refreshSharesPageAdapter()
             }

@@ -55,7 +55,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
-import mega.privacy.android.app.presentation.shares.links.LinksViewModel
+import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
@@ -109,7 +109,7 @@ class SearchFragment : RotatableFragment() {
     private val incomingSharesViewModel: IncomingSharesViewModel by activityViewModels()
     private val outgoingSharesViewModel: OutgoingSharesViewModel by activityViewModels()
     private val inboxViewModel: InboxViewModel by activityViewModels()
-    private val linksViewModel: LinksViewModel by activityViewModels()
+    private val legacyLinksViewModel: LegacyLinksViewModel by activityViewModels()
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
 
@@ -621,7 +621,7 @@ class SearchFragment : RotatableFragment() {
             inboxViewModel.state.value.inboxHandle,
             incomingSharesViewModel.state.value.incomingHandle,
             outgoingSharesViewModel.state.value.outgoingHandle,
-            linksViewModel.state.value.linksHandle,
+            legacyLinksViewModel.state.value.linksHandle,
             managerViewModel.state.value.isFirstNavigationLevel
         )
     }

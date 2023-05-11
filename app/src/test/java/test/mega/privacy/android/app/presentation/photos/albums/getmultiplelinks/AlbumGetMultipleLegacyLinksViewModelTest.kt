@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkViewModel
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksViewModel
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -30,7 +29,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class AlbumGetMultipleLinksViewModelTest {
+class AlbumGetMultipleLegacyLinksViewModelTest {
     private lateinit var underTest: AlbumGetMultipleLinksViewModel
 
     private val getUserAlbumUseCase: GetUserAlbum = mock()

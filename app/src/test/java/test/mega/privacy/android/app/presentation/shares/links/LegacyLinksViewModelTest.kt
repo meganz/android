@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
-import mega.privacy.android.app.presentation.shares.links.LinksViewModel
+import mega.privacy.android.app.presentation.shares.links.LegacyLinksViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,8 +32,8 @@ import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
 @ExperimentalCoroutinesApi
-class LinksViewModelTest {
-    private lateinit var underTest: LinksViewModel
+class LegacyLinksViewModelTest {
+    private lateinit var underTest: LegacyLinksViewModel
 
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
@@ -52,7 +52,7 @@ class LinksViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = LinksViewModel(
+        underTest = LegacyLinksViewModel(
             getNodeByHandle,
             getParentNodeHandle,
             getPublicLinks,

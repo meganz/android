@@ -43,7 +43,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class LinksFragment : MegaNodeBaseFragment() {
 
-    private val viewModel by activityViewModels<LinksViewModel>()
+    private val viewModel by activityViewModels<LegacyLinksViewModel>()
 
     private fun state() = viewModel.state.value
 

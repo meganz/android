@@ -48,7 +48,7 @@ fun ManagerActivity.inboxState() = inboxViewModel.state.value
  *
  * @return the LinksState hold in LinksViewModel
  */
-fun ManagerActivity.linksState() = linksViewModel.state.value
+fun ManagerActivity.linksState() = legacyLinksViewModel.state.value
 
 /**
  * Get the RubbishBinState in RubbishBinViewModel
