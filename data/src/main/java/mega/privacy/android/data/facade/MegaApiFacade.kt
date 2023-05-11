@@ -427,9 +427,26 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getUserAlerts(): List<MegaUserAlert> = megaApi.userAlerts
 
-    @Suppress("DEPRECATION")
+    @Deprecated(
+        "This has been deprecated in favour of the below sendEvent",
+        replaceWith = ReplaceWith("sendEvent(eventId, message, addJourneyId, viewId)")
+    )
     override suspend fun sendEvent(eventID: Int, message: String) =
         megaApi.sendEvent(eventID, message)
+
+    /**
+     * This is marked as deprecated in SDK because this function is for internal usage of MEGA apps
+     * for debug purposes. This info is sent to MEGA servers.
+     */
+    @Suppress("DEPRECATION")
+    override suspend fun sendEvent(
+        eventId: Int,
+        message: String,
+        addJourneyId: Boolean,
+        viewId: String?,
+    ) = megaApi.sendEvent(eventId, message, addJourneyId, viewId)
+
+    override suspend fun generateViewId(): String = megaApi.generateViewId()
 
     override suspend fun getUserAvatarColor(megaUser: MegaUser): String? =
         megaApi.getUserAvatarColor(megaUser)

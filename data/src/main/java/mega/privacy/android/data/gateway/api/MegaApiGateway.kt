@@ -660,7 +660,49 @@ interface MegaApiGateway {
      * @param eventID
      * @param message
      */
+    @Deprecated(
+        "This has been deprecated in favour of the below sendEvent",
+        replaceWith = ReplaceWith("sendEvent(eventId, message, addJourneyId, viewId)")
+    )
     suspend fun sendEvent(eventID: Int, message: String)
+
+    /**
+     * Send events to the stats server
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SEND_EVENT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the event type
+     * - MegaRequest::getText - Returns the event message
+     * - MegaRequest::getFlag - Returns the addJourneyId flag
+     * - MegaRequest::getSessionKey - Returns the ViewID
+     *
+     * @param eventId      Event type
+     *                     Event types are restricted to the following ranges:
+     *                     - MEGAcmd:   [98900, 99000)
+     *                     - MEGAchat:  [99000, 99199)
+     *                     - Android:   [99200, 99300)
+     *                     - iOS:       [99300, 99400)
+     *                     - MEGA SDK:  [99400, 99500)
+     *                     - MEGAsync:  [99500, 99600)
+     *                     - Webclient: [99600, 99800]
+     * @param message      Event message
+     * @param addJourneyId True if JourneyID should be included. Otherwise, false.
+     * @param viewId       ViewID value (C-string null-terminated) to be sent with the event.
+     *                     This value should have been generated with MegaApi::generateViewId method.
+     * @deprecated This function is for internal usage of MEGA apps for debug purposes. This info
+     * is sent to MEGA servers.
+     */
+    suspend fun sendEvent(eventId: Int, message: String, addJourneyId: Boolean, viewId: String?)
+
+    /**
+     * Generate an unique ViewID
+     *
+     * The caller gets the ownership of the object.
+     *
+     * A ViewID consists of a random generated id, encoded in hexadecimal as 16 characters of a null-terminated string.
+     * @return the ViewId.
+     */
+    suspend fun generateViewId(): String
 
     /**
      * Acknowledge user alerts
