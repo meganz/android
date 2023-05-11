@@ -6,4 +6,5 @@ internal data class UserInfoUiState(
     val fullName: String = "",
     val email: String = "",
     val avatarContent: AvatarContent? = null,
+    val isTestPasswordRequired: Boolean = false,
 )

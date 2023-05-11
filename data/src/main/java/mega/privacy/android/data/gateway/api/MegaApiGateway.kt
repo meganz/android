@@ -2442,4 +2442,29 @@ interface MegaApiGateway {
         listener: MegaRequestListenerInterface?,
     )
 
+    /**
+     * Check if the app should show the password reminder dialog to the user
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_PWD_REMINDER
+     *
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getFlag - Returns true if the password reminder dialog should be shown
+     *
+     *
+     * If the corresponding user attribute is not set yet, the request will fail with the
+     * error code MegaError::API_ENOENT but the value of MegaRequest::getFlag will still
+     * be valid.
+     *
+     * @param atLogout True if the check is being done just before a logout
+     * @param listener MegaRequestListener to track this request
+     */
+    fun shouldShowPasswordReminderDialog(
+        atLogout: Boolean,
+        listener: MegaRequestListenerInterface,
+    )
 }

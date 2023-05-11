@@ -143,4 +143,10 @@ interface LoginRepository {
      *
      */
     suspend fun broadcastAccountUpdate()
+
+    /**
+     * Should show password reminder dialog
+     *
+     */
+    suspend fun shouldShowPasswordReminderDialog(atLogin: Boolean): Boolean
 }

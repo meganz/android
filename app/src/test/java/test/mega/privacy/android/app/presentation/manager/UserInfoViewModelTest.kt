@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.manager
 
 import android.content.Context
 import app.cash.turbine.test
+import com.google.common.truth.Truth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
+import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -65,6 +67,7 @@ internal class UserInfoViewModelTest {
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getMyAvatarFile: GetMyAvatarFile = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
+    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase = mock()
 
     @Before
     fun setUp() {
@@ -90,6 +93,7 @@ internal class UserInfoViewModelTest {
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFile = getMyAvatarFile,
             monitorMyAvatarFile = monitorMyAvatarFile,
+            checkPasswordReminderUseCase = checkPasswordReminderUseCase
         )
     }
 
@@ -104,8 +108,8 @@ internal class UserInfoViewModelTest {
         whenever(context.getString(any())).thenReturn("")
         whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
         underTest.getUserInfo()
+        testScheduler.advanceUntilIdle()
         underTest.state.test {
-            awaitItem()
             val item = awaitItem()
             assertEquals(expectedEmail, item.email)
         }
@@ -118,8 +122,8 @@ internal class UserInfoViewModelTest {
             whenever(context.getString(any())).thenReturn("")
             whenever(getCurrentUserFullName(true, "", "")).thenReturn(expectedName)
             underTest.getUserInfo()
+            testScheduler.advanceUntilIdle()
             underTest.state.test {
-                awaitItem()
                 val item = awaitItem()
                 assertEquals(expectedName, item.fullName)
             }
@@ -151,6 +155,7 @@ internal class UserInfoViewModelTest {
     fun `test that call to getUserFirstName and getUserLastName use case when monitorOtherUsersUpdates emit Firstname and Lastname`() =
         runTest {
             initViewModelState()
+            testScheduler.advanceUntilIdle()
             val userId = UserId(123L)
             val map = mapOf(userId to listOf(UserChanges.Firstname, UserChanges.Lastname))
             fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
@@ -170,6 +175,7 @@ internal class UserInfoViewModelTest {
     fun `test that call to getUserFirstName use case when monitorOtherUsersUpdates emit Firstname`() =
         runTest {
             initViewModelState()
+            testScheduler.advanceUntilIdle()
             val userId = UserId(123L)
             val map = mapOf(userId to listOf(UserChanges.Firstname))
             fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
@@ -185,6 +191,7 @@ internal class UserInfoViewModelTest {
     fun `test that call to getUserLastName use case when monitorOtherUsersUpdates emit LastName`() =
         runTest {
             initViewModelState()
+            testScheduler.advanceUntilIdle()
             val userId = UserId(123L)
             val map = mapOf(userId to listOf(UserChanges.Lastname))
             fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
@@ -202,6 +209,7 @@ internal class UserInfoViewModelTest {
     fun `test that call to GetCurrentUserAliases use case when monitorOtherUsersUpdates emit Alias`() =
         runTest {
             initViewModelState()
+            testScheduler.advanceUntilIdle()
             val userId = UserId(123L)
             val map = mapOf(userId to listOf(UserChanges.Alias))
             fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
@@ -215,6 +223,7 @@ internal class UserInfoViewModelTest {
     fun `test that call to getContactEmail use case when monitorOtherUsersUpdates emit Email`() =
         runTest {
             initViewModelState()
+            testScheduler.advanceUntilIdle()
             val userId = UserId(123L)
             val map = mapOf(userId to listOf(UserChanges.Email))
             fakeMonitorOtherUsersUpdates.emit(UserUpdate(map))
@@ -238,6 +247,38 @@ internal class UserInfoViewModelTest {
             verify(reloadContactDatabase, times(1)).invoke(false)
         }
 
+    @Test
+    fun `test that showTestPassword as true when call checkPasswordReminderUseCase returns true`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(false)).thenReturn(true)
+            underTest.checkPasswordReminderStatus()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isTestPasswordRequired).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that showTestPassword as false when call checkPasswordReminderUseCase returns false`() =
+        runTest {
+            whenever(checkPasswordReminderUseCase(false)).thenReturn(false)
+            underTest.checkPasswordReminderStatus()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isTestPasswordRequired).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that showTestPassword as false when call showTestPasswordHandled`() =
+        runTest {
+            underTest.onTestPasswordHandled()
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isTestPasswordRequired).isEqualTo(false)
+            }
+        }
+
     private suspend fun initViewModelState() {
         val expectedEmail = "myEmail"
         val expectedName = "myName"
@@ -245,10 +286,5 @@ internal class UserInfoViewModelTest {
         whenever(getCurrentUserFullName(true, "", "")).thenReturn(expectedName)
         whenever(getCurrentUserEmail()).thenReturn(expectedEmail)
         underTest.getUserInfo()
-        underTest.state.test {
-            awaitItem()
-            awaitItem()
-            awaitItem()
-        }
     }
 }

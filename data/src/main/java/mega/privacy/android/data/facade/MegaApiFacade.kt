@@ -1186,4 +1186,9 @@ internal class MegaApiFacade @Inject constructor(
         longitude,
         listener
     )
+
+    override fun shouldShowPasswordReminderDialog(
+        atLogout: Boolean,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.shouldShowPasswordReminderDialog(atLogout, listener)
 }

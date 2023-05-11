@@ -363,6 +363,29 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun broadcastAccountUpdate() = appEventGateway.broadcastAccountUpdate()
 
+    override suspend fun shouldShowPasswordReminderDialog(atLogin: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    OptionalMegaRequestListenerInterface(onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK, MegaError.API_ENOENT -> continuation.resumeWith(
+                                Result.success(request.flag)
+                            )
+
+                            else -> continuation.failWithError(
+                                error,
+                                "shouldShowPasswordReminderDialog"
+                            )
+                        }
+                    })
+                megaApiGateway.shouldShowPasswordReminderDialog(atLogin, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
     companion object {
         internal const val FETCH_NODES_ERROR_TIMER = 10000L
     }

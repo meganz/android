@@ -98,7 +98,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
@@ -179,7 +178,6 @@ import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -340,9 +338,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.IsRequestPhoneNumberShownUseCase
-import mega.privacy.android.domain.usecase.SetRequestPhoneNumberShownUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
@@ -413,15 +408,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private val userInfoViewModel: UserInfoViewModel by viewModels()
 
     @Inject
-    lateinit var isRequestPhoneNumberShownUseCase: IsRequestPhoneNumberShownUseCase
-
-    @Inject
-    lateinit var setRequestPhoneNumberShownUseCase: SetRequestPhoneNumberShownUseCase
-
-    @Inject
-    lateinit var checkPasswordReminderUseCase: CheckPasswordReminderUseCase
-
-    @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
 
     @Inject
@@ -441,10 +427,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var downloadNodeUseCase: DownloadNodeUseCase
-
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
 
     @Inject
     lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
@@ -1163,7 +1145,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             accountController.renameRK(fRKOld)
         }
         if (handleRootNodeAndHeartbeatState(savedInstanceState)) return
-        checkPasswordReminderStatus()
+        userInfoViewModel.checkPasswordReminderStatus()
         updateAccountDetailsVisibleInfo()
         setContactStatus()
         checkInitialScreens()
@@ -1995,26 +1977,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return false
     }
 
-    private fun checkPasswordReminderStatus() {
-        CompositeDisposable().add(
-            checkPasswordReminderUseCase.check(false)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { show: Boolean ->
-                        if (show) {
-                            startActivity(Intent(this, TestPasswordActivity::class.java))
-                        }
-                    },
-                    { throwable: Throwable? ->
-                        Timber.e(
-                            throwable,
-                            "doUpdateProgressNotification onError"
-                        )
-                    })
-        )
-    }
-
     private fun handleRedirectIntentActions(action: String?): Boolean {
         when (action) {
             Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
@@ -2429,6 +2391,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             setProfileAvatar(state.avatarContent)
             nVEmail.visibility = View.VISIBLE
             nVEmail.text = state.email
+            if (state.isTestPasswordRequired) {
+                startActivity(Intent(this, TestPasswordActivity::class.java))
+                userInfoViewModel.onTestPasswordHandled()
+            }
         }
         this.collectFlow(
             incomingSharesViewModel.state,

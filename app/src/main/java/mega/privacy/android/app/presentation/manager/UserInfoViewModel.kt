@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
+import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -51,6 +52,7 @@ internal class UserInfoViewModel @Inject constructor(
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val avatarContentMapper: AvatarContentMapper,
+    private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -71,6 +73,7 @@ internal class UserInfoViewModel @Inject constructor(
                             getUserFullName(true)
                             getUserAvatarOrDefault(isForceRefresh = false)
                         }
+
                         else -> Unit
                     }
                 }
@@ -216,5 +219,28 @@ internal class UserInfoViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    /**
+     * Check password reminder status
+     *
+     */
+    fun checkPasswordReminderStatus() {
+        viewModelScope.launch {
+            runCatching { checkPasswordReminderUseCase(false) }
+                .onSuccess { show ->
+                    _state.update { it.copy(isTestPasswordRequired = show) }
+                }.onFailure {
+                    Timber.e(it)
+                }
+        }
+    }
+
+    /**
+     * Show test password handled
+     *
+     */
+    fun onTestPasswordHandled() {
+        _state.update { it.copy(isTestPasswordRequired = false) }
     }
 }

@@ -39,7 +39,6 @@ import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
-import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.myAccount.usecase.CheckVersionsUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
@@ -90,6 +89,7 @@ import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
 import nz.mega.sdk.MegaAccountDetails
@@ -743,23 +743,19 @@ class MyAccountViewModel @Inject constructor(
      * @param context
      */
     fun logout(context: Context) {
-        checkPasswordReminderUseCase.check(true)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { show ->
+        viewModelScope.launch {
+            runCatching { checkPasswordReminderUseCase(true) }
+                .onSuccess { show ->
                     if (show) {
                         context.startActivity(
                             Intent(context, TestPasswordActivity::class.java)
                                 .putExtra("logout", true)
                         )
                     } else AccountController.logout(context, megaApi, viewModelScope)
-                },
-                onError = { error ->
+                }.onFailure { error ->
                     Timber.e(error, "Error when killing sessions")
                 }
-            )
-            .addTo(composite)
+        }
     }
 
     /**
