@@ -40,4 +40,15 @@ class VersionsFileViewModel @Inject constructor(
             _state.update { it.copy(isNodeInBackups = isNodeInBackups) }
         }
     }
+
+    /**
+     * Handles the display of the top-right "Delete" button
+     *
+     * @param isCurrentVersionSelected Whether the current Version was selected during Long Press
+     * or not
+     *
+     * @return Whether the top-right "Delete" button is shown or not
+     */
+    fun showDeleteVersionsButton(isCurrentVersionSelected: Boolean) =
+        _state.value.isNodeInBackups.not() || isCurrentVersionSelected.not()
 }

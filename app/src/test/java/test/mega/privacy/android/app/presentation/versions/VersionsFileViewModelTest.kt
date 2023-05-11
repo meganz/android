@@ -16,12 +16,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 /**
  * Test class for [VersionsFileViewModel]
@@ -82,4 +85,25 @@ class VersionsFileViewModelTest {
                 assertThat(awaitItem().isNodeInBackups).isEqualTo(isNodeInBackups)
             }
         }
+
+    @ParameterizedTest(name = "when isNodeInInbox is {0} and isCurrentVersionSelected is {1}, show delete versions button is {2}")
+    @MethodSource("provideDeleteParameters")
+    fun `test that the action bar delete button visibility is handled`(
+        isNodeInBackups: Boolean,
+        isCurrentVersionSelected: Boolean,
+        showDeleteVersionsButton: Boolean,
+    ) = runTest {
+        whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
+
+        underTest.init(123456L)
+        val expected = underTest.showDeleteVersionsButton(isCurrentVersionSelected)
+        assertThat(expected).isEqualTo(showDeleteVersionsButton)
+    }
+
+    private fun provideDeleteParameters() = Stream.of(
+        Arguments.of(false, true, true),
+        Arguments.of(false, false, true),
+        Arguments.of(true, true, false),
+        Arguments.of(true, false, true),
+    )
 }

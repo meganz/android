@@ -207,7 +207,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
-            val nodes = adapter?.selectedNodes
+            val nodes = adapter?.selectedNodeVersions?.first
             when (item.itemId) {
                 R.id.cab_menu_select_all -> {
                     selectAll()
@@ -264,11 +264,14 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             Timber.d("onPrepareActionMode")
 
             adapter?.let { adapter ->
-                adapter.selectedNodes?.let { selected ->
+                adapter.selectedNodeVersions.let { selectedNodesPair ->
                     with(menu) {
-                        if (selected.size != 0) {
+                        val selectedNodes = selectedNodesPair.first
+                        val isCurrentVersionSelected = selectedNodesPair.second
+
+                        if (selectedNodes.size != 0) {
                             val unselect = menu.findItem(R.id.cab_menu_unselect_all)
-                            if (selected.size == adapter.itemCount) {
+                            if (selectedNodes.size == adapter.itemCount) {
                                 findItem(R.id.cab_menu_select_all).isVisible = false
                                 unselect.title = getString(R.string.action_unselect_all)
                                 unselect.isVisible = true
@@ -277,7 +280,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                                 unselect.title = getString(R.string.action_unselect_all)
                                 unselect.isVisible = true
                             }
-                            if (selected.size == 1) {
+                            if (selectedNodes.size == 1) {
                                 findItem(R.id.action_revert_version).isVisible =
                                     selectedPosition != 0
                                 findItem(R.id.action_download_versions).isVisible = true
@@ -285,7 +288,8 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                                 findItem(R.id.action_revert_version).isVisible = false
                                 findItem(R.id.action_download_versions).isVisible = false
                             }
-                            findItem(R.id.action_delete_versions).isVisible = true
+                            findItem(R.id.action_delete_versions).isVisible =
+                                viewModel.showDeleteVersionsButton(isCurrentVersionSelected)
                         } else {
                             findItem(R.id.cab_menu_select_all).isVisible = true
                             findItem(R.id.cab_menu_unselect_all).isVisible = false
@@ -772,14 +776,13 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         Timber.d("updateActionModeTitle")
 
         actionMode?.let {
-            val nodes = adapter?.selectedNodes ?: emptyList()
-            val res = resources
-            val format = "%d %s"
-            it.title = String.format(
-                format,
-                nodes.size,
-                res.getQuantityString(R.plurals.general_num_files, nodes.size)
-            )
+            val selectedNodes = adapter?.selectedNodeVersions?.first ?: emptyList()
+            it.title = "${selectedNodes.size} ${
+                resources.getQuantityString(
+                    R.plurals.general_num_files,
+                    selectedNodes.size,
+                )
+            }"
             try {
                 it.invalidate()
             } catch (e: NullPointerException) {

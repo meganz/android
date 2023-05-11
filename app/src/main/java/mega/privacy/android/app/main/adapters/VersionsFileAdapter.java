@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -206,37 +207,26 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
         return selectedItems.get(position);
     }
 
-    public int getSelectedItemCount() {
-        return selectedItems.size();
-    }
-
-    public List<Integer> getSelectedItems() {
-        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-        for (int i = 0; i < selectedItems.size(); i++) {
-            items.add(selectedItems.keyAt(i));
-        }
-        return items;
-    }
-
-    /*
-     * Get list of all selected nodes
+    /**
+     * Retrieves the selected Node Versions
+     * @return a Pair containing the List of selected Node Versions and whether the current Version
+     * has been selected or not
      */
-    public List<MegaNode> getSelectedNodes() {
-        ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+    @NonNull
+    public Pair<List<MegaNode>, Boolean> getSelectedNodeVersions() {
+        ArrayList<MegaNode> nodeVersions = new ArrayList<>();
+        boolean isCurrentVersionSelected = selectedItems.get(0);
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.valueAt(i) == true) {
-                MegaNode document = getNodeAt(selectedItems.keyAt(i));
-                if (document != null) {
-                    nodes.add(document);
+            if (selectedItems.valueAt(i)) {
+                int position = selectedItems.keyAt(i);
+                MegaNode version = getNodeAt(position);
+                if (version != null) {
+                    nodeVersions.add(version);
                 }
             }
         }
-        return nodes;
-    }
-
-    public List<MegaNode> getNodes() {
-        return nodes;
+        return new Pair<>(nodeVersions, isCurrentVersionSelected);
     }
 
     public VersionsFileAdapter(Context _context, ArrayList<MegaNode> _nodes, RecyclerView recyclerView) {
