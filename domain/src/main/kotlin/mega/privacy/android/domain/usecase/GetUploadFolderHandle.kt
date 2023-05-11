@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase
 
 /**
  * Use Case for getting Either Primary or Secondary Folder Handle
- *
  */
+@Deprecated("Use GetPrimaryFolderSyncHandleUseCase or GetSecondarySyncHandleUseCase instead")
 fun interface GetUploadFolderHandle {
 
     /**
