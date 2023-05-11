@@ -20,6 +20,13 @@ import mega.privacy.android.core.ui.theme.h6
 /**
  * A reusable Dialog
  */
+@Deprecated(
+    "MegaDialog has been deprecated in favour of Specific dialogs in our Design system: " +
+            "https://www.figma.com/file/Ki502d51Imw3nzscZe7Slt/Components---Android?type=design&node-id=337-1713&t=LMP26QoxVcHMqUxf-0" +
+            "check that the Dialog you need is defined in our Design system and if it's already implemented (like [MegaAlertDialog] or [ConfirmationWithRadioButtonsDialog])," +
+            "If the dialog you need is not implemented you should implement it first:" +
+            "https://confluence.developers.mega.co.nz/display/MOB/Implementing+new+designs",
+)
 @Composable
 fun MegaDialog(
     modifier: Modifier = Modifier,

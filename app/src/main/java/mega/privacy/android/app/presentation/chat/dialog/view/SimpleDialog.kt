@@ -9,7 +9,6 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,7 +32,10 @@ import mega.privacy.android.core.ui.theme.white_alpha_060
  * @param onDismiss                 When dismiss the alert dialog.
  * @param onConfirmButton           When confirm the alert dialog.
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@Deprecated(
+    message = "Please use [MegaAlertDialog] as it's better following our design system definition",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog")
+)
 @Composable
 fun SimpleDialog(
     title: Int?,
