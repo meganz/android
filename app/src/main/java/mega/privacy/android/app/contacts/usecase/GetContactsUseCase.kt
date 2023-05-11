@@ -256,10 +256,12 @@ class GetContactsUseCase @Inject constructor(
      *
      * @param userEmail     Email to retrieve
      * @return              Maybe containing MegaUser
-     * @see [Maybe]
+     * @return              Single containing MegaUser
      */
-    fun getMegaUser(userEmail: String?): Maybe<MegaUser> =
-        Maybe.create { megaApi.getContact(userEmail) }
+    fun getMegaUser(userEmail: String?): Single<MegaUser> =
+        Single.fromCallable {
+            userEmail?.let { megaApi.getContact(userEmail) } ?: error("Error MegaUser is null")
+        }
 
     /**
      * Build ContactItem.Data from MegaUser object
