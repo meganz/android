@@ -20,7 +20,7 @@ internal fun toNewFormattedPriceString(
     locale: Locale = Locale.getDefault(),
 ): Pair<String, String> {
     val format = NumberFormat.getCurrencyInstance(locale)
-    format.currency = Currency.getInstance(currencyAmount.currency.currency)
+    format.currency = Currency.getInstance(currencyAmount.currency.code)
     val currencyCode = format.currency?.currencyCode ?: "EUR"
     return Pair(format.format(currencyAmount.value), currencyCode)
 }

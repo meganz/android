@@ -112,7 +112,7 @@ internal class PaymentViewModel @Inject constructor(
         // Try get the local pricing details from the store if available otherwise use "default" from Mega
         val details = getLocalPricingUseCase(getSku(product))
         val (price, currency) = if (details != null) {
-            details.amount.value / 1000000.00 to details.currency.currency
+            details.amount.value / 1000000.00 to details.currency.code
         } else {
             product.amount / 100.00 to product.currency
         }

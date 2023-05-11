@@ -20,6 +20,6 @@ internal fun toFormattedPriceString(
     locale: Locale = Locale.getDefault(),
 ): String {
     val format = NumberFormat.getCurrencyInstance(locale)
-    format.currency = Currency.getInstance(currencyAmount.currency.currency)
+    format.currency = Currency.getInstance(currencyAmount.currency.code)
     return format.format(currencyAmount.value)
 }

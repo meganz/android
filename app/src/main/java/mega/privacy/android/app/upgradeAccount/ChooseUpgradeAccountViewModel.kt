@@ -87,7 +87,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
 
         if (details != null) {
             price = details.amount.value / 1000000.00
-            currency = details.currency.currency
+            currency = details.currency.code
         }
 
         val format = NumberFormat.getCurrencyInstance()

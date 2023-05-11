@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity
 /**
  * Currency value class
  *
- * @property currency
+ * @property code
  */
 @JvmInline
-value class Currency(val currency: String?)
+value class Currency(val code: String?)
