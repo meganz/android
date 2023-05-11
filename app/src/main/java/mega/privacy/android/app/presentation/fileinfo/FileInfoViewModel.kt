@@ -20,6 +20,7 @@ import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
@@ -50,12 +51,16 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -113,6 +118,10 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val isCameraUploadSyncEnabled: IsCameraUploadSyncEnabled,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
@@ -242,7 +251,7 @@ class FileInfoViewModel @Inject constructor(
      * if it's already in the rubbish bin, deletes the node.
      * It will sets the proper [FileInfoJobInProgressState] and launch the proper [FileInfoOneOffViewEvent.Finished]
      */
-    fun removeNode() {
+    internal fun removeNode() {
         if (_uiState.value.isNodeInRubbish) {
             deleteNode()
         } else {
@@ -381,6 +390,7 @@ class FileInfoViewModel @Inject constructor(
      * Set out sharing permission for contacts in [emails] list.
      */
     fun setSharePermissionForUsers(accessPermission: AccessPermission, emails: List<String>) {
+        extraActionFinished()
         val alreadySet = _uiState.value.outShares.map { it.contactItem.email }.containsAll(emails)
         changeSharePermissionForUsers(
             accessPermission,
@@ -388,12 +398,6 @@ class FileInfoViewModel @Inject constructor(
             *emails.toTypedArray()
         )
     }
-
-    /**
-     * Set out sharing permission for selected contacts, see [FileInfoViewState.outShareContactsSelected].
-     */
-    fun setSharePermissionForSelectedUsers(accessPermission: AccessPermission) =
-        setSharePermissionForUsers(accessPermission, _uiState.value.outShareContactsSelected)
 
     /**
      * Removes permission for contacts in [emails]
@@ -414,6 +418,115 @@ class FileInfoViewModel @Inject constructor(
             clipboardGateway.setClip(Constants.COPIED_TEXT_LABEL, it)
             _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.PublicLinkCopiedToClipboard)
         }
+    }
+
+    /**
+     * Updates the uiState to confirm remove shared contacts
+     */
+    fun initiateRemoveContacts(emails: List<String>) {
+        if (!checkAndHandleIsDeviceConnected()) {
+            return
+        }
+        _uiState.update {
+            it.copy(
+                requiredExtraAction = FileInfoExtraAction.ConfirmRemove.DeleteContact(emails)
+            )
+        }
+    }
+
+    /**
+     * Updates the uiState to confirm remove shared contacts
+     */
+    fun initiateChangePermission(
+        emails: List<String>?,
+    ) {
+        if (!checkAndHandleIsDeviceConnected()) {
+            return
+        }
+        val actualEmails = emails ?: _uiState.value.outShareContactsSelected
+        val actualPermissions = actualEmails.map { email ->
+            _uiState.value.outShares.firstOrNull {
+                it.contactItem.email == email
+            }?.accessPermission ?: AccessPermission.UNKNOWN
+        }
+        //if all current permissions are the same, we set it as selected one
+        val selected = actualPermissions.firstOrNull()
+            ?.takeIf { candidate -> actualPermissions.all { it == candidate } }
+
+        _uiState.update {
+            it.copy(
+                requiredExtraAction = FileInfoExtraAction.ChangePermission(actualEmails, selected)
+            )
+        }
+    }
+
+    /**
+     * Updates the uiState to confirm remove shared contacts
+     */
+    fun initiateRemoveLink() {
+        if (!checkAndHandleIsDeviceConnected()) {
+            return
+        }
+        _uiState.update {
+            it.copy(requiredExtraAction = FileInfoExtraAction.ConfirmRemove.DeleteLink)
+        }
+    }
+
+
+    /**
+     * Updates the uiState to confirm remove node
+     */
+    fun initiateRemoveNode(sendToRubbish: Boolean) {
+        if (!checkAndHandleIsDeviceConnected()) {
+            return
+        }
+        viewModelScope.launch {
+            val requiresAction =
+                if (sendToRubbish) {
+                    val handle = nodeId.longValue
+                    when {
+                        getPrimarySyncHandleUseCase() == handle && isCameraUploadSyncEnabled() -> {
+                            FileInfoExtraAction.ConfirmRemove.SendToRubbishCameraUploads
+                        }
+
+                        getSecondarySyncHandleUseCase() == handle && isSecondaryFolderEnabled() -> {
+                            FileInfoExtraAction.ConfirmRemove.SendToRubbishSecondaryMediaUploads
+                        }
+
+                        else -> FileInfoExtraAction.ConfirmRemove.SendToRubbish
+                    }
+                } else {
+                    FileInfoExtraAction.ConfirmRemove.Delete
+                }
+
+            _uiState.update {
+                it.copy(requiredExtraAction = requiresAction)
+            }
+        }
+    }
+
+    /**
+     * User has confirmed a remove (something) action, so it will be done
+     */
+    fun removeConfirmed() {
+        (_uiState.value.requiredExtraAction as? FileInfoExtraAction.ConfirmRemove)?.let {
+            extraActionFinished()
+            when (it) {
+                is FileInfoExtraAction.ConfirmRemove.RemoveNode -> removeNode()
+                is FileInfoExtraAction.ConfirmRemove.DeleteContact -> {
+                    removeSharePermissionForUsers(*it.emails.toTypedArray())
+                }
+
+                is FileInfoExtraAction.ConfirmRemove.DeleteLink -> stopSharing()
+            }
+        }
+    }
+
+    /**
+     * The required extra user action has finished, either done or cancelled
+     */
+    fun extraActionFinished() {
+        _uiState.update { it.copy(requiredExtraAction = null) }
     }
 
     /**

@@ -1,13 +1,9 @@
 package mega.privacy.android.app.presentation.fileinfo
 
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
-import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -16,9 +12,7 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.core.view.WindowCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.BaseActivity
@@ -30,7 +24,6 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.databinding.DialogLinkBinding
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -42,12 +35,12 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -64,7 +57,6 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
@@ -94,7 +86,6 @@ class FileInfoActivity : BaseActivity() {
     private var adapterType = 0
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
-    private val density by lazy { outMetrics.density }
     private val nodeAttacher by lazy { MegaAttacher(this) }
     private val nodeSaver by lazy {
         NodeSaver(
@@ -166,6 +157,14 @@ class FileInfoActivity : BaseActivity() {
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
                 )
+                uiState.requiredExtraAction?.let { action ->
+                    ExtraActionDialog(
+                        action = action,
+                        onRemoveConfirmed = viewModel::removeConfirmed,
+                        onPermissionSelected = viewModel::setSharePermissionForUsers,
+                        onDismiss = viewModel::extraActionFinished,
+                    )
+                }
                 updateContactShareBottomSheet(uiState)
             }
         }
@@ -271,7 +270,7 @@ class FileInfoActivity : BaseActivity() {
                                 MegaShare.ACCESS_READ
                             ) != true
                         ) {
-                            showAccessPermissionOptionsDialog(contactsData)
+                            viewModel.initiateChangePermission(contactsData)
                         }
                     } else {
                         Timber.w("ERROR, the file is not folder")
@@ -314,25 +313,25 @@ class FileInfoActivity : BaseActivity() {
         when (action) {
             FileInfoMenuAction.Copy -> navigateToCopy()
             FileInfoMenuAction.Move -> navigateToMove()
-            FileInfoMenuAction.Delete -> showConfirmDeleteDialog(sendToRubbish = false)
-            FileInfoMenuAction.MoveToRubbishBin -> showConfirmDeleteDialog(sendToRubbish = true)
+            FileInfoMenuAction.Delete -> viewModel.initiateRemoveNode(sendToRubbish = false)
+            FileInfoMenuAction.MoveToRubbishBin -> viewModel.initiateRemoveNode(sendToRubbish = true)
             FileInfoMenuAction.Rename -> showRenameDialog()
             FileInfoMenuAction.Download -> downloadNode()
             FileInfoMenuAction.GetLink, FileInfoMenuAction.ManageLink -> navigateToGetLink()
-            FileInfoMenuAction.RemoveLink -> showConfirmRemoveLinkDialog()
+            FileInfoMenuAction.RemoveLink -> viewModel.initiateRemoveLink()
             FileInfoMenuAction.ShareFolder -> showShareFolderDialog()
             FileInfoMenuAction.Leave -> showConfirmLeaveDialog()
             FileInfoMenuAction.SendToChat -> navigateToSendToChat()
             FileInfoMenuAction.DisputeTakedown -> navigateToDisputeTakeDown()
             FileInfoMenuAction.SelectionModeAction.ChangePermission -> {
-                showAccessPermissionOptionsDialog(null)
+                viewModel.initiateChangePermission(null)
             }
+
             FileInfoMenuAction.SelectionModeAction.ClearSelection -> viewModel.unselectAllContacts()
             FileInfoMenuAction.SelectionModeAction.Remove -> {
-                showConfirmRemoveContactsFromShareDialog(
-                    *viewState.outShareContactsSelected.toTypedArray()
-                )
+                viewModel.initiateRemoveContacts(viewState.outShareContactsSelected)
             }
+
             FileInfoMenuAction.SelectionModeAction.SelectAll -> viewModel.selectAllVisibleContacts()
         }
     }
@@ -404,109 +403,12 @@ class FileInfoActivity : BaseActivity() {
         )
     }
 
-    /**
-     * @param usersEmails list of users to set the permissions, if null the current selected users will be used
-     * @param selected the current permission assigned to these users, if any
-     */
-    private fun showAccessPermissionOptionsDialog(
-        usersEmails: List<String>?,
-        selected: AccessPermission? = null,
-    ) {
-        val dialogBuilder =
-            MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
-        val items = listOf(
-            getString(R.string.file_properties_shared_folder_read_only) to AccessPermission.READ,
-            getString(R.string.file_properties_shared_folder_read_write) to AccessPermission.READWRITE,
-            getString(R.string.file_properties_shared_folder_full_access) to AccessPermission.FULL,
-        )
-        dialogBuilder.setSingleChoiceItems(
-            items.map { it.first }.toTypedArray(),
-            items.indexOfFirst { it.second == selected }) { dialog, item ->
-            dialog.dismiss()
-            if (usersEmails != null) {
-                viewModel.setSharePermissionForUsers(items[item].second, usersEmails)
-            } else {
-                viewModel.setSharePermissionForSelectedUsers(items[item].second)
-            }
-        }.show()
-    }
-
-    private fun showConfirmDeleteDialog(sendToRubbish: Boolean) {
-        Timber.d("moveToTrash")
-        if (!viewModel.checkAndHandleIsDeviceConnected()) {
-            return
-        }
-        if (isFinishing) {
-            return
-        }
-
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog).apply {
-            val messageId = if (sendToRubbish) {
-                val handle = viewModel.nodeId.longValue
-                when {
-                    CameraUploadUtil.getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled() -> {
-                        R.string.confirmation_move_cu_folder_to_rubbish
-                    }
-                    CameraUploadUtil.getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled() -> {
-                        R.string.confirmation_move_mu_folder_to_rubbish
-                    }
-                    else -> {
-                        R.string.confirmation_move_to_rubbish
-                    }
-                }
-            } else {
-                R.string.confirmation_delete_from_mega
-            }
-
-            setMessage(messageId)
-            setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                viewModel.removeNode()
-            }
-            setNegativeButton(R.string.general_cancel, null)
-            show()
-        }
-    }
-
     private fun showConfirmLeaveDialog() {
         showConfirmationLeaveIncomingShare(
             this,
             this,
             viewModel.node
         )
-    }
-
-    private fun showConfirmRemoveLinkDialog() {
-        if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
-            return
-        }
-        val dialogLayout = DialogLinkBinding.inflate(layoutInflater).apply {
-            (dialogLinkTextRemove.layoutParams as RelativeLayout.LayoutParams).setMargins(
-                Util.scaleWidthPx(
-                    25,
-                    outMetrics
-                ), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), 0
-            )
-            dialogLinkLinkUrl.isVisible = false
-            dialogLinkLinkKey.isVisible = false
-            dialogLinkSymbol.isVisible = false
-            dialogLinkTextRemove.isVisible = true
-            dialogLinkTextRemove.text =
-                getString(R.string.context_remove_link_warning_text)
-
-            val isLandscape =
-                resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-            val size = if (isLandscape) 10 else 15
-            val scaleW = Util.getScaleW(outMetrics, density)
-            dialogLinkTextRemove.setTextSize(TypedValue.COMPLEX_UNIT_SP, size * scaleW)
-        }
-
-        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setView(dialogLayout.root)
-            .setPositiveButton(getString(R.string.context_remove)) { _: DialogInterface?, _: Int ->
-                viewModel.stopSharing()
-            }.setNegativeButton(getString(R.string.general_cancel), null)
-            .show()
     }
 
     private fun showShareFolderDialog() {
@@ -531,23 +433,6 @@ class FileInfoActivity : BaseActivity() {
     private fun showRenameDialog() =
         showRenameNodeDialog(this, viewModel.node, this, null)
 
-    private fun showConfirmRemoveContactsFromShareDialog(vararg emails: String) =
-        MaterialAlertDialogBuilder(this)
-            .setMessage(
-                emails.singleOrNull()?.let { singleContact ->
-                    getString(R.string.remove_contact_shared_folder, singleContact)
-                } ?: resources.getQuantityString(
-                    R.plurals.remove_multiple_contacts_shared_folder,
-                    emails.size,
-                    emails.size
-                )
-            )
-            .setPositiveButton(getString(R.string.general_remove)) { _: DialogInterface?, _: Int ->
-                viewModel.removeSharePermissionForUsers(*emails)
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-
     private suspend fun consumeEvent(
         event: FileInfoOneOffViewEvent,
         snackBarHostState: SnackbarHostState,
@@ -560,24 +445,29 @@ class FileInfoActivity : BaseActivity() {
                     this
                 )
             }
+
             FileInfoOneOffViewEvent.NodeDeleted -> {
                 //the node has been deleted, this screen has no more sense
                 finish()
             }
+
             FileInfoOneOffViewEvent.PublicLinkCopiedToClipboard -> {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
                     //Android 13 and up shows a system notification, so no need to show the toast
                     snackBarHostState.showSnackbar(getString(R.string.file_properties_get_link))
                 }
             }
+
             is FileInfoOneOffViewEvent.GeneralError -> {
                 snackBarHostState.showSnackbar(getString(R.string.general_error))
             }
+
             is FileInfoOneOffViewEvent.CollisionDetected -> {
                 val list = ArrayList<NameCollision>()
                 list.add(event.collision)
                 nameCollisionActivityContract?.launch(list)
             }
+
             is FileInfoOneOffViewEvent.Finished -> {
                 if (event.exception == null) {
                     event.jobFinished.successMessage?.let {
@@ -593,6 +483,7 @@ class FileInfoActivity : BaseActivity() {
                     }
                 }
             }
+
             is FileInfoOneOffViewEvent.Message -> snackBarHostState.showSnackbar(getString(event.message))
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
         }
@@ -609,11 +500,11 @@ class FileInfoActivity : BaseActivity() {
                     viewModel.node,
                     object : FileContactsListBottomSheetDialogListener {
                         override fun changePermissions(userEmail: String) {
-                            showAccessPermissionOptionsDialog(listOf(userEmail))
+                            viewModel.initiateChangePermission(listOf(userEmail))
                         }
 
                         override fun removeFileContactShare(userEmail: String) {
-                            showConfirmRemoveContactsFromShareDialog(userEmail)
+                            viewModel.initiateRemoveContacts(listOf(userEmail))
                         }
 
                         override fun fileContactsDialogDismissed() {

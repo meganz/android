@@ -5,14 +5,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.LocalAbsoluteElevation
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.extensions.composeLet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -41,51 +44,44 @@ fun MegaAlertDialog(
     title: String? = null,
     dismissOnClickOutside: Boolean = true,
     dismissOnBackPress: Boolean = true,
-) = AlertDialog(
-    modifier = modifier,
-    title = title?.composeLet {
-        Text(
-            modifier = Modifier.testTag(TITLE_TAG),
-            text = it,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onSurface,
-        )
-    },
-    text = {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.textColorSecondary
-        )
-    },
-    onDismissRequest = onDismiss,
-    confirmButton = {
-        TextMegaButton(
-            modifier = Modifier.testTag(CONFIRM_TAG),
-            text = confirmButtonText,
-            onClick = {
-                onDismiss()
-                onConfirm()
-            },
-        )
-    },
-    dismissButton = cancelButtonText?.composeLet {
-        TextMegaButton(
-            modifier = Modifier.testTag(CANCEL_TAG),
-            text = cancelButtonText,
-            onClick = onDismiss,
-        )
-    },
-    properties = DialogProperties(
-        dismissOnBackPress = dismissOnBackPress,
-        dismissOnClickOutside = dismissOnClickOutside,
-    ),
-)
-
-private fun <T> T.composeLet(block: @Composable (T) -> Unit): @Composable () -> Unit {
-    return {
-        block(this)
-    }
+) = CompositionLocalProvider(LocalAbsoluteElevation provides 24.dp) {
+    AlertDialog(
+        modifier = modifier,
+        title = title?.composeLet {
+            Text(
+                modifier = Modifier.testTag(TITLE_TAG),
+                text = it,
+                style = MaterialTheme.typography.subtitle1,
+                color = MaterialTheme.colors.onSurface,
+            )
+        },
+        text = {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.subtitle1,
+                color = MaterialTheme.colors.textColorSecondary
+            )
+        },
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextMegaButton(
+                modifier = Modifier.testTag(CONFIRM_TAG),
+                text = confirmButtonText,
+                onClick = onConfirm,
+            )
+        },
+        dismissButton = cancelButtonText?.composeLet {
+            TextMegaButton(
+                modifier = Modifier.testTag(CANCEL_TAG),
+                text = cancelButtonText,
+                onClick = onDismiss,
+            )
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = dismissOnBackPress,
+            dismissOnClickOutside = dismissOnClickOutside,
+        ),
+    )
 }
 
 @CombinedThemePreviews

@@ -25,6 +25,7 @@ import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
@@ -50,12 +51,16 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -130,6 +135,10 @@ internal class FileInfoViewModelTest {
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
     private val monitorOnlineStatusUpdates = mock<MonitorOnlineStatusUseCase>()
     private val clipboardGateway = mock<ClipboardGateway>()
+    private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
+    private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
+    private val isCameraUploadSyncEnabled = mock<IsCameraUploadSyncEnabled>()
+    private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -184,6 +193,10 @@ internal class FileInfoViewModelTest {
             nodeActionMapper = nodeActionMapper,
             monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
             clipboardGateway = clipboardGateway,
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
+            isCameraUploadSyncEnabled = isCameraUploadSyncEnabled,
+            isSecondaryFolderEnabled = isSecondaryFolderEnabled,
         )
     }
 
@@ -789,6 +802,61 @@ internal class FileInfoViewModelTest {
         underTest.copyPublicLink()
         verify(clipboardGateway, times(1)).setClip(Constants.COPIED_TEXT_LABEL, link)
     }
+
+    @Test
+    fun `test that when initiate remove node on a node in the rubbish bin then the Delete confirmation action is set`() =
+        runTest {
+            underTest.setNode(node.handle)
+            underTest.initiateRemoveNode(false)
+            underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(FileInfoExtraAction.ConfirmRemove.Delete)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when initiate remove node on a node not in the rubbish bin then the SendToRubbish confirmation action is set`() =
+        runTest {
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(-1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(-1)
+            underTest.setNode(node.handle)
+            underTest.initiateRemoveNode(true)
+            underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
+                Truth.assertThat(awaitItem())
+                    .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbish)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+
+    @Test
+    fun `test that when initiate remove node on the primary camera upload folder then the SendToRubbishCameraUploads confirmation action is set`() =
+        runTest {
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(nodeId.longValue)
+            whenever(isCameraUploadSyncEnabled()).thenReturn(true)
+            underTest.setNode(node.handle)
+            underTest.initiateRemoveNode(true)
+            underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
+                Truth.assertThat(awaitItem())
+                    .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbishCameraUploads)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when initiate remove node on the secondary camera upload folder then the SendToRubbishSecondaryMediaUploads confirmation action is set`() =
+        runTest {
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(-1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(nodeId.longValue)
+            whenever(isSecondaryFolderEnabled()).thenReturn(true)
+            underTest.setNode(node.handle)
+            underTest.initiateRemoveNode(true)
+            underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
+                Truth.assertThat(awaitItem())
+                    .isEqualTo(FileInfoExtraAction.ConfirmRemove.SendToRubbishSecondaryMediaUploads)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(

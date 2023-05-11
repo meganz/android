@@ -26,22 +26,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import mega.privacy.android.core.ui.extensions.composeLet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Confirmation dialog with radio button
+ * @param radioOptions the options to be shown, can be of any type [T],
+ * T.toString() will be used by default to set the text button, but can be defined with [optionDescriptionMapper]
+ * @param optionDescriptionMapper can be used to map each option to the text that represents it, toString() will be used by default
  *
  */
 @Composable
-fun ConfirmationWithRadioButtonsDialog(
+fun <T> ConfirmationWithRadioButtonsDialog(
+    radioOptions: List<T>?,
+    onOptionSelected: (T) -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     titleText: String = "",
-    buttonText: String = " ",
-    initialSelectedOption: String? = null,
-    radioOptions: List<String>? = null,
-    onDismissRequest: () -> Unit,
-    onOptionSelected: (Int) -> Unit,
+    buttonText: String? = null,
+    initialSelectedOption: T? = null,
+    optionDescriptionMapper: @Composable (T) -> String = { it.toString() },
     properties: DialogProperties = DialogProperties(),
 ) {
 
@@ -80,24 +85,24 @@ fun ConfirmationWithRadioButtonsDialog(
                 }
 
                 Column(modifier = modifier.selectableGroup()) {
-                    radioOptions?.forEach { label ->
+                    radioOptions?.forEach { item ->
                         Row(
                             modifier
                                 .fillMaxWidth()
                                 .height(48.dp)
                                 .selectable(
-                                    selected = (label == initialSelectedOption),
+                                    selected = (item == initialSelectedOption),
                                     onClick = {
-                                        onOptionSelected(radioOptions.indexOf(label))
+                                        onOptionSelected(item)
                                     },
                                     role = Role.RadioButton
                                 )
                                 .padding(horizontal = 10.dp),
                         ) {
                             RadioButton(
-                                selected = (label == initialSelectedOption),
+                                selected = (item == initialSelectedOption),
                                 colors = radioButtonColors,
-                                onClick = { onOptionSelected(radioOptions.indexOf(label)) }
+                                onClick = { onOptionSelected(item) }
                             )
                             Box(
                                 modifier = modifier
@@ -107,7 +112,7 @@ fun ConfirmationWithRadioButtonsDialog(
                                 Text(
                                     modifier = modifier
                                         .padding(start = 20.dp),
-                                    text = label,
+                                    text = optionDescriptionMapper(item),
                                     style = MaterialTheme.typography.subtitle1.copy(
                                         color = MaterialTheme.colors.onPrimary,
                                         textAlign = TextAlign.Start
@@ -118,22 +123,24 @@ fun ConfirmationWithRadioButtonsDialog(
                     }
                 }
 
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    TextButton(
-                        onClick = onDismissRequest,
+                buttonText?.composeLet { buttonText ->
+                    Box(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        contentAlignment = Alignment.CenterEnd,
                     ) {
-                        Text(
-                            text = buttonText,
-                            style = MaterialTheme.typography.button.copy(
-                                color = MaterialTheme.colors.secondary,
-                                textAlign = TextAlign.End
+                        TextButton(
+                            onClick = onDismissRequest,
+                        ) {
+                            Text(
+                                text = buttonText,
+                                style = MaterialTheme.typography.button.copy(
+                                    color = MaterialTheme.colors.secondary,
+                                    textAlign = TextAlign.End
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }

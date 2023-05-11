@@ -90,22 +90,6 @@ class MegaAlertDialogTest {
     }
 
     @Test
-    fun `test that on dismiss is fired when confirm button is pressed`() {
-        val onDismiss = mock<() -> Unit>()
-        composeRule.setContent {
-            MegaAlertDialog(
-                text = "text",
-                confirmButtonText = "confirm",
-                cancelButtonText = "cancel",
-                onConfirm = {},
-                onDismiss = onDismiss,
-            )
-        }
-        composeRule.onNodeWithTag(CONFIRM_TAG).performClick()
-        verify(onDismiss).invoke()
-    }
-
-    @Test
     fun `test that on onConfirm is fired when confirm button is pressed`() {
         val onConfirm = mock<() -> Unit>()
         composeRule.setContent {
