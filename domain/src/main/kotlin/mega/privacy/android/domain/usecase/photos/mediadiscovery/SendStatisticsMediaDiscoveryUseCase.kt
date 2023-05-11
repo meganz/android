@@ -26,19 +26,25 @@ class SendStatisticsMediaDiscoveryUseCase @Inject constructor(
         statisticsRepository.setMediaDiscoveryClickCountFolder(++clickCountFolder, mediaHandle)
 
         statisticsRepository.sendEvent(
-            mediaDiscoveryClickedEventId,
-            "Media Discovery Click"
+            eventId = mediaDiscoveryClickedEventId,
+            message = "Media Discovery Click",
+            addJourneyId = false,
+            viewId = null,
         )
         if (clickCount >= 3) {
             statisticsRepository.sendEvent(
-                multiClickEventId,
-                "Media Discovery Click >= 3"
+                eventId = multiClickEventId,
+                message = "Media Discovery Click >= 3",
+                addJourneyId = false,
+                viewId = null,
             )
         }
         if (clickCountFolder >= 3) {
             statisticsRepository.sendEvent(
-                sameFolderMultiClickEventId,
-                "Media Discovery Click Specific Folder >= 3"
+                eventId = sameFolderMultiClickEventId,
+                message = "Media Discovery Click Specific Folder >= 3",
+                addJourneyId = false,
+                viewId = null,
             )
         }
     }

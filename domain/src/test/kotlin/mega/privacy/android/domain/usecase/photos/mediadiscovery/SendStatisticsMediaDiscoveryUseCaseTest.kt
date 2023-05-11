@@ -41,7 +41,9 @@ class SendStatisticsMediaDiscoveryUseCaseTest {
 
         verify(statisticsRepository).sendEvent(
             mediaDiscoveryClickedEventId,
-            "Media Discovery Click"
+            "Media Discovery Click",
+            false,
+            null,
         )
     }
 
@@ -67,7 +69,9 @@ class SendStatisticsMediaDiscoveryUseCaseTest {
 
             verify(statisticsRepository).sendEvent(
                 multiClickEventId,
-                "Media Discovery Click >= 3"
+                "Media Discovery Click >= 3",
+                false,
+                null
             )
         }
 
@@ -81,7 +85,9 @@ class SendStatisticsMediaDiscoveryUseCaseTest {
 
             verify(statisticsRepository).sendEvent(
                 sameFolderMultiClickEventId,
-                "Media Discovery Click Specific Folder >= 3"
+                "Media Discovery Click Specific Folder >= 3",
+                false,
+                null
             )
         }
 }
