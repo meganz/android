@@ -139,6 +139,20 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
+    /**
+     * Gets the completed transfers.
+     *
+     * @return The list with the completed transfers.
+     */
+    val completedTransfers: List<CompletedTransfer?>
+
+    /**
+     * Gets the completed transfers which have as state cancelled or failed.
+     *
+     * @return The list the cancelled or failed transfers.
+     */
+    val failedOrCancelledTransfers: ArrayList<CompletedTransfer>
+
     fun saveCredentials(userCredentials: UserCredentials)
     fun saveSyncRecord(record: SyncRecord)
     fun updateVideoState(state: Int)
@@ -202,6 +216,14 @@ interface DatabaseHandler {
      * @param transfer The transfer to check and add.
      */
     fun addCompletedTransferWithCheck(transfer: CompletedTransfer)
+
+    /**
+     * Gets a completed transfer.
+     *
+     * @param id the identifier of the transfer to get
+     * @return The completed transfer which has the id value as identifier.
+     */
+    fun getCompletedTransfer(id: Long): CompletedTransfer?
 
     /**
      * Deletes a completed transfer.

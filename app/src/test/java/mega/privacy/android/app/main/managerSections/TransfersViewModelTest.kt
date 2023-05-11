@@ -12,10 +12,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.presentation.transfers.model.mapper.AndroidCompletedTransferMapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -51,7 +49,6 @@ internal class TransfersViewModelTest {
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
-    private val androidCompletedTransferMapper: AndroidCompletedTransferMapper = mock()
 
     @Before
     fun setUp() {
@@ -72,7 +69,6 @@ internal class TransfersViewModelTest {
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
-            androidCompletedTransferMapper = androidCompletedTransferMapper,
         )
     }
 
@@ -155,14 +151,12 @@ internal class TransfersViewModelTest {
     @Test
     fun `test that when a completed transfer event is received, the completed transfer list state is updated with the added completed transfer`() =
         runTest {
-            val completedTransfer = mock<CompletedTransfer>()
-            val expected = mock<AndroidCompletedTransfer>()
+            val expected = mock<CompletedTransfer>()
 
             whenever(dbH.completedTransfers).thenReturn(emptyList())
             whenever(monitorCompletedTransferEventUseCase()).thenReturn(
-                flow { emit(completedTransfer) }
+                flow { emit(expected) }
             )
-            whenever(androidCompletedTransferMapper.invoke(completedTransfer)).thenReturn(expected)
 
             underTest.completedState.test {
                 assertThat(awaitItem()).isEqualTo(CompletedTransfersState.TransfersUpdated(emptyList()))

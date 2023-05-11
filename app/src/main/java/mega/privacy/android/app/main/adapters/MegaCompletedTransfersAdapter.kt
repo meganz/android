@@ -8,7 +8,6 @@ import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
@@ -18,6 +17,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils.getRoundedBitmap
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder
 import mega.privacy.android.app.utils.Util.dp2px
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaTransfer.STATE_CANCELLED
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
@@ -30,11 +30,11 @@ import timber.log.Timber
  */
 class MegaCompletedTransfersAdapter(
     private val context: Context,
-    transfers: List<AndroidCompletedTransfer?>,
+    transfers: List<CompletedTransfer?>,
     private val megaApi: MegaApiAndroid,
 ) : RecyclerView.Adapter<TransferViewHolder>() {
 
-    private var completedTransfers: List<AndroidCompletedTransfer?>
+    private var completedTransfers: List<CompletedTransfer?>
 
     init {
         completedTransfers = transfers
@@ -43,9 +43,9 @@ class MegaCompletedTransfersAdapter(
     /**
      * Set completed transfers
      *
-     * @param transfers List<[AndroidCompletedTransfer]>
+     * @param transfers List<[CompletedTransfer]>
      */
-    fun setCompletedTransfers(transfers: List<AndroidCompletedTransfer?>) {
+    fun setCompletedTransfers(transfers: List<CompletedTransfer?>) {
         this.completedTransfers = transfers
         notifyDataSetChanged()
     }
@@ -168,7 +168,7 @@ class MegaCompletedTransfersAdapter(
      * @param position the removed position
      * @param transfers the transfer list after removed
      */
-    fun removeItemData(position: Int, transfers: List<AndroidCompletedTransfer?>) {
+    fun removeItemData(position: Int, transfers: List<CompletedTransfer?>) {
         completedTransfers = transfers
         notifyItemRemoved(position)
     }

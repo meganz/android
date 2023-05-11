@@ -29,12 +29,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer;
 import nz.mega.sdk.MegaNode;
 
 public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
@@ -43,7 +43,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
     private ManagerActivity managerActivity;
 
-    private AndroidCompletedTransfer transfer;
+    private CompletedTransfer transfer;
     private long handle;
     private long transferId;
 

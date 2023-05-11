@@ -11,14 +11,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.model.mapper.AndroidCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -54,7 +53,6 @@ class TransfersViewModel @Inject constructor(
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
-    androidCompletedTransferMapper: AndroidCompletedTransferMapper,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -91,7 +89,7 @@ class TransfersViewModel @Inject constructor(
         .catch { Timber.e(it) }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    private var completedTransfers = mutableListOf<AndroidCompletedTransfer?>()
+    private var completedTransfers = mutableListOf<CompletedTransfer?>()
     private var transferCallback = 0L
     private var currentTab = TransfersTab.NONE
     private var previousTab = TransfersTab.NONE
@@ -123,8 +121,7 @@ class TransfersViewModel @Inject constructor(
             monitorCompletedTransferEventUseCase()
                 .catch { Timber.e(it) }
                 .collect {
-                    val androidCompletedTransfer = androidCompletedTransferMapper(it)
-                    completedTransferFinished(androidCompletedTransfer)
+                    completedTransferFinished(it)
                 }
         }
     }
@@ -325,7 +322,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer the transfer to add
      */
-    private fun completedTransferFinished(transfer: AndroidCompletedTransfer) {
+    private fun completedTransferFinished(transfer: CompletedTransfer) {
         completedTransfers.add(0, transfer)
         if (completedTransfers.size > MAX_TRANSFERS) {
             completedTransfers.removeAt(completedTransfers.size - 1)
@@ -344,7 +341,7 @@ class TransfersViewModel @Inject constructor(
      * @param transfer transfer to remove
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
-    fun completedTransferRemoved(transfer: AndroidCompletedTransfer, isRemovedCache: Boolean) =
+    fun completedTransferRemoved(transfer: CompletedTransfer, isRemovedCache: Boolean) =
         viewModelScope.launch(ioDispatcher) {
             if (isRemovedCache) {
                 transfer.originalPath?.let {
@@ -387,8 +384,8 @@ class TransfersViewModel @Inject constructor(
         }
 
     private fun areTheSameTransfer(
-        transfer1: AndroidCompletedTransfer,
-        transfer2: AndroidCompletedTransfer,
+        transfer1: CompletedTransfer,
+        transfer2: CompletedTransfer,
     ) =
         transfer1.id == transfer2.id ||
                 (isValidHandle(transfer1) && isValidHandle(transfer2) &&
@@ -402,7 +399,7 @@ class TransfersViewModel @Inject constructor(
      * @param transfer AndroidCompletedTransfer to check.
      * @return True if the transfer has a valid handle, false otherwise.
      */
-    private fun isValidHandle(transfer: AndroidCompletedTransfer) =
+    private fun isValidHandle(transfer: CompletedTransfer) =
         !TextUtil.isTextEmpty(transfer.nodeHandle) && transfer.nodeHandle != MegaApiJava.INVALID_HANDLE.toString()
 
     /**
@@ -429,7 +426,7 @@ class TransfersViewModel @Inject constructor(
     /**
      * Get the completed transfers
      *
-     * @return [AndroidCompletedTransfer] list
+     * @return [CompletedTransfer] list
      */
     fun getCompletedTransfers() = completedTransfers
 

@@ -20,20 +20,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
 
     val ephemeral: EphemeralCredentials?
 
-    /**
-     * Gets the completed transfers.
-     *
-     * @return The list with the completed transfers.
-     */
-    val completedTransfers: List<AndroidCompletedTransfer?>
-
-    /**
-     * Gets the completed transfers which have as state cancelled or failed.
-     *
-     * @return The list the cancelled or failed transfers.
-     */
-    val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer>
-
     val offlineFiles: ArrayList<MegaOffline>
 
     val sdTransfers: ArrayList<SDTransfer>
@@ -46,21 +32,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     fun setChatItemPreferences(chatPrefs: ChatItemPreferences)
     fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?
 
-    /**
-     * Gets a completed transfer.
-     *
-     * @param id the identifier of the transfer to get
-     * @return The completed transfer which has the id value as identifier.
-     */
-    fun getCompletedTransfer(id: Long): AndroidCompletedTransfer?
-
-    /**
-     * Gets a list with completed transfers depending on the query received by parameter.
-     *
-     * @param selectQuery the query which selects specific completed transfers
-     * @return The list with the completed transfers.
-     */
-    fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer>
     fun setOfflineFile(offline: MegaOffline): Long
     fun setOfflineFile(offline: MegaOffline, db: SQLiteDatabase): Long
     fun setOfflineFileOld(offline: MegaOffline): Long

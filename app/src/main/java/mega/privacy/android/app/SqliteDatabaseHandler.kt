@@ -2052,7 +2052,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param id the identifier of the transfer to get
      * @return The completed transfer which has the id value as identifier.
      */
-    override fun getCompletedTransfer(id: Long): AndroidCompletedTransfer? {
+    override fun getCompletedTransfer(id: Long): CompletedTransfer? {
         val selectQuery =
             "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID = '$id'"
         try {
@@ -2073,7 +2073,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param cursor Cursor from which the data should be extracted.
      * @return The extracted completed transfer.
      */
-    private fun extractAndroidCompletedTransfer(cursor: Cursor): AndroidCompletedTransfer {
+    private fun extractAndroidCompletedTransfer(cursor: Cursor): CompletedTransfer {
         val id = cursor.getString(0).toInt().toLong()
         val filename = decrypt(cursor.getString(1))
         val type = decrypt(cursor.getString(2))
@@ -2088,7 +2088,7 @@ class SqliteDatabaseHandler @Inject constructor(
         val error = decrypt(cursor.getString(9))
         val originalPath = decrypt(cursor.getString(10))
         val parentHandle = decrypt(cursor.getString(11))?.toLong() ?: -1
-        return AndroidCompletedTransfer(
+        return CompletedTransfer(
             id, filename, typeInt, stateInt, size, nodeHandle, path,
             offline, timeStamp, error, originalPath, parentHandle
         )
@@ -2143,7 +2143,7 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @return The list of the completed transfers
      */
-    override val completedTransfers: List<AndroidCompletedTransfer?>
+    override val completedTransfers: List<CompletedTransfer?>
         get() {
             val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
             val transfers = getCompletedTransfers(selectQuery).apply {
@@ -2157,7 +2157,7 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @return The list the cancelled or failed transfers.
      */
-    override val failedOrCancelledTransfers: ArrayList<AndroidCompletedTransfer>
+    override val failedOrCancelledTransfers: ArrayList<CompletedTransfer>
         get() {
             val stateCancelled = encrypt(MegaTransfer.STATE_CANCELLED.toString())
             val stateFailed = encrypt(MegaTransfer.STATE_FAILED.toString())
@@ -2183,8 +2183,8 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param selectQuery the query which selects specific completed transfers
      * @return The list with the completed transfers.
      */
-    override fun getCompletedTransfers(selectQuery: String?): ArrayList<AndroidCompletedTransfer> {
-        val cTs = ArrayList<AndroidCompletedTransfer>()
+    private fun getCompletedTransfers(selectQuery: String?): ArrayList<CompletedTransfer> {
+        val cTs = ArrayList<CompletedTransfer>()
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToLast()) {

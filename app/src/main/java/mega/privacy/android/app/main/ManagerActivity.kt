@@ -100,7 +100,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -338,6 +337,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -500,7 +500,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             AlertsAndWarnings.showSaveToDeviceConfirmDialog(this)
         )
     }
-    private var selectedTransfer: AndroidCompletedTransfer? = null
+    private var selectedTransfer: CompletedTransfer? = null
 
     @JvmField
     var selectedChatItemId: Long = 0
@@ -7021,7 +7021,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param transfer the completed transfer to manage.
      */
-    fun showManageTransferOptionsPanel(transfer: AndroidCompletedTransfer?) {
+    fun showManageTransferOptionsPanel(transfer: CompletedTransfer?) {
         if (transfer == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
         selectedTransfer = transfer
         bottomSheetDialogFragment = ManageTransferBottomSheetDialogFragment()
@@ -9653,7 +9653,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun getSelectedTransfer(): AndroidCompletedTransfer? {
+    fun getSelectedTransfer(): CompletedTransfer? {
         return selectedTransfer
     }
 
@@ -10089,7 +10089,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param transfer       the completed transfer to remove
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
-    fun removeCompletedTransfer(transfer: AndroidCompletedTransfer, isRemovedCache: Boolean) {
+    fun removeCompletedTransfer(transfer: CompletedTransfer, isRemovedCache: Boolean) {
         dbH.deleteTransfer(transfer.id)
         if (isTransfersCompletedAdded) {
             completedTransfersFragment?.transferRemoved(transfer, isRemovedCache)
@@ -10101,7 +10101,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param transfer the transfer to retry
      */
-    private fun retryTransfer(transfer: AndroidCompletedTransfer) {
+    private fun retryTransfer(transfer: CompletedTransfer) {
         if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
             val node = transfer.nodeHandle?.toLong()?.let { megaApi.getNodeByHandle(it) }
             if (transfer.isOfflineFile) {
@@ -10142,7 +10142,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param transfer the transfer to open its location
      */
-    fun openTransferLocation(transfer: AndroidCompletedTransfer) {
+    fun openTransferLocation(transfer: CompletedTransfer) {
         if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
             if (transfer.isOfflineFile) {
                 selectDrawerItem(DrawerItem.HOMEPAGE)
@@ -10241,7 +10241,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @return A list with the failed and cancelled transfers.
      */
-    private val failedAndCancelledTransfers: ArrayList<AndroidCompletedTransfer>
+    private val failedAndCancelledTransfers: ArrayList<CompletedTransfer>
         get() = dbH.failedOrCancelledTransfers
 
     /**
@@ -10260,9 +10260,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Retry a single transfer.
      *
-     * @param transfer AndroidCompletedTransfer to retry.
+     * @param transfer CompletedTransfer to retry.
      */
-    fun retrySingleTransfer(transfer: AndroidCompletedTransfer) {
+    fun retrySingleTransfer(transfer: CompletedTransfer) {
         removeCompletedTransfer(transfer, false)
         retryTransfer(transfer)
     }
