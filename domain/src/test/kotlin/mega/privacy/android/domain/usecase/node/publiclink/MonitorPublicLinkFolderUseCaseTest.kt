@@ -9,12 +9,12 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
 
     @Test
     internal fun `test that children are returned`() = runTest {
-        val children = listOf<UnTypedNode>(mock(), mock())
+        val children = listOf<FileNode>(mock(), mock())
         val parent = mock<FolderNode> {
             onBlocking { fetchChildren }.thenReturn { children }
         }
@@ -54,7 +54,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
     @Test
     internal fun `test that new items are emitted if a node update of type PublicLink is emitted`() =
         runTest {
-            val children = listOf<UnTypedNode>(mock(), mock())
+            val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
             }
@@ -75,7 +75,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
     @Test
     internal fun `test that no new items are emitted if a node update of type not of PublicLink is emitted`() =
         runTest {
-            val children = listOf<UnTypedNode>(mock(), mock())
+            val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
                 onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
             }

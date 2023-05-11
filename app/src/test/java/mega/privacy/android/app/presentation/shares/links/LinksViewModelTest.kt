@@ -58,7 +58,7 @@ internal class LinksViewModelTest {
 
     @Test
     internal fun `test that public links are returned`() = runTest {
-        val publicLinkNodes = listOf<PublicLinkNode>(mock())
+        val publicLinkNodes = listOf<PublicLinkFolder>(mock())
 
         underTest.state.test {
             assertThat(awaitItem()).isInstanceOf(LinksState.Loading::class.java)
@@ -81,7 +81,7 @@ internal class LinksViewModelTest {
 
     @Test
     internal fun `test that calling open folder returns the children`() = runTest {
-        val publicLinkNodes = listOf<PublicLinkNode>(mock())
+        val publicLinkNodes = listOf<PublicLinkFolder>(mock())
         val flow = flow {
             emit(publicLinkNodes)
             awaitCancellation()
@@ -102,7 +102,7 @@ internal class LinksViewModelTest {
     @Test
     internal fun `test that updates from the root are ignored while children are displayed`() =
         runTest {
-            val publicLinkNodes = listOf<PublicLinkNode>(mock())
+            val publicLinkNodes = listOf<PublicLinkFolder>(mock())
             val flow = flow {
                 emit(publicLinkNodes)
                 awaitCancellation()
@@ -128,7 +128,7 @@ internal class LinksViewModelTest {
     @Test
     internal fun `test that calling closeFolder returns the children of the parent folder`() =
         runTest {
-            val publicLinkNodes = listOf<PublicLinkNode>(mock())
+            val publicLinkNodes = listOf<PublicLinkFolder>(mock())
             val flow = flow {
                 emit(publicLinkNodes)
                 awaitCancellation()
@@ -153,7 +153,7 @@ internal class LinksViewModelTest {
     @Test
     internal fun `test that calling closeFolder on the first level returns all public nodes`() =
         runTest {
-            val publicLinkNodes = listOf<PublicLinkNode>(mock())
+            val publicLinkNodes = listOf<PublicLinkFolder>(mock())
 
             val currentFolder = mock<PublicLinkFolder> {
                 on { parent }.thenReturn(null)

@@ -24,9 +24,9 @@ android {
     compileOptions {
         // Flag to enable support for the new language APIs
 //        coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 11
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        // Sets Java compatibility to JavaVersion in Project Root
+        sourceCompatibility rootProject.javaVersion
+        targetCompatibility rootProject.javaVersion
     }
 
     composeOptions{
@@ -34,13 +34,14 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = rootProject.jdk
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(rootProject.jdk as Integer)
     }
+    namespace 'mega.privacy.android.screenshot'
 }
 
 dependencies {

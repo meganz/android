@@ -55,6 +55,10 @@ ext {
 
     // Prebuilt MEGA SDK version
     megaSdkVersion = '20230510.103352-dev'
+
+    //JDK and Java Version
+    jdk = "17"
+    javaVersion = JavaVersion.VERSION_17
 }
 
 ext.shouldSuppressWarnings = { ->

@@ -11,6 +11,23 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
     }
+
+
+    compileOptions {
+        sourceCompatibility rootProject.javaVersion
+        targetCompatibility rootProject.javaVersion
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.jdk
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+
+    kotlin {
+        jvmToolchain(rootProject.jdk as Integer)
+    }
+
+    namespace 'mega.privacy.android.nocturn'
 }
 
 dependencies {

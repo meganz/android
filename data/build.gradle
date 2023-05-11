@@ -27,16 +27,16 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility rootProject.javaVersion
+        targetCompatibility rootProject.javaVersion
     }
 
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(rootProject.jdk as Integer)
     }
 
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = rootProject.jdk
         suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
@@ -67,6 +67,7 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
+    namespace 'mega.privacy.android.data'
 }
 
 dependencies {

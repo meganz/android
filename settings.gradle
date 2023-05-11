@@ -1,5 +1,4 @@
 apply from: "tools/util.gradle"
-enableFeaturePreview("VERSION_CATALOGS")
 dependencyResolutionManagement {
     versionCatalogs {
         fileTree("./gradle/catalogs").matching {

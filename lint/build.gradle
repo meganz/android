@@ -23,12 +23,12 @@ dependencies {
 
 compileKotlin {
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = rootProject.jdk
         suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 
     kotlin {
-        jvmToolchain(11)
+        jvmToolchain(rootProject.jdk as Integer)
     }
 }
