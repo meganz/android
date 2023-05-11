@@ -13,14 +13,17 @@ import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.green_400
 import mega.privacy.android.core.ui.theme.green_500
 import mega.privacy.android.core.ui.theme.grey_020
+import mega.privacy.android.core.ui.theme.grey_050
 import mega.privacy.android.core.ui.theme.grey_100
 import mega.privacy.android.core.ui.theme.grey_200
 import mega.privacy.android.core.ui.theme.grey_300
 import mega.privacy.android.core.ui.theme.grey_600
 import mega.privacy.android.core.ui.theme.grey_700
+import mega.privacy.android.core.ui.theme.grey_800
 import mega.privacy.android.core.ui.theme.grey_900
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_038
+import mega.privacy.android.core.ui.theme.grey_alpha_050
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.lime_green_200
@@ -29,9 +32,12 @@ import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_400
 import mega.privacy.android.core.ui.theme.red_600
 import mega.privacy.android.core.ui.theme.red_800
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
+import mega.privacy.android.core.ui.theme.white_alpha_050
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.theme.yellow_300
@@ -39,7 +45,7 @@ import mega.privacy.android.core.ui.theme.yellow_600
 import mega.privacy.android.core.ui.theme.yellow_700
 
 /**
- * Text Color Secondary for Composable
+ * Text Color Primary for Composable
  */
 val Colors.textColorPrimary: Color
     get() = if (isLight) dark_grey else white
@@ -163,3 +169,51 @@ val Colors.grey_200_grey_700: Color
  */
 val Colors.grey_020_grey_700: Color
     get() = if (isLight) grey_020 else grey_700
+
+/**
+ * Color for grey when light [teal_300] and when dark [teal_200]
+ */
+val Colors.teal_300_teal_200: Color
+    get() = if (isLight) teal_300 else teal_200
+
+/**
+ * Color [white] when light and [grey_alpha_087] when dark
+ */
+val Colors.white_grey_alpha_087: Color
+    get() = if (isLight) white else grey_alpha_087
+
+/**
+ * Color for grey when light [grey_050] and when dark [grey_800]
+ */
+val Colors.grey_050_grey_800: Color
+    get() = if (isLight) grey_050 else grey_800
+
+/**
+ * Color for grey when light [grey_alpha_050] and when dark [white_alpha_050]
+ */
+val Colors.grey_alpha_050_white_alpha_050: Color
+    get() = if (isLight) grey_alpha_050 else white_alpha_050
+
+/**
+ * Color [grey_alpha_087] when light and [white_alpha_087] when dark
+ */
+val Colors.grey_alpha_087_white_alpha_087: Color
+    get() = if (isLight) grey_alpha_087 else white_alpha_087
+
+/**
+ * Color [black] when light and [white] when dark
+ */
+val Colors.textColorBlackWhite: Color
+    get() = if (isLight) black else white
+
+/**
+ * Color for grey when light [grey_020] and when dark [grey_800]
+ */
+val Colors.grey_020_grey_800: Color
+    get() = if (isLight) grey_020 else grey_800
+
+/**
+ * Text Color Primary reverted (when light [white] and when dark [dark_grey])
+ */
+val Colors.textColorPrimaryReverted: Color
+    get() = if (isLight) white else dark_grey

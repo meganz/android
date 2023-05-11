@@ -1,7 +1,6 @@
 package mega.privacy.android.app.upgradeAccount.view
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,18 +30,14 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
-import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceString
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.Typography
@@ -51,13 +46,11 @@ import mega.privacy.android.core.ui.theme.grey_300
 import mega.privacy.android.core.ui.theme.grey_400
 import mega.privacy.android.core.ui.theme.grey_500
 import mega.privacy.android.core.ui.theme.grey_600
-import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
-import mega.privacy.android.domain.entity.PaymentMethod
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -417,8 +410,10 @@ private fun createPriceText(
     )
     withStyle(SpanStyle(if (isLight) uiAccountType.colorValue else uiAccountType.colorValueDark)) {
         append(
-            priceSubSubString.substring(priceSubSubString.indexOf("[A]"),
-                priceSubSubString.indexOf("[/A]"))
+            priceSubSubString.substring(
+                priceSubSubString.indexOf("[A]"),
+                priceSubSubString.indexOf("[/A]")
+            )
                 .replace("[A]", "")
         )
     }

@@ -25,8 +25,10 @@ import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
 import mega.privacy.android.app.presentation.meeting.mapper.toScheduledTimeFormatted
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeGBBasedMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.NewFormattedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceString
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
+import mega.privacy.android.app.upgradeAccount.model.mapper.toNewFormattedPriceString
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 
 /**
@@ -78,6 +80,13 @@ class MapperModule {
     @Provides
     fun providePriceStringMapper(): FormattedPriceStringMapper =
         { currency: CurrencyAmount -> toFormattedPriceString(currency) }
+
+    /**
+     * Provide formatted price string mapper
+     */
+    @Provides
+    fun provideNewPriceStringMapper(): NewFormattedPriceStringMapper =
+        { currency: CurrencyAmount -> toNewFormattedPriceString(currency) }
 
     /**
      * Provide FormattedSizeGBBased mapper

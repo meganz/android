@@ -436,3 +436,6 @@ val purple_200 = Color(0xFFCE91D3)
 
 @ShowkaseColor("purple_300", "purple")
 val purple_300 = Color(0xFFB965C1)
+
+@ShowkaseColor("transparent", "transparent")
+val transparent = Color(0x00000000)

@@ -12,12 +12,19 @@ import mega.privacy.android.core.ui.theme.red_600
 /**
  *  UI enum class for Account Type
  *
- *  @param iconValue       Int     icon Int
- *  @param textValue       Int     string Int
- *  @param colorValue      Color   color value for Light Theme
- *  @param colorValueDark  Color   color value for Dark Theme
+ *  @param iconValue                  Int     icon Int
+ *  @param textValue                  Int     string Int
+ *  @param colorValue                 Color   color value for Light Theme
+ *  @param colorValueDark             Color   color value for Dark Theme
+ *  @param textBuyAccountTypeValue    String   String for Buy button
  */
-enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue: Color, val colorValueDark: Color) {
+enum class UIAccountType(
+    val iconValue: Int,
+    val textValue: Int,
+    val colorValue: Color,
+    val colorValueDark: Color,
+    val textBuyAccountTypeValue: String,
+) {
     /**
      * FREE
      */
@@ -25,7 +32,8 @@ enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue:
         R.drawable.ic_free_crest,
         R.string.free_account,
         green_500,
-        green_200
+        green_200,
+        "",
     ),
 
     /**
@@ -35,7 +43,8 @@ enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue:
         R.drawable.ic_lite_crest,
         R.string.prolite_account,
         orange_500,
-        orange_300
+        orange_300,
+        "Buy Pro Lite",
     ),
 
     /**
@@ -45,7 +54,8 @@ enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue:
         R.drawable.ic_pro_1_crest,
         R.string.pro1_account,
         red_600,
-        red_300
+        red_300,
+        "Buy Pro I",
     ),
 
     /**
@@ -55,7 +65,8 @@ enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue:
         R.drawable.ic_pro_2_crest,
         R.string.pro2_account,
         red_600,
-        red_300
+        red_300,
+        "Buy Pro II",
     ),
 
     /**
@@ -65,7 +76,8 @@ enum class UIAccountType(val iconValue: Int, val textValue: Int, val colorValue:
         R.drawable.ic_pro_3_crest,
         R.string.pro3_account,
         red_600,
-        red_300
+        red_300,
+        "Buy Pro III",
     );
 
     companion object {

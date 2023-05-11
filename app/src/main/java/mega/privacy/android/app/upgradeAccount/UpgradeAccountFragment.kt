@@ -1,20 +1,25 @@
 package mega.privacy.android.app.upgradeAccount
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
+import mega.privacy.android.app.upgradeAccount.view.NewUpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -22,6 +27,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import javax.inject.Inject
@@ -43,6 +49,10 @@ class UpgradeAccountFragment : Fragment() {
 
     internal lateinit var upgradeAccountActivity: UpgradeAccountActivity
 
+
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         upgradeAccountActivity = activity as UpgradeAccountActivity
@@ -63,23 +73,35 @@ class UpgradeAccountFragment : Fragment() {
         val mode by getThemeMode()
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         AndroidTheme(isDark = mode.isDarkMode()) {
-            UpgradeAccountView(
-                state = uiState,
-                onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
-                onPlanClicked = { onUpgradeClick(it) },
-                onCustomLabelClicked = {
-                    uiState.currentSubscriptionPlan?.let {
-                        onCustomLabelClick(it)
-                    }
-                },
-                hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
-                onDialogPositiveButtonClicked = { onDialogPositiveButtonClicked(it) },
-                onDialogDismissButtonClicked = {
-                    upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
-                        showBuyNewSubscriptionDialog = false
-                    )
-                },
-            )
+            val useNewPlansPageUI by produceState(initialValue = false) {
+                value = getFeatureFlagUseCase(AppFeatures.PlansPageUpdate)
+            }
+            if (useNewPlansPageUI) {
+                NewUpgradeAccountView(
+                    state = uiState,
+                    onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
+                    onPlanClicked = { onUpgradeClick(it) },
+                    onTOSClicked = { redirectToTOSPage() },
+                )
+            } else {
+                UpgradeAccountView(
+                    state = uiState,
+                    onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
+                    onPlanClicked = { onUpgradeClick(it) },
+                    onCustomLabelClicked = {
+                        uiState.currentSubscriptionPlan?.let {
+                            onCustomLabelClick(it)
+                        }
+                    },
+                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+                    onDialogPositiveButtonClicked = { onDialogPositiveButtonClicked(it) },
+                    onDialogDismissButtonClicked = {
+                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
+                            showBuyNewSubscriptionDialog = false
+                        )
+                    },
+                )
+            }
         }
     }
 
@@ -136,5 +158,13 @@ class UpgradeAccountFragment : Fragment() {
             AccountType.PRO_III -> Constants.PRO_III
             else -> Constants.INVALID_VALUE
         }
+    }
+
+    private fun redirectToTOSPage() {
+        startActivity(
+            Intent(requireContext(), WebViewActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .setData(Uri.parse(Constants.TERMS_OF_SERVICE_URL))
+        )
     }
 }

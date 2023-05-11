@@ -14,6 +14,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
@@ -43,6 +44,34 @@ fun MegaSpannedText(
         modifier = modifier,
         text = spannedText(value, styles),
         style = baseStyle
+    )
+}
+
+/**
+ * High light text from mega format
+ * [A]Billed monthly[/A] %s/month
+ * [A]Google Pay[/A] (subscription)
+ *
+ * @param value
+ * @param baseStyle the style apply for all text
+ * @param styles the list of the tag and the custom style
+ * key is [SpanIndicator] for open and close tags, value is the [SpanStyle]
+ * @param modifier
+ * @param textAlign to align text
+ */
+@Composable
+fun MegaSpannedAlignedText(
+    value: String,
+    baseStyle: TextStyle,
+    styles: Map<SpanIndicator, SpanStyle>,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign,
+) {
+    Text(
+        modifier = modifier,
+        text = spannedText(value, styles),
+        style = baseStyle,
+        textAlign = textAlign
     )
 }
 
@@ -167,6 +196,20 @@ fun MegaSpannedTextPreviewThree() {
             SpanIndicator('B') to SpanStyle(color = Color.Green),
             SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MegaSpannedAlignedTextPreview() {
+    MegaSpannedAlignedText(
+        value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B]\n (subscription)",
+        baseStyle = MaterialTheme.typography.subtitle1,
+        styles = hashMapOf(
+            SpanIndicator('B') to SpanStyle(color = Color.Green),
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
+        ),
+        textAlign = TextAlign.Center
     )
 }
 
