@@ -71,6 +71,7 @@ class SnackbarNavigateOption @JvmOverloads constructor(
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
         context.startActivity(intent)
+        if (type == Constants.RESUME_TRANSFERS_TYPE) return
         (context as? Activity)?.finish()
     }
 }
