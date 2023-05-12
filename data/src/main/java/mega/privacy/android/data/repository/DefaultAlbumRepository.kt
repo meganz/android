@@ -24,8 +24,10 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.DisableExportSetsListenerInterface
 import mega.privacy.android.data.listener.ExportSetsListenerInterface
+import mega.privacy.android.data.listener.GetPreviewElementNodeListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.RemoveSetElementListenerInterface
+import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -42,15 +45,17 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.suspendCoroutine
 
-typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosAddingProgress?>>
-typealias AlbumPhotosRemovingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosRemovingProgress?>>
+internal typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosAddingProgress?>>
+internal typealias AlbumPhotosRemovingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosRemovingProgress?>>
 
 /**
  * Default [AlbumRepository] implementation
@@ -62,6 +67,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val userSetMapper: UserSetMapper,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val albumStringResourceGateway: AlbumStringResourceGateway,
+    private val photoMapper: PhotoMapper,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
@@ -79,6 +85,8 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
 
     private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
+
+    private val publicNodesMap: MutableMap<NodeId, MegaNode> = mutableMapOf()
 
     private var monitorNodeUpdatesJob: Job? = null
 
@@ -386,18 +394,24 @@ internal class DefaultAlbumRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
-                        val albumId = AlbumId(request.megaSet.id())
-                        val albumPhotoIds = request.megaSetElementList.let { elementList ->
+                        val userSet = request.megaSet?.toUserSet()
+                        val albumPhotoIds = request.megaSetElementList?.let { elementList ->
                             (0 until elementList.size()).map { index ->
                                 elementList.get(index).toAlbumPhotoId()
                             }
+                        }.orEmpty()
+
+                        if (userSet != null) {
+                            continuation.resumeWith(Result.success(userSet to albumPhotoIds))
+                        } else {
+                            continuation.failWithError(error, "fetchPublicAlbum")
                         }
-                        continuation.resumeWith(Result.success(albumId to albumPhotoIds))
                     } else {
                         continuation.failWithError(error, "fetchPublicAlbum")
                     }
-                }
+                },
             )
+
             megaApiGateway.fetchPublicSet(
                 publicSetLink = albumLink.link,
                 listener = listener,
@@ -405,6 +419,91 @@ internal class DefaultAlbumRepository @Inject constructor(
 
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getPublicPhotos(albumPhotoIds: List<AlbumPhotoId>): List<Photo> {
+        return withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val nodeAlbumPhotoIdMap = albumPhotoIds.associateBy(
+                    keySelector = { it.nodeId.longValue },
+                    valueTransform = { it },
+                )
+
+                val listener = GetPreviewElementNodeListenerInterface(
+                    nodeAlbumPhotoIdMap = nodeAlbumPhotoIdMap,
+                    onCompletion = { nodeAlbumPhotoIdPairs ->
+                        publicNodesMap.clear()
+
+                        val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
+                            publicNodesMap[NodeId(node.handle)] = node
+                            photoMapper(node, albumPhotoId)
+                        }
+                        continuation.resumeWith(Result.success(photos))
+                    }
+                )
+
+                for (albumPhotoId in albumPhotoIds) {
+                    megaApiGateway.getPreviewElementNode(
+                        eid = albumPhotoId.id,
+                        listener = listener,
+                    )
+                }
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+    }
+
+    override suspend fun downloadPublicThumbnail(photo: Photo, callback: (Boolean) -> Unit) {
+        withContext(ioDispatcher) {
+            val node = publicNodesMap[NodeId(photo.id)]
+            val thumbnailFilePath = photo.thumbnailFilePath
+
+            if (thumbnailFilePath.isNullOrBlank()) {
+                callback(false)
+            } else if (File(thumbnailFilePath).exists()) {
+                callback(true)
+            } else if (node == null) {
+                callback(false)
+            } else {
+                megaApiGateway.getThumbnail(
+                    node = node,
+                    thumbnailFilePath = thumbnailFilePath,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            callback(error.errorCode == MegaError.API_OK)
+                        },
+                    ),
+                )
+            }
+        }
+    }
+
+    override suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit) {
+        withContext(ioDispatcher) {
+            val node = publicNodesMap[NodeId(photo.id)]
+            val previewFilePath = photo.previewFilePath
+
+            if (previewFilePath.isNullOrBlank()) {
+                callback(false)
+            } else if (File(previewFilePath).exists()) {
+                callback(true)
+            } else if (node == null) {
+                callback(false)
+            } else {
+                megaApiGateway.getPreview(
+                    node = node,
+                    previewFilePath = previewFilePath,
+                    listener = OptionalMegaRequestListenerInterface(
+                        onRequestFinish = { _, error ->
+                            callback(error.errorCode == MegaError.API_OK)
+                        },
+                    ),
+                )
             }
         }
     }
@@ -418,6 +517,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSets.clear()
         nodeSetsMap.clear()
         albumElements.clear()
+        publicNodesMap.clear()
         albumPhotosAddingProgressPool.clear()
         albumPhotosRemovingProgressPool.clear()
 

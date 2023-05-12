@@ -9,12 +9,14 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate.OnSetElementsUpdate
 import mega.privacy.android.data.model.GlobalUpdate.OnSetsUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.NodeRepository
@@ -43,6 +45,7 @@ class DefaultAlbumRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val userSetMapper: UserSetMapper = ::createUserSet
     private val albumStringResourceGateway = mock<AlbumStringResourceGateway>()
+    private val photoMapper = mock<PhotoMapper>()
 
     private val testName = "Album1"
 
@@ -391,12 +394,39 @@ class DefaultAlbumRepositoryTest {
         }
     }
 
+    @Test
+    fun `test that download public thumbnail executes properly`() = runTest {
+        // given
+        val photo = mock<Photo.Image>()
+
+        // when
+        underTest = createUnderTest(this)
+        underTest.downloadPublicThumbnail(photo) { isSuccess ->
+            // then
+            assertThat(isSuccess).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that download public preview executes properly`() = runTest {
+        // given
+        val photo = mock<Photo.Image>()
+
+        // when
+        underTest = createUnderTest(this)
+        underTest.downloadPublicPreview(photo) { isSuccess ->
+            // then
+            assertThat(isSuccess).isFalse()
+        }
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,
         userSetMapper = userSetMapper,
         isNodeInRubbish = { false },
         albumStringResourceGateway = albumStringResourceGateway,
+        photoMapper = photoMapper,
         ioDispatcher = UnconfinedTestDispatcher(),
         appScope = coroutineScope,
     )

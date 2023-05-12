@@ -4,11 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
-import mega.privacy.android.domain.entity.photos.AlbumIdPhotoIds
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
+import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.UserSetPhotoIds
 import mega.privacy.android.domain.entity.set.UserSet
 
 /**
@@ -158,9 +159,33 @@ interface AlbumRepository {
      * Fetch public album
      *
      * @param albumLink public link as identifier
-     * @return a pair of album id and photo id list
+     * @return a pair of set and photo id list
      */
-    suspend fun fetchPublicAlbum(albumLink: AlbumLink): AlbumIdPhotoIds
+    suspend fun fetchPublicAlbum(albumLink: AlbumLink): UserSetPhotoIds
+
+    /**
+     * Fetch public photos
+     *
+     * @param albumPhotoIds album photo id list
+     * @return photo list
+     */
+    suspend fun getPublicPhotos(albumPhotoIds: List<AlbumPhotoId>): List<Photo>
+
+    /**
+     * Download public thumbnail
+     *
+     * @param photo which the thumbnail to be downloaded
+     * @param callback to notify if the operation is successful
+     */
+    suspend fun downloadPublicThumbnail(photo: Photo, callback: (Boolean) -> Unit)
+
+    /**
+     * Download public preview
+     *
+     * @param photo which the preview to be downloaded
+     * @param callback to notify if the operation is successful
+     */
+    suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit)
 
     /**
      * Clear all albums cache

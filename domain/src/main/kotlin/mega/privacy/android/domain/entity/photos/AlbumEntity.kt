@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.entity.photos
 
-typealias AlbumIdPhotoIds = Pair<AlbumId, List<AlbumPhotoId>>
+import mega.privacy.android.domain.entity.set.UserSet
+
+typealias UserSetPhotoIds = Pair<UserSet, List<AlbumPhotoId>>
 
 typealias AlbumPhotos = Pair<Album.UserAlbum, List<Photo>>
 
