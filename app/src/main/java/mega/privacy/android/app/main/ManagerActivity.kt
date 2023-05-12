@@ -741,6 +741,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
     }
+
     private val receiverCUAttrChanged: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             synchronized(this) {
@@ -2430,6 +2431,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ) { data ->
             handleUpdateMyAccount(data)
         }
+        collectFlow(targetFlow = viewModel.monitorOfflineNodeAvailabilityEvent) {
+            refreshCloudOrder()
+        }
     }
 
     /**
@@ -3151,6 +3155,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         ac.exportMK(parentPath)
                     }
                 }
+
                 Constants.ACTION_OPEN_FOLDER -> {
                     Timber.d("Open after LauncherFileExplorerActivity ")
                     val handleIntent: Long =
@@ -10071,7 +10076,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (transfer.isOfflineFile) {
                 transfer.originalPath?.let {
                     val offlineFile = File(it)
-                    OfflineUtils.saveOffline(offlineFile.parentFile, node, this@ManagerActivity)
+                    OfflineUtils.saveOffline(
+                        offlineFile.parentFile,
+                        node,
+                        this@ManagerActivity
+                    )
                 }
             } else {
                 downloadNodeUseCase.download(this, node, transfer.path)

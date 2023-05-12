@@ -98,6 +98,18 @@ interface TransferRepository {
      */
     suspend fun resetTotalDownloads()
 
+
+    /**
+     * Monitor the offline availability of the file
+     */
+    fun monitorOfflineFileAvailability(): Flow<Long>
+
+    /**
+     * Broadcast the offline availability of the file
+     * @param nodeHandle the node handle
+     */
+    suspend fun broadcastOfflineFileAvailability(nodeHandle: Long)
+
     /**
      * Monitor transfer over quota
      */

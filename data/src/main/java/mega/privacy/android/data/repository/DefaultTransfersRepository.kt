@@ -215,6 +215,14 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.resetTotalDownloads()
     }
 
+    override fun monitorOfflineFileAvailability(): Flow<Long> =
+        appEventGateway.monitorOfflineFileAvailability()
+
+
+    override suspend fun broadcastOfflineFileAvailability(nodeHandle: Long) {
+        appEventGateway.broadcastOfflineFileAvailability(nodeHandle)
+    }
+
     override fun monitorTransferOverQuota(): Flow<Boolean> =
         appEventGateway.monitorTransferOverQuota()
 

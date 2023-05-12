@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -197,6 +198,8 @@ class ManagerViewModelTest {
     private val createShareKey = mock<CreateShareKey>()
     private val deleteOldestCompletedTransfersUseCase =
         mock<DeleteOldestCompletedTransfersUseCase>()
+    private val monitorOfflineNodeAvailabilityUseCase =
+        mock<MonitorOfflineFileAvailabilityUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -244,6 +247,7 @@ class ManagerViewModelTest {
             createShareKey = createShareKey,
             saveContactByEmailUseCase = mock(),
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
+            monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
         )
     }
 

@@ -44,17 +44,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
-import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
-import mega.privacy.android.domain.usecase.CheckCameraUpload
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetFullAccountInfo
-import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
-import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.HasInboxChildren
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
-import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.*
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -117,6 +107,7 @@ import javax.inject.Inject
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
  * @param monitorContactRequestUpdates
  * @param monitorFinishActivityUseCase
+ * @param monitorOfflineNodeAvailabilityUseCase monitor the offline availability of the file to update the UI
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -159,6 +150,7 @@ class ManagerViewModel @Inject constructor(
     private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
+    monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
 ) : ViewModel() {
 
     /**
@@ -191,6 +183,11 @@ class ManagerViewModel @Inject constructor(
      * Monitor My Account Update event
      */
     val monitorMyAccountUpdateEvent = monitorMyAccountUpdateUseCase()
+
+    /**
+     * Monitor offline file availability event
+     */
+    val monitorOfflineNodeAvailabilityEvent = monitorOfflineNodeAvailabilityUseCase()
 
     /**
      * Is network connected

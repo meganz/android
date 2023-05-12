@@ -25,6 +25,7 @@ internal class AppEventFacade @Inject constructor(
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
+    private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
     private val accountUpdate = MutableSharedFlow<Boolean>()
@@ -61,6 +62,13 @@ internal class AppEventFacade @Inject constructor(
     }
 
     override suspend fun isSMSVerificationShown(): Boolean = _isSMSVerificationShownState.value
+
+    override fun monitorOfflineFileAvailability(): Flow<Long> =
+        _fileAvailableOffline.asSharedFlow()
+
+    override suspend fun broadcastOfflineFileAvailability(nodeHandle: Long) {
+        _fileAvailableOffline.emit(nodeHandle)
+    }
 
     override fun monitorTransferOverQuota(): Flow<Boolean> = _transferOverQuota.asSharedFlow()
 

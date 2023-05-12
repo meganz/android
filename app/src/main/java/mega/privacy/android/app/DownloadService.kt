@@ -71,6 +71,7 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
@@ -145,6 +146,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
+
+    @Inject
+    lateinit var broadcastOfflineNodeAvailability: BroadcastOfflineFileAvailabilityUseCase
 
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
@@ -638,6 +642,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 null
             }?.let { transfersFinishState ->
                 applicationScope.launch {
+                    broadcastOfflineNodeAvailability(handle)
                     broadcastTransfersFinishedUseCase(transfersFinishState)
                 }
             }
