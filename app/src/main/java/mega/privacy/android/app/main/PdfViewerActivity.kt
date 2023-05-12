@@ -556,9 +556,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         nodeSaver.saveState(outState)
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {}
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {}
 
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         Timber.d("onUserAlertsUpdate")
     }
 
@@ -576,15 +576,15 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>,
+        requests: ArrayList<MegaContactRequest>?,
     ) {
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {}
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
 
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>) {}
+    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
 
-    override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>) {}
+    override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.pdfViewerContainer, content, chatId)

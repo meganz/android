@@ -157,14 +157,14 @@ internal class MegaApiFacade @Inject constructor(
         val listener = object : MegaGlobalListenerInterface {
             override fun onUsersUpdate(
                 api: MegaApiJava,
-                users: ArrayList<MegaUser>,
+                users: ArrayList<MegaUser>?,
             ) {
                 trySend(GlobalUpdate.OnUsersUpdate(users))
             }
 
             override fun onUserAlertsUpdate(
                 api: MegaApiJava,
-                userAlerts: ArrayList<MegaUserAlert>,
+                userAlerts: ArrayList<MegaUserAlert>?,
             ) {
                 trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
             }
@@ -186,22 +186,22 @@ internal class MegaApiFacade @Inject constructor(
 
             override fun onContactRequestsUpdate(
                 api: MegaApiJava,
-                requests: ArrayList<MegaContactRequest>,
+                requests: ArrayList<MegaContactRequest>?,
             ) {
                 trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
             }
 
-            override fun onEvent(api: MegaApiJava, event: MegaEvent) {
+            override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
                 trySend(GlobalUpdate.OnEvent(event))
             }
 
-            override fun onSetsUpdate(api: MegaApiJava, sets: java.util.ArrayList<MegaSet>) {
+            override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
                 trySend(GlobalUpdate.OnSetsUpdate(sets))
             }
 
             override fun onSetElementsUpdate(
                 api: MegaApiJava,
-                elements: java.util.ArrayList<MegaSetElement>,
+                elements: ArrayList<MegaSetElement>?,
             ) {
                 trySend(GlobalUpdate.OnSetElementsUpdate(elements))
             }

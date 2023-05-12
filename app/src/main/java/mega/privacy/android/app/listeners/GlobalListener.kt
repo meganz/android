@@ -90,8 +90,7 @@ class GlobalListener @Inject constructor(
     /**
      * onUsersUpdate
      */
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
-
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
         users?.filterNotNull()?.forEach { user ->
             val myUserHandle = api.myUserHandle
             val isMyChange =
@@ -127,7 +126,7 @@ class GlobalListener @Inject constructor(
     /**
      * onUserAlertsUpdate
      */
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         megaChatNotificationHandler.updateAppBadge()
         notifyNotificationCountChange(api)
     }
@@ -183,7 +182,7 @@ class GlobalListener @Inject constructor(
      */
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>,
+        requests: ArrayList<MegaContactRequest>?,
     ) {
         if (requests == null) return
         megaChatNotificationHandler.updateAppBadge()
@@ -228,7 +227,7 @@ class GlobalListener @Inject constructor(
     /**
      * onEvent
      */
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
         if (event == null) return
 
         Timber.d("Event received: text(${event.text}), type(${event.type}), number(${event.number})")
@@ -275,7 +274,7 @@ class GlobalListener @Inject constructor(
     /**
      * onSetsUpdate
      */
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>) {
+    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
         Timber.d("Sets Updated")
     }
 
@@ -284,7 +283,7 @@ class GlobalListener @Inject constructor(
      */
     override fun onSetElementsUpdate(
         api: MegaApiJava,
-        elements: ArrayList<MegaSetElement>,
+        elements: ArrayList<MegaSetElement>?,
     ) {
         Timber.d("Set elements updated")
     }

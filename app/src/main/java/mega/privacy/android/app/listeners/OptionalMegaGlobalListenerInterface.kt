@@ -17,11 +17,11 @@ class OptionalMegaGlobalListenerInterface(
     private val onSetElementsUpdate: ((ArrayList<MegaSetElement>?) -> Unit)? = null
 ) : MegaGlobalListenerInterface {
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
         onUsersUpdate?.invoke(users)
     }
 
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         onUserAlertsUpdate?.invoke(userAlerts)
     }
 
@@ -39,22 +39,22 @@ class OptionalMegaGlobalListenerInterface(
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>
+        requests: ArrayList<MegaContactRequest>?
     ) {
         onContactRequestsUpdate?.invoke(requests)
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
         event?.let { onEvent?.invoke(event) }
     }
 
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>) {
+    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {
         onSetsUpdate?.invoke(sets)
     }
 
     override fun onSetElementsUpdate(
         api: MegaApiJava,
-        elements: ArrayList<MegaSetElement>,
+        elements: ArrayList<MegaSetElement>?,
     ) {
         onSetElementsUpdate?.invoke(elements)
     }
