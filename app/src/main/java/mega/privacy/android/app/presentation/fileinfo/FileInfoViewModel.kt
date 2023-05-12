@@ -49,7 +49,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
-import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
@@ -102,7 +102,7 @@ class FileInfoViewModel @Inject constructor(
     private val deleteNodeByHandle: DeleteNodeByHandle,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
     private val getPreview: GetPreview,
-    private val getNodeById: GetNodeById,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFolderTreeInfo: GetFolderTreeInfo,
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
@@ -161,7 +161,8 @@ class FileInfoViewModel @Inject constructor(
         Timber.d("FileInfoViewModel node set $handleNode")
         viewModelScope.launch {
             runCatching {
-                typedNode = getNodeById(NodeId(handleNode))
+                typedNode = getNodeByIdUseCase(NodeId(handleNode))
+                    ?: throw RuntimeException()
                 node = tempMegaNodeRepository.getNodeByHandle(handleNode)
                     ?: throw RuntimeException()
             }.onFailure {
@@ -171,7 +172,7 @@ class FileInfoViewModel @Inject constructor(
             }
 
             if (typedNode is FileNode) {
-                val parent = getNodeById(typedNode.parentId)
+                val parent = getNodeByIdUseCase(typedNode.parentId)
                 if (parent is FileNode) {
                     //we only want the latest version in this screen
                     setNode(parent.id.longValue)
@@ -706,7 +707,9 @@ class FileInfoViewModel @Inject constructor(
     private fun updateIcon() {
         updateState {
             //we need to update the typedNode to get changes, for instance, on outgoing shares
-            typedNode = getNodeById(typedNode.id)
+            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
+                typedNode = updateTypedNode
+            }
             it.copyWithTypedNode(
                 typedNode = typedNode
             ).copy(
@@ -728,7 +731,9 @@ class FileInfoViewModel @Inject constructor(
     private fun updateTimeStamp() {
         updateState {
             //we need to update the typedNode to get changes in timeStamps
-            typedNode = getNodeById(typedNode.id)
+            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
+                typedNode = updateTypedNode
+            }
             it.copyWithTypedNode(typedNode = typedNode)
         }
     }
@@ -766,7 +771,9 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateTitle() {
         updateState {
-            typedNode = getNodeById(typedNode.id)
+            getNodeByIdUseCase(typedNode.id)?.let { updateTypedNode ->
+                typedNode = updateTypedNode
+            }
             it.copyWithTypedNode(typedNode = typedNode)
         }
     }

@@ -49,7 +49,7 @@ import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
-import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
@@ -116,7 +116,7 @@ internal class FileInfoViewModelTest {
     private val node: MegaNode = mock()
     private val getPreview: GetPreview = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
-    private val getNodeById: GetNodeById = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById = mock()
     private val monitorChildrenUpdates: MonitorChildrenUpdates = mock()
@@ -175,7 +175,7 @@ internal class FileInfoViewModelTest {
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
             getPreview = getPreview,
             getFolderTreeInfo = getFolderTreeInfo,
-            getNodeById = getNodeById,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             monitorChildrenUpdates = monitorChildrenUpdates,
@@ -209,7 +209,7 @@ internal class FileInfoViewModelTest {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
-        whenever(getNodeById.invoke(nodeId)).thenReturn(typedFileNode)
+        whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(typedFileNode)
         whenever(megaNodeRepository.getNodeByHandle(node.handle)).thenReturn(node)
         whenever(getNodeVersionsByHandle(nodeId)).thenReturn(null)
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
@@ -1020,7 +1020,7 @@ internal class FileInfoViewModelTest {
         on { id }.thenReturn(nodeId)
         on { name }.thenReturn("Folder name")
     }.also { folderNode ->
-        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
         whenever(getFolderTreeInfo.invoke(folderNode)).thenReturn(mock())
         whenever(getContactItemFromInShareFolder.invoke(any(), any())).thenReturn(mock())
     }

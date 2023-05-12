@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
  * Use case to get the available [NodeAction]s for the given node
  */
 class GetAvailableNodeActionsUseCase @Inject constructor(
-    private val getNodeById: GetNodeById,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val getNodeAccessPermission: GetNodeAccessPermission,
 ) {
@@ -30,7 +30,7 @@ class GetAvailableNodeActionsUseCase @Inject constructor(
         }
         if (typedNode.isIncomingShare) {
             val incomingShareFirstLevel =
-                typedNode.parentId.longValue == -1L || getNodeById(typedNode.parentId).parentId.longValue == -1L
+                typedNode.parentId.longValue == -1L || getNodeByIdUseCase(typedNode.parentId)?.parentId?.longValue == -1L
             if (!typedNode.isTakenDown) {
                 add(NodeAction.Download)
                 add(NodeAction.Copy)

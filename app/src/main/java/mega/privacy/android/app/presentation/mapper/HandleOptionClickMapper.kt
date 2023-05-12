@@ -7,7 +7,7 @@ import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
  */
 class HandleOptionClickMapper @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
-    private val getNodeById: GetNodeById,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) {
 
     /**
@@ -30,7 +30,9 @@ class HandleOptionClickMapper @Inject constructor(
         val selectedNodes = mutableListOf<Node>()
 
         selectedNodeHandle.forEach {
-            selectedNodes.add(getNodeById(NodeId(it)))
+            getNodeByIdUseCase(NodeId(it))?.let { node ->
+                selectedNodes.add(node)
+            }
             getNodeByHandle(handle = it)?.let { megaNode ->
                 selectedMegaNodes.add(megaNode)
             }

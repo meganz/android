@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.jupiter.api.BeforeEach
@@ -31,11 +31,11 @@ class GetAvailableNodeActionsUseCaseTest {
     private val parentNode = mock<TypedFolderNode> {
         on { id }.thenReturn(parentId)
     }
-    private val getNodeById = mock<GetNodeById>()
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
     private val underTest = GetAvailableNodeActionsUseCase(
-        getNodeById,
+        getNodeByIdUseCase,
         isNodeInRubbish,
         getNodeAccessPermission,
     )
@@ -46,7 +46,7 @@ class GetAvailableNodeActionsUseCaseTest {
     }
 
     private fun resetMocks() {
-        reset(fileNode, folderNode, getNodeById, getNodeAccessPermission, isNodeInRubbish)
+        reset(fileNode, folderNode, getNodeByIdUseCase, getNodeAccessPermission, isNodeInRubbish)
     }
 
 
@@ -344,7 +344,7 @@ class GetAvailableNodeActionsUseCaseTest {
 
     private suspend fun mockFolder(): TypedNode {
         resetMocks()
-        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
         whenever(folderNode.id).thenReturn(nodeId)
         whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
         whenever(folderNode.isIncomingShare).thenReturn(false)
@@ -354,7 +354,7 @@ class GetAvailableNodeActionsUseCaseTest {
 
     private suspend fun mockFile(): TypedNode {
         resetMocks()
-        whenever(getNodeById.invoke(nodeId)).thenReturn(fileNode)
+        whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(fileNode)
         whenever(fileNode.id).thenReturn(nodeId)
         whenever(isNodeInRubbish(nodeId.longValue)).thenReturn(false)
         whenever(fileNode.isIncomingShare).thenReturn(false)
@@ -366,7 +366,7 @@ class GetAvailableNodeActionsUseCaseTest {
         mockFile()
         whenever(fileNode.isIncomingShare).thenReturn(true)
         whenever(fileNode.parentId).thenReturn(parentId)
-        whenever(getNodeById(parentId)).thenReturn(parentNode)
+        whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
         return fileNode
     }
 
@@ -374,7 +374,7 @@ class GetAvailableNodeActionsUseCaseTest {
         mockFolder()
         whenever(folderNode.isIncomingShare).thenReturn(true)
         whenever(folderNode.parentId).thenReturn(parentId)
-        whenever(getNodeById(parentId)).thenReturn(parentNode)
+        whenever(getNodeByIdUseCase(parentId)).thenReturn(parentNode)
         return folderNode
     }
 

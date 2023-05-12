@@ -14,8 +14,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetNodeByIdTest {
-    lateinit var underTest: GetNodeById
+class GetNodeByIdUseCaseTest {
+    lateinit var underTest: GetNodeByIdUseCase
     private val nodeRepository = mock<NodeRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -23,7 +23,7 @@ class DefaultGetNodeByIdTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetNodeById(nodeRepository, addNodeType)
+        underTest = GetNodeByIdUseCase(nodeRepository, addNodeType)
     }
 
     @Test
