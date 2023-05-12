@@ -54,7 +54,7 @@ internal class CameraUploadMediaFacade @Inject constructor(
         /**
          * Debug flag if need to set a limit of files retrieved from media cursor
          */
-        private const val SET_LIMITATION = true
+        private const val SET_LIMITATION = false
     }
 
     override suspend fun getMediaQueue(
