@@ -380,6 +380,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         playlistTitle.postValue(getOfflineFolderName(context, firstPlayHandle))
                         buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                     }
+
                     AUDIO_BROWSE_ADAPTER -> {
                         playlistTitle.postValue(context.getString(R.string.upload_to_audio))
                         buildPlaySourcesByTypedNodes(
@@ -388,6 +389,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             firstPlayHandle = firstPlayHandle
                         )
                     }
+
                     VIDEO_BROWSE_ADAPTER -> {
                         playlistTitle.postValue(context.getString(R.string.sortby_type_video_first))
                         buildPlaySourcesByTypedNodes(
@@ -396,6 +398,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             firstPlayHandle = firstPlayHandle
                         )
                     }
+
                     FILE_BROWSER_ADAPTER,
                     RUBBISH_BIN_ADAPTER,
                     INBOX_ADAPTER,
@@ -526,6 +529,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             }
                         }
                     }
+
                     RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
                         playlistTitle.postValue(context.getString(R.string.section_recents))
                         intent.getLongArrayExtra(NODE_HANDLES)?.let { handles ->
@@ -536,6 +540,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             )
                         }
                     }
+
                     FOLDER_LINK_ADAPTER -> {
                         val parentHandle = intent.getLongExtra(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
@@ -569,6 +574,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             }
                         }
                     }
+
                     ZIP_ADAPTER -> {
                         intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
                             ?.let { zipPath ->
@@ -581,6 +587,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 }
                             }
                     }
+
                     SEARCH_BY_ADAPTER -> {
                         intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
                             ?.let { handles ->
@@ -606,9 +613,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         firstPlayHandle.toString()
                     )
                 }
+
                 node == null -> {
                     null
                 }
+
                 else -> {
                     File(getThumbFolder(context), node.base64Id.plus(JPG_EXTENSION))
                 }
@@ -954,6 +963,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
                 return oldDir == newDir
             }
+
             AUDIO_BROWSE_ADAPTER,
             VIDEO_BROWSE_ADAPTER,
             FROM_CHAT,
@@ -962,6 +972,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             -> {
                 return oldType == type
             }
+
             FILE_BROWSER_ADAPTER,
             RUBBISH_BIN_ADAPTER,
             INBOX_ADAPTER,
@@ -981,11 +992,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 )
                 return oldType == type && oldParentHandle == newParentHandle
             }
+
             RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
                 val oldHandles = oldIntent.getLongArrayExtra(NODE_HANDLES) ?: return false
                 val newHandles = intent.getLongArrayExtra(NODE_HANDLES) ?: return false
                 return oldHandles.contentEquals(newHandles)
             }
+
             ZIP_ADAPTER -> {
                 val oldZipPath = oldIntent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
                     ?: return false
@@ -993,6 +1006,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY) ?: return false
                 return oldZipPath == newZipPath
             }
+
             SEARCH_BY_ADAPTER -> {
                 val oldHandles = oldIntent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH)
                     ?: return false
@@ -1000,6 +1014,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     intent.getLongArrayExtra(INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH) ?: return false
                 return oldHandles.contentEquals(newHandles)
             }
+
             else -> {
                 return false
             }
@@ -1186,7 +1201,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun getPlaylistItem(handle: String?): PlaylistItem? =
         handle?.let {
-            playlistItems.firstOrNull { (nodeHandle) ->
+            playlistItems.toList().firstOrNull { (nodeHandle) ->
                 nodeHandle == handle.toLong()
             }
         }

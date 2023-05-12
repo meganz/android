@@ -165,12 +165,14 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                                         positionInMs?.let { position ->
                                             mediaPlayerGateway.playerSeekToPositionInMs(position)
                                         }
+
                                     VIDEO_TYPE_RESTART_PLAYBACK_POSITION -> {
                                         // Remove current playback history, if video type is restart
                                         lifecycleScope.launch {
                                             viewModelGateway.deletePlaybackInformation(it.toLong())
                                         }
                                     }
+
                                     VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG -> {
                                         // Detect the media item whether is transition by comparing
                                         // currentPlayingHandle if is parameter handle
@@ -234,6 +236,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         state == MEDIA_PLAYER_STATE_ENDED && !isPaused() -> {
                             setPaused(true)
                         }
+
                         !isAudioPlayer() && state == MEDIA_PLAYER_STATE_READY -> {
                             // This case is only for video player
                             if (isPaused() && mediaPlayerGateway.getPlayWhenReady()) {
@@ -249,6 +252,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                                 }
                             }
                         }
+
                         state == MEDIA_PLAYER_STATE_READY && isPaused()
                                 && mediaPlayerGateway.getPlayWhenReady() -> {
                             setPaused(false)
@@ -332,12 +336,15 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     needPlayWhenReceiveResumeCommand = true
                 }
             }
+
             COMMAND_RESUME -> {
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
             }
+
             COMMAND_STOP -> {
                 stopAudioPlayer()
             }
+
             else -> {
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
                     createPlayerControlNotification()

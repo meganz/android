@@ -37,6 +37,7 @@ import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParam
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,6 +47,7 @@ import javax.inject.Inject
  */
 class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
+    private val crashReporter: CrashReporter,
     private val repeatModeMapper: RepeatModeMapper,
     private val repeatToggleModeMapper: RepeatToggleModeMapper,
 ) : MediaPlayerGateway {
@@ -65,19 +67,22 @@ class MediaPlayerFacade @Inject constructor(
     ) {
         trackSelector = DefaultTrackSelector(context)
         val renderersFactory = DefaultRenderersFactory(context).setExtensionRendererMode(
-            DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
+            DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
+        )
         exoPlayer = ExoPlayer.Builder(context, renderersFactory)
             .setTrackSelector(trackSelector)
             .setSeekBackIncrementMs(INCREMENT_TIME_IN_MS)
             .build().apply {
                 addListener(MetadataExtractor { title, artist, album ->
+                    crashReporter.log("playing item: ${player.currentMediaItem?.mediaId}, title: $title")
                     nameChangeCallback(title, artist, album)
                 })
                 addListener(object : Player.Listener {
                     override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                         mediaPlayerCallback.onMediaItemTransitionCallback(
                             handle = mediaItem?.mediaId,
-                            isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED)
+                            isUpdateName = reason != Player.MEDIA_ITEM_TRANSITION_REASON_PLAYLIST_CHANGED
+                        )
                     }
 
                     override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
@@ -155,11 +160,15 @@ class MediaPlayerFacade @Inject constructor(
                     ): Bitmap? {
                         val thumbnail = thumbnail.value
                         if (thumbnail == null || !thumbnail.exists()) {
-                            return ContextCompat.getDrawable(context,
-                                R.drawable.ic_default_audio_cover)?.toBitmap()
+                            return ContextCompat.getDrawable(
+                                context,
+                                R.drawable.ic_default_audio_cover
+                            )?.toBitmap()
                         }
-                        return BitmapFactory.decodeFile(thumbnail.absolutePath,
-                            BitmapFactory.Options())
+                        return BitmapFactory.decodeFile(
+                            thumbnail.absolutePath,
+                            BitmapFactory.Options()
+                        )
                     }
                 })
                 .setNotificationListener(object : PlayerNotificationManager.NotificationListener {
@@ -219,6 +228,13 @@ class MediaPlayerFacade @Inject constructor(
     override fun getPlayWhenReady(): Boolean = player.playWhenReady
 
     override fun mediaItemRemoved(index: Int): String? {
+        crashReporter.log(
+            "playingItem: ${player.currentMediaItem?.mediaId} removed item: ${
+                player.getMediaItemAt(
+                    index
+                ).mediaId
+            }"
+        )
         if (index < player.mediaItemCount) {
             val nextIndex = player.nextMediaItemIndex
             player.removeMediaItem(index)
