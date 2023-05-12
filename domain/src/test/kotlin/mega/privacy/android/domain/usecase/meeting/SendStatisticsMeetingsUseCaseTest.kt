@@ -52,7 +52,12 @@ class SendStatisticsMeetingsUseCaseTest {
     ) {
         runTest {
             underTest(event)
-            verify(statisticsRepository).sendEvent(event.id, event.message)
+            verify(statisticsRepository).sendEvent(
+                eventId = event.id,
+                message = event.message,
+                addJourneyId = false,
+                viewId = null
+            )
         }
     }
 

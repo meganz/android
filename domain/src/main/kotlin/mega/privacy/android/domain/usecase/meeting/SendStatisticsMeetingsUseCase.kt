@@ -15,6 +15,7 @@ class SendStatisticsMeetingsUseCase @Inject constructor(
      *
      * @param event [MeetingsStatisticsEvents]
      */
-    suspend operator fun invoke(event: MeetingsStatisticsEvents) =
-        statisticsRepository.sendEvent(event.id, event.message)
+    suspend operator fun invoke(event: MeetingsStatisticsEvents) = statisticsRepository.sendEvent(
+        eventId = event.id, message = event.message, addJourneyId = false, viewId = null
+    )
 }
