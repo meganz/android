@@ -224,6 +224,7 @@ dependencies {
     implementation project(':core-ui')
     implementation project(':data')
     debugImplementation project(':nocturn')
+    debugImplementation project(':xray')
     qaImplementation project(':screenshot')
     implementation project(':liveeventbus-x')
 

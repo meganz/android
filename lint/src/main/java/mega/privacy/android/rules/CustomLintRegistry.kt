@@ -15,6 +15,7 @@ class CustomLintRegistry : IssueRegistry() {
             CallIsSystemInDarkThemeDetector.ISSUE,
             TranslatedStringTemplateDetector.ISSUE,
             NonIndexStringTemplateDetector.ISSUE,
+            XrayImportDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API
