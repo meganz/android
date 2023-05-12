@@ -10,12 +10,12 @@ import org.junit.Test
 /**
  * Test class for [UploadOptionMapper]
  */
-class UploadOptionMapperImplTest {
+class UploadOptionMapperTest {
     private lateinit var underTest: UploadOptionMapper
 
     @Before
     fun setUp() {
-        underTest = UploadOptionMapperImpl()
+        underTest = UploadOptionMapper()
     }
 
     @Test

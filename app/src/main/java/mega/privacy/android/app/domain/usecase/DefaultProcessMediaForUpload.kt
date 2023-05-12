@@ -5,7 +5,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
@@ -14,6 +13,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import nz.mega.sdk.MegaNode
 import java.util.LinkedList
@@ -25,27 +25,25 @@ import javax.inject.Inject
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
- * @property getSyncFileUploadUris [GetSyncFileUploadUris]
+ * @property getMediaStoreFileTypesUseCase [GetMediaStoreFileTypesUseCase]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
  * @property selectionQuery [GetCameraUploadSelectionQuery]
  * @property localPathSecondary [GetCameraUploadLocalPathSecondary]
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
  * @property getPendingUploadList [GetPendingUploadList]
  * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
- * @property mediaStoreFileTypeMapper [MediaStoreFileTypeMapper]
  * @property cameraUploadRepository [CameraUploadSyncManagerWrapper]
  */
 class DefaultProcessMediaForUpload @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
-    private val getSyncFileUploadUris: GetSyncFileUploadUris,
+    private val getMediaStoreFileTypesUseCase: GetMediaStoreFileTypesUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val selectionQuery: GetCameraUploadSelectionQuery,
     private val localPathSecondary: GetCameraUploadLocalPathSecondary,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadList: GetPendingUploadList,
     private val saveSyncRecordsToDB: SaveSyncRecordsToDB,
-    private val mediaStoreFileTypeMapper: MediaStoreFileTypeMapper,
     private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
 ) : ProcessMediaForUpload {
 
@@ -54,7 +52,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
         secondaryUploadNode: MegaNode?,
         tempRoot: String?,
     ) {
-        val mediaStoreTypes = getSyncFileUploadUris().mapNotNull(mediaStoreFileTypeMapper)
+        val mediaStoreTypes = getMediaStoreFileTypesUseCase()
         val secondaryEnabled = isSecondaryFolderEnabled()
         coroutineScope {
             val list = mutableListOf<Job>()

@@ -13,7 +13,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSe
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
-import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
@@ -28,7 +27,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -493,12 +491,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsLocalSecondaryFolderSet(isLocalSecondaryFolderSet: DefaultIsLocalSecondaryFolderSet): IsLocalSecondaryFolderSet
-
-    /**
-     * Provide the [GetSyncFileUploadUris] implementation
-     */
-    @Binds
-    abstract fun bindGetSyncFileUploadUris(getSyncFileUploadUris: DefaultGetSyncFileUploadUris): GetSyncFileUploadUris
 
     /**
      * Provide the [ShouldCompressVideo] implementation

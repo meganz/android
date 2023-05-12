@@ -24,7 +24,6 @@ import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
-import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -61,8 +60,6 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
-import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
-import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
@@ -87,7 +84,6 @@ import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
-import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaExceptionModel
@@ -124,8 +120,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSmsPermissionMapper(implementation: SmsPermissionMapperImpl): SmsPermissionMapper
-    @Binds
-    abstract fun bindUploadOptionMapper(implementation: UploadOptionMapperImpl): UploadOptionMapper
 
     @Binds
     abstract fun bindUploadOptionIntMapper(implementation: UploadOptionIntMapperImpl): UploadOptionIntMapper
@@ -204,13 +198,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideEventMapper(): EventMapper = ::toEvent
-
-
-        /**
-         * Provide media store file type mapper
-         */
-        @Provides
-        fun provideMediaStoreFileTypeMapper(): MediaStoreFileTypeMapper = ::toMediaStoreFileType
 
         /**
          * Provide media store file type uri mapper
