@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
 import com.google.common.truth.Truth
+import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.entity.ContactEntity
 import mega.privacy.android.domain.entity.Contact
@@ -19,7 +20,7 @@ internal class ContactEntityMapperTest {
     }
 
     @Test
-    fun `test that mapper returns model correctly when invoke function`() {
+    fun `test that mapper returns model correctly when invoke function`() = runTest {
         val model = Contact(
             userId = 1L,
             email = "lh@mega.co.nz",

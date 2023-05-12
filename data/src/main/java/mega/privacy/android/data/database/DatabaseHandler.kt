@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 
@@ -38,6 +39,7 @@ interface DatabaseHandler {
     //get the credential of last login
     val credentials: UserCredentials?
 
+    val ephemeral: EphemeralCredentials?
     /**
      * Gets preferences.
      *

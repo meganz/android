@@ -8,11 +8,12 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
 
+@Suppress("RedundantSuspendModifier")
 @Singleton
 internal class EncryptData @Inject constructor(
     @Named("aes_key") private val aesKey: ByteArray,
 ) {
-    operator fun invoke(data: String?) = data?.let {
+    suspend operator fun invoke(data: String?) = data?.let {
         runCatching {
             val skeySpec = SecretKeySpec(aesKey, "AES")
             val cipher = Cipher.getInstance("AES")

@@ -18,8 +18,6 @@ import mega.privacy.android.domain.entity.login.EphemeralCredentials
 interface LegacyDatabaseHandler : DatabaseHandler {
     val megaContacts: ArrayList<MegaContactGetter.MegaContact>
 
-    val ephemeral: EphemeralCredentials?
-
     val offlineFiles: ArrayList<MegaOffline>
 
     val sdTransfers: ArrayList<SDTransfer>

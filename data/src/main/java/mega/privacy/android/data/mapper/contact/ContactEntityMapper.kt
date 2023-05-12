@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class ContactEntityMapper @Inject constructor(
     private val encryptData: EncryptData,
 ) {
-    operator fun invoke(contact: Contact) = ContactEntity(
+    suspend operator fun invoke(contact: Contact) = ContactEntity(
         handle = encryptData(contact.userId.toString()),
         firstName = encryptData(contact.firstName),
         lastName = encryptData(contact.lastName),

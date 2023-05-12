@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal class ContactModelMapper @Inject constructor(
     private val decryptData: DecryptData,
 ) {
-    operator fun invoke(entity: ContactEntity) = Contact(
+    suspend operator fun invoke(entity: ContactEntity) = Contact(
         userId = decryptData(entity.handle)?.toLongOrNull() ?: 0L,
         firstName = decryptData(entity.firstName),
         lastName = decryptData(entity.lastName),
