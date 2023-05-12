@@ -145,7 +145,7 @@ class FileExplorerViewModel @Inject constructor(
         context: Context?,
     ) {
         val shareInfo: List<ShareInfo> =
-            getShareInfoList(intent, context)
+            getShareInfoList(intent, context) ?: emptyList()
 
         _fileNames.postValue(getShareInfoFileNamesMap(shareInfo))
         _filesInfo.postValue(shareInfo)
@@ -160,7 +160,7 @@ class FileExplorerViewModel @Inject constructor(
     private fun getShareInfoList(
         intent: Intent,
         context: Context?,
-    ) = (intent.serializable(FileExplorerActivity.EXTRA_SHARE_INFOS)
+    ): List<ShareInfo>? = (intent.serializable(FileExplorerActivity.EXTRA_SHARE_INFOS)
         ?: ShareInfo.processIntent(intent, context))
 
     private fun getShareInfoFileNamesMap(shareInfo: List<ShareInfo>?) =
