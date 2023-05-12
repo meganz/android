@@ -10,8 +10,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -19,13 +22,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
+import kotlinx.coroutines.launch
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -37,13 +45,17 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -78,6 +90,12 @@ class FileBrowserComposeFragment : Fragment() {
      */
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    /**
+     * Mapper to open file
+     */
+    @Inject
+    lateinit var getIntentToOpenFileMapper: GetIntentToOpenFileMapper
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
@@ -117,7 +135,7 @@ class FileBrowserComposeFragment : Fragment() {
                     FileBrowserComposeView(
                         uiState = uiState,
                         stringUtilWrapper = stringUtilWrapper,
-                        emptyState = getEmptyFolderDrawable(true),
+                        emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
                         onItemClick = fileBrowserViewModel::onItemClicked,
                         onLongClick = {
                             fileBrowserViewModel.onLongItemClicked(it)
@@ -141,7 +159,36 @@ class FileBrowserComposeFragment : Fragment() {
                     fileCount = uiState.selectedFileNodes,
                     folderCount = uiState.selectedFolderNodes
                 )
+                itemClickedEvenReceived(uiState.currentFileNode)
+                ShowMediaDiscovery(uiState.showMediaDiscovery)
             }
+        }
+    }
+
+    /**
+     * Displays if media discovery is to be shown or not
+     */
+    @Composable
+    private fun ShowMediaDiscovery(showMediaDiscovery: Boolean) {
+        if (showMediaDiscovery) {
+            SideEffect {
+                showMediaDiscovery()
+            }
+            fileBrowserViewModel.onItemPerformedClicked()
+        }
+    }
+
+    /**
+     * On Item click event received from [FileBrowserViewModel]
+     *
+     * @param currentFileNode [FileNode]
+     */
+    private fun itemClickedEvenReceived(currentFileNode: FileNode?) {
+        currentFileNode?.let {
+            openFile(fileNode = it)
+            fileBrowserViewModel.onItemPerformedClicked()
+        } ?: run {
+            (requireActivity() as ManagerActivity).setToolbarTitle()
         }
     }
 
@@ -155,6 +202,7 @@ class FileBrowserComposeFragment : Fragment() {
                     actionMode?.finish()
                     0.toString()
                 }
+
                 fileCount == 0 -> folderCount.toString()
                 folderCount == 0 -> fileCount.toString()
                 else -> (fileCount + folderCount).toString()
@@ -188,6 +236,9 @@ class FileBrowserComposeFragment : Fragment() {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             fileBrowserViewModel.refreshNodes()
         })
+
+        LiveEventBus.get(EventConstants.EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
+            .observe(this) { showMediaDiscovery(true) }
     }
 
     /**
@@ -228,7 +279,22 @@ class FileBrowserComposeFragment : Fragment() {
      * On back pressed from ManagerActivity
      */
     fun onBackPressed(): Int {
-        return 0
+        return with(requireActivity() as ManagerActivity) {
+            if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
+                restoreRubbishAfterComingFromNotification()
+                2
+            } else {
+                fileBrowserViewModel.state.value.parentHandle?.let {
+                    fileBrowserViewModel.onBackPressed()
+                    invalidateOptionsMenu()
+                    setToolbarTitle()
+                    fileBrowserViewModel.popLastPositionStack()
+                    2
+                } ?: run {
+                    0
+                }
+            }
+        }
     }
 
     /**
@@ -294,9 +360,11 @@ class FileBrowserComposeFragment : Fragment() {
                         fromChat = false,
                     )
                 }
+
                 OptionItems.RENAME_CLICKED -> {
                     (requireActivity() as ManagerActivity).showRenameDialog(it.selectedMegaNode[0])
                 }
+
                 OptionItems.SHARE_FOLDER_CLICKED -> {
                     it.selectedNode.filterIsInstance<FolderNode>()
                         .map { folderNode -> folderNode.id.longValue }
@@ -315,44 +383,55 @@ class FileBrowserComposeFragment : Fragment() {
                             }
                         }
                 }
+
                 OptionItems.SHARE_OUT_CLICKED -> {
                     MegaNodeUtil.shareNodes(requireContext(), it.selectedMegaNode)
                 }
+
                 OptionItems.SHARE_EDIT_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showGetLinkActivity(it.selectedMegaNode)
                 }
+
                 OptionItems.REMOVE_LINK_CLICKED -> {
                     (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
                         it.selectedMegaNode[0]
                     )
                 }
+
                 OptionItems.SEND_TO_CHAT_CLICKED -> {
                     (requireActivity() as ManagerActivity).attachNodesToChats(it.selectedMegaNode)
                 }
+
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
                     (requireActivity() as ManagerActivity).askConfirmationMoveToRubbish(
                         fileBrowserViewModel.state.value.selectedNodeHandles
                     )
                 }
+
                 OptionItems.REMOVE_SHARE_CLICKED -> {
                     (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
                         it.selectedMegaNode
                     )
                 }
+
                 OptionItems.SELECT_ALL_CLICKED -> {
                     fileBrowserViewModel.selectAllNodes()
                 }
+
                 OptionItems.CLEAR_ALL_CLICKED -> {
                     fileBrowserViewModel.clearAllNodes()
                 }
+
                 OptionItems.COPY_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToCopyNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
                 }
+
                 OptionItems.MOVE_CLICKED -> {
                     val nC = NodeController(requireActivity())
                     nC.chooseLocationToMoveNodes(fileBrowserViewModel.state.value.selectedNodeHandles)
                 }
+
                 OptionItems.DISPUTE_CLICKED -> {
                     startActivity(
                         Intent(requireContext(), WebViewActivity::class.java)
@@ -362,6 +441,53 @@ class FileBrowserComposeFragment : Fragment() {
                 }
             }
             fileBrowserViewModel.clearAllNodes()
+        }
+    }
+
+    /**
+     * Show Media discovery and launch [MediaDiscoveryFragment]
+     */
+    private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
+        (requireActivity() as? ManagerActivity)?.skipToMediaDiscoveryFragment(
+            fragment = MediaDiscoveryFragment.getNewInstance(
+                mediaHandle = fileBrowserViewModel.state.value.mediaHandle,
+                isOpenByMDIcon = isOpenByMDIcon,
+            ),
+            mediaHandle = fileBrowserViewModel.state.value.mediaHandle,
+        )
+    }
+
+    /**
+     * Open File
+     * @param fileNode [FileNode]
+     */
+    private fun openFile(fileNode: FileNode) {
+        lifecycleScope.launch {
+            runCatching {
+                val intent = getIntentToOpenFileMapper(
+                    activity = requireActivity(),
+                    fileNode = fileNode,
+                    viewType = Constants.FILE_BROWSER_ADAPTER
+                )
+                intent?.let {
+                    if (MegaApiUtils.isIntentAvailable(context, it)) {
+                        startActivity(it)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.intent_not_available),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+                (requireActivity() as? BaseActivity)?.showSnackbar(
+                    type = Constants.SNACKBAR_TYPE,
+                    content = getString(R.string.general_text_error),
+                    chatId = -1,
+                )
+            }
         }
     }
 }

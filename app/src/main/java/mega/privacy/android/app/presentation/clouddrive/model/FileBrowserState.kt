@@ -28,6 +28,8 @@ import nz.mega.sdk.MegaNode
  * @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
  * @property sortOrder [SortOrder] of current list
  * @property optionsItemInfo information when option selected clicked
+ * @property isFileBrowserEmpty information about file browser empty
+ * @property showMediaDiscovery shows Media discovery of Folder Node
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -46,6 +48,8 @@ data class FileBrowserState(
     val selectedFolderNodes: Int = 0,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val optionsItemInfo: OptionsItemInfo? = null,
+    val isFileBrowserEmpty: Boolean = false,
+    val showMediaDiscovery: Boolean = false,
 )
 
 /**

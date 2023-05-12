@@ -4,6 +4,7 @@ import android.view.MenuItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -17,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetOptionsForToolbarMapper
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -50,6 +52,8 @@ import javax.inject.Inject
  * @param getCloudSortOrder [GetCloudSortOrder]
  * @param monitorViewType [MonitorViewType] check view type
  * @param setViewType [SetViewType] to set view type
+ * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
+ * @param getOptionsForToolbarMapper [GetIntentToOpenFileMapper] to get toolbar options mapper
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -221,7 +225,9 @@ class FileBrowserViewModel @Inject constructor(
                     nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList(),
                     parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
                     nodesList = nodeList,
-                    sortOrder = getCloudSortOrder()
+                    sortOrder = getCloudSortOrder(),
+                    isFileBrowserEmpty = MegaApiJava.INVALID_HANDLE == _state.value.fileBrowserHandle ||
+                            getRootFolder()?.handle == _state.value.fileBrowserHandle
                 )
             }
         }
@@ -272,9 +278,24 @@ class FileBrowserViewModel @Inject constructor(
      * @param lastFirstVisiblePosition visible position based on listview type
      * @param handle node handle
      */
-    fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
-        pushPositionOnStack(lastFirstVisiblePosition)
-        setBrowserParentHandle(handle)
+    fun onFolderItemClicked(
+        lastFirstVisiblePosition: Int,
+        handle: Long,
+    ) {
+        viewModelScope.launch {
+            setBrowserParentHandle(handle)
+            if (shouldEnterMediaDiscoveryMode(
+                    parentHandle = handle,
+                    mediaDiscoveryViewSettings = state.value.mediaDiscoveryViewSettings
+                )
+            ) {
+                _state.update { state ->
+                    state.copy(showMediaDiscovery = true)
+                }
+            } else {
+                pushPositionOnStack(lastFirstVisiblePosition)
+            }
+        }
     }
 
     /**
@@ -508,6 +529,19 @@ class FileBrowserViewModel @Inject constructor(
                     optionsItemInfo = optionsItemInfo
                 )
             }
+        }
+    }
+
+    /**
+     * When item is clicked on activity
+     */
+    fun onItemPerformedClicked() {
+        _state.update {
+            it.copy(
+                currentFileNode = null,
+                itemIndex = -1,
+                showMediaDiscovery = false
+            )
         }
     }
 }
