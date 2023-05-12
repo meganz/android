@@ -28,7 +28,7 @@ class QueryRecoveryLinkListener(
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 
@@ -38,7 +38,7 @@ class QueryRecoveryLinkListener(
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 
@@ -102,7 +102,7 @@ class QueryRecoveryLinkListener(
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         // Do nothing
     }
 }

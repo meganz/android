@@ -2098,22 +2098,22 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
 
     }
 
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
         Timber.d("onUserAlertsUpdate")
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
+    override fun onEvent(api: MegaApiJava, event: MegaEvent) {}
 
-    override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+    override fun onSetsUpdate(api: MegaApiJava, sets: java.util.ArrayList<MegaSet>) {
     }
 
     override fun onSetElementsUpdate(
-        api: MegaApiJava?,
-        elements: java.util.ArrayList<MegaSetElement>?,
+        api: MegaApiJava,
+        elements: java.util.ArrayList<MegaSetElement>,
     ) {
     }
 
@@ -2194,7 +2194,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?,
+        requests: ArrayList<MegaContactRequest>,
     ) {
 
     }

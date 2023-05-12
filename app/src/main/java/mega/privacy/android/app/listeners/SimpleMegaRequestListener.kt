@@ -59,7 +59,7 @@ class SimpleMegaRequestListener(
     override fun onRequestTemporaryError(
         api: MegaApiJava,
         request: MegaRequest,
-        e: MegaError?,
+        e: MegaError,
     ) {
 
     }

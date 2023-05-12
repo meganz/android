@@ -35,7 +35,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         // DO nothing
     }
 
@@ -45,7 +45,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
         // DO nothing
     }
 
@@ -140,7 +140,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
      * @param request : MegaRequest
      * @param e: MegaError
      */
-    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         // DO nothing
     }
 

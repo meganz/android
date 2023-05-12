@@ -156,52 +156,52 @@ internal class MegaApiFacade @Inject constructor(
     override val globalUpdates: Flow<GlobalUpdate> = callbackFlow {
         val listener = object : MegaGlobalListenerInterface {
             override fun onUsersUpdate(
-                api: MegaApiJava?,
-                users: ArrayList<MegaUser>?,
+                api: MegaApiJava,
+                users: ArrayList<MegaUser>,
             ) {
                 trySend(GlobalUpdate.OnUsersUpdate(users))
             }
 
             override fun onUserAlertsUpdate(
-                api: MegaApiJava?,
-                userAlerts: ArrayList<MegaUserAlert>?,
+                api: MegaApiJava,
+                userAlerts: ArrayList<MegaUserAlert>,
             ) {
                 trySend(GlobalUpdate.OnUserAlertsUpdate(userAlerts))
             }
 
             override fun onNodesUpdate(
-                api: MegaApiJava?,
+                api: MegaApiJava,
                 nodeList: ArrayList<MegaNode>?,
             ) {
                 trySend(GlobalUpdate.OnNodesUpdate(nodeList))
             }
 
-            override fun onReloadNeeded(api: MegaApiJava?) {
+            override fun onReloadNeeded(api: MegaApiJava) {
                 trySend(GlobalUpdate.OnReloadNeeded)
             }
 
-            override fun onAccountUpdate(api: MegaApiJava?) {
+            override fun onAccountUpdate(api: MegaApiJava) {
                 trySend(GlobalUpdate.OnAccountUpdate)
             }
 
             override fun onContactRequestsUpdate(
-                api: MegaApiJava?,
-                requests: ArrayList<MegaContactRequest>?,
+                api: MegaApiJava,
+                requests: ArrayList<MegaContactRequest>,
             ) {
                 trySend(GlobalUpdate.OnContactRequestsUpdate(requests))
             }
 
-            override fun onEvent(api: MegaApiJava?, event: MegaEvent?) {
+            override fun onEvent(api: MegaApiJava, event: MegaEvent) {
                 trySend(GlobalUpdate.OnEvent(event))
             }
 
-            override fun onSetsUpdate(api: MegaApiJava?, sets: java.util.ArrayList<MegaSet>?) {
+            override fun onSetsUpdate(api: MegaApiJava, sets: java.util.ArrayList<MegaSet>) {
                 trySend(GlobalUpdate.OnSetsUpdate(sets))
             }
 
             override fun onSetElementsUpdate(
-                api: MegaApiJava?,
-                elements: java.util.ArrayList<MegaSetElement>?,
+                api: MegaApiJava,
+                elements: java.util.ArrayList<MegaSetElement>,
             ) {
                 trySend(GlobalUpdate.OnSetElementsUpdate(elements))
             }

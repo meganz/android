@@ -575,13 +575,13 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     }
 
-    override fun onRequestStart(p0: MegaApiJava?, p1: MegaRequest?) {
+    override fun onRequestStart(p0: MegaApiJava, p1: MegaRequest) {
         Timber.d("onRequestStart")
     }
 
-    override fun onRequestUpdate(p0: MegaApiJava?, p1: MegaRequest?) {}
+    override fun onRequestUpdate(p0: MegaApiJava, p1: MegaRequest) {}
 
-    override fun onRequestFinish(p0: MegaApiJava?, p1: MegaRequest?, p2: MegaError?) {
+    override fun onRequestFinish(p0: MegaApiJava, p1: MegaRequest, p2: MegaError) {
         Timber.d("onRequestFinish")
         p1?.let { request ->
             when (request.type) {
@@ -631,7 +631,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         binding.containerAcceptButton.isVisible = true
     }
 
-    override fun onRequestTemporaryError(p0: MegaApiJava?, p1: MegaRequest?, p2: MegaError?) {}
+    override fun onRequestTemporaryError(p0: MegaApiJava, p1: MegaRequest, p2: MegaError) {}
 
     override fun onPreviewLoaded(request: MegaChatRequest, alreadyExist: Boolean) {
         val chatId = request.chatHandle

@@ -53,7 +53,7 @@ class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterfa
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 
@@ -63,7 +63,7 @@ class GetAchievementsListener @Inject constructor() : MegaRequestListenerInterfa
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 

@@ -16,9 +16,9 @@ import timber.log.Timber
  */
 class AddContactListener(private val callback: (String) -> Unit, private val context: Context) :
     MegaRequestListenerInterface {
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
 
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (request.type == MegaRequest.TYPE_INVITE_CONTACT) {
@@ -59,5 +59,5 @@ class AddContactListener(private val callback: (String) -> Unit, private val con
         }
     }
 
-    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {}
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 }

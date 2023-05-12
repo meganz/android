@@ -44,7 +44,7 @@ class CreateFolderListener @JvmOverloads constructor(
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 
@@ -54,7 +54,7 @@ class CreateFolderListener @JvmOverloads constructor(
      * @param api : MegaApiJava
      * @param request : MegaRequest
      */
-    override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
         // Do nothing
     }
 
@@ -132,7 +132,7 @@ class CreateFolderListener @JvmOverloads constructor(
      * @param request : MegaRequest
      * @param e: MegaError
      */
-    override fun onRequestTemporaryError(api: MegaApiJava?, request: MegaRequest?, e: MegaError?) {
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         // Do nothing
     }
 }
