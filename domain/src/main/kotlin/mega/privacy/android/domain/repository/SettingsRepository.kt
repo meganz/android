@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.CallsMeetingInvitations
+import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -173,6 +175,34 @@ interface SettingsRepository {
      * @return Sound notifications status.
      */
     suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications)
+
+    /**
+     * Get calls meeting invitations
+     *
+     * @return  Meeting invitations status
+     */
+    fun getCallsMeetingInvitations(): Flow<CallsMeetingInvitations>
+
+    /**
+     * Set calls meeting invitations status
+     *
+     * @param callsMeetingInvitations   New Meeting invitations status
+     */
+    suspend fun setCallsMeetingInvitations(callsMeetingInvitations: CallsMeetingInvitations)
+
+    /**
+     * Get calls meeting reminders
+     *
+     * @return  Meeting reminders status
+     */
+    fun getCallsMeetingReminders(): Flow<CallsMeetingReminders>
+
+    /**
+     * Set calls meeting reminders status
+     *
+     * @param callsMeetingReminders New Meeting reminders status
+     */
+    suspend fun setCallsMeetingReminders(callsMeetingReminders: CallsMeetingReminders)
 
     /**
      * Set string preference

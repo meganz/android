@@ -102,7 +102,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new FileBrowser Compose UI
      */
-    FileBrowserCompose("Enable compose for FileBrowser", false);
+    FileBrowserCompose("Enable compose for FileBrowser", false),
+
+    /**
+     * Meeting notification settings
+     */
+    MeetingNotificationSettings("Enable Meeting notification settings", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.NodeProvider
 import mega.privacy.android.data.mapper.UserAlertContactProvider
@@ -16,6 +17,7 @@ import mega.privacy.android.data.mapper.UserAlertScheduledMeetingOccurrProvider
 import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
@@ -61,6 +63,7 @@ class DefaultNotificationsRepositoryTest {
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val fetchSchedOccurrencesByChatUseCase = mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
     private val getScheduledMeetingUseCase = mock<GetScheduledMeeting>()
+    private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
 
     @Before
     fun setUp() {
@@ -71,8 +74,12 @@ class DefaultNotificationsRepositoryTest {
             localStorageGateway = megaLocalStorageGateway,
             fetchSchedOccurrencesByChatUseCase = fetchSchedOccurrencesByChatUseCase,
             getScheduledMeetingUseCase = getScheduledMeetingUseCase,
+            callsPreferencesGateway = callsPreferencesGateway,
             dispatcher = UnconfinedTestDispatcher(),
         )
+
+        whenever(callsPreferencesGateway.getCallsMeetingInvitationsPreference())
+            .thenReturn(flowOf(CallsMeetingInvitations.Enabled))
     }
 
     @Suppress("UNCHECKED_CAST")

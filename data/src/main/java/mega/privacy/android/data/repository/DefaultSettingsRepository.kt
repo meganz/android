@@ -27,6 +27,8 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.domain.entity.CallsMeetingInvitations
+import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
@@ -243,6 +245,22 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setCallsSoundNotifications(soundNotifications: CallsSoundNotifications) =
         withContext(ioDispatcher) {
             callsPreferencesGateway.setCallsSoundNotificationsPreference(soundNotifications)
+        }
+
+    override fun getCallsMeetingInvitations(): Flow<CallsMeetingInvitations> =
+        callsPreferencesGateway.getCallsMeetingInvitationsPreference()
+
+    override suspend fun setCallsMeetingInvitations(callsMeetingInvitations: CallsMeetingInvitations) =
+        withContext(ioDispatcher) {
+            callsPreferencesGateway.setCallsMeetingInvitationsPreference(callsMeetingInvitations)
+        }
+
+    override fun getCallsMeetingReminders(): Flow<CallsMeetingReminders> =
+        callsPreferencesGateway.getCallsMeetingRemindersPreference()
+
+    override suspend fun setCallsMeetingReminders(callsMeetingReminders: CallsMeetingReminders) =
+        withContext(ioDispatcher) {
+            callsPreferencesGateway.setCallsMeetingRemindersPreference(callsMeetingReminders)
         }
 
     override suspend fun setStringPreference(key: String?, value: String?) =

@@ -12,9 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -47,7 +47,9 @@ class SettingsCallsFragment : Fragment() {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         SettingsCallsView(
             settingsCallsState = uiState,
-            onCheckedChange = viewModel::setNewCallsSoundNotifications
+            onSoundNotificationsChanged = viewModel::setNewCallsSoundNotifications,
+            onMeetingInvitationsChanged = viewModel::setNewCallsMeetingInvitations,
+            onMeetingRemindersChanged = viewModel::setNewCallsMeetingReminders
         )
     }
 }

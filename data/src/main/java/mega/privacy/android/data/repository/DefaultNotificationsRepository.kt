@@ -3,17 +3,22 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.Event
+import mega.privacy.android.domain.entity.ScheduledMeetingAlert
+import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -38,21 +43,28 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val fetchSchedOccurrencesByChatUseCase: FetchNumberOfScheduledMeetingOccurrencesByChat,
     private val getScheduledMeetingUseCase: GetScheduledMeeting,
     private val localStorageGateway: MegaLocalStorageGateway,
+    private val callsPreferencesGateway: CallsPreferencesGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : NotificationsRepository {
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
-        .mapNotNull { (userAlerts) ->
-            userAlerts?.map {
-                withContext(dispatcher) {
+        .mapNotNull { (newUserAlerts) ->
+            withContext(dispatcher) {
+                val userAlerts = newUserAlerts?.map { userAlert ->
                     userAlertsMapper(
-                        it,
+                        userAlert,
                         ::provideContact,
                         ::provideScheduledMeeting,
                         ::provideSchedMeetingOccurrences,
                         megaApiGateway::getMegaNodeByHandle
                     )
+                }
+
+                if (!areMeetingInvitationsEnabled()) {
+                    userAlerts?.filter { it !is ScheduledMeetingAlert }
+                } else {
+                    userAlerts
                 }
             }
         }.flowOn(dispatcher)
@@ -63,15 +75,24 @@ internal class DefaultNotificationsRepository @Inject constructor(
             event?.let { eventMapper(it) }
         }
 
-    override suspend fun getUserAlerts() = withContext(dispatcher) {
-        megaApiGateway.getUserAlerts().map {
-            userAlertsMapper(it,
-                ::provideContact,
-                ::provideScheduledMeeting,
-                ::provideSchedMeetingOccurrences,
-                megaApiGateway::getMegaNodeByHandle)
+    override suspend fun getUserAlerts(): List<UserAlert> =
+        withContext(dispatcher) {
+            val userAlerts = megaApiGateway.getUserAlerts().map { userAlert ->
+                userAlertsMapper(
+                    userAlert,
+                    ::provideContact,
+                    ::provideScheduledMeeting,
+                    ::provideSchedMeetingOccurrences,
+                    megaApiGateway::getMegaNodeByHandle
+                )
+            }
+
+            if (!areMeetingInvitationsEnabled()) {
+                userAlerts.filter { it !is ScheduledMeetingAlert }
+            } else {
+                userAlerts
+            }
         }
-    }
 
     private suspend fun provideEmail(userId: Long): String? =
         getEmailLocally(userId) ?: fetchAndCacheEmail(userId)
@@ -136,4 +157,8 @@ internal class DefaultNotificationsRepository @Inject constructor(
     override suspend fun acknowledgeUserAlerts() {
         megaApiGateway.acknowledgeUserAlerts()
     }
+
+    private suspend fun areMeetingInvitationsEnabled(): Boolean =
+        callsPreferencesGateway.getCallsMeetingInvitationsPreference().firstOrNull() ==
+                CallsMeetingInvitations.Enabled
 }
