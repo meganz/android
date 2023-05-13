@@ -106,7 +106,7 @@ internal class UserInfoViewModel @Inject constructor(
         val avatarContent = avatarContentMapper(
             fullName = _state.value.fullName,
             localFile = avatarFile,
-            backgroundColor = { getMyAvatarColorUseCase() },
+            backgroundColor = getMyAvatarColorUseCase(),
             showBorder = false,
             textSize = 36.sp
         )

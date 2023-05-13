@@ -52,7 +52,7 @@ class AvatarContentMapperImplTest {
                 fullName = "full name",
                 localFile = null,
                 showBorder = true,
-                backgroundColor = { Color.Black.toArgb() },
+                backgroundColor = Color.Black.toArgb(),
                 textSize = 38.sp
             )
             assertThat(result).isInstanceOf(TextAvatarContent::class.java)
@@ -68,7 +68,7 @@ class AvatarContentMapperImplTest {
                 fullName = "full name",
                 localFile = null,
                 showBorder = true,
-                backgroundColor = { Color.Black.toArgb() },
+                backgroundColor = Color.Black.toArgb(),
                 textSize = 38.sp,
             )
             assertThat(result).isInstanceOf(EmojiAvatarContent::class.java)
@@ -90,7 +90,7 @@ class AvatarContentMapperImplTest {
                 fullName = null,
                 localFile = null,
                 showBorder = true,
-                backgroundColor = { Color.Black.toArgb() },
+                backgroundColor = Color.Black.toArgb(),
                 textSize = 38.sp,
             )
             assertThat(result).isInstanceOf(TextAvatarContent::class.java)
@@ -106,7 +106,7 @@ class AvatarContentMapperImplTest {
             fullName = "name",
             localFile = localFile,
             showBorder = true,
-            backgroundColor = { Color.Black.toArgb() },
+            backgroundColor = Color.Black.toArgb(),
             textSize = 38.sp,
         )
         assertThat(result).isInstanceOf(PhotoAvatarContent::class.java)
@@ -122,7 +122,7 @@ class AvatarContentMapperImplTest {
             fullName = "full name",
             localFile = localFile,
             showBorder = true,
-            backgroundColor = { Color.Black.toArgb() },
+            backgroundColor = Color.Black.toArgb(),
             textSize = 38.sp,
         )
         assertThat(result).isInstanceOf(TextAvatarContent::class.java)

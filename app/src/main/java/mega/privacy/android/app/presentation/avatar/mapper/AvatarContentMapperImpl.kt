@@ -26,25 +26,17 @@ class AvatarContentMapperImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher, // file execution need to move to background work
 ) : AvatarContentMapper {
 
-    /**
-     * Convert [fullName] to an [AvatarContent].
-     *
-     * @param fullName full name
-     * @param localFile local path of the avatar photo
-     * @return specific types of [AvatarContent]
-     */
     override suspend fun invoke(
         fullName: String?,
         localFile: File?,
         showBorder: Boolean,
         textSize: TextUnit,
-        backgroundColor: suspend () -> Int,
+        backgroundColor: Int,
     ): AvatarContent = withContext(ioDispatcher) {
         mapAvatarPathToPhoto(localFile, showBorder)
             ?: mapNameToAvatarText(fullName).let { name ->
-                val color = backgroundColor()
-                mapAvatarTextToEmoji(name, color, showBorder)
-                    ?: TextAvatarContent(name, color, showBorder, textSize)
+                mapAvatarTextToEmoji(name, backgroundColor, showBorder)
+                    ?: TextAvatarContent(name, backgroundColor, showBorder, textSize)
             }
     }
 
