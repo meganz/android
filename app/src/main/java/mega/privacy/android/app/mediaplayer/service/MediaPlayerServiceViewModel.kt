@@ -904,7 +904,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     ) {
         if (mediaItems.isNotEmpty() && items.isNotEmpty()) {
             playerSource.postValue(MediaPlaySources(mediaItems, firstPlayIndex, null))
-            recreateAndUpdatePlaylistItems(items = items)
+            recreateAndUpdatePlaylistItems(originalItems = items)
         }
     }
 
@@ -1073,30 +1073,30 @@ class MediaPlayerServiceViewModel @Inject constructor(
     /**
      * Recreate and update playlist items
      *
-     * @param items playlist items
+     * @param originalItems playlist items
      * @param isScroll true is scroll to target position, otherwise is false.
      * @param isBuildPlaySources true is building play sources, otherwise is false.
      */
     private fun recreateAndUpdatePlaylistItems(
-        items: List<PlaylistItem> = playlistItems,
+        originalItems: List<PlaylistItem?> = playlistItems,
         isScroll: Boolean = true,
         isBuildPlaySources: Boolean = true,
     ) {
         sharingScope.launch(ioDispatcher) {
-            Timber.d("recreateAndUpdatePlaylistItems ${items.size} items")
-            if (items.isEmpty()) {
+            Timber.d("recreateAndUpdatePlaylistItems ${originalItems.size} items")
+            if (originalItems.isEmpty()) {
                 return@launch
             }
-
+            val items = originalItems.filterNotNull()
             playingPosition = items.indexOfFirst { (nodeHandle) ->
                 nodeHandle == playingHandle
             }.takeIf { index ->
-                index in items.indices
+                index in originalItems.indices
             } ?: 0
 
             val recreatedItems = mutableListOf<PlaylistItem>()
             // Adjust whether need to build play sources again to avoid playlist is reordered everytime playlist items updated
-            if (isBuildPlaySources && shuffleEnabled && shuffleOrder.length == items.size) {
+            if (isBuildPlaySources && shuffleEnabled && shuffleOrder.length == originalItems.size) {
                 recreatedItems.add(items[playingPosition])
 
                 var newPlayingIndex = 0
@@ -1176,7 +1176,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     override fun searchQueryUpdate(newText: String?) {
         playlistSearchQuery = newText
         recreateAndUpdatePlaylistItems(
-            items = playlistItemsFlow.value.first,
+            originalItems = playlistItemsFlow.value.first,
             isBuildPlaySources = false
         )
     }
@@ -1192,7 +1192,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodeHandle == handle
             }.takeIf { index -> index in playlistItems.indices } ?: 0
             recreateAndUpdatePlaylistItems(
-                items = playlistItemsFlow.value.first,
+                originalItems = playlistItemsFlow.value.first,
                 isBuildPlaySources = false
             )
         }
@@ -1233,7 +1233,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         val newItems = removeSingleItem(handle)
         if (newItems.isNotEmpty()) {
             resetRetryState()
-            recreateAndUpdatePlaylistItems(items = newItems)
+            recreateAndUpdatePlaylistItems(originalItems = newItems)
         } else {
             playlistItemsFlow.update {
                 it.copy(emptyList(), 0)
@@ -1326,7 +1326,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         actionMode.value = isActionMode
         if (isActionMode) {
             recreateAndUpdatePlaylistItems(
-                items = playlistItemsFlow.value.first,
+                originalItems = playlistItemsFlow.value.first,
                 isScroll = false,
                 isBuildPlaySources = false
             )
@@ -1490,7 +1490,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun scrollToPlayingPosition() =
         recreateAndUpdatePlaylistItems(
-            items = playlistItemsFlow.value.first,
+            originalItems = playlistItemsFlow.value.first,
             isBuildPlaySources = false
         )
 
