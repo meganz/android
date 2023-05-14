@@ -126,12 +126,12 @@ class SearchFragment : RotatableFragment() {
     private val binding: FragmentSearchBinding
         get() = _binding!!
 
-    private lateinit var gridLayoutManager: CustomizedGridLayoutManager
+    private var gridLayoutManager: CustomizedGridLayoutManager? = null
     private val outMetrics: DisplayMetrics by lazy {
         DisplayMetrics()
     }
 
-    private lateinit var layoutManager: LinearLayoutManager
+    private var layoutManager: LinearLayoutManager? = null
 
     private var trashIcon: MenuItem? = null
 
@@ -814,9 +814,9 @@ class SearchFragment : RotatableFragment() {
 
             if (lastVisiblePosition >= 0) {
                 if (state().currentViewType == ViewType.LIST) {
-                    layoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    layoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 } else {
-                    gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
+                    gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 }
             }
             return 2
@@ -851,7 +851,7 @@ class SearchFragment : RotatableFragment() {
                 var lastFirstVisiblePosition: Int
                 if (state().currentViewType == ViewType.LIST) {
                     lastFirstVisiblePosition =
-                        layoutManager.findFirstCompletelyVisibleItemPosition()
+                        layoutManager?.findFirstCompletelyVisibleItemPosition() ?: -1
                 } else {
                     lastFirstVisiblePosition =
                         (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
