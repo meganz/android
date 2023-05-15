@@ -6,6 +6,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -125,6 +126,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         refreshPhotosJob?.cancel()
         refreshPhotosJob = refreshPhotosStateFlow
             .filter { it }
+            .conflate()
             .onEach {
                 val photos = searchMegaPhotos()
                 for (photo in photos) {
