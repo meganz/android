@@ -21,9 +21,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     val offlineFiles: ArrayList<MegaOffline>
 
     val sdTransfers: ArrayList<SDTransfer>
-    val cuBackup: Backup?
-    val muBackup: Backup?
-    val allBackups: List<Backup>?
 
     fun saveEphemeral(ephemeralCredentials: EphemeralCredentials)
     fun batchInsertMegaContacts(contacts: List<MegaContactGetter.MegaContact>?)

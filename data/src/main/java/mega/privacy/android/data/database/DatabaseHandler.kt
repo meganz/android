@@ -34,6 +34,27 @@ interface DatabaseHandler {
      */
     val muBackupID: Long?
 
+    /**
+     * Camera upload backup ID
+     *
+     * @return [Long].
+     */
+    val cuBackup: Backup?
+
+    /**
+     * Media upload backup
+     *
+     * @return [Backup].
+     */
+    val muBackup: Backup?
+
+    /**
+     * All Backups
+     *
+     * @return list of [Backup].
+     */
+    val allBackups: List<Backup>?
+
     val myEmail: String?
 
     //get the credential of last login

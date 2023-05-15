@@ -13,11 +13,10 @@ class UpdateBackupUseCase @Inject constructor(private val cameraUploadRepository
      * @param backupId    backup id identifying the backup to be updated
      * @param localFolder Local path of the folder
      * @param state       backup state
-     * @param subState    backup subState
      */
     suspend operator fun invoke(
         backupId: Long, localFolder: String?,
-        backupName: String, state: Int, subState: Int,
+        backupName: String, state: Int,
     ) = cameraUploadRepository.updateBackup(
         backupId = backupId,
         backupType = cameraUploadRepository.getInvalidBackupType(),
@@ -25,7 +24,6 @@ class UpdateBackupUseCase @Inject constructor(private val cameraUploadRepository
         localFolder = localFolder,
         backupName = backupName,
         state = state,
-        subState = subState,
     ).also {
         cameraUploadRepository.getBackupById(it)?.let { backup ->
             cameraUploadRepository.updateLocalBackup(backup)

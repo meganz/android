@@ -662,12 +662,23 @@ interface CameraUploadRepository {
      * @param targetNode  MEGA folder to hold the backups
      * @param localFolder Local path of the folder
      * @param state       backup state
-     * @param subState    backup subState
      */
     suspend fun updateBackup(
         backupId: Long, backupType: Int, targetNode: Long, localFolder: String?,
-        backupName: String, state: Int, subState: Int,
+        backupName: String, state: Int,
     ): Long
+
+    /**
+     * Get Camera upload Backup
+     * @return [Backup]
+     */
+    suspend fun getCuBackUp(): Backup?
+
+    /**
+     * Get Media upload Backup
+     * @return [Backup]
+     */
+    suspend fun getMuBackUp(): Backup?
 
     /**
      * Get upload backup by Id

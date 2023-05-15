@@ -414,6 +414,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getMuBackUpId() = dbHandler.muBackupID
 
+    override suspend fun getCuBackUp() = dbHandler.cuBackup
+
+    override suspend fun getMuBackUp() = dbHandler.muBackup
+
     override suspend fun getBackupById(id: Long) = dbHandler.getBackupById(id)
 
     override suspend fun updateBackup(backup: Backup) = dbHandler.updateBackup(backup)

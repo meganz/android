@@ -2,16 +2,19 @@ package mega.privacy.android.domain.entity.camerauploads
 
 /**
  * To hold Camera UploadState
- * @param primaryPendingUploads
- * @param secondaryPendingUploads
- * @param lastPrimaryTimeStamp
- * @param lastSecondaryTimeStamp
- * @param lastPrimaryHandle
- * @param lastSecondaryHandle
- * @param primaryTotalUploadBytes
- * @param secondaryTotalUploadBytes
- * @param totalToUpload
- * @param totalUploaded
+ * @property primaryPendingUploads
+ * @property secondaryPendingUploads
+ * @property lastPrimaryTimeStamp
+ * @property lastSecondaryTimeStamp
+ * @property lastPrimaryHandle
+ * @property lastSecondaryHandle
+ * @property primaryTotalUploadBytes
+ * @property secondaryTotalUploadBytes
+ * @property primaryTotalUploadedBytes
+ * @property secondaryTotalUploadedBytes
+ * @property totalToUpload
+ * @property totalUploaded
+ * @property totalNumber
  */
 data class CameraUploadsState(
     var primaryPendingUploads: Int = 0,
@@ -22,6 +25,9 @@ data class CameraUploadsState(
     var lastSecondaryHandle: Long = -1,
     var primaryTotalUploadBytes: Long = 0,
     var secondaryTotalUploadBytes: Long = 0,
+    var primaryTotalUploadedBytes: Long = 0,
+    var secondaryTotalUploadedBytes: Long = 0,
     var totalToUpload: Int = 0,
     var totalUploaded: Int = 0,
+    var totalNumber: Int = 0,
 )

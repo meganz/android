@@ -747,6 +747,18 @@ interface MegaLocalStorageGateway {
     ): List<OfflineInformation>
 
     /**
+     * Get Camera upload Backup
+     * @return [Backup]
+     */
+    suspend fun getCuBackUp(): Backup?
+
+    /**
+     * Get Media upload Backup
+     * @return [Backup]
+     */
+    suspend fun getMuBackUp(): Backup?
+
+    /**
      * Get Camera upload Backup ID
      * @return [Long]
      */

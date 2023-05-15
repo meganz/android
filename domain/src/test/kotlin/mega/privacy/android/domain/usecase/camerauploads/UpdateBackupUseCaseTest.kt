@@ -33,7 +33,6 @@ class UpdateBackupUseCaseTest {
             val backupId = 1L
             val backupName = "backup"
             val state = 1
-            val subState = 1
             whenever(cameraUploadRepository.getInvalidBackupType()).thenReturn(-1)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(
@@ -44,11 +43,10 @@ class UpdateBackupUseCaseTest {
                     null,
                     backupName,
                     state,
-                    subState
                 )
             ).thenReturn(expected)
             whenever(cameraUploadRepository.getBackupById(expected)).thenReturn(mock())
-            val actual = underTest(backupId, null, backupName, state, subState)
+            val actual = underTest(backupId, null, backupName, state)
             assertThat(actual).isEqualTo(expected)
             verify(cameraUploadRepository).getBackupById(expected)
             verify(cameraUploadRepository).updateLocalBackup(any())

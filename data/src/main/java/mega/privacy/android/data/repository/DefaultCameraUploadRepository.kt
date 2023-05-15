@@ -677,7 +677,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localFolder: String?,
         backupName: String,
         state: Int,
-        subState: Int,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("updateBackup") { it.parentHandle }
@@ -688,13 +687,21 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 localFolder,
                 backupName,
                 state,
-                subState,
+                MegaError.API_OK,
                 listener,
             )
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun getCuBackUp() = withContext(ioDispatcher) {
+        localStorageGateway.getCuBackUp()
+    }
+
+    override suspend fun getMuBackUp() = withContext(ioDispatcher) {
+        localStorageGateway.getMuBackUp()
     }
 
     override suspend fun getBackupById(id: Long) = withContext(ioDispatcher) {
