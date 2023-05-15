@@ -15,7 +15,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
-import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import javax.inject.Inject
@@ -23,8 +23,8 @@ import javax.inject.Inject
 /**
  * Upgrade account view model
  *
+ * @param getCurrentSubscriptionPlanUseCase use case to get the current subscribed plan
  * @param getSubscriptionsUseCase use case to get the list of available subscriptions in the app
- * @param getCurrentSubscriptionPlan use case to get the current subscribed plan
  * @param getCurrentPaymentUseCase use case to get the current payment option
  * @param isBillingAvailable use to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
@@ -34,7 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UpgradeAccountViewModel @Inject constructor(
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
-    private val getCurrentSubscriptionPlan: GetCurrentSubscriptionPlan,
+    private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
@@ -61,7 +61,7 @@ class UpgradeAccountViewModel @Inject constructor(
             _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
         }
         viewModelScope.launch {
-            val currentSubscriptionPlan = getCurrentSubscriptionPlan()
+            val currentSubscriptionPlan = getCurrentSubscriptionPlanUseCase()
             _state.update { it.copy(currentSubscriptionPlan = currentSubscriptionPlan) }
         }
         viewModelScope.launch {
