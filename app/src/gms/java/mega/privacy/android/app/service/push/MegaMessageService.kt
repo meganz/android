@@ -1,6 +1,7 @@
 package mega.privacy.android.app.service.push
 
 import android.content.Context
+import androidx.work.Data
 import androidx.work.WorkManager
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
@@ -9,44 +10,43 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
-import mega.privacy.android.data.mapper.pushmessage.DataMapper
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
-import mega.privacy.android.domain.entity.pushes.MegaRemoteMessage
 import timber.log.Timber
 import java.util.concurrent.Executors
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MegaMessageService : FirebaseMessagingService() {
 
-    @Inject
-    lateinit var dataMapper: DataMapper
-
     override fun onDestroy() {
-        Timber.d("onDestroyFCM")
+        Timber.d("onDestroy")
         super.onDestroy()
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val megaRemoteMessage = MegaRemoteMessage(
-            from = remoteMessage.from,
-            originalPriority = remoteMessage.originalPriority,
-            priority = remoteMessage.priority,
-            data = remoteMessage.data
-        )
+        Timber.d("Remote Message: $remoteMessage")
 
-        Timber.d("$megaRemoteMessage")
+        val workerData = remoteMessage.data.toWorkerData()
 
         WorkManager.getInstance(this)
-            .enqueuePushMessage(dataMapper(megaRemoteMessage.pushMessage))
+            .enqueuePushMessage(workerData)
     }
 
-    override fun onNewToken(s: String) {
-        Timber.d("New token is: $s")
+    override fun onNewToken(token: String) {
+        Timber.d("New token: $token")
 
         WorkManager.getInstance(this)
-            .enqueueUniqueWorkNewToken(s, DEVICE_ANDROID)
+            .enqueueUniqueWorkNewToken(token, DEVICE_ANDROID)
     }
+
+    /**
+     * Convert RemoteMessage Data Map to Worker Data
+     *
+     * @return  Worker Data
+     */
+    private fun Map<String, String>.toWorkerData(): Data =
+        Data.Builder()
+            .apply { forEach { (key, value) -> putString(key, value) } }
+            .build()
 
     companion object {
         /**

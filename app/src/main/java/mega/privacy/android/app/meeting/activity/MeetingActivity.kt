@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
@@ -74,6 +75,9 @@ class MeetingActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
@@ -218,8 +222,11 @@ class MeetingActivity : BaseActivity() {
                 }
             }
 
-            meetingViewModel.updateChatRoomId(it.getLongExtra(MEETING_CHAT_ID,
-                MEGACHAT_INVALID_HANDLE))
+            val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+            meetingViewModel.updateChatRoomId(chatId)
+
+            // Cancel current notification if needed
+            notificationManager.cancel(chatId.toInt())
 
             isGuest = it.getBooleanExtra(
                 MEETING_IS_GUEST,

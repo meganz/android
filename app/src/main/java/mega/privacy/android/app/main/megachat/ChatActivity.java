@@ -276,6 +276,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
@@ -565,6 +566,9 @@ public class ChatActivity extends PasscodeActivity
     RTCAudioManagerGateway rtcAudioManagerGateway;
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
+
+    @Inject
+    NotificationManagerCompat notificationManager;
 
     private ChatViewModel viewModel;
 
@@ -8779,6 +8783,8 @@ public class ChatActivity extends PasscodeActivity
                 ChatAdvancedNotificationBuilder notificationBuilder;
                 notificationBuilder = ChatAdvancedNotificationBuilder.newInstance(this);
                 notificationBuilder.removeAllChatNotifications();
+
+                notificationManager.cancel((int) idChat);
             } catch (Exception e) {
                 Timber.e(e, "Exception NotificationManager - remove all notifications");
             }

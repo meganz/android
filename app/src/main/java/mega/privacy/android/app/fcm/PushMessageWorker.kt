@@ -1,22 +1,33 @@
 package mega.privacy.android.app.fcm
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
+import mega.privacy.android.domain.entity.CallsMeetingReminders
+import mega.privacy.android.domain.entity.pushes.PushMessage
+import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.PushReceived
@@ -42,12 +53,16 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnections: RetryPendingConnections,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
+    private val getNotificationUseCase: GetNotificationUseCase,
+    private val createNotificationChannels: CreateChatNotificationChannelsUseCase,
+    private val callsPreferencesGateway: CallsPreferencesGateway,
+    private val notificationManager: NotificationManagerCompat,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, workerParams) {
 
+    @SuppressLint("MissingPermission")
     override suspend fun doWork(): Result =
         withContext(ioDispatcher) {
-
             // legacy support, other places need to know logging in happen
             if (MegaApplication.isLoggingIn) {
                 Timber.w("Logging already running.")
@@ -55,16 +70,16 @@ class PushMessageWorker @AssistedInject constructor(
             }
 
             MegaApplication.isLoggingIn = true
-            val result = runCatching { backgroundFastLoginUseCase() }
+            val loginResult = runCatching { backgroundFastLoginUseCase() }
             MegaApplication.isLoggingIn = false
 
-            if (result.isSuccess) {
+            if (loginResult.isSuccess) {
                 Timber.d("Fast login success.")
                 runCatching { retryPendingConnections(disconnect = false) }
                     .recoverCatching { error ->
                         if (error is ChatNotInitializedErrorStatus) {
                             Timber.d("chat engine not ready. try to initialise megachat.")
-                            initialiseMegaChatUseCase(result.getOrDefault(""))
+                            initialiseMegaChatUseCase(loginResult.getOrDefault(""))
                         } else {
                             Timber.w(error)
                         }
@@ -73,37 +88,75 @@ class PushMessageWorker @AssistedInject constructor(
                         return@withContext Result.failure()
                     }
             } else {
-                Timber.e("Fast login error: ${result.exceptionOrNull()}")
+                Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
                 return@withContext Result.failure()
             }
 
-            val pushMessage = pushMessageMapper(inputData)
-            Timber.d("PushMessage.type: ${pushMessage.type}")
+            createChatNotificationChannels()
 
-            if (pushMessage.type == TYPE_CHAT) {
-                kotlin.runCatching { pushReceived(pushMessage.shouldBeep()) }
-                    .fold(
-                        { request ->
-                            ChatAdvancedNotificationBuilder.newInstance(applicationContext)
-                                .generateChatNotification(request)
-                        },
-                        { error ->
-                            Timber.e("Push received error: ${error.message}")
+            when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
+                is ChatPushMessage -> {
+                    runCatching { pushReceived(pushMessage.shouldBeep) }
+                        .onSuccess { request ->
+                            if (areNotificationsEnabled()) {
+                                ChatAdvancedNotificationBuilder.newInstance(applicationContext)
+                                    .generateChatNotification(request)
+                            }
+                        }
+                        .onFailure { error ->
+                            Timber.e(error)
                             return@withContext Result.failure()
                         }
-                    )
+                }
+
+                is ScheduledMeetingPushMessage -> {
+                    if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
+                        runCatching { getNotificationUseCase(pushMessage) }
+                            .onSuccess { result ->
+                                notificationManager.notify(result.first, result.second)
+                            }
+                            .onFailure { error ->
+                                Timber.e(error)
+                                return@withContext Result.failure()
+                            }
+                    }
+                }
+
+                else -> {
+                    Timber.w("Unsupported Push Message type")
+                }
             }
 
             Result.success()
         }
 
+    /**
+     * Create chat notification channels if needed
+     */
+    private fun createChatNotificationChannels() {
+        runCatching { createNotificationChannels.invoke() }
+            .onFailure(Timber.Forest::e)
+    }
+
+    /**
+     * Get push message from worker input data
+     *
+     * @param data
+     * @return          Push Message
+     */
+    private fun getPushMessageFromWorkerData(data: Data): PushMessage? =
+        runCatching { pushMessageMapper(data) }
+            .onFailure(Timber.Forest::e)
+            .getOrNull()
+
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = when (pushMessageMapper(inputData).type) {
-            TYPE_CALL -> getNotification(R.drawable.ic_call_started)
-            TYPE_CHAT -> getNotification(
+        val notification = when (pushMessageMapper(inputData)) {
+            is CallPushMessage -> getNotification(R.drawable.ic_call_started)
+            is ChatPushMessage -> getNotification(
                 R.drawable.ic_stat_notify,
                 R.string.notification_chat_undefined_content
             )
+
             else -> getNotification(R.drawable.ic_stat_notify)
         }
 
@@ -120,29 +173,42 @@ class PushMessageWorker @AssistedInject constructor(
                 enableVibration(false)
                 setSound(null, null)
             }
-            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                .createNotificationChannel(notificationChannel)
+            notificationManager.createNotificationChannel(notificationChannel)
         }
 
-        val builder = NotificationCompat.Builder(applicationContext, RETRIEVING_NOTIFICATIONS_ID)
+        return NotificationCompat.Builder(applicationContext, RETRIEVING_NOTIFICATIONS_ID)
+            .setSmallIcon(iconId)
             .apply {
-                setSmallIcon(iconId)
-
-                if (titleId != null) {
-                    setContentText(applicationContext.getString(titleId))
-                }
-            }
-
-        return builder.build()
+                titleId?.let { setContentText(applicationContext.getString(titleId)) }
+            }.build()
     }
 
-    companion object {
-        private const val TYPE_SHARE_FOLDER = "1"
-        private const val TYPE_CHAT = "2"
-        private const val TYPE_CONTACT_REQUEST = "3"
-        private const val TYPE_CALL = "4"
-        private const val TYPE_ACCEPTANCE = "5"
+    /**
+     * Check if notifications are enabled and required permissions are granted
+     *
+     * @return  True if are enabled, false otherwise
+     */
+    private fun areNotificationsEnabled(): Boolean =
+        notificationManager.areNotificationsEnabled() &&
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.checkSelfPermission(
+                        applicationContext,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
 
+    /**
+     * Check if meeting reminders are enabled
+     *
+     * @return  True if are enabled, false otherwise
+     */
+    private suspend fun areMeetingRemindersEnabled(): Boolean =
+        callsPreferencesGateway.getCallsMeetingRemindersPreference().firstOrNull() ==
+                CallsMeetingReminders.Enabled
+
+    companion object {
         const val NOTIFICATION_CHANNEL_ID = 1086
         const val RETRIEVING_NOTIFICATIONS_ID = "RETRIEVING_NOTIFICATIONS_ID"
         const val RETRIEVING_NOTIFICATIONS = "RETRIEVING_NOTIFICATIONS"

@@ -1,48 +1,52 @@
 package mega.privacy.android.domain.entity.pushes
 
 /**
+ * Push message
  *
- * @property remoteData Map containing all the info of the push message.
- * @property type       Push type or null if the map is empty.
- * @property email      Email or null if the map is empty.
- * @property silent     Value indicating if should beep or not, null if the map is empty.
- * @property chatId     Base64-encoded chat identifier.
+ * @constructor Create empty Push message
  */
-data class PushMessage(
-    private val remoteData: Map<String, String>? = null,
-    val type: String? = remoteData?.get(KEY_TYPE),
-    val email: String? = remoteData?.get(KEY_EMAIL),
-    val silent: String? = remoteData?.get(KEY_SILENT),
-    val chatId: String? = remoteData?.get(KEY_CHAT_ID),
-) {
+sealed class PushMessage {
 
     /**
-     * Checks if the push should beep.
+     * Call push message
      *
-     * @return True if the push should beep, false otherwise.
+     * @constructor Create empty Call push message
      */
-    fun shouldBeep(): Boolean = NO_BEEP != silent
+    object CallPushMessage : PushMessage()
 
-    companion object {
-        /**
-         * Key defining push message type.
-         */
-        const val KEY_TYPE = "type"
+    /**
+     * Chat push message
+     *
+     * @property shouldBeep
+     * @constructor Create empty Chat push message
+     */
+    data class ChatPushMessage(
+        val shouldBeep: Boolean,
+    ) : PushMessage()
 
-        /**
-         * Key defining email.
-         */
-        const val KEY_EMAIL = "email"
-
-        /**
-         * Key defining chat id.
-         */
-        const val KEY_CHAT_ID = "chatid"
-
-        /**
-         * Key defining silent.
-         */
-        const val KEY_SILENT = "silent"
-        private const val NO_BEEP = "0"
-    }
+    /**
+     * Scheduled meeting push message
+     *
+     * @property schedId
+     * @property userHandle
+     * @property chatRoomHandle
+     * @property title
+     * @property description
+     * @property startTimestamp
+     * @property endTimestamp
+     * @property timezone
+     * @property isStartReminder
+     * @constructor Create empty Scheduled meeting push message
+     */
+    data class ScheduledMeetingPushMessage(
+        val schedId: Long,
+        val userHandle: Long,
+        val chatRoomHandle: Long,
+        val title: String?,
+        val description: String?,
+        val startTimestamp: Long,
+        val endTimestamp: Long,
+        val timezone: String?,
+        val isStartReminder: Boolean,
+    ) : PushMessage()
 }
