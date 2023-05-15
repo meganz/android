@@ -135,7 +135,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private int placeholderCount;
 
-    private SparseBooleanArray selectedItems;
+    @NotNull
+    private SparseBooleanArray selectedItems = new SparseBooleanArray();
 
     /**
      * the flag to store the node position where still remained unhandled
@@ -464,15 +465,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     @Override
     public List<Integer> getSelectedItems() {
-        if (selectedItems != null) {
-            List<Integer> items = new ArrayList<Integer>(selectedItems.size());
-            for (int i = 0; i < selectedItems.size(); i++) {
-                items.add(selectedItems.keyAt(i));
-            }
-            return items;
-        } else {
-            return null;
+        List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+        for (int i = 0; i < selectedItems.size(); i++) {
+            items.add(selectedItems.keyAt(i));
         }
+        return items;
     }
 
     /*
@@ -1440,11 +1437,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (this.multipleSelect != multipleSelect) {
             this.multipleSelect = multipleSelect;
         }
-        if (this.multipleSelect) {
-            selectedItems = new SparseBooleanArray();
-        } else if (selectedItems != null) {
-            selectedItems.clear();
-        }
+        selectedItems.clear();
     }
 
     public void setListFragment(RecyclerView listFragment) {
