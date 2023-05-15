@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -170,8 +171,11 @@ class RecentActionsViewModel @Inject constructor(
                 visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
 
             val currentUserIsOwner = isCurrentUserOwner(bucket)
+            val areCredentialsVerified = runCatching { areCredentialsVerified(bucket.userEmail) }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
             val isNodeKeyVerified =
-                bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified(bucket.userEmail)
+                bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified
             val parentNode = getNodeByHandle(bucket.parentHandle)
             val sharesType = getParentSharesType(parentNode)
             recentItemList.add(

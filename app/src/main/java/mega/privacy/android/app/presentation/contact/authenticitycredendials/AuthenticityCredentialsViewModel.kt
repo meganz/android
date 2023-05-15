@@ -16,9 +16,10 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -63,7 +64,12 @@ class AuthenticityCredentialsViewModel @Inject constructor(
             _state.update { it.copy(contactCredentials = getContactCredentials(userEmail)) }
         }
         viewModelScope.launch {
-            _state.update { it.copy(areCredentialsVerified = areCredentialsVerified(userEmail)) }
+            runCatching { areCredentialsVerified(userEmail) }
+                .onSuccess { areCredentialsVerified ->
+                    _state.update { it.copy(areCredentialsVerified = areCredentialsVerified) }
+                }.onFailure {
+                    Timber.e(it)
+                }
         }
     }
 
