@@ -99,23 +99,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     }
 
     @Throws(IllegalArgumentException::class)
-    override suspend fun moveNodeByHandle(
-        nodeToMove: NodeId,
-        newNodeParent: NodeId,
-        newNodeName: String?,
-    ): NodeId = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
-        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
-        if (node == null) {
-            throw IllegalArgumentException("Node to copy with handle $nodeToMove not found")
-        }
-        if (parent == null) {
-            throw IllegalArgumentException("Destination node with handle $newNodeParent not found")
-        }
-        moveNode(node, parent, newNodeName)
-    }
-
-    @Throws(IllegalArgumentException::class)
     override suspend fun deleteNodeByHandle(nodeToDelete: NodeId) = withContext(ioDispatcher) {
         val node = megaApiGateway.getMegaNodeByHandle(nodeToDelete.longValue)
             ?: throw IllegalArgumentException("Node to delete with handle $nodeToDelete not found")

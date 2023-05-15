@@ -42,8 +42,8 @@ class MoveNodeUseCase @Inject constructor(
      * @return Completable.
      */
     @Deprecated(
-        message = "This RXJava version has been deprecated in favour of MoveNodeByHandle use case",
-        replaceWith = ReplaceWith("MoveNodeByHandle"),
+        message = "This RXJava version has been deprecated in favour of [MoveNodeUseCase] use case",
+        replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.node.MoveNodeUseCase"),
         level = DeprecationLevel.WARNING
     )
     fun move(handle: Long, parentHandle: Long): Completable =
@@ -109,6 +109,7 @@ class MoveNodeUseCase @Inject constructor(
                     error.errorCode == API_OK -> emitter.onComplete()
                     error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(parentNode.handle) ->
                         emitter.onError(ForeignNodeException())
+
                     else -> emitter.onError(error.toMegaException())
                 }
             })

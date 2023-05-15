@@ -425,4 +425,28 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
     }
+
+
+    override suspend fun moveNode(
+        nodeToMove: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId = withContext(ioDispatcher) {
+        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
+        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        requireNotNull(node) { "Node to move with handle $nodeToMove not found" }
+        requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("moveNode") { NodeId(it.nodeHandle) }
+            megaApiGateway.moveNode(
+                nodeToMove = node,
+                newNodeParent = parent,
+                newNodeName = newNodeName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

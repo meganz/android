@@ -67,11 +67,11 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -96,7 +96,7 @@ class FileInfoViewModel @Inject constructor(
     private val isNodeInInbox: IsNodeInInbox,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
-    private val moveNodeByHandle: MoveNodeByHandle,
+    private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     private val deleteNodeByHandle: DeleteNodeByHandle,
@@ -218,7 +218,7 @@ class FileInfoViewModel @Inject constructor(
         performBlockSettingProgress(FileInfoJobInProgressState.Moving) {
             if (checkCollision(parentHandle, NameCollisionType.MOVE)) {
                 runCatching {
-                    moveNodeByHandle(typedNode.id, parentHandle)
+                    moveNodeUseCase(typedNode.id, parentHandle)
                 }
             } else {
                 null

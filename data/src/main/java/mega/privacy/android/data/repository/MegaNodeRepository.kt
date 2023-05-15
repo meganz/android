@@ -32,21 +32,6 @@ interface MegaNodeRepository {
     ): NodeId
 
     /**
-     * Moves a [MegaNode] referenced by it handle [NodeId] to a new [MegaNode] referenced by its handle [NodeId] while updating its name if set
-     *
-     * @param nodeToMove the [NodeId] handle to move
-     * @param newNodeParent the [NodeId] handle that [nodeToMove] will be moved to
-     * @param newNodeName the new name for [nodeToMove] if it's not null, if it's null the name will be the same
-     *
-     * @return the [NodeId] handle of the new [MegaNode] that was moved
-     */
-    suspend fun moveNodeByHandle(
-        nodeToMove: NodeId,
-        newNodeParent: NodeId,
-        newNodeName: String?,
-    ): NodeId
-
-    /**
      * Get folder version info
      *
      * @return info

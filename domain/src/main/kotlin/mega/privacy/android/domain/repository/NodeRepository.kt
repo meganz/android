@@ -275,10 +275,25 @@ interface NodeRepository {
      * @param newNodeParent the [NodeId] that [nodeToCopy] will be moved to
      * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
      *
-     * @return the [NodeId] handle of the new [MegaNode] that was copied
+     * @return the [NodeId] handle of the new [Node] that was copied
      */
     suspend fun copyNode(
         nodeToCopy: NodeId,
+        newNodeParent: NodeId,
+        newNodeName: String?,
+    ): NodeId
+
+    /**
+     * Move a [Node] to a new [Node] while updating its name if set
+     *
+     * @param nodeToMove the [NodeId] to move
+     * @param newNodeParent the [NodeId] that [nodeToMove] will be moved to
+     * @param newNodeName the new name for [nodeToMove] once it is moved to [newNodeParent] if it's not null, if it's null the name will be the same
+     *
+     * @return the [NodeId] handle of the [Node] that was moved
+     */
+    suspend fun moveNode(
+        nodeToMove: NodeId,
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId

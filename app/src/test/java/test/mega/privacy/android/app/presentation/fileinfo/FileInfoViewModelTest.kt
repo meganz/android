@@ -67,11 +67,11 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -108,7 +108,7 @@ internal class FileInfoViewModelTest {
     private val isNodeInInbox: IsNodeInInbox = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
-    private val moveNodeByHandle: MoveNodeByHandle = mock()
+    private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val deleteNodeByHandle: DeleteNodeByHandle = mock()
@@ -168,7 +168,7 @@ internal class FileInfoViewModelTest {
             isNodeInInbox = isNodeInInbox,
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
-            moveNodeByHandle = moveNodeByHandle,
+            moveNodeUseCase = moveNodeUseCase,
             copyNodeUseCase = copyNodeUseCase,
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
             deleteNodeByHandle = deleteNodeByHandle,
@@ -916,7 +916,7 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockMoveSuccess() {
-        whenever(moveNodeByHandle.invoke(nodeId, parentId)).thenReturn(nodeId)
+        whenever(moveNodeUseCase.invoke(nodeId, parentId)).thenReturn(nodeId)
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
     }
@@ -935,7 +935,7 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun mockMoveFailure() {
-        whenever(moveNodeByHandle.invoke(nodeId, parentId))
+        whenever(moveNodeUseCase.invoke(nodeId, parentId))
             .thenThrow(RuntimeException("fake exception"))
         whenever(checkNameCollision(nodeId, parentId, NameCollisionType.MOVE))
             .thenThrow(MegaNodeException.ChildDoesNotExistsException::class.java)
