@@ -1,16 +1,12 @@
 package mega.privacy.android.app.di.upgradeaccount
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.usecase.DefaultGetSubscriptions
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetSubscriptionOptions
-import mega.privacy.android.domain.usecase.GetSubscriptions
 
 /**
  * Upgrade account use cases
@@ -18,9 +14,6 @@ import mega.privacy.android.domain.usecase.GetSubscriptions
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class UpgradeAccountUseCases {
-
-    @Binds
-    abstract fun provideGetSubscriptions(defaultGetSubscriptions: DefaultGetSubscriptions): GetSubscriptions
 
     companion object {
         @Provides

@@ -1,6 +1,6 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.billing
 
-import mega.privacy.android.domain.usecase.DefaultGetSubscriptions as DefaultGetSubscriptions
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AccountType
@@ -12,18 +12,14 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_MONTH
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.billing.CalculateCurrencyAmountUseCase
-import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
-import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetSubscriptionsTest {
-    private lateinit var underTest: GetSubscriptions
+class GetSubscriptionsUseCaseTest {
+    private lateinit var underTest: GetSubscriptionsUseCase
     private val accountRepository = mock<AccountRepository>()
     private val calculateCurrencyAmountUseCase = mock<CalculateCurrencyAmountUseCase>()
     private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
@@ -58,7 +54,7 @@ class DefaultGetSubscriptionsTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetSubscriptions(
+        underTest = GetSubscriptionsUseCase(
             accountRepository = accountRepository,
             calculateCurrencyAmountUseCase = calculateCurrencyAmountUseCase,
             getLocalPricingUseCase = getLocalPricingUseCase,
@@ -67,7 +63,7 @@ class DefaultGetSubscriptionsTest {
     }
 
     @Test
-    fun `test the GetSubscriptions returns the list of Subscriptions successfully`() {
+    fun `test the GetSubscriptionsUseCase returns the list of Subscriptions successfully`() {
         runTest {
             whenever(getAppSubscriptionOptionsUseCase()).thenReturn(
                 listOf(
@@ -83,8 +79,7 @@ class DefaultGetSubscriptionsTest {
             ).thenReturn(currencyAmount)
 
             val actual = underTest.invoke()
-
-            assertEquals(actual, listOf(subscription))
+            assertThat(actual).isEqualTo(listOf(subscription))
         }
     }
 }

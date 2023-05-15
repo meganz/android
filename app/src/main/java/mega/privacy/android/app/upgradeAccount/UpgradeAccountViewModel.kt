@@ -16,14 +16,14 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
-import mega.privacy.android.domain.usecase.GetSubscriptions
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import javax.inject.Inject
 
 /**
  * Upgrade account view model
  *
- * @param getSubscriptions use case to get the list of available subscriptions in the app
+ * @param getSubscriptionsUseCase use case to get the list of available subscriptions in the app
  * @param getCurrentSubscriptionPlan use case to get the current subscribed plan
  * @param getCurrentPaymentUseCase use case to get the current payment option
  * @param isBillingAvailable use to check if billing is available
@@ -33,7 +33,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpgradeAccountViewModel @Inject constructor(
-    private val getSubscriptions: GetSubscriptions,
+    private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val getCurrentSubscriptionPlan: GetCurrentSubscriptionPlan,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
@@ -55,7 +55,7 @@ class UpgradeAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val subscriptions = getSubscriptions()
+            val subscriptions = getSubscriptionsUseCase()
             val localisedSubscriptions =
                 subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }
             _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
