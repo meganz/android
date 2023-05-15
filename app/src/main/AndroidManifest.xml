@@ -235,6 +235,7 @@
             android:launchMode="singleTop" />
         <activity
             android:name=".main.FileExplorerActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustNothing">

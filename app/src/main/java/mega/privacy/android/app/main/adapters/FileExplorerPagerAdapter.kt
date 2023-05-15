@@ -13,35 +13,30 @@ import mega.privacy.android.app.main.megachat.ChatExplorerFragment
  *
  * @property tabRemoved True if should remove a tab, false otherwise.
  */
-class FileExplorerPagerAdapter(fm: FragmentManager, lifeCycle: Lifecycle) :
+class FileExplorerPagerAdapter(private val fm: FragmentManager, lifeCycle: Lifecycle) :
     FragmentStateAdapter(fm, lifeCycle) {
 
     var tabRemoved = false
 
-    private var mChatFragment: Fragment? = null
-    private var mCloudFragment: Fragment? = null
-    private var mIncomingFragment: Fragment? = null
+    private val fragments = mapOf(
+        0 to CloudDriveExplorerFragment(),
+        1 to IncomingSharesExplorerFragment(),
+        2 to ChatExplorerFragment()
+    )
 
-    override fun createFragment(position: Int): Fragment = when (position) {
-        1 -> incomingFragment
-        2 -> chatFragment
-        0 -> cloudFragment
-        else -> cloudFragment
+    override fun createFragment(position: Int): Fragment {
+        return fragments[position] as Fragment
+    }
+
+    override fun getItemId(position: Int): Long = fragments[position].hashCode().toLong()
+
+    override fun containsItem(itemId: Long): Boolean {
+        return fragments.filterValues { it.hashCode().toLong() == itemId }.isNotEmpty()
     }
 
     override fun getItemCount(): Int = if (!tabRemoved) PAGE_COUNT else PAGE_COUNT - 1
 
-    private val chatFragment: Fragment
-        get() = mChatFragment ?: ChatExplorerFragment.newInstance()
-            .also { mChatFragment = it }
-
-    private val incomingFragment: Fragment
-        get() = mIncomingFragment ?: IncomingSharesExplorerFragment.newInstance()
-            .also { mIncomingFragment = it }
-
-    private val cloudFragment: Fragment
-        get() = mCloudFragment ?: CloudDriveExplorerFragment.newInstance()
-            .also { mCloudFragment = it }
+    fun getFragment(position: Int): Fragment? = fm.findFragmentByTag("f${getItemId(position)}")
 
     companion object {
         private const val PAGE_COUNT = 3

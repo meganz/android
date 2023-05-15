@@ -507,19 +507,13 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      * @param position the position of item
      */
     fun itemClick(position: Int) {
-        val clickNodes = mutableListOf<MegaNode?>()
         if (searchNodes.isNotEmpty()) {
-            clickNodes.addAll(searchNodes)
             shouldResetNodes = false
             fileExplorerActivity.setQueryAfterSearch()
             fileExplorerActivity.collapseSearchView()
-        } else {
-            clickNodes.addAll(nodes)
         }
 
-        if (position < 0 || position >= clickNodes.size) return
-
-        clickNodes[position]?.let { node ->
+        adapter.getItem(position)?.let { node ->
             when {
                 node.isFolder -> {
                     searchNodes.clear()
@@ -684,7 +678,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         data.toList().let {
             nodes.clear()
             adapter.setNodes(it)
-            nodes.addAll(adapter.getNodes())
+            nodes.addAll(it)
             updateView()
         }
         checkWritePermissions()

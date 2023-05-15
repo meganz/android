@@ -879,7 +879,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     private fun checkFragmentScroll(position: Int) =
-        (mTabsAdapterExplorer?.createFragment(position) as CheckScrollInterface).checkScroll()
+        (mTabsAdapterExplorer?.getFragment(position) as CheckScrollInterface).checkScroll()
 
 
     /**
@@ -1065,7 +1065,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                 override fun onQueryTextChange(newText: String): Boolean {
                     if (!collapsedByClick) {
-                        querySearch = newText
+                        if (isSearchExpanded)
+                            querySearch = newText
+                        else
+                            clearQuerySearch()
                     } else {
                         collapsedByClick = false
                     }
@@ -1303,7 +1306,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             }
         } else {
             val position = binding.explorerTabsPager.currentItem
-            val f = mTabsAdapterExplorer?.createFragment(position)
+            val f = mTabsAdapterExplorer?.getFragment(position)
 
             if (position == 0) {
                 if (f is ChatExplorerFragment) {
@@ -2425,24 +2428,27 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             if (importFileF) {
                 return supportFragmentManager.findFragmentByTag("chatExplorer") as ChatExplorerFragment?
             }
-            if (mTabsAdapterExplorer == null) return null
-            val c = mTabsAdapterExplorer!!.createFragment(2) as ChatExplorerFragment
-            return if (c.isAdded) c else null
+            mTabsAdapterExplorer?.getFragment(2)?.let {
+                val c = it as ChatExplorerFragment
+                return if (c.isAdded) c else null
+            } ?: return null
         }
     private val incomingExplorerFragment: IncomingSharesExplorerFragment?
         get() {
-            if (mTabsAdapterExplorer == null) return null
-            val iS = mTabsAdapterExplorer!!.createFragment(1) as IncomingSharesExplorerFragment
-            return if (iS.isAdded) iS else null
+            mTabsAdapterExplorer?.getFragment(1)?.let {
+                val iS = it as IncomingSharesExplorerFragment
+                return if (iS.isAdded) iS else null
+            } ?: return null
         }
     private val cloudExplorerFragment: CloudDriveExplorerFragment?
         get() {
             if (tabShown == NO_TABS) {
                 return supportFragmentManager.findFragmentByTag("cDriveExplorer") as CloudDriveExplorerFragment?
             }
-            if (mTabsAdapterExplorer == null) return null
-            val cD = mTabsAdapterExplorer!!.createFragment(0) as CloudDriveExplorerFragment
-            return if (cD.isAdded) cD else null
+            mTabsAdapterExplorer?.getFragment(0)?.let {
+                val cD = it as CloudDriveExplorerFragment
+                return if (cD.isAdded) cD else null
+            } ?: return null
         }
 
     /**
