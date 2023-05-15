@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetRecentActions
@@ -454,4 +455,22 @@ class RecentActionsViewModelTest {
                 .isEqualTo(true)
         }
     }
+
+    @Test
+    fun `test that recent action current user is owner item is set to false if get user account throws an exception`() =
+        runTest {
+            whenever(getAccountDetailsUseCase(false)).thenAnswer {
+                throw MegaException(
+                    1,
+                    "Account call failed"
+                )
+            }
+            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            underTest.state.map { it.recentActionItems }.distinctUntilChanged()
+                .test {
+                    awaitItem()
+                    assertThat((awaitItem().filterIsInstance<RecentActionItemType.Item>()[0]).currentUserIsOwner)
+                        .isEqualTo(false)
+                }
+        }
 }

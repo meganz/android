@@ -169,7 +169,7 @@ class RecentActionsViewModel @Inject constructor(
             val userName =
                 visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
 
-            val currentUserIsOwner = getAccountDetailsUseCase(false).email == bucket.userEmail
+            val currentUserIsOwner = isCurrentUserOwner(bucket)
             val isNodeKeyVerified =
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified(bucket.userEmail)
             val parentNode = getNodeByHandle(bucket.parentHandle)
@@ -188,6 +188,11 @@ class RecentActionsViewModel @Inject constructor(
 
         return recentItemList
     }
+
+    private suspend fun isCurrentUserOwner(
+        bucket: RecentActionBucket,
+    ) = kotlin.runCatching { getAccountDetailsUseCase(false).email == bucket.userEmail }
+        .getOrDefault(false)
 
     /**
      * get a MegaNode by id

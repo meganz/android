@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.settings
 
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -16,8 +17,10 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
@@ -29,6 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
@@ -60,12 +64,15 @@ class SettingsViewModelTest {
     }
     private val setMediaDiscoveryView = mock<SetMediaDiscoveryView>()
 
+    private val getAccountDetailsUseCase =
+        mock<GetAccountDetailsUseCase> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         whenever(monitorAutoAcceptQRLinks()).thenReturn(flowOf(true))
         underTest = SettingsViewModel(
-            getAccountDetailsUseCase = mock { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) },
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             refreshPasscodeLockPreference = mock(),
             areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
@@ -269,4 +276,15 @@ class SettingsViewModelTest {
             advanceUntilIdle()
             verify(setMediaDiscoveryView).invoke(expected)
         }
+
+    @Test
+    fun `test that an exception from get account is not propagated`() = runTest {
+        getAccountDetailsUseCase.stub {
+            onBlocking { invoke(any()) }.thenAnswer { throw MegaException(1, "It's broken") }
+        }
+
+        underTest.uiState.test {
+            assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
+        }
+    }
 }
