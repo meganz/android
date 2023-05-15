@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.megaachievements;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
@@ -28,8 +27,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class ReferralBonusesFragment extends Fragment implements OnClickListener
-        , GetAchievementsListener.DataCallback {
+public class ReferralBonusesFragment extends Fragment implements GetAchievementsListener.DataCallback {
     RelativeLayout parentRelativeLayout;
     RecyclerView recyclerView;
     LinearLayoutManager mLayoutManager;
@@ -74,19 +72,6 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
 
         // The root view has been created, fill it with the data when data ready
         getAchievementsListener.setDataCallback(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        Timber.d("onClick");
-        if (v.getId() == R.id.referral_bonuses_layout) {
-            Timber.d("Go to section Referral bonuses");
-        }
-    }
-
-    public int onBackPressed() {
-        Timber.d("onBackPressed");
-        return 0;
     }
 
     private void updateUI() {

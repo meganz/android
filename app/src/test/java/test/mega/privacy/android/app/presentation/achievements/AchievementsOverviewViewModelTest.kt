@@ -60,7 +60,11 @@ class AchievementsOverviewViewModelTest {
         runTest {
             val achievements = AchievementsOverview(listOf(), listOf(), 0L, 0L, 0L)
             val expectedUiContent =
-                AchievementsUIState(achievements, areAllRewardsExpired = true)
+                AchievementsUIState(
+                    achievementsOverview = achievements,
+                    areAllRewardsExpired = true,
+                    currentStorage = 0,
+                )
             whenever(getAccountAchievementsOverview()).thenReturn(achievements)
 
             underTest.state.test {
@@ -73,7 +77,7 @@ class AchievementsOverviewViewModelTest {
     @Test
     fun `test that state contains add phone reward when the add phone reward enabled use case returns true`() =
         runTest {
-            val expectedUiContent = AchievementsUIState(showAddPhoneReward = true)
+            val expectedUiContent = AchievementsUIState(hasAddPhoneReward = true)
             whenever(isAddPhoneRewardEnabled()).thenReturn(true)
 
             underTest.state.test {
