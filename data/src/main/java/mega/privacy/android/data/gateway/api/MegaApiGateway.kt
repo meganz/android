@@ -1496,6 +1496,13 @@ interface MegaApiGateway {
     fun fetchPublicSet(publicSetLink: String, listener: MegaRequestListenerInterface)
 
     /**
+     * Stops public Set preview mode for current SDK instance
+     *
+     * MegaApi instance is no longer useful until a new login
+     */
+    fun stopPublicSetPreview()
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)

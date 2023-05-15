@@ -782,6 +782,10 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.fetchPublicSet(publicSetLink, listener)
     }
 
+    override fun stopPublicSetPreview() {
+        megaApi.stopPublicSetPreview()
+    }
+
     override fun getPreviewElementNode(eid: Long, listener: MegaRequestListenerInterface) {
         megaApi.getPreviewElementNode(eid, listener)
     }

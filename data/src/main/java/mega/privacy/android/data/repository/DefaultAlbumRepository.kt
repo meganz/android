@@ -52,6 +52,7 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 internal typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosAddingProgress?>>
@@ -402,7 +403,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                         }.orEmpty()
 
                         if (userSet != null) {
-                            continuation.resumeWith(Result.success(userSet to albumPhotoIds))
+                            continuation.resume(userSet to albumPhotoIds)
                         } else {
                             continuation.failWithError(error, "fetchPublicAlbum")
                         }
@@ -411,6 +412,8 @@ internal class DefaultAlbumRepository @Inject constructor(
                     }
                 },
             )
+
+            megaApiGateway.stopPublicSetPreview()
 
             megaApiGateway.fetchPublicSet(
                 publicSetLink = albumLink.link,
@@ -440,15 +443,19 @@ internal class DefaultAlbumRepository @Inject constructor(
                             publicNodesMap[NodeId(node.handle)] = node
                             photoMapper(node, albumPhotoId)
                         }
-                        continuation.resumeWith(Result.success(photos))
+                        continuation.resume(photos)
                     }
                 )
 
-                for (albumPhotoId in albumPhotoIds) {
-                    megaApiGateway.getPreviewElementNode(
-                        eid = albumPhotoId.id,
-                        listener = listener,
-                    )
+                if (albumPhotoIds.isNotEmpty()) {
+                    for (albumPhotoId in albumPhotoIds) {
+                        megaApiGateway.getPreviewElementNode(
+                            eid = albumPhotoId.id,
+                            listener = listener,
+                        )
+                    }
+                } else {
+                    continuation.resume(listOf())
                 }
 
                 continuation.invokeOnCancellation {

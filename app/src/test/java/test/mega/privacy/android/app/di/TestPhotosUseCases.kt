@@ -14,8 +14,11 @@ import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressComple
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -54,4 +57,15 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideDisableExportAlbumsUseCase(): DisableExportAlbumsUseCase = mock()
+
+    @Provides
+    fun provideGetPublicAlbumUseCase(): GetPublicAlbumUseCase = mock()
+
+    @Provides
+    fun provideDownloadPublicAlbumPhotoThumbnailUseCaseUseCase(): DownloadPublicAlbumPhotoThumbnailUseCase =
+        mock()
+
+    @Provides
+    fun provideDownloadPublicAlbumPhotoPreviewUseCaseUseCase(): DownloadPublicAlbumPhotoPreviewUseCase =
+        mock()
 }
