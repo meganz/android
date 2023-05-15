@@ -759,6 +759,33 @@ interface MegaApiGateway {
     ): List<MegaNode>
 
     /**
+     *
+     * Allow to search nodes with the following options:
+     * - Search given a parent node of the tree to explore
+     * - Search recursively
+     * - Containing a search string in their name
+     * - Filter by the type of the node
+     * - Order the returned list
+     *
+     * @param parentNode parentNode
+     * @param searchString containing a search string in their name
+     * @param cancelToken use for cancel search
+     * @param recursive is search recursively
+     * @param order
+     * @param type type of nodes requested in the search
+     *
+     * @return List of nodes that match with the search parameters
+     */
+    suspend fun searchByType(
+        parentNode: MegaNode,
+        searchString: String,
+        cancelToken: MegaCancelToken,
+        recursive: Boolean,
+        order: Int,
+        type: Int,
+    ): List<MegaNode>
+
+    /**
      * Get children nodes by megaNodeList
      * @param parentNodes parent nodes
      * @param order order for the returned list

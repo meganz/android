@@ -484,6 +484,16 @@ internal class MegaApiFacade @Inject constructor(
         target: Int,
     ): List<MegaNode> = megaApi.searchByType(cancelToken, order, type, target)
 
+    override suspend fun searchByType(
+        parentNode: MegaNode,
+        searchString: String,
+        cancelToken: MegaCancelToken,
+        recursive: Boolean,
+        order: Int,
+        type: Int,
+    ): List<MegaNode> =
+        megaApi.searchByType(parentNode, searchString, cancelToken, recursive, order, type)
+
     override suspend fun getPublicLinks(): List<MegaNode> = megaApi.publicLinks
 
     override fun getPreview(
