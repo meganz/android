@@ -2017,16 +2017,18 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
      * Method that selects the initially selected participants
      */
     private void addSelectedContactMEGA() {
-        for (String email : emailsContactsSelected) {
-            if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
-                for (int i = 0; i < filteredContactMEGA.size(); i++) {
-                    MegaContactAdapter contact = filteredContactMEGA.get(i);
-                    if (contact != null) {
-                        if (getMegaContactMail(contact).equals(email)) {
-                            contact.setSelected(true);
-                            addContactMEGA(contact);
-                            adapterMEGA.setContacts(filteredContactMEGA);
-                            break;
+        if (emailsContactsSelected != null && !emailsContactsSelected.isEmpty()) {
+            for (String email : emailsContactsSelected) {
+                if (filteredContactMEGA != null && !filteredContactMEGA.isEmpty()) {
+                    for (int i = 0; i < filteredContactMEGA.size(); i++) {
+                        MegaContactAdapter contact = filteredContactMEGA.get(i);
+                        if (contact != null) {
+                            if (getMegaContactMail(contact).equals(email)) {
+                                contact.setSelected(true);
+                                addContactMEGA(contact);
+                                adapterMEGA.setContacts(filteredContactMEGA);
+                                break;
+                            }
                         }
                     }
                 }
