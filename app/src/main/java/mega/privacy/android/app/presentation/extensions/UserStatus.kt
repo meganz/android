@@ -26,12 +26,15 @@ internal fun UserStatus.iconRes(isLightTheme: Boolean): Int =
         UserStatus.Online ->
             if (isLightTheme) R.drawable.ic_online_light
             else R.drawable.ic_online_dark_standard
+
         UserStatus.Away ->
             if (isLightTheme) R.drawable.ic_away_light
             else R.drawable.ic_away_dark_standard
+
         UserStatus.Busy ->
             if (isLightTheme) R.drawable.ic_busy_light
             else R.drawable.ic_busy_dark_standard
+
         else ->
             if (isLightTheme) R.drawable.ic_offline_light
             else R.drawable.ic_offline_dark_standard

@@ -26,12 +26,13 @@ fun TextMegaButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
 ) = TextButton(
     modifier = modifier,
     onClick = onClick,
     enabled = enabled,
     colors = if (MaterialTheme.colors.isLight) lightColors() else darkColors(),
-    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+    contentPadding = contentPadding
 ) {
     Text(
         text = text,
@@ -45,11 +46,13 @@ fun TextMegaButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
 ) = TextMegaButton(
     text = stringResource(id = textId),
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
+    contentPadding = contentPadding,
 )
 
 @Composable
