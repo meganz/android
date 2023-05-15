@@ -42,11 +42,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
-import mega.privacy.android.app.upgradeAccount.model.mapper.toNewFormattedPriceString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.MegaSpannedAlignedText
 import mega.privacy.android.core.ui.controls.MegaSpannedText
@@ -54,7 +56,6 @@ import mega.privacy.android.core.ui.controls.SimpleNoTitleTopAppBar
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
@@ -72,6 +73,7 @@ import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.core.ui.theme.teal_100
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.core.ui.theme.transparent
+import java.util.Locale
 
 
 @Composable
@@ -311,7 +313,7 @@ fun MonthlyYearlyTabs(
 @Composable
 fun SubscriptionPlansInfoRowNew(
     proPlan: AccountType,
-    subscription: Subscription,
+    subscription: LocalisedSubscription,
     isCurrentPlan: Boolean,
     isRecommended: Boolean,
     onPlanClicked: () -> Unit,
@@ -334,7 +336,7 @@ fun SubscriptionPlansInfoRowNew(
     val storageString = "[B]Storage:[/B] [A]$storageValueString[/A]"
     val transferString = "[B]Transfer:[/B] [A]$transferValueString[/A]"
 
-    val formattedPrice = toNewFormattedPriceString(subscription.amount)
+    val formattedPrice = subscription.localisePriceCurrencyCode(Locale.getDefault())
     val priceString =
         if (isMonthly) "[A]${formattedPrice.first}[/A]\r\n[B]${formattedPrice.second}/month[/B]"
         else "[A]${formattedPrice.first}[/A]\r\n[B]${formattedPrice.second}/year[/B]"
@@ -568,37 +570,53 @@ private fun mapUIAccountType(plan: AccountType) = when (plan) {
 )
 @Composable
 fun PreviewUpgradeAccountViewNew() {
-    var expectedSubscriptionsList: List<Subscription>
-    val subscriptionProIMonthly = Subscription(
+    val localisedPriceStringMapper = LocalisedPriceStringMapper()
+    val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    val expectedSubscriptionsList: List<LocalisedSubscription>
+    val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = 2048,
         transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR"))
+        amount = CurrencyAmount(9.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    val subscriptionProIIMonthly = Subscription(
+    val subscriptionProIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_II,
         handle = 7974113413762509455,
         storage = 8192,
         transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR"))
+        amount = CurrencyAmount(
+            19.99.toFloat(),
+            mega.privacy.android.domain.entity.Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    val subscriptionProIIIMonthly = Subscription(
+    val subscriptionProIIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_III,
         handle = -2499193043825823892,
         storage = 16384,
         transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR"))
+        amount = CurrencyAmount(
+            29.99.toFloat(),
+            mega.privacy.android.domain.entity.Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    val subscriptionProLiteMonthly = Subscription(
+    val subscriptionProLiteMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
         handle = -4226692769210777158,
         storage = 400,
         transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), mega.privacy.android.domain.entity.Currency("NZD"))
+        amount = CurrencyAmount(4.99.toFloat(), mega.privacy.android.domain.entity.Currency("NZD")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
     expectedSubscriptionsList = listOf(

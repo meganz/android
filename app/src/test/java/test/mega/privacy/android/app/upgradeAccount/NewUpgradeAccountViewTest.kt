@@ -12,11 +12,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.NewUpgradeAccountView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
@@ -24,36 +26,46 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class NewUpgradeAccountViewTest {
-    private val subscriptionProIMonthly = Subscription(
+    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
+    private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    private val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = 2048,
         transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProIIMonthly = Subscription(
+    private val subscriptionProIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_II,
         handle = 7974113413762509455,
         storage = 8192,
         transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProIIIMonthly = Subscription(
+    private val subscriptionProIIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_III,
         handle = -2499193043825823892,
         storage = 16384,
         transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProLiteMonthly = Subscription(
+    private val subscriptionProLiteMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
         handle = -4226692769210777158,
         storage = 400,
         transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
     private val expectedSubscriptionsList = listOf(

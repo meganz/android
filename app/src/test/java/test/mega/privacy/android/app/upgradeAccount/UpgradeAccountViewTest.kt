@@ -9,12 +9,14 @@ import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.BuyNewSubscriptionDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.PaymentMethod
-import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
@@ -26,36 +28,46 @@ import java.text.DecimalFormat
 
 @RunWith(AndroidJUnit4::class)
 class UpgradeAccountViewTest {
-    private val subscriptionProIMonthly = Subscription(
+    private val localisedPriceStringMapper = LocalisedPriceStringMapper()
+    private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    private val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
         storage = 2048,
         transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProIIMonthly = Subscription(
+    private val subscriptionProIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_II,
         handle = 7974113413762509455,
         storage = 8192,
         transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProIIIMonthly = Subscription(
+    private val subscriptionProIIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_III,
         handle = -2499193043825823892,
         storage = 16384,
         transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
-    private val subscriptionProLiteMonthly = Subscription(
+    private val subscriptionProLiteMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
         handle = -4226692769210777158,
         storage = 400,
         transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
     )
 
     private val expectedSubscriptionsList = listOf(
@@ -100,8 +112,10 @@ class UpgradeAccountViewTest {
         }
 
         val text =
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.type_of_my_account,
-                "Free").replace("[A]", "").replace("[/A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.type_of_my_account,
+                "Free"
+            ).replace("[A]", "").replace("[/A]", "")
         composeRule.onNodeWithText(text).assertExists()
     }
 
@@ -121,40 +135,64 @@ class UpgradeAccountViewTest {
 
         val expectedResults = listOf(
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.prolite_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.type_month,
-                "€4.99").replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(400)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.type_month,
+                "€4.99"
+            ).replace("[A]", "").replace("[/A]", ""),
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_storage_label,
+                getStorageTransferStringGBBased(400)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(1024)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_transfer_quota_label,
+                getStorageTransferStringGBBased(1024)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro1_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.type_month,
-                "€9.99").replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(2048)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.type_month,
+                "€9.99"
+            ).replace("[A]", "").replace("[/A]", ""),
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_storage_label,
+                getStorageTransferStringGBBased(2048)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(2048)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_transfer_quota_label,
+                getStorageTransferStringGBBased(2048)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro2_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.type_month,
-                "€19.99").replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(8192)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.type_month,
+                "€19.99"
+            ).replace("[A]", "").replace("[/A]", ""),
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_storage_label,
+                getStorageTransferStringGBBased(8192)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(8192)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_transfer_quota_label,
+                getStorageTransferStringGBBased(8192)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
             InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro3_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.type_month,
-                "€29.99").replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(16384)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.type_month,
+                "€29.99"
+            ).replace("[A]", "").replace("[/A]", ""),
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_storage_label,
+                getStorageTransferStringGBBased(16384)
+            ).replace("[A]", "")
                 .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(16384)).replace("[A]", "")
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                R.string.account_upgrade_transfer_quota_label,
+                getStorageTransferStringGBBased(16384)
+            ).replace("[A]", "")
                 .replace("[/A]", "")
         )
         expectedResults.forEach {
@@ -271,12 +309,16 @@ class UpgradeAccountViewTest {
 
         if (gbSize < TB) {
             sizeString =
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.label_file_size_giga_byte,
-                    decf.format(gbSize))
+                InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                    R.string.label_file_size_giga_byte,
+                    decf.format(gbSize)
+                )
         } else {
             sizeString =
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.label_file_size_tera_byte,
-                    decf.format(gbSize / TB))
+                InstrumentationRegistry.getInstrumentation().targetContext.getString(
+                    R.string.label_file_size_tera_byte,
+                    decf.format(gbSize / TB)
+                )
         }
 
         return sizeString

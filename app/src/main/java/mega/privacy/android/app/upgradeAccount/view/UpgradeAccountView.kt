@@ -33,12 +33,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
-import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedPriceString
 import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
@@ -51,6 +50,7 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
+import java.util.Locale
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -222,7 +222,7 @@ fun CurrentSubscriptionPlanBox(state: UpgradeAccountState) {
 @Composable
 fun SubscriptionPlansInfoRow(
     proPlan: AccountType,
-    subscription: Subscription,
+    subscription: LocalisedSubscription,
     isCurrentPlan: Boolean,
     onPlanClicked: (AccountType) -> Unit,
 ) {
@@ -256,7 +256,7 @@ fun SubscriptionPlansInfoRow(
         transferValueString
     )
 
-    val formattedPrice = toFormattedPriceString(subscription.amount)
+    val formattedPrice = subscription.localisePrice(Locale.getDefault())
     val priceString = stringResource(
         id = R.string.type_month,
         formattedPrice

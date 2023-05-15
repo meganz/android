@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
@@ -24,6 +25,9 @@ import javax.inject.Inject
  *
  * @param getSubscriptions use case to get the list of available subscriptions in the app
  * @param getCurrentSubscriptionPlan use case to get the current subscribed plan
+ * @param getCurrentPaymentUseCase use case to get the current payment option
+ * @param isBillingAvailable use to check if billing is available
+ * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  *
  * @property state The current UI state
  */
@@ -33,6 +37,7 @@ class UpgradeAccountViewModel @Inject constructor(
     private val getCurrentSubscriptionPlan: GetCurrentSubscriptionPlan,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
+    private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         UpgradeAccountState(
@@ -51,7 +56,9 @@ class UpgradeAccountViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val subscriptions = getSubscriptions()
-            _state.update { it.copy(subscriptionsList = subscriptions) }
+            val localisedSubscriptions =
+                subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }
+            _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
         }
         viewModelScope.launch {
             val currentSubscriptionPlan = getCurrentSubscriptionPlan()

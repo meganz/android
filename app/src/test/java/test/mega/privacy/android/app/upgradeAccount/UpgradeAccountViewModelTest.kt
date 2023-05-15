@@ -11,7 +11,11 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
+import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
@@ -38,6 +42,14 @@ class UpgradeAccountViewModelTest {
     private val getCurrentSubscriptionPlan = mock<GetCurrentSubscriptionPlan>()
     private val getCurrentPaymentUseCase = mock<GetCurrentPaymentUseCase>()
     private val isBillingAvailable = mock<IsBillingAvailable>()
+    private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
+    private val localisedPriceCurrencyCodeStringMapper =
+        mock<LocalisedPriceCurrencyCodeStringMapper>()
+    private val localisedSubscriptionMapper =
+        LocalisedSubscriptionMapper(
+            localisedPriceStringMapper,
+            localisedPriceCurrencyCodeStringMapper
+        )
 
 
     private val subscriptionProIMonthly = Subscription(
@@ -79,6 +91,53 @@ class UpgradeAccountViewModelTest {
         subscriptionProIIIMonthly
     )
 
+    private val localisedSubscriptionProIMonthly = LocalisedSubscription(
+        accountType = AccountType.PRO_I,
+        handle = 1560943707714440503,
+        storage = 2048,
+        transfer = 2048,
+        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+    )
+
+    private val localisedSubscriptionProIIMonthly = LocalisedSubscription(
+        accountType = AccountType.PRO_II,
+        handle = 7974113413762509455,
+        storage = 8192,
+        transfer = 8192,
+        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+    )
+
+    private val localisedSubscriptionProIIIMonthly = LocalisedSubscription(
+        accountType = AccountType.PRO_III,
+        handle = -2499193043825823892,
+        storage = 16384,
+        transfer = 16384,
+        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+    )
+
+    private val localisedSubscriptionProLiteMonthly = LocalisedSubscription(
+        accountType = AccountType.PRO_LITE,
+        handle = -4226692769210777158,
+        storage = 400,
+        transfer = 1024,
+        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+    )
+
+    private val expectedLocalisedSubscriptionsList = listOf(
+        localisedSubscriptionProLiteMonthly,
+        localisedSubscriptionProIMonthly,
+        localisedSubscriptionProIIMonthly,
+        localisedSubscriptionProIIIMonthly
+    )
+
     private val expectedInitialCurrentPlan = AccountType.FREE
     private val expectedCurrentPlan = AccountType.PRO_I
     private val expectedShowBuyNewSubscriptionDialog = true
@@ -96,6 +155,7 @@ class UpgradeAccountViewModelTest {
             getCurrentSubscriptionPlan = getCurrentSubscriptionPlan,
             getCurrentPaymentUseCase = getCurrentPaymentUseCase,
             isBillingAvailable = isBillingAvailable,
+            localisedSubscriptionMapper = localisedSubscriptionMapper
         )
     }
 
@@ -109,7 +169,7 @@ class UpgradeAccountViewModelTest {
         whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
         underTest.state.map { it.subscriptionsList }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEmpty()
-            assertThat(awaitItem()).isSameInstanceAs(expectedSubscriptionsList)
+            assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
         }
     }
 
