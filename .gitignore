@@ -9,6 +9,8 @@
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
+.idea/kotlinc.xml
+.idea/inspectionProfiles/Project_Default.xml
 
 # User-specific stuff:
 .idea/workspace.xml
