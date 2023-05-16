@@ -119,7 +119,6 @@ class PushMessageWorkerTest {
         )
 
         whenever(notificationManager.notify(any(), any())).then(mock())
-        whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
         whenever(pushMessageMapper(any())).thenReturn(PushMessage.CallPushMessage)
         whenever(notificationManager.areNotificationsEnabled()).thenReturn(false)
         whenever(callsPreferencesGateway.getCallsMeetingRemindersPreference())
@@ -142,6 +141,7 @@ class PushMessageWorkerTest {
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
         whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
         whenever(pushReceived.invoke(any())).thenReturn(mock())
+        whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
 
         underTest.doWork()
         verify(retryPendingConnections).invoke(false)
@@ -152,6 +152,7 @@ class PushMessageWorkerTest {
         runTest {
             whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
             whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
 
             underTest.doWork()
             verify(initialiseMegaChatUseCase).invoke("good_session")
@@ -161,6 +162,7 @@ class PushMessageWorkerTest {
     fun `test that initialiseMegaChat is not invoked if rootNode exists and retryPendingConnections raises exception other than ChatNotInitializedException`() =
         runTest {
             whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
+            whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
                 EmptyFolderException()
             )
@@ -176,6 +178,7 @@ class PushMessageWorkerTest {
             whenever(backgroundFastLoginUseCase()).thenReturn(sessionId)
             whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
             whenever(initialiseMegaChatUseCase(sessionId)).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
 
             val result = underTest.doWork()
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())
@@ -185,6 +188,7 @@ class PushMessageWorkerTest {
     fun `test that ChatPushMessage are triggered as expected`() {
         runTest {
             whenever(pushMessageMapper(any())).thenReturn(PushMessage.ChatPushMessage(true))
+            whenever(getNotificationUseCase.invoke(any())).thenReturn(mock())
 
             val result = underTest.doWork()
 
