@@ -740,8 +740,20 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateFolderTreeInfo() {
         (typedNode as? TypedFolderNode)?.let { folder ->
-            updateState {
-                it.copyWithFolderTreeInfo(folderTreeInfo = getFolderTreeInfo(folder))
+            viewModelScope.launch {
+                runCatching {
+                    getFolderTreeInfo(folder).let { folderTreeInfo ->
+                        _uiState.update {
+                            it.copy(
+                                actions = getAvailableNodeActionsUseCase(typedNode)
+                                    .map { nodeAction -> nodeActionMapper(nodeAction) },
+                                folderTreeInfo = folderTreeInfo
+                            )
+                        }
+                    }
+                }.onFailure {
+                    Timber.w("Exception getting folder tree info.", it)
+                }
             }
         }
     }

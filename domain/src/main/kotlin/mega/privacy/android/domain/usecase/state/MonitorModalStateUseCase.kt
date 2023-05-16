@@ -137,12 +137,15 @@ class MonitorModalStateUseCase @Inject constructor(
         newLogin: Boolean,
         isNewAccount: Boolean,
     ) {
-        if (requireTwoFactorAuthenticationUseCase(
+        runCatching {
+            requireTwoFactorAuthenticationUseCase(
                 newAccount = newLogin,
                 firstLogin = isNewAccount
             )
-        ) {
-            emit(ModalState.RequestTwoFactorAuthentication)
+        }.getOrNull()?.let { requireTwoFactorAuthentication ->
+            if (requireTwoFactorAuthentication) {
+                emit(ModalState.RequestTwoFactorAuthentication)
+            }
         }
     }
 

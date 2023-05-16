@@ -645,22 +645,30 @@ class MediaPlayerServiceViewModel @Inject constructor(
             if (thumbnail != null && !thumbnail.exists() && node != null) {
                 runCatching {
                     if (isMegaApiFolder(type = type)) {
-                        getThumbnailFromMegaApiFolderUseCase(
-                            nodeHandle = node.id.longValue,
-                            path = thumbnail.absolutePath
-                        )?.let { nodeHandle ->
+                        runCatching {
+                            getThumbnailFromMegaApiFolderUseCase(
+                                nodeHandle = node.id.longValue,
+                                path = thumbnail.absolutePath
+                            )
+                        }.onSuccess { nodeHandle ->
                             if (nodeHandle == playingHandle) {
                                 postPlayingThumbnail()
                             }
+                        }.onFailure {
+                            Timber.w("Exception getting thumbnail.", it)
                         }
                     } else {
-                        getThumbnailFromMegaApiUseCase(
-                            nodeHandle = node.id.longValue,
-                            path = thumbnail.absolutePath
-                        )?.let { nodeHandle ->
+                        runCatching {
+                            getThumbnailFromMegaApiUseCase(
+                                nodeHandle = node.id.longValue,
+                                path = thumbnail.absolutePath
+                            )
+                        }.onSuccess { nodeHandle ->
                             if (nodeHandle == playingHandle) {
                                 postPlayingThumbnail()
                             }
+                        }.onFailure {
+                            Timber.w("Exception getting thumbnail.", it)
                         }
                     }
                 }.onFailure { Timber.e(it) }
@@ -807,22 +815,30 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 nodesWithoutThumbnail.map {
                     runCatching {
                         if (isMegaApiFolder(type = type)) {
-                            getThumbnailFromMegaApiFolderUseCase(
-                                nodeHandle = it.first,
-                                path = it.second.absolutePath
-                            )?.let { nodeHandle ->
+                            runCatching {
+                                getThumbnailFromMegaApiFolderUseCase(
+                                    nodeHandle = it.first,
+                                    path = it.second.absolutePath
+                                )
+                            }.onSuccess { nodeHandle ->
                                 if (nodeHandle == playingHandle) {
                                     postPlayingThumbnail()
                                 }
+                            }.onFailure {
+                                Timber.w("Exception getting thumbnail.", it)
                             }
                         } else {
-                            getThumbnailFromMegaApiUseCase(
-                                nodeHandle = it.first,
-                                path = it.second.absolutePath
-                            )?.let { nodeHandle ->
+                            runCatching {
+                                getThumbnailFromMegaApiUseCase(
+                                    nodeHandle = it.first,
+                                    path = it.second.absolutePath
+                                )
+                            }.onSuccess { nodeHandle ->
                                 if (nodeHandle == playingHandle) {
                                     postPlayingThumbnail()
                                 }
+                            }.onFailure {
+                                Timber.w("Exception getting thumbnail.", it)
                             }
                         }
                     }.onFailure { Timber.e(it) }

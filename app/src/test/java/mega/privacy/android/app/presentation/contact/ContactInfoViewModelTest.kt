@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
@@ -68,6 +69,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import kotlin.random.Random
+import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
 class ContactInfoViewModelTest {
@@ -581,6 +583,19 @@ class ContactInfoViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.callStatusChanged).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that an exception from remove contact by email is not propagated`() = runTest {
+        whenever(removeContactByEmailUseCase(any()))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            removeContact()
+            state.test {
+                assertFalse(awaitItem().isUserRemoved)
+            }
         }
     }
 }

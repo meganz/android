@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -65,24 +66,16 @@ class EditProfileViewModel @Inject constructor(
         getUserLastName(false)
     }
 
-    private fun getUserFistName(forceRefresh: Boolean) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    firstName = getCurrentUserFirstName(forceRefresh)
-                )
-            }
-        }
+    private fun getUserFistName(forceRefresh: Boolean) = viewModelScope.launch {
+        runCatching { getCurrentUserFirstName(forceRefresh) }
+            .onSuccess { _state.update { state -> state.copy(firstName = it) } }
+            .onFailure { Timber.w("Exception getting user first name.", it) }
     }
 
-    private fun getUserLastName(forceRefresh: Boolean) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    lastName = getCurrentUserLastName(forceRefresh)
-                )
-            }
-        }
+    private fun getUserLastName(forceRefresh: Boolean) = viewModelScope.launch {
+        runCatching { getCurrentUserLastName(forceRefresh) }
+            .onSuccess { _state.update { state -> state.copy(lastName = it) } }
+            .onFailure { Timber.w("Exception getting user last name.", it) }
     }
 
     /**

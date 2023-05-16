@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.manager
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
@@ -42,13 +43,15 @@ import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
+import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -59,6 +62,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -76,6 +80,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
 class ManagerViewModelTest {
@@ -201,6 +206,9 @@ class ManagerViewModelTest {
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
 
+    private val getPricing = mock<GetPricing>()
+    private val getFullAccountInfo = mock<GetFullAccountInfo>()
+
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
@@ -226,8 +234,8 @@ class ManagerViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
-            getPricing = mock(),
-            getFullAccountInfo = mock(),
+            getPricing = getPricing,
+            getFullAccountInfo = getFullAccountInfo,
             getActiveSubscription = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
@@ -578,4 +586,42 @@ class ManagerViewModelTest {
             testScheduler.advanceUntilIdle()
             verify(deleteOldestCompletedTransfersUseCase).invoke()
         }
+
+    @Test
+    fun `test that an exception from get pricing is not propagated`() = runTest {
+        whenever(getPricing(any())).thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            getProductAccounts()
+            state.test {
+                assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun `test that an exception from get full account info is not propagated`() = runTest {
+        whenever(getFullAccountInfo()).thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            askForFullAccountInfo()
+            state.test {
+                assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun `test that an exception from require 2FA is not propagated`() = runTest {
+        whenever(requireTwoFactorAuthenticationUseCase(newAccount = false, firstLogin = false))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            checkToShow2FADialog(newAccount = false, firstLogin = false)
+            state.map { it.show2FADialog }.test {
+                assertFalse(awaitItem())
+                assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
+            }
+        }
+    }
 }

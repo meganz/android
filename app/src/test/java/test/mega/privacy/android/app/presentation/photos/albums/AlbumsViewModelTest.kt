@@ -4,9 +4,11 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -24,6 +26,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
@@ -47,7 +50,9 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
 class AlbumsViewModelTest {
@@ -761,6 +766,23 @@ class AlbumsViewModelTest {
         underTest.state.test {
             val selectedAlbumIds = awaitItem().selectedAlbumIds
             assertThat(selectedAlbumIds.isEmpty()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that exception when update album name is not propagated`() = runTest {
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(mock())
+        whenever(updateAlbumNameUseCase(AlbumId(-1), "new name"))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            state.map { it.showRenameDialog }.distinctUntilChanged().test {
+                assertFalse(awaitItem())
+                showRenameDialog(true)
+                assertTrue(awaitItem())
+                updateAlbumName("new name")
+                assertFalse(awaitItem())
+            }
         }
     }
 

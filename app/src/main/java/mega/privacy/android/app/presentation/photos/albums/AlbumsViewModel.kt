@@ -373,27 +373,17 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
-    fun updateAlbumName(title: String) {
-        viewModelScope.launch {
-            try {
-                val finalTitle = title.trim()
-                if (checkTitleValidity(finalTitle)) {
-                    val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
-                    updateAlbumNameUseCase(currentAlbumId, finalTitle)
-                    _state.update {
-                        it.copy(
-                            showRenameDialog = false,
-                        )
-                    }
-                }
-            } catch (exception: Exception) {
-                Timber.e(exception)
-                _state.update {
-                    it.copy(
-                        showRenameDialog = false,
-                    )
-                }
+    fun updateAlbumName(title: String) = viewModelScope.launch {
+        runCatching {
+            val finalTitle = title.trim()
+            if (checkTitleValidity(finalTitle)) {
+                val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
+                updateAlbumNameUseCase(currentAlbumId, finalTitle)
+                _state.update { state -> state.copy(showRenameDialog = false) }
             }
+        }.onFailure {
+            Timber.e(it)
+            _state.update { state -> state.copy(showRenameDialog = false) }
         }
     }
 

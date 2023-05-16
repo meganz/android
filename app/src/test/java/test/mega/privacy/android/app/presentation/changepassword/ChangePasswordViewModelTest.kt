@@ -23,8 +23,8 @@ import mega.privacy.android.domain.usecase.ChangePasswordUseCase
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -32,6 +32,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.random.Random
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class ChangePasswordViewModelTest {
@@ -458,6 +461,21 @@ internal class ChangePasswordViewModelTest {
             }
         }
 
+    @Test
+    fun `test that an exception from change password is not propagated`() = runTest {
+        whenever(multiFactorAuthSetting()).thenReturn(false)
+        whenever(changePasswordUseCase(any())).thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            onUserClickChangePassword("")
+            uiState.test {
+                val state = awaitItem()
+                assertEquals(state.snackBarMessage, R.string.general_text_error)
+                assertNull(state.loadingMessage)
+                assertFalse(state.isPasswordChanged)
+            }
+        }
+    }
 
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,

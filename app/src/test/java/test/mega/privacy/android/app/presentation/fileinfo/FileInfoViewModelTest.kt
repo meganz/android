@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -95,6 +96,8 @@ import org.mockito.kotlin.whenever
 import java.io.File
 import java.lang.ref.WeakReference
 import java.net.URI
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -857,6 +860,26 @@ internal class FileInfoViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that an exception from get folder tree info is not propagated`() = runTest {
+        val folderNode = mock<TypedFolderNode> {
+            on { id }.thenReturn(nodeId)
+            on { name }.thenReturn("Folder name")
+        }.also { folderNode ->
+            whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
+            whenever(getFolderTreeInfo.invoke(folderNode))
+                .thenAnswer { throw MegaException(1, "It's broken") }
+            whenever(getContactItemFromInShareFolder.invoke(any(), any())).thenReturn(mock())
+        }
+
+        with(underTest) {
+            setNode(folderNode.id.longValue)
+            uiState.test {
+                assertNull(awaitItem().folderTreeInfo)
+            }
+        }
+    }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(

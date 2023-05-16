@@ -22,10 +22,11 @@ import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
-import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -91,7 +92,10 @@ internal class PaymentViewModel @Inject constructor(
      */
     private fun refreshPricing() {
         viewModelScope.launch {
-            val pricing = getPricing(false)
+            val pricing = runCatching { getPricing(false) }.getOrElse {
+                Timber.w("Returning empty pricing as get pricing failed.", it)
+                Pricing(emptyList())
+            }
             val currentProducts =
                 pricing.products.filter { product -> product.level == _state.value.upgradeType }
             val monthlyPrice =

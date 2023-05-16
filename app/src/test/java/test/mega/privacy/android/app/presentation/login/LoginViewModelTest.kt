@@ -20,6 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
@@ -50,6 +51,8 @@ import org.junit.rules.TestRule
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
 internal class LoginViewModelTest {
@@ -247,6 +250,21 @@ internal class LoginViewModelTest {
                 assertThat(awaitItem().passwordError).isNull()
                 assertThat(awaitItem().ongoingTransfersExist).isNull()
                 assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed<Int>().javaClass)
+            }
+        }
+    }
+
+    @Test
+    fun `test that an exception from local logout is not propagated`() = runTest {
+        whenever(localLogoutUseCase(any(), any()))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            state.map { it.isLocalLogoutInProgress }.distinctUntilChanged().test {
+                assertFalse(awaitItem())
+                stopLogin()
+                assertTrue(awaitItem())
+                assertFalse(awaitItem())
             }
         }
     }

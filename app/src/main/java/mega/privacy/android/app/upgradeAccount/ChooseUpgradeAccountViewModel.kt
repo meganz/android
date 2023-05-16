@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import timber.log.Timber
@@ -60,7 +61,10 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      */
     fun refreshPricing() {
         viewModelScope.launch {
-            val pricing = getPricing(false)
+            val pricing = runCatching { getPricing(false) }.getOrElse {
+                Timber.w("Returning empty pricing as get pricing failed.", it)
+                Pricing(emptyList())
+            }
             _state.update {
                 it.copy(product = pricing.products)
             }

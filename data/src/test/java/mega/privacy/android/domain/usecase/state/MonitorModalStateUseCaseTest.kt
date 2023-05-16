@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -509,6 +510,25 @@ class MonitorModalStateUseCaseTest {
                 assertThat(events).doesNotContain(Event.Item(ModalState.ExpiredBusinessAccountGracePeriod))
             }
         }
+
+    @Test
+    internal fun `test that exception when checking 2FA is not propagated`() = runTest {
+        requiresTwoFactorAuthentication.stub {
+            onBlocking { invoke(any(), any()) }
+                .thenAnswer { throw MegaException(-1, "It's broken") }
+        }
+
+        underTest(
+            firsLoginState = firsLoginState,
+            askPermissionState = askPermissionState,
+            newAccountState = newAccountState,
+            getUpgradeAccount = getUpgradeAccount,
+            getAccountType = getAccountType,
+        ).test {
+            val events = cancelAndConsumeRemainingEvents()
+            assertThat(events).doesNotContain(Event.Item(ModalState.RequestTwoFactorAuthentication))
+        }
+    }
 
     private fun setSavedStateVariables(
         upgradeAccount: Boolean = false,

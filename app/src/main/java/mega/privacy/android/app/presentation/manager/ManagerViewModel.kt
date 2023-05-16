@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -507,7 +508,9 @@ class ManagerViewModel @Inject constructor(
      * Get product accounts
      *
      */
-    fun getProductAccounts(): List<Product> = runBlocking { getPricing(false).products }
+    fun getProductAccounts(): List<Product> = runBlocking {
+        runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
+    }
 
     /**
      * Ask for full account info
@@ -519,7 +522,7 @@ class ManagerViewModel @Inject constructor(
             runCatching {
                 getFullAccountInfo()
             }.onFailure {
-                Timber.e(it)
+                Timber.w("Exception getting account info.", it)
             }
         }
     }
@@ -529,13 +532,16 @@ class ManagerViewModel @Inject constructor(
      * @param newAccount checks if its a new user
      * @param firstLogin checks if its a first login
      */
-    fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) {
-        viewModelScope.launch {
-            val result = requireTwoFactorAuthenticationUseCase(
+    fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) = viewModelScope.launch {
+        runCatching {
+            requireTwoFactorAuthenticationUseCase(
                 newAccount = newAccount,
                 firstLogin = firstLogin,
             )
-            _state.update { it.copy(show2FADialog = result) }
+        }.onSuccess {
+            _state.update { state -> state.copy(show2FADialog = it) }
+        }.onFailure {
+            Timber.w("Exception checking 2FA.", it)
         }
     }
 

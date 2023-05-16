@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -11,10 +12,11 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.junit.After
 import org.junit.Before
@@ -127,4 +129,17 @@ internal class FilePreferencesViewModelTest {
                 assertFalse(state.isFileVersioningEnabled)
             }
         }
+
+    @Test
+    fun `test that exception when enable file version option is not propagated`() = runTest {
+        whenever(enableFileVersionsOption(false))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            state.map { it.isFileVersioningEnabled }.test {
+                enableFileVersionOption(false)
+                assertTrue(awaitItem())
+            }
+        }
+    }
 }

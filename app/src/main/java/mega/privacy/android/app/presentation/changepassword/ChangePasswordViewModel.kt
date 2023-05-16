@@ -141,21 +141,29 @@ internal class ChangePasswordViewModel @Inject constructor(
      * @param newPassword the new password that the user inputs
      * when user has passed the multi-factor auth check, this method trigger changing the user's password
      */
-    private suspend fun onExecuteChangePassword(newPassword: String) {
-        changePasswordUseCase(newPassword).also { isSuccess ->
-            _uiState.update {
-                if (isSuccess) {
-                    it.copy(
-                        isPasswordChanged = true,
-                        loadingMessage = null
-                    )
-                } else {
-                    it.copy(
-                        snackBarMessage = R.string.general_text_error,
-                        loadingMessage = null
-                    )
+    private suspend fun onExecuteChangePassword(newPassword: String) = runCatching {
+        changePasswordUseCase(newPassword)
+            .also { isSuccess ->
+                _uiState.update {
+                    if (isSuccess) {
+                        it.copy(
+                            isPasswordChanged = true,
+                            loadingMessage = null
+                        )
+                    } else {
+                        it.copy(
+                            snackBarMessage = R.string.general_text_error,
+                            loadingMessage = null
+                        )
+                    }
                 }
             }
+    }.onFailure {
+        _uiState.update {
+            it.copy(
+                snackBarMessage = R.string.general_text_error,
+                loadingMessage = null
+            )
         }
     }
 

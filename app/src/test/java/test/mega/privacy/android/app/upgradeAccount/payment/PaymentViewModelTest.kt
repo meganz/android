@@ -131,4 +131,17 @@ internal class PaymentViewModelTest {
             assertFalse(state.isPaymentMethodAvailable)
         }
     }
+
+    @Test
+    fun `test that an exception from refresh pricing is not propagated`() = runTest {
+        whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
+        whenever(isBillingAvailable()).thenReturn(true)
+        whenever(getPricing(false)).thenAnswer { throw MegaException(1, "Not available") }
+        initViewModel()
+        underTest.state.drop(1).test {
+            val state = awaitItem()
+            assertEquals(state.monthlyPrice, "")
+            assertEquals(state.yearlyPrice, "")
+        }
+    }
 }

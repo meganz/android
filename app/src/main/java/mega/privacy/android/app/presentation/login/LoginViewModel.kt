@@ -238,10 +238,14 @@ class LoginViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            localLogoutUseCase(
-                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                ClearPsa { PsaManager::clearPsa }
-            )
+            runCatching {
+                localLogoutUseCase(
+                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
+                    ClearPsa { PsaManager::clearPsa }
+                )
+            }.onFailure {
+                Timber.w("Exception in local logout.", it)
+            }
             _state.update { it.copy(isLocalLogoutInProgress = false) }
             MegaApplication.isLoggingIn = false
         }

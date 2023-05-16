@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -86,4 +88,57 @@ internal class EditProfileViewModelTest {
                 assertEquals(state.avatarFile, file)
             }
         }
+
+    @Test
+    fun `test that an exception from get user first name is not propagated`() = runTest {
+        whenever(getCurrentUserFirstName(any()))
+            .thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            state.test {
+                getFirstName()
+                assertEquals(awaitItem().firstName, "")
+            }
+        }
+    }
+
+    @Test
+    fun `test that get user first name updates the value in the state`() = runTest {
+        val expectedName = "Test name"
+        whenever(getCurrentUserFirstName(any())).thenReturn(expectedName)
+
+        with(underTest) {
+            state.test {
+                assertEquals(awaitItem().firstName, "")
+                getFirstName()
+                assertEquals(awaitItem().firstName, expectedName)
+            }
+        }
+    }
+
+    @Test
+    fun `test that an exception from get user last name is not propagated`() = runTest {
+        whenever(getCurrentUserLastName(any())).thenAnswer { throw MegaException(1, "It's broken") }
+
+        with(underTest) {
+            state.test {
+                getLastName()
+                assertEquals(awaitItem().lastName, "")
+            }
+        }
+    }
+
+    @Test
+    fun `test that get user last name updates the value in the state`() = runTest {
+        val expectedName = "Test name"
+        whenever(getCurrentUserLastName(any())).thenReturn(expectedName)
+
+        with(underTest) {
+            state.test {
+                assertEquals(awaitItem().lastName, "")
+                getLastName()
+                assertEquals(awaitItem().lastName, expectedName)
+            }
+        }
+    }
 }

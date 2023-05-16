@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -93,10 +94,9 @@ class FilePreferencesViewModel @Inject constructor(
      *
      * @param enable
      */
-    fun enableFileVersionOption(enable: Boolean) {
-        viewModelScope.launch {
-            enableFileVersionsOption(enabled = enable)
-            _state.update { it.copy(isFileVersioningEnabled = enable) }
-        }
+    fun enableFileVersionOption(enable: Boolean) = viewModelScope.launch {
+        runCatching { enableFileVersionsOption(enabled = enable) }
+            .onSuccess { _state.update { it.copy(isFileVersioningEnabled = enable) } }
+            .onFailure { Timber.w("Exception enabling file versioning.", it) }
     }
 }

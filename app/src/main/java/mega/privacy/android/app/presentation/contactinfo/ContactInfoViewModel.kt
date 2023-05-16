@@ -553,7 +553,12 @@ class ContactInfoViewModel @Inject constructor(
      * Exits from contact info page if succeeds
      */
     fun removeContact() = applicationScope.launch {
-        val isRemoved = state.value.email?.let { email -> removeContactByEmailUseCase(email) }
+        val isRemoved = state.value.email?.let { email ->
+            runCatching { removeContactByEmailUseCase(email) }.getOrElse {
+                Timber.w("Exception removing contact.", it)
+                false
+            }
+        }
         _state.update {
             it.copy(isUserRemoved = isRemoved ?: false)
         }
