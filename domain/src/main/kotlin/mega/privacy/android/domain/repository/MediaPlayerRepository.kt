@@ -115,14 +115,6 @@ interface MediaPlayerRepository {
     suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode?
 
     /**
-     * Get parent node by handle
-     *
-     * @param parentHandle node handle
-     * @return [UnTypedNode]?
-     */
-    suspend fun getParentNodeByHandle(parentHandle: Long): UnTypedNode?
-
-    /**
      * MegaApiFolder gets parent node by handle
      *
      * @param parentHandle node handle

@@ -4,6 +4,7 @@ import nz.mega.sdk.MegaNode
 
 /**
  * Get parent mega node
+ * see @link{mega.privacy.android.domain.usecase.GetParentNodeUseCase} for Domain level implementation
  */
 fun interface GetParentMegaNode {
     /**

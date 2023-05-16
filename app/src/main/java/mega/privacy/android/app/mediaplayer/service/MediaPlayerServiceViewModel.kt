@@ -31,7 +31,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -93,6 +92,7 @@ import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
@@ -112,8 +112,8 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUs
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodesByHandlesUseCase
-import mega.privacy.android.domain.usecase.GetParentNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -129,6 +129,7 @@ import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
@@ -185,7 +186,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getThumbnailFromMegaApiUseCase: GetThumbnailFromMegaApiUseCase,
     private val getThumbnailFromMegaApiFolderUseCase: GetThumbnailFromMegaApiFolderUseCase,
     private val getInboxNodeUseCase: GetInboxNodeUseCase,
-    private val getParentNodeByHandleUseCase: GetParentNodeByHandleUseCase,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
@@ -495,7 +496,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 else -> getRootNodeUseCase()
                             }
                         } else {
-                            getParentNodeByHandleUseCase(parentHandle)
+                            getParentNodeUseCase(NodeId(parentHandle))
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(

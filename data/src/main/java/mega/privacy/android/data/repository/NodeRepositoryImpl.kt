@@ -453,4 +453,11 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
         megaApiGateway.getFingerprint(filePath)
     }
+
+    override suspend fun getParentNode(nodeId: NodeId) = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+        megaNode?.let {
+            megaApiGateway.getParentNode(megaNode)?.let { nodeMapper(it) }
+        }
+    }
 }

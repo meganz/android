@@ -7,7 +7,9 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
@@ -27,7 +29,7 @@ import javax.inject.Inject
 class DefaultGetPendingUploadList @Inject constructor(
     private val getNodeFromCloud: GetNodeFromCloud,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getParentMegaNode: GetParentMegaNode,
+    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
@@ -103,7 +105,7 @@ class DefaultGetPendingUploadList @Inject constructor(
                 pendingList.add(record)
             } else {
                 Timber.d("Possible node with same fingerprint with handle: ${nodeExists.handle}")
-                if (!isNodeInRubbish(nodeExists.handle) && getParentMegaNode(nodeExists)?.handle != parentNodeHandle) {
+                if (!isNodeInRubbish(nodeExists.handle) && getParentNodeUseCase(NodeId(nodeExists.handle))?.id?.longValue != parentNodeHandle) {
                     val record = SyncRecord(
                         0,
                         media.filePath,

@@ -304,4 +304,13 @@ interface NodeRepository {
      * @param filePath
      */
     suspend fun getFingerprint(filePath: String): String?
+
+    /**
+     * Get the parent node of a Node
+     *
+     * @param nodeId [NodeId]
+     * @return the parent node of the node, null if node doesn't exist or
+     *         is the root node
+     */
+    suspend fun getParentNode(nodeId: NodeId): UnTypedNode?
 }

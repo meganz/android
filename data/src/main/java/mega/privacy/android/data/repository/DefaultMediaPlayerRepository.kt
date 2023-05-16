@@ -13,9 +13,9 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
@@ -172,13 +172,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolder.getRootNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
-    override suspend fun getParentNodeByHandle(parentHandle: Long): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
                 convertToUnTypedNode(megaNode)
             }
         }

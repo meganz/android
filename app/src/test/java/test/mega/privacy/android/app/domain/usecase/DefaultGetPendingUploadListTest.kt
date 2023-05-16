@@ -4,20 +4,22 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
+import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import nz.mega.sdk.MegaNode
@@ -36,7 +38,7 @@ class DefaultGetPendingUploadListTest {
 
     private val getNodeFromCloud: GetNodeFromCloud = mock()
     private val getNodeByHandle: GetNodeByHandle = mock()
-    private val getParentMegaNode: GetParentMegaNode = mock()
+    private val getParentNodeUseCase: GetParentNodeUseCase = mock()
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private val updateTimeStamp: UpdateCameraUploadTimeStamp = mock()
@@ -122,7 +124,7 @@ class DefaultGetPendingUploadListTest {
         underTest = DefaultGetPendingUploadList(
             getNodeFromCloud,
             getNodeByHandle,
-            getParentMegaNode,
+            getParentNodeUseCase,
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             updateTimeStamp,
@@ -160,13 +162,20 @@ class DefaultGetPendingUploadListTest {
     @Test
     fun `test that correct sync record list is returned if node does not exist for secondary photo media`() =
         runTest {
-            val result = mock<MegaNode> {}
+            val handle = 1234L
+            val result = mock<MegaNode> {
+                on { this.handle }.thenReturn(handle)
+            }
+            val node = mock<FileNode> {
+                on { this.id }.thenReturn(NodeId(handle))
+            }
             whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
+            whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(syncRecordTypeIntMapper(any())).thenReturn(1)
@@ -182,7 +191,13 @@ class DefaultGetPendingUploadListTest {
     @Test
     fun `test that correct sync record list is returned if node does not exist for primary video media which needs to be compressed`() =
         runTest {
-            val result = mock<MegaNode> {}
+            val handle = 1234L
+            val result = mock<MegaNode> {
+                on { this.handle }.thenReturn(handle)
+            }
+            val node = mock<FileNode> {
+                on { this.id }.thenReturn(NodeId(handle))
+            }
             whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
@@ -190,6 +205,7 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
+            whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(syncRecordTypeIntMapper(any())).thenReturn(2)
             val queue = LinkedList<CameraUploadMedia>()
@@ -226,7 +242,13 @@ class DefaultGetPendingUploadListTest {
     @Test
     fun `test that empty sync record list is returned if node exists and parent node already exists for primary photo media`() =
         runTest {
-            val result = mock<MegaNode> {}
+            val handle = 1234L
+            val result = mock<MegaNode> {
+                on { this.handle }.thenReturn(handle)
+            }
+            val node = mock<FileNode> {
+                on { this.id }.thenReturn(NodeId(handle))
+            }
             whenever(result.handle).thenReturn(1L)
             whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
@@ -235,11 +257,10 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(result)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
-            whenever(getParentMegaNode(any())).thenReturn(result)
+            whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(isNodeInRubbishBin(any())).thenReturn(false)
             val queue = LinkedList<CameraUploadMedia>()
-            queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
                 emptyList<SyncRecord>()
             )
@@ -248,7 +269,13 @@ class DefaultGetPendingUploadListTest {
     @Test
     fun `test that empty sync record list is returned if node is in rubbish bin`() =
         runTest {
-            val result = mock<MegaNode> {}
+            val handle = 1234L
+            val result = mock<MegaNode> {
+                on { this.handle }.thenReturn(handle)
+            }
+            val node = mock<FileNode> {
+                on { this.id }.thenReturn(NodeId(handle))
+            }
             whenever(result.handle).thenReturn(1L)
             whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
@@ -257,11 +284,10 @@ class DefaultGetPendingUploadListTest {
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(result)
             whenever(mediaLocalPathExists(any(), any())).thenReturn(false)
-            whenever(getParentMegaNode(any())).thenReturn(result)
+            whenever(getParentNodeUseCase(NodeId(handle))).thenReturn(node)
             whenever(getGPSCoordinates(any(), any())).thenReturn(Pair(0F, 1F))
             whenever(isNodeInRubbishBin(any())).thenReturn(true)
             val queue = LinkedList<CameraUploadMedia>()
-            queue.add(uploadMedia)
             assertThat(underTest(queue, isSecondary = false, isVideo = false)).isEqualTo(
                 emptyList<SyncRecord>()
             )
