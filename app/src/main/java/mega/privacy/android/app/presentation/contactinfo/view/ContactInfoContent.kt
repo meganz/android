@@ -26,4 +26,11 @@ internal fun ContactInfoContent(
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     ChatOptions()
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
+    IncomingSharesView(count = uiState.inShares.size)
+    ChatNotificationsView(isNotificationEnabled = true)
+    ShareContactView()
+    VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
+    ShareFilesView(isChatRoomExists = uiState.chatRoom != null)
+    ManageChatHistory(isChatRoomExists = uiState.chatRoom != null)
+    RemoveContact()
 }
