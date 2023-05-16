@@ -1211,7 +1211,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             if (contactType == CONTACT_TYPE_MEGA && !onNewGroup &&
                     (createNewGroup || (comesFromChat &&
                             ((adapterMEGAContacts != null && adapterMEGAContacts.getItemCount() > 0) ||
-                                    (!emailsContactsSelected.isEmpty()))))) {
+                                    (emailsContactsSelected != null && !emailsContactsSelected.isEmpty()))))) {
                 fabButton.show();
             } else if (contactType == CONTACT_TYPE_DEVICE && adapterContacts != null && adapterContacts.getItemCount() > 0) {
                 fabButton.show();
