@@ -570,10 +570,6 @@ class FileBrowserFragment : RotatableFragment() {
             viewerFrom = Constants.VIEWER_FROM_FILE_BROWSER,
         )
 
-        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
-            handleViewType(state.viewType)
-        }
-
         viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.isPendingRefresh }
             .sample(500L)) { isPendingRefresh ->
             if (isPendingRefresh) {
@@ -600,6 +596,9 @@ class FileBrowserFragment : RotatableFragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 fileBrowserViewModel.state.collect {
                     hideMultipleSelect()
+                    handleViewType(
+                        megaNodeAdapter?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    )
                     setNodes(it.nodes.toMutableList())
                     changeFastScrollerVisibility()
                     updateUI(nodeHandle = fileBrowserViewModel.getSafeBrowserParentHandle())
@@ -627,9 +626,8 @@ class FileBrowserFragment : RotatableFragment() {
      *
      * @param viewType The new View Type received from [SortByHeaderViewModel]
      */
-    private fun handleViewType(viewType: ViewType) {
-        if (viewType != fileBrowserState().currentViewType) {
-            fileBrowserViewModel.setCurrentViewType(viewType)
+    private fun handleViewType(viewType: Int) {
+        if (viewType != fileBrowserState().currentViewType.id) {
             switchViewType()
         }
     }

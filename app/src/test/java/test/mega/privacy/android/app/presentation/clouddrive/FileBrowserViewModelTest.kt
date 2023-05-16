@@ -269,22 +269,6 @@ class FileBrowserViewModelTest {
         }
 
     @Test
-    fun `test that the list view type is set when updating the current view type`() =
-        testSetCurrentViewType(ViewType.LIST)
-
-    @Test
-    fun `test that the grid view type is set when updating the current view type`() =
-        testSetCurrentViewType(ViewType.GRID)
-
-    private fun testSetCurrentViewType(expectedValue: ViewType) = runTest {
-        underTest.setCurrentViewType(expectedValue)
-
-        underTest.state.test {
-            Truth.assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
-        }
-    }
-
-    @Test
     fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
         runTest {
             val nodesListItem1 = mock<TypedFolderNode>()

@@ -4,7 +4,6 @@ import android.view.MenuItem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -296,15 +295,6 @@ class FileBrowserViewModel @Inject constructor(
                 pushPositionOnStack(lastFirstVisiblePosition)
             }
         }
-    }
-
-    /**
-     * Updates the value of [FileBrowserState.currentViewType]
-     *
-     * @param newViewType The new [ViewType]
-     */
-    fun setCurrentViewType(newViewType: ViewType) {
-        _state.update { it.copy(currentViewType = newViewType) }
     }
 
     /**
