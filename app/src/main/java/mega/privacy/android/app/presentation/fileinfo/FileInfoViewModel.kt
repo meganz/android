@@ -743,10 +743,11 @@ class FileInfoViewModel @Inject constructor(
             viewModelScope.launch {
                 runCatching {
                     getFolderTreeInfo(folder).let { folderTreeInfo ->
+                        val actions = getAvailableNodeActionsUseCase(typedNode)
+                            .map { nodeAction -> nodeActionMapper(nodeAction) }
                         _uiState.update {
                             it.copy(
-                                actions = getAvailableNodeActionsUseCase(typedNode)
-                                    .map { nodeAction -> nodeActionMapper(nodeAction) },
+                                actions = actions,
                                 folderTreeInfo = folderTreeInfo
                             )
                         }
