@@ -43,7 +43,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     SlideShowCompose(
         "Enable slideshow compose",
-        true
+        false
     ),
 
     /**

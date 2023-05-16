@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDi
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
@@ -177,8 +178,11 @@ class MediaDiscoveryFragment : Fragment() {
                             actionMode?.title = state.selectedPhotoIds.size.toString()
                         }
                         menu?.let {
-                            handleMenuIconsVisibility(isShowing = state.selectedTimeBarTab == TimeBarTab.All)
-                            if (state.selectedTimeBarTab == TimeBarTab.All) {
+                            handleMenuIconsVisibility(
+                                isShowing = state.selectedTimeBarTab == TimeBarTab.All
+                                        && state.uiPhotoList.isNotEmpty()
+                            )
+                            if (state.selectedTimeBarTab == TimeBarTab.All && state.uiPhotoList.isNotEmpty()) {
                                 handleZoomMenuEnableStatus()
                             }
                         }
@@ -235,6 +239,17 @@ class MediaDiscoveryFragment : Fragment() {
             )
         }
 
+        if (uiState.uiPhotoList.isNotEmpty()) {
+            MDView(uiState)
+        } else {
+            EmptyView(uiState.currentMediaType)
+        }
+    }
+
+    @Composable
+    private fun MDView(
+        uiState: MediaDiscoveryViewState,
+    ) {
         val lazyGridState: LazyGridState =
             rememberSaveable(
                 uiState.scrollStartIndex,
@@ -505,6 +520,7 @@ class MediaDiscoveryFragment : Fragment() {
         this.menu = menu
         handleMenuIconsVisibility(
             isShowing = mediaDiscoveryViewModel.state.value.selectedTimeBarTab == TimeBarTab.All
+                    && mediaDiscoveryViewModel.state.value.uiPhotoList.isNotEmpty()
         )
     }
 
@@ -512,8 +528,6 @@ class MediaDiscoveryFragment : Fragment() {
         this.menu?.apply {
             findItem(R.id.action_zoom_in)?.isVisible = isShowing
             findItem(R.id.action_zoom_out)?.isVisible = isShowing
-            findItem(R.id.action_menu_sort_by)?.isVisible = isShowing
-            findItem(R.id.action_menu_filter)?.isVisible = isShowing
         }
     }
 

@@ -24,7 +24,7 @@
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="105"
         android:title="@string/action_sort_by"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="never" />
 
     <item
@@ -32,6 +32,6 @@
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="110"
         android:title="@string/photos_action_filter"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="never" />
 </menu>
