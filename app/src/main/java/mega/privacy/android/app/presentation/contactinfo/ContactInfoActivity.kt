@@ -636,7 +636,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
         val handle = viewModel.userHandle ?: return
         val intent = Intent(this, ChatExplorerActivity::class.java).apply {
-            putExtra(Constants.USER_HANDLES, arrayOf(handle))
+            putExtra(Constants.USER_HANDLES, longArrayOf(handle))
         }
         shareContactResultLauncher.launch(intent)
     }
