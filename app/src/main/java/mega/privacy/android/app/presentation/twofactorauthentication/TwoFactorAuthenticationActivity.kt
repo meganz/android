@@ -20,13 +20,19 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,25 +44,39 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBinding
 import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
+import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationView
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.jetbrains.anko.toast
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * TwoFactorAuthenticationActivity
  */
+@AndroidEntryPoint
 class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
     private lateinit var binding: ActivityTwoFactorAuthenticationBinding
     private val viewModel: TwoFactorAuthenticationViewModel by viewModels()
 
@@ -122,8 +142,28 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    /**
+     * Checks if TwoFactorAuthenticationCompose enabled from [AppFeatures.TwoFactorAuthenticationCompose]
+     */
+    private suspend fun isTwoFactorAuthenticationComposeEnabled() =
+        getFeatureFlagValueUseCase(AppFeatures.TwoFactorAuthenticationCompose)
+
+    @Composable
+    fun TwoFactorAuthenticationScreen() {
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        TwoFactorAuthenticationView(uiState = uiState) {}
+    }
+
+    private fun setContentByCompose() {
+        setContent {
+            val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                TwoFactorAuthenticationScreen()
+            }
+        }
+    }
+
+    private fun setLegacyContent(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         binding = ActivityTwoFactorAuthenticationBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -215,6 +255,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 scanOrCopyIsShown || newAccount -> {
                     showScanOrCopyLayout()
                 }
+
                 confirm2FAIsShown -> {
                     listOf(
                         containerQrSeed2fa,
@@ -229,6 +270,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                         showError()
                     }
                 }
+
                 isEnabled2FA -> {
                     listOf(
                         scrollContainer2fa,
@@ -237,6 +279,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                     container2faEnabled.visibility = View.VISIBLE
                     buttonDismissRk.isVisible = rkSaved
                 }
+
                 else -> {
                     viewModel.getAuthenticationCode()
                     scrollContainer2fa.visibility = View.VISIBLE
@@ -248,6 +291,17 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             }
         }
         observeUIState()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        lifecycleScope.launch {
+            if (isTwoFactorAuthenticationComposeEnabled()) {
+                setContentByCompose()
+            } else {
+                setLegacyContent(savedInstanceState)
+            }
+        }
     }
 
     private fun showError() {
@@ -319,6 +373,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             key.isNullOrBlank() -> {
                 showSnackbar(getString(R.string.general_text_error))
             }
+
             isSaveToTextFileSuccessful(key, result) -> {
                 val intent =
                     Intent(
@@ -330,6 +385,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 finish()
                 toast(R.string.save_MK_confirmation)
             }
+
             else -> {
                 showSnackbar(getString(R.string.general_text_error))
             }
@@ -623,6 +679,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                         firstTime && !pinLongClick -> {
                             clearAllPins(index + 1)
                         }
+
                         pinLongClick -> pasteClipboard()
                         else -> permitVerify()
                     }
@@ -794,9 +851,11 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                             buttonDismissRk.isVisible = isMasterKeyExported
                         }
                     }
+
                     AuthenticationState.AuthenticationFailed -> {
                         showError()
                     }
+
                     else -> {
                         showSnackbar(getString(R.string.error_enable_2fa))
                     }

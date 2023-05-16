@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -44,12 +43,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
@@ -294,11 +293,7 @@ private fun PinTwoFactorAuthentication(
     }
 }
 
-@Preview
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "DarkPreviewTwoFactorAuthenticationField"
-)
+@CombinedThemePreviews
 @Composable
 private fun PreviewTwoFactorAuthenticationField() {
     var twoFAPin by remember { mutableStateOf(listOf("", "", "", "", "", "")) }

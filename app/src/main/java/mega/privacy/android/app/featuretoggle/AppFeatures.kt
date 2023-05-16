@@ -13,6 +13,15 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+
+    /**
+     * To switch to Two Factor Authentication compose
+     */
+    TwoFactorAuthenticationCompose(
+        "Enable compose implementation of Two Factor Authentication screen",
+        false
+    ),
+
     /**
      * Shares compose
      */
