@@ -1403,16 +1403,19 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setSpacing(spacing);
             PDFView.this.setPageFitPolicy(pageFitPolicy);
 
-            PDFView.this.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (pageNumbers != null) {
-                        PDFView.this.load(documentSource, password, pageNumbers);
-                    } else {
-                        PDFView.this.load(documentSource, password);
-                    }
-                }
-            });
+            PDFView.this.removeCallbacks(loadRunnable);
+            PDFView.this.post(loadRunnable);
         }
+
+        private final Runnable loadRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (pageNumbers != null) {
+                    PDFView.this.load(documentSource, password, pageNumbers);
+                } else {
+                    PDFView.this.load(documentSource, password);
+                }
+            }
+        };
     }
 }
