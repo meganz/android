@@ -27,17 +27,14 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
-import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
@@ -78,7 +75,6 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
-    private val sortOrderIntMapper: SortOrderIntMapper,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -209,17 +205,45 @@ internal class DefaultPhotosRepository @Inject constructor(
         }?.also { photosCache[nodeId] = it }
     }
 
-    override suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo> =
+    override suspend fun getPhotosByFolderId(folderId: NodeId, recursive: Boolean): List<Photo> =
         withContext(ioDispatcher) {
-            val parent = megaApiFacade.getMegaNodeByHandle(id)
+            val parent = megaApiFacade.getMegaNodeByHandle(folderId.longValue)
             parent?.let { parentNode ->
-                val megaNodes = megaApiFacade.getChildren(
-                    parent = parentNode,
-                    order = sortOrderIntMapper(order),
-                )
-                mapMegaNodesToPhotos(megaNodes)
+                val token = MegaCancelToken.createInstance()
+                val images = async {
+                    val imageNodes = megaApiFacade.searchByType(
+                        parentNode = parentNode,
+                        searchString = "",
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                    )
+                    mapPhotoNodesToImages(imageNodes)
+                }
+                val videos = async {
+                    val videoNodes = megaApiFacade.searchByType(
+                        parentNode = parentNode,
+                        searchString = "",
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                    )
+                    mapPhotoNodesToVideos(videoNodes)
+                }
+                val photos = images.await() + videos.await()
+                suspendCancellableCoroutine { continuation ->
+                    continuation.resumeWith(Result.success(photos))
+                    continuation.invokeOnCancellation {
+                        token.cancel()
+                    }
+                }
+                token.cancel()
+                photos
             } ?: emptyList()
         }
+
 
     override suspend fun getPhotosByIds(ids: List<NodeId>): List<Photo> =
         withContext(ioDispatcher) {
@@ -446,7 +470,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getPhotoByPublicLink(link: String): Photo? =
         withContext(ioDispatcher) {
-            var node = getPublicNode(link)
+            val node = getPublicNode(link)
             node?.let {
                 getPhotoFromCache(it)
             }

@@ -16,9 +16,11 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.presentation.photos.compose.albumcontent.applyFilter
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
@@ -32,17 +34,15 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
-import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.SetCameraSortOrder
-import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
+import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.io.File
 import javax.inject.Inject
@@ -52,8 +52,6 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
-    private val getCameraSortOrder: GetCameraSortOrder,
-    private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val getNodeByHandle: GetNodeByHandle,
@@ -71,9 +69,6 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val sortOrder = getCameraSortOrder()
-            setCurrentSort(sort = mapSortOrderToSort(sortOrder))
-
             monitorMediaDiscoveryView().collectLatest { mediaDiscoveryViewSettings ->
                 _state.update {
                     it.copy(
@@ -83,6 +78,8 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }
             }
         }
+
+        fetchPhotos()
     }
 
     private fun fetchPhotos() {
@@ -91,31 +88,31 @@ class MediaDiscoveryViewModel @Inject constructor(
         val currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
         fetchPhotosJob = currentFolderId?.let {
             viewModelScope.launch {
-                val sortOrder = mapSortToSortOrder(_state.value.currentSort)
-                getPhotosByFolderIdUseCase(it, sortOrder)
+                getPhotosByFolderIdUseCase(folderId = NodeId(it), recursive = true)
                     .collectLatest { sourcePhotos ->
-                        handlePhotoItems(sourcePhotos)
+                        handlePhotoItems(
+                            sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                            sourcePhotos = sourcePhotos
+                        )
                     }
             }
         }
     }
 
-    private fun mapSortOrderToSort(sortOrder: SortOrder): Sort = when (sortOrder) {
-        SortOrder.ORDER_MODIFICATION_DESC -> Sort.NEWEST
-        SortOrder.ORDER_MODIFICATION_ASC -> Sort.OLDEST
-        SortOrder.ORDER_PHOTO_DESC -> Sort.PHOTOS
-        SortOrder.ORDER_VIDEO_DESC -> Sort.VIDEOS
-        else -> Sort.NEWEST
+    private fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {
+        val filteredPhotos = when (_state.value.currentMediaType) {
+            FilterMediaType.ALL_MEDIA -> sourcePhotos
+            FilterMediaType.IMAGES -> sourcePhotos.filterIsInstance<Photo.Image>()
+            FilterMediaType.VIDEOS -> sourcePhotos.filterIsInstance<Photo.Video>()
+        }
+        return when (_state.value.currentSort) {
+            Sort.NEWEST -> filteredPhotos.sortedByDescending { it.modificationTime }
+            Sort.OLDEST -> filteredPhotos.sortedBy { it.modificationTime }
+            else -> filteredPhotos.sortedByDescending { it.modificationTime }
+        }
     }
 
-    private fun mapSortToSortOrder(sort: Sort): SortOrder = when (sort) {
-        Sort.NEWEST -> SortOrder.ORDER_MODIFICATION_DESC
-        Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
-        Sort.PHOTOS -> SortOrder.ORDER_PHOTO_DESC
-        Sort.VIDEOS -> SortOrder.ORDER_VIDEO_DESC
-    }
-
-    private fun handlePhotoItems(sortedPhotos: List<Photo>) {
+    private fun handlePhotoItems(sortedPhotos: List<Photo>, sourcePhotos: List<Photo>? = null) {
         val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
         val yearsCardList = createYearsCardList(dayPhotos = dayPhotos)
         val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
@@ -137,16 +134,33 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
             uiPhotoList.add(UIPhoto.PhotoItem(photo))
         }
-        _state.update {
-            it.copy(
-                uiPhotoList = uiPhotoList,
-                shouldBack = uiPhotoList.isEmpty(),
-                yearsCardList = yearsCardList,
-                monthsCardList = monthsCardList,
-                daysCardList = daysCardList,
-            )
+        if (sourcePhotos == null) {
+            _state.update {
+                it.copy(
+                    uiPhotoList = uiPhotoList,
+                    shouldBack = shouldBack(uiPhotoList),
+                    yearsCardList = yearsCardList,
+                    monthsCardList = monthsCardList,
+                    daysCardList = daysCardList,
+                )
+            }
+        } else {
+            _state.update {
+                it.copy(
+                    sourcePhotos = sourcePhotos,
+                    uiPhotoList = uiPhotoList,
+                    shouldBack = shouldBack(uiPhotoList),
+                    yearsCardList = yearsCardList,
+                    monthsCardList = monthsCardList,
+                    daysCardList = daysCardList,
+                )
+            }
         }
     }
+
+    private fun shouldBack(uiPhotoList: MutableList<UIPhoto>) =
+        _state.value.currentMediaType == FilterMediaType.ALL_MEDIA
+                && uiPhotoList.isEmpty()
 
     private fun needsDateSeparator(
         current: Photo,
@@ -201,13 +215,14 @@ class MediaDiscoveryViewModel @Inject constructor(
         _state.update {
             it.copy(currentSort = sort)
         }
+        handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+    }
 
-        viewModelScope.launch {
-            val sortOrder = mapSortToSortOrder(sort)
-            setCameraSortOrder(sortOrder)
-
-            fetchPhotos()
+    fun setCurrentMediaType(mediaType: FilterMediaType) {
+        _state.update {
+            it.copy(currentMediaType = mediaType)
         }
+        handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {
@@ -222,12 +237,14 @@ class MediaDiscoveryViewModel @Inject constructor(
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
             }
+
             is DateCard.MonthsCard -> {
                 updateSelectedTimeBarState(TimeBarTab.Days,
                     _state.value.daysCardList.indexOfFirst {
                         it.photo.modificationTime == dateCard.photo.modificationTime
                     })
             }
+
             is DateCard.DaysCard -> {
                 updateSelectedTimeBarState(
                     TimeBarTab.All,
@@ -256,6 +273,18 @@ class MediaDiscoveryViewModel @Inject constructor(
     fun updateZoomLevel(zoomLevel: ZoomLevel) {
         _state.update {
             it.copy(currentZoomLevel = zoomLevel)
+        }
+    }
+
+    fun showSortByDialog(showSortByDialog: Boolean) {
+        _state.update {
+            it.copy(showSortByDialog = showSortByDialog)
+        }
+    }
+
+    fun showFilterDialog(showFilterDialog: Boolean) {
+        _state.update {
+            it.copy(showFilterDialog = showFilterDialog)
         }
     }
 

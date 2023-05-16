@@ -5,14 +5,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
-import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
 /**
- * Get Photos from a folder
+ * Get Photos from a folder (support recursive sub folder)
  */
 class GetPhotosByFolderIdUseCase @Inject constructor(
     private val photosRepository: PhotosRepository,
@@ -23,21 +23,23 @@ class GetPhotosByFolderIdUseCase @Inject constructor(
      * Get Photos from a folder
      *
      * @param folderId
+     * @param recursive
+     *
      * @return photo
      */
-    operator fun invoke(folderId: Long, order: SortOrder): Flow<List<Photo>> {
+    operator fun invoke(folderId: NodeId, recursive: Boolean): Flow<List<Photo>> {
         return flow {
-            emit(getChildren(folderId, order))
-            emitAll(getMonitoredList(folderId, order))
+            emit(getFolderPhotos(folderId, recursive))
+            emitAll(getMonitoredList(folderId, recursive))
         }
     }
 
-    private suspend fun getChildren(folderId: Long, order: SortOrder): List<Photo> =
-        photosRepository.getPhotosByFolderId(folderId, order)
+    private suspend fun getFolderPhotos(folderId: NodeId, recursive: Boolean): List<Photo> =
+        photosRepository.getPhotosByFolderId(folderId, recursive)
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getMonitoredList(folderId: Long, order: SortOrder) =
+    private fun getMonitoredList(folderId: NodeId, recursive: Boolean) =
         nodeRepository.monitorNodeUpdates()
-            .mapLatest { getChildren(folderId, order) }
+            .mapLatest { getFolderPhotos(folderId, recursive) }
 }

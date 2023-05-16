@@ -60,13 +60,13 @@ import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.CardListView
+import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
-import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.utils.Constants
@@ -210,6 +210,30 @@ class MediaDiscoveryFragment : Fragment() {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         if (uiState.shouldBack)
             Back()
+
+        if (uiState.showSortByDialog) {
+            SortByDialog(
+                onDialogDismissed = {
+                    viewModel.showSortByDialog(showSortByDialog = false)
+                },
+                selectedOption = uiState.currentSort,
+                onOptionSelected = {
+                    viewModel.setCurrentSort(it)
+                }
+            )
+        }
+
+        if (uiState.showFilterDialog) {
+            FilterDialog(
+                onDialogDismissed = {
+                    viewModel.showFilterDialog(showFilterDialog = false)
+                },
+                selectedOption = uiState.currentMediaType,
+                onOptionSelected = {
+                    viewModel.setCurrentMediaType(it)
+                }
+            )
+        }
 
         val lazyGridState: LazyGridState =
             rememberSaveable(
@@ -489,6 +513,7 @@ class MediaDiscoveryFragment : Fragment() {
             findItem(R.id.action_zoom_in)?.isVisible = isShowing
             findItem(R.id.action_zoom_out)?.isVisible = isShowing
             findItem(R.id.action_menu_sort_by)?.isVisible = isShowing
+            findItem(R.id.action_menu_filter)?.isVisible = isShowing
         }
     }
 
@@ -497,23 +522,17 @@ class MediaDiscoveryFragment : Fragment() {
             R.id.action_zoom_in -> {
                 mediaDiscoveryZoomViewModel.zoomIn()
             }
+
             R.id.action_zoom_out -> {
                 mediaDiscoveryZoomViewModel.zoomOut()
             }
+
             R.id.action_menu_sort_by -> {
-                showSortByDialog(
-                    context = managerActivity,
-                    items = listOf(
-                        getString(R.string.sortby_date_newest),
-                        getString(R.string.sortby_date_oldest),
-                        getString(R.string.sortby_type_photo_first),
-                        getString(R.string.sortby_type_video_first),
-                    ),
-                    checkedItem = mediaDiscoveryViewModel.state.value.currentSort.ordinal,
-                    onClickListener = { _, i ->
-                        mediaDiscoveryViewModel.setCurrentSort(Sort.values()[i])
-                    },
-                )
+                mediaDiscoveryViewModel.showSortByDialog(showSortByDialog = true)
+            }
+
+            R.id.action_menu_filter -> {
+                mediaDiscoveryViewModel.showFilterDialog(showFilterDialog = true)
             }
         }
         return super.onOptionsItemSelected(item)

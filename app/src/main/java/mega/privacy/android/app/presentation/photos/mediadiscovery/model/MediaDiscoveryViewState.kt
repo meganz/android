@@ -1,20 +1,22 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 
 import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
-import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
-import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.entity.photos.Photo
 
 /**
  * Media Discovery View state
  *
+ * @property sourcePhotos the photos from sdk
  * @property uiPhotoList photo list
  * @property currentZoomLevel current zoom level
  * @property selectedPhotoIds selected photo ids
  * @property currentSort current sort
+ * @property currentMediaType
  * @property selectedTimeBarTab selected time bar tab
  * @property yearsCardList years card list
  * @property monthsCardList months card list
@@ -23,12 +25,16 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
  * @property scrollStartOffset the start offset of scroll
  * @property mediaDiscoveryViewSettings media discovery dialog view settings
  * @property shouldBack handle empty state, when no photos then back to file list page, eg, delete.
+ * @property showSortByDialog
+ * @property showFilterDialog
  */
 data class MediaDiscoveryViewState(
+    val sourcePhotos: List<Photo> = emptyList(),
     val uiPhotoList: List<UIPhoto> = emptyList(),
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     val selectedPhotoIds: Set<Long> = emptySet(),
     val currentSort: Sort = Sort.NEWEST,
+    val currentMediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
     val selectedTimeBarTab: TimeBarTab = TimeBarTab.All,
     val yearsCardList: List<DateCard> = emptyList(),
     val monthsCardList: List<DateCard> = emptyList(),
@@ -37,4 +43,6 @@ data class MediaDiscoveryViewState(
     val scrollStartOffset: Int = 0,
     val mediaDiscoveryViewSettings: Int? = null,
     val shouldBack: Boolean = false,
+    val showSortByDialog: Boolean = false,
+    val showFilterDialog: Boolean = false,
 )

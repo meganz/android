@@ -1,7 +1,6 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -52,8 +51,11 @@ interface PhotosRepository {
 
     /**
      * Get Photos from a folder
+     *
+     * @param folderId
+     * @param recursive True search Photo from sub folders, false only search current folder
      */
-    suspend fun getPhotosByFolderId(id: Long, order: SortOrder): List<Photo>
+    suspend fun getPhotosByFolderId(folderId: NodeId, recursive: Boolean): List<Photo>
 
     /**
      * Get Photos By a list of id
