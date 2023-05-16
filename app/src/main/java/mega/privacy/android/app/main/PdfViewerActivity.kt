@@ -1528,7 +1528,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         Timber.d("page: %d, pageCount: %d", page, pageCount)
         if (!notChangePage) {
             currentPage = page + 1
-            title = String.format("$pdfFileName $currentPage / $pageCount")
+            title = "$pdfFileName $currentPage / $pageCount"
         } else {
             notChangePage = false
         }
