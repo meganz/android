@@ -202,10 +202,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)
     }
 
-    override suspend fun getFingerprint(filePath: String): String? = withContext(ioDispatcher) {
-        megaApiGateway.getFingerprint(filePath)
-    }
-
     override suspend fun getNodesByOriginalFingerprint(
         originalFingerprint: String,
         parentNode: MegaNode?,

@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.app.domain.usecase.GetFingerprint
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
@@ -57,7 +57,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getFingerprint: GetFingerprint,
+    private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
@@ -329,7 +329,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             val localPath = FileUtil.getLocalFile(node)
             File(FileUtil.getDownloadLocation(), node.name).let { file ->
                 if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
-                            || (node.fingerprint == getFingerprint(localPath)))
+                            || (node.fingerprint == getFingerprintUseCase(localPath)))
                 ) {
                     localPath
                 } else {

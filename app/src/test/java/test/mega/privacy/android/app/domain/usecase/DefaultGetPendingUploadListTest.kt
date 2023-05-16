@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetFingerprint
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
@@ -40,7 +40,7 @@ class DefaultGetPendingUploadListTest {
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private val updateTimeStamp: UpdateCameraUploadTimeStamp = mock()
-    private val getFingerprint: GetFingerprint = mock()
+    private val getFingerprintUseCase: GetFingerprintUseCase = mock()
     private val mediaLocalPathExists: MediaLocalPathExists = mock()
     private val shouldCompressVideo: ShouldCompressVideo = mock()
     private val getGPSCoordinates: GetGPSCoordinates = mock()
@@ -126,7 +126,7 @@ class DefaultGetPendingUploadListTest {
             getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase,
             updateTimeStamp,
-            getFingerprint,
+            getFingerprintUseCase,
             mediaLocalPathExists,
             shouldCompressVideo,
             getGPSCoordinates,
@@ -139,7 +139,7 @@ class DefaultGetPendingUploadListTest {
     fun `test that correct sync record list is returned if node does not exist for primary photo media`() =
         runTest {
             val result = mock<MegaNode> {}
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
@@ -161,7 +161,7 @@ class DefaultGetPendingUploadListTest {
     fun `test that correct sync record list is returned if node does not exist for secondary photo media`() =
         runTest {
             val result = mock<MegaNode> {}
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
@@ -183,7 +183,7 @@ class DefaultGetPendingUploadListTest {
     fun `test that correct sync record list is returned if node does not exist for primary video media which needs to be compressed`() =
         runTest {
             val result = mock<MegaNode> {}
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(true)
@@ -205,7 +205,7 @@ class DefaultGetPendingUploadListTest {
     fun `test that correct sync record list is returned if node does not exist for secondary video media which does not need to be compressed`() =
         runTest {
             val result = mock<MegaNode> {}
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
@@ -228,7 +228,7 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(result.handle).thenReturn(1L)
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
@@ -250,7 +250,7 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(result.handle).thenReturn(1L)
-            whenever(getFingerprint(any())).thenReturn("local fingerprint")
+            whenever(getFingerprintUseCase(any())).thenReturn("local fingerprint")
             whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)

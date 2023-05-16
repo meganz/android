@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import nz.mega.sdk.MegaNode
@@ -30,7 +31,7 @@ class DefaultGetPendingUploadList @Inject constructor(
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
-    private val getFingerprint: GetFingerprint,
+    private val getFingerprintUseCase: GetFingerprintUseCase,
     private val mediaLocalPathExists: MediaLocalPathExists,
     private val shouldCompressVideo: ShouldCompressVideo,
     private val getGPSCoordinates: GetGPSCoordinates,
@@ -59,7 +60,7 @@ class DefaultGetPendingUploadList @Inject constructor(
             }
 
             val sourceFile = media.filePath?.let { File(it) }
-            val localFingerPrint = media.filePath?.let { getFingerprint(it) }
+            val localFingerPrint = media.filePath?.let { getFingerprintUseCase(it) }
             var nodeExists: MegaNode? = null
             try {
                 nodeExists = getNodeByHandle(parentNodeHandle)?.let { node ->

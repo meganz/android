@@ -31,7 +31,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
-import mega.privacy.android.app.domain.usecase.GetFingerprint
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -207,7 +207,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getAudioNodesByParentHandleUseCase: GetAudioNodesByParentHandleUseCase,
     private val getVideoNodesByParentHandleUseCase: GetVideoNodesByParentHandleUseCase,
     private val getNodesByHandlesUseCase: GetNodesByHandlesUseCase,
-    private val getFingerprint: GetFingerprint,
+    private val getFingerprintUseCase: GetFingerprintUseCase,
     private val fileDurationMapper: FileDurationMapper,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
@@ -1578,7 +1578,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
         node.fingerprint.let { fingerprint ->
             localPath != null &&
                     (isOnMegaDownloads(node) || (fingerprint != null
-                            && fingerprint == getFingerprint(localPath)))
+                            && fingerprint == getFingerprintUseCase(localPath)))
         }
 
     private fun isOnMegaDownloads(node: TypedFileNode): Boolean =

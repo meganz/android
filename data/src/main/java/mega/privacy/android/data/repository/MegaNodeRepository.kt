@@ -132,13 +132,6 @@ interface MegaNodeRepository {
     suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
 
     /**
-     * Get the fingerprint of a file by path
-     *
-     * @param filePath
-     */
-    suspend fun getFingerprint(filePath: String): String?
-
-    /**
      * Get MegaNode by original fingerprint
      * @param originalFingerprint
      * @param parentNode MegaNode

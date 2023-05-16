@@ -297,4 +297,11 @@ interface NodeRepository {
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId
+
+    /**
+     * Get the fingerprint of a file by path
+     *
+     * @param filePath
+     */
+    suspend fun getFingerprint(filePath: String): String?
 }

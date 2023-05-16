@@ -449,4 +449,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
+        megaApiGateway.getFingerprint(filePath)
+    }
 }

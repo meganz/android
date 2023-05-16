@@ -9,7 +9,6 @@ import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
-import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
@@ -132,9 +131,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetVideoSyncRecordsByStatus() = mock<GetVideoSyncRecordsByStatus>()
-
-    @Provides
-    fun provideGetFingerPrint() = mock<GetFingerprint>()
 
     @Provides
     fun provideGetNodesByOriginalFingerprint() = mock<GetNodesByOriginalFingerprint>()
