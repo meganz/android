@@ -63,8 +63,6 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
 
     private BadgeDrawerArrowDrawable badgeDrawable;
 
-    public long selectedChatItemId;
-
     DisplayMetrics outMetrics;
 
     MenuItem searchMenuItem;
@@ -143,8 +141,7 @@ public class ArchivedChatsActivity extends PasscodeActivity implements MegaChatR
 
         if (chat == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
-        selectedChatItemId = chat.getChatId();
-        bottomSheetDialogFragment = new ChatBottomSheetDialogFragment();
+        bottomSheetDialogFragment = ChatBottomSheetDialogFragment.newInstance(chat.getChatId());
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 

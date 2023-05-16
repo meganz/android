@@ -47,7 +47,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
-import mega.privacy.android.app.main.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.main.megachat.ChatItemPreferences;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
@@ -62,9 +61,16 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
     private ChatController chatC;
     private MegaChatListItem chat = null;
-    private long chatId;
     private RoundedImageView chatImageView;
     private TextView optionMuteChatText;
+
+    public static ChatBottomSheetDialogFragment newInstance(long chatItemId) {
+        Bundle bundle = new Bundle();
+        bundle.putLong(CHAT_ID, chatItemId);
+        ChatBottomSheetDialogFragment fragment = new ChatBottomSheetDialogFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -72,13 +78,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         contentView = View.inflate(getContext(), R.layout.chat_item_bottom_sheet, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
 
-        if (savedInstanceState != null) {
-            chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
-        } else if (requireActivity() instanceof ManagerActivity) {
-            chatId = ((ManagerActivity) requireActivity()).selectedChatItemId;
-        } else if (requireActivity() instanceof ArchivedChatsActivity) {
-            chatId = ((ArchivedChatsActivity) requireActivity()).selectedChatItemId;
-        }
+        long chatId = requireArguments().getLong(CHAT_ID, INVALID_HANDLE);
 
         if (chatId != INVALID_HANDLE) {
             chat = megaChatApi.getChatListItem(chatId);
@@ -91,6 +91,7 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        if (chat == null) dismissAllowingStateLoss();
         ImageView iconStateChatPanel = contentView.findViewById(R.id.chat_list_contact_state);
         iconStateChatPanel.setMaxWidth(scaleWidthPx(6, getResources().getDisplayMetrics()));
         iconStateChatPanel.setMaxHeight(scaleHeightPx(6, getResources().getDisplayMetrics()));
@@ -310,11 +311,5 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
         }
 
         setStateBottomSheetBehaviorHidden();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLong(CHAT_ID, chatId);
     }
 }

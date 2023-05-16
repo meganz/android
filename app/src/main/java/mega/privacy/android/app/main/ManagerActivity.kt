@@ -484,8 +484,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
     private var selectedTransfer: CompletedTransfer? = null
 
-    @JvmField
-    var selectedChatItemId: Long = 0
     private val badgeDrawable: BadgeDrawerArrowDrawable by lazy {
         BadgeDrawerArrowDrawable(
             this, R.color.red_600_red_300,
@@ -9511,8 +9509,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun showChatPanel(chat: MegaChatListItem?) {
         Timber.d("showChatPanel")
         if (chat == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedChatItemId = chat.chatId
-        bottomSheetDialogFragment = ChatBottomSheetDialogFragment()
+        bottomSheetDialogFragment = ChatBottomSheetDialogFragment.newInstance(chat.chatId)
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
