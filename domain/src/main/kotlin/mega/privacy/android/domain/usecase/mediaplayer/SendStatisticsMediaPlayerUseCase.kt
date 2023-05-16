@@ -16,5 +16,10 @@ class SendStatisticsMediaPlayerUseCase @Inject constructor(
      * @param event [MediaPlayerStatisticsEvents]
      */
     suspend operator fun invoke(event: MediaPlayerStatisticsEvents) =
-        statisticsRepository.sendEvent(event.id, event.message)
+        statisticsRepository.sendEvent(
+            eventId = event.id,
+            message = event.message,
+            addJourneyId = event.addJourneyId,
+            viewId = event.viewId
+        )
 }

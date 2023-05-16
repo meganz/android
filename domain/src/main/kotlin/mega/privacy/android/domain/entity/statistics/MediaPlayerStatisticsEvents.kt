@@ -3,10 +3,18 @@ package mega.privacy.android.domain.entity.statistics
 /**
  * Events for data statistics regarding media player
  *
- * @param id Event type or ID
- * @param message Event message
+ * @property id Event type or ID
+ * @property message Event message
+ * @property addJourneyId True if JourneyID should be included. Otherwise, false.
+ * @property viewId ViewID value (C-string null-terminated) to be sent with the event.
+ *                     This value should have been generated with [this.generateViewId].
  */
-sealed class MediaPlayerStatisticsEvents(val id: Int, val message: String) {
+sealed class MediaPlayerStatisticsEvents(
+    val id: Int,
+    val message: String,
+    val addJourneyId: Boolean = false,
+    val viewId: String? = null,
+) {
 
     /**
      * The Video Player is Activated Event
