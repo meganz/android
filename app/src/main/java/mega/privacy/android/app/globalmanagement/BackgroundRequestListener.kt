@@ -222,7 +222,11 @@ class BackgroundRequestListener @Inject constructor(
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            getFullAccountInfo()
+            runCatching {
+                getFullAccountInfo()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }

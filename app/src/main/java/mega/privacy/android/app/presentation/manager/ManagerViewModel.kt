@@ -516,7 +516,11 @@ class ManagerViewModel @Inject constructor(
     fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         viewModelScope.launch {
-            getFullAccountInfo()
+            runCatching {
+                getFullAccountInfo()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

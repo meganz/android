@@ -21,6 +21,7 @@ import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
@@ -70,7 +71,8 @@ internal class PaymentViewModel @Inject constructor(
      */
     private fun getPaymentMethod() {
         viewModelScope.launch {
-            val paymentMethod = getPaymentMethod(false)
+            val paymentMethod =
+                runCatching { getPaymentMethod(false) }.getOrElse { PaymentMethodFlags(0L) }
             if (paymentMethod.flag == 0L) {
                 Timber.w("Not payment bit set received!!!")
             }

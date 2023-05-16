@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -16,10 +17,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
-import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import nz.mega.sdk.MegaApiJava
 import org.junit.After
@@ -31,6 +33,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class PaymentViewModelTest {
     private val getPaymentMethod: GetPaymentMethod = mock()
     private val getPricing: GetPricing = mock()
@@ -115,4 +118,17 @@ internal class PaymentViewModelTest {
                 assertFalse(state.isPaymentMethodAvailable)
             }
         }
+
+
+    @Test
+    fun `test that an exception from getPaymentMethod is not propagated`() = runTest {
+        whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
+        whenever(isBillingAvailable()).thenReturn(true)
+        whenever(getPaymentMethod(false)).thenAnswer { throw MegaException(1, "Not available") }
+        initViewModel()
+        underTest.state.drop(1).test {
+            val state = awaitItem()
+            assertFalse(state.isPaymentMethodAvailable)
+        }
+    }
 }
