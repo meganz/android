@@ -4720,9 +4720,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Vergadernaam is vereist</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Voer minder dan 30&#160;tekens in</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Voer tot 30&#160;tekens in</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Voer minder dan 3000&#160;tekens in</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Voer tot 3000&#160;tekens in</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Vergadering gepland</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4779,4 +4779,16 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">Voer tijd in</string>
+    <!-- Label for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations">Vergader uitnodigingen</string>
+    <!-- Text for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <!-- Label for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <!-- Text for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <!-- Notification description for scheduled meetings that starts in 15 minutes -->
+    <string name="notification_sched_meeting_starts_15_minutes">Vergadering begint over 15 minuten</string>
+    <!-- Notification description for scheduled meetings that starts now -->
+    <string name="notification_sched_meeting_starts_now">Vergadering begint nu</string>
 </resources>
