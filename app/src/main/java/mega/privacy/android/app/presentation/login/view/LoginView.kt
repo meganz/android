@@ -327,14 +327,6 @@ private fun RequireLogin(
                 onClick = onCreateAccount
             )
         }
-
-        with(state) {
-            if (emailError != null) {
-                LaunchedEffect(key1 = emailError) { focusManager.moveFocus(FocusDirection.Previous) }
-            } else if (passwordError != null) {
-                LaunchedEffect(key1 = passwordError) { focusManager.moveFocus(FocusDirection.Next) }
-            }
-        }
     }
 }
 

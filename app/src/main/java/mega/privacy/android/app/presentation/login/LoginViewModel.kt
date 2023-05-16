@@ -402,7 +402,7 @@ class LoginViewModel @Inject constructor(
         }
 
         with(state.value) {
-            val typedEmail = accountSession?.email
+            val typedEmail = accountSession?.email?.lowercase()?.trim()
             val emailError = when {
                 typedEmail.isNullOrEmpty() -> LoginError.EmptyEmail
                 !Constants.EMAIL_ADDRESS.matcher(typedEmail).matches() -> LoginError.NotValidEmail
