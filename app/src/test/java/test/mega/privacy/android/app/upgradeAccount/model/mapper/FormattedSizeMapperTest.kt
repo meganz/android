@@ -1,20 +1,22 @@
 package test.mega.privacy.android.app.upgradeAccount.model.mapper
 
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
-import org.junit.Assert.*
+import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import org.junit.Test
 
-class FormattedSizeGBBasedMapperTest {
+class FormattedSizeMapperTest {
+    private val underTest = FormattedSizeMapper()
+
     @Test
     fun `test that mapper returns correct formatted GB size and GB string id`() {
         val expectedResult = Pair(R.string.label_file_size_giga_byte, "400")
-        assertEquals(expectedResult, toFormattedSizeGBBased(400))
+        assertThat(underTest(400)).isEqualTo(expectedResult)
     }
 
     @Test
     fun `test that mapper returns correct formatted TB size and TB string id`() {
         val expectedResult = Pair(R.string.label_file_size_tera_byte, "1")
-        assertEquals(expectedResult, toFormattedSizeGBBased(1024))
+        assertThat(underTest(1024)).isEqualTo(expectedResult)
     }
 }

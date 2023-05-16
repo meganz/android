@@ -23,8 +23,6 @@ import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestamp
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
 import mega.privacy.android.app.presentation.meeting.mapper.toScheduledTimeFormatted
-import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeGBBasedMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
 
 /**
  * Module for providing mapper dependencies
@@ -68,12 +66,6 @@ class MapperModule {
      */
     @Provides
     fun provideHeaderMapper(): HeaderMapper = ::toHeader
-
-    /**
-     * Provide FormattedSizeGBBased mapper
-     */
-    @Provides
-    fun provideFormattedSizeGBBasedMapper(): FormattedSizeGBBasedMapper = ::toFormattedSizeGBBased
 
     /**
      * Provide meeting last timestamp mapper

@@ -10,6 +10,7 @@ import javax.inject.Inject
 class LocalisedSubscriptionMapper @Inject constructor(
     private val localisedPriceStringMapper: LocalisedPriceStringMapper,
     private val localisedPriceCurrencyCodeStringMapper: LocalisedPriceCurrencyCodeStringMapper,
+    private val formattedSizeMapper: FormattedSizeMapper
 ) {
     /**
      * Invoke
@@ -26,6 +27,7 @@ class LocalisedSubscriptionMapper @Inject constructor(
         transfer = subscription.transfer,
         amount = subscription.amount,
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 }

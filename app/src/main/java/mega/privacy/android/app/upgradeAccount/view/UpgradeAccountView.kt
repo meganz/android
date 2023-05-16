@@ -36,7 +36,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
-import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.Typography
@@ -230,13 +229,13 @@ fun SubscriptionPlansInfoRow(
 
     val storageValueString =
         stringResource(
-            id = toFormattedSizeGBBased(subscription.storage.toLong()).first,
-            toFormattedSizeGBBased(subscription.storage.toLong()).second
+            id = subscription.formatStorageSize().first,
+            subscription.formatStorageSize().second
         )
     val transferValueString =
         stringResource(
-            id = toFormattedSizeGBBased(subscription.transfer.toLong()).first,
-            toFormattedSizeGBBased(subscription.transfer.toLong()).second
+            id = subscription.formatTransferSize().first,
+            subscription.formatTransferSize().second
         )
 
     val uiAccountType = when (proPlan) {

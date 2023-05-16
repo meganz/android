@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
@@ -45,10 +46,12 @@ class UpgradeAccountViewModelTest {
     private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
+    private val formattedSizeMapper = mock<FormattedSizeMapper>()
     private val localisedSubscriptionMapper =
         LocalisedSubscriptionMapper(
             localisedPriceStringMapper,
-            localisedPriceCurrencyCodeStringMapper
+            localisedPriceCurrencyCodeStringMapper,
+            formattedSizeMapper,
         )
 
 
@@ -98,7 +101,8 @@ class UpgradeAccountViewModelTest {
         transfer = 2048,
         amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProIIMonthly = LocalisedSubscription(
@@ -108,7 +112,8 @@ class UpgradeAccountViewModelTest {
         transfer = 8192,
         amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProIIIMonthly = LocalisedSubscription(
@@ -118,7 +123,8 @@ class UpgradeAccountViewModelTest {
         transfer = 16384,
         amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val localisedSubscriptionProLiteMonthly = LocalisedSubscription(
@@ -128,7 +134,8 @@ class UpgradeAccountViewModelTest {
         transfer = 1024,
         amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val expectedLocalisedSubscriptionsList = listOf(

@@ -46,9 +46,9 @@ import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
-import mega.privacy.android.app.upgradeAccount.model.mapper.toFormattedSizeGBBased
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.MegaSpannedAlignedText
 import mega.privacy.android.core.ui.controls.MegaSpannedText
@@ -322,14 +322,16 @@ fun SubscriptionPlansInfoRowNew(
 ) {
     val isClicked = chosenPlan == proPlan
 
-    val storageValueString = stringResource(
-        id = toFormattedSizeGBBased(subscription.storage.toLong()).first,
-        toFormattedSizeGBBased(subscription.storage.toLong()).second
-    )
-    val transferValueString = stringResource(
-        id = toFormattedSizeGBBased(subscription.transfer.toLong()).first,
-        toFormattedSizeGBBased(subscription.transfer.toLong()).second
-    )
+    val storageValueString =
+        stringResource(
+            id = subscription.formatStorageSize().first,
+            subscription.formatStorageSize().second
+        )
+    val transferValueString =
+        stringResource(
+            id = subscription.formatTransferSize().first,
+            subscription.formatTransferSize().second
+        )
 
     val uiAccountType = mapUIAccountType(proPlan)
 
@@ -572,6 +574,7 @@ private fun mapUIAccountType(plan: AccountType) = when (plan) {
 fun PreviewUpgradeAccountViewNew() {
     val localisedPriceStringMapper = LocalisedPriceStringMapper()
     val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    val formattedSizeMapper = FormattedSizeMapper()
     val expectedSubscriptionsList: List<LocalisedSubscription>
     val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
@@ -580,7 +583,8 @@ fun PreviewUpgradeAccountViewNew() {
         transfer = 2048,
         amount = CurrencyAmount(9.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     val subscriptionProIIMonthly = LocalisedSubscription(
@@ -593,7 +597,9 @@ fun PreviewUpgradeAccountViewNew() {
             mega.privacy.android.domain.entity.Currency("EUR")
         ),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+
     )
 
     val subscriptionProIIIMonthly = LocalisedSubscription(
@@ -606,7 +612,8 @@ fun PreviewUpgradeAccountViewNew() {
             mega.privacy.android.domain.entity.Currency("EUR")
         ),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     val subscriptionProLiteMonthly = LocalisedSubscription(
@@ -616,7 +623,8 @@ fun PreviewUpgradeAccountViewNew() {
         transfer = 1024,
         amount = CurrencyAmount(4.99.toFloat(), mega.privacy.android.domain.entity.Currency("NZD")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     expectedSubscriptionsList = listOf(

@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.upgradeAccount.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
+import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
@@ -14,9 +15,11 @@ import org.junit.Test
 class LocalisedSubscriptionMapperTest {
     private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    private val formattedSizeMapper = FormattedSizeMapper()
     private val underTest = LocalisedSubscriptionMapper(
         localisedPriceStringMapper,
-        localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCodeStringMapper,
+        formattedSizeMapper,
     )
 
     @Test
@@ -37,6 +40,7 @@ class LocalisedSubscriptionMapperTest {
             amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
             localisedPrice = localisedPriceStringMapper,
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
         )
         assertThat(underTest(subscription)).isEqualTo(localisedSubscription)
     }

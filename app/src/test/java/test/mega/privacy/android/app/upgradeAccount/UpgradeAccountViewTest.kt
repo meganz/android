@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.view.BuyNewSubscriptionDialog
@@ -30,6 +31,7 @@ import java.text.DecimalFormat
 class UpgradeAccountViewTest {
     private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
+    private val formattedSizeMapper = FormattedSizeMapper()
     private val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         handle = 1560943707714440503,
@@ -37,7 +39,8 @@ class UpgradeAccountViewTest {
         transfer = 2048,
         amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val subscriptionProIIMonthly = LocalisedSubscription(
@@ -47,7 +50,8 @@ class UpgradeAccountViewTest {
         transfer = 8192,
         amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val subscriptionProIIIMonthly = LocalisedSubscription(
@@ -57,7 +61,8 @@ class UpgradeAccountViewTest {
         transfer = 16384,
         amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val subscriptionProLiteMonthly = LocalisedSubscription(
@@ -67,7 +72,8 @@ class UpgradeAccountViewTest {
         transfer = 1024,
         amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
         localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
     )
 
     private val expectedSubscriptionsList = listOf(
