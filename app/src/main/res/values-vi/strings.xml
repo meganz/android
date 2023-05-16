@@ -1425,7 +1425,7 @@
     <!-- title of the advanced setting to choose the use of https -->
     <string name="setting_title_use_https_only">Không dùng HTTP</string>
     <!-- subtitle of the advanced setting to choose the use of https -->
-    <string name="setting_subtitle_use_https_only">Chỉ nên bật tính năng này khi các phiên truyền tải lên/xuống không hoạt động. Trong các trường hợp bình thường, giao thức HTTP rất thích hợp để truyền tải các nội dung mã hóa.</string>
+    <string name="setting_subtitle_use_https_only">Chỉ nên bật khi các phiên truyền&#160;tải không lưu&#160;thông. Trong các trường&#160;hợp bình&#160;thường, HTTP là đủ đáp&#160;ứng vì các phiên truyền&#160;tải đã được mã&#160;hóa.</string>
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cách hoạt động</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
@@ -4518,9 +4518,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Tên cho cuộc&#160;họp là bắt&#160;buộc</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Nhập ít hơn 30&#160;ký&#160;tự</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Nhập ít hơn 3 000&#160;ký&#160;tự</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Cuộc họp được lên lịch</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4569,4 +4569,16 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">Nhập thời&#160;gian</string>
+    <!-- Label for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations">Mời vào cuộc họp</string>
+    <!-- Text for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <!-- Label for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <!-- Text for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <!-- Notification description for scheduled meetings that starts in 15 minutes -->
+    <string name="notification_sched_meeting_starts_15_minutes">Cuộc họp bắt&#160;đầu trong 15 phút</string>
+    <!-- Notification description for scheduled meetings that starts now -->
+    <string name="notification_sched_meeting_starts_now">Cuộc họp bắt&#160;đầu ngay bây&#160;giờ</string>
 </resources>

@@ -4518,9 +4518,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">会议名称为必填项</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">输入少于30&#160;个字符（15个中文字）</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">输入最多30&#160;个字符（15个中文字）</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">输入少于3,000&#160;个字符（1,500个中文字）</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">输入最多3,000&#160;个字符（1,500个中文字）</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排会议</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4569,4 +4569,16 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">输入时间</string>
+    <!-- Label for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations">会议邀请</string>
+    <!-- Text for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <!-- Label for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <!-- Text for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <!-- Notification description for scheduled meetings that starts in 15 minutes -->
+    <string name="notification_sched_meeting_starts_15_minutes">会议将在15分钟后开始</string>
+    <!-- Notification description for scheduled meetings that starts now -->
+    <string name="notification_sched_meeting_starts_now">会议现在开始</string>
 </resources>

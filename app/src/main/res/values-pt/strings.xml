@@ -298,7 +298,7 @@
     </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
-        <item quantity="one">Envio iniciado</item>
+        <item quantity="one">Upload iniciado</item>
         <item quantity="many">%1$d uploads foram iniciados</item>
         <item quantity="other">%1$d uploads foram iniciados</item>
     </plurals>
@@ -4922,9 +4922,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">O nome da reunião é obrigatório</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Digite menos de 30&#160;caracteres</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Digite até 30&#160;caracteres</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Digite menos de 3000&#160;caracteres</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Digite até 3000&#160;caracteres</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Reunião agendada</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4989,4 +4989,16 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">Digite a hora</string>
+    <!-- Label for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations">Convites à reunião</string>
+    <!-- Text for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <!-- Label for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <!-- Text for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <!-- Notification description for scheduled meetings that starts in 15 minutes -->
+    <string name="notification_sched_meeting_starts_15_minutes">A reunião começa em 15 minutos.</string>
+    <!-- Notification description for scheduled meetings that starts now -->
+    <string name="notification_sched_meeting_starts_now">A reunião está começando</string>
 </resources>

@@ -4922,9 +4922,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Le nom de la réunion est requis</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Saisir moins de 30&#160;caractères</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Saisir jusqu’à 30&#160;caractères</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Saisir moins de 3 000&#160;caractères</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Saisir jusqu’à 3 000&#160;caractères</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">La réunion a été planifiée</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4989,4 +4989,16 @@
     </plurals>
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">Saisir l’heure</string>
+    <!-- Label for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations">Invitations à la réunion</string>
+    <!-- Text for the meeting invitations option on calls settings -->
+    <string name="settings_calls_preferences_meeting_invitations_text"></string>
+    <!-- Label for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders"></string>
+    <!-- Text for the meeting reminders option on calls settings -->
+    <string name="settings_calls_preferences_meeting_reminders_text"></string>
+    <!-- Notification description for scheduled meetings that starts in 15 minutes -->
+    <string name="notification_sched_meeting_starts_15_minutes">La réunion commence dans 15&#160;minutes</string>
+    <!-- Notification description for scheduled meetings that starts now -->
+    <string name="notification_sched_meeting_starts_now">La réunion commence maintenant</string>
 </resources>
