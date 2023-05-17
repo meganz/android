@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -20,16 +21,17 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.settings.reportissue.model.ReportIssueState
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.domain.entity.SubmitIssueRequest
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SubmitIssue
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -145,14 +147,18 @@ class ReportIssueViewModel @Inject constructor(
      */
     fun submit() {
         if (isConnected.value) {
-            submitReportJob = viewModelScope.launch(ioDispatcher) {
-                submitIssue(SubmitIssueRequest(description.value, includeLogs.value))
-                    .cancellable()
-                    .onCompletion { error ->
-                        onSubmitCompleted(error)
-                    }.collect { progress ->
-                        _state.update { it.copy(uploadProgress = progress.floatValue) }
-                    }
+            if (submitReportJob?.isActive != true) {
+                submitReportJob = viewModelScope.launch(ioDispatcher) {
+                    submitIssue(SubmitIssueRequest(description.value, includeLogs.value))
+                        .cancellable()
+                        .onCompletion { error ->
+                            onSubmitCompleted(error)
+                        }
+                        .catch { Timber.e(it) }
+                        .collect { progress ->
+                            _state.update { it.copy(uploadProgress = progress.floatValue) }
+                        }
+                }
             }
         } else {
             _state.update { it.copy(error = R.string.check_internet_connection_error) }
@@ -168,7 +174,8 @@ class ReportIssueViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         result = SubmitIssueResult.Success,
-                        uploadProgress = null
+                        uploadProgress = null,
+                        canSubmit = false
                     )
                 }
             }
