@@ -952,35 +952,35 @@ class DefaultAccountRepositoryTest {
         }
 
     @Test
-    fun `test that getLatestTargetPathPreference is not invoked whenever latestTargetTimeStamp is over 60 mins old`() =
+    fun `test that getLatestTargetPathCopyPreference is not invoked whenever latestTargetTimeStamp is over 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
-            whenever(accountPreferencesGateway.getLatestTargetTimestampPreference()).thenReturn(
+            whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            underTest.getLatestTargetPathPreference()
-            verify(accountPreferencesGateway, never()).getLatestTargetPathPreference()
+            underTest.getLatestTargetPathCopyPreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetPathCopyPreference()
         }
 
     @Test
-    fun `test that getLatestTargetPathPreference is invoked whenever latestTargetTimeStamp is less than 60 mins old`() =
+    fun `test that getLatestTargetPathCopyPreference is invoked whenever latestTargetTimeStamp is less than 60 minutes old`() =
         runTest {
             val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
-            whenever(accountPreferencesGateway.getLatestTargetTimestampPreference()).thenReturn(
+            whenever(accountPreferencesGateway.getLatestTargetTimestampCopyPreference()).thenReturn(
                 flowOf(latestTargetTimestamp)
             )
-            whenever(accountPreferencesGateway.getLatestTargetPathPreference()).thenReturn(
+            whenever(accountPreferencesGateway.getLatestTargetPathCopyPreference()).thenReturn(
                 flowOf(1234)
             )
-            underTest.getLatestTargetPathPreference()
-            verify(accountPreferencesGateway).getLatestTargetPathPreference()
+            underTest.getLatestTargetPathCopyPreference()
+            verify(accountPreferencesGateway).getLatestTargetPathCopyPreference()
         }
 
     @Test
-    fun `test that setLatestTargetPathPreference is invoked when setLatestTargetPathPreference called`() =
+    fun `test that setLatestTargetPathCopyPreference is invoked when setLatestTargetPathPreference called`() =
         runTest {
             val handle = 1234L
-            underTest.setLatestTargetPathPreference(handle)
-            verify(accountPreferencesGateway).setLatestTargetPathPreference(handle)
+            underTest.setLatestTargetPathCopyPreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetPathCopyPreference(handle)
         }
 }

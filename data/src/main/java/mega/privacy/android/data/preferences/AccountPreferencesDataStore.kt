@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
@@ -24,8 +25,10 @@ private const val ACCOUNT_PREFERENCE = "ACCOUNT_PREFERENCE"
 private const val accountPreferenceFileName = ACCOUNT_PREFERENCE
 
 private const val SHOW_2FA_DIALOG = "SHOW_2FA_DIALOG"
-private const val LATEST_TARGET_PATH = "LATEST_TARGET_PATH"
-private const val LATEST_TARGET_PATH_TIMESTAMP = "LATEST_TARGET_PATH_TIMESTAMP"
+private const val LATEST_TARGET_PATH_COPY = "LATEST_TARGET_PATH_COPY"
+private const val LATEST_TARGET_PATH_MOVE = "LATEST_TARGET_PATH_MOVE"
+private const val LATEST_TARGET_PATH_TIMESTAMP_COPY = "LATEST_TARGET_PATH_TIMESTAMP_COPY"
+private const val LATEST_TARGET_PATH_TIMESTAMP_MOVE = "LATEST_TARGET_PATH_TIMESTAMP_MOVE"
 
 private val Context.accountPreferencesDataStore: DataStore<Preferences> by preferencesDataStore(
     name = accountPreferenceFileName,
@@ -43,9 +46,12 @@ class AccountPreferencesDataStore @Inject constructor(
 ) : AccountPreferencesGateway {
 
     private val show2FADialog = booleanPreferencesKey(SHOW_2FA_DIALOG)
-    private val latestTargetPathPreferenceKey = longPreferencesKey(LATEST_TARGET_PATH)
-    private val latestTargetPathTimestampPreferenceKey =
-        longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP)
+    private val latestTargetPathCopyPreferenceKey = longPreferencesKey(LATEST_TARGET_PATH_COPY)
+    private val latestTargetPathMovePreferenceKey = longPreferencesKey(LATEST_TARGET_PATH_MOVE)
+    private val latestTargetPathTimestampCopyPreferenceKey =
+        longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_COPY)
+    private val latestTargetPathTimestampMovePreferenceKey =
+        longPreferencesKey(LATEST_TARGET_PATH_TIMESTAMP_MOVE)
 
     override suspend fun setDisplay2FADialog(show2FA: Boolean) {
         context.accountPreferencesDataStore.edit {
@@ -63,41 +69,41 @@ class AccountPreferencesDataStore @Inject constructor(
                 }
             }.map { it[show2FADialog] ?: false }
 
-    override suspend fun setLatestTargetPathPreference(path: Long) {
-        withContext(ioDispatcher) {
-            context.accountPreferencesDataStore.edit {
-                it[latestTargetPathPreferenceKey] = path
-            }
+    override suspend fun setLatestTargetPathCopyPreference(path: Long) {
+        context.accountPreferencesDataStore.edit {
+            it[latestTargetPathCopyPreferenceKey] = path
         }
     }
 
-    override fun getLatestTargetPathPreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }.map { it[latestTargetPathPreferenceKey] }
+    override fun getLatestTargetPathCopyPreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetPathCopyPreferenceKey)
 
-    override suspend fun setLatestTargetTimestampPreference(timestamp: Long) {
-        withContext(ioDispatcher) {
-            context.accountPreferencesDataStore.edit {
-                it[latestTargetPathTimestampPreferenceKey] = timestamp
-            }
+    override suspend fun setLatestTargetTimestampCopyPreference(timestamp: Long) {
+        context.accountPreferencesDataStore.edit {
+            it[latestTargetPathTimestampCopyPreferenceKey] = timestamp
         }
     }
 
-    override fun getLatestTargetTimestampPreference(): Flow<Long?> =
-        context.accountPreferencesDataStore.data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }.map { it[latestTargetPathTimestampPreferenceKey] }
+    override fun getLatestTargetTimestampCopyPreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetPathTimestampCopyPreferenceKey)
+
+    override suspend fun setLatestTargetPathMovePreference(path: Long) {
+        context.accountPreferencesDataStore.edit {
+            it[latestTargetPathMovePreferenceKey] = path
+        }
+    }
+
+    override fun getLatestTargetPathMovePreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetPathMovePreferenceKey)
+
+    override suspend fun setLatestTargetTimestampMovePreference(timestamp: Long) {
+        context.accountPreferencesDataStore.edit {
+            it[latestTargetPathTimestampMovePreferenceKey] = timestamp
+        }
+    }
+
+    override fun getLatestTargetTimestampMovePreference(): Flow<Long?> =
+        context.accountPreferencesDataStore.monitor(latestTargetPathTimestampMovePreferenceKey)
 
     override suspend fun clearPreferences() {
         withContext(ioDispatcher) {

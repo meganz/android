@@ -9,8 +9,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -19,9 +20,14 @@ import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -35,10 +41,16 @@ import javax.inject.Inject
 class FileExplorerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val getLatestTargetPath: GetLatestTargetPath,
+    private val getCopyLatestTargetPathUseCase: GetCopyLatestTargetPathUseCase,
+    private val getMoveLatestTargetPathUseCase: GetMoveLatestTargetPathUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ViewModel() {
 
     private var dataAlreadyRequested = false
+    var latestCopyTargetPath: Long? = null
+    var latestCopyTargetPathTab: Int = 0
+    var latestMoveTargetPath: Long? = null
+    var latestMoveTargetPathTab: Int = 0
     private val _filesInfo = MutableLiveData<List<ShareInfo>>()
     private val _textInfo = MutableLiveData<ShareTextInfo>()
     private val _fileNames = MutableLiveData<HashMap<String, String>>()
@@ -69,12 +81,19 @@ class FileExplorerViewModel @Inject constructor(
      */
     val textInfoContent get() = _textInfo.value
 
-    private val _targetPathFlow = MutableSharedFlow<Long?>()
+    private val _copyTargetPathFlow = MutableStateFlow<Long?>(null)
 
     /**
      * Gets the latest used target path of move/copy
      */
-    val targetPathFlow: SharedFlow<Long?> = _targetPathFlow
+    val copyTargetPathFlow: StateFlow<Long?> = _copyTargetPathFlow.asStateFlow()
+
+    private val _moveTargetPathFlow = MutableStateFlow<Long?>(null)
+
+    /**
+     * Gets the latest used target path of move
+     */
+    val moveTargetPathFlow: StateFlow<Long?> = _moveTargetPathFlow.asStateFlow()
 
     /**
      * Set file names
@@ -276,12 +295,59 @@ class FileExplorerViewModel @Inject constructor(
                 && intent.extras?.containsKey(Intent.EXTRA_STREAM)?.not() ?: true
 
     /**
-     * Get the last target path of move/copy if not valid then return null
+     * Get the last target path of copy if not valid then return null
      */
-    fun getTargetPath() {
+    fun getCopyTargetPath() {
         viewModelScope.launch {
-            _targetPathFlow.emit(getLatestTargetPath())
+            runCatching { getCopyLatestTargetPathUseCase() }
+                .onSuccess { latestCopyPath ->
+                    latestCopyTargetPath = latestCopyPath
+                    latestCopyTargetPath?.let {
+                        val accessPermission = getNodeAccessPermission(NodeId(it))
+                        latestCopyTargetPathTab = if (accessPermission == AccessPermission.OWNER)
+                            FileExplorerActivity.CLOUD_TAB
+                        else
+                            FileExplorerActivity.INCOMING_TAB
+                    }
+                    _copyTargetPathFlow.emit(latestCopyTargetPath ?: -1)
+                }
+                .onFailure { Timber.e(it) }
         }
+    }
+
+    /**
+     * Get the last target path of move if not valid then return null
+     */
+    fun getMoveTargetPath() {
+        viewModelScope.launch {
+            runCatching { getMoveLatestTargetPathUseCase() }
+                .onSuccess { latestMovePath ->
+                    latestMoveTargetPath = latestMovePath
+                    latestMoveTargetPath?.let {
+                        val accessPermission = getNodeAccessPermission(NodeId(it))
+                        latestMoveTargetPathTab = if (accessPermission == AccessPermission.OWNER)
+                            FileExplorerActivity.CLOUD_TAB
+                        else
+                            FileExplorerActivity.INCOMING_TAB
+                    }
+                    _moveTargetPathFlow.emit(latestMoveTargetPath ?: -1)
+                }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Reset copyTargetPathFlow state
+     */
+    fun resetCopyTargetPathState() {
+        _copyTargetPathFlow.value = null
+    }
+
+    /**
+     * Reset moveTargetPathFlow state
+     */
+    fun resetMoveTargetPathState() {
+        _moveTargetPathFlow.value = null
     }
 
 }

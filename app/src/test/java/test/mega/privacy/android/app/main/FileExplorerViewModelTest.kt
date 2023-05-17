@@ -7,7 +7,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,14 +17,18 @@ import org.mockito.kotlin.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class FileExplorerViewModelTest {
     private lateinit var underTest: FileExplorerViewModel
-    private val getLatestTargetPath = mock<GetLatestTargetPath>()
+    private val getCopyLatestTargetPathUseCase = mock<GetCopyLatestTargetPathUseCase>()
+    private val getMoveLatestTargetPathUseCase = mock<GetMoveLatestTargetPathUseCase>()
+    private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
 
     @Before
     fun setUp() {
         underTest = FileExplorerViewModel(
             ioDispatcher = StandardTestDispatcher(),
             monitorStorageStateEventUseCase = mock(),
-            getLatestTargetPath = getLatestTargetPath
+            getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
+            getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
+            getNodeAccessPermission = getNodeAccessPermission
         )
     }
 

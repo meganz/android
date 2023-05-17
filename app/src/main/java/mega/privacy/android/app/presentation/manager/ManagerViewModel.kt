@@ -51,7 +51,8 @@ import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
-import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
@@ -141,7 +142,8 @@ class ManagerViewModel @Inject constructor(
     monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
     private val monitorVerificationStatus: MonitorVerificationStatus,
-    private val setLatestTargetPath: SetLatestTargetPath,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
@@ -569,11 +571,22 @@ class ManagerViewModel @Inject constructor(
     val activeSubscription: MegaPurchase? get() = getActiveSubscription()
 
     /**
-     * Set last used path of copy/move as target path for next copy/move
+     * Set last used path of copy as target path for next copy
      */
-    fun setTargetPath(path: Long) {
+    fun setCopyTargetPath(path: Long) {
         viewModelScope.launch {
-            setLatestTargetPath(path)
+            runCatching { setCopyLatestTargetPathUseCase(path) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Set last used path of move as target path for next move
+     */
+    fun setMoveTargetPath(path: Long) {
+        viewModelScope.launch {
+            runCatching { setMoveLatestTargetPathUseCase(path) }
+                .onFailure { Timber.e(it) }
         }
     }
 

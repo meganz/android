@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -70,6 +71,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
     lateinit var megaApi: MegaApiAndroid
 
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val fileExplorerViewModel by activityViewModels<FileExplorerViewModel>()
 
     private var _binding: FragmentFileexplorerlistBinding? = null
     private val binding get() = _binding!!
@@ -279,9 +281,22 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             }
         }
 
-        val latestTargetPathTab = (requireActivity() as FileExplorerActivity).latestTargetPathTab
-        if (latestTargetPathTab == FileExplorerActivity.INCOMING_TAB && parentHandle == INVALID_HANDLE && (modeCloud == COPY || modeCloud == MOVE)) {
-            fileExplorerActivity.latestTargetPath?.let {
+        val latestTargetPathTab = fileExplorerViewModel.latestCopyTargetPathTab
+        val latestMoveTargetPathTab = fileExplorerViewModel.latestMoveTargetPathTab
+        if (latestMoveTargetPathTab == FileExplorerActivity.INCOMING_TAB || latestTargetPathTab == FileExplorerActivity.INCOMING_TAB) {
+            var targetPath: Long? = null
+            if (modeCloud == COPY) {
+                targetPath = fileExplorerViewModel.latestCopyTargetPath?.let {
+                    fileExplorerActivity.hideTabs(true, FileExplorerActivity.CLOUD_FRAGMENT)
+                    it
+                }
+            } else if (modeCloud == MOVE) {
+                targetPath = fileExplorerViewModel.latestMoveTargetPath?.let {
+                    fileExplorerActivity.hideTabs(true, FileExplorerActivity.CLOUD_FRAGMENT)
+                    it
+                }
+            }
+            targetPath?.let {
                 fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
                 setDeepBrowserTree(it)
                 setParentHandle(it)

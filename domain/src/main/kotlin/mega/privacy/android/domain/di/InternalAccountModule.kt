@@ -19,9 +19,7 @@ import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.account.ChangeEmail
-import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
-import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
@@ -103,14 +101,6 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideChangeEmail(accountRepository: AccountRepository): ChangeEmail =
             ChangeEmail(accountRepository::changeEmail)
-
-        @Provides
-        fun provideSetLatestTargetPath(accountRepository: AccountRepository): SetLatestTargetPath =
-            SetLatestTargetPath(accountRepository::setLatestTargetPathPreference)
-
-        @Provides
-        fun provideGetLatestTargetPath(accountRepository: AccountRepository): GetLatestTargetPath =
-            GetLatestTargetPath(accountRepository::getLatestTargetPathPreference)
 
         @Provides
         fun provideUpgradeSecurity(accountRepository: AccountRepository): UpgradeSecurity =

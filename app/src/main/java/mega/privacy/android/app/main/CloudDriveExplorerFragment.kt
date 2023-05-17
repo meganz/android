@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -81,6 +82,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     lateinit var megaApi: MegaApiAndroid
 
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
+    private val fileExplorerViewModel by activityViewModels<FileExplorerViewModel>()
     private lateinit var binding: FragmentFileexplorerlistBinding
 
     private val nodes = mutableListOf<MegaNode?>()
@@ -298,15 +300,23 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         when {
             modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER -> setParentHandle(INVALID_HANDLE)
             parentHandle == INVALID_HANDLE -> {
-                val latestTargetPathTab =
-                    (requireActivity() as FileExplorerActivity).latestTargetPathTab
                 val rootHandle = megaApi.rootNode?.handle ?: INVALID_HANDLE
                 var targetPath = rootHandle
-                if (latestTargetPathTab == FileExplorerActivity.CLOUD_TAB && (modeCloud == FileExplorerActivity.COPY || modeCloud == FileExplorerActivity.MOVE)) {
-                    targetPath = fileExplorerActivity.latestTargetPath?.let {
-                        fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
-                        it
-                    } ?: rootHandle
+                val latestTargetPathTab = fileExplorerViewModel.latestCopyTargetPathTab
+                val latestMoveTargetPathTab = fileExplorerViewModel.latestMoveTargetPathTab
+
+                if (latestTargetPathTab == FileExplorerActivity.CLOUD_TAB || latestMoveTargetPathTab == FileExplorerActivity.CLOUD_TAB) {
+                    if (modeCloud == FileExplorerActivity.COPY) {
+                        targetPath = fileExplorerViewModel.latestCopyTargetPath?.let {
+                            fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
+                            it
+                        } ?: rootHandle
+                    } else if (modeCloud == FileExplorerActivity.MOVE) {
+                        targetPath = fileExplorerViewModel.latestMoveTargetPath?.let {
+                            fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
+                            it
+                        } ?: rootHandle
+                    }
                 }
                 setParentHandle(targetPath)
             }

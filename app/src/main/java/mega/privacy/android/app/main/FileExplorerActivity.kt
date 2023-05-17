@@ -19,8 +19,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
@@ -28,12 +26,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -178,8 +176,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         private set
     var parentHandleIncoming: Long = 0
     var parentHandleCloud: Long = 0
-    var latestTargetPath: Long? = null
-    var latestTargetPathTab: Int = 0
     var deepBrowserTree = 0
     var shouldRestartSearch = false
 
@@ -626,25 +622,21 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             onProcessAsyncInfo(info)
         }
         viewModel.textInfo.observe(this) { dismissAlertDialogIfExists(statusDialog) }
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.targetPathFlow.collect { latestTargetHandle ->
-                    when (mode) {
-                        MOVE, COPY -> {
-                            latestTargetHandle?.let {
-                                latestTargetPathTab =
-                                    if (megaApi.getAccess(megaApi.getNodeByHandle(it)) == MegaShare.ACCESS_OWNER)
-                                        CLOUD_TAB
-                                    else
-                                        INCOMING_TAB
-                            }
-                            latestTargetPath = latestTargetHandle
-                            setView(SHOW_TABS, true)
-                        }
-                    }
-                }
+
+        collectFlow(viewModel.copyTargetPathFlow) {
+            if (it != null) {
+                setView(SHOW_TABS, true)
+                viewModel.resetCopyTargetPathState()
             }
         }
+
+        collectFlow(viewModel.moveTargetPathFlow) {
+            if (it != null) {
+                setView(SHOW_TABS, true)
+                viewModel.resetMoveTargetPathState()
+            }
+        }
+
     }
 
     private fun afterLoginAndFetch() {
@@ -695,7 +687,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     mode = MOVE
                     moveFromHandles = intent.getLongArrayExtra("MOVE_FROM")
 
-                    viewModel.getTargetPath()
+                    viewModel.getMoveTargetPath()
                     moveFromHandles?.let { handles ->
                         if (handles.isNotEmpty()) {
                             parentMoveCopy =
@@ -711,7 +703,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     mode = COPY
                     copyFromHandles = intent.getLongArrayExtra("COPY_FROM")
 
-                    viewModel.getTargetPath()
+                    viewModel.getCopyTargetPath()
                     copyFromHandles?.let { handles ->
                         parentMoveCopy =
                             megaApi.getParentNode(megaApi.getNodeByHandle(handles[0]))
@@ -788,7 +780,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
             val position =
                 if (mTabsAdapterExplorer != null) explorerTabsPager.currentItem
-                else if (latestTargetPath != null) latestTargetPathTab
+                else if (viewModel.latestCopyTargetPath != null) viewModel.latestCopyTargetPathTab
+                else if (viewModel.latestMoveTargetPath != null) viewModel.latestMoveTargetPathTab
                 else 0
 
             mTabsAdapterExplorer = FileExplorerPagerAdapter(

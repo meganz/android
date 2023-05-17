@@ -730,18 +730,35 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun setLatestTargetPathPreference(path: Long) = withContext(ioDispatcher) {
-        accountPreferencesGateway.setLatestTargetPathPreference(path)
-        accountPreferencesGateway.setLatestTargetTimestampPreference(System.currentTimeMillis())
+    override suspend fun setLatestTargetPathCopyPreference(path: Long) = withContext(ioDispatcher) {
+        accountPreferencesGateway.setLatestTargetPathCopyPreference(path)
+        accountPreferencesGateway.setLatestTargetTimestampCopyPreference(System.currentTimeMillis())
     }
 
-    override suspend fun getLatestTargetPathPreference(): Long? = withContext(ioDispatcher) {
-        val timestamp = accountPreferencesGateway.getLatestTargetTimestampPreference().firstOrNull()
-        timestamp?.let {
+    override suspend fun getLatestTargetPathCopyPreference(): Long? {
+        val timestamp =
+            accountPreferencesGateway.getLatestTargetTimestampCopyPreference().firstOrNull()
+        return timestamp?.let {
             if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
                 null
             else
-                accountPreferencesGateway.getLatestTargetPathPreference().firstOrNull()
+                accountPreferencesGateway.getLatestTargetPathCopyPreference().firstOrNull()
+        }
+    }
+
+    override suspend fun setLatestTargetPathMovePreference(path: Long) {
+        accountPreferencesGateway.setLatestTargetPathMovePreference(path)
+        accountPreferencesGateway.setLatestTargetTimestampMovePreference(System.currentTimeMillis())
+    }
+
+    override suspend fun getLatestTargetPathMovePreference(): Long? {
+        val timestamp =
+            accountPreferencesGateway.getLatestTargetTimestampMovePreference().firstOrNull()
+        return timestamp?.let {
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+                null
+            else
+                accountPreferencesGateway.getLatestTargetPathMovePreference().firstOrNull()
         }
     }
 

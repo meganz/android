@@ -7424,6 +7424,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         Timber.d("Request code: %d, Result code:%d", requestCode, resultCode)
         if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
@@ -7619,7 +7620,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { moveResult: MoveRequestResult.GeneralMovement, moveThrowable: Throwable? ->
                                         if (!manageCopyMoveException(moveThrowable)) {
-                                            viewModel.setTargetPath(toHandle)
+                                            viewModel.setMoveTargetPath(toHandle)
                                             showMovementResult(
                                                 moveResult,
                                                 handlesWithoutCollision[0]
@@ -7665,7 +7666,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     .subscribe { copyResult: CopyRequestResult, copyThrowable: Throwable? ->
                                         dismissAlertDialogIfExists(statusDialog)
                                         if (!manageCopyMoveException(copyThrowable)) {
-                                            viewModel.setTargetPath(toHandle)
+                                            viewModel.setCopyTargetPath(toHandle)
                                             showCopyResult(copyResult)
                                         }
                                     }

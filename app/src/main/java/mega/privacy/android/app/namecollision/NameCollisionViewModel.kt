@@ -34,7 +34,8 @@ import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import timber.log.Timber
 import javax.inject.Inject
@@ -57,7 +58,8 @@ class NameCollisionViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getNodeUseCase: GetNodeUseCase,
-    private val setLatestTargetPath: SetLatestTargetPath,
+    private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
+    private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
 ) : BaseRxViewModel() {
@@ -533,7 +535,10 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { result ->
-                    setMovementResult(result)
+                    setMovementResult(
+                        result,
+                        currentCollision.value?.nameCollision?.parentHandle ?: -1
+                    )
                     continueWithNext(choice)
                 },
                 onError = { error ->
@@ -554,7 +559,12 @@ class NameCollisionViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { result -> setMovementResult(result) },
+                onSuccess = { result ->
+                    setMovementResult(
+                        result,
+                        list[0].nameCollision.parentHandle ?: -1
+                    )
+                },
                 onError = { error ->
                     throwable.value = error
                     Timber.w(error)
@@ -568,7 +578,12 @@ class NameCollisionViewModel @Inject constructor(
      * @param movementResult    [MoveRequestResult.GeneralMovement] containing all the required info
      *                          about the movement.
      */
-    private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
+    private fun setMovementResult(
+        movementResult: MoveRequestResult.GeneralMovement,
+        moveToHandle: Long
+    ) {
+        if (moveToHandle != -1L)
+            setMoveLatestPath(moveToHandle)
         actionResult.value = NameCollisionActionResult(
             message = moveRequestMessageMapper(movementResult),
             shouldFinish = pendingCollisions.isEmpty()
@@ -634,7 +649,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun setCopyResult(copyResult: CopyRequestResult, copyToHandle: Long) {
         if (copyToHandle != -1L)
-            setLatestPath(copyToHandle)
+            setCopyLatestPath(copyToHandle)
         actionResult.value = NameCollisionActionResult(
             message = copyRequestMessageMapper(copyResult),
             shouldFinish = pendingCollisions.isEmpty()
@@ -642,11 +657,22 @@ class NameCollisionViewModel @Inject constructor(
     }
 
     /**
-     * Set last used path of copy/move as target path for next copy/move
+     * Set last used path of copy as target path for next copy
      */
-    private fun setLatestPath(path: Long) {
+    private fun setCopyLatestPath(path: Long) {
         viewModelScope.launch {
-            setLatestTargetPath(path)
+            runCatching { setCopyLatestTargetPathUseCase(path) }
+                .onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Set last used path of move as target path for next move
+     */
+    private fun setMoveLatestPath(path: Long) {
+        viewModelScope.launch {
+            runCatching { setMoveLatestTargetPathUseCase(path) }
+                .onFailure { Timber.e(it) }
         }
     }
 }

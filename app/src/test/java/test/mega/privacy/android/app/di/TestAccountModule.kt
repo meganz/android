@@ -9,26 +9,24 @@ import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
-import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.GetMyCredentials
-import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
-import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
-import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnections
-import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
-import mega.privacy.android.domain.usecase.account.SetSecureFlag
-import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.account.ChangeEmail
-import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
-import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
+import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
+import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
+import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -107,12 +105,6 @@ object TestAccountModule {
 
     @Provides
     fun provideLocalLogoutAppUseCase() = mock<LocalLogoutAppUseCase>()
-
-    @Provides
-    fun provideSetLatestTargetPath() = mock<SetLatestTargetPath>()
-
-    @Provides
-    fun provideGetLatestTargetPath() = mock<GetLatestTargetPath>()
 
     @Provides
     fun provideSetSecureFlag() = mock<SetSecureFlag>()

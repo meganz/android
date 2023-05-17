@@ -20,24 +20,44 @@ interface AccountPreferencesGateway {
     fun monitorShow2FADialog(): Flow<Boolean>
 
     /**
-     * Set last target path of move/copy
+     * Set last target path of copy
      */
-    suspend fun setLatestTargetPathPreference(path: Long)
+    suspend fun setLatestTargetPathCopyPreference(path: Long)
 
     /**
-     * Get last target path of move/copy
+     * Get last target path of copy
      */
-    fun getLatestTargetPathPreference(): Flow<Long?>
+    fun getLatestTargetPathCopyPreference(): Flow<Long?>
 
     /**
-     * Set timestamp of last target path of move/copy
+     * Set timestamp of last target path of copy
      */
-    suspend fun setLatestTargetTimestampPreference(timestamp: Long)
+    suspend fun setLatestTargetTimestampCopyPreference(timestamp: Long)
 
     /**
-     * Get timestamp of last target path of move/copy
+     * Get timestamp of last target path of copy
      */
-    fun getLatestTargetTimestampPreference(): Flow<Long?>
+    fun getLatestTargetTimestampCopyPreference(): Flow<Long?>
+
+    /**
+     * Set last target path of move
+     */
+    suspend fun setLatestTargetPathMovePreference(path: Long)
+
+    /**
+     * Get last target path of move
+     */
+    fun getLatestTargetPathMovePreference(): Flow<Long?>
+
+    /**
+     * Set timestamp of last target path of move
+     */
+    suspend fun setLatestTargetTimestampMovePreference(timestamp: Long)
+
+    /**
+     * Get timestamp of last target path of move
+     */
+    fun getLatestTargetTimestampMovePreference(): Flow<Long?>
 
     /**
      * Clears account preferences.

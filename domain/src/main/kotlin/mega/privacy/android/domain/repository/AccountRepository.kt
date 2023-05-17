@@ -321,14 +321,24 @@ interface AccountRepository {
     suspend fun is2FAEnabled(): Boolean
 
     /**
-     * Set last target path of move/copy
+     * Set last target path of copy
      */
-    suspend fun setLatestTargetPathPreference(path: Long)
+    suspend fun setLatestTargetPathCopyPreference(path: Long)
 
     /**
-     * Get last target path of move/copy
+     * Get last target path of copy
      */
-    suspend fun getLatestTargetPathPreference(): Long?
+    suspend fun getLatestTargetPathCopyPreference(): Long?
+
+    /**
+     * Set last target path of move
+     */
+    suspend fun setLatestTargetPathMovePreference(path: Long)
+
+    /**
+     * Get last target path of move
+     */
+    suspend fun getLatestTargetPathMovePreference(): Long?
 
     /**
      *  Notify the user has successfully skipped the password check

@@ -56,7 +56,8 @@ import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUse
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
-import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -187,7 +188,8 @@ class ManagerViewModelTest {
         }
     private val requireTwoFactorAuthenticationUseCase =
         mock<RequireTwoFactorAuthenticationUseCase>()
-    private val setLatestTargetPath = mock<SetLatestTargetPath>()
+    private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
+    private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase> {
         onBlocking { invoke() }.thenReturn(
@@ -245,7 +247,8 @@ class ManagerViewModelTest {
             monitorFinishActivityUseCase = monitorFinishActivity,
             monitorVerificationStatus = { monitorVerificationStatus },
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
-            setLatestTargetPath = setLatestTargetPath,
+            setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
+            setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
