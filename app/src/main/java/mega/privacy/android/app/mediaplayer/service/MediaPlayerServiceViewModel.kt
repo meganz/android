@@ -92,7 +92,6 @@ import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
@@ -113,7 +112,6 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodesByHandlesUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
@@ -186,7 +184,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getThumbnailFromMegaApiUseCase: GetThumbnailFromMegaApiUseCase,
     private val getThumbnailFromMegaApiFolderUseCase: GetThumbnailFromMegaApiFolderUseCase,
     private val getInboxNodeUseCase: GetInboxNodeUseCase,
-    private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
@@ -496,7 +493,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 else -> getRootNodeUseCase()
                             }
                         } else {
-                            getParentNodeUseCase(NodeId(parentHandle))
+                            getUnTypedNodeByHandleUseCase(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
