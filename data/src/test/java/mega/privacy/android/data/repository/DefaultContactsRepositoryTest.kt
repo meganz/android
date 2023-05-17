@@ -30,6 +30,8 @@ import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserId
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
@@ -1011,4 +1014,34 @@ class DefaultContactsRepositoryTest {
             }
         }
     }
+
+    @Test
+    fun `test that empty list is returned when gateway returns null for incoming contact requests`() =
+        runTest {
+            whenever(megaApiGateway.getIncomingContactRequests()).thenReturn(null)
+            assertThat(underTest.getIncomingContactRequests().size).isEqualTo(0)
+        }
+
+    @Test
+    fun `test that api gateway is called when get incoming contact requests is triggered`() =
+        runTest {
+            val contactRequest = mock<MegaContactRequest>()
+            whenever(megaApiGateway.getIncomingContactRequests()).thenReturn(
+                arrayListOf(contactRequest)
+            )
+            whenever(contactRequestMapper(any())).thenReturn(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "sourceEmail",
+                    sourceMessage = "sourceMessage,",
+                    targetEmail = "targetEmail",
+                    creationTime = 1L,
+                    modificationTime = 2L,
+                    status = ContactRequestStatus.Accepted,
+                    isOutgoing = false,
+                    isAutoAccepted = true,
+                )
+            )
+            assertThat(underTest.getIncomingContactRequests().size).isEqualTo(1)
+        }
 }

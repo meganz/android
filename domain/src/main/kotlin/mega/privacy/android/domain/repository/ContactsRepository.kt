@@ -346,4 +346,10 @@ interface ContactsRepository {
      * @return
      */
     suspend fun getContactHandleByEmail(email: String): Long
+
+    /**
+     * Get incoming contact requests
+     * @return list of [ContactRequest]
+     */
+    suspend fun getIncomingContactRequests(): List<ContactRequest>
 }

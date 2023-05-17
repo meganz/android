@@ -1267,9 +1267,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun setViewListeners() {
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                refreshDrawerInfo(false)
-            }
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
 
             override fun onDrawerOpened(drawerView: View) {
                 refreshDrawerInfo(storageState === StorageState.Unknown)
@@ -3696,9 +3694,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun updateNavigationToolbarIcon(numUnreadUserAlerts: Int) {
-        val requests = megaApi.incomingContactRequests
-        val totalIpc = requests?.size ?: 0
-        val totalNotifications = numUnreadUserAlerts + totalIpc
+        val totalIncomingContactRequestCount = viewModel.incomingContactRequests.size
+        val totalNotifications = numUnreadUserAlerts + totalIncomingContactRequestCount
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel) {
                 if (drawerItem === DrawerItem.SEARCH || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.TRANSFERS) {
@@ -9326,22 +9323,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun updateContactRequests(requests: List<ContactRequest>?) {
         Timber.d("onContactRequestsUpdate")
-        if (requests != null) {
-            for (i in requests.indices) {
-                val req: ContactRequest = requests[i]
-                if (req.isOutgoing) {
-                    Timber.d("SENT REQUEST")
-                    Timber.d("STATUS: %s, Contact Handle: %d", req.status, req.handle)
-                    if (req.status === ContactRequestStatus.Accepted) {
-                        viewModel.addNewContact(req.targetEmail)
-                    }
-                } else {
-                    Timber.d("RECEIVED REQUEST")
-                    setContactTitleSection()
-                    Timber.d("STATUS: %s Contact Handle: %d", req.status, req.handle)
-                    if (req.status === ContactRequestStatus.Accepted) {
-                        viewModel.addNewContact(req.sourceEmail)
-                    }
+        requests?.forEach { req ->
+            if (req.isOutgoing) {
+                Timber.d("SENT REQUEST")
+                Timber.d("STATUS: %s, Contact Handle: %d", req.status, req.handle)
+                if (req.status === ContactRequestStatus.Accepted) {
+                    viewModel.addNewContact(req.targetEmail)
+                }
+            } else {
+                Timber.d("RECEIVED REQUEST")
+                setContactTitleSection()
+                Timber.d("STATUS: %s Contact Handle: %d", req.status, req.handle)
+                if (req.status === ContactRequestStatus.Accepted) {
+                    viewModel.addNewContact(req.sourceEmail)
                 }
             }
         }
@@ -9657,6 +9651,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    private fun setContactTitleSection() {
+        val pendingRequest = viewModel.incomingContactRequests
+        if (pendingRequest.isEmpty()) {
+            contactsSectionText.text = getString(R.string.section_contacts)
+        } else {
+            setFormattedContactTitleSection(pendingRequest.size, true)
+        }
+    }
+
     /**
      * This method is used to change the elevation of the AppBarLayout for some reason
      *
@@ -9699,16 +9702,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             this,
             mElevationCause > 0 && !isInMainHomePage
         )
-    }
-
-    private fun setContactTitleSection() {
-        val requests = megaApi.incomingContactRequests
-        val pendingRequest = requests?.size ?: 0
-        if (pendingRequest == 0) {
-            contactsSectionText.text = getString(R.string.section_contacts)
-        } else {
-            setFormattedContactTitleSection(pendingRequest, true)
-        }
     }
 
     private fun setFormattedContactTitleSection(pendingRequest: Int, enable: Boolean) {

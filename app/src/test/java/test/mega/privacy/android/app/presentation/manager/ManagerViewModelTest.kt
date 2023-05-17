@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -205,6 +206,7 @@ class ManagerViewModelTest {
         mock<DeleteOldestCompletedTransfersUseCase>()
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
+    private val getIncomingContactRequestUseCase = mock<GetIncomingContactRequestsUseCase>()
 
     private val getPricing = mock<GetPricing>()
     private val getFullAccountInfo = mock<GetFullAccountInfo>()
@@ -256,6 +258,7 @@ class ManagerViewModelTest {
             saveContactByEmailUseCase = mock(),
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
+            getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase
         )
     }
 
@@ -585,6 +588,31 @@ class ManagerViewModelTest {
         runTest {
             testScheduler.advanceUntilIdle()
             verify(deleteOldestCompletedTransfersUseCase).invoke()
+        }
+
+    @Test
+    fun `test that get incoming contact requests is triggered when there is contact request event`() =
+        runTest {
+            val testObserver = underTest.updateContactsRequests.test()
+            testObserver.assertNoValue()
+
+            monitorContactRequestUpdates.emit(
+                listOf(
+                    ContactRequest(
+                        handle = 1L,
+                        sourceEmail = "",
+                        sourceMessage = null,
+                        targetEmail = "",
+                        creationTime = 1L,
+                        modificationTime = 1L,
+                        status = ContactRequestStatus.Unresolved,
+                        isOutgoing = false,
+                        isAutoAccepted = false,
+                    )
+                )
+            )
+            testScheduler.advanceUntilIdle()
+            verify(getIncomingContactRequestUseCase, times(2)).invoke()
         }
 
     @Test

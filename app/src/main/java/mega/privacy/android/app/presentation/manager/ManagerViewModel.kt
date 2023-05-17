@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.*
+import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -103,6 +104,7 @@ import javax.inject.Inject
  * @property startCameraUploadUseCase
  * @property stopCameraUploadUseCase
  * @property deleteOldestCompletedTransfersUseCase
+ * @property getIncomingContactRequestsUseCase
  *
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
@@ -149,6 +151,7 @@ class ManagerViewModel @Inject constructor(
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     private val createShareKey: CreateShareKey,
     private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
+    private val getIncomingContactRequestsUseCase: GetIncomingContactRequestsUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
@@ -191,6 +194,12 @@ class ManagerViewModel @Inject constructor(
     val monitorOfflineNodeAvailabilityEvent = monitorOfflineNodeAvailabilityUseCase()
 
     /**
+     * The latest incoming contact requests
+     */
+    var incomingContactRequests = emptyList<ContactRequest>()
+        private set
+
+    /**
      * Is network connected
      */
     val isConnected: Boolean
@@ -228,7 +237,6 @@ class ManagerViewModel @Inject constructor(
                 _state.update(it)
             }
         }
-
 
         viewModelScope.launch {
             monitorNodeUpdates().collect {
@@ -273,6 +281,9 @@ class ManagerViewModel @Inject constructor(
                 _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
             }
         }
+        viewModelScope.launch {
+            incomingContactRequests = getIncomingContactRequestsUseCase()
+        }
     }
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
@@ -294,7 +305,17 @@ class ManagerViewModel @Inject constructor(
      * Monitor contact requests
      */
     private val _updateContactRequests = monitorContactRequestUpdates()
+        .onEach { updateIncomingContactRequests() }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
+    /**
+     * Cache up-to-date incoming contact requests in view model
+     */
+    private fun updateIncomingContactRequests() {
+        runBlocking {
+            incomingContactRequests = getIncomingContactRequestsUseCase()
+        }
+    }
 
     /**
      * Monitor user alerts updates and dispatch to observers
@@ -303,6 +324,7 @@ class ManagerViewModel @Inject constructor(
         _updates
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .also { Timber.d("onUserAlertsUpdate") }
+            .onEach { updateIncomingContactRequests() }
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
