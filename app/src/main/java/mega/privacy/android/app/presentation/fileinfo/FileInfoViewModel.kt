@@ -721,8 +721,14 @@ class FileInfoViewModel @Inject constructor(
     private fun updatePreview() {
         viewModelScope.launch {
             if ((typedNode as? TypedFileNode)?.hasPreview == true && _uiState.value.previewUriString == null) {
-                _uiState.update {
-                    it.copy(previewUriString = getPreview(typedNode.id.longValue)?.uriStringIfExists())
+                runCatching {
+                    getPreview(typedNode.id.longValue)
+                }.onSuccess { previewUri ->
+                    _uiState.update {
+                        it.copy(previewUriString = previewUri?.uriStringIfExists())
+                    }
+                }.onFailure {
+                    Timber.e(it)
                 }
             }
         }

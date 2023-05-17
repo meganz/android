@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.presentation.fileinfo
 
 import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -96,7 +97,6 @@ import org.mockito.kotlin.whenever
 import java.io.File
 import java.lang.ref.WeakReference
 import java.net.URI
-import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @ExperimentalCoroutinesApi
@@ -592,6 +592,22 @@ internal class FileInfoViewModelTest {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo(previewUri)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test exception from getPreview is not propagated`() = runTest {
+        whenever(typedFileNode.hasPreview).thenReturn(true)
+        whenever(getPreview.invoke(NODE_HANDLE)).thenAnswer {
+            throw MegaException(
+                -5,
+                "Failed Permanently"
+            )
+        }
+        whenever(typedFileNode.thumbnailPath).thenReturn(null)
+        underTest.setNode(node.handle)
+        underTest.uiState.test {
+            Truth.assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
         }
     }
 
