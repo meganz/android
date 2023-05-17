@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import java.util.Queue
@@ -643,15 +644,14 @@ interface CameraUploadRepository {
     /**
      * Send heartbeat associated with an existing backup
      * @param backupId backup id identifying the backup
-     * @param status   backup state
-     * @param progress backup progress
+     * @param heartbeatStatus   heartbeat status
      * @param ups      Number of pending upload transfers
      * @param downs    Number of pending download transfers
      * @param ts       Last action timestamp
      * @param lastNode Last node handle to be synced
      */
     suspend fun sendBackupHeartbeat(
-        backupId: Long, status: Int, progress: Int, ups: Int, downs: Int,
+        backupId: Long, heartbeatStatus: HeartbeatStatus, ups: Int, downs: Int,
         ts: Long, lastNode: Long,
     )
 

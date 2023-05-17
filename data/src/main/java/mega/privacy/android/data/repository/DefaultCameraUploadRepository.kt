@@ -26,6 +26,7 @@ import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
+import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.LocalStorageException
@@ -64,6 +66,7 @@ import kotlin.coroutines.Continuation
  * @property cameraUploadMediaGateway [CameraUploadMediaGateway]
  * @property cacheGateway [CacheGateway]
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
+ * @property heartbeatStatusIntMapper [HeartbeatStatusIntMapper]
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher [CoroutineDispatcher]
  * @property appEventGateway [AppEventGateway]
@@ -83,6 +86,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val cameraUploadMediaGateway: CameraUploadMediaGateway,
     private val cacheGateway: CacheGateway,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
+    private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
     private val deviceEventGateway: DeviceEventGateway,
@@ -645,8 +649,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun sendBackupHeartbeat(
         backupId: Long,
-        status: Int,
-        progress: Int,
+        heartbeatStatus: HeartbeatStatus,
         ups: Int,
         downs: Int,
         ts: Long,
@@ -656,8 +659,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             val listener = continuation.getRequestListener("sendBackupHeartbeat") { }
             megaApiGateway.sendBackupHeartbeat(
                 backupId,
-                status,
-                progress,
+                heartbeatStatus.value,
+                heartbeatStatusIntMapper(heartbeatStatus),
                 ups,
                 downs,
                 ts,

@@ -52,7 +52,6 @@ import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTra
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
-import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadFinish
@@ -79,6 +78,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NotEnoughStorageException

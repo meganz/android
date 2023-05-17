@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
+import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
@@ -77,6 +78,7 @@ class DefaultCameraUploadRepositoryTest {
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val workerGateway = mock<WorkerGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
+    private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
@@ -112,6 +114,7 @@ class DefaultCameraUploadRepositoryTest {
             cameraUploadMediaGateway = cameraUploadMediaGateway,
             workerGateway = workerGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
+            heartbeatStatusIntMapper = heartbeatStatusIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -138,6 +141,7 @@ class DefaultCameraUploadRepositoryTest {
             cameraUploadMediaGateway,
             workerGateway,
             syncRecordTypeIntMapper,
+            heartbeatStatusIntMapper,
             mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper,
             videoCompressorGateway,

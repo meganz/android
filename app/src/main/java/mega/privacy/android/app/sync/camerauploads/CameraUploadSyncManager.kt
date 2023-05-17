@@ -10,7 +10,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -20,6 +19,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
@@ -205,6 +205,10 @@ object CameraUploadSyncManager {
      *
      * @param heartbeatStatus The heartbeat status
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SendCameraUploadsBackupHeartBeatUseCase")
+    )
     fun sendPrimaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val cuBackup = databaseHandler.cuBackup
         // When the Heartbeat Status is UP_TO_DATE, immediately set its value to PROGRESS_FINISHED (100)
@@ -234,6 +238,10 @@ object CameraUploadSyncManager {
      *
      * @param heartbeatStatus The heartbeat status
      */
+    @Deprecated(
+        message = "Replace all usages with use case",
+        replaceWith = ReplaceWith("SendMediaUploadsBackupHeartBeatUseCase")
+    )
     fun sendSecondaryFolderHeartbeat(heartbeatStatus: HeartbeatStatus) {
         val muBackup = databaseHandler.muBackup
         // When the Heartbeat Status is UP_TO_DATE, immediately set its value to PROGRESS_FINISHED (100)
