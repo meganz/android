@@ -201,10 +201,12 @@ class DragToExitSupport(
 
                 mainView.pivotX = 0F
                 mainView.pivotY = 0F
-                mainView.scaleX = widthScale
-                mainView.scaleY = heightScale
-                mainView.translationX = leftDelta
-                mainView.translationY = topDelta
+                if (widthScale.isFinite() && heightScale.isFinite() && leftDelta.isFinite() && topDelta.isFinite()) {
+                    mainView.scaleX = widthScale
+                    mainView.scaleY = heightScale
+                    mainView.translationX = leftDelta
+                    mainView.translationY = topDelta
+                }
 
                 ivShadow?.alpha = 0F
 
