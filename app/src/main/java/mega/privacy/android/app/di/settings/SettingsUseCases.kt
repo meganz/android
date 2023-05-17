@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.DefaultMonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
@@ -69,9 +68,6 @@ abstract class SettingsUseCases {
     abstract fun bindMonitorMediaDiscoveryView(implementation: DefaultMonitorMediaDiscoveryView): MonitorMediaDiscoveryView
 
     companion object {
-        @Provides
-        fun provideFetchMultiFactorAuthSetting(accountRepository: AccountRepository): FetchMultiFactorAuthSetting =
-            FetchMultiFactorAuthSetting(accountRepository::isMultiFactorAuthEnabled)
 
         @Provides
         fun providePutStringPreference(settingsRepository: SettingsRepository): PutPreference<String> =

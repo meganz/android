@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
@@ -64,7 +64,7 @@ class SettingsViewModel @Inject constructor(
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
-    private val fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
+    private val fetchMultiFactorAuthSettingUseCase: FetchMultiFactorAuthSettingUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
@@ -134,7 +134,7 @@ class SettingsViewModel @Inject constructor(
                 }.map { enabled ->
                     { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
                 },
-                flow { emit(fetchMultiFactorAuthSetting()) }
+                flow { emit(fetchMultiFactorAuthSettingUseCase()) }
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
@@ -187,7 +187,7 @@ class SettingsViewModel @Inject constructor(
     fun refreshMultiFactorAuthSetting() {
         viewModelScope.launch {
             state.update {
-                it.copy(multiFactorAuthChecked = fetchMultiFactorAuthSetting())
+                it.copy(multiFactorAuthChecked = fetchMultiFactorAuthSettingUseCase())
             }
         }
     }

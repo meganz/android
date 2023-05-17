@@ -175,13 +175,15 @@ internal class DefaultAccountRepository @Inject constructor(
 
     @Throws(MegaException::class)
     override suspend fun isMultiFactorAuthEnabled(): Boolean = withContext(ioDispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = onMultiFactorAuthCheckRequestFinish(continuation)
+            )
             megaApiGateway.multiFactorAuthEnabled(
                 megaApiGateway.accountEmail,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onMultiFactorAuthCheckRequestFinish(continuation)
-                )
+                listener
             )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 

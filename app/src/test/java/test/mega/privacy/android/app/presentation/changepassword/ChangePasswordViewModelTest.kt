@@ -20,7 +20,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
@@ -48,7 +48,7 @@ internal class ChangePasswordViewModelTest {
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
     private val resetPasswordUseCase = mock<ResetPasswordUseCase>()
-    private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
+    private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSettingUseCase>()
     private val getRootFolder = mock<GetRootFolder>()
 
     @Before

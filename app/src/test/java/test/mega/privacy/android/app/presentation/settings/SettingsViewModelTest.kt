@@ -19,7 +19,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.SettingsViewModel
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -47,7 +47,7 @@ class SettingsViewModelTest {
         )
     }
     private val toggleAutoAcceptQRLinks = mock<ToggleAutoAcceptQRLinks>()
-    private val fetchMultiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
+    private val fetchMultiFactorAuthSettingUseCase = mock<FetchMultiFactorAuthSettingUseCase>()
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
@@ -81,7 +81,7 @@ class SettingsViewModelTest {
             rootNodeExistsUseCase = mock { on { runBlocking { invoke() } }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
-            fetchMultiFactorAuthSetting = fetchMultiFactorAuthSetting,
+            fetchMultiFactorAuthSettingUseCase = fetchMultiFactorAuthSettingUseCase,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
             monitorHideRecentActivity = monitorHideRecentActivity,
             setHideRecentActivity = setHideRecentActivity,
@@ -118,7 +118,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
-        whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+        whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
         whenever(monitorAutoAcceptQRLinks()).thenReturn(
             flow {
                 emit(true)
@@ -138,7 +138,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `test that logging out of chat disables chat settings`() = runTest {
-        whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+        whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
         underTest.uiState
             .map { it.chatEnabled }
             .distinctUntilChanged()
@@ -192,7 +192,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is enabled when fetching multi factor enabled returns true`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(true)
+            whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(true)
             underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
                 .map { it.multiFactorAuthChecked }
@@ -206,7 +206,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that multi factor is disabled when fetching multi factor enabled returns false`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+            whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
             underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
                 .map { it.multiFactorAuthChecked }
@@ -219,7 +219,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that hideRecentActivityChecked is set with return value of monitorHideRecentActivity`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+            whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
             whenever(monitorHideRecentActivity()).thenReturn(
                 flow {
                     emit(true)
@@ -240,7 +240,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that mediaDiscoveryViewChecked is set with return value of monitorMediaDiscoveryView`() =
         runTest {
-            whenever(fetchMultiFactorAuthSetting()).thenReturn(false)
+            whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
             whenever(monitorMediaDiscoveryView()).thenReturn(
                 flow {
                     emit(0)

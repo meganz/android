@@ -16,7 +16,6 @@ import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
@@ -61,8 +60,6 @@ object TestSettingsModule {
         mock<IsMultiFactorAuthAvailable> { on { invoke() }.thenReturn(true) }
     val fetchAutoAcceptQRLinks =
         mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
-    val fetchMultiFactorAuthSetting =
-        mock<FetchMultiFactorAuthSetting> { onBlocking { invoke() }.thenReturn(false) }
     val monitorHideRecentActivity =
         mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
     val monitorMediaDiscoveryView =
@@ -101,11 +98,6 @@ object TestSettingsModule {
     @Provides
     fun provideFetchContactLinksOption(): FetchAutoAcceptQRLinks =
         fetchAutoAcceptQRLinks
-
-
-    @Provides
-    fun provideFetchMultiFactorAuthSetting(): FetchMultiFactorAuthSetting =
-        fetchMultiFactorAuthSetting
 
 
     @Provides

@@ -17,11 +17,12 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePasswordUseCase
-import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
+import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,7 +34,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val changePasswordUseCase: ChangePasswordUseCase,
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val getRootFolder: GetRootFolder,
-    private val multiFactorAuthSetting: FetchMultiFactorAuthSetting,
+    private val multiFactorAuthSetting: FetchMultiFactorAuthSettingUseCase,
 ) : ViewModel() {
     private var mJob: Job? = null
 
@@ -121,7 +122,7 @@ internal class ChangePasswordViewModel @Inject constructor(
                 it.copy(loadingMessage = R.string.my_account_changing_password)
             }
 
-            multiFactorAuthSetting().also { isEnabled ->
+            runCatching { multiFactorAuthSetting() }.onSuccess { isEnabled ->
                 if (isEnabled) {
                     _uiState.update {
                         it.copy(
@@ -132,6 +133,8 @@ internal class ChangePasswordViewModel @Inject constructor(
                 } else {
                     onExecuteChangePassword(newPassword)
                 }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
