@@ -528,9 +528,8 @@ class ManagerViewModel @Inject constructor(
      * Get product accounts
      *
      */
-    fun getProductAccounts(): List<Product> = runBlocking {
+    suspend fun getProductAccounts(): List<Product> =
         runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
-    }
 
     /**
      * Ask for full account info

@@ -8263,25 +8263,25 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         storageState: StorageState,
         overQuotaAlert: Boolean,
         preWarning: Boolean,
-    ) {
+    ) = lifecycleScope.launch {
         Timber.d("showStorageStatusDialog")
         if (myAccountInfo.accountType == -1) {
             Timber.w("Do not show dialog, not info of the account received yet")
-            return
+            return@launch
         }
         if (isStorageStatusDialogShown) {
             Timber.d("Storage status dialog already shown")
-            return
+            return@launch
         }
-        val dialogBuilder = MaterialAlertDialogBuilder(this)
-        val inflater: LayoutInflater = this.layoutInflater
+        val dialogBuilder = MaterialAlertDialogBuilder(this@ManagerActivity)
+        val inflater: LayoutInflater = this@ManagerActivity.layoutInflater
         val dialogView = inflater.inflate(R.layout.storage_status_dialog_layout, null)
         dialogBuilder.setView(dialogView)
         val title = dialogView.findViewById<TextView>(R.id.storage_status_title)
         title.text = getString(R.string.action_upgrade_account)
         val image = dialogView.findViewById<ImageView>(R.id.image_storage_status)
         val text = dialogView.findViewById<TextView>(R.id.text_storage_status)
-        val pro3 = pRO3OneMonth
+        val pro3 = pRO3OneMonth()
         var storageString: String? = ""
         var transferString: String? = ""
         if (pro3 != null) {
@@ -8291,7 +8291,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         when (storageState) {
             StorageState.Green -> {
                 Timber.d("STORAGE STATE GREEN")
-                return
+                return@launch
             }
 
             StorageState.Orange -> {
@@ -8314,7 +8314,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             else -> {
                 Timber.w("STORAGE STATE INVALID VALUE: %d", storageState.ordinal)
-                return
+                return@launch
             }
         }
         if (overQuotaAlert) {
@@ -8344,7 +8344,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val customPlanClickListener = View.OnClickListener {
             alertDialogStorageStatus?.dismiss()
             isStorageStatusDialogShown = false
-            askForCustomizedPlan(this, megaApi.myEmail, myAccountInfo.accountType)
+            askForCustomizedPlan(this@ManagerActivity, megaApi.myEmail, myAccountInfo.accountType)
         }
         val verticalDismissButton =
             dialogView.findViewById<Button>(R.id.vertical_storage_status_button_dissmiss)
@@ -8441,9 +8441,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     // Edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
-    private val pRO3OneMonth: Product?
-        get() = viewModel.getProductAccounts()
-            .firstOrNull { it.level == Constants.PRO_III && it.months == 1 }
+    private suspend fun pRO3OneMonth(): Product? = viewModel.getProductAccounts()
+        .firstOrNull { it.level == Constants.PRO_III && it.months == 1 }
 
     private fun refreshOfflineNodes() {
         Timber.d("updateOfflineView")
