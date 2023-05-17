@@ -16,7 +16,6 @@ import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetPublicLinks
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -41,11 +40,6 @@ object TestManagerUseCases {
     @Provides
     fun provideMonitorNodeUpdates() = mock<MonitorNodeUpdates> {
         on { run { invoke() } }.thenReturn(flowOf(any()))
-    }
-
-    @Provides
-    fun provideRubbishBinChildrenNode() = mock<GetRubbishBinChildrenNode> {
-        on { runBlocking { invoke(0) } }.thenReturn(emptyList())
     }
 
     @Provides

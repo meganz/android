@@ -11,8 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
@@ -35,13 +36,11 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
-import java.util.Stack
 import javax.inject.Inject
 
 /**
  * [ViewModel] class associated to RubbishBinFragment
  *
- * @param getRubbishBinChildrenNode [GetRubbishBinChildrenNode] Fetch the rubbish bin nodes
  * @param monitorNodeUpdates Monitor node updates
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
@@ -53,7 +52,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
-    private val getRubbishBinChildrenNode: GetRubbishBinChildrenNode,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
     private val getRubbishBinChildren: GetRubbishBinChildren,
@@ -63,6 +61,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
     private val getRubbishBinFolder: GetRubbishBinFolder,
+    private val getNodeByHandle: GetNodeByHandle
 ) : ViewModel() {
 
     /**
@@ -74,11 +73,6 @@ class RubbishBinViewModel @Inject constructor(
      * The RubbishBin UI State accessible outside the ViewModel
      */
     val state: StateFlow<RubbishBinState> = _state
-
-    /**
-     * Stack to maintain folder navigation clicks
-     */
-    private val lastPositionStack = Stack<Int>()
 
     init {
         nodeUpdates()
@@ -121,16 +115,16 @@ class RubbishBinViewModel @Inject constructor(
 
     /**
      * Retrieves the list of Nodes
-     * Call the Use Case [getRubbishBinChildrenNode] to retrieve and return the list of Nodes
+     * Call the Use Case [getRubbishBinChildren] to retrieve and return the list of Nodes
      *
      * @return a List of Inbox Nodes
      */
     fun refreshNodes() {
         viewModelScope.launch {
-            val nodeList = getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
+            val nodeList =
+                getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
             _state.update {
                 it.copy(
-                    nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
                     nodeList = nodeList,
                     sortOrder = getCloudSortOrder(),
@@ -167,27 +161,10 @@ class RubbishBinViewModel @Inject constructor(
     }
 
     /**
-     * Pop scroll position for previous depth
-     *
-     * @return last position saved
-     */
-    fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
-
-    /**
-     * Push lastPosition to stack
-     * @param lastPosition last position to be added to stack
-     */
-    private fun pushPositionOnStack(lastPosition: Int) {
-        lastPositionStack.push(lastPosition)
-    }
-
-    /**
      * Performs action when folder is clicked from adapter
-     * @param lastFirstVisiblePosition visible position based on listview type
      * @param handle node handle
      */
-    fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
-        pushPositionOnStack(lastFirstVisiblePosition)
+    private fun onFolderItemClicked(handle: Long) {
         setRubbishBinHandle(handle)
         onItemPerformedClicked()
     }
@@ -246,7 +223,7 @@ class RubbishBinViewModel @Inject constructor(
                     }
                 }
             } else {
-                onFolderItemClicked(0, nodeUIItem.id.longValue)
+                onFolderItemClicked(nodeUIItem.id.longValue)
             }
         }
     }
@@ -382,14 +359,8 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * Given a list of Node Handles, this retrieves the list of Nodes that were selected by the User
      */
-    fun retrieveSelectedMegaNodes() {
-        val megaNodeList = mutableListOf<MegaNode>()
-        _state.value.selectedNodeHandles.forEach {
-            val selectedMegaNode = state.value.nodes.find { megaNode -> megaNode.handle == it }
-            selectedMegaNode?.let { megaNode ->
-                megaNodeList.add(megaNode)
-            }
-        }
+    private suspend fun retrieveSelectedMegaNodes() {
+        val megaNodeList = _state.value.selectedNodeHandles.mapNotNull { getNodeByHandle(it) }
         updateSelectedMegaNodes(megaNodeList)
     }
 

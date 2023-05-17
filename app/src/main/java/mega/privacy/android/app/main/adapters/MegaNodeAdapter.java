@@ -90,7 +90,6 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
-import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
 import mega.privacy.android.app.presentation.shares.links.LinksFragment;
@@ -412,9 +411,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     void hideMultipleSelect() {
         if (selectedItems.size() <= 0) {
-            if (type == RUBBISH_BIN_ADAPTER) {
-                ((RubbishBinFragment) fragment).hideMultipleSelect();
-            } else if (type == INBOX_ADAPTER) {
+            if (type == INBOX_ADAPTER) {
                 ((InboxFragment) fragment).hideMultipleSelect();
             } else if (type == INCOMING_SHARES_ADAPTER) {
                 ((IncomingSharesFragment) fragment).hideMultipleSelect();
@@ -1293,9 +1290,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     private void fileClicked(int currentPosition) {
-        if (type == RUBBISH_BIN_ADAPTER) {
-            ((RubbishBinFragment) fragment).itemClick(currentPosition);
-        } else if (type == INBOX_ADAPTER) {
+        if (type == INBOX_ADAPTER) {
             ((InboxFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {
             ((IncomingSharesFragment) fragment).itemClick(currentPosition);
@@ -1324,9 +1319,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         if (isMultipleSelect()) {
-            if (type == RUBBISH_BIN_ADAPTER) {
-                ((RubbishBinFragment) fragment).itemClick(currentPosition);
-            } else if (type == INBOX_ADAPTER) {
+            if (type == INBOX_ADAPTER) {
                 ((InboxFragment) fragment).onNodeSelected(currentPosition);
             } else if (type == INCOMING_SHARES_ADAPTER) {
                 ((IncomingSharesFragment) fragment).itemClick(currentPosition);
@@ -1369,10 +1362,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
         ViewHolderBrowser holder = (ViewHolderBrowser) view.getTag();
         int currentPosition = holder.getAdapterPosition();
-        if (type == RUBBISH_BIN_ADAPTER) {
-            ((RubbishBinFragment) fragment).activateActionMode();
-            ((RubbishBinFragment) fragment).itemClick(currentPosition);
-        } else if (type == INBOX_ADAPTER) {
+        if (type == INBOX_ADAPTER) {
             ((InboxFragment) fragment).activateActionMode();
             ((InboxFragment) fragment).onNodeSelected(currentPosition);
         } else if (type == INCOMING_SHARES_ADAPTER) {

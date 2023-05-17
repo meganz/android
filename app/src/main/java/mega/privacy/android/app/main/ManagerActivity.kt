@@ -225,7 +225,6 @@ import mega.privacy.android.app.presentation.photos.timeline.photosfilter.Photos
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
-import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchFragment
 import mega.privacy.android.app.presentation.search.SearchViewModel
@@ -577,7 +576,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     // Fragments
     private var fileBrowserFragment: FileBrowserFragment? = null
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
-    private var rubbishBinFragment: RubbishBinFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
     private var inboxFragment: InboxFragment? = null
@@ -2512,12 +2510,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Checks if RubbishBinCompose enabled from [AppFeatures.RubbishBinCompose]
-     */
-    private fun isRubbishBinComposeEnabled() =
-        isFeatureEnabled(AppFeatures.RubbishBinCompose)
-
-    /**
      * Checks if ileBrowserCompose enabled from [AppFeatures.FileBrowserCompose]
      */
     private fun isFileBrowserComposeEnabled(): Boolean =
@@ -4263,27 +4255,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.RUBBISH_BIN -> {
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
-                lifecycleScope.launch {
-                    if (isRubbishBinComposeEnabled()) {
-                        rubbishBinComposeFragment = getRubbishBinComposeFragment()
-                            ?: RubbishBinComposeFragment.newInstance()
-                        rubbishBinComposeFragment?.let {
-                            replaceFragment(
-                                it,
-                                FragmentTag.RUBBISH_BIN_COMPOSE.tag
-                            )
-                        }
-                    } else {
-                        rubbishBinFragment =
-                            getRubbishBinFragment() ?: RubbishBinFragment.newInstance()
-                        rubbishBinFragment?.let { replaceFragment(it, FragmentTag.RUBBISH_BIN.tag) }
-                    }
-                    setBottomNavigationMenuItemChecked(NO_BNV)
 
-                    if (openFolderRefresh) {
-                        onNodesCloudDriveUpdate()
-                        openFolderRefresh = false
-                    }
+                rubbishBinComposeFragment = getRubbishBinComposeFragment()
+                    ?: RubbishBinComposeFragment.newInstance()
+                rubbishBinComposeFragment?.let {
+                    replaceFragment(
+                        it,
+                        FragmentTag.RUBBISH_BIN_COMPOSE.tag
+                    )
+                }
+
+                setBottomNavigationMenuItemChecked(NO_BNV)
+
+                if (openFolderRefresh) {
+                    onNodesCloudDriveUpdate()
+                    openFolderRefresh = false
                 }
 
                 supportInvalidateOptionsMenu()
@@ -4637,13 +4623,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            DrawerItem.RUBBISH_BIN -> {
-                rubbishBinFragment = getRubbishBinFragment()
-                if (rubbishBinFragment != null) {
-                    rubbishBinFragment?.checkScroll()
-                }
-            }
-
             DrawerItem.TRANSFERS -> {
                 if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded) {
                     transfersFragment?.updateElevation()
@@ -4981,7 +4960,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 DrawerItem.RUBBISH_BIN -> {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (rubbishBinViewModel.state.value.nodes.isNotEmpty()) {
+                    if (rubbishBinViewModel.state.value.nodeList.isNotEmpty()) {
                         clearRubbishBinMenuItem?.isVisible = isFirstNavigationLevel
                         searchMenuItem?.isVisible = true
                     }
@@ -5161,8 +5140,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else if (drawerItem === DrawerItem.SYNC) {
                         onBackPressedDispatcher.onBackPressed()
                     } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
-                        rubbishBinFragment = getRubbishBinFragment()
-                        rubbishBinFragment?.onBackPressed()
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
                         rubbishBinComposeFragment?.onBackPressed()
                     } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
@@ -5284,9 +5261,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     DrawerItem.RUBBISH_BIN -> {
-                        if (getRubbishBinFragment() != null) {
-                            getRubbishBinFragment()?.selectAll()
-                        }
                         if (getRubbishBinComposeFragment() != null) {
                             rubbishBinViewModel.selectAllNodes()
                         }
@@ -5539,17 +5513,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.SYNC) {
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
-            rubbishBinFragment = getRubbishBinFragment()
             rubbishBinComposeFragment = getRubbishBinComposeFragment()
-            if (isRubbishBinComposeEnabled()) {
-                if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
-                    backToDrawerItem(bottomNavigationCurrentItem)
-                }
-            } else {
-                if (rubbishBinFragment == null || rubbishBinFragment?.onBackPressed() == 0) {
-                    backToDrawerItem(bottomNavigationCurrentItem)
-                }
+            if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
+                backToDrawerItem(bottomNavigationCurrentItem)
             }
+
         } else if (drawerItem === DrawerItem.TRANSFERS) {
             backToDrawerItem(bottomNavigationCurrentItem)
             if (transfersToImageViewer) {
@@ -6512,12 +6480,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun showClearRubbishBinDialog() {
         Timber.d("showClearRubbishBinDialog")
-        rubbishBinFragment = getRubbishBinFragment()
-        if (rubbishBinFragment != null) {
-            if (rubbishBinFragment?.isVisible == true) {
-                rubbishBinFragment?.notifyDataSetChanged()
-            }
-        }
         val builder = MaterialAlertDialogBuilder(this)
         builder.setTitle(getString(R.string.context_clear_rubbish))
         builder.setMessage(getString(R.string.clear_rubbish_confirmation))
@@ -9315,8 +9277,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun onNodesCloudDriveUpdate() {
         Timber.d("onNodesCloudDriveUpdate")
-        rubbishBinFragment = getRubbishBinFragment()
-        rubbishBinFragment?.hideMultipleSelect()
         refreshRubbishBin()
         pagerOfflineFragment?.refreshNodes()
         refreshCloudDrive()
@@ -10244,12 +10204,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun thereAreFailedOrCancelledTransfers(): Boolean {
         return failedAndCancelledTransfers.size > 0
-    }
-
-    private fun getRubbishBinFragment(): RubbishBinFragment? {
-        return (supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment).also {
-            rubbishBinFragment = it
-        }
     }
 
     private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {

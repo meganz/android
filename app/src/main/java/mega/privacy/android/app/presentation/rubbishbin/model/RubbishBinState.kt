@@ -8,7 +8,6 @@ import nz.mega.sdk.MegaNode
 
 /**
  *  @property rubbishBinHandle The current RubbishBin Handle
- *  @property nodes List of RubbishBin Nodes
  *  @property parentHandle parent handle of the current node
  *  @property nodeList List of [NodeUIItem]
  *  @property selectedFileNodes number of selected file [NodeUIItem] on Compose
@@ -26,7 +25,6 @@ import nz.mega.sdk.MegaNode
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
-    val nodes: List<MegaNode> = emptyList(),
     val parentHandle: Long? = null,
     val nodeList: List<NodeUIItem> = emptyList(),
     val selectedFileNodes: Int = 0,

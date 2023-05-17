@@ -12,7 +12,7 @@ import javax.inject.Inject
  *
  *  @property nodeRepository [NodeRepository]
  *  @property getCloudSortOrder [GetCloudSortOrder]
- *  @property getRubbishBinFolder [GetRubbishBinChildren]
+ *  @property getRubbishBinFolder [GetRubbishBinFolder]
  */
 class DefaultGetRubbishBinChildren @Inject constructor(
     private val nodeRepository: NodeRepository,
@@ -20,7 +20,13 @@ class DefaultGetRubbishBinChildren @Inject constructor(
     private val getRubbishBinFolder: GetRubbishBinFolder,
     private val addNodeType: AddNodeType,
 ) : GetRubbishBinChildren {
-    override suspend fun invoke(parentHandle: Long): List<TypedNode> {
+    /**
+     * Get children nodes of the rubbish bin parent handle
+     *
+     * @param parentHandle
+     * @return Children nodes of the parent handle, null if cannot be retrieved
+     */
+    override suspend operator fun invoke(parentHandle: Long): List<TypedNode> {
         val nodeID = if (parentHandle == nodeRepository.getInvalidHandle()) {
             getRubbishBinFolder()?.let {
                 NodeId(longValue = it.handle)

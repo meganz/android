@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -19,9 +18,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultGetRubbishBinChildrenTest {
+class GetRubbishBinChildrenUseCaseTest {
 
-    private lateinit var underTest: GetRubbishBinChildren
+    private lateinit var underTest: DefaultGetRubbishBinChildren
     private val nodeRepository: NodeRepository = mock()
     private val getCloudSortOrder: GetCloudSortOrder = mock()
     private val getRubbishBinFolder: GetRubbishBinFolder = mock()

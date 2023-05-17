@@ -295,7 +295,6 @@ class RubbishBinComposeFragment : Fragment() {
                     rubbishBinViewModel.onBackPressed()
                     invalidateOptionsMenu()
                     setToolbarTitle()
-                    rubbishBinViewModel.popLastPositionStack()
                     2
                 } ?: run {
                     0

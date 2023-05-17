@@ -11,15 +11,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
-import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -47,16 +45,16 @@ class RubbishBinViewModelTest {
 
     private lateinit var underTest: RubbishBinViewModel
 
-    private val getRubbishBinChildrenNode = mock<GetRubbishBinChildrenNode>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
-    private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val getIntentToOpenFileMapper = mock<GetIntentToOpenFileMapper>()
     private val getRubbishBinFolder = mock<GetRubbishBinFolder>()
+    private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -69,7 +67,6 @@ class RubbishBinViewModelTest {
 
     private fun initViewModel() {
         underTest = RubbishBinViewModel(
-            getRubbishBinChildrenNode = getRubbishBinChildrenNode,
             monitorNodeUpdates = monitorNodeUpdates,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
             getRubbishBinChildren = getRubbishBinChildren,
@@ -78,7 +75,8 @@ class RubbishBinViewModelTest {
             monitorViewType = monitorViewType,
             getCloudSortOrder = getCloudSortOrder,
             getIntentToOpenFileMapper = getIntentToOpenFileMapper,
-            getRubbishBinFolder = getRubbishBinFolder
+            getRubbishBinFolder = getRubbishBinFolder,
+            getNodeByHandle = getNodeByHandle
         )
     }
 
@@ -87,7 +85,6 @@ class RubbishBinViewModelTest {
         underTest.state.test {
             val initial = awaitItem()
             Truth.assertThat(initial.rubbishBinHandle).isEqualTo(-1L)
-            Truth.assertThat(initial.nodes).isEmpty()
             Truth.assertThat(initial.parentHandle).isNull()
             Truth.assertThat(initial.nodeList).isEmpty()
             Truth.assertThat(initial.selectedFileNodes).isEqualTo(0)
@@ -120,73 +117,19 @@ class RubbishBinViewModelTest {
     fun `test that on setting rubbish bin handle rubbish bin node returns empty list`() =
         runTest {
             val newValue = 123456789L
-            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(ArrayList())
+            whenever(getRubbishBinChildren.invoke(newValue)).thenReturn(ArrayList())
             monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
             underTest.setRubbishBinHandle(newValue)
-            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
-        }
-
-    @Test
-    fun `test that on setting rubbish bin handle rubbish bin node returns some items in list`() =
-        runTest {
-            val newValue = 123456789L
-            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(
-                listOf(
-                    mock(),
-                    mock()
-                )
-            )
-            whenever(getRubbishBinChildren(newValue)).thenReturn(
-                listOf<TypedFolderNode>(mock(), mock())
-            )
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
-            val update = mapOf<Node, List<NodeChanges>>(
-                mock<Node>() to emptyList(),
-                mock<Node>() to emptyList()
-            )
-            monitorNodeUpdates.emit(NodeUpdate(update))
-            underTest.setRubbishBinHandle(newValue)
-            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(2)
+            Truth.assertThat(underTest.state.value.nodeList.size).isEqualTo(0)
         }
 
     @Test
     fun `test that on setting rubbish bin handle rubbish bin node returns null`() = runTest {
         val newValue = 123456789L
-        whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(null)
         whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
         underTest.setRubbishBinHandle(newValue)
-        Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
-        verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
-    }
-
-    @Test
-    fun `test that when folder is clicked from adapter, then stack gets updated with appropriate value`() =
-        runTest {
-            val lastFirstVisiblePosition = 123456
-            val newValue = 12345L
-
-            whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(
-                listOf(
-                    mock(),
-                    mock()
-                )
-            )
-            val update = mapOf<Node, List<NodeChanges>>(
-                mock<Node>() to emptyList(),
-                mock<Node>() to emptyList()
-            )
-            monitorNodeUpdates.emit(NodeUpdate(update))
-            underTest.setRubbishBinHandle(newValue)
-
-            underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)
-            Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
-        }
-
-    @Test
-    fun `test that last position returns 0 when items are popped from stack and stack has no items`() {
-        val poppedValue = underTest.popLastPositionStack()
-        Truth.assertThat(poppedValue).isEqualTo(0)
+        Truth.assertThat(underTest.state.value.nodeList.size).isEqualTo(0)
+        verify(getRubbishBinChildren, times(1)).invoke(newValue)
     }
 
     @Test
@@ -194,7 +137,7 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             underTest.onBackPressed()
-            verify(getRubbishBinChildrenNode, times(0)).invoke(newValue)
+            verify(getRubbishBinChildren, times(0)).invoke(newValue)
         }
 
     @Test
@@ -205,7 +148,7 @@ class RubbishBinViewModelTest {
             whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
             underTest.setRubbishBinHandle(newValue)
             underTest.onBackPressed()
-            verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
+            verify(getRubbishBinChildren, times(1)).invoke(newValue)
         }
 
     @Test
@@ -215,9 +158,6 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(mock(), mock())
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -245,9 +185,6 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(mock(), mock())
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -283,9 +220,6 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(mock(), mock())
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -328,9 +262,6 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(mock(), mock())
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -353,9 +284,6 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(mock(), mock())
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -373,45 +301,12 @@ class RubbishBinViewModelTest {
         }
 
     @Test
-    fun `when restore items are clicked then list of selected mega nodes is equal to list of selected node handle`() =
-        runTest {
-            val nodesListItem1 = mock<TypedFolderNode>()
-            val nodesListItem2 = mock<TypedFileNode>()
-            val megaNode1 = mock<MegaNode>()
-            val megaNode2 = mock<MegaNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(megaNode1.handle).thenReturn(1L)
-            whenever(megaNode2.handle).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(megaNode1, megaNode2)
-            )
-            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(nodesListItem1, nodesListItem2)
-            )
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
-
-            underTest.refreshNodes()
-            underTest.selectAllNodes()
-            underTest.retrieveSelectedMegaNodes()
-            Truth.assertThat(underTest.state.value.selectedNodeHandles.size)
-                .isEqualTo(underTest.state.value.selectedMegaNodes?.size)
-        }
-
-    @Test
     fun `test that when any file item is clicked and no other item is selected then it updates FileNode in state`() =
         runTest {
             val nodesListItem1 = mock<TypedFolderNode>()
             val nodesListItem2 = mock<TypedFileNode>()
-            val megaNode1 = mock<MegaNode>()
-            val megaNode2 = mock<MegaNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
-            whenever(megaNode1.handle).thenReturn(1L)
-            whenever(megaNode2.handle).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(megaNode1, megaNode2)
-            )
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
@@ -434,20 +329,22 @@ class RubbishBinViewModelTest {
         runTest {
             val nodesListItem1 = mock<TypedFolderNode>()
             val nodesListItem2 = mock<TypedFileNode>()
-            val megaNode1 = mock<MegaNode>()
-            val megaNode2 = mock<MegaNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
+
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(megaNode1, megaNode2)
-            )
+
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(true)
+
+            whenever(getNodeByHandle(1L)).thenReturn(megaNode1)
+            whenever(getNodeByHandle(2L)).thenReturn(megaNode2)
 
             underTest.refreshNodes()
             underTest.selectAllNodes()
@@ -463,21 +360,22 @@ class RubbishBinViewModelTest {
         runTest {
             val nodesListItem1 = mock<TypedFolderNode>()
             val nodesListItem2 = mock<TypedFileNode>()
-            val megaNode1 = mock<MegaNode>()
-            val megaNode2 = mock<MegaNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(megaNode1, megaNode2)
-            )
+
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(isNodeDeletedFromBackupsUseCase(NodeId(1L))).thenReturn(true)
             whenever(isNodeDeletedFromBackupsUseCase(NodeId(2L))).thenReturn(false)
+
+            whenever(getNodeByHandle(1L)).thenReturn(megaNode1)
+            whenever(getNodeByHandle(2L)).thenReturn(megaNode2)
 
             underTest.refreshNodes()
             underTest.selectAllNodes()
@@ -495,18 +393,17 @@ class RubbishBinViewModelTest {
             val nodesListItem2 = mock<TypedFileNode>()
             val megaNode1 = mock<MegaNode>()
             val megaNode2 = mock<MegaNode>()
-            whenever(nodesListItem1.id.longValue).thenReturn(1L)
-            whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(megaNode1.handle).thenReturn(1L)
             whenever(megaNode2.handle).thenReturn(2L)
-            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
-                listOf(megaNode1, megaNode2)
-            )
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             whenever(isNodeDeletedFromBackupsUseCase(NodeId(any()))).thenReturn(false)
+            whenever(getNodeByHandle(1L)).thenReturn(megaNode1)
+            whenever(getNodeByHandle(2L)).thenReturn(megaNode2)
 
             underTest.refreshNodes()
             underTest.selectAllNodes()
