@@ -164,16 +164,12 @@ class GlobalListener @Inject constructor(
         Timber.d("onAccountUpdate")
 
         applicationScope.launch {
-            runCatching {
-                broadcastAccountUpdateUseCase()
-                getPaymentMethod(true)
-                getPricing(true)
-                dbH.resetExtendedAccountDetailsTimestamp()
-                getAccountDetailsUseCase(forceRefresh = true)
-                getNumberOfSubscription(true)
-            }.onFailure {
-                Timber.e(it)
-            }
+            runCatching { broadcastAccountUpdateUseCase() }.onFailure { Timber.e(it) }
+            runCatching { getPaymentMethod(true) }.onFailure { Timber.e(it) }
+            runCatching { getPricing(true) }.onFailure { Timber.e(it) }
+            runCatching { dbH.resetExtendedAccountDetailsTimestamp() }.onFailure { Timber.e(it) }
+            runCatching { getAccountDetailsUseCase(forceRefresh = true) }.onFailure { Timber.e(it) }
+            runCatching { getNumberOfSubscription(true) }.onFailure { Timber.e(it) }
         }
     }
 
