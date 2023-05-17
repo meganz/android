@@ -64,7 +64,7 @@ class VersionsFileViewModelTest {
     }
 
     @Test
-    fun `test that the node is not a backup node by default if the node handle is null`() =
+    fun `test that the node is not a backup node by default when the node handle is null`() =
         runTest {
             underTest.init(null)
             underTest.state.test {
@@ -76,7 +76,7 @@ class VersionsFileViewModelTest {
 
     @ParameterizedTest(name = "is node in backups: {0}")
     @ValueSource(booleans = [true, false])
-    fun `test that the node could be a backup node on initialization`(isNodeInBackups: Boolean) =
+    fun `test that the node can be a backup node when initialized`(isNodeInBackups: Boolean) =
         runTest {
             whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
 
@@ -86,9 +86,21 @@ class VersionsFileViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "when isNodeInInbox is {0} and isCurrentVersionSelected is {1}, show delete versions button is {2}")
+    @Test
+    fun `test that the action bar delete button is hidden when there are no versions selected`() =
+        runTest {
+            whenever(isNodeInInbox(any())).thenReturn(false)
+            underTest.init(123456L)
+            val expected = underTest.showDeleteVersionsButton(
+                selectedVersions = 0,
+                isCurrentVersionSelected = false,
+            )
+            assertThat(expected).isFalse()
+        }
+
+    @ParameterizedTest(name = "when isNodeInBackups is {0} and isCurrentVersionSelected is {1}, show delete versions button is {2}")
     @MethodSource("provideDeleteParameters")
-    fun `test that the action bar delete button visibility is handled`(
+    fun `test that the visibility of the action bar delete button is handled when there are versions selected`(
         isNodeInBackups: Boolean,
         isCurrentVersionSelected: Boolean,
         showDeleteVersionsButton: Boolean,
@@ -96,14 +108,82 @@ class VersionsFileViewModelTest {
         whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
 
         underTest.init(123456L)
-        val expected = underTest.showDeleteVersionsButton(isCurrentVersionSelected)
+        val expected = underTest.showDeleteVersionsButton(
+            selectedVersions = 1,
+            isCurrentVersionSelected = isCurrentVersionSelected,
+        )
         assertThat(expected).isEqualTo(showDeleteVersionsButton)
     }
 
+    /**
+     * Provides parameters for the test concerning the "Delete" button visibility
+     *
+     * The parameters are ordered into:
+     * 1. Is Node in Backups
+     * 2. Is Current Version Selected
+     * 3. Show Delete Versions Button
+     */
     private fun provideDeleteParameters() = Stream.of(
-        Arguments.of(false, true, true),
-        Arguments.of(false, false, true),
         Arguments.of(true, true, false),
         Arguments.of(true, false, true),
+        Arguments.of(false, true, true),
+        Arguments.of(false, false, true),
     )
+
+    @Test
+    fun `test that the action bar revert button is hidden when there are no versions selected`() =
+        runTest {
+            whenever(isNodeInInbox(any())).thenReturn(false)
+            underTest.init(123456L)
+            val expected = underTest.showRevertVersionButton(
+                selectedVersions = 0,
+                isCurrentVersionSelected = false,
+            )
+            assertThat(expected).isFalse()
+        }
+
+    @ParameterizedTest(name = "when isNodeInBackups is {0} and isCurrentVersionSelected is {1}, show revert version button is {2}")
+    @MethodSource("provideRevertParameters")
+    fun `test that the visibility of the action bar revert button is handled when there is only one version selected`(
+        isNodeInBackups: Boolean,
+        isCurrentVersionSelected: Boolean,
+        showRevertVersionButton: Boolean,
+    ) = runTest {
+        whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
+
+        underTest.init(123456L)
+        val expected = underTest.showRevertVersionButton(
+            selectedVersions = 1,
+            isCurrentVersionSelected = isCurrentVersionSelected,
+        )
+        assertThat(expected).isEqualTo(showRevertVersionButton)
+    }
+
+    /**
+     * Provides parameters for the test concerning the "Revert" button visibility
+     *
+     * The parameters are ordered into:
+     * 1. Is Node in Backups
+     * 2. Is Current Version Selected
+     * 3. Show Revert Version Button
+     */
+    private fun provideRevertParameters() = Stream.of(
+        Arguments.of(true, true, false),
+        Arguments.of(true, false, false),
+        Arguments.of(false, true, false),
+        Arguments.of(false, false, true),
+    )
+
+    @Test
+    fun `test that the action bar revert button is hidden when there are more than one version selected`() =
+        runTest {
+            whenever(isNodeInInbox(any())).thenReturn(false)
+
+            underTest.init(123456L)
+            val expected = underTest.showRevertVersionButton(
+                selectedVersions = 2,
+                isCurrentVersionSelected = false,
+            )
+            assertThat(expected).isFalse()
+        }
 }

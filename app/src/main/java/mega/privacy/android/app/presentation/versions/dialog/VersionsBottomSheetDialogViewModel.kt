@@ -48,6 +48,8 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
                 savedStateHandle[VersionsBottomSheetDialogFragment.PARAM_NODE_HANDLE]
             val selectedNodePosition: Int =
                 savedStateHandle[VersionsBottomSheetDialogFragment.PARAM_SELECTED_POSITION] ?: -1
+            val versionsCount: Int =
+                savedStateHandle[VersionsBottomSheetDialogFragment.PARAM_VERSIONS_COUNT] ?: 0
 
             nodeHandle?.let { nonNullHandle ->
                 // Async-Await is used here in order to prevent the hidden options from being
@@ -59,14 +61,18 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
                 val isNodeTheCurrentVersion = selectedNodePosition == 0
                 val isDeleteAccessPermissionEligible =
                     isDeleteAccessPermissionEligible(accessPermission.await())
-
-                val canDeleteVersion = if (isNodeInBackups.await()) {
-                    !isNodeTheCurrentVersion && isDeleteAccessPermissionEligible
-                } else isDeleteAccessPermissionEligible
-                val canRevertVersion = if (isNodeInBackups.await()) {
-                    false
-                } else !isNodeTheCurrentVersion && isRevertAccessPermissionEligible(
-                    accessPermission.await()
+                val canDeleteVersion = canDeleteVersion(
+                    isDeleteAccessPermissionEligible = isDeleteAccessPermissionEligible,
+                    isNodeInBackups = isNodeInBackups.await(),
+                    isNodeTheCurrentVersion = isNodeTheCurrentVersion,
+                    versionsCount = versionsCount,
+                )
+                val canRevertVersion = canRevertVersion(
+                    isNodeInBackups = isNodeInBackups.await(),
+                    isNodeTheCurrentVersion = isNodeTheCurrentVersion,
+                    isRevertAccessPermissionEligible = isRevertAccessPermissionEligible(
+                        accessPermission.await(),
+                    ),
                 )
 
                 _state.update {
@@ -81,8 +87,54 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
     }
 
     /**
+     * Checks whether this Version can be deleted or not
+     *
+     * @param isDeleteAccessPermissionEligible true if the current Node Access Permission meets any
+     * of the listed [AccessPermission] for deleting a Version, and false if otherwise
+     * @param isNodeInBackups true if the Node exists in Backups, and false if otherwise
+     * @param isNodeTheCurrentVersion true if this is the Current Version, and false if otherwise
+     * @param versionsCount The current number of Versions in the file
+     *
+     * @return true if this Version can be deleted, and false if otherwise
+     */
+    private fun canDeleteVersion(
+        isDeleteAccessPermissionEligible: Boolean,
+        isNodeInBackups: Boolean,
+        isNodeTheCurrentVersion: Boolean,
+        versionsCount: Int,
+    ) = if (isNodeInBackups) {
+        isNodeTheCurrentVersion.not() && isDeleteAccessPermissionEligible
+    } else {
+        if (versionsCount > 1) isDeleteAccessPermissionEligible
+        else false
+    }
+
+    /**
+     * Checks whether this Version can be reverted or not
+     *
+     * @param isNodeInBackups true if the Node exists in Backups, and false if otherwise
+     * @param isNodeTheCurrentVersion true if this is the Current Version, and false if otherwise
+     * @param isRevertAccessPermissionEligible true if the current Node Access Permission meets any
+     * of the listed [AccessPermission] for reverting a Version, and false if otherwise
+     *
+     * @return true if this Version can be reverted, and false if otherwise
+     */
+    private fun canRevertVersion(
+        isNodeInBackups: Boolean,
+        isNodeTheCurrentVersion: Boolean,
+        isRevertAccessPermissionEligible: Boolean,
+    ) = if (isNodeInBackups) {
+        false
+    } else {
+        isNodeTheCurrentVersion.not() && isRevertAccessPermissionEligible
+    }
+
+    /**
      * Checks whether the current Node Access Permission meets any of the listed
      * [AccessPermission] for deleting a Version
+     *
+     * @return true if the Access Permission makes the Version eligible to be deleted, and false
+     * if otherwise
      */
     private fun isDeleteAccessPermissionEligible(accessPermission: AccessPermission?) =
         accessPermission in listOf(AccessPermission.FULL, AccessPermission.OWNER)
@@ -90,6 +142,9 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
     /**
      * Checks whether the current Node Access Permission meets any of the listed
      * [AccessPermission] for reverting a Version
+     *
+     * @return true if the Access Permission makes the Version eligible to be reverted, and false
+     * if otherwise
      */
     private fun isRevertAccessPermissionEligible(accessPermission: AccessPermission?) =
         accessPermission in listOf(

@@ -210,7 +210,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             val nodes = adapter?.selectedNodeVersions?.first
             when (item.itemId) {
                 R.id.cab_menu_select_all -> {
-                    selectAll()
+                    selectAllClicked()
                 }
                 R.id.cab_menu_unselect_all -> {
                     clearSelections()
@@ -263,42 +263,35 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
             Timber.d("onPrepareActionMode")
 
-            adapter?.let { adapter ->
-                adapter.selectedNodeVersions.let { selectedNodesPair ->
-                    with(menu) {
-                        val selectedNodes = selectedNodesPair.first
-                        val isCurrentVersionSelected = selectedNodesPair.second
+            // Call Adapter functionalities
+            val selectedVersions = adapter?.selectedNodeVersions?.first ?: emptyList()
+            val isCurrentVersionSelected = adapter?.selectedNodeVersions?.second ?: false
+            val areAllPreviousVersionsSelected =
+                adapter?.areAllPreviousVersionsSelected() ?: false
 
-                        if (selectedNodes.size != 0) {
-                            val unselect = menu.findItem(R.id.cab_menu_unselect_all)
-                            if (selectedNodes.size == adapter.itemCount) {
-                                findItem(R.id.cab_menu_select_all).isVisible = false
-                                unselect.title = getString(R.string.action_unselect_all)
-                                unselect.isVisible = true
-                            } else {
-                                findItem(R.id.cab_menu_select_all).isVisible = true
-                                unselect.title = getString(R.string.action_unselect_all)
-                                unselect.isVisible = true
-                            }
-                            if (selectedNodes.size == 1) {
-                                findItem(R.id.action_revert_version).isVisible =
-                                    selectedPosition != 0
-                                findItem(R.id.action_download_versions).isVisible = true
-                            } else {
-                                findItem(R.id.action_revert_version).isVisible = false
-                                findItem(R.id.action_download_versions).isVisible = false
-                            }
-                            findItem(R.id.action_delete_versions).isVisible =
-                                viewModel.showDeleteVersionsButton(isCurrentVersionSelected)
-                        } else {
-                            findItem(R.id.cab_menu_select_all).isVisible = true
-                            findItem(R.id.cab_menu_unselect_all).isVisible = false
-                            findItem(R.id.action_download_versions).isVisible = false
-                            findItem(R.id.action_delete_versions).isVisible = false
-                            findItem(R.id.action_revert_version).isVisible = false
-                        }
-                    }
-                }
+            // Menu Items
+            val selectAll = menu.findItem(R.id.cab_menu_select_all)
+            val unselectAll = menu.findItem(R.id.cab_menu_unselect_all)
+            val revertVersion = menu.findItem(R.id.action_revert_version)
+            val downloadVersions = menu.findItem(R.id.action_download_versions)
+            val deleteVersions = menu.findItem(R.id.action_delete_versions)
+
+            revertVersion.isVisible = viewModel.showRevertVersionButton(
+                selectedVersions = selectedVersions.size,
+                isCurrentVersionSelected = isCurrentVersionSelected,
+            )
+            deleteVersions.isVisible = viewModel.showDeleteVersionsButton(
+                selectedVersions = selectedVersions.size,
+                isCurrentVersionSelected = isCurrentVersionSelected,
+            )
+            if (selectedVersions.isNotEmpty()) {
+                selectAll.isVisible = areAllPreviousVersionsSelected.not()
+                unselectAll.isVisible = true
+                downloadVersions.isVisible = selectedVersions.size == 1
+            } else {
+                selectAll.isVisible = true
+                unselectAll.isVisible = false
+                downloadVersions.isVisible = false
             }
             return false
         }
@@ -314,12 +307,19 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         )
     }
 
-    fun showOptionsPanel(sNode: MegaNode?, sPosition: Int) {
+    /**
+     * Instantiates [VersionsBottomSheetDialogFragment] in order to display options for that specific
+     * Version
+     *
+     * @param megaNode A potentially nullable [MegaNode]
+     * @param currentPosition The current Version position
+     */
+    fun showVersionsBottomSheetDialog(megaNode: MegaNode?, currentPosition: Int) {
         Timber.d("showOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedNode = sNode
+        selectedNode = megaNode
         selectedNodeHandle = selectedNode?.handle ?: 0L
-        selectedPosition = sPosition
+        selectedPosition = currentPosition
 
         supportFragmentManager.setFragmentResultListener(
             VersionsBottomSheetDialogFragment.REQUEST_KEY_VERSIONS_DIALOG,
@@ -329,6 +329,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         bottomSheetDialogFragment = VersionsBottomSheetDialogFragment.newInstance(
             nodeHandle = selectedNodeHandle,
             selectedPosition = selectedPosition,
+            versionsCount = adapter?.itemCount ?: 0,
         ).also { it.show(supportFragmentManager, it.tag) }
     }
 
@@ -429,7 +430,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                 true
             }
             R.id.action_select -> {
-                selectAll()
+                selectAllClicked()
                 true
             }
             R.id.action_delete_version_history -> {
@@ -470,17 +471,22 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         }
     }
 
-    private fun selectAll() {
+    /**
+     * When "Select all" is clicked, select all Previous Versions
+     */
+    private fun selectAllClicked() {
         Timber.d("selectAll")
         adapter?.let {
-            if (it.isMultipleSelect) {
-                it.selectAll()
-            } else {
-                it.isMultipleSelect = true
-                it.selectAll()
-                actionMode = startSupportActionMode(ActionBarCallBack())
+            if (it.itemCount > 1) {
+                if (it.isMultipleSelect) {
+                    it.selectAllPreviousVersions()
+                } else {
+                    it.isMultipleSelect = true
+                    it.selectAllPreviousVersions()
+                    actionMode = startSupportActionMode(ActionBarCallBack())
+                }
+                Handler(Looper.getMainLooper()).post { updateActionModeTitle() }
             }
-            Handler(Looper.getMainLooper()).post { updateActionModeTitle() }
         }
     }
 
@@ -766,7 +772,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                     manageTextFileIntent(this, vNode, Constants.VERSIONS_ADAPTER)
                 }
                 else -> {
-                    showOptionsPanel(vNode, position)
+                    showVersionsBottomSheetDialog(vNode, position)
                 }
             }
         }

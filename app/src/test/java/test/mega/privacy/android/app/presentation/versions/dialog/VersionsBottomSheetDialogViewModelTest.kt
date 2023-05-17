@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -55,11 +56,12 @@ class VersionsBottomSheetDialogViewModelTest {
         reset(getNodeAccessPermission, getNodeByHandle, isNodeInInbox)
     }
 
-    fun initViewModel(nodeHandle: Long?, selectedNodePosition: Int) {
+    fun initViewModel(nodeHandle: Long?, selectedNodePosition: Int, versionsCount: Int) {
         val savedStateHandle = SavedStateHandle(
             mapOf(
                 VersionsBottomSheetDialogFragment.PARAM_NODE_HANDLE to nodeHandle,
                 VersionsBottomSheetDialogFragment.PARAM_SELECTED_POSITION to selectedNodePosition,
+                VersionsBottomSheetDialogFragment.PARAM_VERSIONS_COUNT to versionsCount,
             )
         )
         underTest = VersionsBottomSheetDialogViewModel(
@@ -80,6 +82,7 @@ class VersionsBottomSheetDialogViewModelTest {
         initViewModel(
             nodeHandle = null,
             selectedNodePosition = 0,
+            versionsCount = 1,
         )
         underTest.state.test {
             val state = awaitItem()
@@ -102,9 +105,48 @@ class VersionsBottomSheetDialogViewModelTest {
         initViewModel(
             nodeHandle = 123456L,
             selectedNodePosition = 0,
+            versionsCount = 1,
         )
         underTest.state.test {
             assertThat(awaitItem().node).isEqualTo(testNode)
+        }
+    }
+
+    @Test
+    fun `test that a non-backup node version cannot be deleted if it is the only version`() =
+        runTest {
+            whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(mock())
+            whenever(getNodeByHandle(any())).thenReturn(mock())
+            whenever(isNodeInInbox(any())).thenReturn(false)
+
+            initViewModel(
+                nodeHandle = 123456,
+                selectedNodePosition = 0,
+                versionsCount = 1,
+            )
+            underTest.state.test {
+                assertThat(awaitItem().canDeleteVersion).isFalse()
+            }
+        }
+
+    @ParameterizedTest(name = "access permission: {0}")
+    @EnumSource(AccessPermission::class)
+    fun `test that a non-backup node version could be deleted when there is more than one version`(
+        accessPermission: AccessPermission,
+    ) = runTest {
+        whenever(getNodeAccessPermission(NodeId(any()))).thenReturn(accessPermission)
+        whenever(getNodeByHandle(any())).thenReturn(mock())
+        whenever(isNodeInInbox(any())).thenReturn(false)
+
+        initViewModel(
+            nodeHandle = 123456,
+            selectedNodePosition = 0,
+            versionsCount = 3,
+        )
+
+        val expected = isDeleteAllowed(accessPermission)
+        underTest.state.test {
+            assertThat(awaitItem().canDeleteVersion).isEqualTo(expected)
         }
     }
 
@@ -117,6 +159,7 @@ class VersionsBottomSheetDialogViewModelTest {
         initViewModel(
             nodeHandle = 123456L,
             selectedNodePosition = 0,
+            versionsCount = 1,
         )
         underTest.state.test {
             assertThat(awaitItem().canDeleteVersion).isFalse()
@@ -124,7 +167,7 @@ class VersionsBottomSheetDialogViewModelTest {
     }
 
     @TestFactory
-    fun `test that the delete eligibility of a previous version backup node is determined`() =
+    fun `test that a previous version backup node could be deleted`() =
         generateTestDeleteOptionData().map { (accessPermission, isDeleteAllowed) ->
             dynamicTest(
                 "when accessPermission is $accessPermission, " +
@@ -138,6 +181,7 @@ class VersionsBottomSheetDialogViewModelTest {
                     initViewModel(
                         nodeHandle = 123456L,
                         selectedNodePosition = 1,
+                        versionsCount = 2,
                     )
                     underTest.state.test {
                         assertThat(awaitItem().canDeleteVersion).isEqualTo(isDeleteAllowed)
@@ -156,6 +200,7 @@ class VersionsBottomSheetDialogViewModelTest {
         initViewModel(
             nodeHandle = 123456L,
             selectedNodePosition = 0,
+            versionsCount = 1,
         )
         underTest.state.test {
             assertThat(awaitItem().canRevertVersion).isEqualTo(false)
@@ -163,7 +208,7 @@ class VersionsBottomSheetDialogViewModelTest {
     }
 
     @TestFactory
-    fun `test that the revert eligibility of a previous version non-backup node is determined`() =
+    fun `test that a previous version non-backup node could be reverted`() =
         generateTestRevertOptionData().map { (accessPermission, isRevertAllowed) ->
             dynamicTest(
                 "when accessPermission is $accessPermission, " +
@@ -177,6 +222,7 @@ class VersionsBottomSheetDialogViewModelTest {
                     initViewModel(
                         nodeHandle = 123456L,
                         selectedNodePosition = 1,
+                        versionsCount = 2,
                     )
                     underTest.state.test {
                         assertThat(awaitItem().canRevertVersion).isEqualTo(isRevertAllowed)

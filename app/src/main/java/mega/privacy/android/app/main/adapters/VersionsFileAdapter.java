@@ -175,7 +175,6 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
                 @Override
                 public void onAnimationRepeat(Animation animation) {
-
                 }
             });
 
@@ -186,12 +185,31 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
         }
     }
 
-    public void selectAll() {
-        for (int i = 0; i < this.getItemCount(); i++) {
-            if (!isItemChecked(i)) {
-                toggleAllSelection(i);
-            }
+    /**
+     * Selects all Previous Versions and de-select the Current Version
+     */
+    public void selectAllPreviousVersions() {
+        if (isItemChecked(0)) toggleAllSelection(0);
+        for (int i = 1; i < this.getItemCount(); i++) {
+            if (!isItemChecked(i)) toggleAllSelection(i);
         }
+    }
+
+    /**
+     * Checks whether all of the Previous Versions have been selected or not
+     *
+     * @return true if all Previous Versions have been selected or not, and false if otherwise. It
+     * will also return false if only one Version exists (the Current Version), or the Versions list
+     * is empty
+     */
+    public boolean areAllPreviousVersionsSelected() {
+        int versionCount = getItemCount();
+        if (versionCount <= 1) return false;
+
+        for (int i = 1; i < getItemCount(); i++) {
+            if (!isItemChecked(i)) return false;
+        }
+        return true;
     }
 
     public void clearSelections() {
@@ -561,10 +579,12 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
         if (currentPosition < 0) {
             Timber.e("Current position error - not valid value");
             return;
+        } else if (multipleSelect && currentPosition < 1) {
+            Timber.e("Current Version cannot be selected when Multiple Select is activated");
+            return;
         }
 
-        final MegaNode n = (MegaNode) getItem(currentPosition);
-
+        final MegaNode megaNode = (MegaNode) getItem(currentPosition);
         int id = v.getId();
         if (id == R.id.version_file_three_dots_layout) {
             Timber.d("version_file_three_dots: %s", currentPosition);
@@ -576,7 +596,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
             if (multipleSelect) {
                 ((VersionsFileActivity) context).itemClick(currentPosition);
             } else {
-                ((VersionsFileActivity) context).showOptionsPanel(n, currentPosition);
+                ((VersionsFileActivity) context).showVersionsBottomSheetDialog(megaNode, currentPosition);
 
             }
         } else if (id == R.id.version_file_item_layout) {
@@ -590,7 +610,8 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
         int currentPosition = holder.getAdapterPosition();
 
         if (!isMultipleSelect()) {
-            if (currentPosition < 0) {
+            // The Current Version is not allowed to be long-pressed
+            if (currentPosition < 1) {
                 Timber.w("Position not valid: %s", currentPosition);
             } else {
                 setMultipleSelect(true);

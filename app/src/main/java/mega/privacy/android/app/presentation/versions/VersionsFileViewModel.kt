@@ -44,11 +44,34 @@ class VersionsFileViewModel @Inject constructor(
     /**
      * Handles the display of the top-right "Delete" button
      *
+     * @param selectedVersions The number of Versions selected during Long Press
      * @param isCurrentVersionSelected Whether the current Version was selected during Long Press
      * or not
      *
-     * @return Whether the top-right "Delete" button is shown or not
+     * @return true if the Node is not in Backups or if the selected Version is a Previous Version.
+     * false is returned if none of the conditions are met
      */
-    fun showDeleteVersionsButton(isCurrentVersionSelected: Boolean) =
-        _state.value.isNodeInBackups.not() || isCurrentVersionSelected.not()
+    fun showDeleteVersionsButton(selectedVersions: Int, isCurrentVersionSelected: Boolean) =
+        if (selectedVersions <= 0) false
+        else _state.value.isNodeInBackups.not() || isCurrentVersionSelected.not()
+
+    /**
+     * Handles the display of the top-right "Revert" button
+     *
+     * @param selectedVersions The number of Versions selected during Long Press
+     * @param isCurrentVersionSelected Whether the current Version was selected during Long Press
+     * or not
+     *
+     * @return true if there is only one previous Version selected and the Node is not in Backups.
+     * Otherwise, false is returned
+     */
+    fun showRevertVersionButton(selectedVersions: Int, isCurrentVersionSelected: Boolean) =
+        when {
+            selectedVersions <= 0 -> false
+            selectedVersions == 1 -> {
+                _state.value.isNodeInBackups.not() && isCurrentVersionSelected.not()
+            }
+
+            else -> false
+        }
 }

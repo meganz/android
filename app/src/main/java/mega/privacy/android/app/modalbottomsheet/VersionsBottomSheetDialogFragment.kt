@@ -181,19 +181,27 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         const val PARAM_SELECTED_POSITION = "PARAM_SELECTED_POSITION"
 
         /**
+         * Parameter Key that specifies the current number of Versions in the file
+         */
+        const val PARAM_VERSIONS_COUNT = "PARAM_VERSIONS_COUNT"
+
+        /**
          * Instantiates [VersionsBottomSheetDialogFragment] with properties
          *
          * @param nodeHandle A potentially nullable Node Handle
          * @param selectedPosition The selected position
+         * @param versionsCount The current number of versions in the file
          */
         fun newInstance(
             nodeHandle: Long?,
             selectedPosition: Int,
+            versionsCount: Int,
         ): VersionsBottomSheetDialogFragment {
             val fragment = VersionsBottomSheetDialogFragment()
             fragment.arguments = bundleOf(
                 PARAM_NODE_HANDLE to nodeHandle,
                 PARAM_SELECTED_POSITION to selectedPosition,
+                PARAM_VERSIONS_COUNT to versionsCount,
             )
             return fragment
         }
