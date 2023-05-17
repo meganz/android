@@ -6,15 +6,18 @@ import mega.privacy.android.core.ui.theme.amber_300
 import mega.privacy.android.core.ui.theme.amber_700
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.blue_200
+import mega.privacy.android.core.ui.theme.blue_300
 import mega.privacy.android.core.ui.theme.blue_400
 import mega.privacy.android.core.ui.theme.dark_blue_200
 import mega.privacy.android.core.ui.theme.dark_blue_500
 import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.green_300
 import mega.privacy.android.core.ui.theme.green_400
 import mega.privacy.android.core.ui.theme.green_500
 import mega.privacy.android.core.ui.theme.grey_020
 import mega.privacy.android.core.ui.theme.grey_050
 import mega.privacy.android.core.ui.theme.grey_100
+import mega.privacy.android.core.ui.theme.grey_100_alpha_060
 import mega.privacy.android.core.ui.theme.grey_200
 import mega.privacy.android.core.ui.theme.grey_300
 import mega.privacy.android.core.ui.theme.grey_600
@@ -28,6 +31,9 @@ import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.lime_green_200
 import mega.privacy.android.core.ui.theme.lime_green_500
+import mega.privacy.android.core.ui.theme.orange_300
+import mega.privacy.android.core.ui.theme.orange_600
+import mega.privacy.android.core.ui.theme.red_200
 import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_400
 import mega.privacy.android.core.ui.theme.red_600
@@ -55,6 +61,12 @@ val Colors.textColorPrimary: Color
  */
 val Colors.textColorSecondary: Color
     get() = if (isLight) grey_alpha_054 else white_alpha_054
+
+/**
+ * Color [grey_alpha_087] when light and [yellow_700] when dark
+ */
+val Colors.grey_alpha_087_white_alpha_087: Color
+    get() = if (isLight) grey_alpha_087 else white_alpha_087
 
 /**
  * Color [grey_alpha_012] when light and [white_alpha_038] when dark
@@ -111,7 +123,7 @@ val Colors.red_800_red_400: Color
     get() = if (isLight) red_800 else red_400
 
 /**
- * Color [grey_alpha_038] when light and [wwhite_alpha_038hite] when dark
+ * Color [grey_alpha_038] when light and [white_alpha_038] when dark
  */
 val Colors.grey_alpha_038_white_alpha_038: Color
     get() = if (isLight) grey_alpha_038 else white_alpha_038
@@ -165,6 +177,12 @@ val Colors.black_white: Color
     get() = if (isLight) black else white
 
 /**
+ * Color [white] when light and [black] when dark
+ */
+val Colors.white_black: Color
+    get() = if (isLight) white else black
+
+/**
  * Color [red_600] when light and [white_alpha_087] when dark
  */
 val Colors.red_600_white_alpha_087: Color
@@ -177,13 +195,13 @@ val Colors.grey_200_grey_700: Color
     get() = if (isLight) grey_200 else grey_700
 
 /**
- * Color for grey when light [grey_020] and when dark [grey_700]
+ * Color when light [grey_020] and when dark [grey_700]
  */
 val Colors.grey_020_grey_700: Color
     get() = if (isLight) grey_020 else grey_700
 
 /**
- * Color for grey when light [teal_300] and when dark [teal_200]
+ * Color when light [teal_300] and when dark [teal_200]
  */
 val Colors.teal_300_teal_200: Color
     get() = if (isLight) teal_300 else teal_200
@@ -195,22 +213,16 @@ val Colors.white_grey_alpha_087: Color
     get() = if (isLight) white else grey_alpha_087
 
 /**
- * Color for grey when light [grey_050] and when dark [grey_800]
+ * Color when light [grey_050] and when dark [grey_800]
  */
 val Colors.grey_050_grey_800: Color
     get() = if (isLight) grey_050 else grey_800
 
 /**
- * Color for grey when light [grey_alpha_050] and when dark [white_alpha_050]
+ * Color when light [grey_alpha_050] and when dark [white_alpha_050]
  */
 val Colors.grey_alpha_050_white_alpha_050: Color
     get() = if (isLight) grey_alpha_050 else white_alpha_050
-
-/**
- * Color [grey_alpha_087] when light and [white_alpha_087] when dark
- */
-val Colors.grey_alpha_087_white_alpha_087: Color
-    get() = if (isLight) grey_alpha_087 else white_alpha_087
 
 /**
  * Color [black] when light and [white] when dark
@@ -229,3 +241,70 @@ val Colors.grey_020_grey_800: Color
  */
 val Colors.textColorPrimaryReverted: Color
     get() = if (isLight) white else dark_grey
+
+/**
+ * Color when light [grey_020] and when dark [grey_700]
+ */
+val Colors.grey_020_black: Color
+    get() = if (isLight) grey_020 else black
+
+/**
+ * Color when light [grey_050] and when dark [grey_700]
+ */
+val Colors.grey_050_grey_700: Color
+    get() = if (isLight) grey_050 else grey_700
+
+/**
+ * Color when light [white] and when dark [dark_grey]
+ */
+val Colors.white_dark_grey: Color
+    get() = if (isLight) white else dark_grey
+
+/**
+ * Color when light [white] and when dark [grey_800]
+ */
+val Colors.white_grey_800: Color
+    get() = if (isLight) white else grey_800
+
+/**
+ * Color when light [grey_100_alpha_060] and when dark [grey_100]
+ */
+val Colors.grey_100_alpha_060_grey_100: Color
+    get() = if (isLight) grey_100_alpha_060 else grey_100
+
+/**
+ * Color when light [grey_050] and when dark [grey_900]
+ */
+val Colors.grey_050_grey_900: Color
+    get() = if (isLight) grey_050 else grey_900
+
+/**
+ * Color when light [grey_alpha_054] and when dark [white_alpha_054]
+ */
+val Colors.grey_alpha_054_white_alpha_054: Color
+    get() = if (isLight) grey_alpha_054 else white_alpha_054
+
+/**
+ * Color when light [green_400] and when dark [green_300]
+ */
+val Colors.green_400_green_300: Color
+    get() = if (isLight) green_400 else green_300
+
+/**
+ * Color when light [green_400] and when dark [green_300]
+ */
+val Colors.orange_600_orange_300: Color
+    get() = if (isLight) orange_600 else orange_300
+
+/**
+ * Color when light [green_400] and when dark [green_300]
+ */
+val Colors.red_300_red_200: Color
+    get() = if (isLight) red_300 else red_200
+
+/**
+ * Color when light [green_400] and when dark [green_300]
+ */
+val Colors.blue_400_blue_300: Color
+    get() = if (isLight) blue_400 else blue_300
+

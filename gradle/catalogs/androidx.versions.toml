@@ -67,6 +67,7 @@ multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 navigation-runtime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigation" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+navigation-testing = { module = "androidx.navigation:navigation-testing", version.ref = "navigation" }
 palette = { module = "androidx.palette:palette-ktx", version.ref = "palette" }
 preferences = { module = "androidx.preference:preference-ktx", version.ref = "preferences" }
 recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }

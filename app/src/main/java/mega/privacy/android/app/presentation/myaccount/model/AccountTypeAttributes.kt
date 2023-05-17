@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.myaccount.model
 
-import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.Color
 
 /**
  * Account Type Attributes data holder
@@ -11,7 +11,7 @@ import androidx.annotation.StringRes
  * @property description as string resource id
  */
 data class AccountTypeAttributes(
-    @ColorRes val background: Int,
+    val background: Color,
     @DrawableRes val icon: Int,
     @StringRes val description: Int
 )

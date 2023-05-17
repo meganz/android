@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.myaccount
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -33,7 +36,6 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -193,11 +195,15 @@ class MyAccountHomeViewModel @Inject constructor(
                     )
                 }
 
-                val isBusinessStatusActive = getBusinessStatusUseCase().let { status ->
-                    (status == BusinessAccountStatus.GracePeriod || status == BusinessAccountStatus.Expired).not()
-                }
+                val businessStatus = getBusinessStatusUseCase()
+                val isBusinessStatusActive =
+                    (businessStatus == BusinessAccountStatus.GracePeriod || businessStatus == BusinessAccountStatus.Expired).not()
+
                 _uiState.update {
-                    it.copy(isBusinessStatusActive = isBusinessStatusActive)
+                    it.copy(
+                        isBusinessStatusActive = isBusinessStatusActive,
+                        businessStatus = businessStatus
+                    )
                 }
 
                 val achievements = getAccountAchievements(
@@ -213,6 +219,42 @@ class MyAccountHomeViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    /**
+     * Trigger navigation event to Achievements screen if connected to network
+     * if not connected, show message
+     */
+    fun navigateToAchievements() {
+        viewModelScope.launch {
+            if (uiState.value.isConnectedToNetwork) {
+                _uiState.update {
+                    it.copy(navigateToAchievements = triggered)
+                }
+            } else {
+                _uiState.update {
+                    it.copy(userMessage = triggered(R.string.error_server_connection_problem))
+                }
+            }
+        }
+    }
+
+    /**
+     * Reset Achievements navigation event to consumed
+     */
+    fun resetNavigationToAchievements() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(navigateToAchievements = consumed) }
+        }
+    }
+
+    /**
+     * Reset user message event to consumed
+     */
+    fun resetUserMessage() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(userMessage = consumed()) }
         }
     }
 }

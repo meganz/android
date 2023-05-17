@@ -378,6 +378,7 @@ dependencies {
     testImplementation androidx.work.test
     testImplementation testlib.room.test
     testImplementation testlib.compose.junit
+    testImplementation androidx.navigation.testing
 
     //jUnit 5
     testImplementation(platform(testlib.junit5.bom))

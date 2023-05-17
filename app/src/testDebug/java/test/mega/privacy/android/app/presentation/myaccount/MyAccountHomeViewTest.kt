@@ -1,0 +1,469 @@
+package test.mega.privacy.android.app.presentation.myaccount
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
+import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
+import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
+import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
+import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.ADD_PHONE_NUMBER
+import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
+import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTACTS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.EMAIL_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER
+import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.IMAGE_AVATAR
+import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
+import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
+import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.TEXT_AVATAR
+import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_IMAGE
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_PROGRESS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_IMAGE
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_PROGRESS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
+import mega.privacy.android.app.presentation.myaccount.view.MyAccountHeader
+import mega.privacy.android.app.presentation.myaccount.view.MyAccountHomeView
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.blue_300
+import mega.privacy.android.core.ui.theme.blue_400
+import mega.privacy.android.core.ui.theme.green_300
+import mega.privacy.android.core.ui.theme.green_400
+import mega.privacy.android.core.ui.theme.orange_300
+import mega.privacy.android.core.ui.theme.orange_600
+import mega.privacy.android.core.ui.theme.red_200
+import mega.privacy.android.core.ui.theme.red_300
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.AccountType.*
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
+import test.mega.privacy.android.app.fromId
+import test.mega.privacy.android.app.hasBackgroundColor
+import kotlin.random.Random
+
+@HiltAndroidTest
+@RunWith(AndroidJUnit4::class)
+@Config(qualifiers = "w720dp-h1280dp-xhdpi")
+class MyAccountHomeViewTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private lateinit var navController: TestNavHostController
+
+    private fun initNavHostController() {
+        navController = TestNavHostController(ApplicationProvider.getApplicationContext())
+        navController.navigatorProvider.addNavigator(ComposeNavigator())
+    }
+
+    private fun initMyAccountWithDefaults(uiState: MyAccountHomeUIState = MyAccountHomeUIState()) {
+        composeTestRule.setContent {
+            initNavHostController()
+
+            MyAccountHomeView(
+                uiState = uiState,
+                uiActions = object : MyAccountHomeViewActions {
+                    override val isPhoneNumberDialogShown: Boolean
+                        get() = false
+                },
+                navController = navController
+            )
+        }
+    }
+
+    @Test
+    fun `test that my account header section should render with correct attributes`() {
+        composeTestRule.setContent {
+            MyAccountHeader(
+                avatar = null,
+                avatarColor = R.color.dark_grey,
+                name = "Mega",
+                email = "asd@mega.co.nz",
+                verifiedPhoneNumber = "123456789",
+                onClickUserAvatar = {},
+                onEditProfile = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(IMAGE_AVATAR).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(TEXT_AVATAR)
+            .assertIsDisplayed()
+            .assert(hasText("M"))
+        composeTestRule.onNodeWithTag(NAME_TEXT)
+            .assertIsDisplayed()
+            .assert(hasText("Mega"))
+        composeTestRule.onNodeWithTag(EMAIL_TEXT)
+            .assertIsDisplayed()
+            .assert(hasText("asd@mega.co.nz"))
+        composeTestRule.onNodeWithTag(PHONE_NUMBER_TEXT)
+            .assertIsDisplayed()
+            .assert(hasText("123456789"))
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is FREE and dark theme`() {
+        verifyAccountTypeSectionColor(FREE, green_300, true)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is PRO_LITE and dark theme`() {
+        verifyAccountTypeSectionColor(PRO_LITE, orange_300, true)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is PRO and dark theme`() {
+        val proList = listOf(PRO_I, PRO_II, PRO_III, PRO_FLEXI)
+        verifyAccountTypeSectionColor(proList.random(), red_200, true)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is BUSINESS and dark theme`() {
+        verifyAccountTypeSectionColor(BUSINESS, blue_300, true)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is FREE and light theme`() {
+        verifyAccountTypeSectionColor(FREE, green_400, false)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is PRO_LITE and light theme`() {
+        verifyAccountTypeSectionColor(PRO_LITE, orange_600, false)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is PRO and light theme`() {
+        val proList = listOf(PRO_I, PRO_II, PRO_III, PRO_FLEXI)
+        verifyAccountTypeSectionColor(proList.random(), red_300, false)
+    }
+
+    @Test
+    fun `test that account type section render with correct attributes when account is BUSINESS and light theme`() {
+        verifyAccountTypeSectionColor(BUSINESS, blue_400, false)
+    }
+
+    @Test
+    fun `test that account type button should be invisible when account is BUSINESS account`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = BUSINESS,
+                isBusinessAccount = true,
+                isMasterBusinessAccount = true
+            )
+        )
+
+        composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that account type button should be invisible when account is PRO_FLEXI account`() {
+        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_FLEXI))
+
+        composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that account type button text should render with correct text when account not business account`() {
+        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_I))
+
+        composeTestRule.onNodeWithTag(UPGRADE_BUTTON).assertIsDisplayed()
+            .assert(hasText(fromId(R.string.my_account_upgrade_pro)))
+    }
+
+    @Test
+    fun `test that expired banner should be visible when account is master business account but is currently expired or on grace period`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that expired banner should render with correct text when expired`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = false,
+                businessStatus = BusinessAccountStatus.Expired
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER_TEXT)
+            .assertIsDisplayed()
+            .assert(hasText(fromId(R.string.payment_overdue_label)))
+    }
+
+    @Test
+    fun `test that expired banner should render with correct text when on grace period`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = false,
+                businessStatus = BusinessAccountStatus.GracePeriod
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER_TEXT)
+            .assertIsDisplayed()
+            .assert(hasText(fromId(R.string.payment_required_label)))
+    }
+
+    @Test
+    fun `test that expired banner should not be shown when business status is active`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = true,
+                businessStatus = BusinessAccountStatus.Active
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that payment alert should be visible when business status active and has renewable or expireable subscription`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = true,
+                hasRenewableSubscription = true,
+                hasExpireAbleSubscription = true
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that payment alert should be visible when account is not BUSINESS and has renewable or expireable subscription`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isBusinessAccount = false,
+                isMasterBusinessAccount = false,
+                hasRenewableSubscription = true,
+                hasExpireAbleSubscription = true
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that payment alert should be invisible when account has no renewable or expireable subscription`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isBusinessAccount = false,
+                isMasterBusinessAccount = false,
+                hasRenewableSubscription = false,
+                hasExpireAbleSubscription = false
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that usage transfer should be invisible when account type is FREE`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = FREE
+            )
+        )
+
+        composeTestRule.onNodeWithTag(USAGE_TRANSFER_SECTION).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that usage transfer should be visible when account type is not FREE`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(accountType = PRO_I)
+        )
+
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_SECTION, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that usage progress bar should be invisible and show image instead when account is BUSINESS`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isBusinessAccount = true,
+                accountType = BUSINESS
+            )
+        )
+
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that usage progress bar should be invisible and show image instead when account is PRO_FLEXI`() {
+        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = PRO_FLEXI))
+
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that usage progress bar should be visible when account is other than BUSINESS or PRO_FLEXI`() {
+        val randomAccountType = enumValues<AccountType>()
+            .filter { it != BUSINESS }
+            .filter { it != PRO_FLEXI }
+            .filter { it != FREE }
+            .random()
+        initMyAccountWithDefaults(MyAccountHomeUIState(accountType = randomAccountType))
+
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_PROGRESS, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_PROGRESS, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(testTag = USAGE_STORAGE_IMAGE, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeTestRule.onNodeWithTag(testTag = USAGE_TRANSFER_IMAGE, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that my account menus should be visible on first load and default state`() {
+        initMyAccountWithDefaults()
+
+        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(BACKUP_RECOVERY_KEY).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(CONTACTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ACHIEVEMENTS).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(LAST_SESSION).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that add phone number menu should be visible when phone number can be verified`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                canVerifyPhoneNumber = true,
+                verifiedPhoneNumber = null
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that add phone number section should be invisible when phone number existed`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                canVerifyPhoneNumber = false,
+                verifiedPhoneNumber = "1231231231"
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that contacts should show correct number of contacts when screen loads`() {
+        val randomContacts = Random.nextInt(from = 1, until = 100)
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(visibleContacts = randomContacts)
+        )
+
+        composeTestRule.onNodeWithText("$randomContacts connections").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that achievements should not be visible if account type is BUSINESS`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(isBusinessAccount = true, accountType = BUSINESS)
+        )
+
+        composeTestRule.onNodeWithTag(ACHIEVEMENTS).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that add your phone number should render with correct subtitle when achievements is enabled`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                canVerifyPhoneNumber = true,
+                isAchievementsEnabled = true,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER)
+            .assertIsDisplayed()
+            .assert(
+                hasText(
+                    text = fromId(R.string.sms_add_phone_number_dialog_msg_achievement_user)
+                        .split(".")
+                        .last(),
+                    substring = true
+                )
+            )
+    }
+
+    @Test
+    fun `test that add your phone number should render with correct subtitle when achievements is disabled`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                canVerifyPhoneNumber = true,
+                isAchievementsEnabled = false,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER)
+            .assertIsDisplayed()
+            .assert(hasText(fromId(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)))
+    }
+
+    private fun verifyAccountTypeSectionColor(
+        accountType: AccountType,
+        color: Color,
+        isDark: Boolean,
+    ) {
+        composeTestRule.setContent {
+            AndroidTheme(isDark = isDark) {
+                AccountTypeSection(
+                    accountType = accountType,
+                    showButton = true,
+                    buttonText = "test",
+                    onButtonClickListener = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag(ACCOUNT_TYPE_SECTION)
+            .assertIsDisplayed()
+            .assert(hasBackgroundColor(color))
+    }
+}

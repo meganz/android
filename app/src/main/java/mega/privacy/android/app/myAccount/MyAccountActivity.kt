@@ -40,7 +40,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.myaccount.MyAccountFragment
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -70,7 +69,7 @@ import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
 import java.util.Locale
 
-class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCallback,
+class MyAccountActivity : PasscodeActivity(),
     SnackbarShower {
 
     companion object {
@@ -825,10 +824,6 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
     fun showSnackbar(text: String) {
         showSnackbar(binding.root, text)
-    }
-
-    override fun show(message: String) {
-        showSnackbar(message)
     }
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {

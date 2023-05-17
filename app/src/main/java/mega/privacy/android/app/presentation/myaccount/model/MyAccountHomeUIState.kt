@@ -1,7 +1,11 @@
 package mega.privacy.android.app.presentation.myaccount.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import java.io.File
 
 /**
@@ -17,6 +21,7 @@ import java.io.File
  * @property isMasterBusinessAccount
  * @property isAchievementsEnabled
  * @property isBusinessStatusActive
+ * @property businessStatus
  * @property visibleContacts
  * @property accountDetail
  * @property isProFlexiAccount
@@ -33,6 +38,8 @@ import java.io.File
  * @property proExpirationTime
  * @property bonusStorageSms
  * @property isConnectedToNetwork
+ * @property navigateToAchievements
+ * @property userMessage
  */
 data class MyAccountHomeUIState(
     val name: String? = null,
@@ -46,9 +53,9 @@ data class MyAccountHomeUIState(
     val isMasterBusinessAccount: Boolean = false,
     val isAchievementsEnabled: Boolean = false,
     val isBusinessStatusActive: Boolean = false,
+    val businessStatus: BusinessAccountStatus? = null,
     val visibleContacts: Int? = null,
     val accountDetail: AccountDetail? = null,
-    val isProFlexiAccount: Boolean = false,
     val hasRenewableSubscription: Boolean = false,
     val hasExpireAbleSubscription: Boolean = false,
     val lastSession: Long? = null,
@@ -61,5 +68,7 @@ data class MyAccountHomeUIState(
     val subscriptionRenewTime: Long = 0,
     val proExpirationTime: Long = 0,
     val bonusStorageSms: Long = 0,
-    val isConnectedToNetwork: Boolean = true
+    val isConnectedToNetwork: Boolean = true,
+    val navigateToAchievements: StateEvent = consumed,
+    val userMessage: StateEventWithContent<Int> = consumed()
 )
