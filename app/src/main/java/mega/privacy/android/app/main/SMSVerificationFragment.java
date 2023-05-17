@@ -68,6 +68,12 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     }
 
     @Override
+    public void onDestroyView() {
+        megaApi.removeRequestListener(this);
+        super.onDestroyView();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
@@ -108,7 +114,9 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
     public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
         if (request.getType() == MegaRequest.TYPE_GET_ACHIEVEMENTS) {
             if (e.getErrorCode() == MegaError.API_OK) {
-                managerActivity.myAccountInfo.setBonusStorageSMS(getSizeString(request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE), requireContext()));
+                long bonusStorage = request.getMegaAchievementsDetails().getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE);
+                managerActivity.myAccountInfo
+                        .setBonusStorageSMS(getSizeString(bonusStorage, context));
             }
             if (isAdded()) {
                 String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user),
