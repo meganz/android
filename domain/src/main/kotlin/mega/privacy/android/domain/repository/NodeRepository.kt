@@ -51,6 +51,13 @@ interface NodeRepository {
     suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
 
     /**
+     * Provides Verified incoming shares from SDK
+     *
+     * @return List of [ShareData]
+     */
+    suspend fun getVerifiedIncomingShares(order: SortOrder): List<ShareData>
+
+    /**
      * check whether the node is in rubbish bin or not
      *
      * @return Boolean

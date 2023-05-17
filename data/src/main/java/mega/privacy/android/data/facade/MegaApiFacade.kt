@@ -313,6 +313,15 @@ internal class MegaApiFacade @Inject constructor(
         else
             megaApi.getOutShares(order)
 
+    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
+        megaApi.getUnverifiedIncomingShares(order)
+
+    override suspend fun getVerifiedIncomingShares(order: Int?): List<MegaShare> =
+        if (order == null)
+            megaApi.inSharesList
+        else
+            megaApi.getInSharesList(order)
+
     override suspend fun isPendingShare(node: MegaNode): Boolean = megaApi.isPendingShare(node)
 
     override suspend fun getPublicLinks(order: Int?): List<MegaNode> =
@@ -1083,12 +1092,6 @@ internal class MegaApiFacade @Inject constructor(
             order
         )
     }
-
-    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedIncomingShares(order)
-
-    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
-        megaApi.getOutShares(order)
 
     override fun openShareDialog(
         megaNode: MegaNode,

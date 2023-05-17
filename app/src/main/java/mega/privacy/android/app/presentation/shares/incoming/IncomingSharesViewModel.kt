@@ -13,14 +13,15 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
-import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -43,6 +44,7 @@ class IncomingSharesViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
     monitorContactUpdates: MonitorContactUpdates,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
+    private val getVerifiedIncomingSharesUseCase: GetVerifiedIncomingSharesUseCase,
 ) : ViewModel() {
 
     /** private UI state */
@@ -220,19 +222,24 @@ class IncomingSharesViewModel @Inject constructor(
             null
         }
 
-        // We need to filter out the nodes that are in the unverified list
-        // Somehow when a node is un-decrypted, it will be present in the result
-        // of getUnverifiedIncomingShares and getIncomingSharesChildrenNode
-        val verifiedNodes: List<Pair<MegaNode, ShareData?>>? =
-            getIncomingSharesChildrenNode(handle)
-                ?.filter { it ->
-                    !(unverifiedNodes?.map { it.first.handle }?.contains(it.handle) ?: false)
+        val verifiedNodes = if (state.value.incomingTreeDepth == 0) {
+            getVerifiedIncomingSharesUseCase(_state.value.sortOrder)
+                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+                .mapNotNull { shareData ->
+                    getNodeByHandle(shareData.nodeHandle)?.let {
+                        Pair(it, null)
+                    }
                 }
+        } else {
+            getIncomingSharesChildrenNode(handle)
                 ?.map { Pair<MegaNode, ShareData?>(it, null) }
+        }
 
-        return unverifiedNodes?.takeIf { unverifiedNodes.isNotEmpty() }?.let { list1 ->
-            verifiedNodes?.let { list2 -> list1 + list2 } ?: list1
-        } ?: verifiedNodes
+        return when {
+            unverifiedNodes?.isNotEmpty() == true && verifiedNodes?.isNotEmpty() == true -> unverifiedNodes + verifiedNodes
+            unverifiedNodes?.isNotEmpty() == true -> unverifiedNodes
+            else -> verifiedNodes
+        }
     }
 
     /**

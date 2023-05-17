@@ -219,10 +219,8 @@ class ManagerViewModel @Inject constructor(
                     .onEach {
                         Timber.d("Verification status returned: $it")
                     },
-                flowOf(
-                    getUnverifiedIncomingShares(order) +
-                            getUnverifiedOutgoingShares(order).filter { shareData -> !shareData.isVerified }
-                ).map { it.size },
+                flowOf(getUnverifiedIncomingShares(order) + getUnverifiedOutgoingShares(order))
+                    .map { it.size },
                 flowOf(getEnabledFeatures()),
             ) { firstLogin: Boolean, verificationStatus: VerificationStatus, pendingShares: Int, features: Set<Feature> ->
                 { state: ManagerState ->
@@ -392,8 +390,7 @@ class ManagerViewModel @Inject constructor(
     private suspend fun checkUnverifiedSharesCount() {
         val sortOrder = getCloudSortOrder()
         val unverifiedIncomingShares = getUnverifiedIncomingShares(sortOrder).size
-        val unverifiedOutgoingShares =
-            getUnverifiedOutgoingShares(sortOrder).filter { shareData -> !shareData.isVerified }.size
+        val unverifiedOutgoingShares = getUnverifiedOutgoingShares(sortOrder).size
         _state.update { it.copy(pendingActionsCount = unverifiedIncomingShares + unverifiedOutgoingShares) }
     }
 

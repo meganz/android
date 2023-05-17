@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -41,6 +42,7 @@ import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
 import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -49,6 +51,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -116,6 +119,11 @@ class NodeRepositoryImplTest {
         )
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(megaApiGateway)
+    }
+
     @Test
     fun `test that base64ToHandle returns properly`() =
         runTest {
@@ -148,7 +156,7 @@ class NodeRepositoryImplTest {
         whenever(megaApiGateway.getAccess(node)).thenReturn(ACCESS_READ)
         whenever(accessPermissionMapper.invoke(ACCESS_READ)).thenReturn(AccessPermission.READ)
         underTest.getNodeAccessPermission(nodeId)
-        verify(megaApiGateway, times(1)).getAccess(node)
+        verify(megaApiGateway).getAccess(node)
     }
 
     @Test
@@ -157,7 +165,7 @@ class NodeRepositoryImplTest {
             val megaNode = mock<MegaNode>()
             whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
             underTest.stopSharingNode(nodeId)
-            verify(megaApiGateway, times(1)).stopSharingNode(megaNode)
+            verify(megaApiGateway).stopSharingNode(megaNode)
         }
 
     @Test
@@ -170,7 +178,7 @@ class NodeRepositoryImplTest {
             whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
 
             underTest.setShareAccess(nodeId, AccessPermission.READ, email)
-            verify(mapperResultBlock, times(1)).invoke(AccessPermission.READ, email)
+            verify(mapperResultBlock).invoke(AccessPermission.READ, email)
         }
 
     @Test
@@ -194,7 +202,7 @@ class NodeRepositoryImplTest {
             }
 
             val actual = underTest.createShareKey(folderNode)
-            verify(megaApiGateway, times(1)).openShareDialog(eq(megaNode), any())
+            verify(megaApiGateway).openShareDialog(eq(megaNode), any())
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -273,6 +281,103 @@ class NodeRepositoryImplTest {
         Arguments.of("", ""),
         Arguments.of("test/path", "test/path")
     )
+
+    @Test
+    fun `test that getUnverifiedIncomingShares calls api gateway getUnverifiedIncomingShares with mapped sort order`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_NONE
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            whenever(megaApiGateway.getUnverifiedIncomingShares(any())).thenReturn(listOf(mock()))
+
+            underTest.getUnverifiedIncomingShares(sortOrder)
+
+            verify(megaApiGateway).getUnverifiedIncomingShares(sortOrderIntMapper(sortOrder))
+        }
+
+    @Test
+    fun `test that getUnverifiedIncomingShares returns mapped result from api gateway`() =
+        runTest {
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            val megaShare1 = mock<MegaShare>()
+            val megaShare2 = mock<MegaShare>()
+            val megaShares = listOf(megaShare1, megaShare2)
+            whenever(megaApiGateway.getUnverifiedIncomingShares(any())).thenReturn(megaShares)
+            val share1 = mock<ShareData>()
+            val share2 = mock<ShareData>()
+            whenever(shareDataMapper(megaShare1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare2)).thenReturn(share2)
+
+            val expected = listOf(share1, share2)
+            val actual = underTest.getUnverifiedIncomingShares(any())
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getUnverifiedOutgoingShares calls api gateway getOutgoingSharesNode`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_NONE
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            whenever(megaApiGateway.getOutgoingSharesNode(any())).thenReturn(listOf(mock()))
+
+            underTest.getUnverifiedOutgoingShares(sortOrder)
+
+            verify(megaApiGateway).getOutgoingSharesNode(sortOrderIntMapper(sortOrder))
+        }
+
+    @Test
+    fun `test that getUnverifiedOutgoingShares returns mapped result from api gateway with filtered result`() =
+        runTest {
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            val megaShare1 = mock<MegaShare> {
+                on { isVerified }.thenReturn(true)
+            }
+            val megaShare2 = mock<MegaShare> {
+                on { isVerified }.thenReturn(false)
+            }
+            val megaShares = listOf(megaShare1, megaShare2)
+            whenever(megaApiGateway.getOutgoingSharesNode(any())).thenReturn(megaShares)
+            val share1 = mock<ShareData>()
+            val share2 = mock<ShareData>()
+            whenever(shareDataMapper(megaShare1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare2)).thenReturn(share2)
+
+            val expected = listOf(share2)
+            val actual = underTest.getUnverifiedOutgoingShares(any())
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getVerifiedIncomingShares calls api gateway getVerifiedIncomingShares with mapped sort order`() =
+        runTest {
+            val sortOrder = SortOrder.ORDER_NONE
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            whenever(megaApiGateway.getVerifiedIncomingShares(any())).thenReturn(listOf(mock()))
+
+            underTest.getVerifiedIncomingShares(sortOrder)
+
+            verify(megaApiGateway).getVerifiedIncomingShares(sortOrderIntMapper(sortOrder))
+        }
+
+    @Test
+    fun `test that getVerifiedIncomingShares returns mapped result from api gateway`() =
+        runTest {
+            whenever(sortOrderIntMapper(any())).thenReturn(0)
+            val megaShare1 = mock<MegaShare>()
+            val megaShare2 = mock<MegaShare>()
+            val megaShares = listOf(megaShare1, megaShare2)
+            whenever(megaApiGateway.getVerifiedIncomingShares(any())).thenReturn(megaShares)
+            val share1 = mock<ShareData>()
+            val share2 = mock<ShareData>()
+            whenever(shareDataMapper(megaShare1)).thenReturn(share1)
+            whenever(shareDataMapper(megaShare2)).thenReturn(share2)
+
+            val expected = listOf(share1, share2)
+            val actual = underTest.getVerifiedIncomingShares(any())
+
+            assertThat(actual).isEqualTo(expected)
+        }
 
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()

@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -36,6 +37,8 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 
@@ -63,6 +66,10 @@ class IncomingSharesViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
 
+    private val getVerifiedIncomingSharesUseCase = mock<GetVerifiedIncomingSharesUseCase> {
+        onBlocking { invoke(any()) }.thenReturn(emptyList())
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
@@ -85,6 +92,7 @@ class IncomingSharesViewModelTest {
             monitorNodeUpdates,
             { monitorContactUpdates },
             getUnverifiedIncomingShares,
+            getVerifiedIncomingSharesUseCase,
         )
     }
 
@@ -214,14 +222,15 @@ class IncomingSharesViewModelTest {
     @Test
     fun `test that incoming handle is reset to default if fails to get node list when calling set incoming tree depth`() =
         runTest {
-            whenever(getIncomingSharesChildrenNode(any())).thenReturn(mock())
-            underTest.setIncomingTreeDepth(any(), 123456789L)
+            whenever(getVerifiedIncomingSharesUseCase(underTest.state.value.sortOrder))
+                .thenReturn(mock())
+            whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
+            underTest.setIncomingTreeDepth(0, 123456789L)
 
             underTest.state.map { it.incomingHandle }
                 .test {
                     assertThat(awaitItem()).isEqualTo(123456789L)
-                    whenever(getIncomingSharesChildrenNode(any())).thenReturn(null)
-                    underTest.setIncomingTreeDepth(any(), 987654321L)
+                    underTest.setIncomingTreeDepth(1, 987654321L)
                     assertThat(awaitItem()).isEqualTo(-1L)
                 }
         }
@@ -308,19 +317,64 @@ class IncomingSharesViewModelTest {
         }
 
     @Test
-    fun `test that getIncomingSharesNode executes when set incoming tree depth`() =
+    fun `test that getVerifiedIncomingSharesUseCase executes when set incoming tree depth to 0`() =
         runTest {
             val handle = 123456789L
-            underTest.setIncomingTreeDepth(any(), handle)
+            underTest.setIncomingTreeDepth(0, handle)
+            verify(getVerifiedIncomingSharesUseCase).invoke(underTest.state.value.sortOrder)
+        }
+
+    @Test
+    fun `test that getVerifiedIncomingSharesUseCase does not execute when set incoming tree depth to greater than 0`() =
+        runTest {
+            val handle = 123456789L
+            // initialization
+            verify(getVerifiedIncomingSharesUseCase).invoke(underTest.state.value.sortOrder)
+            underTest.setIncomingTreeDepth(1, handle)
+            verifyNoMoreInteractions(getVerifiedIncomingSharesUseCase)
+        }
+
+    @Test
+    fun `test that getIncomingSharesNode executes when set incoming tree depth to greater than 0`() =
+        runTest {
+            val handle = 123456789L
+            underTest.setIncomingTreeDepth(1, handle)
             verify(getIncomingSharesChildrenNode).invoke(handle)
         }
 
     @Test
-    fun `test that getIncomingSharesNode executes when resetIncomingTreeDepth`() =
+    fun `test that getIncomingSharesNode does not execute when set incoming tree depth to 0`() =
+        runTest {
+            val handle = 123456789L
+            underTest.setIncomingTreeDepth(0, handle)
+            verifyNoInteractions(getIncomingSharesChildrenNode)
+        }
+
+    @Test
+    fun `test that getVerifiedIncomingSharesUseCase executes when resetIncomingTreeDepth`() =
         runTest {
             underTest.resetIncomingTreeDepth()
-            // initialization call + subsequent call
-            verify(getIncomingSharesChildrenNode, times(2)).invoke(-1L)
+            verify(getVerifiedIncomingSharesUseCase).invoke(underTest.state.value.sortOrder)
+        }
+
+    @Test
+    fun `test that getUnverifiedIncomingShares executes when refresh and incoming tree depth is set to 0`() =
+        runTest {
+            val handle = 123456789L
+            // initialization
+            verify(getUnverifiedIncomingShares).invoke(underTest.state.value.sortOrder)
+            underTest.setIncomingTreeDepth(0, handle)
+            verify(getUnverifiedIncomingShares).invoke(underTest.state.value.sortOrder)
+        }
+
+    @Test
+    fun `test that getUnverifiedIncomingShares does not execute when refresh and incoming tree depth is set to greater than 0`() =
+        runTest {
+            val handle = 123456789L
+            // initialization
+            verify(getVerifiedIncomingSharesUseCase).invoke(underTest.state.value.sortOrder)
+            underTest.setIncomingTreeDepth(1, handle)
+            verifyNoMoreInteractions(getVerifiedIncomingSharesUseCase)
         }
 
     @Test
@@ -517,9 +571,9 @@ class IncomingSharesViewModelTest {
         monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
-            getIncomingSharesChildrenNode,
+            getVerifiedIncomingSharesUseCase,
             times(2)
-        ).invoke(underTest.state.value.incomingHandle)
+        ).invoke(underTest.state.value.sortOrder)
     }
 
     @Test

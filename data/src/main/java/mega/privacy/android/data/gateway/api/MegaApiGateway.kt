@@ -1254,6 +1254,22 @@ interface MegaApiGateway {
     suspend fun getOutShares(megaNode: MegaNode): List<MegaShare>
 
     /**
+     * Get unverified incoming shares
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
+
+    /**
+     * Get verified incoming shares
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getVerifiedIncomingShares(order: Int?): List<MegaShare>
+
+    /**
      * Returns the rubbish node of the account.
      *
      * @return Rubbish node of the account.
@@ -2151,22 +2167,6 @@ interface MegaApiGateway {
         megaCancelToken: MegaCancelToken,
         order: Int,
     ): List<MegaNode>
-
-    /**
-     * Function to get unverified incoming shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
-
-    /**
-     * Function to get unverified outgoing shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare>
 
     /**
      * Creates a new share key for the node if there is no share key already created.

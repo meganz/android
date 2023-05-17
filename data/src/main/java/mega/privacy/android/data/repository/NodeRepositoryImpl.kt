@@ -33,7 +33,6 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -95,29 +94,36 @@ internal class NodeRepositoryImpl @Inject constructor(
 ) : NodeRepository {
 
 
-    override suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData> =
+    override suspend fun getOutgoingSharesNode(order: SortOrder) =
         withContext(ioDispatcher) {
             megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
                 .map { shareDataMapper(it) }
         }
 
-    override suspend fun getNodeOutgoingShares(nodeId: NodeId): List<ShareData> =
+    override suspend fun getNodeOutgoingShares(nodeId: NodeId) =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { megaNode ->
                 megaApiGateway.getOutShares(megaNode).map { shareDataMapper(it) }
             } ?: emptyList()
         }
 
-    override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
+    override suspend fun getUnverifiedIncomingShares(order: SortOrder) =
         withContext(ioDispatcher) {
             megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
                 shareDataMapper(it)
             }
         }
 
-    override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
+    override suspend fun getUnverifiedOutgoingShares(order: SortOrder) =
         withContext(ioDispatcher) {
-            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order)).map {
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
+                .filter { !it.isVerified }
+                .map { shareDataMapper(it) }
+        }
+
+    override suspend fun getVerifiedIncomingShares(order: SortOrder) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getVerifiedIncomingShares(sortOrderIntMapper(order)).map {
                 shareDataMapper(it)
             }
         }
