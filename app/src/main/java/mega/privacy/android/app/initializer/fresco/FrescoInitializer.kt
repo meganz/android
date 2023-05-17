@@ -1,4 +1,4 @@
-package mega.privacy.android.app.initializer
+package mega.privacy.android.app.initializer.fresco
 
 import android.content.Context
 import androidx.startup.Initializer
@@ -6,8 +6,8 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.core.ImagePipelineConfig
 import com.facebook.imagepipeline.memory.PoolConfig
 import com.facebook.imagepipeline.memory.PoolFactory
+import mega.privacy.android.app.initializer.LoggerInitializer
 import mega.privacy.android.app.utils.ContextUtils.getAvailableMemory
-import mega.privacy.android.app.utils.FrescoNativeMemoryChunkPoolParams
 
 /**
  * Initialize Fresco library
@@ -20,13 +20,21 @@ class FrescoInitializer : Initializer<Unit> {
     override fun create(context: Context) {
         val poolFactory = PoolFactory(
             PoolConfig.newBuilder()
-                .setNativeMemoryChunkPoolParams(FrescoNativeMemoryChunkPoolParams.get(context.getAvailableMemory()))
+                .setNativeMemoryChunkPoolParams(
+                    getFrescoNativeMemoryChunkPoolParams(
+                        availableMemory = context.getAvailableMemory(),
+                        maxMemory = Runtime.getRuntime().maxMemory()
+                    )
+                )
                 .build()
         )
-        Fresco.initialize(context, ImagePipelineConfig.newBuilder(context)
-            .setPoolFactory(poolFactory)
-            .setDownsampleEnabled(true)
-            .build())
+        Fresco.initialize(
+            context,
+            ImagePipelineConfig.newBuilder(context)
+                .setPoolFactory(poolFactory)
+                .setDownsampleEnabled(true)
+                .build()
+        )
     }
 
     /**
