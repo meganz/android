@@ -132,14 +132,15 @@ internal class DefaultAccountRepository @Inject constructor(
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
+        val email = user?.email ?: megaChatApiGateway.getMyEmail() ?: ""
         userAccountMapper(
-            user?.let { UserId(it.handle) },
-            user?.email ?: megaChatApiGateway.getMyEmail(),
-            megaChatApiGateway.getMyFullname(),
-            megaApiGateway.isBusinessAccount,
-            megaApiGateway.isMasterBusinessAccount(),
-            accountTypeMapper(myAccountInfoFacade.accountTypeId),
-            myAccountInfoFacade.accountTypeString,
+            userId = user?.let { UserId(it.handle) },
+            email = email,
+            fullName = megaChatApiGateway.getMyFullname(),
+            isBusinessAccount = megaApiGateway.isBusinessAccount,
+            isMasterBusinessAccount = megaApiGateway.isMasterBusinessAccount(),
+            accountTypeIdentifier = accountTypeMapper(myAccountInfoFacade.accountTypeId),
+            accountTypeString = myAccountInfoFacade.accountTypeString,
         )
     }
 

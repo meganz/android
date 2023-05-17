@@ -149,7 +149,6 @@ class DefaultAccountRepositoryTest {
             appEventGateway = appEventGateway,
         )
 
-        whenever(megaChatApiGateway.getMyEmail()).thenReturn(mockEmail)
     }
 
     @Test
@@ -158,6 +157,7 @@ class DefaultAccountRepositoryTest {
         val expectedAccountTypeString = "Free"
 
         whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
+        whenever(megaChatApiGateway.getMyEmail()).thenReturn(null)
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(expectedUserIdObj)
@@ -173,7 +173,10 @@ class DefaultAccountRepositoryTest {
         val expectedUserIdObj = UserId(expectedUserId)
         val expectedAccountTypeString = "Free"
 
-        val user = mock<MegaUser> { on { handle }.thenReturn(expectedUserId) }
+        val user = mock<MegaUser> {
+            on { handle }.thenReturn(expectedUserId)
+            on { email }.thenReturn(mockEmail)
+        }
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(user)

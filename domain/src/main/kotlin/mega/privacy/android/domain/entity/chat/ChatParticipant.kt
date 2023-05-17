@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property status                     [UserStatus].
  * @property lastSeen                   User last seen.
  * @property avatarUpdateTimestamp      Timestamp for last avatar file update
- * @property privilegesUpdated                Check if privilege are updated.
+ * @property privilegesUpdated          Check if privilege are updated.
  */
 data class ChatParticipant(
     val handle: Long,

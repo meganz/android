@@ -440,11 +440,16 @@ interface MegaChatApiGateway {
     fun getMyFullname(): String?
 
     /**
-     * Get my email
+     * @brief Returns the email of the logged in user.
      *
-     * @return My full email
+     * This function works even in offline mode (MegaChatApi::INIT_OFFLINE_SESSION),
+     * since the value is retrieved from cache.
+     *
+     * You take the ownership of the returned value
+     *
+     * @return Own user email
      */
-    fun getMyEmail(): String
+    fun getMyEmail(): String?
 
     /**
      * Get Chat Invalid Handle

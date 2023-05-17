@@ -53,19 +53,19 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             val list: MutableList<ChatParticipant> = mutableListOf()
             val peerHandles = getChatParticipantsHandles(chatId)
 
-            val myEmail = megaChatApiGateway.getMyEmail()
-            val myName = megaChatApiGateway.getMyFullname()
-            val myParticipant = ChatParticipant(
-                handle = megaChatApiGateway.getMyUserHandle(), data = ContactData(
-                    fullName = myName?.ifEmpty { myEmail }, alias = null, avatarUri = null
-                ),
-                email = myEmail,
-                isMe = true,
-                defaultAvatarColor = avatarRepository.getMyAvatarColor(),
-                privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
-            )
-
-            list.add(myParticipant)
+            megaChatApiGateway.getMyEmail()?.let {
+                val myName = megaChatApiGateway.getMyFullname()
+                val myParticipant = ChatParticipant(
+                    handle = megaChatApiGateway.getMyUserHandle(), data = ContactData(
+                        fullName = myName?.ifEmpty { it }, alias = null, avatarUri = null
+                    ),
+                    email = it,
+                    isMe = true,
+                    defaultAvatarColor = avatarRepository.getMyAvatarColor(),
+                    privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
+                )
+                list.add(myParticipant)
+            }
 
             peerHandles.forEach { handle ->
                 val participantPrivilege = chatRoom.getPeerPrivilegeByHandle(handle)
