@@ -25,6 +25,7 @@ import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
@@ -159,11 +160,20 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     fun showSnackbar(message: String) = showSnackbar(binding.relativeContainerLogin, message)
 
     /**
+     * Show fragment
+     *
+     * @param fragmentType
+     */
+    fun showFragment(fragmentType: LoginFragmentType) {
+        viewModel.setPendingFragmentToShow(fragmentType)
+    }
+
+    /**
      * Shows a fragment.
      *
      * @param visibleFragment The fragment to show.
      */
-    fun showFragment(visibleFragment: Int) {
+    private fun showFragment(visibleFragment: Int) {
         Timber.d("visibleFragment: %s", visibleFragment)
         this.visibleFragment = visibleFragment
         restrictOrientation()
@@ -235,14 +245,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                     beginTransaction()
                         .replace(R.id.fragment_container_login, confirmEmailFragment)
                         .commitNowAllowingStateLoss()
-
-                    executePendingTransactions()
                 }
 
                 Util.setDrawUnderStatusBar(this, false)
             }
         }
-
         if ((application as MegaApplication).isEsid) {
             showAlertLoggedOut()
         }

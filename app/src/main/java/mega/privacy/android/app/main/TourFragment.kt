@@ -33,13 +33,14 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.DialogRecoveryKeyBinding
 import mega.privacy.android.app.databinding.FragmentTourBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFragment
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -118,11 +119,11 @@ class TourFragment : Fragment() {
     private fun setupView() = with(binding) {
         buttonLoginTour.setOnClickListener {
             Timber.d("onLoginClick")
-            (requireActivity() as LoginActivity).showFragment(Constants.LOGIN_FRAGMENT)
+            (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Login)
         }
         buttonRegisterTour.setOnClickListener {
             Timber.d("onRegisterClick")
-            (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
+            (requireActivity() as LoginActivity).showFragment(LoginFragmentType.CreateAccount)
         }
         joinMeetingAsGuest.setOnClickListener {
             Timber.d("onJoinMeetingAsGuestClick")

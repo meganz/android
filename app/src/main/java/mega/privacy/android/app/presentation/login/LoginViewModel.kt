@@ -197,6 +197,14 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
+     * Set pending fragment to show
+     *
+     * @param fragmentType
+     */
+    fun setPendingFragmentToShow(fragmentType: LoginFragmentType) =
+        _state.update { state -> state.copy(isPendingToShowFragment = fragmentType) }
+
+    /**
      * Update state with isPendingToShowFragment as null.
      */
     fun isPendingToShowFragmentConsumed() {

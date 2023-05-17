@@ -24,6 +24,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.FragmentCreateAccountBinding
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.ColorUtils.resetEditTextUnderlineColor
 import mega.privacy.android.app.utils.ColorUtils.setEditTextUnderlineColor
 import mega.privacy.android.app.utils.Constants
@@ -172,8 +173,9 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        megaApi.removeRequestListener(this)
+        super.onDestroyView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -279,7 +281,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         buttonLoginCreate.apply {
             text = getString(R.string.login_text)
             setOnClickListener {
-                loginActivity?.showFragment(Constants.LOGIN_FRAGMENT)
+                loginActivity?.showFragment(LoginFragmentType.Login)
             }
         }
         createAccountCreateLayout.isVisible = true
@@ -522,7 +524,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                     val message = e.errorString
                     loginActivity?.apply {
                         showSnackbar(message)
-                        showFragment(Constants.LOGIN_FRAGMENT)
+                        showFragment(LoginFragmentType.Login)
                     }
                     createAccountCreateLayout.isVisible = true
                     createAccountCreatingLayout.isVisible = false

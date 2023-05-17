@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.view.LoginView
@@ -790,7 +791,7 @@ class LoginFragment : Fragment() {
             showConfirmLogoutDialog()
         } else {
             LoginActivity.isBackFromLoginPage = true
-            (requireActivity() as LoginActivity).showFragment(Constants.TOUR_FRAGMENT)
+            (requireActivity() as LoginActivity).showFragment(LoginFragmentType.Tour)
         }
     }
 
@@ -880,7 +881,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun onCreateAccount() {
-        (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
+        (requireActivity() as LoginActivity).showFragment(LoginFragmentType.CreateAccount)
     }
 
     private fun onLostAuthenticationDevice() {

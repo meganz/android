@@ -16,7 +16,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
@@ -72,7 +71,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             with(uiState) {
                 if (isPendingToShowFragment != null) {
-                    (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment.toConstant())
+                    (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment)
                     viewModel.isPendingToShowFragmentConsumed()
                 }
             }
@@ -104,6 +103,11 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             megaApi.cancelCreateAccount(this@ConfirmEmailFragment)
             (requireActivity() as LoginActivity).cancelConfirmationAccount()
         }
+    }
+
+    override fun onDestroyView() {
+        megaApi.removeRequestListener(this)
+        super.onDestroyView()
     }
 
     /**
