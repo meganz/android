@@ -2,6 +2,7 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -23,6 +24,18 @@ internal class SyncRepositoryImpl @Inject constructor(
     override suspend fun setupFolderPair(localPath: String, remoteFolderId: Long) {
         withContext(ioDispatcher) {
             syncGateway.syncFolderPair(localPath, remoteFolderId)
+        }
+    }
+
+    override suspend fun resumeAllSyncs() {
+        withContext(ioDispatcher) {
+            syncGateway.resumeAllSyncs()
+        }
+    }
+
+    override suspend fun pauseAllSyncs() {
+        withContext(ioDispatcher) {
+            syncGateway.pauseAllSyncs()
         }
     }
 
@@ -51,4 +64,14 @@ internal class SyncRepositoryImpl @Inject constructor(
 
     override fun observeSyncState(): Flow<FolderPairState> =
         syncGateway.observeSyncState()
+
+    override fun monitorSync(): Flow<FolderPair> =
+        syncGateway
+            .monitorSync()
+            .map { megaSync ->
+                val megaFolderName =
+                    megaApi.getMegaNodeByHandle(megaSync.megaHandle)?.name ?: ""
+
+                folderPairMapper(megaSync, megaFolderName)
+            }
 }

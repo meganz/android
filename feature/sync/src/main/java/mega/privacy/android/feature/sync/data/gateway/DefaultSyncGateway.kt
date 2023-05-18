@@ -3,9 +3,12 @@ package mega.privacy.android.feature.sync.data.gateway
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.feature.sync.data.forEach
 import mega.privacy.android.feature.sync.data.mock.MegaApiSyncMock
+import mega.privacy.android.feature.sync.data.mock.MegaApiSyncMock.GlobalUpdate
 import mega.privacy.android.feature.sync.data.mock.MegaSync
 import mega.privacy.android.feature.sync.data.mock.MegaSyncList
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
@@ -57,5 +60,19 @@ internal class DefaultSyncGateway @Inject constructor(
         // syncState will be updated by using megaapi::onSyncStateChanged. This will be implemented
         // later in a separate task
         return syncState.asSharedFlow()
+    }
+
+    override fun monitorSync(): Flow<MegaSync> =
+        megaApi
+            .globalUpdates
+            .filterIsInstance<GlobalUpdate.OnGlobalSyncStateChanged>()
+            .map { it.megaSync }
+
+    override fun resumeAllSyncs() {
+        megaApi.resumeAllSyncs()
+    }
+
+    override fun pauseAllSyncs() {
+        megaApi.pauseAllSyncs()
     }
 }

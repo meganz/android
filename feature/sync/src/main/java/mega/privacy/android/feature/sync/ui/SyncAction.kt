@@ -27,4 +27,9 @@ sealed interface SyncAction {
      * Sync button clicked
      */
     object RemoveFolderPairClicked : SyncAction
+
+    /**
+     * Indicates that user chose to sync by only using Wi-Fi
+     */
+    data class SyncByWiFiChecked(val checked: Boolean) : SyncAction
 }

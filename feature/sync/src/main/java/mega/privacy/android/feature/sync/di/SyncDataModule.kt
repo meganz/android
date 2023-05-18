@@ -6,7 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.feature.sync.data.gateway.DefaultSyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
+import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
+import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Singleton
 
@@ -17,6 +19,10 @@ internal interface SyncDataModule {
     @Binds
     @Singleton
     fun bindSyncRepository(implementation: SyncRepositoryImpl): SyncRepository
+
+    @Binds
+    @Singleton
+    fun bindSyncPreferencesRepository(implementation: SyncPreferencesRepositoryImpl): SyncPreferencesRepository
 
     @Binds
     @Singleton

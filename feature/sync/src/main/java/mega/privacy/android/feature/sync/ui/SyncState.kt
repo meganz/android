@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.ui
 
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * @param selectedLocalFolder selected local folder
@@ -14,4 +14,5 @@ data class SyncState(
     val selectedMegaFolder: RemoteFolder? = null,
     val rootMegaRemoteFolders: List<RemoteFolder> = emptyList(),
     val status: FolderPairState = FolderPairState.DISABLED,
+    val syncOnlyByWiFi: Boolean = false
 )

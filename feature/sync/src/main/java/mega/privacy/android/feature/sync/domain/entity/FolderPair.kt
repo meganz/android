@@ -14,4 +14,16 @@ data class FolderPair(
     val localFolderPath: String,
     val remoteFolder: RemoteFolder,
     val state: FolderPairState,
-)
+) {
+
+    companion object {
+        fun empty(): FolderPair =
+            FolderPair(
+                id = -1,
+                pairName = "",
+                localFolderPath = "",
+                remoteFolder = RemoteFolder(-1, ""),
+                state = FolderPairState.DISABLED
+            )
+    }
+}

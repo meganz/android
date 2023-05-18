@@ -15,8 +15,9 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairs
 import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
-import mega.privacy.android.feature.sync.domain.usecase.ObserveSyncState
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairs
+import mega.privacy.android.feature.sync.domain.usecase.SetSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPair
 import javax.inject.Inject
 
@@ -29,7 +30,8 @@ class SyncViewModel @Inject constructor(
     private val syncFolderPair: SyncFolderPair,
     private val getFolderPairs: GetFolderPairs,
     private val removeFolderPairs: RemoveFolderPairs,
-    private val observeSyncState: ObserveSyncState,
+    private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
+    private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncState())
@@ -71,10 +73,11 @@ class SyncViewModel @Inject constructor(
 
     private fun observeSyncStatus() {
         viewModelScope.launch {
-            observeSyncState.invoke()
-                .collectLatest {
-                    _state.value = _state.value.copy(status = it)
+            monitorSyncByWiFiUseCase().collectLatest { syncByWiFi ->
+                _state.update {
+                    it.copy(syncOnlyByWiFi = syncByWiFi)
                 }
+            }
         }
     }
 
@@ -107,10 +110,18 @@ class SyncViewModel @Inject constructor(
                 viewModelScope.launch {
                     removeFolderPairs()
                     _state.update {
-                        it.copy(selectedLocalFolder = "",
+                        it.copy(
+                            selectedLocalFolder = "",
                             selectedMegaFolder = null,
-                            status = FolderPairState.DISABLED)
+                            status = FolderPairState.DISABLED
+                        )
                     }
+                }
+            }
+
+            is SyncAction.SyncByWiFiChecked -> {
+                viewModelScope.launch {
+                    setSyncByWiFiUseCase(syncAction.checked)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.data.gateway
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.sync.data.mock.MegaSync
 import mega.privacy.android.feature.sync.data.mock.MegaSyncList
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 
@@ -34,5 +35,23 @@ internal interface SyncGateway {
      * @return
      */
     fun observeSyncState(): Flow<FolderPairState>
+
+    /**
+     * Monitor changes to MegaSync objects
+     *
+     */
+    fun monitorSync(): Flow<MegaSync>
+
+    /**
+     * Resume all syncs
+     *
+     */
+    fun resumeAllSyncs()
+
+    /**
+     * Pause all syncs
+     *
+     */
+    fun pauseAllSyncs()
 }
 

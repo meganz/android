@@ -29,4 +29,10 @@ interface SyncRepository {
      * Subscribes to status updates of a sync with the given syncId
      */
     fun observeSyncState(): Flow<FolderPairState>
+
+    suspend fun resumeAllSyncs()
+
+    suspend fun pauseAllSyncs()
+
+    fun monitorSync(): Flow<FolderPair>
 }

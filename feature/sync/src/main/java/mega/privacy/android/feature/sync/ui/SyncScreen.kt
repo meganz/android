@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
@@ -32,9 +34,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState.LOADING
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState.RUNNING
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
 /**
  * Composable Sync screen
@@ -64,6 +66,9 @@ fun SyncScreen(
             remoteFolderSelected = {
                 syncViewModel.handleAction(SyncAction.RemoteFolderSelected(it))
             },
+            uploadWithWiFiChecked = {
+                syncViewModel.handleAction(SyncAction.SyncByWiFiChecked(it))
+            }
         )
     }
 }
@@ -88,6 +93,7 @@ private fun SyncView(
     removeClicked: () -> Unit,
     chooseLocalFolderClicked: () -> Unit,
     remoteFolderSelected: (RemoteFolder) -> Unit,
+    uploadWithWiFiChecked: (Boolean) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -141,7 +147,18 @@ private fun SyncView(
                     Text(text = "Sync now")
                 }
             }
-
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = state.syncOnlyByWiFi,
+                    onCheckedChange = { checked ->
+                        uploadWithWiFiChecked(checked)
+                    }
+                )
+                Text(
+                    modifier = Modifier.padding(start = 2.dp),
+                    text = "Sync only with Wi-Fi"
+                )
+            }
         }
     }
 }
@@ -196,6 +213,7 @@ private fun SyncViewPreview() {
             removeClicked = {},
             remoteFolderSelected = {},
             chooseLocalFolderClicked = { },
+            uploadWithWiFiChecked = {}
         )
     }
 }
