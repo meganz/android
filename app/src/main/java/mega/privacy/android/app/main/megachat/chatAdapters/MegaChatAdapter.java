@@ -8146,9 +8146,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public boolean onLongClick(View view) {
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
 
         ViewHolderMessageChat holder = (ViewHolderMessageChat) view.getTag();
         int currentPosition = holder.getAdapterPosition();

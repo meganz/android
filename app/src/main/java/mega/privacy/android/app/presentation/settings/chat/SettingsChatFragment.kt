@@ -129,9 +129,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
                 isChecked = MegaApplication.isEnabledRichLinks
             }
 
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
 
         //Get chat status
         statusConfig = megaChatApi.presenceConfig
@@ -145,9 +143,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             }
 
             showPresenceChatConfig()
-            if (megaChatApi.isSignalActivityRequired) {
-                megaChatApi.signalPresenceActivity()
-            }
+            megaChatApi.signalPresenceActivity()
         } else {
             waitPresenceConfig()
         }
@@ -171,9 +167,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
 
         if (Util.isOffline(context)) return false
 

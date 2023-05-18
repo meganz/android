@@ -1850,9 +1850,7 @@ public class ChatActivity extends PasscodeActivity
                         handlerSend.postDelayed(runnable, interval);
                     }
 
-                    if (megaChatApi.isSignalActivityRequired()) {
-                        megaChatApi.signalPresenceActivity();
-                    }
+                    megaChatApi.signalPresenceActivity();
                 } else {
                     if (chatRoom != null) {
                         megaChatApi.sendStopTypingNotification(chatRoom.getChatId());

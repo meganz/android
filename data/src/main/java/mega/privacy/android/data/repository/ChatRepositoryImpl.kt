@@ -399,20 +399,18 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun signalPresenceActivity() =
         withContext(ioDispatcher) {
-            if (megaChatApiGateway.isSignalActivityRequired()) {
-                suspendCoroutine { continuation ->
-                    megaChatApiGateway.signalPresenceActivity(
-                        OptionalMegaChatRequestListenerInterface(
-                            onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
-                                if (error.errorCode == MegaChatError.ERROR_OK) {
-                                    continuation.resume(Unit)
-                                } else {
-                                    continuation.failWithError(error, "signalPresenceActivity")
-                                }
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.signalPresenceActivity(
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error, "signalPresenceActivity")
                             }
-                        )
+                        }
                     )
-                }
+                )
             }
         }
 

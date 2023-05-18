@@ -378,11 +378,6 @@ class ChatRepositoryImplTest {
     @Test
     fun `test that signalPresenceActivity invokes the right methods`() =
         runTest {
-            val signalActivityRequired = Random.nextBoolean()
-
-            whenever(megaChatApiGateway.isSignalActivityRequired()).thenReturn(
-                signalActivityRequired
-            )
             whenever(megaChatApiGateway.signalPresenceActivity(any())).thenAnswer {
                 ((it.arguments[0]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
                     mock(),
@@ -393,11 +388,7 @@ class ChatRepositoryImplTest {
 
             underTest.signalPresenceActivity()
 
-            if (signalActivityRequired) {
-                verify(megaChatApiGateway).signalPresenceActivity(any())
-            } else {
-                verify(megaChatApiGateway, never()).signalPresenceActivity(any())
-            }
+            verify(megaChatApiGateway).signalPresenceActivity(any())
         }
 
     @Test

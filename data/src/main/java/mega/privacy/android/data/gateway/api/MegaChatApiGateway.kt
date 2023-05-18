@@ -522,17 +522,6 @@ interface MegaChatApiGateway {
     fun removeRequestListener(listener: MegaChatRequestListenerInterface)
 
     /**
-     * Returns whether the autoaway mechanism is active.
-     *
-     * This function may return false even when the Presence settings
-     * establish that autoaway option is active. It happens when the persist
-     * option is enabled and when the status is offline or away.
-     *
-     * @return  True if the app should call [signalPresenceActivity], false otherwise
-     */
-    fun isSignalActivityRequired(): Boolean
-
-    /**
      * Signal there is some user activity
      *
      * When the presence configuration is set to autoaway (and persist is false), this

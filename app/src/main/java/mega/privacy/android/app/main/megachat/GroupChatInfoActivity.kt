@@ -304,9 +304,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 })
             }
 
-            if (megaChatApi.isSignalActivityRequired) {
-                megaChatApi.signalPresenceActivity()
-            }
+            megaChatApi.signalPresenceActivity()
 
             registerReceiver(
                 retentionTimeReceiver,
@@ -465,9 +463,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
         when (item.itemId) {
             android.R.id.home -> finish()
             R.id.action_add_participants -> chooseAddParticipantDialog()
@@ -490,9 +486,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      */
     fun chooseAddParticipantDialog() {
         Timber.d("chooseAddContactDialog")
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
         if (megaApi.rootNode != null) {
             val contacts = megaApi.contacts
             if (contacts.isNullOrEmpty() || !contacts.any { it.visibility == VISIBILITY_VISIBLE }) {
@@ -530,9 +524,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * @param handle participant's handle
      */
     fun showRemoveParticipantConfirmation(handle: Long) {
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
 
         groupChatInfoActivity?.let { activity ->
             val builder = MaterialAlertDialogBuilder(
@@ -556,9 +548,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * @param chatToChange [MegaChatRoom] current chat
      */
     fun showChangePermissionsDialog(handle: Long, chatToChange: MegaChatRoom) {
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
 
         val inflater = layoutInflater
         val dialogLayout = inflater.inflate(R.layout.change_permissions_dialog, null)

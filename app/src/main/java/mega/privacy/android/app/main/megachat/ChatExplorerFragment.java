@@ -218,9 +218,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
         mainRelativeLayout = v.findViewById(R.id.main_relative_layout);
 
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
 
         if (savedInstanceState != null) {
             addedItemsSaved = savedInstanceState.getStringArrayList("addedItemsSaved");
@@ -365,9 +363,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
 
     public void itemClick(int position) {
         Timber.d("Position: %s", position);
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
 
         if (adapterList == null || adapterList.getItemCount() <= 0) {
             return;

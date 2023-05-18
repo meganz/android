@@ -331,7 +331,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     @Suppress("DEPRECATION")
     override fun onPreferenceClick(preference: Preference): Boolean {
-        if (megaChatApi.isSignalActivityRequired) megaChatApi.signalPresenceActivity()
+        megaChatApi.signalPresenceActivity()
         val intent: Intent
         when (preference.key) {
             KEY_CAMERA_UPLOAD_INCLUDE_GPS -> {

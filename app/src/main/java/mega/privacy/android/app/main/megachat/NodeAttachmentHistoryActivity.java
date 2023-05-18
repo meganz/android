@@ -474,9 +474,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     public void itemClick(int position) {
         Timber.d("Position: %s", position);
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
 
         if (position < messages.size()) {
             MegaChatMessage m = messages.get(position);

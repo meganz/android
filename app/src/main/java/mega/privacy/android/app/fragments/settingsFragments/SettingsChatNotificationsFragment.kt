@@ -72,9 +72,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
         }
 
         updateSwitch()
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
     }
 
     /**
@@ -164,9 +162,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {
-        if (megaChatApi.isSignalActivityRequired) {
-            megaChatApi.signalPresenceActivity()
-        }
+        megaChatApi.signalPresenceActivity()
         when (preference.key) {
             KEY_CHAT_NOTIFICATIONS ->
                 chatNotificationsSwitch?.let {

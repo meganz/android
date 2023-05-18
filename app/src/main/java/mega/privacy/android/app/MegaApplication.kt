@@ -385,11 +385,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      */
     fun sendSignalPresenceActivity() {
         Timber.d("sendSignalPresenceActivity")
-        megaChatApi.run {
-            if (isSignalActivityRequired) {
-                signalPresenceActivity()
-            }
-        }
+        megaChatApi.run { signalPresenceActivity() }
     }
 
     /**

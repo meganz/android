@@ -699,7 +699,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             if (megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
                 delaySignalPresence = false
 
-                if (this !is MeetingActivity && megaChatApi.isSignalActivityRequired) {
+                if (this !is MeetingActivity) {
                     Timber.d("Send signal presence")
                     megaChatApi.signalPresenceActivity()
                 }

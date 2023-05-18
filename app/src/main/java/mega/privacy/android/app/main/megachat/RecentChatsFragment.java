@@ -442,9 +442,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
         this.setChats();
 
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
         setCustomisedActionBar();
 
         //Invitation bar
@@ -674,9 +672,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                     in.putExtra("contactType", CONTACT_TYPE_MEGA);
                     ((ManagerActivity) context).startActivityForResult(in, REQUEST_CREATE_CHAT);
                 }
-                if (megaChatApi.isSignalActivityRequired()) {
-                    megaChatApi.signalPresenceActivity();
-                }
+                megaChatApi.signalPresenceActivity();
             } else {
                 ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             }
@@ -805,9 +801,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
 
     public void itemClick(int position) {
         Timber.d("Position: %s", position);
-        if (megaChatApi.isSignalActivityRequired()) {
-            megaChatApi.signalPresenceActivity();
-        }
+        megaChatApi.signalPresenceActivity();
         if (adapterList.isMultipleSelect()) {
             adapterList.toggleSelection(position);
             List<MegaChatListItem> chats = adapterList.getSelectedChats();
@@ -1526,9 +1520,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             ArrayList<MegaChatListItem> chats = adapterList.getSelectedChats();
 
-            if (megaChatApi.isSignalActivityRequired()) {
-                megaChatApi.signalPresenceActivity();
-            }
+            megaChatApi.signalPresenceActivity();
 
             int itemId = item.getItemId();
             if (itemId == R.id.cab_menu_select_all) {
