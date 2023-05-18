@@ -385,7 +385,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
         credentials = dbH.credentials
-        if (credentials != null && shouldRefreshSessionDueToSDK(true)) return
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         createChatLauncher =
