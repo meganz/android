@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.billing
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.AccountType
@@ -7,7 +8,8 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.repository.AccountRepository
-import org.junit.Assert
+import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetSubscriptionOptionsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -17,6 +19,7 @@ import org.mockito.kotlin.whenever
 class GetAppSubscriptionOptionsUseCaseTest {
     private lateinit var underTest: GetAppSubscriptionOptionsUseCase
     private val accountRepository = mock<AccountRepository>()
+    private val getSubscriptionOptionsUseCase = GetSubscriptionOptionsUseCase(accountRepository)
 
     private val subscriptionPlanProIMonthly = SubscriptionOption(
         handle = 1560943707714440503,
@@ -152,7 +155,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
     @Before
     fun setUp() {
         underTest = GetAppSubscriptionOptionsUseCase(
-            accountRepository = accountRepository,
+            getSubscriptionOptionsUseCase = getSubscriptionOptionsUseCase
         )
     }
 
@@ -165,8 +168,7 @@ class GetAppSubscriptionOptionsUseCaseTest {
             )
 
             val actual = underTest.invoke()
-
-            Assert.assertEquals(actual, expectedResult)
+            assertThat(actual).isEqualTo(expectedResult)
         }
     }
 }

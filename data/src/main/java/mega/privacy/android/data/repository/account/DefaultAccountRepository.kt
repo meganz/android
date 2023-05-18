@@ -280,7 +280,7 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
-                megaApiGateway.getPricing(OptionalMegaRequestListenerInterface(
+                val listener = OptionalMegaRequestListenerInterface(
                     onRequestFinish = { request, error ->
                         if (error.errorCode == MegaError.API_OK) {
                             continuation.resumeWith(
@@ -292,7 +292,11 @@ internal class DefaultAccountRepository @Inject constructor(
                             continuation.failWithError(error, "getSubscriptionOptions")
                         }
                     }
-                ))
+                )
+                megaApiGateway.getPricing(listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
             }
         }
 
