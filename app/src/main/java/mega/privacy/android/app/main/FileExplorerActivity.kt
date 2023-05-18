@@ -18,7 +18,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
@@ -381,7 +380,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
         credentials = dbH.credentials
-        if (credentials != null && shouldRefreshSessionDueToSDK(true)) return
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         createChatLauncher =
