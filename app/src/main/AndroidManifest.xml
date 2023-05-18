@@ -361,7 +361,7 @@
         <activity
             android:name=".main.megachat.GroupChatInfoActivity" />
         <activity
-            android:name=".main.PdfViewerActivity"
+            android:name=".presentation.pdfviewer.PdfViewerActivity"
             android:exported="true"
             android:label="@string/pdf_app_name"
             android:launchMode="singleTop">

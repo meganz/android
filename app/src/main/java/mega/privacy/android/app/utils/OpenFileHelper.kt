@@ -6,7 +6,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import nz.mega.sdk.MegaApiAndroid

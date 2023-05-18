@@ -17,7 +17,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.Util;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.main.PdfViewerActivity;
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import timber.log.Timber;
 
 public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandle {

@@ -27,7 +27,7 @@ import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
-import mega.privacy.android.app.main.PdfViewerActivity;
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;

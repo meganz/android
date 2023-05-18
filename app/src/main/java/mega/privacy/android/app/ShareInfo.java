@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.PdfViewerActivity;
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
 import timber.log.Timber;
 
