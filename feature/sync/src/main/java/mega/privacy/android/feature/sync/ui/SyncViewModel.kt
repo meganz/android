@@ -44,7 +44,7 @@ class SyncViewModel @Inject constructor(
     init {
         fetchAllMegaFolders()
         fetchFirstFolderPair()
-        observeSyncStatus()
+        monitorSyncByWifi()
     }
 
     private fun fetchAllMegaFolders() {
@@ -71,7 +71,7 @@ class SyncViewModel @Inject constructor(
         }
     }
 
-    private fun observeSyncStatus() {
+    private fun monitorSyncByWifi() {
         viewModelScope.launch {
             monitorSyncByWiFiUseCase().collectLatest { syncByWiFi ->
                 _state.update {
@@ -90,10 +90,13 @@ class SyncViewModel @Inject constructor(
                 _state.value.selectedMegaFolder?.let { remoteFolder ->
                     viewModelScope.launch {
                         removeFolderPairs()
-                        syncFolderPair(
+                        val isSyncFolderPairRequestSuccessful = syncFolderPair(
                             _state.value.selectedLocalFolder,
                             remoteFolder
                         )
+                        if (isSyncFolderPairRequestSuccessful) {
+                            fetchFirstFolderPair()
+                        }
                     }
                 }
             }

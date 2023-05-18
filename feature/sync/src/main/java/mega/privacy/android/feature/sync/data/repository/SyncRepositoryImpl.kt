@@ -10,7 +10,6 @@ import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
 import mega.privacy.android.feature.sync.data.mock.MegaSyncList
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import javax.inject.Inject
 
@@ -21,11 +20,13 @@ internal class SyncRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SyncRepository {
 
-    override suspend fun setupFolderPair(localPath: String, remoteFolderId: Long) {
+    override suspend fun setupFolderPair(
+        localPath: String,
+        remoteFolderId: Long,
+    ): Boolean =
         withContext(ioDispatcher) {
             syncGateway.syncFolderPair(localPath, remoteFolderId)
         }
-    }
 
     override suspend fun resumeAllSyncs() {
         withContext(ioDispatcher) {
@@ -61,9 +62,6 @@ internal class SyncRepositoryImpl @Inject constructor(
             syncGateway.removeFolderPairs()
         }
     }
-
-    override fun observeSyncState(): Flow<FolderPairState> =
-        syncGateway.observeSyncState()
 
     override fun monitorSync(): Flow<FolderPair> =
         syncGateway

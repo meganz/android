@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.data.mock
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.model.GlobalUpdate
+import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject
 
 /*
@@ -63,6 +63,16 @@ internal class MegaApiSyncMock @Inject constructor() {
      * for every folder pair
      */
     fun pauseAllSyncs() {
+        // Mock
+    }
+
+    /**
+     * Mocks
+     * [mega.privacy.android.data.gateway.api.MegaApiGateway.removeRequestListener]
+     *
+     * @param listener
+     */
+    fun removeRequestListener(listener: MegaRequestListenerInterface) {
         // Mock
     }
 
