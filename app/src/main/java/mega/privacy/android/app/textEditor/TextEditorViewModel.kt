@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -306,6 +307,7 @@ class TextEditorViewModel @Inject constructor(
                     }
                 }
             }
+
             OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                 val filePath = intent.getStringExtra(INTENT_EXTRA_KEY_PATH)
 
@@ -314,6 +316,7 @@ class TextEditorViewModel @Inject constructor(
                     textEditorData.value?.fileSize = File(filePath).length()
                 }
             }
+
             FILE_LINK_ADAPTER -> {
                 intent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serializedNode ->
                     val node = MegaNode.unserialize(serializedNode)
@@ -323,6 +326,7 @@ class TextEditorViewModel @Inject constructor(
                     }
                 }
             }
+
             FOLDER_LINK_ADAPTER -> {
                 megaApiFolder.getNodeByHandle(
                     intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
@@ -335,6 +339,7 @@ class TextEditorViewModel @Inject constructor(
                     }
                 }
             }
+
             else -> {
                 val node = megaApi.getNodeByHandle(
                     intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
@@ -462,11 +467,23 @@ class TextEditorViewModel @Inject constructor(
      */
     private suspend fun downloadFileForReading() {
         downloadBackgroundFileJob = viewModelScope.launch(ioDispatcher) {
-            localFileUri = downloadBackgroundFile(textEditorData.value?.viewerNode ?: return@launch)
+            runCatching {
+                localFileUri =
+                    downloadBackgroundFile(textEditorData.value?.viewerNode ?: return@launch)
 
-            if (!readLocalFile()) {
-                fatalError.value = Unit
+                if (!readLocalFile()) {
+                    showFatalError()
+                }
+            }.onFailure {
+                Timber.e(it)
+                showFatalError()
             }
+        }
+    }
+
+    private suspend fun showFatalError() {
+        withContext(Dispatchers.Main) {
+            fatalError.value = Unit
         }
     }
 
@@ -594,6 +611,7 @@ class TextEditorViewModel @Inject constructor(
                         is MegaNodeException.ParentDoesNotExistException -> {
                             Timber.e(error)
                         }
+
                         is MegaNodeException.ChildDoesNotExistsException -> {
                             uploadFile(activity, fromHome, tempFile, parentHandle)
                         }
@@ -760,12 +778,14 @@ class TextEditorViewModel @Inject constructor(
                 getFileSize()!!,
                 true
             )
+
             FROM_CHAT -> nodeSaver.saveNode(
                 getNode()!!,
                 highPriority = true,
                 isFolderLink = true,
                 fromMediaViewer = true
             )
+
             else -> nodeSaver.saveHandle(
                 getNode()!!.handle,
                 isFolderLink = getAdapterType() == FOLDER_LINK_ADAPTER,
@@ -808,6 +828,7 @@ class TextEditorViewModel @Inject constructor(
                 getNameOfFile(),
                 getFileUri()
             )
+
             FILE_LINK_ADAPTER -> shareLink(context, urlFileLink)
             else -> shareNode(context, getNode()!!) { updateNode() }
         }
