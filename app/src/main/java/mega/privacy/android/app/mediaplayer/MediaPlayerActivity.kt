@@ -95,6 +95,7 @@ import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
@@ -1079,7 +1080,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 val copyHandles = intent?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
                     ?: return
-                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
 
                 viewModel.copyNode(
                     nodeHandle = copyHandles[0],
