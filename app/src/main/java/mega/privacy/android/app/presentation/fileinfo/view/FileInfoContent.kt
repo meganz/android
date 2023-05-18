@@ -139,7 +139,7 @@ internal fun FileInfoContent(
             //folder content
             folderTreeInfo?.let {
                 FolderContentView(
-                    numberOfFolders = it.numberOfFolders,
+                    numberOfFolders = it.numberOfFolders - 1, //we don't want to count itself
                     numberOfFiles = it.numberOfFiles,
                     modifier = paddingHorizontal,
                 )

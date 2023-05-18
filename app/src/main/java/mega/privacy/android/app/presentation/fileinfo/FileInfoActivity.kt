@@ -11,6 +11,10 @@ import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -111,6 +115,7 @@ class FileInfoActivity : BaseActivity() {
     /**
      * on create the activity
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -156,6 +161,9 @@ class FileInfoActivity : BaseActivity() {
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    }
                 )
                 uiState.requiredExtraAction?.let { action ->
                     ExtraActionDialog(
