@@ -150,6 +150,7 @@ internal fun FileInfoScreen(
                         )
                     } else {
                         FileInfoTopBar(
+                            modifier = Modifier.testTag(TEST_TAG_TOP_APPBAR),
                             title = viewState.title,
                             actions = viewState.actions,
                             tintColor = tintColor,
@@ -243,10 +244,12 @@ private fun FileInfoScreenPreview(
                     FileInfoMenuAction.SelectionModeAction.ClearSelection -> {
                         state = state.copy(outShareContactsSelected = emptyList())
                     }
+
                     FileInfoMenuAction.SelectionModeAction.SelectAll -> {
                         state = state.copy(
                             outShareContactsSelected = state.outSharesCoerceMax.map { it.contactItem.email })
                     }
+
                     else -> {}
                 }
             },

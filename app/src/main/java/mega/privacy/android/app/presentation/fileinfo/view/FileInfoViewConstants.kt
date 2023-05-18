@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.fileinfo.view
 internal const val verticalSpace = 20
 internal const val paddingStartDefault = 72
 
+internal const val TEST_TAG_TOP_APPBAR = "topAppBar"
 internal const val TEST_TAG_AVAILABLE_OFFLINE_SWITCH = "switch"
 internal const val TEST_TAG_CREATION_TIME = "creationTime"
 internal const val TEST_TAG_MODIFICATION_TIME = "modificationTime"

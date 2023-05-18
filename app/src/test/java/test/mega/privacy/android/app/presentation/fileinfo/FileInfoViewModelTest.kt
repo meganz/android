@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactPermission
@@ -217,6 +218,7 @@ internal class FileInfoViewModelTest {
         whenever(getNodeVersionsByHandle(nodeId)).thenReturn(null)
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
+        whenever(monitorOnlineStatusUpdates.invoke()).thenReturn(emptyFlow())
         whenever(monitorContactUpdates.invoke()).thenReturn(emptyFlow())
         whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
             .thenReturn(File(null as File?, thumbUri))
@@ -228,6 +230,8 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
         whenever(getAvailableNodeActionsUseCase(any())).thenReturn(emptyList())
+        whenever(getNodeOutSharesUseCase(nodeId)).thenReturn(emptyList())
+        whenever(getOutShares(nodeId)).thenReturn(emptyList())
     }
 
     @After
@@ -880,6 +884,31 @@ internal class FileInfoViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that when folder tree info is received then total size, folder content and available offline is updated correctly`() =
+        runTest {
+            val actualSize = 1024L
+            val versionsSize = 512L
+            val folderTreeInfo = FolderTreeInfo(1, 2, actualSize, 1, versionsSize)
+            val folderNode = mock<TypedFolderNode> {
+                on { id }.thenReturn(nodeId)
+                on { name }.thenReturn("Folder name")
+            }.also { folderNode ->
+                whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
+                whenever(getFolderTreeInfo.invoke(folderNode))
+                    .thenReturn(folderTreeInfo)
+                whenever(getContactItemFromInShareFolder.invoke(any(), any())).thenReturn(mock())
+            }
+            underTest.setNode(folderNode.id.longValue)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                Truth.assertThat(actual.folderTreeInfo).isEqualTo(folderTreeInfo)
+                Truth.assertThat(actual.isAvailableOfflineAvailable).isTrue()
+                Truth.assertThat(actual.sizeInBytes)
+                    .isEqualTo(actualSize + versionsSize)
+            }
+        }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(
