@@ -11,6 +11,7 @@ import android.media.AudioManager.OnAudioFocusChangeListener
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -708,7 +709,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         fun pauseAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
-            context.startService(audioPlayerIntent)
+            ContextCompat.startForegroundService(context, audioPlayerIntent)
         }
 
         /**
@@ -720,7 +721,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         fun resumeAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_RESUME)
-            context.startService(audioPlayerIntent)
+            ContextCompat.startForegroundService(context, audioPlayerIntent)
         }
 
         /**
@@ -745,7 +746,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         fun stopAudioPlayer(context: Context) {
             val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
             audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
-            context.startService(audioPlayerIntent)
+            ContextCompat.startForegroundService(context, audioPlayerIntent)
         }
     }
 
