@@ -227,14 +227,27 @@ class LoginViewModel @Inject constructor(
     fun stopLogin() {
         _state.update {
             it.copy(
-                pressedBackWhileLogin = true,
-                isAlreadyLoggedIn = false,
                 fetchNodesUpdate = null,
-                is2FARequired = false,
+                isFirstTime = false,
+                isAlreadyLoggedIn = false,
+                pressedBackWhileLogin = true,
                 is2FAEnabled = false,
-                isLoginInProgress = false,
+                is2FARequired = false,
+                twoFAPin = listOf("", "", "", "", "", ""),
+                multiFactorAuthState = null,
+                isAccountConfirmed = false,
+                rootNodesExists = false,
+                temporalEmail = null,
+                temporalPassword = null,
+                hasPreferences = false,
+                hasCUSetting = false,
+                isCUSettingEnabled = false,
                 isLocalLogoutInProgress = true,
                 isLoginRequired = true,
+                isLoginInProgress = false,
+                loginException = null,
+                ongoingTransfersExist = null,
+                isCheckingSignupLink = false
             )
         }
         viewModelScope.launch {
@@ -459,13 +472,15 @@ class LoginViewModel @Inject constructor(
                     accountSession = state.value.accountSession?.copy(email = typedEmail)
                         ?: AccountSession(email = typedEmail),
                     password = typedPassword,
-                    ongoingTransfersExist = null
+                    ongoingTransfersExist = null,
+                    pressedBackWhileLogin = false,
                 )
             } else {
                 it.copy(
                     isLoginInProgress = true,
                     is2FARequired = false,
-                    ongoingTransfersExist = null
+                    ongoingTransfersExist = null,
+                    pressedBackWhileLogin = false,
                 )
             }
         }
@@ -491,7 +506,8 @@ class LoginViewModel @Inject constructor(
                                 isLoginInProgress = false,
                                 is2FAEnabled = true,
                                 isLoginRequired = false,
-                                is2FARequired = true
+                                is2FARequired = true,
+                                isFirstTime2FA = triggered
                             )
                         }
                     } else {
@@ -760,6 +776,12 @@ class LoginViewModel @Inject constructor(
      */
     fun setSnackbarMessageId(@StringRes messageId: Int) =
         _state.update { state -> state.copy(snackbarMessage = triggered(messageId)) }
+
+    /**
+     * Sets isFirstTime2FA as consumed.
+     */
+    fun onFirstTime2FAConsumed() =
+        _state.update { state -> state.copy(isFirstTime2FA = consumed) }
 
     companion object {
         /**

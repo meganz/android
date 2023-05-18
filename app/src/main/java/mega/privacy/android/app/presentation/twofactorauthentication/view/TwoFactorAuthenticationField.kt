@@ -46,6 +46,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -56,12 +59,13 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 /**
  * View for typing 2FA pin.
  *
- * @param twoFAPin            Typed 2FA pin.
- * @param on2FAPinChanged     Action when 2FA pin changes.
- * @param on2FAChanged        Action when the entire 2FA changes: Paste option.
- * @param isError             True if the 2FA pin was typed but is not the correct one.
- * @param shouldRequestFocus  True when it is required to request focus and open keyboard, false otherwise.
- * @param modifier           [Modifier].
+ * @param twoFAPin               Typed 2FA pin.
+ * @param on2FAPinChanged        Action when 2FA pin changes.
+ * @param on2FAChanged           Action when the entire 2FA changes: Paste option.
+ * @param isError                True if the 2FA pin was typed but is not the correct one.
+ * @param requestFocus           [StateEvent]
+ * @param onRequestFocusConsumed Action when request focus has been consumed.
+ * @param modifier               [Modifier].
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -70,7 +74,8 @@ fun TwoFactorAuthenticationField(
     on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
     isError: Boolean,
-    shouldRequestFocus: Boolean,
+    requestFocus: StateEvent,
+    onRequestFocusConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Row(modifier = modifier.testTag(TWO_FACTOR_AUTHENTICATION_TEST_TAG)) {
     val (
@@ -175,26 +180,8 @@ fun TwoFactorAuthenticationField(
         )
     }
 
-    if (shouldRequestFocus) {
-        LaunchedEffect(Unit) {
-            if (twoFAPin.none { it.isNotEmpty() }) {
-                focusRequesterSixthPin.requestFocus()
-            } else {
-                twoFAPin.forEachIndexed { index, pin ->
-                    if (pin.isEmpty()) {
-                        when (index) {
-                            FIRST_PIN -> focusRequesterFirstPin.requestFocus()
-                            SECOND_PIN -> focusRequesterSecondPin.requestFocus()
-                            THIRD_PIN -> focusRequesterThirdPin.requestFocus()
-                            FOURTH_PIN -> focusRequesterFourthPin.requestFocus()
-                            FIFTH_PIN -> focusRequesterFifthPin.requestFocus()
-                            SIXTH_PIN -> focusRequesterSixthPin.requestFocus()
-                        }
-                        return@forEachIndexed
-                    }
-                }
-            }
-        }
+    EventEffect(event = requestFocus, onConsumed = onRequestFocusConsumed) {
+        focusRequesterFirstPin.requestFocus()
     }
 }
 
@@ -241,7 +228,7 @@ private fun PinTwoFactorAuthentication(
             ),
             onValueChange = {
                 with(it.text) {
-                    if (isEmpty() || length == 1) onPinChanged(this)
+                    if (pin != this && (isEmpty() || length == 1)) onPinChanged(this)
                     else if (length == NUMBER_PINS) on2FAChanged(this)
                 }
             },
@@ -312,7 +299,8 @@ private fun PreviewTwoFactorAuthenticationField() {
                 }
             },
             isError = isError,
-            shouldRequestFocus = true
+            requestFocus = consumed,
+            onRequestFocusConsumed = {}
         )
     }
 }
