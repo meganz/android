@@ -108,9 +108,8 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun itemClick(position: Int) {
-        val actualPosition = position - 1
-        val node = incomingSharesState().nodes.getOrNull(actualPosition)?.first
-        val shareData = incomingSharesState().nodes.getOrNull(actualPosition)?.second
+        val node = megaNodeAdapter?.getItem(position)
+        val shareData = megaNodeAdapter?.getShareData(position)
         when {
             shareData?.isVerified == false -> {
                 Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
@@ -143,7 +142,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     openFile(
                         it,
                         Constants.INCOMING_SHARES_ADAPTER,
-                        actualPosition
+                        position
                     )
                 }
         }

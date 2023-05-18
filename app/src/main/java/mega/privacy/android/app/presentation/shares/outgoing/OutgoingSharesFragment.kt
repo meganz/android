@@ -103,13 +103,13 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun itemClick(position: Int) {
-        val actualPosition = position - 1
-        val node = outgoingSharesState().nodes.getOrNull(actualPosition)?.first
-        val shareData = outgoingSharesState().nodes.getOrNull(actualPosition)?.second
+        val node = megaNodeAdapter?.getItem(position)
+        val shareData = megaNodeAdapter?.getShareData(position)
         when {
             shareData?.isPending == true -> {
                 showCanNotVerifyContact(shareData.user)
             }
+
             shareData?.isVerified == false -> {
                 openAuthenticityCredentials(shareData.user)
             }
@@ -131,7 +131,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     openFile(
                         it,
                         Constants.OUTGOING_SHARES_ADAPTER,
-                        actualPosition
+                        position
                     )
                 }
         }

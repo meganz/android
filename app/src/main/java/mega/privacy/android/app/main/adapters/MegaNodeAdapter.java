@@ -656,8 +656,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         this.nodes = insertPlaceHolderNode(nodes);
         // need to add extra elements to sharedata too, so that the element at a specific position
         // corresponds exactly to the node in the nodes list
-        for (int i = 0; i < this.nodes.size() - shareData.size(); i++) {
-            shareData.add(0, null);
+        for (int i = 0; i < this.nodes.size(); i++) {
+            if (this.nodes.get(i) == null)
+                shareData.add(i, null);
         }
         this.shareData = shareData;
         Timber.d("setNodes size: %s", this.nodes.size());
@@ -1229,6 +1230,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return nodes.get(position);
         }
 
+        return null;
+    }
+
+    public ShareData getShareData(int position) {
+        if (shareData != null) {
+            return shareData.get(position);
+        }
         return null;
     }
 
