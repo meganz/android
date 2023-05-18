@@ -1,12 +1,10 @@
 package mega.privacy.android.app
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
@@ -20,7 +18,9 @@ import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
+import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +30,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -38,6 +39,8 @@ import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
 import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
@@ -63,6 +66,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
@@ -80,7 +84,7 @@ import javax.inject.Inject
  * Service to Upload files
  */
 @AndroidEntryPoint
-class UploadService : Service() {
+internal class UploadService : LifecycleService() {
 
     /**
      * Use case to get glboal transfer
@@ -129,16 +133,28 @@ class UploadService : Service() {
     lateinit var completedTransferMapper: CompletedTransferMapper
 
     @Inject
+    lateinit var getRootFolder: GetRootFolder
+
+    @Inject
+    lateinit var getNodeByHandle: GetNodeByHandle
+
+    @Inject
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
+
+    @Inject
+    lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
+
+    private val intentFlow = MutableSharedFlow<Intent>()
 
     private var isForeground = false
     private var canceled = false
 
     private var lock: WifiManager.WifiLock? = null
     private var wl: PowerManager.WakeLock? = null
-    private var notificationBuilder: Notification.Builder? = null
-    private var notificationBuilderCompat: NotificationCompat.Builder? = null
+    private val notificationBuilderCompat: NotificationCompat.Builder by lazy(LazyThreadSafetyMode.NONE) {
+        NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_UPLOAD_ID)
+    }
     private var notificationManager: NotificationManager? = null
     private val mapProgressFileTransfers: HashMap<Int, MegaTransfer> = HashMap()
     private var pendingToAddInQueue = 0
@@ -165,13 +181,9 @@ class UploadService : Service() {
 
     private var monitorPausedTransfersJob: Job? = null
 
-    @SuppressLint("NewApi", "CheckResult", "WrongConstant")
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
-        notificationBuilder = Notification.Builder(this@UploadService)
-        notificationBuilderCompat =
-            NotificationCompat.Builder(this@UploadService, Constants.NOTIFICATION_CHANNEL_UPLOAD_ID)
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         startForeground()
         isForeground = false
@@ -211,36 +223,36 @@ class UploadService : Service() {
                 when (event) {
                     is GetGlobalTransferUseCase.Result.OnTransferStart -> {
                         val transfer = event.transfer
-                        doOnTransferStart(transfer)
+                        rxSubscriptions.add(doOnTransferStart(transfer)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
                         val transfer = event.transfer
-                        doOnTransferUpdate(transfer)
+                        rxSubscriptions.add(doOnTransferUpdate(transfer)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
                         val transfer = event.transfer
                         val error = event.error
-                        doOnTransferFinish(transfer, error)
+                        rxSubscriptions.add(doOnTransferFinish(transfer, error)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
                         val transfer = event.transfer
                         val error = event.error
-                        doOnTransferTemporaryError(transfer, error)
+                        rxSubscriptions.add(doOnTransferTemporaryError(transfer, error)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
                     }
 
                     else -> {}
@@ -248,6 +260,11 @@ class UploadService : Service() {
             }
             ) { t: Throwable? -> Timber.e(t) }
         rxSubscriptions.add(subscription)
+        lifecycleScope.launch {
+            intentFlow.collect { intent ->
+                onHandleIntent(intent)
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -268,7 +285,9 @@ class UploadService : Service() {
 
         Timber.d("action = ${intent.action}")
         startForeground()
-        onHandleIntent(intent)
+        lifecycleScope.launch {
+            intentFlow.emit(intent)
+        }
         return START_NOT_STICKY
     }
 
@@ -325,8 +344,7 @@ class UploadService : Service() {
         super.onDestroy()
     }
 
-    @Synchronized
-    private fun onHandleIntent(intent: Intent) {
+    private suspend fun onHandleIntent(intent: Intent) {
         Timber.d("onHandleIntent")
         val action = intent.action
         Timber.d("Action is $action")
@@ -380,7 +398,13 @@ class UploadService : Service() {
         }
     }
 
-    private fun doHandleIntent(intent: Intent, filePath: String) {
+    private suspend fun doHandleIntent(intent: Intent, filePath: String) {
+        if (!MegaApplication.isLoggingIn) {
+            // attempt to fast login if need, ignore the result
+            MegaApplication.isLoggingIn = true
+            runCatching { backgroundFastLoginUseCase() }
+            MegaApplication.isLoggingIn = false
+        }
         val file = File(filePath)
         Timber.d("File to manage: ${file.absolutePath}")
         val textFileMode = intent.getStringExtra(EXTRA_UPLOAD_TXT)
@@ -392,9 +416,10 @@ class UploadService : Service() {
         }
         val parentNode =
             if (parentHandle == MegaApiJava.INVALID_HANDLE)
-                megaApi.rootNode
+                getRootFolder()
             else
-                megaApi.getNodeByHandle(parentHandle)
+                getNodeByHandle(parentHandle)
+        if (parentNode == null) return
         val mTime = if (lastModified == 0L) Constants.INVALID_VALUE.toLong() else lastModified
         pendingToAddInQueue++
         if (!TextUtil.isTextEmpty(textFileMode)) {
@@ -507,8 +532,7 @@ class UploadService : Service() {
 
             notificationManager?.notify(notificationId, builderCompatOreo.build())
         } else {
-            notificationBuilderCompat?.let { builder ->
-                builder
+                notificationBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
                     .setContentIntent(
@@ -522,8 +546,7 @@ class UploadService : Service() {
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false)
-                notificationManager?.notify(notificationId, builder.build())
-            }
+                notificationManager?.notify(notificationId, notificationBuilderCompat.build())
         }
     }
 
@@ -631,8 +654,7 @@ class UploadService : Service() {
                 .setOnlyAlertOnce(true)
                 .build()
         } else {
-            notificationBuilder?.let { builder ->
-                builder
+                notificationBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
                     .setProgress(100, progressPercent, false)
@@ -642,8 +664,7 @@ class UploadService : Service() {
                     .setSubText(info)
                     .setContentText(actionString)
                     .setOnlyAlertOnce(true)
-                builder.build()
-            }
+                    .build()
         }
         if (!isForeground) {
             Timber.d("Starting foreground")

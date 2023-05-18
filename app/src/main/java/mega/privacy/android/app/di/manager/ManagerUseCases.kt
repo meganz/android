@@ -4,6 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
@@ -42,7 +43,7 @@ import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
  */
 
 @Module(includes = [GetNodeModule::class])
-@InstallIn(ViewModelComponent::class)
+@InstallIn(ViewModelComponent::class, ServiceComponent::class)
 abstract class ManagerUseCases {
 
     @Binds
