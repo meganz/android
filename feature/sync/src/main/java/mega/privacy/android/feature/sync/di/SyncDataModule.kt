@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.feature.sync.data.gateway.DefaultSyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
+import mega.privacy.android.feature.sync.data.gateway.SyncGatewayImpl
 import mega.privacy.android.feature.sync.data.repository.SyncPreferencesRepositoryImpl
 import mega.privacy.android.feature.sync.data.repository.SyncRepositoryImpl
 import mega.privacy.android.feature.sync.domain.repository.SyncPreferencesRepository
@@ -26,5 +26,5 @@ internal interface SyncDataModule {
 
     @Binds
     @Singleton
-    fun bindSyncGateway(implementation: DefaultSyncGateway): SyncGateway
+    fun bindSyncGateway(implementation: SyncGatewayImpl): SyncGateway
 }

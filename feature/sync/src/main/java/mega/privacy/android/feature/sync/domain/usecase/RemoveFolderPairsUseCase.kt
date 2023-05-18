@@ -6,7 +6,9 @@ import javax.inject.Inject
 /**
  * Removes all folder pairs
  */
-fun interface RemoveFolderPairs {
+class RemoveFolderPairsUseCase @Inject constructor(private val syncRepository: SyncRepository) {
 
-    suspend operator fun invoke()
+    suspend operator fun invoke() {
+        syncRepository.removeFolderPairs()
+    }
 }

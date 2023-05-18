@@ -18,7 +18,7 @@ import javax.inject.Inject
  * Gateway implementation to access Sync API
  *
  */
-internal class DefaultSyncGateway @Inject constructor(
+internal class SyncGatewayImpl @Inject constructor(
     private val megaApi: MegaApiSyncMock,
 ) : SyncGateway {
 

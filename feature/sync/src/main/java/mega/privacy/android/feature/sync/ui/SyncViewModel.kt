@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
-import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairs
-import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFolders
+import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.GetRemoteFoldersUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairs
+import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.SetSyncByWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPair
+import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPairUseCase
 import javax.inject.Inject
 
 /**
@@ -26,10 +26,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SyncViewModel @Inject constructor(
-    private val getRemoteFolders: GetRemoteFolders,
-    private val syncFolderPair: SyncFolderPair,
-    private val getFolderPairs: GetFolderPairs,
-    private val removeFolderPairs: RemoveFolderPairs,
+    private val getRemoteFoldersUseCase: GetRemoteFoldersUseCase,
+    private val syncFolderPairUseCase: SyncFolderPairUseCase,
+    private val getFolderPairsUseCase: GetFolderPairsUseCase,
+    private val removeFolderPairsUseCase: RemoveFolderPairsUseCase,
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase,
     private val setSyncByWiFiUseCase: SetSyncByWiFiUseCase,
 ) : ViewModel() {
@@ -49,7 +49,7 @@ class SyncViewModel @Inject constructor(
 
     private fun fetchAllMegaFolders() {
         viewModelScope.launch {
-            runCatching { getRemoteFolders() }
+            runCatching { getRemoteFoldersUseCase() }
                 .onSuccess {
                     _state.value = _state.value.copy(rootMegaRemoteFolders = it)
                 }
@@ -89,8 +89,8 @@ class SyncViewModel @Inject constructor(
             is SyncAction.SyncClicked -> {
                 _state.value.selectedMegaFolder?.let { remoteFolder ->
                     viewModelScope.launch {
-                        removeFolderPairs()
-                        val isSyncFolderPairRequestSuccessful = syncFolderPair(
+                        removeFolderPairsUseCase()
+                        val isSyncFolderPairRequestSuccessful = syncFolderPairUseCase(
                             _state.value.selectedLocalFolder,
                             remoteFolder
                         )
@@ -111,7 +111,7 @@ class SyncViewModel @Inject constructor(
 
             is SyncAction.RemoveFolderPairClicked -> {
                 viewModelScope.launch {
-                    removeFolderPairs()
+                    removeFolderPairsUseCase()
                     _state.update {
                         it.copy(
                             selectedLocalFolder = "",
@@ -132,7 +132,7 @@ class SyncViewModel @Inject constructor(
 
     // For POC, we are only syncing one folder
     private suspend fun getFirstFolderPair(): FolderPair =
-        getFolderPairs().first()
+        getFolderPairsUseCase().first()
 
     /**
      * Saves selected sync path with full path. It also converts relative path to absolute.

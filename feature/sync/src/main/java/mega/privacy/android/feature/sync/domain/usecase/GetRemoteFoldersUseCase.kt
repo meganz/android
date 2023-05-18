@@ -5,11 +5,11 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import javax.inject.Inject
 
-internal class DefaultGetRemoteFolders @Inject constructor(
+class GetRemoteFoldersUseCase @Inject constructor(
     private val megaNodeRepository: MegaNodeRepository,
-) : GetRemoteFolders {
+) {
 
-    override suspend fun invoke(): List<RemoteFolder> =
+    suspend operator fun invoke(): List<RemoteFolder> =
         megaNodeRepository
             .getRootNode()
             ?.let {
