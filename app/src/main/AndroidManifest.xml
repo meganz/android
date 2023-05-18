@@ -112,6 +112,7 @@
         android:theme="@style/Theme.Mega"
         android:usesCleartextTraffic="true"
         android:localeConfig="@xml/locales_config"
+        android:gwpAsanMode="always"
         >
         <activity
             android:name=".presentation.settings.SettingsActivity"
