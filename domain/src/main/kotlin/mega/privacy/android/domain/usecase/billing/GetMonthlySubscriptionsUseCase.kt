@@ -7,20 +7,25 @@ import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Get list of subscriptions
+ * Get list of monthly subscriptions
  *
  * @property accountRepository                  [AccountRepository]
  * @property getLocalPricingUseCase             [GetLocalPricingUseCase]
  * @property calculateCurrencyAmountUseCase     [CalculateCurrencyAmountUseCase]
  */
-class GetSubscriptionsUseCase @Inject constructor(
+class GetMonthlySubscriptionsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
     private val calculateCurrencyAmountUseCase: CalculateCurrencyAmountUseCase,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
 ) {
+    /**
+     * Invoke
+     *
+     * @return [List<Subscription>]
+     */
     suspend operator fun invoke(): List<Subscription> {
-        return getAppSubscriptionOptionsUseCase().map { plan ->
+        return getAppSubscriptionOptionsUseCase(1).map { plan ->
             val sku = getSku(plan.accountType)
             val localPricing = sku?.let { getLocalPricingUseCase(it) }
 

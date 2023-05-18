@@ -14,9 +14,9 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptio
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
-import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,7 +25,7 @@ import javax.inject.Inject
  * Upgrade account view model
  *
  * @param getCurrentSubscriptionPlanUseCase use case to get the current subscribed plan
- * @param getSubscriptionsUseCase use case to get the list of available subscriptions in the app
+ * @param getMonthlySubscriptionsUseCase use case to get the list of available subscriptions in the app
  * @param getCurrentPaymentUseCase use case to get the current payment option
  * @param isBillingAvailable use to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
@@ -34,7 +34,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class UpgradeAccountViewModel @Inject constructor(
-    private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
+    private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
@@ -56,7 +56,7 @@ class UpgradeAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            runCatching { getSubscriptionsUseCase() }
+            runCatching { getMonthlySubscriptionsUseCase() }
                 .onSuccess { subscriptions ->
                     val localisedSubscriptions =
                         subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }

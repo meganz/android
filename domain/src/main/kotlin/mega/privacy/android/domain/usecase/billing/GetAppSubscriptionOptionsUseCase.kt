@@ -12,14 +12,14 @@ class GetAppSubscriptionOptionsUseCase @Inject constructor(
     /**
      * Invoke
      * filter SubscriptionOptions to get monthly subscriptions options
-     *
-     * @return [List<SubscriptionOption>]
+     * @param months [Int]
+     * @return [List<SubscriptionOptions>]
      */
-    suspend operator fun invoke() =
+    suspend operator fun invoke(months: Int) =
         getSubscriptionOptionsUseCase().filter { plan ->
             plan.accountType !== AccountType.BUSINESS &&
                     plan.accountType !== AccountType.PRO_FLEXI &&
                     plan.accountType !== AccountType.UNKNOWN &&
-                    plan.months == 1
+                    plan.months == months
         }
 }

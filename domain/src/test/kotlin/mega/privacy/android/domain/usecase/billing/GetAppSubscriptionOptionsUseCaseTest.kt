@@ -8,8 +8,6 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
-import mega.privacy.android.domain.usecase.billing.GetSubscriptionOptionsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -145,11 +143,18 @@ class GetAppSubscriptionOptionsUseCaseTest {
         subscriptionPlanUnknown
     )
 
-    private val expectedResult = listOf(
+    private val expectedMonthlyResult = listOf(
         subscriptionPlanProLiteMonthly,
         subscriptionPlanProIMonthly,
         subscriptionPlanProIIMonthly,
         subscriptionPlanProIIIMonthly
+    )
+
+    private val expectedYearlyResult = listOf(
+        subscriptionPlanProLiteYearly,
+        subscriptionPlanProIYearly,
+        subscriptionPlanProIIYearly,
+        subscriptionPlanProIIIYearly
     )
 
     @Before
@@ -160,15 +165,28 @@ class GetAppSubscriptionOptionsUseCaseTest {
     }
 
     @Test
-    fun `test that subscription options are filtered correctly`() {
+    fun `test that subscription options are filtered correctly for monthly subscriptions`() {
         runTest {
 
             whenever(accountRepository.getSubscriptionOptions()).thenReturn(
                 fullListOfSubscriptionOptions
             )
 
-            val actual = underTest.invoke()
-            assertThat(actual).isEqualTo(expectedResult)
+            val actual = underTest.invoke(1)
+            assertThat(actual).isEqualTo(expectedMonthlyResult)
+        }
+    }
+
+    @Test
+    fun `test that subscription options are filtered correctly for yearly subscriptions`() {
+        runTest {
+
+            whenever(accountRepository.getSubscriptionOptions()).thenReturn(
+                fullListOfSubscriptionOptions
+            )
+
+            val actual = underTest.invoke(12)
+            assertThat(actual).isEqualTo(expectedYearlyResult)
         }
     }
 }

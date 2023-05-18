@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
-import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import org.junit.After
 
@@ -39,7 +39,7 @@ import org.mockito.kotlin.whenever
 class UpgradeAccountViewModelTest {
     private lateinit var underTest: UpgradeAccountViewModel
 
-    private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
+    private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
     private val getCurrentPaymentUseCase = mock<GetCurrentPaymentUseCase>()
     private val isBillingAvailable = mock<IsBillingAvailable>()
@@ -158,7 +158,7 @@ class UpgradeAccountViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = UpgradeAccountViewModel(
-            getSubscriptionsUseCase = getSubscriptionsUseCase,
+            getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             getCurrentPaymentUseCase = getCurrentPaymentUseCase,
             isBillingAvailable = isBillingAvailable,
@@ -173,7 +173,7 @@ class UpgradeAccountViewModelTest {
 
     @Test
     fun `test that initial state has all Pro plans listed`() = runTest {
-        whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+        whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
         underTest.state.map { it.subscriptionsList }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEmpty()
             assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
@@ -183,7 +183,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that current subscribed plan is listed`() =
         runTest {
-            whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             underTest.state.map { it.currentSubscriptionPlan }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPlan)
@@ -204,7 +204,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that state is updated when current payment is available and current payment check is called`() =
         runTest {
-            whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
@@ -223,7 +223,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that showBillingWarning state is set to True`() =
         runTest {
-            whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
@@ -238,7 +238,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that showBillingWarning state is set to False`() =
         runTest {
-            whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
@@ -253,7 +253,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that showBuyNewSubscriptionDialog state is updated if setShowBuyNewSubscriptionDialog is called`() =
         runTest {
-            whenever(getSubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 

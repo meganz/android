@@ -19,6 +19,7 @@ class CalculateCurrencyAmountUseCase @Inject constructor() {
             (currencyPoint.value / 1000000.00).toFloat(),
             currency
         )
+
         is CurrencyPoint.SystemCurrencyPoint -> CurrencyAmount(
             (currencyPoint.value / 100.00).toFloat(),
             currency

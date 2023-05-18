@@ -18,8 +18,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetSubscriptionsUseCaseTest {
-    private lateinit var underTest: GetSubscriptionsUseCase
+class GetMonthlySubscriptionsUseCaseTest {
+    private lateinit var underTest: GetMonthlySubscriptionsUseCase
     private val accountRepository = mock<AccountRepository>()
     private val calculateCurrencyAmountUseCase = mock<CalculateCurrencyAmountUseCase>()
     private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
@@ -32,7 +32,7 @@ class GetSubscriptionsUseCaseTest {
         handle = 1560943707714440503,
         storage = 450,
         transfer = 450,
-        amount = CurrencyPoint.SystemCurrencyPoint(9.99.toLong()),
+        amount = CurrencyPoint.SystemCurrencyPoint(999.toLong()),
         currency = currencyMapper("EUR"),
     )
     private val subscription = Subscription(
@@ -40,21 +40,21 @@ class GetSubscriptionsUseCaseTest {
         handle = 1560943707714440503,
         storage = 450,
         transfer = 450,
-        amount = CurrencyAmount(9.99.toLong().toFloat(), Currency("EUR"))
+        amount = CurrencyAmount(999.toLong().toFloat(), Currency("EUR"))
     )
 
     private val localPricing = LocalPricing(
-        CurrencyPoint.LocalCurrencyPoint(9.99.toLong()),
+        CurrencyPoint.LocalCurrencyPoint(999.toLong()),
         Currency("EUR"),
         SKU_PRO_LITE_MONTH
     )
 
-    private val currencyAmount = CurrencyAmount(9.99.toLong().toFloat(), Currency("EUR"))
+    private val currencyAmount = CurrencyAmount(999.toLong().toFloat(), Currency("EUR"))
 
 
     @Before
     fun setUp() {
-        underTest = GetSubscriptionsUseCase(
+        underTest = GetMonthlySubscriptionsUseCase(
             accountRepository = accountRepository,
             calculateCurrencyAmountUseCase = calculateCurrencyAmountUseCase,
             getLocalPricingUseCase = getLocalPricingUseCase,
@@ -65,7 +65,7 @@ class GetSubscriptionsUseCaseTest {
     @Test
     fun `test the GetSubscriptionsUseCase returns the list of Subscriptions successfully`() {
         runTest {
-            whenever(getAppSubscriptionOptionsUseCase()).thenReturn(
+            whenever(getAppSubscriptionOptionsUseCase(1)).thenReturn(
                 listOf(
                     subscriptionOption
                 )
@@ -73,7 +73,7 @@ class GetSubscriptionsUseCaseTest {
             whenever(getLocalPricingUseCase(SKU_PRO_LITE_MONTH)).thenReturn(localPricing)
             whenever(
                 calculateCurrencyAmountUseCase(
-                    CurrencyPoint.LocalCurrencyPoint(9.99.toLong()),
+                    CurrencyPoint.LocalCurrencyPoint(999.toLong()),
                     Currency("EUR")
                 )
             ).thenReturn(currencyAmount)
