@@ -26,7 +26,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -52,7 +51,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,8 +59,8 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.controls.MegaSwitch
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
@@ -111,13 +109,13 @@ internal fun AlbumGetLinkScreen(
 
         ShareKeyConfirmationDialog(
             onDismiss = {
-                val link = keylessLink
+                val link = context.getString(R.string.share_link_with_key, keylessLink, key)
                 onShareLink(link)
 
                 showShareKeyConfirmation = false
             },
             onShareKey = {
-                val link = context.getString(R.string.share_link_with_key, keylessLink, key)
+                val link = keylessLink
                 onShareLink(link)
 
                 showShareKeyConfirmation = false
@@ -200,7 +198,7 @@ private fun AlbumGetLinkTopBar(
     TopAppBar(
         title = {
             Text(
-                text = pluralStringResource(id = R.plurals.get_links, count = 1).takeIf {
+                text = pluralStringResource(id = R.plurals.album_share_get_links, count = 1).takeIf {
                     isAlbumNewLink
                 } ?: stringResource(id = R.string.edit_link_option),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
@@ -436,7 +434,7 @@ private fun ExportSeparateKeySection(
                 modifier = Modifier.weight(1f),
                 content = {
                     Text(
-                        text = stringResource(id = R.string.option_send_decryption_key_separately).uppercase(),
+                        text = stringResource(id = R.string.option_send_decryption_key_separately),
                         color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
@@ -496,7 +494,7 @@ private fun LinkSection(
         modifier = modifier.fillMaxWidth(),
         content = {
             Text(
-                text = stringResource(id = R.string.file_properties_shared_folder_public_link_name).uppercase(),
+                text = stringResource(id = R.string.file_properties_shared_folder_public_link_name),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W500,
@@ -530,7 +528,7 @@ private fun DecryptionKeySection(
         modifier = modifier.fillMaxWidth(),
         content = {
             Text(
-                text = stringResource(id = R.string.key_label).uppercase(),
+                text = stringResource(id = R.string.key_label),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W500,
@@ -611,52 +609,13 @@ private fun ShareKeyConfirmationDialog(
     onDismiss: () -> Unit,
     onShareKey: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
-    MegaDialog(
+    MegaAlertDialog(
         modifier = modifier,
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false,
-        ),
-        body = {
-            Text(
-                text = stringResource(id = R.string.share_key_warning),
-                modifier = Modifier.padding(top = 8.dp),
-                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.W400,
-                style = MaterialTheme.typography.subtitle1,
-            )
-        },
-        onDismissRequest = {},
-        confirmButton = {
-            TextButton(
-                onClick = onShareKey,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.button_share_key),
-                        color = teal_300,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W500,
-                        style = MaterialTheme.typography.button,
-                    )
-                },
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.general_dismiss),
-                        color = teal_300,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.W400,
-                        style = MaterialTheme.typography.button,
-                    )
-                },
-            )
-        },
+        title = stringResource(id = R.string.album_share_share_link_dialog_title),
+        text = stringResource(id = R.string.album_share_share_link_dialog_body),
+        confirmButtonText = stringResource(id = R.string.album_share_share_link_dialog_button_link_only),
+        cancelButtonText = stringResource(id = R.string.album_share_share_link_dialog_button_link_and_key),
+        onConfirm = onShareKey,
+        onDismiss = onDismiss,
     )
 }

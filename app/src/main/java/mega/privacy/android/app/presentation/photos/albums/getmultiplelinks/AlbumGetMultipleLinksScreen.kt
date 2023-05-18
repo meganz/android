@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
 import android.text.TextUtils.TruncateAt.MIDDLE
 import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -58,12 +57,9 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
-import mega.privacy.android.core.ui.theme.grey_020
 import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_033
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.surface_dark
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
@@ -140,7 +136,7 @@ private fun AlbumGetMultipleLinksTopBar(
     TopAppBar(
         title = {
             Text(
-                text = pluralStringResource(id = R.plurals.get_links, count = 2),
+                text = pluralStringResource(id = R.plurals.album_share_get_links, count = 2),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
@@ -193,19 +189,6 @@ private fun AlbumGetMultipleLinksContent(
     val isLight = MaterialTheme.colors.isLight
 
     Column(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = grey_020.takeIf { isLight } ?: surface_dark),
-        ) {
-            Text(
-                modifier = Modifier.padding(all = 16.dp),
-                text = stringResource(id = R.string.warning_get_links),
-                fontSize = 13.sp,
-                color = grey_alpha_033.takeIf { isLight } ?: white_alpha_054,
-                lineHeight = 17.sp,
-            )
-        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(start = 16.dp),

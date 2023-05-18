@@ -226,7 +226,8 @@ class AlbumDynamicContentFragment : Fragment() {
                     getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
                 }
                 menu.findItem(R.id.action_menu_get_link)?.let { menu ->
-                    menu.title = context?.resources?.getQuantityString(R.plurals.get_links, 1)
+                    menu.title =
+                        context?.resources?.getQuantityString(R.plurals.album_share_get_links, 1)
                     menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == false
                 }
                 menu.findItem(R.id.action_menu_manage_link)?.let { menu ->

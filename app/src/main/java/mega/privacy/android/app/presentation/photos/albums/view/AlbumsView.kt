@@ -73,6 +73,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption
@@ -463,46 +464,22 @@ fun RemoveLinksConfirmationDialog(
     onCancel: () -> Unit,
     onRemove: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
-
-    MegaDialog(
-        properties = DialogProperties(dismissOnClickOutside = false),
-        onDismissRequest = onCancel,
-        body = {
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = pluralStringResource(
-                    id = R.plurals.remove_links_warning_text,
-                    count = numLinks,
-                ),
-                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
-                style = subtitle1,
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onRemove,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.context_remove),
-                        style = button,
-                        color = teal_300.takeIf { isLight } ?: teal_200,
-                    )
-                },
-            )
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onCancel,
-                content = {
-                    Text(
-                        text = stringResource(id = R.string.button_cancel),
-                        style = button,
-                        color = teal_300.takeIf { isLight } ?: teal_200,
-                    )
-                },
-            )
-        },
+    MegaAlertDialog(
+        title = pluralStringResource(
+            id = R.plurals.album_share_remove_links_dialog_title,
+            count = numLinks,
+        ),
+        text = pluralStringResource(
+            id = R.plurals.album_share_remove_links_dialog_body,
+            count = numLinks,
+        ),
+        confirmButtonText = pluralStringResource(
+            id = R.plurals.album_share_remove_links_dialog_button,
+            count = numLinks,
+        ),
+        cancelButtonText = stringResource(id = R.string.button_cancel),
+        onConfirm = onRemove,
+        onDismiss = onCancel,
     )
 }
 
