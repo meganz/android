@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.twofactorauthentication.view.FIFTH_PIN_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.FIRST_PIN_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.view.FOURTH_PIN_TEST_TAG
@@ -32,7 +33,8 @@ class TwoFactorAuthenticationFieldTest {
                 on2FAPinChanged = { _, _ -> },
                 on2FAChanged = {},
                 isError = false,
-                shouldRequestFocus = false,
+                requestFocus = consumed,
+                onRequestFocusConsumed = {}
             )
         }
     }

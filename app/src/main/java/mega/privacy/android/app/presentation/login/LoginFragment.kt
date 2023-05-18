@@ -146,7 +146,8 @@ class LoginFragment : Fragment() {
                 onBackPressed = { onBackPressed(uiState) },
                 onUpdateKarereLogs = { viewModel.checkAndUpdateKarereLogs(requireActivity()) },
                 onUpdateSdkLogs = { viewModel.checkAndUpdateSDKLogs(requireActivity()) },
-                onChangeApiServer = ::showChangeApiServerDialog
+                onChangeApiServer = ::showChangeApiServerDialog,
+                onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed
             )
         }
     }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.Feature
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property pressedBackWhileLogin      True if pressed back while a login was in progress, false otherwise.
  * @property is2FAEnabled               True if should ask for 2FA, false otherwise.
  * @property is2FARequired              True if 2FA needs to be requested, false otherwise.
+ * @property isFirstTime2FA             True if it is the first time the 2FA is requested.
  * @property twoFAPin                   Typed 2FA pin.
  * @property multiFactorAuthState       [MultiFactorAuthState]
  * @property isAccountConfirmed         True if account is confirmed after creation, false otherwise.
@@ -55,6 +57,7 @@ data class LoginState(
     val pressedBackWhileLogin: Boolean = false,
     val is2FAEnabled: Boolean = false,
     val is2FARequired: Boolean = false,
+    val isFirstTime2FA: StateEvent = consumed,
     val twoFAPin: List<String> = listOf("", "", "", "", "", ""),
     val multiFactorAuthState: MultiFactorAuthState? = null,
     val isAccountConfirmed: Boolean = false,

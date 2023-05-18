@@ -28,7 +28,6 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -95,6 +93,7 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
  * @param onUpdateKarereLogs        Action when needs to update MegaChat logs.
  * @param onUpdateSdkLogs           Action when needs to update Sdk logs.
  * @param onChangeApiServer         Action when needs to update API server.
+ * @param onFirstTime2FAConsumed    Action when the 2FA is shown for the first time.
  * @param modifier                  [Modifier]
  */
 @Composable
@@ -113,6 +112,7 @@ fun LoginView(
     onUpdateKarereLogs: () -> Unit,
     onUpdateSdkLogs: () -> Unit,
     onChangeApiServer: () -> Unit,
+    onFirstTime2FAConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -158,7 +158,8 @@ fun LoginView(
                     paddingValues = paddingValues,
                     on2FAPinChanged = on2FAPinChanged,
                     on2FAChanged = on2FAChanged,
-                    onLostAuthenticatorDevice = onLostAuthenticatorDevice
+                    onLostAuthenticatorDevice = onLostAuthenticatorDevice,
+                    onFirstTime2FAConsumed = onFirstTime2FAConsumed
                 )
             }
         }
@@ -423,6 +424,7 @@ private fun TwoFactorAuthentication(
     on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
     onLostAuthenticatorDevice: () -> Unit,
+    onFirstTime2FAConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Box(
     modifier = modifier
@@ -449,7 +451,8 @@ private fun TwoFactorAuthentication(
             isError = isError,
             on2FAPinChanged = on2FAPinChanged,
             on2FAChanged = on2FAChanged,
-            shouldRequestFocus = isChecking2FA
+            requestFocus = state.isFirstTime2FA,
+            onRequestFocusConsumed = onFirstTime2FAConsumed
         )
         if (isError) {
             Text(
@@ -528,7 +531,8 @@ private fun PreviewLoginView(
             onBackPressed = {},
             onUpdateKarereLogs = {},
             onUpdateSdkLogs = {},
-            onChangeApiServer = {}
+            onChangeApiServer = {},
+            onFirstTime2FAConsumed = {}
         )
     }
 }

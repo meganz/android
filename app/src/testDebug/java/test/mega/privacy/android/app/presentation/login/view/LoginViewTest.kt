@@ -48,7 +48,8 @@ class LoginViewTest {
                 onBackPressed = {},
                 onUpdateKarereLogs = {},
                 onUpdateSdkLogs = {},
-                onChangeApiServer = {}
+                onChangeApiServer = {},
+                onFirstTime2FAConsumed = {}
             )
         }
     }
