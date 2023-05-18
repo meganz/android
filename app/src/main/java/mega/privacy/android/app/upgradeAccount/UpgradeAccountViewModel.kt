@@ -14,10 +14,11 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptio
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -55,10 +56,14 @@ class UpgradeAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val subscriptions = getSubscriptionsUseCase()
-            val localisedSubscriptions =
-                subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }
-            _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
+            runCatching { getSubscriptionsUseCase() }
+                .onSuccess { subscriptions ->
+                    val localisedSubscriptions =
+                        subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }
+                    _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
+                }.onFailure {
+                    Timber.e(it)
+                }
         }
         viewModelScope.launch {
             val currentSubscriptionPlan = getCurrentSubscriptionPlanUseCase()
