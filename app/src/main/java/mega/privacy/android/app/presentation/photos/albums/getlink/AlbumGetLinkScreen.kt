@@ -165,7 +165,7 @@ internal fun AlbumGetLinkScreen(
                     coroutineScope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = context.resources.getQuantityString(
-                                R.plurals.links_copied_clipboard,
+                                R.plurals.album_share_links_copied,
                                 1,
                             ),
                         )

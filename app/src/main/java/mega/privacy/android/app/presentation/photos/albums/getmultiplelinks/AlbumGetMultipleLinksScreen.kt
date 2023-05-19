@@ -136,7 +136,10 @@ private fun AlbumGetMultipleLinksTopBar(
     TopAppBar(
         title = {
             Text(
-                text = pluralStringResource(id = R.plurals.album_share_get_links, count = 2),
+                text = pluralStringResource(
+                    id = R.plurals.album_share_get_links,
+                    count = links.size
+                ),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
@@ -235,8 +238,8 @@ private fun AlbumGetMultipleLinksContent(
                     coroutineScope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(
                             message = context.resources.getQuantityString(
-                                R.plurals.links_copied_clipboard,
-                                2,
+                                R.plurals.album_share_links_copied,
+                                links.size,
                             ),
                         )
                     }
