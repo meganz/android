@@ -7663,11 +7663,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { copyResult: CopyRequestResult, copyThrowable: Throwable? ->
+                                    .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->
                                         dismissAlertDialogIfExists(statusDialog)
                                         if (!manageCopyMoveException(copyThrowable)) {
                                             viewModel.setCopyTargetPath(toHandle)
-                                            showCopyResult(copyResult)
+                                            copyResult?.let { showCopyResult(it) }
                                         }
                                     }
                             }
