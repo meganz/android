@@ -4810,4 +4810,8 @@
         <item quantity="one">Remove link</item>
         <item quantity="other">Remove links</item>
     </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">Enter decryption key</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>

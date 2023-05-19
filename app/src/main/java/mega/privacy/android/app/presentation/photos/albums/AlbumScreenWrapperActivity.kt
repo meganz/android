@@ -15,11 +15,13 @@ import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDe
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumImportDeeplinkScreen
+import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -32,6 +34,7 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         AlbumGetMultipleLinksScreen,
         AlbumDecryptionKeyScreen,
         AlbumImportDeeplinkScreen,
+        AlbumImportScreen,
     }
 
     @Inject
@@ -124,8 +127,18 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                     AlbumScreen.AlbumImportDeeplinkScreen -> {
                         AlbumImportDeeplinkScreen(
                             onApply = {
+                                val intent = createAlbumImportScreen(
+                                    context = this,
+                                    albumLink = AlbumLink(it),
+                                )
+                                startActivity(intent)
                                 finish()
                             },
+                        )
+                    }
+                    AlbumScreen.AlbumImportScreen -> {
+                        AlbumImportScreen(
+                            onBack = ::finish,
                         )
                     }
                     else -> finish()
@@ -142,6 +155,8 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         const val ALBUM_FLOW: String = "album_flow"
 
         const val ALBUM_NEW_LINK: String = "album_new_link"
+
+        const val ALBUM_LINK: String = "album_link"
 
         const val NUM_PHOTOS: String = "num_photos"
 
@@ -195,6 +210,14 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
             context: Context,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumImportDeeplinkScreen.name)
+        }
+
+        fun createAlbumImportScreen(
+            context: Context,
+            albumLink: AlbumLink,
+        ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
+            putExtra(ALBUM_SCREEN, AlbumScreen.AlbumImportScreen.name)
+            putExtra(ALBUM_LINK, albumLink.link)
         }
     }
 }
