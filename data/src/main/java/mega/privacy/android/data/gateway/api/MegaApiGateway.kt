@@ -2501,4 +2501,12 @@ interface MegaApiGateway {
         atLogout: Boolean,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Is foreign node
+     *
+     * @param handle
+     * @return true if foreign node
+     */
+    suspend fun isForeignNode(handle: Long): Boolean
 }

@@ -1208,4 +1208,6 @@ internal class MegaApiFacade @Inject constructor(
         atLogout: Boolean,
         listener: MegaRequestListenerInterface
     ) = megaApi.shouldShowPasswordReminderDialog(atLogout, listener)
+
+    override suspend fun isForeignNode(handle: Long) = megaApi.isForeignNode(handle)
 }

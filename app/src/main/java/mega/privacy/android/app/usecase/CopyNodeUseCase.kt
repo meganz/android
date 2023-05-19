@@ -3,6 +3,7 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import kotlinx.coroutines.rx3.rxSingle
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
@@ -38,6 +39,7 @@ class CopyNodeUseCase @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val copyNodeListUseCase: CopyNodeListUseCase,
 ) {
     /**
      * Copies a node.
@@ -92,6 +94,7 @@ class CopyNodeUseCase @Inject constructor(
                     error.errorCode == API_OK -> emitter.onComplete()
                     error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(parentNode.handle) ->
                         emitter.onError(ForeignNodeException())
+
                     else -> emitter.onError(error.toMegaException())
                 }
             })
@@ -280,37 +283,7 @@ class CopyNodeUseCase @Inject constructor(
      * @return Single with the [CopyRequestResult].
      */
     fun copy(nodes: List<MegaNode>, parentHandle: Long): Single<CopyRequestResult> =
-        Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            var errorCount = 0
-
-            for (node in nodes) {
-                if (emitter.isDisposed) break
-
-                copy(node, parentNode).blockingSubscribeBy(onError = { error ->
-                    when {
-                        error.shouldEmmitError() -> emitter.onError(error)
-                        else -> errorCount++
-                    }
-                })
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        nodes.size,
-                        errorCount
-                    ).also { resetAccountDetailsIfNeeded(it) }
-                )
-            }
-        }
+        rxSingle { copyNodeListUseCase(nodes, parentHandle) }
 
     /**
      * Checks if the error of the request is over quota, pre over quota or foreign node.
