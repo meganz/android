@@ -158,7 +158,7 @@ class MegaCompletedTransfersAdapter(
      * @param position the item position
      * @return transfer item
      */
-    fun getItem(position: Int) = completedTransfers[position]
+    fun getItem(position: Int) = completedTransfers.getOrNull(position)
 
     override fun getItemId(position: Int) = position.toLong()
 
