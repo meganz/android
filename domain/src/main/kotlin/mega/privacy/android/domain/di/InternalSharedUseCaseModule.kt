@@ -8,7 +8,6 @@ import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.DefaultGetCurrentUserFullName
 import mega.privacy.android.domain.usecase.DefaultGetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.DefaultGetUserFullName
 import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
@@ -17,7 +16,6 @@ import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.GetUserFullName
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
 import mega.privacy.android.domain.usecase.impl.DefaultGetFullAccountInfo
@@ -57,8 +55,6 @@ internal abstract class InternalSharedUseCaseModule {
     abstract fun bindGetCurrentUserFullName(implementation: DefaultGetCurrentUserFullName)
             : GetCurrentUserFullName
 
-    @Binds
-    abstract fun bindGetUserFullName(implementation: DefaultGetUserFullName): GetUserFullName
 
     companion object {
 

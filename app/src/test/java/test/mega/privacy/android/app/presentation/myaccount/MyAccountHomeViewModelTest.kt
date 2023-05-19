@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountAchievements
@@ -28,7 +27,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
-import mega.privacy.android.domain.usecase.GetUserFullName
+import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -91,7 +89,7 @@ class MyAccountHomeViewModelTest {
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getInSharesUseCase: GetInSharesUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
-    private val getUserFullName: GetUserFullName = mock()
+    private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFile: GetMyAvatarFile = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
 
@@ -111,7 +109,7 @@ class MyAccountHomeViewModelTest {
             getMyAvatarColorUseCase,
             getInSharesUseCase,
             getCurrentUserEmail,
-            getUserFullName,
+            getUserFullNameUseCase,
             getMyAvatarFile,
             getAccountAchievements
         )
@@ -155,7 +153,7 @@ class MyAccountHomeViewModelTest {
     fun `test uiState name updates`(expected: UserChanges) =
         runTest {
             val mockName = "Dog"
-            whenever(getUserFullName(true)).thenReturn(mockName)
+            whenever(getUserFullNameUseCase(true)).thenReturn(mockName)
 
             userUpdatesFlow.emit(expected)
 

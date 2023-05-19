@@ -3,25 +3,27 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ContactsRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetUserFullNameTest {
+class GetUserFullNameUseCaseTest {
 
-    private lateinit var underTest: DefaultGetUserFullName
+    private lateinit var underTest: GetUserFullNameUseCase
 
     private val contactsRepository: ContactsRepository = mock()
     private val accountRepository: AccountRepository = mock()
 
-    @Before
+    @BeforeEach
     fun setUp() {
-        underTest = DefaultGetUserFullName(
+        underTest = GetUserFullNameUseCase(
             contactsRepository = contactsRepository,
             accountRepository = accountRepository,
         )
@@ -68,4 +70,37 @@ class DefaultGetUserFullNameTest {
             underTest(true)
         ).isEqualTo(null)
     }
+
+    @Test
+    internal fun `test that last name is returned if first name throw an exception`() = runTest {
+        val expected = "LastName"
+        contactsRepository.stub {
+            onBlocking { getCurrentUserFirstName(any()) }.thenAnswer {
+                throw MegaException(
+                    1,
+                    "First Name threw exception"
+                )
+            }
+            onBlocking { getCurrentUserLastName(any()) }.thenReturn(expected)
+        }
+
+        assertThat(underTest(true)).isEqualTo(expected)
+    }
+
+    @Test
+    internal fun `test that first name is returned if last name throws an exception`() = runTest {
+        val expected = "FirstName"
+        contactsRepository.stub {
+            onBlocking { getCurrentUserFirstName(any()) }.thenReturn(expected)
+            onBlocking { getCurrentUserLastName(any()) }.thenAnswer {
+                throw MegaException(
+                    1,
+                    "Last Name threw exception"
+                )
+            }
+        }
+
+        assertThat(underTest(true)).isEqualTo(expected)
+    }
+
 }

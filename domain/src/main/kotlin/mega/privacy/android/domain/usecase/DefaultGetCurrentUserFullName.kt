@@ -10,7 +10,7 @@ import javax.inject.Inject
     replaceWith = ReplaceWith("GetUserFullName")
 )
 class DefaultGetCurrentUserFullName @Inject constructor(
-    private val getUserFullName: GetUserFullName,
+    private val getUserFullNameUseCase: GetUserFullNameUseCase,
 ) : GetCurrentUserFullName {
 
     override suspend fun invoke(
@@ -18,5 +18,5 @@ class DefaultGetCurrentUserFullName @Inject constructor(
         defaultFirstName: String,
         defaultLastName: String,
     ): String =
-        getUserFullName(forceRefresh) ?: "$defaultFirstName $defaultLastName"
+        getUserFullNameUseCase(forceRefresh) ?: "$defaultFirstName $defaultLastName"
 }

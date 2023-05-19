@@ -14,7 +14,7 @@ class DefaultGetCurrentUserFullNameTest {
 
     private lateinit var underTest: DefaultGetCurrentUserFullName
 
-    private val getUserFullName: GetUserFullName = mock()
+    private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
 
     private val defaultFirstName = "defaultFirstName"
     private val defaultLastName = "defaultLastName"
@@ -22,7 +22,7 @@ class DefaultGetCurrentUserFullNameTest {
     @Before
     fun setUp() {
         underTest = DefaultGetCurrentUserFullName(
-            getUserFullName = getUserFullName
+            getUserFullNameUseCase = getUserFullNameUseCase
         )
     }
 
@@ -37,7 +37,7 @@ class DefaultGetCurrentUserFullNameTest {
     @Test
     fun `test that default names are not used when getUserFullName returns valid name`() = runTest {
         val expectedFullName = "Full Name"
-        whenever(getUserFullName(any())).thenReturn(expectedFullName)
+        whenever(getUserFullNameUseCase(any())).thenReturn(expectedFullName)
         assertThat(
             underTest(true, defaultFirstName, defaultLastName)
         ).isEqualTo(expectedFullName)

@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
-import mega.privacy.android.domain.usecase.GetUserFullName
+import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -56,7 +56,7 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getInSharesUseCase: GetInSharesUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
-    private val getUserFullName: GetUserFullName,
+    private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFile: GetMyAvatarFile,
     private val getAccountAchievements: GetAccountAchievements,
 ) : ViewModel() {
@@ -172,11 +172,8 @@ class MyAccountHomeViewModel @Inject constructor(
 
     private fun refreshUserName(forceRefresh: Boolean) {
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    name = getUserFullName(forceRefresh = forceRefresh)
-                )
-            }
+            val fullName = getUserFullNameUseCase(forceRefresh)
+            _uiState.update { it.copy(name = fullName) }
         }
     }
 

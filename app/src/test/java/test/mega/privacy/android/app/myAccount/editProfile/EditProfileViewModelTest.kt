@@ -2,15 +2,18 @@ package test.mega.privacy.android.app.myAccount.editProfile
 
 import android.graphics.Color
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
@@ -18,19 +21,23 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.extensions.withCoroutineExceptions
 import java.io.File
 import kotlin.test.assertEquals
 
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class EditProfileViewModelTest {
     private lateinit var underTest: EditProfileViewModel
 
@@ -39,13 +46,30 @@ internal class EditProfileViewModelTest {
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val colorMyAvatar = Color.RED
     private val monitorMyAvatarFileFlow = MutableSharedFlow<File?>()
-    private val getCurrentUserFirstName: GetCurrentUserFirstName = mock()
-    private val getCurrentUserLastName: GetCurrentUserLastName = mock()
-    private val monitorUserUpdates: MonitorUserUpdates = mock()
+    private val firstName = "FirstName"
+    private val getCurrentUserFirstName: GetCurrentUserFirstName =
+        mock { onBlocking { invoke(false) }.thenReturn(firstName) }
+    private val lastName = "LastName"
+    private val getCurrentUserLastName: GetCurrentUserLastName =
+        mock { onBlocking { invoke(false) }.thenReturn(lastName) }
+    private lateinit var userUpdates: Channel<UserChanges>
+    private val monitorUserUpdates: MonitorUserUpdates =
+        mock {
+            on { invoke() }.thenAnswer {
+                userUpdates = Channel()
+                userUpdates.consumeAsFlow()
+            }
+        }
 
-    @Before
+
+    @BeforeAll
+    fun initialise() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+
         whenever(monitorMyAvatarFile()).thenReturn(monitorMyAvatarFileFlow)
         getMyAvatarColorUseCase.stub {
             onBlocking { invoke() }.doReturn(colorMyAvatar)
@@ -61,7 +85,7 @@ internal class EditProfileViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -90,55 +114,43 @@ internal class EditProfileViewModelTest {
         }
 
     @Test
-    fun `test that an exception from get user first name is not propagated`() = runTest {
-        whenever(getCurrentUserFirstName(any()))
-            .thenAnswer { throw MegaException(1, "It's broken") }
+    internal fun `test that an exception on get last name is not propagated`() =
+        withCoroutineExceptions {
+            runTest {
+                getCurrentUserLastName.stub {
+                    onBlocking { invoke(any()) }.thenAnswer {
+                        throw MegaException(
+                            1,
+                            "Get last name threw an exception"
+                        )
+                    }
+                }
 
-        with(underTest) {
-            state.test {
-                getFirstName()
-                assertEquals(awaitItem().firstName, "")
+                underTest.state.test {
+                    assertThat(awaitItem().lastName).isEqualTo(lastName)
+                    userUpdates.send(UserChanges.Lastname)
+                }
             }
         }
-    }
 
     @Test
-    fun `test that get user first name updates the value in the state`() = runTest {
-        val expectedName = "Test name"
-        whenever(getCurrentUserFirstName(any())).thenReturn(expectedName)
+    internal fun `test that an exception on get first name is not propagated`() =
+        withCoroutineExceptions {
+            runTest {
+                getCurrentUserFirstName.stub {
+                    onBlocking { invoke(true) }.thenAnswer {
+                        throw MegaException(
+                            1,
+                            "Get first name threw an exception"
+                        )
+                    }
+                }
 
-        with(underTest) {
-            state.test {
-                assertEquals(awaitItem().firstName, "")
-                getFirstName()
-                assertEquals(awaitItem().firstName, expectedName)
+                underTest.state.test {
+                    assertThat(awaitItem().firstName).isEqualTo(firstName)
+                    userUpdates.send(UserChanges.Firstname)
+                }
             }
         }
-    }
-
-    @Test
-    fun `test that an exception from get user last name is not propagated`() = runTest {
-        whenever(getCurrentUserLastName(any())).thenAnswer { throw MegaException(1, "It's broken") }
-
-        with(underTest) {
-            state.test {
-                getLastName()
-                assertEquals(awaitItem().lastName, "")
-            }
-        }
-    }
-
-    @Test
-    fun `test that get user last name updates the value in the state`() = runTest {
-        val expectedName = "Test name"
-        whenever(getCurrentUserLastName(any())).thenReturn(expectedName)
-
-        with(underTest) {
-            state.test {
-                assertEquals(awaitItem().lastName, "")
-                getLastName()
-                assertEquals(awaitItem().lastName, expectedName)
-            }
-        }
-    }
 }
+
