@@ -526,10 +526,6 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
         <service
-            android:name=".cameraupload.CameraUploadsService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-        <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />

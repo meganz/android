@@ -10,7 +10,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.cameraupload.CameraUploadsService
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
@@ -29,7 +28,6 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
-import mega.privacy.android.data.wrapper.CameraUploadServiceWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.domain.entity.BackupState
 
@@ -74,12 +72,6 @@ abstract class UtilWrapperModule {
                 }
             }
         }
-
-        @Provides
-        fun provideCameraUploadServiceWrapper(): CameraUploadServiceWrapper =
-            object : CameraUploadServiceWrapper {
-                override fun newIntent(context: Context) = CameraUploadsService.newIntent(context)
-            }
 
         @Provides
         fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
