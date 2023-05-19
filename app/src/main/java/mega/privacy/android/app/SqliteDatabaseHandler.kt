@@ -1999,10 +1999,10 @@ class SqliteDatabaseHandler @Inject constructor(
             put(KEY_TRANSFER_TYPE, encrypt(transfer.type.toString()))
             put(KEY_TRANSFER_STATE, encrypt(transfer.state.toString()))
             put(KEY_TRANSFER_SIZE, encrypt(transfer.size))
-            put(KEY_TRANSFER_HANDLE, encrypt(transfer.nodeHandle))
+            put(KEY_TRANSFER_HANDLE, encrypt(transfer.handle.toString()))
             put(KEY_TRANSFER_PATH, encrypt(transfer.path))
-            put(KEY_TRANSFER_OFFLINE, encrypt(transfer.isOfflineFile.toString()))
-            put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.timeStamp.toString()))
+            put(KEY_TRANSFER_OFFLINE, encrypt(transfer.isOffline.toString()))
+            put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.timestamp.toString()))
             put(KEY_TRANSFER_ERROR, encrypt(transfer.error))
             put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.originalPath))
             put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.parentHandle.toString()))
@@ -2022,7 +2022,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
                 val transfers = getCompletedTransfers(selectQuery)
                 val ids = transfers.apply {
-                    sortWith(compareByDescending { it.timeStamp })
+                    sortWith(compareByDescending { it.timestamp })
                 }
                     .filterIndexed { index, _ -> index >= MAX_TRANSFERS }
                     .map { it.id }
@@ -2042,7 +2042,7 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @param id the identifier of the transfer to delete
      */
-    override fun deleteTransfer(id: Long) {
+    override fun deleteTransfer(id: Int) {
         db.delete(TABLE_COMPLETED_TRANSFERS, "$KEY_ID=$id", null)
     }
 
@@ -2052,7 +2052,7 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param id the identifier of the transfer to get
      * @return The completed transfer which has the id value as identifier.
      */
-    override fun getCompletedTransfer(id: Long): CompletedTransfer? {
+    override fun getCompletedTransfer(id: Int): CompletedTransfer? {
         val selectQuery =
             "SELECT * FROM $TABLE_COMPLETED_TRANSFERS WHERE $KEY_ID = '$id'"
         try {
@@ -2074,23 +2074,21 @@ class SqliteDatabaseHandler @Inject constructor(
      * @return The extracted completed transfer.
      */
     private fun extractAndroidCompletedTransfer(cursor: Cursor): CompletedTransfer {
-        val id = cursor.getString(0).toInt().toLong()
-        val filename = decrypt(cursor.getString(1))
-        val type = decrypt(cursor.getString(2))
-        val typeInt = type?.toInt() ?: -1
-        val state = decrypt(cursor.getString(3))
-        val stateInt = state?.toInt() ?: -1
-        val size = decrypt(cursor.getString(4))
-        val nodeHandle = decrypt(cursor.getString(5))
-        val path = decrypt(cursor.getString(6))
-        val offline = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(7)))
-        val timeStamp = decrypt(cursor.getString(8))?.toLong() ?: -1
+        val id = cursor.getInt(0)
+        val filename = decrypt(cursor.getString(1)).orEmpty()
+        val type = decrypt(cursor.getString(2))?.toInt() ?: -1
+        val state = decrypt(cursor.getString(3))?.toInt() ?: -1
+        val size = decrypt(cursor.getString(4)).orEmpty()
+        val handle = decrypt(cursor.getString(5))?.toLong() ?: -1
+        val path = decrypt(cursor.getString(6)).orEmpty()
+        val offline = decrypt(cursor.getString(7))?.toBooleanStrictOrNull()
+        val timestamp = decrypt(cursor.getString(8))?.toLong() ?: -1
         val error = decrypt(cursor.getString(9))
-        val originalPath = decrypt(cursor.getString(10))
+        val originalPath = decrypt(cursor.getString(10)).orEmpty()
         val parentHandle = decrypt(cursor.getString(11))?.toLong() ?: -1
         return CompletedTransfer(
-            id, filename, typeInt, stateInt, size, nodeHandle, path,
-            offline, timeStamp, error, originalPath, parentHandle
+            id, filename, type, state, size, handle, path,
+            offline, timestamp, error, originalPath, parentHandle
         )
     }
 
@@ -2118,9 +2116,9 @@ class SqliteDatabaseHandler @Inject constructor(
                 "AND $KEY_TRANSFER_TYPE = '${encrypt(transfer.type.toString())}' " +
                 "AND $KEY_TRANSFER_STATE = '${encrypt(transfer.state.toString())}' " +
                 "AND $KEY_TRANSFER_SIZE = '${encrypt(transfer.size)}' " +
-                "AND $KEY_TRANSFER_HANDLE = '${encrypt(transfer.nodeHandle)}' " +
+                "AND $KEY_TRANSFER_HANDLE = '${encrypt(transfer.handle.toString())}' " +
                 "AND $KEY_TRANSFER_PATH = '${encrypt(transfer.path)}' " +
-                "AND $KEY_TRANSFER_OFFLINE = '${encrypt(transfer.isOfflineFile.toString())}' " +
+                "AND $KEY_TRANSFER_OFFLINE = '${encrypt(transfer.isOffline.toString())}' " +
                 "AND $KEY_TRANSFER_ERROR = '${encrypt(transfer.error)}' " +
                 "AND $KEY_TRANSFER_ORIGINAL_PATH = '${encrypt(transfer.originalPath)}' " +
                 "AND $KEY_TRANSFER_PARENT_HANDLE = '${encrypt(transfer.parentHandle.toString())}'"
@@ -2147,7 +2145,7 @@ class SqliteDatabaseHandler @Inject constructor(
         get() {
             val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
             val transfers = getCompletedTransfers(selectQuery).apply {
-                sortWith(compareByDescending { it.timeStamp })
+                sortWith(compareByDescending { it.timestamp })
             }.take(MAX_TRANSFERS)
             return transfers
         }

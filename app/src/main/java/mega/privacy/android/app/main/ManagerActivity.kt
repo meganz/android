@@ -62,8 +62,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
@@ -312,6 +314,7 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -10026,7 +10029,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
      */
     fun removeCompletedTransfer(transfer: CompletedTransfer, isRemovedCache: Boolean) {
-        dbH.deleteTransfer(transfer.id)
+        dbH.deleteTransfer(transfer.id ?: return)
         if (isTransfersCompletedAdded) {
             completedTransfersFragment?.transferRemoved(transfer, isRemovedCache)
         }
@@ -10038,42 +10041,53 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param transfer the transfer to retry
      */
     private fun retryTransfer(transfer: CompletedTransfer) {
-        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
-            val node = transfer.nodeHandle?.toLong()?.let { megaApi.getNodeByHandle(it) }
-            if (transfer.isOfflineFile) {
-                transfer.originalPath?.let {
-                    val offlineFile = File(it)
-                    OfflineUtils.saveOffline(
-                        offlineFile.parentFile,
-                        node,
-                        this@ManagerActivity
-                    )
-                }
-            } else {
-                downloadNodeUseCase.download(this, node, transfer.path)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { Timber.d("Transfer retried: ${node?.handle}") },
-                        { throwable: Throwable? ->
-                            Timber.e(
-                                throwable,
-                                "Retry transfer failed."
+        when (transfer.type) {
+            MegaTransfer.TYPE_DOWNLOAD -> {
+                val node = megaApi.getNodeByHandle(transfer.handle) ?: return
+                when (transfer.isOffline) {
+                    true -> {
+                        val offlineFile = File(transfer.originalPath)
+                        OfflineUtils.saveOffline(
+                            offlineFile.parentFile,
+                            node,
+                            this@ManagerActivity
+                        )
+                    }
+
+                    false -> {
+                        downloadNodeUseCase.download(this, node, transfer.path)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(
+                                { Timber.d("Transfer retried: ${node?.handle}") },
+                                { throwable: Throwable? ->
+                                    Timber.e(throwable, "Retry transfer failed.")
+                                }
                             )
-                        })
+                    }
+
+                    null -> {
+                        Timber.d("Unable to retrieve transfer isOffline value")
+                    }
+                }
             }
-        } else if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            PermissionUtils.checkNotificationsPermission(this)
-            transfer.originalPath?.let {
-                val file = File(it)
+
+            MegaTransfer.TYPE_UPLOAD -> {
+                PermissionUtils.checkNotificationsPermission(this)
+                val file = File(transfer.originalPath)
                 uploadUseCase.upload(this, file, transfer.parentHandle)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { Timber.d("Transfer retried.") },
                         { t: Throwable? -> Timber.e(t) })
+                    }
+
+            else -> {
+                Timber.d("Unable to retrieve transfer type value")
             }
         }
+
         removeCompletedTransfer(transfer, false)
     }
 
@@ -10083,31 +10097,49 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param transfer the transfer to open its location
      */
     fun openTransferLocation(transfer: CompletedTransfer) {
-        if (transfer.type == MegaTransfer.TYPE_DOWNLOAD) {
-            if (transfer.isOfflineFile) {
-                selectDrawerItem(DrawerItem.HOMEPAGE)
-                openFullscreenOfflineFragment(
-                    OfflineUtils.removeInitialOfflinePath(transfer.path, this) + Constants.SEPARATOR
-                )
-            } else {
-                val file = transfer.path?.let { File(it) }
-                if (!FileUtil.isFileAvailable(file)) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.location_not_exist),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                    return
+        when (transfer.type) {
+            MegaTransfer.TYPE_DOWNLOAD -> {
+                when (transfer.isOffline) {
+                    true -> {
+                        selectDrawerItem(DrawerItem.HOMEPAGE)
+                        openFullscreenOfflineFragment(
+                            OfflineUtils.removeInitialOfflinePath(
+                                transfer.path,
+                                this
+                            ) + Constants.SEPARATOR
+                        )
+                    }
+
+                    false -> {
+                        val file = transfer.path?.let { File(it) }
+                        if (!FileUtil.isFileAvailable(file)) {
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                getString(R.string.location_not_exist),
+                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            )
+                            return
+                        }
+                        val intent = Intent(this, FileStorageActivity::class.java)
+                        intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
+                        intent.putExtra(FileStorageActivity.EXTRA_PATH, transfer.path)
+                        startActivity(intent)
+                    }
+
+                    null -> {
+                        Timber.d("Unable to retrieve transfer isOffline value")
+                    }
                 }
-                val intent = Intent(this, FileStorageActivity::class.java)
-                intent.action = FileStorageActivity.Mode.BROWSE_FILES.action
-                intent.putExtra(FileStorageActivity.EXTRA_PATH, transfer.path)
-                startActivity(intent)
             }
-        } else if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-            val node = transfer.nodeHandle?.toLong()?.let { megaApi.getNodeByHandle(it) }
-            if (node != null) {
-                viewNodeInFolder(node)
+
+            MegaTransfer.TYPE_UPLOAD -> {
+                transfer.handle
+                    ?.let { megaApi.getNodeByHandle(it) }
+                    ?.let { viewNodeInFolder(it) }
+            }
+
+            else -> {
+                Timber.d("Unable to retrieve transfer type")
             }
         }
     }

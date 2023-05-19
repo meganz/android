@@ -45,7 +45,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
     private CompletedTransfer transfer;
     private long handle;
-    private long transferId;
+    private int transferId;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
             transfer = managerActivity.getSelectedTransfer();
             transferId = transfer.getId();
         } else {
-            transferId = savedInstanceState.getLong(TRANSFER_ID, INVALID_ID);
+            transferId = savedInstanceState.getInt(TRANSFER_ID, INVALID_ID);
             transfer = dbH.getCompletedTransfer(transferId);
         }
 
@@ -138,7 +138,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
         stateIcon.setLayoutParams(params);
 
-        handle = Long.parseLong(transfer.getNodeHandle());
+        handle = transfer.getHandle();
 
         Bitmap thumb = getThumbnailFromCache(handle);
         if (thumb == null) {
@@ -186,6 +186,6 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(TRANSFER_ID, transferId);
+        outState.putInt(TRANSFER_ID, transferId);
     }
 }

@@ -15,7 +15,6 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -389,7 +388,7 @@ class TransfersViewModel @Inject constructor(
     ) =
         transfer1.id == transfer2.id ||
                 (isValidHandle(transfer1) && isValidHandle(transfer2) &&
-                        transfer1.nodeHandle == transfer2.nodeHandle) ||
+                        transfer1.handle == transfer2.handle) ||
                 (transfer1.error == transfer2.error && transfer1.fileName == transfer2.fileName &&
                         transfer1.size == transfer2.size)
 
@@ -400,7 +399,7 @@ class TransfersViewModel @Inject constructor(
      * @return True if the transfer has a valid handle, false otherwise.
      */
     private fun isValidHandle(transfer: CompletedTransfer) =
-        !TextUtil.isTextEmpty(transfer.nodeHandle) && transfer.nodeHandle != MegaApiJava.INVALID_HANDLE.toString()
+        transfer.handle != MegaApiJava.INVALID_HANDLE
 
     /**
      * Removes all completed transfers.

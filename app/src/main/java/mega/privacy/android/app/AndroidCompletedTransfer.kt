@@ -1,8 +1,6 @@
 package mega.privacy.android.app
 
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeFolderPath
@@ -31,39 +29,19 @@ import nz.mega.sdk.MegaTransfer
  * @property originalPath
  * @property parentHandle
  */
-class AndroidCompletedTransfer : Parcelable {
+class AndroidCompletedTransfer {
     var id: Long = 0
     val fileName: String?
     val type: Int
     val state: Int
     val size: String?
-    val nodeHandle: String?
+    val nodeHandle: String
     var path: String?
     var isOfflineFile = false
     val timeStamp: Long
     val error: String?
     val originalPath: String?
     val parentHandle: Long
-
-    constructor(
-        id: Long, fileName: String?, type: Int, state: Int, size: String?,
-        nodeHandle: String?, path: String?, isOfflineFile: Boolean,
-        timeStamp: Long, error: String?, originalPath: String?,
-        parentHandle: Long,
-    ) {
-        this.id = id
-        this.fileName = fileName
-        this.type = type
-        this.state = state
-        this.size = size
-        this.nodeHandle = nodeHandle
-        this.path = removeLastFileSeparator(path)
-        this.isOfflineFile = isOfflineFile
-        this.timeStamp = timeStamp
-        this.error = error
-        this.originalPath = originalPath
-        this.parentHandle = parentHandle
-    }
 
     constructor(transfer: MegaTransfer, error: MegaError, context: Context) {
         fileName = transfer.fileName
@@ -150,48 +128,4 @@ class AndroidCompletedTransfer : Parcelable {
             context.getString(R.string.error_share_owner_storage_quota)
         else
             StringResourcesUtils.getTranslatedErrorString(error)
-
-    private constructor(parcel: Parcel) {
-        id = parcel.readLong()
-        fileName = parcel.readString()
-        type = parcel.readInt()
-        state = parcel.readInt()
-        size = parcel.readString()
-        nodeHandle = parcel.readString()
-        path = parcel.readString()
-        isOfflineFile = parcel.readByte().toInt() != 0
-        timeStamp = parcel.readLong()
-        error = parcel.readString()
-        originalPath = parcel.readString()
-        parentHandle = parcel.readLong()
-    }
-
-    override fun describeContents(): Int = 0
-
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeLong(id)
-        dest.writeString(fileName)
-        dest.writeInt(type)
-        dest.writeInt(state)
-        dest.writeString(size)
-        dest.writeString(nodeHandle)
-        dest.writeString(path)
-        dest.writeByte((if (isOfflineFile) 1 else 0).toByte())
-        dest.writeLong(timeStamp)
-        dest.writeString(error)
-        dest.writeString(originalPath)
-        dest.writeLong(parentHandle)
-    }
-
-    companion object {
-        @JvmField
-        val CREATOR: Parcelable.Creator<AndroidCompletedTransfer?> =
-            object : Parcelable.Creator<AndroidCompletedTransfer?> {
-                override fun createFromParcel(parcel: Parcel): AndroidCompletedTransfer =
-                    AndroidCompletedTransfer(parcel)
-
-                override fun newArray(size: Int): Array<AndroidCompletedTransfer?> =
-                    arrayOfNulls(size)
-            }
-    }
 }

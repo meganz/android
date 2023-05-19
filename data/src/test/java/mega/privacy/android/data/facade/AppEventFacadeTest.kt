@@ -68,9 +68,10 @@ class AppEventFacadeTest {
             type = MegaTransfer.TYPE_UPLOAD,
             state = MegaTransfer.STATE_COMPLETED,
             size = "",
-            nodeHandle = "",
+            handle = 0L,
+            isOffline = false,
             path = "",
-            timeStamp = 0L,
+            timestamp = 0L,
             error = "",
             originalPath = "",
             parentHandle = 0L

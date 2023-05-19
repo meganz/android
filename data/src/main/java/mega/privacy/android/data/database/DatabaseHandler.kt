@@ -246,14 +246,14 @@ interface DatabaseHandler {
      * @param id the identifier of the transfer to get
      * @return The completed transfer which has the id value as identifier.
      */
-    fun getCompletedTransfer(id: Long): CompletedTransfer?
+    fun getCompletedTransfer(id: Int): CompletedTransfer?
 
     /**
      * Deletes a completed transfer.
      *
      * @param id the identifier of the transfer to delete
      */
-    fun deleteTransfer(id: Long)
+    fun deleteTransfer(id: Int)
 
     fun emptyCompletedTransfers()
 

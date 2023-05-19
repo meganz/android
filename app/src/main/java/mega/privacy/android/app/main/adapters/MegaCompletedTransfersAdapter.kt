@@ -91,7 +91,7 @@ class MegaCompletedTransfersAdapter(
                 defaultIcon.setImageResource(MimeTypeList.typeForName(fileName).iconResourceId)
                 MimeTypeList.typeForName(fileName).let { mimeTypeList ->
                     if (mimeTypeList.isImage || mimeTypeList.isVideo) {
-                        completedTransfer.nodeHandle?.toLong()?.let { handle ->
+                        completedTransfer.handle?.let { handle ->
                             val thumbnail =
                                 getThumbnailFromCache(handle) ?: megaApi.getNodeByHandle(handle)
                                     ?.let { node ->

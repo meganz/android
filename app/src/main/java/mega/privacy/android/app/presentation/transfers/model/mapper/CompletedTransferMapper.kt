@@ -16,17 +16,17 @@ class CompletedTransferMapper @Inject constructor() {
      */
     operator fun invoke(transfer: AndroidCompletedTransfer) =
         CompletedTransfer(
-            id = transfer.id,
-            fileName = transfer.fileName,
+            id = transfer.id.toInt(),
+            fileName = transfer.fileName.orEmpty(),
             type = transfer.type,
             state = transfer.state,
-            size = transfer.size,
-            nodeHandle = transfer.nodeHandle,
-            path = transfer.path,
-            isOfflineFile = transfer.isOfflineFile,
-            timeStamp = transfer.timeStamp,
+            size = transfer.size.orEmpty(),
+            handle = transfer.nodeHandle.toLong(),
+            path = transfer.path.orEmpty(),
+            isOffline = transfer.isOfflineFile,
+            timestamp = transfer.timeStamp,
             error = transfer.error,
-            originalPath = transfer.originalPath,
+            originalPath = transfer.originalPath.orEmpty(),
             parentHandle = transfer.parentHandle,
         )
 }
