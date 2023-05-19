@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumC
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
+import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumImportDeeplinkScreen
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -30,6 +31,7 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         AlbumGetLinkScreen,
         AlbumGetMultipleLinksScreen,
         AlbumDecryptionKeyScreen,
+        AlbumImportDeeplinkScreen,
     }
 
     @Inject
@@ -119,6 +121,13 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                             onBack = ::finish,
                         )
                     }
+                    AlbumScreen.AlbumImportDeeplinkScreen -> {
+                        AlbumImportDeeplinkScreen(
+                            onApply = {
+                                finish()
+                            },
+                        )
+                    }
                     else -> finish()
                 }
             }
@@ -180,6 +189,12 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
             context: Context,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumDecryptionKeyScreen.name)
+        }
+
+        fun createAlbumImportDeeplinkScreen(
+            context: Context,
+        ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
+            putExtra(ALBUM_SCREEN, AlbumScreen.AlbumImportDeeplinkScreen.name)
         }
     }
 }

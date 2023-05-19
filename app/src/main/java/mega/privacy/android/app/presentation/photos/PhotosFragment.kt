@@ -385,6 +385,11 @@ class PhotosFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         this.menu = menu
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val isEnabled = getFeatureFlagUseCase(AppFeatures.AlbumSharing)
+            this@PhotosFragment.menu?.findItem(R.id.action_import)?.isVisible = isEnabled
+        }
     }
 
     private fun handleMenuIcons(isShowing: Boolean) {
@@ -457,6 +462,11 @@ class PhotosFragment : Fragment() {
                         timelineViewModel.showingSortByDialog(false)
                     }
                 )
+                true
+            }
+            R.id.action_import -> {
+                val intent = AlbumScreenWrapperActivity.createAlbumImportDeeplinkScreen(requireContext())
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
