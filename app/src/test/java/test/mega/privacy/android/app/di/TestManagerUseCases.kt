@@ -21,7 +21,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.domain.usecase.CheckCameraUpload
-import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import nz.mega.sdk.MegaNode
@@ -59,7 +59,7 @@ object TestManagerUseCases {
     }
 
     @Provides
-    fun provideGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlerts> {
+    fun provideGetNumUnreadUserAlerts() = mock<GetNumUnreadUserAlertsUseCase> {
         on { runBlocking { invoke() } }.thenReturn(0)
     }
 

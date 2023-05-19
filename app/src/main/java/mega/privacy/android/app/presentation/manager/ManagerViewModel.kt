@@ -81,7 +81,7 @@ import javax.inject.Inject
  *
  * @property monitorGlobalUpdates
  * @property getInboxNode
- * @property getNumUnreadUserAlerts
+ * @property getNumUnreadUserAlertsUseCase
  * @property hasInboxChildren
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
@@ -120,7 +120,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
-    private val getNumUnreadUserAlerts: GetNumUnreadUserAlerts,
+    private val getNumUnreadUserAlertsUseCase: GetNumUnreadUserAlertsUseCase,
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
@@ -420,7 +420,7 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkNumUnreadUserAlerts(type: UnreadUserAlertsCheckType) {
         viewModelScope.launch {
-            numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlerts())
+            numUnreadUserAlerts.value = Pair(type, getNumUnreadUserAlertsUseCase())
         }
     }
 

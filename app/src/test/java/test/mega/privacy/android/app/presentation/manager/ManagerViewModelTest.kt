@@ -47,7 +47,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
-import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
+import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
@@ -92,8 +92,8 @@ class ManagerViewModelTest {
     private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
-    private val getNumUnreadUserAlerts =
-        mock<GetNumUnreadUserAlerts> { onBlocking { invoke() }.thenReturn(0) }
+    private val getNumUnreadUserAlertsUseCase =
+        mock<GetNumUnreadUserAlertsUseCase> { onBlocking { invoke() }.thenReturn(0) }
     private val hasInboxChildren =
         mock<HasInboxChildren> { onBlocking { invoke() }.thenReturn(false) }
     private val monitorContactRequestUpdates = MutableStateFlow(emptyList<ContactRequest>())
@@ -224,7 +224,7 @@ class ManagerViewModelTest {
             monitorContactUpdates = { monitorContactUpdates },
             monitorGlobalUpdates = { monitorGlobalUpdates },
             monitorContactRequestUpdates = { monitorContactRequestUpdates },
-            getNumUnreadUserAlerts = getNumUnreadUserAlerts,
+            getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
             savedStateHandle = savedStateHandle,
