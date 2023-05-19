@@ -1,5 +1,7 @@
 package mega.privacy.android.app.mediaplayer.service
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -23,7 +25,11 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,6 +44,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.STREAM_MUSIC_DEFAULT
@@ -52,6 +59,7 @@ import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
+
 
 /**
  * Media player service
@@ -72,6 +80,12 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     @Inject
     lateinit var viewModelGateway: PlayerServiceViewModelGateway
 
+    /**
+     * CrashReporter
+     */
+    @Inject
+    lateinit var crashReporter: CrashReporter
+
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
     private val metadata = MutableLiveData<Metadata>()
@@ -89,6 +103,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var currentMediaPlaySources: MediaPlaySources? = null
+
+    private var isNotificationCreated = false
 
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
@@ -127,10 +143,19 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun onCreate() {
         super.onCreate()
-        viewModelGateway.setAudioPlayer(this is AudioPlayerService)
+        val isAudioPlayer = this is AudioPlayerService
+        viewModelGateway.setAudioPlayer(isAudioPlayer)
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         createPlayer()
+        if (isAudioPlayer) {
+            if (!isNotificationCreated) {
+                createPlayerControlNotification()
+                isNotificationCreated = true
+            }
+        } else {
+            pauseAudioPlayer(this)
+        }
         observeData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
@@ -329,7 +354,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         mainHandler.removeCallbacks(resumePlayRunnable)
-
         when (intent?.getIntExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_CREATE)) {
             COMMAND_PAUSE -> {
                 if (playing()) {
@@ -348,7 +372,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
             else -> {
                 if (MediaPlayerActivity.isAudioPlayer(intent)) {
-                    createPlayerControlNotification()
+                    if (!isNotificationCreated) {
+                        createPlayerControlNotification()
+                        isNotificationCreated = true
+                    }
                     lifecycleScope.launch {
                         if (viewModelGateway.buildPlayerSource(intent)) {
                             if (viewModelGateway.isAudioPlayer()) {
@@ -695,6 +722,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         private const val INTENT_KEY_STATE = "state"
         private const val STATE_HEADSET_UNPLUGGED = 0
 
+        private const val AUDIO_SERVICE_NAME = "AudioPlayerService"
+
         /**
          * The minimum size of single playlist
          */
@@ -707,9 +736,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
          */
         @JvmStatic
         fun pauseAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
-            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_PAUSE)
-            ContextCompat.startForegroundService(context, audioPlayerIntent)
+            sendCommandToAudioPlayer(context = context, command = COMMAND_PAUSE)
         }
 
         /**
@@ -719,9 +746,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
          */
         @JvmStatic
         fun resumeAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
-            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_RESUME)
-            ContextCompat.startForegroundService(context, audioPlayerIntent)
+            sendCommandToAudioPlayer(context = context, command = COMMAND_RESUME)
         }
 
         /**
@@ -744,9 +769,63 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
          */
         @JvmStatic
         fun stopAudioPlayer(context: Context) {
-            val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
-            audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, COMMAND_STOP)
-            ContextCompat.startForegroundService(context, audioPlayerIntent)
+            sendCommandToAudioPlayer(context = context, command = COMMAND_STOP)
+        }
+
+        /**
+         * Use for companion object injection
+         */
+        @EntryPoint
+        @InstallIn(SingletonComponent::class)
+        interface CrashReporterEntryPoint {
+            /**
+             * Get [CrashReporter]
+             *
+             * @return [CrashReporter] instance
+             */
+            fun crashReporter(): CrashReporter
+        }
+
+        /**
+         * Send the command to audio player service
+         * Check the AudioPlayerService whether is started before send command to avoid ForegroundServiceDidNotStartInTimeException
+         *
+         * @param context
+         * @param command
+         */
+        private fun sendCommandToAudioPlayer(context: Context, command: Int) {
+            val am = context.getSystemService(ACTIVITY_SERVICE) as ActivityManager
+            am.getRunningServices(50).firstOrNull { runningServiceInfo ->
+                runningServiceInfo.service.className.endsWith(AUDIO_SERVICE_NAME)
+            }?.let { runningServiceInfo ->
+                if (runningServiceInfo.started) {
+                    Timber.d("sendCommandToAudioPlayer invoked")
+                    // Add crash log
+                    EntryPointAccessors.fromApplication(
+                        context,
+                        CrashReporterEntryPoint::class.java
+                    ).run {
+                        if (context is Activity) {
+                            crashReporter()
+                                .log("Activity name: ${context.javaClass.name}")
+                        }
+                        crashReporter().log(
+                            "command: ${
+                                when (command) {
+                                    COMMAND_PAUSE -> "COMMAND_PAUSE"
+                                    COMMAND_RESUME -> "COMMAND_RESUME"
+                                    COMMAND_STOP -> "COMMAND_STOP"
+                                    else -> command
+                                }
+                            }"
+                        )
+                    }
+
+                    val audioPlayerIntent = Intent(context, AudioPlayerService::class.java)
+                    audioPlayerIntent.putExtra(INTENT_EXTRA_KEY_COMMAND, command)
+                    ContextCompat.startForegroundService(context, audioPlayerIntent)
+                }
+            }
         }
     }
 
