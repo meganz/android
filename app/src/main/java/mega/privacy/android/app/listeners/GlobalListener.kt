@@ -378,15 +378,14 @@ class GlobalListener @Inject constructor(
         getCookieSettingsUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { cookies: Set<CookieType?>?, throwable: Throwable? ->
-                if (throwable == null) {
-                    cookies?.let {
-                        val analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS)
-                        crashReporter.setEnabled(analyticsCookiesEnabled)
-                        performanceReporter.setEnabled(analyticsCookiesEnabled)
-                    }
-                }
-            }
+            .subscribe(
+                { cookies: Set<CookieType> ->
+                    val analyticsCookiesEnabled = cookies.contains(CookieType.ANALYTICS)
+                    crashReporter.setEnabled(analyticsCookiesEnabled)
+                    performanceReporter.setEnabled(analyticsCookiesEnabled)
+                },
+                { throwable: Throwable -> Timber.e(throwable) }
+            )
     }
 
     /**

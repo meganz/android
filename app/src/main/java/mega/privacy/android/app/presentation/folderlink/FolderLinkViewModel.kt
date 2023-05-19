@@ -236,8 +236,8 @@ class FolderLinkViewModel @Inject constructor(
         checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY, context)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result: Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
-                if (throwable == null) {
+            .subscribe(
+                { result: Pair<ArrayList<NameCollision>, List<MegaNode>> ->
                     val collisions: ArrayList<NameCollision> = result.first
                     if (collisions.isNotEmpty()) {
                         _state.update {
@@ -258,8 +258,9 @@ class FolderLinkViewModel @Inject constructor(
                                 }
                             }
                     }
-                }
-            }
+                },
+                { throwable: Throwable -> Timber.e(throwable) }
+            )
     }
 
     /**

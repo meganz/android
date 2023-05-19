@@ -1646,12 +1646,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>>, throwable: Throwable? ->
-                    dismissAlertDialogIfExists(statusDialog)
+                .subscribe(
+                    { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>> ->
+                        dismissAlertDialogIfExists(statusDialog)
 
-                    if (throwable != null) {
-                        showSnackbar(getString(R.string.error_temporary_unavaible))
-                    } else {
                         if (collisions.isNotEmpty()) {
                             (nameCollisionActivityContract ?: return@subscribe).launch(collisions)
                         }
@@ -1682,8 +1680,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     finishAndRemoveTask()
                                 }) { t: Throwable? -> Timber.e(t) }
                         }
+                    },
+                    { throwable: Throwable ->
+                        dismissAlertDialogIfExists(statusDialog)
+                        showSnackbar(getString(R.string.error_temporary_unavaible))
+                        Timber.e(throwable)
                     }
-                }
+                )
         }
     }
 
@@ -2390,11 +2393,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             filePrepareUseCase.prepareFiles(intent)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { shareInfo: List<ShareInfo>?, throwable: Throwable? ->
-                    if (throwable == null) {
+                .subscribe(
+                    { shareInfo: List<ShareInfo> ->
                         onIntentProcessed(shareInfo)
-                    }
-                }
+                    },
+                    { throwable: Throwable -> Timber.e(throwable) }
+                )
         } else {
             onIntentProcessed(filePreparedInfos)
         }

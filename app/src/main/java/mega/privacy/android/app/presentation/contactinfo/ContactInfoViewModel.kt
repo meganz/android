@@ -677,8 +677,8 @@ class ContactInfoViewModel @Inject constructor(
             context,
         ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray>, throwable: Throwable? ->
-                if (throwable == null) {
+            .subscribe(
+                { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
                     if (collisions.isNotEmpty()) {
                         _state.update {
                             it.copy(
@@ -690,8 +690,9 @@ class ContactInfoViewModel @Inject constructor(
                     if (handlesWithoutCollision.isNotEmpty()) {
                         copyNodes(handlesWithoutCollision, toHandle)
                     }
-                }
-            }
+                },
+                { throwable: Throwable -> Timber.e(throwable) }
+            )
     }
 
     @SuppressLint("CheckResult")
@@ -699,7 +700,7 @@ class ContactInfoViewModel @Inject constructor(
         copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { copyResult: CopyRequestResult, copyThrowable: Throwable? ->
+            .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->
                 _state.update { it.copy(isCopyInProgress = false, isTransferComplete = true) }
                 if (copyThrowable == null) {
                     _state.update {

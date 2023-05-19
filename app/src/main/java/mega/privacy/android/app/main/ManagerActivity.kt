@@ -2588,16 +2588,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         inviteContactUseCase.getContactLink(handle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result: InviteContactUseCase.ContactLinkResult, throwable: Throwable? ->
-                if (throwable == null) {
+            .subscribe(
+                { result: InviteContactUseCase.ContactLinkResult ->
                     showContactInviteDialog(
                         result.contactLinkHandle,
                         result.fullName,
                         result.email,
                         result.isContact
                     )
-                }
-            }
+                },
+                { throwable: Throwable -> Timber.e(throwable) }
+            )
     }
 
     /**
@@ -5797,31 +5798,36 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull(), this)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { (collisions, nodesWithoutCollisions): Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
-                if (throwable == null) {
+            .subscribe(
+                { (collisions, nodesWithoutCollisions): Pair<ArrayList<NameCollision>, List<MegaNode>> ->
                     if (collisions.isNotEmpty()) {
                         nameCollisionActivityContract?.launch(collisions)
                     }
                     if (nodesWithoutCollisions.isNotEmpty()) {
                         proceedWithRestoration(nodesWithoutCollisions)
                     }
-                }
-            }
+                },
+                { throwable: Throwable -> Timber.e(throwable) }
+            )
     }
 
     private fun proceedWithRestoration(nodes: List<MegaNode>) {
         moveNodeUseCase.restore(nodes, this)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result: MoveRequestResult.Restoration, throwable: Throwable? ->
-                if (throwable == null) {
+            .subscribe(
+                { result: MoveRequestResult.Restoration ->
                     val notValidView =
                         result.isSingleAction && result.isSuccess && this@ManagerActivity.rubbishBinState().rubbishBinHandle == nodes[0].handle
                     showRestorationOrRemovalResult(notValidView, result.getResultText())
-                } else if (throwable is ForeignNodeException) {
-                    launchForeignNodeError()
+                },
+                { throwable: Throwable ->
+                    if (throwable is ForeignNodeException) {
+                        launchForeignNodeError()
+                    }
+                    Timber.e(throwable)
                 }
-            }
+            )
     }
 
     /**
@@ -5927,16 +5933,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 moveNodeUseCase.moveToRubbishBin(handleList, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { result: MoveRequestResult.RubbishMovement, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribe(
+                        { result: MoveRequestResult.RubbishMovement ->
                             showMovementResult(result, handleList[0])
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 result.getResultText(),
                                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                             )
-                        }
-                    }
+                        },
+                        { throwable: Throwable -> Timber.e(throwable) }
+                    )
             }
         } else {
             builder.setMessage(resources.getString(R.string.confirmation_delete_from_mega))
@@ -5944,16 +5951,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 removeNodeUseCase.remove(handleList)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { result: RemoveRequestResult, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribe(
+                        { result: RemoveRequestResult ->
                             val notValidView = (result.count == 1
                                     && result.errorCount == 0) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
                             showRestorationOrRemovalResult(
                                 notValidView,
                                 result.getResultText(context = this@ManagerActivity)
                             )
-                        }
-                    }
+                        },
+                        { throwable: Throwable -> Timber.e(throwable) }
+                    )
             }
         }
         builder.setNegativeButton(R.string.general_cancel, null)
@@ -7454,11 +7462,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 filePrepareUseCase.prepareFiles(intent)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { shareInfo: List<ShareInfo>?, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribe(
+                        { shareInfo: List<ShareInfo> ->
                             onIntentProcessed(shareInfo)
-                        }
-                    }
+                        },
+                        { throwable: Throwable -> Timber.e(throwable) }
+                    )
             }
 
             requestCode == Constants.REQUEST_CODE_GET_FOLDER -> {
@@ -7608,8 +7617,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray>, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribe(
+                        { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
                             if (collisions.isNotEmpty()) {
                                 dismissAlertDialogIfExists(statusDialog)
                                 nameCollisionActivityContract?.launch(collisions)
@@ -7618,23 +7627,26 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 moveNodeUseCase.move(handlesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { moveResult: MoveRequestResult.GeneralMovement, moveThrowable: Throwable? ->
+                                    .subscribe { moveResult: MoveRequestResult.GeneralMovement?, moveThrowable: Throwable? ->
                                         if (!manageCopyMoveException(moveThrowable)) {
                                             viewModel.setMoveTargetPath(toHandle)
-                                            showMovementResult(
-                                                moveResult,
-                                                handlesWithoutCollision[0]
-                                            )
-                                            showSnackbar(
-                                                Constants.SNACKBAR_TYPE,
-                                                moveRequestMessageMapper(moveResult),
-                                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                            )
+                                            moveResult?.let { result ->
+                                                showMovementResult(
+                                                    result,
+                                                    handlesWithoutCollision[0]
+                                                )
+                                                showSnackbar(
+                                                    Constants.SNACKBAR_TYPE,
+                                                    moveRequestMessageMapper(result),
+                                                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                                                )
+                                            }
                                         }
                                     }
                             }
-                        }
-                    }
+                        },
+                        { throwable: Throwable -> Timber.e(throwable) }
+                    )
             }
 
             requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == Activity.RESULT_OK -> {
@@ -7653,8 +7665,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray>, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribe(
+                        { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
                             if (collisions.isNotEmpty()) {
                                 dismissAlertDialogIfExists(statusDialog)
                                 nameCollisionActivityContract?.launch(collisions)
@@ -7671,8 +7683,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                         }
                                     }
                             }
-                        }
-                    }
+                        },
+                        { throwable: Throwable -> Timber.e(throwable) }
+                    )
             }
 
             requestCode == Constants.REQUEST_CODE_REFRESH_API_SERVER && resultCode == Activity.RESULT_OK -> {
@@ -8490,16 +8503,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         checkNameCollisionUseCase.checkShareInfoList(infoList, parentNode)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>>, throwable: Throwable? ->
-                dismissAlertDialogIfExists(statusDialog)
-                dismissAlertDialogIfExists(processFileDialog)
-                if (throwable != null) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_temporary_unavaible),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                } else {
+            .subscribe(
+                { (collisions, withoutCollisions): Pair<ArrayList<NameCollision>, List<ShareInfo>> ->
+                    dismissAlertDialogIfExists(statusDialog)
+                    dismissAlertDialogIfExists(processFileDialog)
+
                     if (collisions.isNotEmpty()) {
                         nameCollisionActivityContract?.launch(collisions)
                     }
@@ -8526,8 +8534,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
                         }
                     }
+                },
+                {
+                    dismissAlertDialogIfExists(statusDialog)
+                    dismissAlertDialogIfExists(processFileDialog)
+                    showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.error_temporary_unavaible),
+                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                    )
                 }
-            }
+            )
     }
 
     private fun requestContactsPermissions(info: ShareInfo?, parentNode: MegaNode?) {
