@@ -198,9 +198,7 @@ private fun AlbumGetLinkTopBar(
     TopAppBar(
         title = {
             Text(
-                text = pluralStringResource(id = R.plurals.album_share_get_links, count = 1).takeIf {
-                    isAlbumNewLink
-                } ?: stringResource(id = R.string.edit_link_option),
+                text = pluralStringResource(id = R.plurals.album_share_get_links, count = 1),
                 color = grey_alpha_087.takeIf { isLight } ?: white_alpha_087,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.W500,
