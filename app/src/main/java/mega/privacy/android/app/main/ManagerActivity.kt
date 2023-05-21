@@ -522,7 +522,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private lateinit var navigationDrawerAddPhoneContainer: RelativeLayout
     private var orientationSaved = 0
-    private var isSMSDialogShowing = false
 
     // Determine if in Media discovery page, if it is true, it must in CD drawerItem tab
     private var isInMDMode = false
@@ -606,7 +605,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var permissionsDialog: AlertDialog? = null
     private var presenceStatusDialog: AlertDialog? = null
     private var alertDialogStorageStatus: AlertDialog? = null
-    private var alertDialogSMSVerification: AlertDialog? = null
     private var enable2FADialog: AlertDialog? = null
 
     private var searchMenuItem: MenuItem? = null
@@ -947,7 +945,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE,
             bottomItemBeforeOpenFullscreenOffline
         )
-        outState.putBoolean(STATE_KEY_SMS_DIALOG, isSMSDialogShowing)
         outState.putString("pathNavigationOffline", pathNavigationOffline)
         if (turnOnNotifications) {
             outState.putBoolean("turnOnNotifications", turnOnNotifications)
@@ -2204,7 +2201,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun restoreFromSavedInstanceState(savedInstanceState: Bundle) {
         Timber.d("Bundle is NOT NULL")
-        isSMSDialogShowing = savedInstanceState.getBoolean(STATE_KEY_SMS_DIALOG, false)
         askPermissions = savedInstanceState.getBoolean(IntentConstants.EXTRA_ASK_PERMISSIONS)
         drawerItem = savedInstanceState.serializable("drawerItem")
         bottomItemBeforeOpenFullscreenOffline = savedInstanceState.getInt(
@@ -3282,9 +3278,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         dbH.removeSentPendingMessages()
         megaApi.removeRequestListener(this)
         composite.clear()
-        if (alertDialogSMSVerification != null) {
-            alertDialogSMSVerification?.dismiss()
-        }
         isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(receiverUpdateOrder)
@@ -3399,7 +3392,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             firstTimeAfterInstallation = false
             dbH.setFirstTime(false)
         }
-        checkBeforeShowSMSVerificationDialog()
         cookieDialogHandler.showDialogIfNeeded(this)
     }
 
@@ -3431,17 +3423,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         ) {
             psaViewHolder?.bind(psa)
             handler.post { updateHomepageFabPosition() }
-        }
-    }
-
-    private fun checkBeforeShowSMSVerificationDialog() {
-        //This account hasn't verified a phone number and first login.
-        if (myAccountInfo.isBusinessAlertShown) {
-            //The business alerts has priority over SMS verification
-            return
-        }
-        if (canVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
-            showSMSVerificationDialog()
         }
     }
 
@@ -8233,41 +8214,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
 
-    private fun showSMSVerificationDialog() {
-        isSMSDialogShowing = true
-        smsDialogTimeChecker.update()
-        val dialogBuilder = MaterialAlertDialogBuilder(this)
-        val inflater: LayoutInflater = layoutInflater
-        val dialogView = inflater.inflate(R.layout.sms_verification_dialog_layout, null)
-        dialogBuilder.setView(dialogView)
-        val msg = dialogView.findViewById<TextView>(R.id.sv_dialog_msg)
-        val isAchievementUser: Boolean = megaApi.isAchievementsEnabled
-        Timber.d("is achievement user: %s", isAchievementUser)
-        if (isAchievementUser) {
-            val message: String = String.format(
-                getString(R.string.sms_add_phone_number_dialog_msg_achievement_user),
-                myAccountInfo.bonusStorageSMS
-            )
-            msg.text = message
-        } else {
-            msg.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)
-        }
-        dialogBuilder.setPositiveButton(R.string.general_add) { _: DialogInterface?, _: Int ->
-            startActivity(Intent(applicationContext, SMSVerificationActivity::class.java))
-            alertDialogSMSVerification?.dismiss()
-        }
-            .setNegativeButton(R.string.verify_account_not_now_button) { _: DialogInterface?, _: Int -> alertDialogSMSVerification?.dismiss() }
-        if (alertDialogSMSVerification == null) {
-            alertDialogSMSVerification = dialogBuilder.create()
-            alertDialogSMSVerification?.setCancelable(false)
-            alertDialogSMSVerification?.setOnDismissListener { _: DialogInterface? ->
-                isSMSDialogShowing = false
-            }
-            alertDialogSMSVerification?.setCanceledOnTouchOutside(false)
-        }
-        alertDialogSMSVerification?.show()
-    }
-
     /**
      * Method to show a dialog to indicate the storage status.
      *
@@ -8857,7 +8803,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
                 showAddPhoneNumberInMenu()
-                checkBeforeShowSMSVerificationDialog()
             }
 
             MegaRequest.TYPE_SET_ATTR_USER -> {
@@ -10713,7 +10658,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
          */
         const val ELEVATION_SCROLL = 0x01
         const val ELEVATION_CALL_IN_PROGRESS = 0x02
-        private const val STATE_KEY_SMS_DIALOG = "isSMSDialogShowing"
         private const val STATE_KEY_IS_IN_MD_MODE = "isInMDMode"
         private const val STATE_KEY_IS_IN_ALBUM_CONTENT = "isInAlbumContent"
         private const val STATE_KEY_IS_IN_PHOTOS_FILTER = "isInFilterPage"
