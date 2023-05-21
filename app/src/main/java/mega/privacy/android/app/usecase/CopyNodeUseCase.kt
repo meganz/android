@@ -40,6 +40,7 @@ class CopyNodeUseCase @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
+    private val copyNodeListByHandleUseCase: CopyNodeListByHandleUseCase,
 ) {
 
     /**
@@ -223,43 +224,7 @@ class CopyNodeUseCase @Inject constructor(
      * @return Single with the [CopyRequestResult].
      */
     fun copy(handles: LongArray, newParentHandle: Long): Single<CopyRequestResult> =
-        Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(newParentHandle).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            var errorCount = 0
-
-            for (handle in handles) {
-                if (emitter.isDisposed) break
-
-                val node = getNodeUseCase.get(handle).blockingGetOrNull()
-
-                if (node == null) {
-                    errorCount++
-                } else {
-                    copy(node, parentNode).blockingSubscribeBy(onError = { error ->
-                        when {
-                            error.shouldEmmitError() -> emitter.onError(error)
-                            else -> errorCount++
-                        }
-                    })
-                }
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        handles.size,
-                        errorCount
-                    ).also { resetAccountDetailsIfNeeded(it) }
-                )
-            }
-        }
+        rxSingle { copyNodeListByHandleUseCase(handles.asList(), newParentHandle) }
 
     /**
      * Copies nodes.
