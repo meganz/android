@@ -19,7 +19,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -39,14 +38,15 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.extensions.getStateFlow
-import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -369,33 +369,28 @@ class MediaPlayerViewModel @Inject constructor(
             type = NameCollisionType.COPY,
             context = context
         ) {
-            if (node != null) {
-                copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
-                    .subscribeAndCompleteCopy()
-            } else {
-                nodeHandle?.let {
-                    copyNodeUseCase.copy(handle = it, parentHandle = newParentHandle)
-                        .subscribeAndCompleteCopy()
+            val handle = node?.handle ?: nodeHandle
+            handle?.let {
+                val nodeId = NodeId(it)
+                viewModelScope.launch {
+                    runCatching {
+                        copyNodeUseCase(
+                            nodeToCopy = nodeId,
+                            newNodeParent = NodeId(newParentHandle),
+                            newNodeName = null
+                        )
+                    }.onSuccess {
+                        snackbarMessage.value =
+                            R.string.context_correctly_copied
+                    }.onFailure { error ->
+                        throwable.value = error
+                        Timber.e(error, "Error not copied.")
+                    }
                 }
             }
         }
     }
 
-    private fun Completable.subscribeAndCompleteCopy() {
-        subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = {
-                    snackbarMessage.value =
-                        R.string.context_correctly_copied
-                },
-                onError = { error ->
-                    throwable.value = error
-                    Timber.e(error, "Error not copied.")
-                }
-            )
-            .addTo(composite)
-    }
 
     /**
      * Moves a node if there is no name collision.

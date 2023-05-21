@@ -41,20 +41,6 @@ class CopyNodeUseCase @Inject constructor(
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
 ) {
-    /**
-     * Copies a node.
-     *
-     * @param handle        The identifier of the MegaNode to copy.
-     * @param parentHandle  The parent MegaNode where the node has to be copied.
-     * @return Completable.
-     */
-    fun copy(handle: Long, parentHandle: Long): Completable =
-        Completable.fromCallable {
-            copy(
-                getNodeUseCase.get(handle).blockingGetOrNull(),
-                getNodeUseCase.get(parentHandle).blockingGetOrNull()
-            ).blockingAwait()
-        }
 
     /**
      * Copies a node.
