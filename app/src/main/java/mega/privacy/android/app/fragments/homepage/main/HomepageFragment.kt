@@ -690,7 +690,9 @@ class HomepageFragment : Fragment() {
 
     private fun expandFab() {
         fabMain.visibility = View.GONE
-        addMask()
+        if (fabMaskLayoutDataBinding.root.parent == null) {
+            addMask()
+        }
         // Need to do so, otherwise, fabMaskMain.background is null.
         post {
             rotateFab(true)
