@@ -190,4 +190,18 @@ internal interface AppEventGateway {
      * @param transfersFinishedState [TransfersFinishedState]
      */
     suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
+
+    /**
+     * Monitor chat archived.
+     *
+     * @return Flow [String]
+     */
+    fun monitorChatArchived(): Flow<String>
+
+    /**
+     * Broadcast chat archived.
+     *
+     * @param chatTitle [String]
+     */
+    suspend fun broadcastChatArchived(chatTitle: String)
 }

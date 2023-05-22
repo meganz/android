@@ -19,6 +19,8 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -62,6 +64,10 @@ class ChatViewModelTest {
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
             onBlocking { invoke() }.thenReturn(flowOf(true))
         }
+    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
+    }
+    private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
 
     @Before
     fun setUp() {
@@ -85,7 +91,9 @@ class ChatViewModelTest {
             monitorChatCallUpdates = monitorChatCallUpdates,
             endCallUseCase = endCallUseCase,
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
-            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase
+            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
+            monitorChatArchivedUseCase = monitorChatArchivedUseCase,
+            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase
         )
     }
 

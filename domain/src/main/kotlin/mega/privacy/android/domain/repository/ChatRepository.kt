@@ -262,4 +262,18 @@ interface ChatRepository {
      * @return [ChatConnectionStatus]
      */
     suspend fun getChatConnectionState(chatId: Long): ChatConnectionStatus
+
+    /**
+     * Monitor chat archived.
+     *
+     * @return Flow [String]
+     */
+    fun monitorChatArchived(): Flow<String>
+
+    /**
+     * Broadcast chat archived.
+     *
+     * @param chatTitle [String]
+     */
+    suspend fun broadcastChatArchived(chatTitle: String)
 }

@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -41,16 +42,18 @@ import javax.inject.Inject
 /**
  * GroupChatInfoActivity view model.
  *
- * @property setOpenInvite                  [SetOpenInvite]
- * @property startChatCall                  [StartChatCall]
- * @property getChatRoomUseCase             [GetChatRoomUseCase]
- * @property passcodeManagement             [PasscodeManagement]
- * @property chatApiGateway                 [MegaChatApiGateway]
- * @property cameraGateway                  [CameraGateway]
- * @property chatManagement                 [ChatManagement]
- * @property endCallUseCase                 [EndCallUseCase]
- * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
- * @property state                       Current view state as [GroupInfoState]
+ * @property setOpenInvite                                  [SetOpenInvite]
+ * @property startChatCall                                  [StartChatCall]
+ * @property getChatRoomUseCase                             [GetChatRoomUseCase]
+ * @property passcodeManagement                             [PasscodeManagement]
+ * @property chatApiGateway                                 [MegaChatApiGateway]
+ * @property cameraGateway                                  [CameraGateway]
+ * @property chatManagement                                 [ChatManagement]
+ * @property endCallUseCase                                 [EndCallUseCase]
+ * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
+ * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
+ * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
+ * @property state                                          Current view state as [GroupInfoState]
  */
 @HiltViewModel
 class GroupChatInfoViewModel @Inject constructor(
@@ -65,6 +68,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
+    private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -242,5 +246,14 @@ class GroupChatInfoViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
+    }
+
+    /**
+     * Launch broadcast for a chat archived event
+     *
+     * @param chatTitle [String]
+     */
+    fun launchBroadcastChatArchived(chatTitle: String) = viewModelScope.launch {
+        broadcastChatArchivedUseCase(chatTitle)
     }
 }

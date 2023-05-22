@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -209,6 +210,9 @@ class ManagerViewModelTest {
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getIncomingContactRequestUseCase = mock<GetIncomingContactRequestsUseCase>()
+    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
+    }
 
     private val getPricing = mock<GetPricing>()
     private val getFullAccountInfo = mock<GetFullAccountInfo>()
@@ -261,7 +265,8 @@ class ManagerViewModelTest {
             saveContactByEmailUseCase = mock(),
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
-            getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase
+            getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
+            monitorChatArchivedUseCase = monitorChatArchivedUseCase
         )
     }
 

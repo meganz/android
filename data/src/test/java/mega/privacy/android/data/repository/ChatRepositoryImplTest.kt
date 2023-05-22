@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -75,6 +76,7 @@ class ChatRepositoryImplTest {
     private val megaChatErrorSuccess = mock<MegaChatError> {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
     }
+    private val appEventGateway = mock<AppEventGateway>()
 
     @Before
     fun setUp() {
@@ -94,6 +96,7 @@ class ChatRepositoryImplTest {
             megaChatPeerListMapper = megaChatPeerListMapper,
             connectionStateMapper = connectionStateMapper,
             chatConnectionStatusMapper = chatConnectionStatusMapper,
+            appEventGateway = appEventGateway
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -442,5 +445,4 @@ class ChatRepositoryImplTest {
         val actual = underTest.getChatConnectionState(chatId = chatId)
         assertThat(actual).isEqualTo(ChatConnectionStatus.Online)
     }
-
 }

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property canVerifyPhoneNumber
  * @property enabledFlags
  * @property isPushNotificationSettingsUpdatedEvent
+ * @property titleChatArchivedEvent
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -38,4 +39,5 @@ data class ManagerState(
     val canVerifyPhoneNumber: Boolean = false,
     val enabledFlags: Set<Feature> = emptySet(),
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
+    val titleChatArchivedEvent: String? = null,
 )

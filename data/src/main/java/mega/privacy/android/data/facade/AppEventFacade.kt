@@ -34,6 +34,7 @@ internal class AppEventFacade @Inject constructor(
     private val transfersFinished = MutableSharedFlow<TransfersFinishedState>()
     private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
     private val myAccountUpdate = MutableSharedFlow<MyAccountUpdate>()
+    private val chatArchived = MutableSharedFlow<String>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
     private val _finishActivity = MutableSharedFlow<Boolean>()
@@ -129,6 +130,10 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
         transfersFinished.emit(transfersFinishedState)
+
+    override fun monitorChatArchived(): Flow<String> = chatArchived.toSharedFlow(appScope)
+
+    override suspend fun broadcastChatArchived(chatTitle: String) = chatArchived.emit(chatTitle)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

@@ -38,6 +38,8 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -93,6 +95,8 @@ class ChatViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val deviceGateway: DeviceGateway,
+    private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
+    private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -468,4 +472,19 @@ class ChatViewModel @Inject constructor(
      */
     fun getMeeting(): ChatScheduledMeeting? =
         _state.value.scheduledMeeting
+
+    /**
+     * Launch broadcast for a chat archived event
+     *
+     * @param chatTitle [String]
+     */
+    fun launchBroadcastChatArchived(chatTitle: String) = viewModelScope.launch {
+        broadcastChatArchivedUseCase(chatTitle)
+    }
+
+    /**
+     * Consume chat archive event
+     */
+    fun onChatArchivedEventConsumed() =
+        _state.update { it.copy(titleChatArchivedEvent = null) }
 }

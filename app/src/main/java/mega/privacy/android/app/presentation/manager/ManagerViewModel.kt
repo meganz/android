@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
@@ -157,6 +158,7 @@ class ManagerViewModel @Inject constructor(
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
+    private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
 ) : ViewModel() {
 
     /**
@@ -651,6 +653,12 @@ class ManagerViewModel @Inject constructor(
     }.onFailure {
         Timber.e(it)
     }
+
+    /**
+     * Consume chat archive event
+     */
+    fun onChatArchivedEventConsumed() =
+        _state.update { it.copy(titleChatArchivedEvent = null) }
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

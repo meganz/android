@@ -16,6 +16,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -73,6 +74,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher                       [CoroutineDispatcher]
  * @property deviceEventGateway                 [DeviceEventGateway]
  * @property megaChatPeerListMapper             [MegaChatPeerListMapper]
+ * @property appEventGateway                    [AppEventGateway]
  */
 internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -88,6 +90,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val deviceEventGateway: DeviceEventGateway,
+    private val appEventGateway: AppEventGateway,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> =
@@ -467,4 +470,9 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getChatConnectionState(chatId: Long) = withContext(ioDispatcher) {
         chatConnectionStatusMapper(megaChatApiGateway.getChatConnectionState(chatId))
     }
+
+    override fun monitorChatArchived(): Flow<String> = appEventGateway.monitorChatArchived()
+
+    override suspend fun broadcastChatArchived(chatTitle: String) =
+        appEventGateway.broadcastChatArchived(chatTitle)
 }
