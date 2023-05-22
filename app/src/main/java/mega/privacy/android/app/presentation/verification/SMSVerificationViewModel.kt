@@ -159,17 +159,21 @@ class SMSVerificationViewModel @Inject constructor(
         if (!_uiState.value.isUserLocked) {
             val isAchievementUser = areAccountAchievementsEnabled()
             if (isAchievementUser) {
-                val achievements =
+                runCatching {
                     getAccountAchievements(
                         AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE,
                         awardIndex = 0,
                     )
-                achievements?.let {
-                    val bonusStorageSMS =
-                        stringUtilWrapper.getSizeString(achievements.grantedStorage, context)
-                    _uiState.mapAndUpdate {
-                        it.copy(isAchievementsEnabled = true, bonusStorageSMS = bonusStorageSMS)
+                }.onSuccess { achievements ->
+                    achievements?.let {
+                        val bonusStorageSMS =
+                            stringUtilWrapper.getSizeString(achievements.grantedStorage, context)
+                        _uiState.mapAndUpdate {
+                            it.copy(isAchievementsEnabled = true, bonusStorageSMS = bonusStorageSMS)
+                        }
                     }
+                }.onFailure {
+                    Timber.e(it)
                 }
             }
         }

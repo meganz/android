@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.usecase.GetAccountAchievements
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -67,11 +68,19 @@ class AchievementsViewModel @Inject constructor(
      */
     private fun getAccountAchievements() {
         viewModelScope.launch {
-            getAccountAchievements(achievementType = state.value.achievementType,
-                awardIndex = state.value.awardCount)?.let { achievement ->
-                _state.update {
-                    it.copy(uiMegaAchievement = uiMegaAchievementMapper(achievement))
+            runCatching {
+                getAccountAchievements(
+                    achievementType = state.value.achievementType,
+                    awardIndex = state.value.awardCount
+                )
+            }.onSuccess { achievement ->
+                achievement?.let {
+                    _state.update {
+                        it.copy(uiMegaAchievement = uiMegaAchievementMapper(achievement))
+                    }
                 }
+            }.onFailure {
+                Timber.e(it)
             }
         }
     }
