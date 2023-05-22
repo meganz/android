@@ -53,6 +53,7 @@ import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -330,7 +331,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 viewModel.moveNode(toHandle, this)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
-                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
+                val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
                     ?: return
 
                 viewModel.copyNode(toHandle, this)
