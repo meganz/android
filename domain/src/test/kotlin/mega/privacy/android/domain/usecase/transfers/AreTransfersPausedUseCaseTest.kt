@@ -1,9 +1,10 @@
-package mega.privacy.android.domain.usecase.camerauploads
+package mega.privacy.android.domain.usecase.transfers
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -14,19 +15,19 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [AreAllUploadTransfersPausedUseCase]
+ * Test class for [AreTransfersPausedUseCaseTest]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class AreAllUploadTransfersPausedUseCaseTest {
+class AreTransfersPausedUseCaseTest {
 
-    private lateinit var underTest: AreAllUploadTransfersPausedUseCase
+    private lateinit var underTest: AreTransfersPausedUseCase
 
     private val transferRepository = mock<TransferRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = AreAllUploadTransfersPausedUseCase(
+        underTest = AreTransfersPausedUseCase(
             transferRepository = transferRepository,
         )
     }
@@ -40,7 +41,7 @@ class AreAllUploadTransfersPausedUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that correct value is returned when invoked`(expected: Boolean) =
         runTest {
-            whenever(transferRepository.areAllUploadTransfersPaused()).thenReturn(expected)
+            whenever(transferRepository.areTransfersPaused()).thenReturn(expected)
             val actual = underTest()
             Truth.assertThat(actual).isEqualTo(expected)
         }

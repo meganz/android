@@ -162,11 +162,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun areTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.areTransfersPaused()
-    }
-
-    override suspend fun areAllUploadTransfersPaused(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.areUploadTransfersPaused()
+        megaApiGateway.areUploadTransfersPaused() || megaApiGateway.areDownloadTransfersPaused()
     }
 
     override suspend fun getNumPendingPausedUploads(): Int = withContext(ioDispatcher) {

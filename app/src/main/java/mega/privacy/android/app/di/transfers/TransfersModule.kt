@@ -14,7 +14,6 @@ import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.AreTransfersPaused
 import mega.privacy.android.domain.usecase.DefaultHasPendingUploads
 import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
@@ -82,16 +81,6 @@ abstract class TransfersModule {
         @Provides
         fun provideStartUpload(transfersRepository: TransfersRepository): StartUpload =
             StartUpload(transfersRepository::startUpload)
-
-        /**
-         * Provides the [AreTransfersPaused] implementation
-         *
-         * @param transfersRepository [TransferRepository]
-         * @return [AreTransfersPaused]
-         */
-        @Provides
-        fun provideAreTransfersPaused(transfersRepository: TransferRepository):
-                AreTransfersPaused = AreTransfersPaused(transfersRepository::areTransfersPaused)
 
         /**
          * Provides the [GetNumPendingDownloadsNonBackground] implementation

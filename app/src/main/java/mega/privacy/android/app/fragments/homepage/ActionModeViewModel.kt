@@ -8,14 +8,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 @HiltViewModel
 class ActionModeViewModel @Inject constructor(
-    private val areTransfersPaused: AreTransfersPaused,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
 ) : ViewModel() {
 
     // The full set of nodes
@@ -55,7 +55,7 @@ class ActionModeViewModel @Inject constructor(
 
     fun executeTransfer(transferAction: () -> Unit) {
         viewModelScope.launch {
-            if (areTransfersPaused()) {
+            if (areTransfersPausedUseCase()) {
                 showTransfersAction()
             } else {
                 transferAction()

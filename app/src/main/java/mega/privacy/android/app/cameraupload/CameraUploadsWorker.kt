@@ -115,7 +115,6 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.camerauploads.AreAllUploadTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
@@ -134,6 +133,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -360,10 +360,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase
 
     /**
-     * AreAllUploadTransfersPaused
+     * AreTransfersPausedUseCase
      */
     @Inject
-    lateinit var areAllUploadTransfersPausedUseCase: AreAllUploadTransfersPausedUseCase
+    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
 
     /**
      * Sync Record Type Mapper
@@ -1098,7 +1098,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         // If the Service detects that all upload transfers are paused when turning on
         // Camera Uploads, update the Primary and Secondary Folder Backup States to
         // BackupState.PAUSE_UPLOADS
-        if (areAllUploadTransfersPausedUseCase()) {
+        if (areTransfersPausedUseCase()) {
             Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)

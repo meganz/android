@@ -55,7 +55,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
-import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -79,7 +79,7 @@ import javax.inject.Inject
  * @property cancelTransferUseCase      Needed to cancel current full image transfer if needed
  * @property isUserLoggedInUseCase      UseCase required to check when the user is already logged in
  * @property deleteChatMessageUseCase   UseCase required to delete current chat node message
- * @property areTransfersPaused         UseCase required to check if transfers are paused
+ * @property areTransfersPausedUseCase         UseCase required to check if transfers are paused
  * @property copyNodeUseCase            UseCase required to copy nodes
  * @property moveNodeUseCase            UseCase required to move nodes
  * @property removeNodeUseCase          UseCase required to remove nodes
@@ -95,7 +95,7 @@ class ImageViewerViewModel @Inject constructor(
     private val cancelTransferUseCase: CancelTransferUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedIn,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
-    private val areTransfersPaused: AreTransfersPaused,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
@@ -736,7 +736,7 @@ class ImageViewerViewModel @Inject constructor(
      */
     fun executeTransfer(transferAction: () -> Unit) {
         viewModelScope.launch {
-            if (areTransfersPaused()) {
+            if (areTransfersPausedUseCase()) {
                 showTransfersAction()
             } else {
                 transferAction()

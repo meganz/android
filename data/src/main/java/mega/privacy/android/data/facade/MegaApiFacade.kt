@@ -140,12 +140,11 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getBusinessStatus(): Int = megaApi.businessStatus
 
-    override suspend fun areTransfersPaused(): Boolean =
-        megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||
-                megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-
     override suspend fun areUploadTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+
+    override suspend fun areDownloadTransfersPaused(): Boolean =
+        megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
 
     override suspend fun getRootNode(): MegaNode? = megaApi.rootNode
 

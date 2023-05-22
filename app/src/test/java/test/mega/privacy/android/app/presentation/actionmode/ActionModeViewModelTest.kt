@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.fragments.homepage.ActionModeViewModel
-import mega.privacy.android.domain.usecase.AreTransfersPaused
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -24,7 +24,7 @@ class ActionModeViewModelTest {
 
     private lateinit var underTest: ActionModeViewModel
 
-    private val areTransfersPaused = mock<AreTransfersPaused>()
+    private val areTransfersPausedUseCase = mock<AreTransfersPausedUseCase>()
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -44,8 +44,8 @@ class ActionModeViewModelTest {
     @Test
     fun `test that an action bar message is emitted if the transfers are paused`() =
         runTest {
-            underTest = ActionModeViewModel(areTransfersPaused)
-            whenever(areTransfersPaused()).thenReturn(true)
+            underTest = ActionModeViewModel(areTransfersPausedUseCase)
+            whenever(areTransfersPausedUseCase()).thenReturn(true)
             underTest.executeTransfer { return@executeTransfer }
             scheduler.advanceUntilIdle()
 
@@ -59,8 +59,8 @@ class ActionModeViewModelTest {
     @Test
     fun `test that no action bar message is shown if the transfers are not paused`() =
         runTest {
-            underTest = ActionModeViewModel(areTransfersPaused)
-            whenever(areTransfersPaused()).thenReturn(false)
+            underTest = ActionModeViewModel(areTransfersPausedUseCase)
+            whenever(areTransfersPausedUseCase()).thenReturn(false)
             underTest.executeTransfer { return@executeTransfer }
             scheduler.advanceUntilIdle()
 

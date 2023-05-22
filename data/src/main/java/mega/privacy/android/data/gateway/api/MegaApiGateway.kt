@@ -198,14 +198,14 @@ interface MegaApiGateway {
     val isAchievementsEnabled: Boolean
 
     /**
-     * Are transfers paused (downloads and uploads)
-     */
-    suspend fun areTransfersPaused(): Boolean
-
-    /**
      * Are upload transfers paused
      */
     suspend fun areUploadTransfersPaused(): Boolean
+
+    /**
+     * Are download transfers paused
+     */
+    suspend fun areDownloadTransfersPaused(): Boolean
 
     /**
      * Root node of the account
