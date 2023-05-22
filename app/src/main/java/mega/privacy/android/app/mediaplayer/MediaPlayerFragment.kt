@@ -154,7 +154,7 @@ class MediaPlayerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View =
-        if (MediaPlayerActivity.isAudioPlayer(activity?.intent)) {
+        if (isAudioPlayer) {
             val binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
             audioPlayerVH = AudioPlayerViewHolder(binding)
             binding.root
@@ -176,7 +176,7 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
+        isAudioPlayer = activity is AudioPlayerActivity
         val playerServiceIntent = Intent(
             requireContext(),
             if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
@@ -328,6 +328,7 @@ class MediaPlayerFragment : Fragment() {
                                     }
                                     .show()
                             }
+
                             isRetry -> {
                                 retryFailedDialog?.dismiss()
                                 retryFailedDialog = null
@@ -431,7 +432,7 @@ class MediaPlayerFragment : Fragment() {
                                         layout = binding.screenshotScaleAnimationLayout,
                                         bitmap = bitmap
                                     )
-                                    (requireActivity() as MediaPlayerActivity)
+                                    (requireActivity() as VideoPlayerActivity)
                                         .showSnackbarForVideoPlayer(
                                             getString(R.string.media_player_video_snackbar_screenshot_saved)
                                         )

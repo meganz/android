@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlaylistBinding
+import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
@@ -111,7 +112,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
+        isAudioPlayer = activity is AudioPlayerActivity
         val playerServiceIntent = Intent(
             requireContext(),
             if (isAudioPlayer)
@@ -184,11 +185,15 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 recyclerView.layoutParams = params
             }
             recyclerView.setHasFixedSize(true)
-            recyclerView.setBackgroundColor(requireActivity().getColor(if (isAudioPlayer) {
-                R.color.grey_020_grey_800
-            } else {
-                R.color.grey_800
-            }))
+            recyclerView.setBackgroundColor(
+                requireActivity().getColor(
+                    if (isAudioPlayer) {
+                        R.color.grey_020_grey_800
+                    } else {
+                        R.color.grey_800
+                    }
+                )
+            )
             // Avoid the item is flash when it is refreshed.
             (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             recyclerView.layoutManager = listLayoutManager
@@ -210,12 +215,15 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                             R.drawable.playlist_divider_layer
                         } else {
                             R.drawable.playlist_divider_layer_video
-                        }),
-                    requireContext().getDrawable(if (isAudioPlayer) {
-                        R.drawable.playlist_divider_layer_next
-                    } else {
-                        R.drawable.playlist_divider_layer_next_video
-                    }),
+                        }
+                    ),
+                    requireContext().getDrawable(
+                        if (isAudioPlayer) {
+                            R.drawable.playlist_divider_layer_next
+                        } else {
+                            R.drawable.playlist_divider_layer_next_video
+                        }
+                    ),
                     it
                 )
             }

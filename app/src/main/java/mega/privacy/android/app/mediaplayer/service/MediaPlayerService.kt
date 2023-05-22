@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
-import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
@@ -371,7 +370,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
 
             else -> {
-                if (MediaPlayerActivity.isAudioPlayer(intent)) {
+                if (viewModelGateway.isAudioPlayer()) {
                     if (!isNotificationCreated) {
                         createPlayerControlNotification()
                         isNotificationCreated = true
@@ -701,6 +700,14 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         videoPlayType = type
     }
 
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        when (event) {
+            Lifecycle.Event.ON_START -> onMoveToForeground()
+            Lifecycle.Event.ON_STOP -> onMoveToBackground()
+            else -> return
+        }
+    }
+
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1
 
@@ -826,14 +833,6 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                     ContextCompat.startForegroundService(context, audioPlayerIntent)
                 }
             }
-        }
-    }
-
-    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        when (event) {
-            Lifecycle.Event.ON_START -> onMoveToForeground()
-            Lifecycle.Event.ON_STOP -> onMoveToBackground()
-            else -> return
         }
     }
 }
