@@ -202,7 +202,7 @@ class SearchFragment : RotatableFragment() {
 
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             hideMultipleSelect()
-            refresh()
+            refresh(isInvalidateOptionMenu = false)
         })
 
         searchViewModel.updateNodes.observe(
@@ -769,10 +769,12 @@ class SearchFragment : RotatableFragment() {
     /**
      * This function refresh the search
      */
-    fun refresh() {
+    fun refresh(isInvalidateOptionMenu: Boolean = true) {
         Timber.d("refresh ")
         newSearchNodesTask()
-        managerActivity.invalidateOptionsMenu()
+        if (isInvalidateOptionMenu) {
+            managerActivity.invalidateOptionsMenu()
+        }
         visibilityFastScroller()
     }
 
