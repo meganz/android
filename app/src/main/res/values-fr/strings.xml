@@ -4699,20 +4699,6 @@
         <item quantity="many">Cinquième dimanche tous les %1$d&#160;mois à partir du [A]%2$s[/A] de [B]%3$s à %4$s[/B]</item>
         <item quantity="other">Cinquième dimanche tous les %1$d&#160;mois à partir du [A]%2$s[/A] de [B]%3$s à %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">Lundi</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">Mardi</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">Mercredi</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">Jeudi</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">Vendredi</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">Samedi</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">Dimanche</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Aujourd’hui %1$s de %2$s à %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -5001,4 +4987,46 @@
     <string name="notification_sched_meeting_starts_15_minutes">La réunion commence dans 15&#160;minutes</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">La réunion commence maintenant</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">Partager aussi la clé de déchiffrement ?</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">La clé de déchiffrement a été exportée et sera partagée avec le lien.</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">Ne partager que le lien</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">Partager le lien et la clé</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="one">Partager un lien</item>
+        <item quantity="many">Partager des liens</item>
+        <item quantity="other">Partager des liens</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="one">Le lien a été copié dans le presse-papiers</item>
+        <item quantity="many">Les liens ont été copiés dans le presse-papiers</item>
+        <item quantity="other">Les liens ont été copiés dans le presse-papiers</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="one">Supprimer le lien ?</item>
+        <item quantity="many">Supprimer les liens ?</item>
+        <item quantity="other">Supprimer les liens ?</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="one">Les personnes avec qui vous avez partagé ce lien perdront l’accès à l’album.</item>
+        <item quantity="many">Les personnes avec qui vous avez partagé ces liens perdront l’accès aux albums.</item>
+        <item quantity="other">Les personnes avec qui vous avez partagé ces liens perdront l’accès aux albums.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="one">Supprimer le lien</item>
+        <item quantity="many">Supprimer les liens</item>
+        <item quantity="other">Supprimer les liens</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">Saisir la clé de déchiffrement</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>

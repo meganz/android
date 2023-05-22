@@ -4780,7 +4780,7 @@
     <!-- Title for the Album Link share with decryption key separated dialog -->
     <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link</string>
+    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
     <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
