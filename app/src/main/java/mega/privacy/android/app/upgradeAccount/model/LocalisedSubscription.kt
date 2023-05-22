@@ -10,21 +10,23 @@ import java.util.Locale
 /**
  * Localised Subscription
  *
- * @property accountType     Account type (PRO I, PRO II, PRO III, PRO LITE, etc.)
- * @property handle          Subscription option handle
- * @property storage         Amount of storage of the subscription option
- * @property transfer        Amount of transfer quota of the subscription option
- * @property amount          Currency amount object, containing price amount for subscription option and local currency
- * @property localisedPrice  Mapper to get localised price
- * @property localisedPriceCurrencyCode Mapper to get localised price and currency code (e.g. "EUR")
- * @property formattedSize   Mapper to get correctly formatted size for storage and transfer
+ * @property accountType                        Account type (PRO I, PRO II, PRO III, PRO LITE, etc.)
+ * @property storage                            Amount of storage of the subscription option
+ * @property monthlyTransfer                    Amount of monthly transfer quota of the subscription option
+ * @property yearlyTransfer                     Amount of yearly transfer quota of the subscription option
+ * @property monthlyAmount                      Currency amount object, containing monthly price amount for subscription option and local currency
+ * @property yearlyAmount                       Currency amount object, containing yearly price amount for subscription option and local currency
+ * @property localisedPrice                     Mapper to get localised price
+ * @property localisedPriceCurrencyCode         Mapper to get localised price and currency code (e.g. "EUR")
+ * @property formattedSize                      Mapper to get correctly formatted size for storage and transfer
  */
 data class LocalisedSubscription(
     val accountType: AccountType,
-    val handle: Long,
     val storage: Int,
-    val transfer: Int,
-    val amount: CurrencyAmount,
+    val monthlyTransfer: Int,
+    val yearlyTransfer: Int,
+    val monthlyAmount: CurrencyAmount,
+    val yearlyAmount: CurrencyAmount,
     val localisedPrice: LocalisedPriceStringMapper,
     val localisedPriceCurrencyCode: LocalisedPriceCurrencyCodeStringMapper,
     val formattedSize: FormattedSizeMapper,
@@ -35,28 +37,38 @@ data class LocalisedSubscription(
      * @param locale [Locale]
      * @return String
      */
-    fun localisePrice(locale: Locale): String = localisedPrice(amount, locale)
+    fun localisePrice(locale: Locale): String = localisedPrice(monthlyAmount, locale)
 
     /**
      * method to call LocalisedPriceCurrencyCodeStringMapper to return pair of strings containing localised price, currency sign and currency code
      *
      * @param locale [Locale]
+     * @param isMonthly [Boolean]
      * @return Pair<String, String>
      */
-    fun localisePriceCurrencyCode(locale: Locale): Pair<String, String> =
-        localisedPriceCurrencyCode(amount, locale)
+    fun localisePriceCurrencyCode(locale: Locale, isMonthly: Boolean): LocalisedProductPrice =
+        when (isMonthly) {
+            true -> localisedPriceCurrencyCode(monthlyAmount, locale)
+            false -> localisedPriceCurrencyCode(yearlyAmount, locale)
+        }
+
 
     /**
      * method to call FormattedSizeMapper to return pair of int and string containing correctly formatted size for storage
      *
      * @return Pair<Int, String>
      */
-    fun formatStorageSize(): Pair<Int, String> = formattedSize(storage)
+    fun formatStorageSize(): FormattedSize = formattedSize(storage)
 
     /**
      * method to call FormattedSizeMapper to return pair of int and string containing correctly formatted size for transfer
      *
+     * @param isMonthly [Boolean]
      * @return Pair<Int, String>
      */
-    fun formatTransferSize(): Pair<Int, String> = formattedSize(transfer)
+    fun formatTransferSize(isMonthly: Boolean): FormattedSize =
+        when (isMonthly) {
+            true -> formattedSize(monthlyTransfer)
+            false -> formattedSize(yearlyTransfer)
+        }
 }

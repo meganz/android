@@ -15,17 +15,20 @@ class LocalisedSubscriptionMapper @Inject constructor(
     /**
      * Invoke
      * Convert Subscription to LocalisedSubscription
-     * @param subscription [Subscription]
-     * @return LocalisedSubscription
+     * @param monthlySubscription [Subscription]
+     * @param yearlySubscription [Subscription]
+     * @return [LocalisedSubscription]
      */
     internal operator fun invoke(
-        subscription: Subscription,
+        monthlySubscription: Subscription,
+        yearlySubscription: Subscription,
     ) = LocalisedSubscription(
-        accountType = subscription.accountType,
-        handle = subscription.handle,
-        storage = subscription.storage,
-        transfer = subscription.transfer,
-        amount = subscription.amount,
+        accountType = monthlySubscription.accountType,
+        storage = monthlySubscription.storage,
+        monthlyTransfer = monthlySubscription.transfer,
+        yearlyTransfer = yearlySubscription.transfer,
+        monthlyAmount = monthlySubscription.amount,
+        yearlyAmount = yearlySubscription.amount,
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,

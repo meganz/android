@@ -30,55 +30,72 @@ class NewUpgradeAccountViewTest {
     private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
-    private val subscriptionProIMonthly = LocalisedSubscription(
+
+    private val localisedSubscriptionProI = LocalisedSubscription(
         accountType = AccountType.PRO_I,
-        handle = 1560943707714440503,
         storage = 2048,
-        transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 2048,
+        yearlyTransfer = 24576,
+        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            99.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProIIMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProII = LocalisedSubscription(
         accountType = AccountType.PRO_II,
-        handle = 7974113413762509455,
         storage = 8192,
-        transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 8192,
+        yearlyTransfer = 98304,
+        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            199.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProIIIMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProIII = LocalisedSubscription(
         accountType = AccountType.PRO_III,
-        handle = -2499193043825823892,
         storage = 16384,
-        transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 16384,
+        yearlyTransfer = 196608,
+        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            299.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProLiteMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProLite = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
-        handle = -4226692769210777158,
         storage = 400,
-        transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 1024,
+        yearlyTransfer = 12288,
+        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            49.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    private val expectedSubscriptionsList = listOf(
-        subscriptionProLiteMonthly,
-        subscriptionProIMonthly,
-        subscriptionProIIMonthly,
-        subscriptionProIIIMonthly
+    private val expectedLocalisedSubscriptionsList = listOf(
+        localisedSubscriptionProLite,
+        localisedSubscriptionProI,
+        localisedSubscriptionProII,
+        localisedSubscriptionProIII
     )
 
     @get:Rule
@@ -90,10 +107,11 @@ class NewUpgradeAccountViewTest {
             NewUpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
+                onButtonClicked = {},
                 onTOSClicked = {},
             )
         }
+        composeRule.onNodeWithText("Monthly").performClick()
 
         composeRule.onNode(hasTestTag("Monthly check"), useUnmergedTree = true).assertExists()
         composeRule.onNode(hasTestTag("Yearly check"), useUnmergedTree = true).assertDoesNotExist()
@@ -105,7 +123,7 @@ class NewUpgradeAccountViewTest {
             NewUpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
+                onButtonClicked = {},
                 onTOSClicked = {},
             )
         }
@@ -121,7 +139,7 @@ class NewUpgradeAccountViewTest {
             NewUpgradeAccountView(
                 getUpgradeAccountState(AccountType.PRO_I, false),
                 onBackPressed = {},
-                onPlanClicked = {},
+                onButtonClicked = {},
                 onTOSClicked = {},
             )
         }
@@ -139,7 +157,7 @@ class NewUpgradeAccountViewTest {
             NewUpgradeAccountView(
                 getUpgradeAccountState(AccountType.PRO_I, false),
                 onBackPressed = {},
-                onPlanClicked = {},
+                onButtonClicked = {},
                 onTOSClicked = {},
             )
         }
@@ -157,7 +175,7 @@ class NewUpgradeAccountViewTest {
             NewUpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
+                onButtonClicked = {},
                 onTOSClicked = {},
             )
         }
@@ -174,7 +192,7 @@ class NewUpgradeAccountViewTest {
         showBillingWarning: Boolean,
     ): UpgradeAccountState =
         UpgradeAccountState(
-            subscriptionsList = expectedSubscriptionsList,
+            localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             currentSubscriptionPlan = accountType,
             showBillingWarning = showBillingWarning,
             currentPayment = UpgradePayment(

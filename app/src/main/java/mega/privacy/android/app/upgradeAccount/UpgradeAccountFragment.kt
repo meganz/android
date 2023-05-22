@@ -80,7 +80,7 @@ class UpgradeAccountFragment : Fragment() {
                 NewUpgradeAccountView(
                     state = uiState,
                     onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
-                    onPlanClicked = { onUpgradeClick(it) },
+                    onButtonClicked = { onUpgradeClick(it) },
                     onTOSClicked = { redirectToTOSPage() },
                 )
             } else {

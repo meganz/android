@@ -73,6 +73,7 @@ import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.core.ui.theme.teal_100
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.core.ui.theme.transparent
+import mega.privacy.android.domain.entity.Currency
 import java.util.Locale
 
 
@@ -80,18 +81,21 @@ import java.util.Locale
 fun NewUpgradeAccountView(
     state: UpgradeAccountState,
     onBackPressed: () -> Unit,
-    onPlanClicked: (AccountType) -> Unit,
+    onButtonClicked: (AccountType) -> Unit,
     onTOSClicked: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    var isMonthly by rememberSaveable { mutableStateOf(true) }
+    var isMonthly by rememberSaveable { mutableStateOf(false) }
     var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
-    Scaffold(topBar = {
-        SimpleNoTitleTopAppBar(
-            elevation = false,
-            onBackPressed = onBackPressed
-        )
-    }) { paddingValues ->
+    var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
+    Scaffold(
+        topBar = {
+            SimpleNoTitleTopAppBar(
+                elevation = false,
+                onBackPressed = onBackPressed
+            )
+        },
+    ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
@@ -135,19 +139,23 @@ fun NewUpgradeAccountView(
                 )
             }
 
-            state.subscriptionsList.forEach {
+            state.localisedSubscriptionsList.forEach {
                 val isCurrentPlan = remember {
                     derivedStateOf { state.currentSubscriptionPlan == it.accountType }
                 }
                 val isRecommended = remember {
                     derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
                 }
+                if (isRecommended.value && !isPreselectedPlanOnce) chosenPlan = it.accountType
                 SubscriptionPlansInfoRowNew(
                     proPlan = it.accountType,
                     subscription = it,
                     isCurrentPlan = isCurrentPlan.value,
                     isRecommended = isRecommended.value,
-                    onPlanClicked = { chosenPlan = it.accountType },
+                    onPlanClicked = {
+                        chosenPlan = it.accountType
+                        isPreselectedPlanOnce = true
+                    },
                     chosenPlan = chosenPlan,
                     isMonthly = isMonthly,
                 )
@@ -157,7 +165,7 @@ fun NewUpgradeAccountView(
 
             if (chosenPlan != AccountType.FREE) {
                 TextButton(
-                    onClick = { onPlanClicked(chosenPlan) },
+                    onClick = { onButtonClicked(chosenPlan) },
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth(),
@@ -324,13 +332,13 @@ fun SubscriptionPlansInfoRowNew(
 
     val storageValueString =
         stringResource(
-            id = subscription.formatStorageSize().first,
-            subscription.formatStorageSize().second
+            id = subscription.formatStorageSize().unit,
+            subscription.formatStorageSize().size
         )
     val transferValueString =
         stringResource(
-            id = subscription.formatTransferSize().first,
-            subscription.formatTransferSize().second
+            id = subscription.formatTransferSize(isMonthly).unit,
+            subscription.formatTransferSize(isMonthly).size
         )
 
     val uiAccountType = mapUIAccountType(proPlan)
@@ -338,10 +346,10 @@ fun SubscriptionPlansInfoRowNew(
     val storageString = "[B]Storage:[/B] [A]$storageValueString[/A]"
     val transferString = "[B]Transfer:[/B] [A]$transferValueString[/A]"
 
-    val formattedPrice = subscription.localisePriceCurrencyCode(Locale.getDefault())
+    val formattedPrice = subscription.localisePriceCurrencyCode(Locale.getDefault(), isMonthly)
     val priceString =
-        if (isMonthly) "[A]${formattedPrice.first}[/A]\r\n[B]${formattedPrice.second}/month[/B]"
-        else "[A]${formattedPrice.first}[/A]\r\n[B]${formattedPrice.second}/year[/B]"
+        if (isMonthly) "[A]${formattedPrice.price}[/A]\r\n[B]${formattedPrice.currencyCode}/month[/B]"
+        else "[A]${formattedPrice.price}[/A]\r\n[B]${formattedPrice.currencyCode}/year[/B]"
 
     Card(shape = RoundedCornerShape(12.dp),
         elevation = if (isClicked) 8.dp else 0.dp,
@@ -503,7 +511,7 @@ private fun FeaturesOfPlans() {
         ) {
 
             Text(
-                text = "•  Password protected links",
+                text = "•  Password-protected links",
                 style = body2,
                 color = MaterialTheme.colors.textColorBlackWhite,
                 modifier = Modifier.padding(
@@ -539,7 +547,7 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III",
+                text = "•  Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)",
                 style = body2,
                 color = MaterialTheme.colors.textColorBlackWhite,
                 modifier = Modifier.padding(
@@ -548,7 +556,7 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Schedule rubbish bin clearing between 7 days to 10 years",
+                text = "•  Schedule rubbish bin clearing between 7 days and 10 years",
                 style = body2,
                 color = MaterialTheme.colors.textColorBlackWhite,
                 modifier = Modifier.padding(start = 10.dp)
@@ -575,68 +583,79 @@ fun PreviewUpgradeAccountViewNew() {
     val localisedPriceStringMapper = LocalisedPriceStringMapper()
     val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     val formattedSizeMapper = FormattedSizeMapper()
-    val expectedSubscriptionsList: List<LocalisedSubscription>
-    val subscriptionProIMonthly = LocalisedSubscription(
+    val localisedSubscriptionsList: List<LocalisedSubscription>
+
+    val subscriptionProI = LocalisedSubscription(
         accountType = AccountType.PRO_I,
-        handle = 1560943707714440503,
         storage = 2048,
-        transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), mega.privacy.android.domain.entity.Currency("EUR")),
+        monthlyTransfer = 2048,
+        yearlyTransfer = 24576,
+        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            99.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    val subscriptionProIIMonthly = LocalisedSubscription(
+    val subscriptionProII = LocalisedSubscription(
         accountType = AccountType.PRO_II,
-        handle = 7974113413762509455,
         storage = 8192,
-        transfer = 8192,
-        amount = CurrencyAmount(
-            19.99.toFloat(),
-            mega.privacy.android.domain.entity.Currency("EUR")
+        monthlyTransfer = 8192,
+        yearlyTransfer = 98304,
+        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            199.99.toFloat(),
+            Currency("EUR")
         ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
-
     )
 
-    val subscriptionProIIIMonthly = LocalisedSubscription(
+    val subscriptionProIII = LocalisedSubscription(
         accountType = AccountType.PRO_III,
-        handle = -2499193043825823892,
         storage = 16384,
-        transfer = 16384,
-        amount = CurrencyAmount(
-            29.99.toFloat(),
-            mega.privacy.android.domain.entity.Currency("EUR")
+        monthlyTransfer = 16384,
+        yearlyTransfer = 196608,
+        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            299.99.toFloat(),
+            Currency("EUR")
         ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    val subscriptionProLiteMonthly = LocalisedSubscription(
+    val subscriptionProLite = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
-        handle = -4226692769210777158,
         storage = 400,
-        transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), mega.privacy.android.domain.entity.Currency("NZD")),
+        monthlyTransfer = 1024,
+        yearlyTransfer = 12288,
+        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            49.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    expectedSubscriptionsList = listOf(
-        subscriptionProLiteMonthly,
-        subscriptionProIMonthly,
-        subscriptionProIIMonthly,
-        subscriptionProIIIMonthly
+    localisedSubscriptionsList = listOf(
+        subscriptionProLite,
+        subscriptionProI,
+        subscriptionProII,
+        subscriptionProIII
     )
+
     MaterialTheme {
         NewUpgradeAccountView(
             state = UpgradeAccountState(
-                subscriptionsList = expectedSubscriptionsList,
+                localisedSubscriptionsList = localisedSubscriptionsList,
                 currentSubscriptionPlan = AccountType.PRO_II,
                 showBillingWarning = false,
                 showBuyNewSubscriptionDialog = false,
@@ -646,7 +665,7 @@ fun PreviewUpgradeAccountViewNew() {
                 ),
             ),
             onBackPressed = {},
-            onPlanClicked = {},
+            onButtonClicked = {},
             onTOSClicked = {},
         )
     }

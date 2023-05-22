@@ -82,7 +82,7 @@ fun UpgradeAccountView(
                 BillingWarning(hideBillingWarning)
             }
             CurrentSubscriptionPlanBox(state = state)
-            state.subscriptionsList.forEach {
+            state.localisedSubscriptionsList.forEach {
                 SubscriptionPlansInfoRow(
                     proPlan = it.accountType,
                     subscription = it,
@@ -100,7 +100,7 @@ fun UpgradeAccountView(
                         )
                 )
             }
-            if (state.subscriptionsList.isNotEmpty()) {
+            if (state.localisedSubscriptionsList.isNotEmpty()) {
                 if (state.currentSubscriptionPlan == AccountType.PRO_III) {
                     CustomLabelText(
                         onCustomLabelClicked = onCustomLabelClicked
@@ -229,13 +229,13 @@ fun SubscriptionPlansInfoRow(
 
     val storageValueString =
         stringResource(
-            id = subscription.formatStorageSize().first,
-            subscription.formatStorageSize().second
+            id = subscription.formatStorageSize().unit,
+            subscription.formatStorageSize().size
         )
     val transferValueString =
         stringResource(
-            id = subscription.formatTransferSize().first,
-            subscription.formatTransferSize().second
+            id = subscription.formatTransferSize(true).unit,
+            subscription.formatTransferSize(true).size
         )
 
     val uiAccountType = when (proPlan) {

@@ -8,15 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import timber.log.Timber
 import javax.inject.Inject
@@ -24,8 +27,9 @@ import javax.inject.Inject
 /**
  * Upgrade account view model
  *
+ * @param getMonthlySubscriptionsUseCase use case to get the list of monthly subscriptions available in the app
+ * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param getCurrentSubscriptionPlanUseCase use case to get the current subscribed plan
- * @param getMonthlySubscriptionsUseCase use case to get the list of available subscriptions in the app
  * @param getCurrentPaymentUseCase use case to get the current payment option
  * @param isBillingAvailable use to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
@@ -35,6 +39,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UpgradeAccountViewModel @Inject constructor(
     private val getMonthlySubscriptionsUseCase: GetMonthlySubscriptionsUseCase,
+    private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
@@ -56,14 +61,30 @@ class UpgradeAccountViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            var monthlySubscriptions = listOf<Subscription>()
+            var yearlySubscriptions = listOf<Subscription>()
+            val localisedSubscriptions = mutableListOf<LocalisedSubscription>()
             runCatching { getMonthlySubscriptionsUseCase() }
                 .onSuccess { subscriptions ->
-                    val localisedSubscriptions =
-                        subscriptions.map { subscription -> localisedSubscriptionMapper(subscription) }
-                    _state.update { it.copy(subscriptionsList = localisedSubscriptions) }
+                    monthlySubscriptions = subscriptions
                 }.onFailure {
                     Timber.e(it)
                 }
+            runCatching { getYearlySubscriptionsUseCase() }
+                .onSuccess { subscriptions ->
+                    yearlySubscriptions = subscriptions
+                }.onFailure {
+                    Timber.e(it)
+                }
+            monthlySubscriptions.map { monthlySubscription ->
+                val yearlySubscription =
+                    yearlySubscriptions.first { it.accountType == monthlySubscription.accountType }
+                localisedSubscriptions += localisedSubscriptionMapper(
+                    monthlySubscription = monthlySubscription,
+                    yearlySubscription = yearlySubscription
+                )
+            }
+            _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
         }
         viewModelScope.launch {
             val currentSubscriptionPlan = getCurrentSubscriptionPlanUseCase()

@@ -34,10 +34,14 @@ class UpgradeAccountViewTest {
     private val formattedSizeMapper = FormattedSizeMapper()
     private val subscriptionProIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_I,
-        handle = 1560943707714440503,
         storage = 2048,
-        transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 2048,
+        yearlyTransfer = 24576,
+        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            99.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
@@ -45,10 +49,14 @@ class UpgradeAccountViewTest {
 
     private val subscriptionProIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_II,
-        handle = 7974113413762509455,
         storage = 8192,
-        transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 8192,
+        yearlyTransfer = 98304,
+        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            199.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
@@ -56,10 +64,14 @@ class UpgradeAccountViewTest {
 
     private val subscriptionProIIIMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_III,
-        handle = -2499193043825823892,
         storage = 16384,
-        transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 16384,
+        yearlyTransfer = 196608,
+        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            299.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
@@ -67,16 +79,20 @@ class UpgradeAccountViewTest {
 
     private val subscriptionProLiteMonthly = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
-        handle = -4226692769210777158,
         storage = 400,
-        transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        monthlyTransfer = 1024,
+        yearlyTransfer = 12288,
+        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            49.99.toFloat(),
+            Currency("EUR")
+        ),
         localisedPrice = localisedPriceStringMapper,
         localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
         formattedSize = formattedSizeMapper,
     )
 
-    private val expectedSubscriptionsList = listOf(
+    private val expectedLocalisedSubscriptionsList = listOf(
         subscriptionProLiteMonthly,
         subscriptionProIMonthly,
         subscriptionProIIMonthly,
@@ -298,7 +314,7 @@ class UpgradeAccountViewTest {
         showBillingWarning: Boolean,
     ): UpgradeAccountState =
         UpgradeAccountState(
-            subscriptionsList = expectedSubscriptionsList,
+            localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             currentSubscriptionPlan = accountType,
             showBillingWarning = showBillingWarning,
             currentPayment = UpgradePayment(

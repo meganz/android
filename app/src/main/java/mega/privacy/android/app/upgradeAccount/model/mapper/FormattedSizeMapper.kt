@@ -1,6 +1,7 @@
 package mega.privacy.android.app.upgradeAccount.model.mapper
 
 import mega.privacy.android.app.R
+import mega.privacy.android.app.upgradeAccount.model.FormattedSize
 import java.text.DecimalFormat
 import javax.inject.Inject
 
@@ -12,14 +13,14 @@ class FormattedSizeMapper @Inject constructor() {
      * Invoke
      * Convert Int to Pair<Int, String>
      * @param size [Int]
-     * @return Pair<Int, String>
+     * @return FormattedSize
      */
-    internal operator fun invoke(size: Int): Pair<Int, String> {
+    internal operator fun invoke(size: Int): FormattedSize {
         val decimalFormatter = DecimalFormat("###.##")
         return if (size < 1024) {
-            Pair(R.string.label_file_size_giga_byte, decimalFormatter.format(size))
+            FormattedSize(R.string.label_file_size_giga_byte, decimalFormatter.format(size))
         } else {
-            Pair(R.string.label_file_size_tera_byte, decimalFormatter.format(size / 1024))
+            FormattedSize(R.string.label_file_size_tera_byte, decimalFormatter.format(size / 1024))
         }
     }
 }

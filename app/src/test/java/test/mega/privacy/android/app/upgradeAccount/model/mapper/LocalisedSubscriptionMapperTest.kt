@@ -24,24 +24,38 @@ class LocalisedSubscriptionMapperTest {
 
     @Test
     fun `test that mapper returns correctly LocalisedSubscription object`() {
-        val subscription = Subscription(
-            accountType = AccountType.FREE,
-            handle = 11,
-            storage = 12,
-            transfer = 13,
-            amount = CurrencyAmount(4.99.toFloat(), Currency("EUR"))
+        val subscriptionProIMonthly = Subscription(
+            accountType = AccountType.PRO_I,
+            handle = 1560943707714440503,
+            storage = 2048,
+            transfer = 2048,
+            amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
+        )
+
+        val subscriptionProIYearly = Subscription(
+            accountType = AccountType.PRO_I,
+            handle = 7472683699866478542,
+            storage = 2048,
+            transfer = 24576,
+            amount = CurrencyAmount(99.99.toFloat(), Currency("EUR"))
         )
 
         val localisedSubscription = LocalisedSubscription(
-            accountType = AccountType.FREE,
-            handle = 11,
-            storage = 12,
-            transfer = 13,
-            amount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+            accountType = AccountType.PRO_I,
+            storage = 2048,
+            monthlyTransfer = 2048,
+            yearlyTransfer = 24576,
+            monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+            yearlyAmount = CurrencyAmount(
+                99.99.toFloat(),
+                Currency("EUR")
+            ),
             localisedPrice = localisedPriceStringMapper,
             localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
             formattedSize = formattedSizeMapper,
         )
-        assertThat(underTest(subscription)).isEqualTo(localisedSubscription)
+        assertThat(underTest(subscriptionProIMonthly, subscriptionProIYearly)).isEqualTo(
+            localisedSubscription
+        )
     }
 }
