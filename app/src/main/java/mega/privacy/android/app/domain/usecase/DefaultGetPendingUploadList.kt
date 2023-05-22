@@ -1,7 +1,6 @@
 package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.yield
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -37,7 +36,6 @@ class DefaultGetPendingUploadList @Inject constructor(
     private val mediaLocalPathExists: MediaLocalPathExists,
     private val shouldCompressVideo: ShouldCompressVideo,
     private val getGPSCoordinates: GetGPSCoordinates,
-    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val isNodeInRubbish: IsNodeInRubbish,
 ) : GetPendingUploadList {
 
@@ -96,7 +94,7 @@ class DefaultGetPendingUploadList @Inject constructor(
                         SyncStatus.STATUS_TO_COMPRESS.value
                     else
                         SyncStatus.STATUS_PENDING.value,
-                    syncRecordTypeIntMapper(type),
+                    type,
                     null,
                     false,
                     isSecondary
@@ -117,7 +115,7 @@ class DefaultGetPendingUploadList @Inject constructor(
                         nodeExists.longitude.toFloat(),
                         nodeExists.latitude.toFloat(),
                         SyncStatus.STATUS_PENDING.value,
-                        syncRecordTypeIntMapper(type),
+                        type,
                         nodeExists.handle,
                         true,
                         isSecondary

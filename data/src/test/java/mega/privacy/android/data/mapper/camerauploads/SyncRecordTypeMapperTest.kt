@@ -8,18 +8,18 @@ import org.junit.Test
 /**
  * Test class for [SyncRecordTypeMapper]
  */
-class SyncRecordTypeMapperImplTest {
+class SyncRecordTypeMapperTest {
     private lateinit var underTest: SyncRecordTypeMapper
 
     @Before
     fun setUp() {
-        underTest = SyncRecordTypeMapperImpl()
+        underTest = SyncRecordTypeMapper()
     }
 
     @Test
     fun `test that SyncRecordType can be mapped correctly`() {
         val expectedResults = HashMap<Int, SyncRecordType?>().apply {
-            put(-2, null)
+            put(-2, SyncRecordType.TYPE_ANY)
             put(-1, SyncRecordType.TYPE_ANY)
             put(1, SyncRecordType.TYPE_PHOTO)
             put(2, SyncRecordType.TYPE_VIDEO)

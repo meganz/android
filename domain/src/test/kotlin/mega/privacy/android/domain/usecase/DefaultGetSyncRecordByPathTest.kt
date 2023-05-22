@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.Before
 import org.junit.Test
@@ -35,7 +36,7 @@ class DefaultGetSyncRecordByPathTest {
             longitude = null,
             latitude = null,
             status = 0,
-            type = 0,
+            type = SyncRecordType.TYPE_PHOTO,
             nodeHandle = null,
             isCopyOnly = false,
             isSecondary = false,

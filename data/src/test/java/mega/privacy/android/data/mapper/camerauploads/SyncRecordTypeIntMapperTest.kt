@@ -8,12 +8,12 @@ import org.junit.Test
 /**
  * Test class for [SyncRecordTypeIntMapper]
  */
-class SyncRecordTypeIntMapperImplTest {
+class SyncRecordTypeIntMapperTest {
     private lateinit var underTest: SyncRecordTypeIntMapper
 
     @Before
     fun setUp() {
-        underTest = SyncRecordTypeIntMapperImpl()
+        underTest = SyncRecordTypeIntMapper()
     }
 
     @Test

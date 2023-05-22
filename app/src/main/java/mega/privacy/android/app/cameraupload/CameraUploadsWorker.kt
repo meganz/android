@@ -1110,7 +1110,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         for (file in finalList) {
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
-            if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
+            if (file.type == SyncRecordType.TYPE_PHOTO && !file.isCopyOnly) {
                 if (!areLocationTagsEnabledUseCase()) {
                     var shouldContinue = false
                     flowOf(
@@ -1153,8 +1153,8 @@ class CameraUploadsWorker @AssistedInject constructor(
             }
 
             var path: String?
-            if (isCompressedVideo || file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO)
-                || file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_VIDEO) && shouldCompressVideo()
+            if (isCompressedVideo || file.type == SyncRecordType.TYPE_PHOTO
+                || file.type == SyncRecordType.TYPE_VIDEO && shouldCompressVideo()
             ) {
                 path = file.newPath
                 val temp = path?.let { File(it) }

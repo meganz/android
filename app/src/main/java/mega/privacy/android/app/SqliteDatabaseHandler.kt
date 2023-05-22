@@ -39,6 +39,8 @@ import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
+import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
@@ -72,7 +74,9 @@ class SqliteDatabaseHandler @Inject constructor(
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
-    private val megaLocalRoomGateway: MegaLocalRoomGateway
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val syncRecordTypeMapper: SyncRecordTypeMapper,
+    private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
@@ -729,7 +733,7 @@ class SqliteDatabaseHandler @Inject constructor(
                 longitude?.let { put(KEY_SYNC_LONGITUDE, encrypt(it.toString())) }
                 latitude?.let { put(KEY_SYNC_LATITUDE, encrypt(it.toString())) }
                 put(KEY_SYNC_STATE, record.status)
-                put(KEY_SYNC_TYPE, record.type)
+                put(KEY_SYNC_TYPE, syncRecordTypeIntMapper(record.type))
             }
         }
         db.insert(TABLE_SYNC_RECORDS, null, values)
@@ -882,7 +886,7 @@ class SqliteDatabaseHandler @Inject constructor(
             longitude = if (!longitude.isNullOrEmpty()) longitude.toFloat() else null,
             latitude = if (!latitude.isNullOrEmpty()) latitude.toFloat() else null,
             status = cursor.getInt(9),
-            type = cursor.getInt(10),
+            type = syncRecordTypeMapper(cursor.getInt(10)),
             nodeHandle = if (!nodeHandle.isNullOrEmpty()) nodeHandle.toLong() else null,
             isCopyOnly = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(12))),
             isSecondary = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(13)))

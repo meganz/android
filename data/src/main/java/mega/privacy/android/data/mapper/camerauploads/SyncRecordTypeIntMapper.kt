@@ -1,18 +1,19 @@
 package mega.privacy.android.data.mapper.camerauploads
 
 import mega.privacy.android.domain.entity.SyncRecordType
+import javax.inject.Inject
 
 /**
  * Mapper that converts [SyncRecordType] objects to their [Int] counterparts in the Database
  */
-fun interface SyncRecordTypeIntMapper {
-
+class SyncRecordTypeIntMapper @Inject constructor() {
     /**
-     * Invocation function
-     *
-     * @param syncRecordType The [SyncRecordType] to be converted
-     *
-     * @return The corresponding [Int] value of the [SyncRecordType]
+     * invoke
+     * @param syncRecordType [SyncRecordType]
      */
-    operator fun invoke(syncRecordType: SyncRecordType): Int
+    operator fun invoke(syncRecordType: SyncRecordType): Int = when (syncRecordType) {
+        SyncRecordType.TYPE_PHOTO -> 1
+        SyncRecordType.TYPE_VIDEO -> 2
+        SyncRecordType.TYPE_ANY -> -1
+    }
 }

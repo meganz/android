@@ -54,10 +54,6 @@ import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapperImpl
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapperImpl
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
@@ -126,12 +122,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindViewTypeMapper(implementation: ViewTypeMapperImpl): ViewTypeMapper
-
-    @Binds
-    abstract fun bindSyncRecordTypeMapper(implementation: SyncRecordTypeMapperImpl): SyncRecordTypeMapper
-
-    @Binds
-    abstract fun bindSyncRecordTypeIntMapper(implementation: SyncRecordTypeIntMapperImpl): SyncRecordTypeIntMapper
 
     @Binds
     abstract fun bindCameraUploadsHandlesMapper(implementation: CameraUploadsHandlesMapperImpl): CameraUploadsHandlesMapper

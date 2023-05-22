@@ -18,11 +18,12 @@ import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.FileNotCreatedException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
@@ -215,7 +216,7 @@ internal class FileSystemRepositoryImplTest {
             longitude = null,
             latitude = null,
             status = 0,
-            type = 0,
+            type = SyncRecordType.TYPE_ANY,
             nodeHandle = null,
             isCopyOnly = false,
             isSecondary = false,
@@ -241,7 +242,7 @@ internal class FileSystemRepositoryImplTest {
             longitude = null,
             latitude = null,
             status = 0,
-            type = 0,
+            type = SyncRecordType.TYPE_ANY,
             nodeHandle = null,
             isCopyOnly = false,
             isSecondary = false,
@@ -270,7 +271,7 @@ internal class FileSystemRepositoryImplTest {
                 longitude = null,
                 latitude = null,
                 status = 0,
-                type = 0,
+                type = SyncRecordType.TYPE_ANY,
                 nodeHandle = null,
                 isCopyOnly = false,
                 isSecondary = false,
@@ -301,7 +302,7 @@ internal class FileSystemRepositoryImplTest {
                 longitude = null,
                 latitude = null,
                 status = 0,
-                type = 0,
+                type = SyncRecordType.TYPE_ANY,
                 nodeHandle = null,
                 isCopyOnly = false,
                 isSecondary = false,

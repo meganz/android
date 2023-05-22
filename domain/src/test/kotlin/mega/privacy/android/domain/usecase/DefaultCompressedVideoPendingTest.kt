@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -69,7 +70,7 @@ class DefaultCompressedVideoPendingTest {
                 longitude = null,
                 latitude = null,
                 status = 0,
-                type = 0,
+                type = SyncRecordType.TYPE_VIDEO,
                 nodeHandle = null,
                 isCopyOnly = false,
                 isSecondary = false,

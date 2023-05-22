@@ -97,7 +97,7 @@ class DefaultCameraUploadRepositoryTest {
         longitude = null,
         latitude = null,
         status = SyncStatus.STATUS_PENDING.value,
-        type = -1,
+        type = SyncRecordType.TYPE_ANY,
         nodeHandle = null,
         isCopyOnly = false,
         isSecondary = false,

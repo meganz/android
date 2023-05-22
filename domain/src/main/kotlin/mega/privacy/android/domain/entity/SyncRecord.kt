@@ -47,7 +47,7 @@ data class SyncRecord(
     /**
      * record type (photo or video or anything)
      */
-    val type: Int,
+    val type: SyncRecordType,
     /**
      * node handle of record
      */
