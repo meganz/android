@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
@@ -128,6 +129,12 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             monitorUpdatePushNotificationSettingsUseCase().collect {
                 _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorChatArchivedUseCase().conflate().collect { chatTitle ->
+                _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
             }
         }
     }

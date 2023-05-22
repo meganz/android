@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
@@ -285,6 +286,12 @@ class ManagerViewModel @Inject constructor(
         }
         viewModelScope.launch {
             incomingContactRequests = getIncomingContactRequestsUseCase()
+        }
+
+        viewModelScope.launch {
+            monitorChatArchivedUseCase().conflate().collect { chatTitle ->
+                _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
+            }
         }
     }
 

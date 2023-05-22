@@ -84,4 +84,11 @@ class AppEventFacadeTest {
         }
     }
 
+    @Test
+    fun `test that broadcast chat archived state fires an event`() = runTest {
+        underTest.monitorChatArchived().test {
+            underTest.broadcastChatArchived("Chat Title")
+            assertThat(awaitItem()).isNotNull()
+        }
+    }
 }

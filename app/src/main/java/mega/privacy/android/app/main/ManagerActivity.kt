@@ -350,6 +350,7 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
@@ -712,19 +713,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var versionsRemoved = 0
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
-
-    private val chatArchivedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val title = intent.getStringExtra(Constants.CHAT_TITLE)
-            if (title != null) {
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.success_archive_chat, title),
-                    -1
-                )
-            }
-        }
-    }
 
     private val receiverUpdateOrder: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -2165,14 +2153,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         registerContactUpdateReceiver()
         registerCameraUploadAttributeChangedReceiver()
         registerOrderUpdatedReceiver()
-        registerChatArchivedReceiver()
-    }
-
-    private fun registerChatArchivedReceiver() {
-        registerReceiver(
-            chatArchivedReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED)
-        )
     }
 
     private fun registerOrderUpdatedReceiver() {
@@ -2357,6 +2337,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             //Show 2FA dialog to the user on Second Launch after sign up
             if (managerState.show2FADialog || isEnable2FADialogShown) {
                 showEnable2FADialog()
+            }
+
+            if (managerState.titleChatArchivedEvent != null) {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(R.string.success_archive_chat, managerState.titleChatArchivedEvent),
+                    MEGACHAT_INVALID_HANDLE
+                )
+                viewModel.onChatArchivedEventConsumed()
             }
         }
         this.collectFlow(
@@ -3281,7 +3270,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(receiverUpdateOrder)
-        unregisterReceiver(chatArchivedReceiver)
         unregisterReceiver(receiverCUAttrChanged)
         LiveEventBus.get(EVENT_REFRESH, Boolean::class.java)
             .removeObserver(refreshObserver)

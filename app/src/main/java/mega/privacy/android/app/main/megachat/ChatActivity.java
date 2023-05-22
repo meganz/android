@@ -103,13 +103,10 @@ import static mega.privacy.android.app.utils.Constants.APP_DATA_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CALL_IN_PROGRESS;
 import static mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_PLAY_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED;
-import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP;
 import static mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CHAT_LINK_EXTRA;
-import static mega.privacy.android.app.utils.Constants.CHAT_TITLE;
 import static mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_CHAT_LINK;
 import static mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_UNKNOWN_LINK;
 import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA;
@@ -1283,16 +1280,6 @@ public class ChatActivity extends PasscodeActivity
         }
     };
 
-    private BroadcastReceiver chatArchivedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null) return;
-
-            String title = intent.getStringExtra(CHAT_TITLE);
-            sendBroadcastChatArchived(title);
-        }
-    };
-
     private BroadcastReceiver userNameReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1495,8 +1482,6 @@ public class ChatActivity extends PasscodeActivity
         contactUpdateFilter.addAction(ACTION_UPDATE_FIRST_NAME);
         contactUpdateFilter.addAction(ACTION_UPDATE_LAST_NAME);
         registerReceiver(userNameReceiver, contactUpdateFilter);
-
-        registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP));
 
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall.class).observe(this, callStatusObserver);
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
@@ -2093,6 +2078,12 @@ public class ChatActivity extends PasscodeActivity
                 intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, chatState.getCurrentCallAudioStatus());
                 intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, chatState.getCurrentCallVideoStatus());
                 startActivity(intentMeeting);
+            }
+
+            if (chatState.getTitleChatArchivedEvent() != null) {
+                viewModel.onChatArchivedEventConsumed();
+                closeChat(true);
+                finish();
             }
 
             return Unit.INSTANCE;
@@ -8257,7 +8248,9 @@ public class ChatActivity extends PasscodeActivity
 
                 if (request.getFlag()) {
                     Timber.d("Chat archived");
-                    sendBroadcastChatArchived(chatTitle);
+                    viewModel.launchBroadcastChatArchived(chatTitle);
+                    closeChat(true);
+                    finish();
                 } else {
                     Timber.d("Chat unarchived");
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.success_unarchive_chat, chatTitle), -1);
@@ -8370,7 +8363,6 @@ public class ChatActivity extends PasscodeActivity
         unregisterReceiver(historyTruncatedByRetentionTimeReceiver);
         unregisterReceiver(voiceclipDownloadedReceiver);
         unregisterReceiver(userNameReceiver);
-        unregisterReceiver(chatArchivedReceiver);
         unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
         unregisterReceiver(joinedSuccessfullyReceiver);
@@ -9806,14 +9798,6 @@ public class ChatActivity extends PasscodeActivity
 
     public boolean isForwardingFromNC() {
         return isForwardingFromNC;
-    }
-
-    private void sendBroadcastChatArchived(String chatTitle) {
-        Intent intent = new Intent(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED);
-        intent.putExtra(CHAT_TITLE, chatTitle);
-        sendBroadcast(intent);
-        closeChat(true);
-        finish();
     }
 
     public void setIsWaitingForMoreFiles(boolean isWaitingForMoreFiles) {

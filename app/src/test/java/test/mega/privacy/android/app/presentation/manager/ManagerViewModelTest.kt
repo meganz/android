@@ -660,4 +660,29 @@ class ManagerViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that when a chat is archived state is updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatArchivedUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.titleChatArchivedEvent).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that when onChatArchivedEventConsumed is called then state is also updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatArchivedUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.titleChatArchivedEvent).isNotNull()
+                underTest.onChatArchivedEventConsumed()
+                val updatedState = awaitItem()
+                assertThat(updatedState.titleChatArchivedEvent).isNull()
+            }
+        }
 }

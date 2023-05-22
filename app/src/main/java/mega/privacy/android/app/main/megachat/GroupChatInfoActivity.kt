@@ -919,9 +919,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 if (e.errorCode == MegaChatError.ERROR_OK) {
                     if (request.flag) {
                         Timber.d("Chat archived")
-                        val intent = Intent(Constants.BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP)
-                        intent.putExtra(Constants.CHAT_TITLE, chatTitle)
-                        sendBroadcast(intent)
+                        viewModel.launchBroadcastChatArchived(chatTitle)
                         finish()
                     } else {
                         Timber.d("Chat unarchived")
