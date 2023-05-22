@@ -56,8 +56,6 @@ internal class CacheFolderFacade @Inject constructor(
         appScope.launch(ioDispatcher) {
             try {
                 fileGateway.deleteFolderAndSubFolders(context.externalCacheDir)
-            } catch (e: IOException) {
-                Timber.e("IOException deleting external cache", e)
             } catch (e: Exception) {
                 Timber.e("Exception deleting external cache", e)
             }
@@ -100,7 +98,6 @@ internal class CacheFolderFacade @Inject constructor(
         try {
             fileGateway.deleteFolderAndSubFolders(context.cacheDir)
         } catch (e: IOException) {
-            Timber.e(e)
             Timber.e("Exception deleting private cache", e)
         }
         clearPublicCache()
@@ -162,7 +159,6 @@ internal class CacheFolderFacade @Inject constructor(
         try {
             fileGateway.deleteFolderAndSubFolders(context.filesDir)
         } catch (e: IOException) {
-            Timber.e(e)
             Timber.e("Exception deleting private cache", e)
         }
     }

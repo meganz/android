@@ -3,8 +3,6 @@ package mega.privacy.android.app.main.controllers
 import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -43,14 +41,12 @@ import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.psa.PsaManager.clearPsa
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolders
 import mega.privacy.android.app.utils.ChatUtil.removeEmojisSharedPreferences
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders
 import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
@@ -77,7 +73,6 @@ import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 @ActivityScoped
@@ -257,17 +252,15 @@ class AccountController @Inject constructor(
                 Timber.e("EXCEPTION removing all the notifications", e)
                 e.printStackTrace()
             }
-
-            removeFolder(context, context.filesDir)
-            removeFolder(context, context.externalCacheDir)
-
-            val downloadToSDCardCache = context.externalCacheDirs
-            if (downloadToSDCardCache.size > 1) {
-                removeFolder(context, downloadToSDCardCache[1])
+            context.filesDir?.deleteRecursively()
+            context.externalCacheDir?.deleteRecursively()
+            context.externalCacheDirs?.takeIf { it.size > 1 }?.let { it[1].deleteRecursively() }
+            context.cacheDir?.deleteRecursively()
+            runCatching {
+                removeOldTempFolders(context)
+            }.onFailure {
+                Timber.e("Failed to delete old TempFolders $it")
             }
-
-            removeFolder(context, context.cacheDir)
-            removeOldTempFolders(context)
 
             try {
                 var cancelTransfersIntent = Intent(context, DownloadService::class.java)
@@ -356,14 +349,6 @@ class AccountController @Inject constructor(
 
             //Clear MyAccountInfo
             app.resetMyAccountInfo()
-        }
-
-        fun removeFolder(context: Context?, folder: File?) {
-            try {
-                deleteFolderAndSubfolders(context, folder)
-            } catch (e: IOException) {
-                Timber.e(e, "Exception deleting ${folder?.name} directory")
-            }
         }
 
         @JvmStatic

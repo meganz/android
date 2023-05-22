@@ -12,7 +12,7 @@ import static mega.privacy.android.app.utils.Constants.URL_INDICATOR;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.FileUtil.MAIN_DIR;
 import static mega.privacy.android.app.utils.FileUtil.copyFile;
-import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders;
+import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubFolders;
 import static mega.privacy.android.app.utils.FileUtil.getDirSize;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.FileUtil.isFileDownloadedLatest;
@@ -158,9 +158,9 @@ public class OfflineUtils {
         //Remove the node physically
         File offlineFile = getOfflineFile(context, mOffDelete);
         try {
-            deleteFolderAndSubfolders(context, offlineFile);
+            deleteFolderAndSubFolders(offlineFile);
         } catch (Exception e) {
-            Timber.e(e, "EXCEPTION: file");
+            Timber.e(e, "Exception deleting folder");
         }
 
     }
@@ -377,10 +377,9 @@ public class OfflineUtils {
         File offline = getOfflineFolder(context, OFFLINE_DIR);
         if (isFileAvailable(offline)) {
             try {
-                deleteFolderAndSubfolders(context, offline);
-            } catch (IOException e) {
+                deleteFolderAndSubFolders(offline);
+            } catch (Exception e) {
                 Timber.e(e, "Exception deleting offline folder");
-                e.printStackTrace();
             }
         }
     }

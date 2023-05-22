@@ -1,6 +1,6 @@
 package mega.privacy.android.app.main.tasks;
 
-import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders;
+import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubFolders;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.OfflineUtils.OFFLINE_DIR;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.LegacyDatabaseHandler;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import timber.log.Timber;
@@ -63,9 +62,9 @@ public class CheckOfflineNodesTask extends AsyncTask<String, Void, String> {
                         dbH.deleteOfflineFile(mOff);
                         File folderToDelete = getOfflineFile(context, mOff);
                         try {
-                            deleteFolderAndSubfolders(context, folderToDelete);
-                        } catch (IOException e) {
-                            Timber.e(e, "IOException mOff");
+                            deleteFolderAndSubFolders(folderToDelete);
+                        } catch (Exception e) {
+                            Timber.e(e, "Exception deleting folder");
                         }
                     }
                 }

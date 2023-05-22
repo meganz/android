@@ -23,11 +23,10 @@ interface FileGateway {
     suspend fun getDirSize(dir: File?): Long
 
     /**
-     * Delete folder and subfolders
+     * Delete folder and sub folders
      *
      */
-    @Throws(IOException::class)
-    fun deleteFolderAndSubFolders(f: File?)
+    fun deleteFolderAndSubFolders(folder: File?):Boolean
 
     /**
      * Is file available

@@ -240,36 +240,19 @@ public class FileUtil {
         return setLocalIntentParams(context, node, intent, localPath, true, snackbarShower);
     }
 
-    public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
-        if (f == null) return;
+    public static Boolean deleteFolderAndSubFolders(File folder) {
+        if (folder == null) return false;
 
-        Timber.d("deleteFolderAndSubfolders: %s", f.getAbsolutePath());
-        if (f.isDirectory() && f.listFiles() != null) {
-            for (File c : f.listFiles()) {
-                deleteFolderAndSubfolders(context, c);
-            }
-        }
-
-        if (!f.delete()) {
-            throw new FileNotFoundException("Failed to delete file: " + f);
-        } else {
-            try {
-                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                File fileToDelete = new File(f.getAbsolutePath());
-                Uri contentUri;
-                try {
-                    contentUri = FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", fileToDelete);
-                } catch (Exception e) {
-                    contentUri = Uri.fromFile(fileToDelete);
+        Timber.d("deleteFolderAndSubFolders: %s", folder.getAbsolutePath());
+        File[] files = folder.listFiles();
+        if (folder.isDirectory() && files != null) {
+            for (File file : files) {
+                if(deleteFolderAndSubFolders(file)){
+                   Timber.d("Delete unsuccessful for %s", file.getAbsolutePath());
                 }
-                mediaScanIntent.setData(contentUri);
-                mediaScanIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                context.sendBroadcast(mediaScanIntent);
-            } catch (Exception e) {
-                Timber.e(e, "Exception while deleting media scanner file");
             }
-
         }
+        return folder.delete();
     }
 
     public static File createTemporalTextFile(Context context, String name, String data) {
