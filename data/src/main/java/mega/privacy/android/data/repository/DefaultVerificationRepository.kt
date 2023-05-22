@@ -86,6 +86,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                             MegaError.API_OK -> {
                                 continuation.resumeWith(Result.success(Unit))
                             }
+
                             MegaError.API_ETEMPUNAVAIL -> {
                                 continuation.failWithException(
                                     SMSVerificationException.LimitReached(
@@ -93,6 +94,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                     )
                                 )
                             }
+
                             MegaError.API_EACCESS -> {
                                 continuation.failWithException(
                                     SMSVerificationException.AlreadyVerified(
@@ -100,6 +102,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                     )
                                 )
                             }
+
                             MegaError.API_EARGS -> {
                                 continuation.failWithException(
                                     SMSVerificationException.InvalidPhoneNumber(
@@ -107,6 +110,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                     )
                                 )
                             }
+
                             MegaError.API_EEXIST -> {
                                 continuation.failWithException(
                                     SMSVerificationException.AlreadyExists(
@@ -114,6 +118,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                     )
                                 )
                             }
+
                             else -> {
                                 continuation.failWithException(
                                     SMSVerificationException.Unknown(
@@ -174,9 +179,10 @@ internal class DefaultVerificationRepository @Inject constructor(
         emitAll(verifiedPhoneNumberFlow)
     }
 
-    private suspend fun getVerifiedPhoneNumber() =
+    private suspend fun getVerifiedPhoneNumber() = withContext(ioDispatcher) {
         megaApiGateway.getVerifiedPhoneNumber()?.let { VerifiedPhoneNumber.PhoneNumber(it) }
             ?: VerifiedPhoneNumber.NoVerifiedPhoneNumber
+    }
 
     override suspend fun verifyPhoneNumber(pin: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -187,6 +193,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                         MegaError.API_OK -> {
                             continuation.resumeWith(Result.success(Unit))
                         }
+
                         MegaError.API_EACCESS -> {
                             continuation.failWithException(
                                 SMSVerificationException.LimitReached(
@@ -194,6 +201,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                 )
                             )
                         }
+
                         MegaError.API_EEXPIRED -> {
                             continuation.failWithException(
                                 SMSVerificationException.AlreadyVerified(
@@ -201,6 +209,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                 )
                             )
                         }
+
                         MegaError.API_EEXIST -> {
                             continuation.failWithException(
                                 SMSVerificationException.AlreadyExists(
@@ -208,6 +217,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                 )
                             )
                         }
+
                         MegaError.API_EFAILED -> {
                             continuation.failWithException(
                                 SMSVerificationException.VerificationCodeDoesNotMatch(
@@ -216,6 +226,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                                 )
                             )
                         }
+
                         else -> {
                             continuation.failWithException(
                                 SMSVerificationException.Unknown(
