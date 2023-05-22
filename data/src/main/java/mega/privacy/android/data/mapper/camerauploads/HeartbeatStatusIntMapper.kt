@@ -9,6 +9,7 @@ import javax.inject.Inject
 internal class HeartbeatStatusIntMapper @Inject constructor() {
     operator fun invoke(heartbeatStatus: HeartbeatStatus) = when (heartbeatStatus) {
         HeartbeatStatus.UP_TO_DATE -> 100
+        HeartbeatStatus.INACTIVE -> -1
         else -> 0
     }
 }

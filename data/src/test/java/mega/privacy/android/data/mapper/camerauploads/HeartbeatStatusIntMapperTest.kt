@@ -20,9 +20,9 @@ internal class HeartbeatStatusIntMapperTest {
     fun `test that HeartbeatStatus is mapped correctly`() {
         val expectedResults = HashMap<HeartbeatStatus, Int>().apply {
             put(HeartbeatStatus.UP_TO_DATE, 100)
+            put(HeartbeatStatus.INACTIVE, -1)
             put(HeartbeatStatus.SYNCING, 0)
             put(HeartbeatStatus.PENDING, 0)
-            put(HeartbeatStatus.INACTIVE, 0)
             put(HeartbeatStatus.UNKNOWN, 0)
         }
 

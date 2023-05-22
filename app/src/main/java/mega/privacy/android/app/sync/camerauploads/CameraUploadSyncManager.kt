@@ -707,6 +707,10 @@ object CameraUploadSyncManager {
     /**
      * Callback when the process finished, report to server.
      */
+    @Deprecated(
+        message = "Replace all usages with use case and update timestamp in lambda",
+        replaceWith = ReplaceWith("ReportUploadFinishedUseCase")
+    )
     fun reportUploadFinish() {
         val cuBackup = databaseHandler.cuBackup
         if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
@@ -744,6 +748,10 @@ object CameraUploadSyncManager {
     /**
      * Callback when the process is interrupted, report to server.
      */
+    @Deprecated(
+        message = "Replace all usages with use case and update timestamp in lambda",
+        replaceWith = ReplaceWith("ReportUploadInterruptedUseCase")
+    )
     fun reportUploadInterrupted() {
         val cuBackup = databaseHandler.cuBackup
         if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
