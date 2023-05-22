@@ -1198,6 +1198,8 @@ class FileBrowserFragment : RotatableFragment() {
      * Show Media discovery and launch [MediaDiscoveryFragment]
      */
     private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
+        clearSelections()
+        hideMultipleSelect()
         requireActivity().lifecycleScope.launch {
             (requireActivity() as? ManagerActivity)?.skipToMediaDiscoveryFragment(
                 fragment = MediaDiscoveryFragment.getNewInstance(
