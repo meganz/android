@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -29,7 +30,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.contacts.ContactItem
 
 /**
- * View to show Node owner information
+ * View to show Node's owner information
  * @param contactItem of the owner
  * @param modifier
  */
@@ -57,16 +58,19 @@ internal fun OwnerInfoView(
                     }
                 }
                 Text(
+                    modifier = Modifier.testTag(TEST_TAG_OWNER_NAME),
                     text = text,
                     maxLines = 1,
                     style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.textColorPrimary),
                 )
                 Image(
+                    modifier = Modifier.testTag(TEST_TAG_OWNER_STATUS),
                     painter = painterResource(id = contactItem.status.iconRes(MaterialTheme.colors.isLight)),
-                    contentDescription = "Access permission"
+                    contentDescription = "Contact status"
                 )
             }
             Text(
+                modifier = Modifier.testTag(TEST_TAG_OWNER_EMAIL),
                 text = contactItem.email,
                 maxLines = 1,
                 style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038),
