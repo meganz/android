@@ -9540,7 +9540,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.w("Item NULL")
             return
         }
-        if (recentChatsFragment?.isVisible == true) {
+        if (recentChatsFragment != null) {
             recentChatsFragment?.listItemUpdate(item)
         }
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
