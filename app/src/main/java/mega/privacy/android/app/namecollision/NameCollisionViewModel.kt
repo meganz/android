@@ -287,6 +287,7 @@ class NameCollisionViewModel @Inject constructor(
                     arrayListOf<NameCollisionResult>().apply { addAll(resolvedCollisions) }
 
             }
+
             else -> currentCollision.value = null
         }
     }
@@ -349,6 +350,7 @@ class NameCollisionViewModel @Inject constructor(
         when {
             applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 ->
                 proceedWithAllFiles(NameCollisionChoice.CANCEL)
+
             applyOnNext -> cancelAll()
             else -> continueWithNext(NameCollisionChoice.CANCEL)
         }
@@ -396,24 +398,29 @@ class NameCollisionViewModel @Inject constructor(
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         upload(context!!, proceedWithAllFiles(choice), rename)
                     }
+
                     applyOnNext -> upload(context!!, getAllPendingCollisions(), rename)
                     else -> singleUpload(context!!, rename)
                 }
             }
+
             NameCollisionType.MOVE -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         move(proceedWithAllFiles(choice), rename)
                     }
+
                     applyOnNext -> move(getAllPendingCollisions(), rename)
                     else -> singleMovement(rename)
                 }
             }
+
             NameCollisionType.COPY -> {
                 when {
                     applyOnNext && pendingFileCollisions > 0 && pendingFolderCollisions > 0 -> {
                         copy(proceedWithAllFiles(choice), rename)
                     }
+
                     applyOnNext -> copy(getAllPendingCollisions(), rename)
                     else -> singleCopy(rename)
                 }
@@ -453,7 +460,8 @@ class NameCollisionViewModel @Inject constructor(
             return
         }
 
-        uploadUseCase.upload(context, currentCollision.value!!, rename)
+        val currentCollision = currentCollision.value ?: return
+        uploadUseCase.upload(context, currentCollision, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -530,7 +538,7 @@ class NameCollisionViewModel @Inject constructor(
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
-        moveNodeUseCase.move(currentCollision.value!!, rename)
+        moveNodeUseCase.move(currentCollision.value ?: return, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -600,7 +608,7 @@ class NameCollisionViewModel @Inject constructor(
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
-        copyNodeUseCase.copy(currentCollision.value!!, rename)
+        copyNodeUseCase.copy(currentCollision.value ?: return, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
