@@ -30,6 +30,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -129,6 +131,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
+    private val ephemeralCredentialsGateway: EphemeralCredentialsGateway
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -537,11 +540,8 @@ internal class DefaultAccountRepository @Inject constructor(
 
         val session = megaApiGateway.dumpSession
         val credentials = userCredentialsMapper(email, session, null, null, myUserHandle.toString())
-
-        with(localStorageGateway) {
-            saveCredentials(credentials)
-            clearEphemeral()
-        }
+        localStorageGateway.saveCredentials(credentials)
+        ephemeralCredentialsGateway.clear()
 
         accountSessionMapper(email, session, myUserHandle)
     }
@@ -832,6 +832,14 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate) =
         appEventGateway.broadcastMyAccountUpdate(data)
+
+    override fun monitorEphemeralCredentials() =
+        ephemeralCredentialsGateway.monitorEphemeralCredentials()
+
+    override suspend fun saveEphemeral(ephemeral: EphemeralCredentials) =
+        ephemeralCredentialsGateway.save(ephemeral)
+
+    override suspend fun clearEphemeral() = ephemeralCredentialsGateway.clear()
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

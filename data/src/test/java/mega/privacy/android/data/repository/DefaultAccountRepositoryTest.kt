@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -91,6 +93,7 @@ class DefaultAccountRepositoryTest {
     private val cacheFolderGateway = mock<CacheFolderGateway>()
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
+    private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -147,6 +150,7 @@ class DefaultAccountRepositoryTest {
             cacheFolderGateway = cacheFolderGateway,
             passwordStrengthMapper = passwordStrengthMapper,
             appEventGateway = appEventGateway,
+            ephemeralCredentialsGateway = ephemeralCredentialsGateway
         )
 
     }
@@ -755,7 +759,7 @@ class DefaultAccountRepositoryTest {
 
             underTest.saveAccountCredentials()
             verify(localStorageGateway).saveCredentials(credentials)
-            verify(localStorageGateway).clearEphemeral()
+            verify(ephemeralCredentialsGateway).clear()
         }
 
     @Test
@@ -982,5 +986,27 @@ class DefaultAccountRepositoryTest {
             val handle = 1234L
             underTest.setLatestTargetPathCopyPreference(handle)
             verify(accountPreferencesGateway).setLatestTargetPathCopyPreference(handle)
+        }
+
+    @Test
+    fun `test that ephemeralCredentialsGateway saveEphemeral invoke when calling saveEphemeral`() =
+        runTest {
+            val ephemeral = mock<EphemeralCredentials>()
+            underTest.saveEphemeral(ephemeral)
+            verify(ephemeralCredentialsGateway).save(ephemeral)
+        }
+
+    @Test
+    fun `test that ephemeralCredentialsGateway clear invoke when calling clearEphemeral`() =
+        runTest {
+            underTest.clearEphemeral()
+            verify(ephemeralCredentialsGateway).clear()
+        }
+
+    @Test
+    fun `test that ephemeralCredentialsGateway monitorEphemeralCredentials invoke when calling monitorEphemeralCredentials`() =
+        runTest {
+            underTest.monitorEphemeralCredentials()
+            verify(ephemeralCredentialsGateway).monitorEphemeralCredentials()
         }
 }

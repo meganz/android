@@ -61,6 +61,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraTimestampsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
@@ -74,6 +75,7 @@ import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
+import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
@@ -246,4 +248,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindWorkManagerGateway(implementation: WorkManagerFacade): WorkManagerGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindEphemeralCredentialsGateway(implementation: EphemeralCredentialsDataStore): EphemeralCredentialsGateway
 }

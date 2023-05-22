@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
@@ -390,4 +391,24 @@ interface AccountRepository {
      * Broadcast my account update
      */
     suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate)
+
+    /**
+     * Monitor ephemeral credentials
+     *
+     * @return the Flow of Nullable EphemeralCredentials
+     */
+    fun monitorEphemeralCredentials(): Flow<EphemeralCredentials?>
+
+    /**
+     * Save ephemeral
+     *
+     * @param ephemeral
+     */
+    suspend fun saveEphemeral(ephemeral: EphemeralCredentials)
+
+    /**
+     * Clear ephemeral
+     *
+     */
+    suspend fun clearEphemeral()
 }
