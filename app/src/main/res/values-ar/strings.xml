@@ -5254,20 +5254,6 @@
         <item quantity="many">خامس أحد من كل %1$d شهراً اعتباراً من تاريخ [A]%2$s[/A] من [B]%3$s إلى %4$s[/B]</item>
         <item quantity="other">خامس أحد من كل %1$d شهر اعتباراً من تاريخ [A]%2$s[/A] من [B]%3$s إلى %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">الاثنين</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">الثلاثاء</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">الأربعاء</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">الخميس</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">الجمعة</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">السبت</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">الأحد</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">اليوم، %1$s من %2$s إلى %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -5528,9 +5514,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">اسم الاجتماع مطلوب</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">أدخل ما يصل إلى 30&#160; محرفًا</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">أدخل ما يصل إلى 3000&#160; محرفًا</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">تم تحديد موعد الاجتماع</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -5618,7 +5604,7 @@
         <item quantity="other">تعذرت إزالة %1$d عنصر نهائيًا</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">أدخل الوقت</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">دعوات الاجتماع</string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -5631,4 +5617,53 @@
     <string name="notification_sched_meeting_starts_15_minutes">يبدأ الاجتماع خلال 15 دقيقة</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">يبدأ الاجتماع الآن</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="zero">شارك الرابط</item>
+        <item quantity="one">شارك الرابط</item>
+        <item quantity="two">شارك الروابط</item>
+        <item quantity="few">شارك الروابط</item>
+        <item quantity="many">شارك الروابط</item>
+        <item quantity="other">شارك الروابط</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="one">Link copied to clipboard</item>
+        <item quantity="other">Links copied to clipboard</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="zero">إزالة الرابط؟</item>
+        <item quantity="one">إزالة الرابط؟</item>
+        <item quantity="two">إزالة الروابط؟</item>
+        <item quantity="few">إزالة الروابط؟</item>
+        <item quantity="many">إزالة الروابط؟</item>
+        <item quantity="other">إزالة الروابط؟</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="one">People you shared this link with, will lose access to the album.</item>
+        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="zero">إزالة الرابط</item>
+        <item quantity="one">إزالة الرابط</item>
+        <item quantity="two">إزالة الروابط</item>
+        <item quantity="few">إزالة الروابط</item>
+        <item quantity="many">إزالة الروابط</item>
+        <item quantity="other">إزالة الروابط</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">أدخل مفتاح فك التشفير</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>

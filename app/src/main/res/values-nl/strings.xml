@@ -4514,20 +4514,6 @@
         <item quantity="one">De vijfde Zondag van elke maand van kracht [A]%2$s[/A] van [B]%3$s tot %4$s[/B]</item>
         <item quantity="other">De vijfde Zondag van elke %1$d maanden van kracht [A]%2$s[/A] van [B]%3$s tot %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">Ma</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">Di</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">Woe</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">Do</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">Vrij</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">Za</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">Zo</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Vandaag, %1$s van %2$s tot %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -4791,4 +4777,41 @@
     <string name="notification_sched_meeting_starts_15_minutes">Vergadering begint over 15 minuten</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Vergadering begint nu</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">De decoderingssleutel ook delen?</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">De decoderingssleutel is geëxporteerd en wordt gedeeld met de link.</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">Alleen link delen</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">Link en sleutel delen</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="one">Link delen</item>
+        <item quantity="other">Links delen</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="one">Koppeling gekopieerd naar klembord</item>
+        <item quantity="other">Koppelingen gekopieerd naar klembord</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="one">Link verwijderen?</item>
+        <item quantity="other">Links verwijderen?</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="one">Mensen met wie u deze link hebt gedeeld, verliezen de toegang tot de albums.</item>
+        <item quantity="other">Mensen met wie u deze links hebt gedeeld, verliezen de toegang tot de albums.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="one">Link verwijderen</item>
+        <item quantity="other">Links verwijderen</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">Vul decoderingssleutel in</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>

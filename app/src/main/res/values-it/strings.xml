@@ -4699,20 +4699,6 @@
         <item quantity="many">La quinta domenica di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
         <item quantity="other">La quinta domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">Lun</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">Mar</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">Mer</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">Gio</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">Ven</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">Sab</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">Dom</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Oggi, %1$s dalle %2$s alle %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -5001,4 +4987,44 @@
     <string name="notification_sched_meeting_starts_15_minutes">Il meeting inizierà tra 15 minuti</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Il meeting inizia ora</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="one">Condividi link</item>
+        <item quantity="many">Condividi link</item>
+        <item quantity="other">Condividi link</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="one">Link copied to clipboard</item>
+        <item quantity="other">Links copied to clipboard</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="one">Rimuovere il link?</item>
+        <item quantity="many">Rimuovere i link?</item>
+        <item quantity="other">Rimuovere i link?</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="one">People you shared this link with, will lose access to the album.</item>
+        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="one">Rimuovi il link</item>
+        <item quantity="many">Rimuovi i link</item>
+        <item quantity="other">Rimuovi i link</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">Inserisci la chiave di decrittazione</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>

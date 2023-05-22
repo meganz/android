@@ -241,7 +241,7 @@
     <!-- Title of the fragment Choose Account -->
     <string name="choose_account_fragment">選擇帳戶</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
-    <string name="file_properties_available_offline">可離線存取</string>
+    <string name="file_properties_available_offline">離線使用</string>
     <!-- category in sort by action -->
     <string name="file_properties_info_size_file">大小</string>
     <!-- When the file/folder was last modified -->
@@ -359,7 +359,7 @@
     <!-- Menu option to delete one or multiple selected items. -->
     <string name="context_remove">移除</string>
     <!-- Menu option to delete selected items of the offline state -->
-    <string name="context_delete_offline">從離線存取中移除</string>
+    <string name="context_delete_offline">從離線使用中移除</string>
     <!-- menu item -->
     <string name="context_share_folder">共享資料夾</string>
     <!-- menu item -->
@@ -1595,7 +1595,7 @@
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
     <string name="context_empty_cloud_drive">[B]沒有檔案在您的[/B][A]雲端硬碟[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
-    <string name="context_empty_offline">[A]離線存取[/A]裡[B]沒有檔案[/B]</string>
+    <string name="context_empty_offline">[A]離線使用[/A]裡[B]沒有檔案[/B]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_contacts">[B]沒有[/B][A]聯絡人[/A]</string>
     <!-- Message shown when the user has no chats -->
@@ -1896,7 +1896,7 @@
     <!-- Label shown when it disables the Two-Factor Authentication -->
     <string name="label_2fa_disabled">已停用雙重驗證</string>
     <!-- Text of the button which action is to show the authentication apps -->
-    <string name="open_app_button">於&#8230;開啟</string>
+    <string name="open_app_button">從&#8230;開啟</string>
     <!-- message when trying to open a link that contains the seed to enable Two-Factor Authentication but there isn’t any app that open it -->
     <string name="intent_not_available_2fa">在您的裝置上，沒有任何可用的應用程式可以用來啟用雙重驗證</string>
     <!-- Text button -->
@@ -1922,7 +1922,7 @@
     <!-- message shown when the user open a file, there is no network connection and the file is not been downloaded -->
     <string name="error_fail_to_open_file_no_network">沒有網路連線。請重新連線來開啟檔案。</string>
     <!-- message when trying to save for offline a file that already exists -->
-    <string name="file_already_exists">檔案已存在於離線存取裡</string>
+    <string name="file_already_exists">檔案已存在於離線使用中</string>
     <!-- Error message if forwarding a message failed, many messages -->
     <plurals name="error_forwarding_messages">
         <item quantity="other">訊息未轉發</item>
@@ -2678,7 +2678,7 @@
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text_2">請聯繫您的商業帳戶管理員來解決問題並啟用您的帳戶。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
-    <string name="logout_warning_offline">當您登出時，裝置中可離線存取的檔案將會被刪除。</string>
+    <string name="logout_warning_offline">當您登出時，裝置中可離線使用的檔案將會被刪除。</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
     <string name="logout_warning_transfers">當您登出時，正在進行中的傳輸將取消。</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files and transfers in progress. -->
@@ -3376,9 +3376,9 @@
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
     <string name="contact_invited">已發送邀請。查看已發送請求。</string>
     <!-- Message when file available offline. -->
-    <string name="file_available_offline">檔案可離線存取</string>
+    <string name="file_available_offline">檔案可離線使用</string>
     <!-- Message when file removed from offline. -->
-    <string name="file_removed_offline">檔案已從離線存取移除</string>
+    <string name="file_removed_offline">檔案已從離線使用中移除</string>
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">打開連結</string>
     <!-- error message shown when a chat link is not well formed. -->
@@ -3804,7 +3804,7 @@
     <!-- Button to skip asking permissions. -->
     <string name="permissions_not_now_button">稍後再說</string>
     <!-- Title of the screen asking for enabling notifications permission. -->
-    <string name="permissions_notifications_title">開啟通知</string>
+    <string name="permissions_notifications_title">取得通知</string>
     <!-- Description of the screen asking for enabling notifications permission. -->
     <string name="permissions_notifications_description">MEGA將會向您發送通話、聊天和檔案傳輸的通知。</string>
     <!-- Title of the "Backups" feature in the Home Side Menu and the Backups feature itself. -->
@@ -4329,20 +4329,6 @@
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
         <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期天的[B]%3$s到%4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">星期一</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">星期二</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">星期三</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">星期四</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">星期五</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">星期六</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">星期日</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">今天，%1$s從%2$s到%3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -4518,9 +4504,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">會議名稱為必填</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">最多輸入30&#160;個字元（15個中文字）</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">最多輸入3,000&#160;個字元（1,500個中文字）</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排會議</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4581,4 +4567,36 @@
     <string name="notification_sched_meeting_starts_15_minutes">會議將在15分鐘後開始</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">會議現在開始</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">同時共享解密金鑰？</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">解密金鑰已匯出並將與連結一起共享。</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">僅共享連結</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">共享連結和金鑰</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="other">共享連結</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="other">連結已複製到剪貼簿</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="other">移除連結？</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="other">您與之共享這些連結的人將失去這些相簿的存取權限。</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="other">移除連結</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">請輸入解密金鑰</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">要存取相簿，請輸入解密金鑰。如果您沒有金鑰，請聯繫共享金鑰給您的人。</string>
 </resources>

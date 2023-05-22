@@ -4514,20 +4514,6 @@
         <item quantity="one">Ab [A]%2$s[/A] am fünften Sonntag des Monats von [B]%3$s bis %4$s[/B]</item>
         <item quantity="other">Ab [A]%2$s[/A] am fünften Sonntag jedes %1$d. Monats von [B]%3$s bis %4$s[/B]</item>
     </plurals>
-    <!-- In app notification description text representing the meeting repeats every Monday -->
-    <string name="notification_scheduled_meeting_week_day_mon">Mo</string>
-    <!-- In app notification description text representing the meeting repeats every Tuesday -->
-    <string name="notification_scheduled_meeting_week_day_tue">Di</string>
-    <!-- In app notification description text representing the meeting repeats every Wednesday -->
-    <string name="notification_scheduled_meeting_week_day_wed">Mi</string>
-    <!-- In app notification description text representing the meeting repeats every Thursday -->
-    <string name="notification_scheduled_meeting_week_day_thu">Do</string>
-    <!-- In app notification description text representing the meeting repeats every Friday -->
-    <string name="notification_scheduled_meeting_week_day_fri">Fr</string>
-    <!-- In app notification description text representing the meeting repeats every Saturday -->
-    <string name="notification_scheduled_meeting_week_day_sat">Sa</string>
-    <!-- In app notification description text representing the meeting repeats every Sunday -->
-    <string name="notification_scheduled_meeting_week_day_sun">So</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Heute, den %1$s von %2$s bis %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
@@ -4720,9 +4706,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Der Meetingname ist erforderlich</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Maximal 30 Zeichen eingeben</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Maximal 3.000 Zeichen eingeben</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting geplant</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4791,4 +4777,41 @@
     <string name="notification_sched_meeting_starts_15_minutes">Meeting beginnt in 15 Minuten</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Meeting beginnt jetzt</string>
+    <!-- Title for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_title">Schlüssel für die Entschlüsselung ebenfalls teilen?</string>
+    <!-- Explanation text for the Album Link share with decryption key separated dialog -->
+    <string name="album_share_share_link_dialog_body">Der Schlüssel für die Entschlüsselung wurde exportiert und wird mit dem Link geteilt.</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
+    <string name="album_share_share_link_dialog_button_link_only">Nur Link teilen</string>
+    <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
+    <string name="album_share_share_link_dialog_button_link_and_key">Link und Schlüssel teilen</string>
+    <!-- Title for the Album Get Link(s) Page -->
+    <plurals name="album_share_get_links">
+        <item quantity="one">Link teilen</item>
+        <item quantity="other">Links teilen</item>
+    </plurals>
+    <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
+    <plurals name="album_share_links_copied">
+        <item quantity="one">Link in Zwischenablage kopiert</item>
+        <item quantity="other">Links in Zwischenablage kopiert</item>
+    </plurals>
+    <!-- Title for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_title">
+        <item quantity="one">Link entfernen?</item>
+        <item quantity="other">Links entfernen?</item>
+    </plurals>
+    <!-- Explanation text for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_body">
+        <item quantity="one">Die Personen, mit denen Sie diesen Link geteilt haben, können nicht mehr auf das Album zugreifen.</item>
+        <item quantity="other">Die Personen, mit denen Sie diese Links geteilt haben, können nicht mehr auf die Alben zugreifen.</item>
+    </plurals>
+    <!-- Remove button for the album remove link(s) confirmation dialog -->
+    <plurals name="album_share_remove_links_dialog_button">
+        <item quantity="one">Link entfernen</item>
+        <item quantity="other">Links entfernen</item>
+    </plurals>
+    <!-- Input decryption key dialog title for album import -->
+    <string name="album_import_input_decryption_key_title">Schlüssel eingeben</string>
+    <!-- Input decryption key dialog description for album import -->
+    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
 </resources>
