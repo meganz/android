@@ -62,10 +62,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.ActivityCompat.invalidateOptionsMenu
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.GravityCompat
@@ -293,7 +291,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_FAB
@@ -314,7 +311,6 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -396,9 +392,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Transfers tab should go back to [mega.privacy.android.app.imageviewer.ImageViewerActivity]
      */
     private var transfersToImageViewer = false
-    private val smsDialogTimeChecker: LastShowSMSDialogTimeChecker by lazy {
-        LastShowSMSDialogTimeChecker(this)
-    }
 
     internal val viewModel: ManagerViewModel by viewModels()
     internal val fileBrowserViewModel: FileBrowserViewModel by viewModels()
@@ -594,7 +587,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var chatTabsFragment: ChatTabsFragment? = null
     private var turnOnNotificationsFragment: TurnOnNotificationsFragment? = null
     private var permissionsFragment: PermissionsFragment? = null
-    private var smsVerificationFragment: SMSVerificationFragment? = null
     private var mediaDiscoveryFragment: Fragment? = null
     private var mStopped = true
     private var bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
@@ -656,7 +648,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var joiningToChatLink = false
     private var linkJoinToChatLink: String? = null
     private var onAskingPermissionsFragment = false
-    private var onAskingSMSVerificationFragment = false
     private lateinit var navHostView: View
     private var navController: NavController? = null
     private var mHomepageSearchable: HomepageSearchable? = null
@@ -675,13 +666,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
         }
-    }
-    private val refreshAddPhoneNumberButtonObserver: Observer<Boolean> = Observer {
-        //This check is a code smell, but is here temporarily until this code is refactored
-        if (this::drawerLayout.isInitialized) {
-            closeDrawer()
-        }
-        hideAddPhoneNumberButton()
     }
     private var isBusinessGraceAlertShown = false
     private var businessGraceAlert: AlertDialog? = null
@@ -957,18 +941,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportFragmentManager.putFragment(
                     outState,
                     FragmentTag.PERMISSIONS.tag,
-                    it
-                )
-            }
-        }
-        outState.putBoolean("onAskingSMSVerificationFragment", onAskingSMSVerificationFragment)
-        smsVerificationFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.SMS_VERIFICATION.tag) as? SMSVerificationFragment
-        if (onAskingSMSVerificationFragment && smsVerificationFragment != null) {
-            smsVerificationFragment?.let {
-                supportFragmentManager.putFragment(
-                    outState,
-                    FragmentTag.SMS_VERIFICATION.tag,
                     it
                 )
             }
@@ -2218,14 +2190,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 FragmentTag.PERMISSIONS.tag
             ) as? PermissionsFragment
         }
-        onAskingSMSVerificationFragment =
-            savedInstanceState.getBoolean("onAskingSMSVerificationFragment", false)
-        if (onAskingSMSVerificationFragment) {
-            smsVerificationFragment = supportFragmentManager.getFragment(
-                savedInstanceState,
-                FragmentTag.SMS_VERIFICATION.tag
-            ) as? SMSVerificationFragment?
-        }
         mElevationCause = savedInstanceState.getInt("elevation", 0)
         storageState = savedInstanceState.serializable("storageState")
             ?: StorageState.Unknown
@@ -2462,12 +2426,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     /**
      * Checks which screen should be shown when an user is logins.
-     * There are four different screens or warnings:
-     * - Business warning: it takes priority over the other three.
-     * - SMS verification screen: it takes priority over the other two.
+     * There are three different screens or warnings:
+     * - Business warning: it takes priority over the other two.
      * - Onboarding permissions screens: it has to be only shown when account is logged in after
      * the installation, and some of the permissions required have not been granted and
-     * the business warning and SMS verification have not to be shown.
+     * the business warning is not to be shown.
      * - Notifications permission screen: it has to be shown if the onboarding permissions screens
      * have not been shown.
      */
@@ -2477,15 +2440,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (firstTimeAfterInstallation || askPermissions) {
-            //haven't verified phone number
-            if (canVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
-                askForSMSVerification()
-            } else {
+            if (canVerifyPhoneNumber().not() || onAskingPermissionsFragment || newCreationAccount) {
                 drawerItem = DrawerItem.ASK_PERMISSIONS
                 askForAccess()
             }
-        } else if (viewModel.state.value.isFirstLogin && !newCreationAccount && canVerifyPhoneNumber() && !onAskingPermissionsFragment) {
-            askForSMSVerification()
         } else if (requestNotificationsPermissionFirstLogin) {
             askForNotificationsPermission()
         }
@@ -2678,33 +2636,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
     }
 
-    private fun askForSMSVerification() {
-        if (!smsDialogTimeChecker.shouldShow()) return
-        showStorageAlertWithDelay = true
-        //If mobile device, only portrait mode is allowed
-        if (!Util.isTablet(this)) {
-            Timber.d("mobile only portrait mode")
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
-        smsDialogTimeChecker.update()
-        onAskingSMSVerificationFragment = true
-        if (smsVerificationFragment == null) {
-            smsVerificationFragment = SMSVerificationFragment()
-        }
-        smsVerificationFragment?.let { replaceFragment(it, FragmentTag.SMS_VERIFICATION.tag) }
-        tabLayoutShares.visibility = View.GONE
-        viewPagerShares.visibility = View.GONE
-        tabLayoutTransfers.visibility = View.GONE
-        viewPagerTransfers.visibility = View.GONE
-        appBarLayout.visibility = View.GONE
-        fragmentContainer.visibility = View.VISIBLE
-        closeDrawer()
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        supportInvalidateOptionsMenu()
-        hideFabButton()
-        showHideBottomNavigationView(true)
-    }
-
     fun askForAccess() {
         askPermissions = false
         showStorageAlertWithDelay = true
@@ -2748,22 +2679,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             supportInvalidateOptionsMenu()
             hideFabButton()
             showHideBottomNavigationView(true)
-        }
-    }
-
-    fun destroySMSVerificationFragment() {
-        if (!Util.isTablet(this)) {
-            Timber.d("mobile, all orientation")
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_USER
-        }
-        onAskingSMSVerificationFragment = false
-        smsVerificationFragment = null
-        if (!firstTimeAfterInstallation) {
-            appBarLayout.visibility = View.VISIBLE
-            deleteCurrentFragment()
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-            supportInvalidateOptionsMenu()
-            selectDrawerItem(drawerItem)
         }
     }
 
@@ -5368,30 +5283,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         startActivity(qrIntent)
     }
 
-    /**
-     * When [isList] receives an update through the Flow [ManagerViewModel.onViewTypeChanged], refresh
-     * all Dashboard Fragments, so that the new View Type will be reflected
-     */
-    private fun refreshDashboardFragments() {
-        dbH.setPreferredViewList(isList)
-        //Refresh Cloud Fragment
-        refreshFragment(FragmentTag.CLOUD_DRIVE.tag)
-
-        //Refresh Rubbish Fragment
-        refreshFragment(FragmentTag.RUBBISH_BIN.tag)
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.INCOMING_TAB.position)
-
-        //Refresh shares section
-        sharesPageAdapter.refreshFragment(SharesTab.OUTGOING_TAB.position)
-
-        //Refresh search section
-        refreshFragment(FragmentTag.SEARCH.tag)
-
-        //Refresh inbox section
-        refreshFragment(FragmentTag.INBOX.tag)
-    }
-
     private fun refreshAfterMovingToRubbish() {
         Timber.d("refreshAfterMovingToRubbish")
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
@@ -5455,7 +5346,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             deleteTurnOnNotificationsFragment()
             return
         }
-        if (onAskingPermissionsFragment || onAskingSMSVerificationFragment) {
+        if (onAskingPermissionsFragment) {
             return
         }
         if (navController?.currentDestination != null &&

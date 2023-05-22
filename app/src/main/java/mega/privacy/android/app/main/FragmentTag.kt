@@ -18,7 +18,6 @@ internal enum class FragmentTag {
     NOTIFICATIONS,
     TURN_ON_NOTIFICATIONS,
     PERMISSIONS,
-    SMS_VERIFICATION,
     LINKS,
     MEDIA_DISCOVERY,
     ALBUM_CONTENT,
@@ -43,7 +42,6 @@ internal enum class FragmentTag {
             NOTIFICATIONS -> "notificationsFragment"
             TURN_ON_NOTIFICATIONS -> "turnOnNotificationsFragment"
             PERMISSIONS -> "permissionsFragment"
-            SMS_VERIFICATION -> "smsVerificationFragment"
             LINKS -> "linksFragment"
             MEDIA_DISCOVERY -> "mediaDiscoveryFragment"
             ALBUM_CONTENT -> "fragmentAlbumContent"
