@@ -276,4 +276,11 @@ interface ChatRepository {
      * @param chatTitle [String]
      */
     suspend fun broadcastChatArchived(chatTitle: String)
+
+    /**
+     * Gets the number of unread chats for the logged in user.
+     *
+     * @return Number of unread chats.
+     */
+    suspend fun getNumUnreadChats(): Int
 }

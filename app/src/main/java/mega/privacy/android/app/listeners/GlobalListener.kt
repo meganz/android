@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
+import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -85,13 +86,14 @@ class GlobalListener @Inject constructor(
     private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
     private val broadcastAccountUpdateUseCase: BroadcastAccountUpdateUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
+    private val getNotificationCountUseCase: GetNotificationCountUseCase,
 ) : MegaGlobalListenerInterface {
 
     /**
      * onUsersUpdate
      */
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-        users?.filterNotNull()?.forEach { user ->
+        users?.toList()?.forEach { user ->
             val myUserHandle = api.myUserHandle
             val isMyChange =
                 myUserHandle != null && myUserHandle == MegaApiJava.userHandleToBase64(user.handle)
@@ -128,21 +130,22 @@ class GlobalListener @Inject constructor(
      */
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         megaChatNotificationHandler.updateAppBadge()
-        notifyNotificationCountChange(api)
+        notifyNotificationCountChange()
     }
 
-    private fun notifyNotificationCountChange(api: MegaApiJava) {
-        val incomingContactRequests = api.incomingContactRequests
-        LiveEventBus.get(Constants.EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).post(
-            api.numUnreadUserAlerts + (incomingContactRequests?.size ?: 0)
-        )
+    private fun notifyNotificationCountChange() = applicationScope.launch {
+        val notificationCount = runCatching { getNotificationCountUseCase(false) }
+            .getOrNull() ?: 0
+
+        LiveEventBus.get(Constants.EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
+            .post(notificationCount)
     }
 
     /**
      * onNodesUpdate
      */
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
-        nodeList?.filterNotNull()?.forEach { node ->
+        nodeList?.toList()?.forEach { node ->
             if (node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
                 showSharedFolderNotification(node)
             } else if (node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK) && node.publicLink != null) {
@@ -182,9 +185,9 @@ class GlobalListener @Inject constructor(
     ) {
         if (requests == null) return
         megaChatNotificationHandler.updateAppBadge()
-        notifyNotificationCountChange(api)
+        notifyNotificationCountChange()
 
-        requests.filterNotNull().forEach { cr ->
+        requests.toList().forEach { cr ->
             if (cr.status == MegaContactRequest.STATUS_UNRESOLVED && !cr.isOutgoing) {
                 val notificationBuilder: ContactsAdvancedNotificationBuilder =
                     ContactsAdvancedNotificationBuilder.newInstance(

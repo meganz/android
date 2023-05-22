@@ -4,12 +4,14 @@ import android.app.Application
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.utils.Constants
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
@@ -22,18 +24,17 @@ import kotlin.math.abs
 /**
  * Mega chat notification handler
  *
- * @property megaApi
  * @property megaChatApi
  * @property application
  * @property activityLifecycleHandler
  */
 @Singleton
 class MegaChatNotificationHandler @Inject constructor(
-    @MegaApi
-    private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val application: Application,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
+    private val getNotificationCountUseCase: GetNotificationCountUseCase,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MegaChatNotificationListenerInterface {
     /**
      * On chat notification
@@ -98,29 +99,27 @@ class MegaChatNotificationHandler @Inject constructor(
     /**
      * Update app badge
      */
-    fun updateAppBadge() {
+    fun updateAppBadge() = applicationScope.launch {
         Timber.d("updateAppBadge")
-        var totalHistoric = 0
-        var totalIpc = 0
-        if (megaApi.rootNode != null) {
-            totalHistoric = megaApi.numUnreadUserAlerts
-            totalIpc = megaApi.incomingContactRequests.orEmpty().size
-        }
-        val chatUnread = megaChatApi.unreadChats
-        val totalNotifications = totalHistoric + totalIpc + chatUnread
+        val totalNotifications = runCatching { getNotificationCountUseCase(true) }.getOrNull() ?: 0
+
         //Add Android version check if needed
         if (totalNotifications == 0) {
             //Remove badge indicator - no unread chats
             ShortcutBadger.applyCount(application, 0)
             //Xiaomi support
-            application.startService(Intent(application,
-                BadgeIntentService::class.java).putExtra("badgeCount", 0))
+            application.startService(
+                Intent(application, BadgeIntentService::class.java)
+                    .putExtra("badgeCount", 0)
+            )
         } else {
             //Show badge with indicator = unread
             ShortcutBadger.applyCount(application, abs(totalNotifications))
             //Xiaomi support
-            application.startService(Intent(application,
-                BadgeIntentService::class.java).putExtra("badgeCount", totalNotifications))
+            application.startService(
+                Intent(application, BadgeIntentService::class.java)
+                    .putExtra("badgeCount", totalNotifications)
+            )
         }
     }
 }

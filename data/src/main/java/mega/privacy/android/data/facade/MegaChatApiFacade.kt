@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
@@ -446,4 +447,6 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getConnectedState() = chatApi.connectionState
 
     override fun getChatConnectionState(chatId: Long) = chatApi.getChatConnectionState(chatId)
+
+    override suspend fun getNumUnreadChats() = chatApi.unreadChats
 }

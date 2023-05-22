@@ -648,4 +648,11 @@ interface MegaChatApiGateway {
      * @return The state of connection
      */
     fun getChatConnectionState(chatId: Long): Int
+
+    /**
+     * Gets the number of unread chats for the logged in user.
+     *
+     * @return Number of unread chats.
+     */
+    suspend fun getNumUnreadChats(): Int
 }

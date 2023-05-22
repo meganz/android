@@ -475,4 +475,8 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastChatArchived(chatTitle: String) =
         appEventGateway.broadcastChatArchived(chatTitle)
+
+    override suspend fun getNumUnreadChats() = withContext(ioDispatcher) {
+        megaChatApiGateway.getNumUnreadChats()
+    }
 }
