@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
@@ -45,6 +46,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    private val appEventGateway: AppEventGateway,
 ) : NotificationsRepository {
 
     override fun monitorUserAlerts() = megaApiGateway.globalUpdates
@@ -156,6 +158,12 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
     override suspend fun acknowledgeUserAlerts() {
         megaApiGateway.acknowledgeUserAlerts()
+    }
+
+    override fun monitorHomeBadgeCount() = appEventGateway.monitorHomeBadgeCount()
+
+    override suspend fun broadcastHomeBadgeCount(badgeCount: Int) = withContext(dispatcher) {
+        appEventGateway.broadcastHomeBadgeCount(badgeCount)
     }
 
     private suspend fun areMeetingInvitationsEnabled(): Boolean =

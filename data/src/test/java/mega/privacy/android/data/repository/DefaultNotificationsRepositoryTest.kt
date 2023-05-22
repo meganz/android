@@ -76,6 +76,7 @@ class DefaultNotificationsRepositoryTest {
             getScheduledMeetingUseCase = getScheduledMeetingUseCase,
             callsPreferencesGateway = callsPreferencesGateway,
             dispatcher = UnconfinedTestDispatcher(),
+            appEventGateway = mock()
         )
 
         whenever(callsPreferencesGateway.getCallsMeetingInvitationsPreference())

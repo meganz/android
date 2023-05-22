@@ -204,4 +204,18 @@ internal interface AppEventGateway {
      * @param chatTitle [String]
      */
     suspend fun broadcastChatArchived(chatTitle: String)
+
+    /**
+     * Monitor home badge count.
+     *
+     * @return Flow of the number of pending actions the current logged in account has.
+     */
+    fun monitorHomeBadgeCount(): Flow<Int>
+
+    /**
+     * Broadcast home badge count.
+     *
+     * @param badgeCount Number of pending actions the current logged in account has.
+     */
+    suspend fun broadcastHomeBadgeCount(badgeCount: Int)
 }

@@ -11,14 +11,15 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
-import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorHomeBadgeCountUseCase
 import nz.mega.sdk.MegaBanner
 import timber.log.Timber
 import javax.inject.Inject
@@ -29,6 +30,7 @@ class HomePageViewModel @Inject constructor(
     getCallUseCase: GetCallUseCase,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorLogoutUseCase: MonitorLogoutUseCase,
+    private val monitorHomeBadgeCountUseCase: MonitorHomeBadgeCountUseCase,
 ) : BaseRxViewModel() {
 
     private val _notificationCount = MutableLiveData<Int>()
@@ -46,19 +48,14 @@ class HomePageViewModel @Inject constructor(
     /**
      * Is network connected state
      */
-    val isConnected = monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
-
-    private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
-        _notificationCount.value = it
-    }
+    val isConnected =
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val chatOnlineStatusObserver = androidx.lifecycle.Observer<Int> {
         _chatStatus.value = it
     }
 
     init {
-        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
-            .observeForever(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
 
@@ -73,14 +70,16 @@ class HomePageViewModel @Inject constructor(
             )
             .addTo(composite)
 
+        viewModelScope.launch {
+            monitorHomeBadgeCountUseCase().conflate().collect {
+                _notificationCount.value = it
+            }
+        }
         viewModelScope.launch { monitorLogoutUseCase().collect { repository.logout() } }
     }
 
     override fun onCleared() {
         super.onCleared()
-
-        LiveEventBus.get(EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
-            .removeObserver(notificationCountObserver)
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .removeObserver(chatOnlineStatusObserver)
     }

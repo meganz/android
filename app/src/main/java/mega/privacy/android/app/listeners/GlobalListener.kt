@@ -48,10 +48,11 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
-import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
+import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -87,6 +88,7 @@ class GlobalListener @Inject constructor(
     private val broadcastAccountUpdateUseCase: BroadcastAccountUpdateUseCase,
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
+    private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
 ) : MegaGlobalListenerInterface {
 
     /**
@@ -137,8 +139,7 @@ class GlobalListener @Inject constructor(
         val notificationCount = runCatching { getNotificationCountUseCase(false) }
             .getOrNull() ?: 0
 
-        LiveEventBus.get(Constants.EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java)
-            .post(notificationCount)
+        broadcastHomeBadgeCountUseCase(notificationCount)
     }
 
     /**
