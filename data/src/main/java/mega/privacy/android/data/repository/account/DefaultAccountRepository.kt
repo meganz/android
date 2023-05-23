@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
@@ -131,7 +132,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
-    private val ephemeralCredentialsGateway: EphemeralCredentialsGateway
+    private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -489,16 +490,18 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun getAccountEmail(forceRefresh: Boolean): String? {
-        if (forceRefresh) {
-            return megaApiGateway.accountEmail
-                .also {
-                    if (it.isNullOrBlank().not()) {
-                        dbHandler.saveMyEmail(it)
+    override suspend fun getAccountEmail(forceRefresh: Boolean): String? = withTimeout(5000L) {
+        withContext(ioDispatcher) {
+            if (forceRefresh) {
+                return@withContext megaApiGateway.accountEmail
+                    .also {
+                        if (it.isNullOrBlank().not()) {
+                            dbHandler.saveMyEmail(it)
+                        }
                     }
-                }
+            }
+            return@withContext dbHandler.myEmail
         }
-        return dbHandler.myEmail
     }
 
     private suspend fun handleAccountDetail(request: MegaRequest) {
