@@ -694,7 +694,7 @@ public class ContactFileListActivity extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY, this)
+            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -749,7 +749,7 @@ public class ContactFileListActivity extends PasscodeActivity
             }
             statusDialog = temp;
 
-            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE, this)
+            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -822,7 +822,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             .subscribe(handle -> {
                                         ArrayList<NameCollision> list = new ArrayList<>();
                                         list.add(NameCollision.Upload.getUploadCollision(handle,
-                                                file, parentHandle, this));
+                                                file, parentHandle));
                                         nameCollisionActivityContract.launch(list);
                                     },
                                     throwable -> {

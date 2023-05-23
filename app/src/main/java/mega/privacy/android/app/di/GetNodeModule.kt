@@ -1,12 +1,10 @@
 package mega.privacy.android.app.di
 
-import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.rx3.await
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
@@ -69,14 +67,12 @@ abstract class GetNodeModule {
         @Provides
         fun provideCheckNameCollision(
             checkNameCollisionUseCase: CheckNameCollisionUseCase,
-            @ApplicationContext context: Context,
         ): CheckNameCollision =
             CheckNameCollision { nodeHandle, parentNodeHandle, type ->
                 checkNameCollisionUseCase.check(
                     nodeHandle.longValue,
                     parentNodeHandle.longValue,
                     type,
-                    context,
                 ).await()
             }
 

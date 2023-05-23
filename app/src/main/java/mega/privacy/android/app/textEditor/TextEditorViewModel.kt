@@ -606,7 +606,6 @@ class TextEditorViewModel @Inject constructor(
                             handle,
                             tempFile,
                             parentHandle,
-                            activity
                         )
                 },
                 onError = { error ->

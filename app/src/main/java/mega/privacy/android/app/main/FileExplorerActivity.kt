@@ -1911,7 +1911,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ handle: Long? ->
                 val list = ArrayList<NameCollision>()
-                list.add(getUploadCollision(handle ?: return@subscribe, file, parentHandle, this))
+                list.add(getUploadCollision(handle ?: return@subscribe, file, parentHandle))
                 nameCollisionActivityContract?.launch(list)
             }) { throwable: Throwable? ->
                 if (throwable is ParentDoesNotExistException) {

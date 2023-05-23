@@ -671,7 +671,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
      * Checks if there is any name collision before copying the node.
      */
     private void checkCollisionBeforeCopying() {
-        checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY, this)
+        checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(collision -> {

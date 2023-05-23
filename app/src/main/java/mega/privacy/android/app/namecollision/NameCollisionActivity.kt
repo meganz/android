@@ -34,6 +34,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -240,6 +241,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 hasThumbnail -> {
                     thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
                 }
+
                 else -> {
                     thumbnailIcon.setImageResource(
                         if (isFile) MimeTypeList.typeForName(name).iconResourceId
@@ -255,7 +257,7 @@ class NameCollisionActivity : PasscodeActivity() {
             size.text = if (isFile) getSizeString(
                 collision.size ?: 0,
                 this@NameCollisionActivity
-            ) else collision.folderContent
+            ) else getFolderContentString(collision)
             date.text = formatLongDateTime(
                 if (collision is NameCollision.Upload) collision.lastModified / 1000
                 else collision.lastModified
@@ -285,11 +287,13 @@ class NameCollisionActivity : PasscodeActivity() {
                 renameInfoId = R.string.warning_upload_and_rename
                 renameButtonId = R.string.upload_and_rename
             }
+
             is NameCollision.Copy, is NameCollision.Import -> {
                 cancelButtonId = R.string.do_not_copy
                 renameInfoId = R.string.warning_copy_and_rename
                 renameButtonId = R.string.copy_and_rename
             }
+
             is NameCollision.Movement -> {
                 cancelButtonId = R.string.do_not_move
                 renameInfoId = R.string.warning_move_and_rename
@@ -344,6 +348,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     hasThumbnail -> {
                         thumbnail.setImageRequest(ImageRequest.fromUri(collisionResult.thumbnail))
                     }
+
                     else -> {
                         thumbnailIcon.setImageResource(MimeTypeList.typeForName(name).iconResourceId)
 
@@ -386,6 +391,9 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
     }
+
+    private fun getFolderContentString(collision: NameCollision) =
+        TextUtil.getFolderInfo(collision.childFolderCount, collision.childFileCount, this)
 
     /**
      * Requests the thumbnail of a file through Fresco controller and updates the UI if get.
@@ -489,6 +497,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     else -> R.string.upload_and_replace
                 }
             }
+
             NameCollisionType.COPY -> {
                 replaceUpdateMergeInfoId =
                     if (isFile) R.string.warning_copy_and_replace
@@ -497,6 +506,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     if (isFile) R.string.copy_and_replace
                     else R.string.copy_and_merge
             }
+
             NameCollisionType.MOVE -> {
                 replaceUpdateMergeInfoId =
                     if (isFile) R.string.warning_move_and_replace

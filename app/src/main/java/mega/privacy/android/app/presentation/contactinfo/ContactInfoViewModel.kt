@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.contactinfo
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -661,7 +660,7 @@ class ContactInfoViewModel @Inject constructor(
      * @param context context of parent activity
      */
     @SuppressLint("CheckResult")
-    fun checkCopyNameCollision(handles: Pair<LongArray, Long>?, context: Context) {
+    fun checkCopyNameCollision(handles: Pair<LongArray, Long>?) {
         if (!isOnline()) {
             _state.update { it.copy(snackBarMessage = R.string.error_server_connection_problem) }
             return
@@ -674,7 +673,6 @@ class ContactInfoViewModel @Inject constructor(
             copyHandles,
             toHandle,
             NameCollisionType.COPY,
-            context,
         ).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

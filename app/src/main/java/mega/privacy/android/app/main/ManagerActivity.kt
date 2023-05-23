@@ -5656,7 +5656,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun restoreFromRubbish(nodes: List<MegaNode?>?) {
         if (nodes == null) return
-        checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull(), this)
+        checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -7474,7 +7474,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     moveHandles,
                     toHandle,
                     NameCollisionType.MOVE,
-                    this
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -7522,7 +7521,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     copyHandles,
                     toHandle,
                     NameCollisionType.COPY,
-                    this
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -7579,7 +7577,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     list.add(
                                         NameCollision.Upload.getUploadCollision(
                                             handle,
-                                            file, parentHandle, this
+                                            file,
+                                            parentHandle,
                                         )
                                     )
                                     nameCollisionActivityContract?.launch(list)
@@ -8496,7 +8495,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     list.add(
                         NameCollision.Upload.getUploadCollision(
                             handle,
-                            file, parentNode.handle, this
+                            file,
+                            parentNode.handle,
                         )
                     )
                     nameCollisionActivityContract?.launch(list)
@@ -9899,7 +9899,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     .subscribe(
                         { Timber.d("Transfer retried.") },
                         { t: Throwable? -> Timber.e(t) })
-                    }
+            }
 
             else -> {
                 Timber.d("Unable to retrieve transfer type value")

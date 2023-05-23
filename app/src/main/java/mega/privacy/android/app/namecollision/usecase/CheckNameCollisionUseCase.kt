@@ -1,6 +1,5 @@
 package mega.privacy.android.app.namecollision.usecase
 
-import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import kotlinx.coroutines.CoroutineDispatcher
@@ -60,14 +59,12 @@ class CheckNameCollisionUseCase @Inject constructor(
         handle: Long,
         parentHandle: Long,
         type: NameCollisionType,
-        context: Context,
     ): Single<NameCollision> =
         rxSingle(ioDispatcher) {
             checkNodeCollisionsWithType(
                 node = megaApiGateway.getMegaNodeByHandle(handle),
                 parentNode = getParentOrRootNode(parentHandle),
                 type = type,
-                context = context,
             )
         }
 
@@ -84,17 +81,15 @@ class CheckNameCollisionUseCase @Inject constructor(
         node: MegaNode?,
         parentNode: MegaNode?,
         type: NameCollisionType,
-        context: Context,
     ): Single<NameCollision> =
         rxSingle(ioDispatcher) {
-            checkNodeCollisionsWithType(node, parentNode, type, context)
+            checkNodeCollisionsWithType(node, parentNode, type)
         }
 
     private suspend fun checkNodeCollisionsWithType(
         node: MegaNode?,
         parentNode: MegaNode?,
         type: NameCollisionType,
-        context: Context,
     ): NameCollision {
         if (node == null) throw MegaNodeException.NodeDoesNotExistsException()
         val handle = checkAsync(node.name, parentNode)
@@ -106,7 +101,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                 parentHandle = parentNode.handle,
                 childFolderCount = childCounts.first,
                 childFileCount = childCounts.second,
-                context = context,
             )
 
             NameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(
@@ -115,7 +109,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                 parentHandle = parentNode.handle,
                 childFolderCount = childCounts.first,
                 childFileCount = childCounts.second,
-                context = context,
             )
 
             NameCollisionType.UPLOAD -> throw IllegalStateException("UPLOAD collisions are not handled in this method")
@@ -177,10 +170,9 @@ class CheckNameCollisionUseCase @Inject constructor(
         nodes: List<MegaNode>,
         parentHandle: Long,
         type: NameCollisionType,
-        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         rxSingle(ioDispatcher) {
-            checkNodeListAsync(nodes, parentHandle, type, context)
+            checkNodeListAsync(nodes, parentHandle, type)
         }
 
     /**
@@ -189,14 +181,12 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param nodes
      * @param parentHandle
      * @param type
-     * @param context
      * @return
      */
     suspend fun checkNodeListAsync(
         nodes: List<MegaNode>,
         parentHandle: Long,
         type: NameCollisionType,
-        context: Context,
     ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
         if (nodes.isEmpty()) throw NoPendingCollisionsException()
         return nodes.fold(
@@ -210,7 +200,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                     node = node,
                     parentNode = getParentOrRootNode(parentHandle),
                     type = type,
-                    context = context
                 )
             }.onFailure {
                 Timber.e(it, "No collision.")
@@ -237,10 +226,9 @@ class CheckNameCollisionUseCase @Inject constructor(
         handles: LongArray,
         parentHandle: Long,
         type: NameCollisionType,
-        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, LongArray>> =
         rxSingle(ioDispatcher) {
-            checkHandleListAsync(handles, parentHandle, type, context)
+            checkHandleListAsync(handles, parentHandle, type)
         }
 
     /**
@@ -249,14 +237,12 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param handles
      * @param parentHandle
      * @param type
-     * @param context
      * @return
      */
     suspend fun checkHandleListAsync(
         handles: LongArray,
         parentHandle: Long,
         type: NameCollisionType,
-        context: Context,
     ): Pair<ArrayList<NameCollision>, LongArray> {
         if (handles.isEmpty()) throw NoPendingCollisionsException()
         val resultPair = handles.fold(
@@ -270,7 +256,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                     node = megaApiGateway.getMegaNodeByHandle(handle),
                     parentNode = getParentOrRootNode(parentHandle),
                     type = type,
-                    context = context
                 )
             }.onFailure {
                 Timber.e(it, "No collision.")
@@ -296,22 +281,19 @@ class CheckNameCollisionUseCase @Inject constructor(
      */
     fun checkRestorations(
         nodes: List<MegaNode>,
-        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         rxSingle(ioDispatcher) {
-            checkRestorationsAsync(nodes, context)
+            checkRestorationsAsync(nodes)
         }
 
     /**
      * Check restorations async
      *
      * @param nodes
-     * @param context
      * @return
      */
     suspend fun checkRestorationsAsync(
         nodes: List<MegaNode>,
-        context: Context,
     ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
         if (nodes.isEmpty()) throw NoPendingCollisionsException()
         return nodes.fold(
@@ -339,7 +321,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                                 parentHandle = restoreHandle,
                                 childFileCount = childCounts.second,
                                 childFolderCount = childCounts.first,
-                                context = context,
                             )
                         )
                     }
@@ -418,10 +399,9 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun checkFolderUploadList(
         parentHandle: Long,
         uploadContent: MutableList<FolderContent.Data>,
-        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
         rxSingle(ioDispatcher) {
-            return@rxSingle checkFolderUploadListAsync(parentHandle, uploadContent, context)
+            return@rxSingle checkFolderUploadListAsync(parentHandle, uploadContent)
 
 
         }
@@ -431,13 +411,11 @@ class CheckNameCollisionUseCase @Inject constructor(
      *
      * @param parentHandle
      * @param uploadContent
-     * @param context
      * @return
      */
     suspend fun checkFolderUploadListAsync(
         parentHandle: Long,
         uploadContent: MutableList<FolderContent.Data>,
-        context: Context,
     ): Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>> {
         val parent = getParentOrRootNode(parentHandle)
             ?: throw MegaNodeException.ParentDoesNotExistException()
@@ -451,7 +429,6 @@ class CheckNameCollisionUseCase @Inject constructor(
                     handle,
                     item,
                     parentHandle,
-                    context
                 )
             }.getOrNull()
         }

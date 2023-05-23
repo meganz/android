@@ -412,7 +412,7 @@ class UploadFolderViewModel @Inject constructor(
      */
     private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
         nameCollisionDisposable =
-            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults, context)
+            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

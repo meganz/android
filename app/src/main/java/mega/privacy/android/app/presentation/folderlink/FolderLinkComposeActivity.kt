@@ -116,7 +116,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 )
             statusDialog?.show()
 
-            viewModel.importNodes(toHandle, this)
+            viewModel.importNodes(toHandle)
         }
 
     private val selectImportFolderLauncher = registerForActivityResult(

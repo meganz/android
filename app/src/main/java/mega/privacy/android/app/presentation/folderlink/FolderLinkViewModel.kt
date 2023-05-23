@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
@@ -232,8 +231,8 @@ class FolderLinkViewModel @Inject constructor(
      * @param toHandle      Handle of destination node
      */
     @SuppressLint("CheckResult")
-    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long, context: Context) {
-        checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY, context)
+    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) {
+        checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -574,7 +573,7 @@ class FolderLinkViewModel @Inject constructor(
      * @param toHandle  Handle of the destination node
      * @param context   Context
      */
-    fun importNodes(toHandle: Long, context: Context) {
+    fun importNodes(toHandle: Long) {
         viewModelScope.launch {
             if (isMultipleNodeSelected()) {
                 Timber.d("Is multiple select")
@@ -583,13 +582,13 @@ class FolderLinkViewModel @Inject constructor(
                     return@launch
                 val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
                 val selectedMegaNodes = getNodeListByIds(selectedNodeIds)
-                checkNameCollision(selectedMegaNodes, toHandle, context)
+                checkNameCollision(selectedMegaNodes, toHandle)
             } else {
                 val importNodeHandle =
                     state.value.importNode?.id?.longValue ?: state.value.rootNode?.id?.longValue
                 if (importNodeHandle != null) {
                     val selectedNode = getNodeUseCase.getAuthorizedNode(importNodeHandle)
-                    selectedNode?.let { checkNameCollision(listOf(it), toHandle, context) }
+                    selectedNode?.let { checkNameCollision(listOf(it), toHandle) }
                     resetImportNode()
                 } else {
                     Timber.w("Selected Node is NULL")

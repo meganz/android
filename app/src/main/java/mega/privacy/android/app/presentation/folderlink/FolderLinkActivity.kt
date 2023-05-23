@@ -56,12 +56,12 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -322,12 +322,12 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     showSnackbar(R.string.context_no_copied)
                     return@ActivityResultCallback
                 }
-                viewModel.checkNameCollision(nodes, toHandle, this)
+                viewModel.checkNameCollision(nodes, toHandle)
 
             } else if (selectedNode != null) {
                 Timber.d("No multiple select")
                 selectedNode = megaApiFolder.authorizeNode(selectedNode)
-                selectedNode?.let { viewModel.checkNameCollision(listOf(it), toHandle, this) }
+                selectedNode?.let { viewModel.checkNameCollision(listOf(it), toHandle) }
 
             } else {
                 Timber.w("Selected Node is NULL")

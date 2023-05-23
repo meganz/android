@@ -379,7 +379,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun configureFolderToCopyLauncher() {
         selectFolderToCopyLauncher =
             registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
-                viewModel.checkCopyNameCollision(handles = result, context = this)
+                viewModel.checkCopyNameCollision(handles = result)
             }
     }
 

@@ -110,7 +110,6 @@ internal class CheckNameCollisionUseCaseTest {
             node = mock { on { name }.thenReturn("name") },
             parentNode = mock(),
             type = NameCollisionType.COPY,
-            context = mock(),
         ).test()
             .assertValue {
                 it is NameCollision.Copy
@@ -136,7 +135,6 @@ internal class CheckNameCollisionUseCaseTest {
             node = mock { on { name }.thenReturn("name") },
             parentNode = mock(),
             type = NameCollisionType.MOVE,
-            context = mock(),
         ).test()
             .assertValue {
                 it is NameCollision.Movement
@@ -159,7 +157,6 @@ internal class CheckNameCollisionUseCaseTest {
                 node = mock { on { name }.thenReturn("name") },
                 parentNode = mock(),
                 type = NameCollisionType.UPLOAD,
-                context = mock(),
             ).test()
                 .assertError(IllegalStateException::class.java)
         }
@@ -190,7 +187,6 @@ internal class CheckNameCollisionUseCaseTest {
 
             underTest.checkRestorations(
                 nodes = listOf(deletedNode),
-                context = mock()
             ).test()
                 .assertValue {
                     val actual: NameCollision = it.first.first()

@@ -1,10 +1,7 @@
 package mega.privacy.android.app.namecollision.data
 
-import android.content.Context
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
-import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
-import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.io.Serializable
@@ -14,7 +11,6 @@ import java.io.Serializable
  * @property collisionHandle
  * @property name
  * @property size
- * @property folderContent
  * @property childFolderCount
  * @property childFileCount
  * @property lastModified
@@ -26,7 +22,6 @@ sealed class NameCollision : Serializable {
     abstract val collisionHandle: Long
     abstract val name: String
     abstract val size: Long?
-    abstract val folderContent: String?
     abstract val childFolderCount: Int
     abstract val childFileCount: Int
     abstract val lastModified: Long
@@ -40,7 +35,6 @@ sealed class NameCollision : Serializable {
      * @property absolutePath
      * @property name
      * @property size
-     * @property folderContent
      * @property childFolderCount
      * @property childFileCount
      * @property lastModified
@@ -53,7 +47,6 @@ sealed class NameCollision : Serializable {
         val absolutePath: String,
         override val name: String,
         override val size: Long? = null,
-        override val folderContent: String? = null,
         override val childFolderCount: Int = 0,
         override val childFileCount: Int = 0,
         override val lastModified: Long,
@@ -75,17 +68,12 @@ sealed class NameCollision : Serializable {
                 collisionHandle: Long,
                 file: File,
                 parentHandle: Long?,
-                context: Context,
             ): Upload =
                 Upload(
                     collisionHandle = collisionHandle,
                     absolutePath = file.absolutePath,
                     name = file.name,
                     size = if (file.isFile) file.length() else null,
-                    folderContent = if (file.isDirectory) getFileFolderInfo(
-                        file,
-                        context
-                    ) else null,
                     childFolderCount = file.listFiles()?.count { it.isDirectory } ?: 0,
                     childFileCount = file.listFiles()?.count { it.isFile } ?: 0,
                     lastModified = file.lastModified(),
@@ -124,16 +112,11 @@ sealed class NameCollision : Serializable {
                 collisionHandle: Long,
                 uploadContent: FolderContent.Data,
                 parentHandle: Long,
-                context: Context,
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
                 absolutePath = uploadContent.uri.toString(),
                 name = uploadContent.name!!,
                 size = if (uploadContent.isFolder) null else uploadContent.size,
-                folderContent = if (uploadContent.isFolder) getFileFolderInfo(
-                    uploadContent.document,
-                    context
-                ) else null,
                 childFolderCount = uploadContent.document.listFiles().count { it.isDirectory },
                 childFileCount = uploadContent.document.listFiles().count { it.isFile },
                 lastModified = uploadContent.lastModified,
@@ -150,7 +133,6 @@ sealed class NameCollision : Serializable {
      * @property nodeHandle
      * @property name
      * @property size
-     * @property folderContent
      * @property childFolderCount
      * @property childFileCount
      * @property lastModified
@@ -163,7 +145,6 @@ sealed class NameCollision : Serializable {
         val nodeHandle: Long,
         override val name: String,
         override val size: Long? = null,
-        override val folderContent: String? = null,
         override val childFolderCount: Int = 0,
         override val childFileCount: Int = 0,
         override val lastModified: Long,
@@ -187,17 +168,12 @@ sealed class NameCollision : Serializable {
                 parentHandle: Long,
                 childFolderCount: Int,
                 childFileCount: Int,
-                context: Context,
             ): Copy =
                 Copy(
                     collisionHandle = collisionHandle,
                     nodeHandle = node.handle,
                     name = node.name,
                     size = if (node.isFile) node.size else null,
-                    folderContent = if (node.isFolder) getMegaNodeFolderInfo(
-                        node,
-                        context
-                    ) else null,
                     childFolderCount = childFolderCount,
                     childFileCount = childFileCount,
                     lastModified = if (node.isFile) node.modificationTime else node.creationTime,
@@ -216,7 +192,6 @@ sealed class NameCollision : Serializable {
      * @property messageId
      * @property name
      * @property size
-     * @property folderContent
      * @property childFolderCount
      * @property childFileCount
      * @property lastModified
@@ -231,7 +206,6 @@ sealed class NameCollision : Serializable {
         val messageId: Long,
         override val name: String,
         override val size: Long? = null,
-        override val folderContent: String? = null,
         override val childFolderCount: Int = 0,
         override val childFileCount: Int = 0,
         override val lastModified: Long,
@@ -279,7 +253,6 @@ sealed class NameCollision : Serializable {
      * @property nodeHandle
      * @property name
      * @property size
-     * @property folderContent
      * @property childFolderCount
      * @property childFileCount
      * @property lastModified
@@ -292,7 +265,6 @@ sealed class NameCollision : Serializable {
         val nodeHandle: Long,
         override val name: String,
         override val size: Long? = null,
-        override val folderContent: String? = null,
         override val childFolderCount: Int = 0,
         override val childFileCount: Int = 0,
         override val lastModified: Long,
@@ -316,13 +288,11 @@ sealed class NameCollision : Serializable {
                 parentHandle: Long,
                 childFolderCount: Int,
                 childFileCount: Int,
-                context: Context,
             ): Movement = Movement(
                 collisionHandle = collisionHandle,
                 nodeHandle = node.handle,
                 name = node.name,
                 size = if (node.isFile) node.size else null,
-                folderContent = if (node.isFolder) getMegaNodeFolderInfo(node, context) else null,
                 childFolderCount = childFolderCount,
                 childFileCount = childFileCount,
                 lastModified = if (node.isFile) node.modificationTime else node.creationTime,
