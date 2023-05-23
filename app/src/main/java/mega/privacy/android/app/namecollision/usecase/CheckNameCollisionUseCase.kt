@@ -3,6 +3,9 @@ package mega.privacy.android.app.namecollision.usecase
 import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.rx3.rxSingle
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -13,49 +16,37 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.exception.EmptyFolderException
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * Use case for checking name collisions before uploading, copying or moving.
  *
- * @property megaApi                [MegaApiAndroid] instance to check collisions.
+ * @property megaApiGateway                [MegaApiAndroid] instance to check collisions.
  * @property getNodeUseCase         Required for getting nodes.
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
+@OptIn(ExperimentalContracts::class)
 class CheckNameCollisionUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaApiGateway: MegaApiGateway,
     private val getNodeUseCase: GetNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
-    /**
-     * Checks if a node with the same name exists on the provided parent node.
-     *
-     * @param node          [MegaNode] to check its name.
-     * @param parentHandle  Handle of the parent node in which to look.
-     * @param type          [NameCollisionType]
-     * @return Single Long with the node handle with which there is a name collision.
-     */
-    fun check(
-        node: MegaNode?,
-        parentHandle: Long,
-        type: NameCollisionType,
-        context: Context,
-    ): Single<NameCollision> =
-        Single.fromCallable {
-            check(
-                node = node,
-                parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull(),
-                type = type,
-                context = context,
-            ).blockingGet()
-        }
+    private suspend fun getParentOrRootNode(parentHandle: Long) =
+        if (parentHandle == INVALID_HANDLE) megaApiGateway.getRootNode() else megaApiGateway.getMegaNodeByHandle(
+            parentHandle
+        )
+
 
     /**
      * Checks if a node with the same name exists on the provided parent node.
@@ -71,14 +62,15 @@ class CheckNameCollisionUseCase @Inject constructor(
         type: NameCollisionType,
         context: Context,
     ): Single<NameCollision> =
-        Single.fromCallable {
-            check(
-                node = getNodeUseCase.get(handle).blockingGetOrNull(),
-                parentHandle = parentHandle,
+        rxSingle(ioDispatcher) {
+            checkNodeCollisionsWithType(
+                node = megaApiGateway.getMegaNodeByHandle(handle),
+                parentNode = getParentOrRootNode(parentHandle),
                 type = type,
                 context = context,
-            ).blockingGet()
+            )
         }
+
 
     /**
      * Checks if a node with the same name exists on the provided parent node.
@@ -94,37 +86,47 @@ class CheckNameCollisionUseCase @Inject constructor(
         type: NameCollisionType,
         context: Context,
     ): Single<NameCollision> =
-        Single.create { emitter ->
-            if (node == null) {
-                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                return@create
-            }
+        rxSingle(ioDispatcher) {
+            checkNodeCollisionsWithType(node, parentNode, type, context)
+        }
 
-            check(name = node.name, parentNode = parentNode)
-                .blockingSubscribeBy(
-                    onError = { error -> emitter.onError(error) },
-                    onSuccess = { handle ->
-                        val collision: NameCollision? = when (type) {
-                            NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
-                                handle,
-                                node,
-                                parentHandle = parentNode!!.handle,
-                                context = context,
-                            )
-                            NameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(
-                                handle,
-                                node,
-                                parentHandle = parentNode!!.handle,
-                                context = context,
-                            )
-                            else -> null
-                        }
+    private suspend fun checkNodeCollisionsWithType(
+        node: MegaNode?,
+        parentNode: MegaNode?,
+        type: NameCollisionType,
+        context: Context,
+    ): NameCollision {
+        if (node == null) throw MegaNodeException.NodeDoesNotExistsException()
+        val handle = checkAsync(node.name, parentNode)
+        val childCounts = getChildCounts(parentNode)
+        return when (type) {
+            NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
+                handle,
+                node,
+                parentHandle = parentNode.handle,
+                childFolderCount = childCounts.first,
+                childFileCount = childCounts.second,
+                context = context,
+            )
 
-                        if (collision != null) {
-                            emitter.onSuccess(collision)
-                        }
-                    }
-                )
+            NameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(
+                handle,
+                node,
+                parentHandle = parentNode.handle,
+                childFolderCount = childCounts.first,
+                childFileCount = childCounts.second,
+                context = context,
+            )
+
+            NameCollisionType.UPLOAD -> throw IllegalStateException("UPLOAD collisions are not handled in this method")
+        }
+    }
+
+    private suspend fun getChildCounts(parentNode: MegaNode) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getNumChildFolders(parentNode) to megaApiGateway.getNumChildFiles(
+                parentNode
+            )
         }
 
     /**
@@ -135,18 +137,10 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @return Single Long with the node handle with which there is a name collision.
      */
     fun check(name: String, parentHandle: Long): Single<Long> =
-        Single.create { emitter ->
-            val parentNode = if (parentHandle == INVALID_HANDLE) {
-                megaApi.rootNode
-            } else {
-                getNodeUseCase.get(parentHandle).blockingGetOrNull()
-            }
-
-            check(name = name, parentNode = parentNode).blockingSubscribeBy(
-                onError = { error -> emitter.onError(error) },
-                onSuccess = { handle -> emitter.onSuccess(handle) }
-            )
+        rxSingle(ioDispatcher) {
+            checkAsync(name = name, parent = getParentOrRootNode(parentHandle))
         }
+
 
     /**
      * Checks if a node with the given name exists on the provided parent node.
@@ -156,20 +150,19 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @return Single Long with the node handle with which there is a name collision.
      */
     fun check(name: String, parentNode: MegaNode?): Single<Long> =
-        Single.create { emitter ->
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            val child = megaApi.getChildNode(parentNode, name)
-
-            if (child != null) {
-                emitter.onSuccess(child.handle)
-            } else {
-                emitter.onError(MegaNodeException.ChildDoesNotExistsException())
-            }
+        rxSingle(ioDispatcher) {
+            checkAsync(name, parentNode)
         }
+
+    private suspend fun checkAsync(name: String, parent: MegaNode?): Long {
+        contract { returns() implies (parent != null) }
+        if (parent == null) {
+            throw MegaNodeException.ParentDoesNotExistException()
+        }
+
+        return withContext(ioDispatcher) { megaApiGateway.getChildNode(parent, name)?.handle }
+            ?: throw MegaNodeException.ChildDoesNotExistsException()
+    }
 
     /**
      * Checks a list of handles in order to know which names already exist on the parent nodes.
@@ -186,37 +179,50 @@ class CheckNameCollisionUseCase @Inject constructor(
         type: NameCollisionType,
         context: Context,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
-        Single.create { emitter ->
-            if (nodes.isEmpty()) {
-                emitter.onError(NoPendingCollisionsException())
-                return@create
-            }
+        rxSingle(ioDispatcher) {
+            checkNodeListAsync(nodes, parentHandle, type, context)
+        }
 
-            val collisions = ArrayList<NameCollision>()
-            val results = mutableListOf<MegaNode>()
-
-            for (node in nodes) {
-                if (emitter.isDisposed) break
-
-                check(
+    /**
+     * Check node list async
+     *
+     * @param nodes
+     * @param parentHandle
+     * @param type
+     * @param context
+     * @return
+     */
+    suspend fun checkNodeListAsync(
+        nodes: List<MegaNode>,
+        parentHandle: Long,
+        type: NameCollisionType,
+        context: Context,
+    ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
+        if (nodes.isEmpty()) throw NoPendingCollisionsException()
+        return nodes.fold(
+            Pair(
+                ArrayList(),
+                mutableListOf()
+            )
+        ) { result, node ->
+            runCatching {
+                checkNodeCollisionsWithType(
                     node = node,
-                    parentHandle = parentHandle,
+                    parentNode = getParentOrRootNode(parentHandle),
                     type = type,
                     context = context
-                ).blockingSubscribeBy(
-                    onError = { error ->
-                        Timber.e(error, "No collision.")
-                        results.add(node)
-                    },
-                    onSuccess = { collision -> collisions.add(collision) }
                 )
+            }.onFailure {
+                Timber.e(it, "No collision.")
+                result.second.add(node)
+            }.onSuccess {
+                result.first.add(it)
             }
 
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, results))
-            }
+            result
         }
+    }
+
 
     /**
      * Checks a list of handles in order to know which names already exist on the parent nodes.
@@ -233,33 +239,51 @@ class CheckNameCollisionUseCase @Inject constructor(
         type: NameCollisionType,
         context: Context,
     ): Single<Pair<ArrayList<NameCollision>, LongArray>> =
-        Single.create { emitter ->
-            if (handles.isEmpty()) {
-                emitter.onError(NoPendingCollisionsException())
-                return@create
-            }
-
-            val collisions = ArrayList<NameCollision>()
-            val results = mutableListOf<Long>()
-
-            for (handle in handles) {
-                if (emitter.isDisposed) break
-
-                check(handle = handle, parentHandle = parentHandle, type = type, context = context)
-                    .blockingSubscribeBy(
-                        onError = { error ->
-                            Timber.e(error, "No collision.")
-                            results.add(handle)
-                        },
-                        onSuccess = { collision -> collisions.add(collision) }
-                    )
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, results.toLongArray()))
-            }
+        rxSingle(ioDispatcher) {
+            checkHandleListAsync(handles, parentHandle, type, context)
         }
+
+    /**
+     * Check handle list async
+     *
+     * @param handles
+     * @param parentHandle
+     * @param type
+     * @param context
+     * @return
+     */
+    suspend fun checkHandleListAsync(
+        handles: LongArray,
+        parentHandle: Long,
+        type: NameCollisionType,
+        context: Context,
+    ): Pair<ArrayList<NameCollision>, LongArray> {
+        if (handles.isEmpty()) throw NoPendingCollisionsException()
+        val resultPair = handles.fold(
+            Pair(
+                ArrayList<NameCollision>(),
+                mutableListOf<Long>()
+            )
+        ) { result, handle ->
+            runCatching {
+                checkNodeCollisionsWithType(
+                    node = megaApiGateway.getMegaNodeByHandle(handle),
+                    parentNode = getParentOrRootNode(parentHandle),
+                    type = type,
+                    context = context
+                )
+            }.onFailure {
+                Timber.e(it, "No collision.")
+                result.second.add(handle)
+            }.onSuccess {
+                result.first.add(it)
+            }
+
+            result
+        }
+
+        return Pair(resultPair.first, resultPair.second.toLongArray())
+    }
 
     /**
      * Checks a list of [MegaNode] in order to know which names already exist on the parent nodes
@@ -274,101 +298,113 @@ class CheckNameCollisionUseCase @Inject constructor(
         nodes: List<MegaNode>,
         context: Context,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
-        Single.create { emitter ->
-            if (nodes.isEmpty()) {
-                emitter.onError(NoPendingCollisionsException())
-                return@create
-            }
-
-            val collisions = ArrayList<NameCollision>()
-            val results = mutableListOf<MegaNode>()
-
-            for (node in nodes) {
-                if (emitter.isDisposed) break
-
-                val restoreHandle = node.restoreHandle
-                val parent = getNodeUseCase.get(restoreHandle).blockingGetOrNull()
-
-                if (parent == null || megaApi.isInRubbish(parent)) {
-                    results.add(node)
-                } else {
-                    check(node.name, parent).blockingSubscribeBy(
-                        onError = { error ->
-                            Timber.e(error, "No collision.")
-                            results.add(node)
-                        },
-                        onSuccess = { handle ->
-                            collisions.add(
-                                NameCollision.Movement.getMovementCollision(
-                                    handle,
-                                    node,
-                                    restoreHandle,
-                                    context,
-                                )
-                            )
-                        }
-                    )
-                }
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, results))
-            }
+        rxSingle(ioDispatcher) {
+            checkRestorationsAsync(nodes, context)
         }
+
+    /**
+     * Check restorations async
+     *
+     * @param nodes
+     * @param context
+     * @return
+     */
+    suspend fun checkRestorationsAsync(
+        nodes: List<MegaNode>,
+        context: Context,
+    ): Pair<ArrayList<NameCollision>, MutableList<MegaNode>> {
+        if (nodes.isEmpty()) throw NoPendingCollisionsException()
+        return nodes.fold(
+            Pair(
+                ArrayList(),
+                mutableListOf()
+            )
+        ) { result, node ->
+            val restoreHandle = node.restoreHandle
+            val parent = getParentOrRootNode(restoreHandle)
+            if (parent == null || megaApiGateway.isInRubbish(parent)) {
+                result.second.add(node)
+            } else {
+                val childCounts = getChildCounts(parent)
+                runCatching { checkAsync(node.name, parent) }
+                    .onFailure {
+                        Timber.e(it, "No collision.")
+                        result.second.add(node)
+                    }
+                    .onSuccess {
+                        result.first.add(
+                            NameCollision.Movement.getMovementCollision(
+                                collisionHandle = it,
+                                node = node,
+                                parentHandle = restoreHandle,
+                                childFileCount = childCounts.second,
+                                childFolderCount = childCounts.first,
+                                context = context,
+                            )
+                        )
+                    }
+            }
+            result
+        }
+    }
+
 
     /**
      * Checks a list of ShareInfo in order to know which names already exist
      * on the provided parent node.
      *
-     * @param shareInfos    List of ShareInfo to check.
+     * @param shareInfoList    List of ShareInfo to check.
      * @param parentNode    Parent node in which to look.
      * @return Single<Pair<ArrayList<NameCollision>, List<ShareInfo>>> containing:
      *  - First:    List of [NameCollision] with name collisions.
      *  - Second:   List of [ShareInfo] without name collision.
      */
     fun checkShareInfoList(
-        shareInfos: List<ShareInfo>,
+        shareInfoList: List<ShareInfo>,
         parentNode: MegaNode?,
     ): Single<Pair<ArrayList<NameCollision>, List<ShareInfo>>> =
-        Single.create { emitter ->
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
+        rxSingle(ioDispatcher) {
+            checkShareInfoAsync(parentNode, shareInfoList)
+        }
 
-            val collisions = ArrayList<NameCollision>()
-            val results = ArrayList<ShareInfo>()
-
-            for (shareInfo in shareInfos) {
-                if (emitter.isDisposed) break
-
-                check(shareInfo.originalFileName, parentNode).blockingSubscribeBy(
-                    onError = { error ->
-                        if (error is MegaNodeException.ParentDoesNotExistException) {
-                            emitter.onError(error)
-                            return@blockingSubscribeBy
-                        } else {
-                            results.add(shareInfo)
-                        }
-                    },
-                    onSuccess = { handle ->
-                        collisions.add(
-                            NameCollision.Upload.getUploadCollision(
-                                handle,
-                                shareInfo,
-                                parentNode.handle
-                            )
-                        )
-                    },
+    /**
+     * Check share info async
+     *
+     * @param parentNode
+     * @param shareInfoList
+     * @return
+     */
+    suspend fun checkShareInfoAsync(
+        parentNode: MegaNode?,
+        shareInfoList: List<ShareInfo>,
+    ): Pair<ArrayList<NameCollision>, MutableList<ShareInfo>> {
+        if (parentNode == null) {
+            throw MegaNodeException.ParentDoesNotExistException()
+        }
+        return shareInfoList.fold(
+            Pair(
+                ArrayList(),
+                mutableListOf()
+            )
+        ) { result, shareInfo ->
+            runCatching {
+                checkAsync(shareInfo.originalFileName, parentNode)
+            }.onFailure {
+                Timber.e(it, "No collision.")
+                result.second.add(shareInfo)
+            }.onSuccess {
+                result.first.add(
+                    NameCollision.Upload.getUploadCollision(
+                        it,
+                        shareInfo,
+                        parentNode.handle
+                    )
                 )
             }
 
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, results))
-            }
+            result
         }
+    }
 
     /**
      * Checks a list of [FolderContent.Data] in order to know which names already exist
@@ -384,45 +420,44 @@ class CheckNameCollisionUseCase @Inject constructor(
         uploadContent: MutableList<FolderContent.Data>,
         context: Context,
     ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
-        Single.create { emitter ->
-            if (uploadContent.isEmpty()) {
-                emitter.onError(EmptyFolderException())
-                return@create
-            }
+        rxSingle(ioDispatcher) {
+            return@rxSingle checkFolderUploadListAsync(parentHandle, uploadContent, context)
 
-            val collisions = ArrayList<NameCollision>()
 
-            for (item in uploadContent) {
-                if (emitter.isDisposed) break
-
-                item.name?.let {
-                    check(it, parentHandle).blockingSubscribeBy(
-                        onError = { error ->
-                            if (error is MegaNodeException.ParentDoesNotExistException) {
-                                emitter.onError(error)
-                                return@blockingSubscribeBy
-                            }
-                        },
-                        onSuccess = { handle ->
-                            val collision = NameCollision.Upload.getUploadCollision(
-                                handle,
-                                item,
-                                parentHandle,
-                                context
-                            )
-
-                            collisions.add(collision)
-                            item.nameCollision = collision
-                        },
-                    )
-                }
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(Pair(collisions, uploadContent))
-            }
         }
+
+    /**
+     * Check folder upload list async
+     *
+     * @param parentHandle
+     * @param uploadContent
+     * @param context
+     * @return
+     */
+    suspend fun checkFolderUploadListAsync(
+        parentHandle: Long,
+        uploadContent: MutableList<FolderContent.Data>,
+        context: Context,
+    ): Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>> {
+        val parent = getParentOrRootNode(parentHandle)
+            ?: throw MegaNodeException.ParentDoesNotExistException()
+        if (uploadContent.isEmpty()) throw EmptyFolderException()
+
+        val collisions = uploadContent.mapNotNull { item ->
+            runCatching {
+                val name = item.name ?: return@mapNotNull null
+                val handle = checkAsync(name = name, parent)
+                NameCollision.Upload.getUploadCollision(
+                    handle,
+                    item,
+                    parentHandle,
+                    context
+                )
+            }.getOrNull()
+        }
+        return Pair(ArrayList(collisions), uploadContent)
+    }
+
 
     /**
      * Checks a list of attached nodes in a chat conversation in order to know which names already
@@ -467,6 +502,7 @@ class CheckNameCollisionUseCase @Inject constructor(
                                         is MegaNodeException.ChildDoesNotExistsException -> {
                                             nodesWithoutCollision.add(node)
                                         }
+
                                         else -> {
                                             emitter.onError(error)
                                         }

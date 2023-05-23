@@ -10,36 +10,43 @@ import java.io.File
 import java.io.Serializable
 
 /**
- * Data class containing all the required to create a [NameCollisionResult].
- *
- * @property collisionHandle        The node handle with which there is a name collision.
- * @property name                   The name of the item to upload, copy or move.
- * @property size                   The size of the item to upload, copy or move if is a file, null otherwise.
- * @property folderContent          The content of the item to upload, copy or move if is a folder, null otherwise.
- * @property lastModified           The last modified date of the item to upload, copy or move.
- * @property parentHandle           The parent handle of the node in which the item has to be uploaded, copied or moved.
- * @property isFile                 True if the item is a file, false if is a folder.
+ * Name collision
+ * @property collisionHandle
+ * @property name
+ * @property size
+ * @property folderContent
+ * @property childFolderCount
+ * @property childFileCount
+ * @property lastModified
+ * @property parentHandle
+ * @property isFile
+ * @constructor Create empty Name collision
  */
 sealed class NameCollision : Serializable {
     abstract val collisionHandle: Long
     abstract val name: String
     abstract val size: Long?
     abstract val folderContent: String?
+    abstract val childFolderCount: Int
+    abstract val childFileCount: Int
     abstract val lastModified: Long
     abstract val parentHandle: Long?
     abstract val isFile: Boolean
 
     /**
-     * Data class containing all the required to present an upload name collision.
+     * Upload
      *
-     * @property collisionHandle    The node handle with which there is a name collision.
-     * @property absolutePath       The absolute path of the file to upload.
-     * @property name               The name of the file to upload.
-     * @property size               The size of the item to upload, copy or move if is a file, null otherwise.
-     * @property folderContent      The content of the item to upload, copy or move if is a folder, null otherwise.
-     * @property lastModified       The last modified date of the file to upload.
-     * @property parentHandle       The parent handle of the node in which the file has to be uploaded.
-     * @property isFile             True if the file is a file, false if is a folder.
+     * @property collisionHandle
+     * @property absolutePath
+     * @property name
+     * @property size
+     * @property folderContent
+     * @property childFolderCount
+     * @property childFileCount
+     * @property lastModified
+     * @property parentHandle
+     * @property isFile
+     * @constructor Create empty Upload
      */
     data class Upload constructor(
         override val collisionHandle: Long,
@@ -47,6 +54,8 @@ sealed class NameCollision : Serializable {
         override val name: String,
         override val size: Long? = null,
         override val folderContent: String? = null,
+        override val childFolderCount: Int = 0,
+        override val childFileCount: Int = 0,
         override val lastModified: Long,
         override val parentHandle: Long?,
         override val isFile: Boolean = true,
@@ -77,6 +86,8 @@ sealed class NameCollision : Serializable {
                         file,
                         context
                     ) else null,
+                    childFolderCount = file.listFiles()?.count { it.isDirectory } ?: 0,
+                    childFileCount = file.listFiles()?.count { it.isFile } ?: 0,
                     lastModified = file.lastModified(),
                     parentHandle = parentHandle
                 )
@@ -123,6 +134,8 @@ sealed class NameCollision : Serializable {
                     uploadContent.document,
                     context
                 ) else null,
+                childFolderCount = uploadContent.document.listFiles().count { it.isDirectory },
+                childFileCount = uploadContent.document.listFiles().count { it.isFile },
                 lastModified = uploadContent.lastModified,
                 parentHandle = parentHandle,
                 isFile = !uploadContent.isFolder
@@ -131,16 +144,19 @@ sealed class NameCollision : Serializable {
     }
 
     /**
-     * Data class containing all the required to present a copy name collision.
+     * Copy
      *
-     * @property collisionHandle    The node handle with which there is a name collision.
-     * @property nodeHandle         The node handle of the node to copy.
-     * @property name               The name of the node to copy.
-     * @property size               The size of the item to upload, copy or move if is a file, null otherwise.
-     * @property folderContent      The content of the item to upload, copy or move if is a folder, null otherwise.
-     * @property lastModified       The last modified date of the node to copy.
-     * @property parentHandle       The parent handle of the node in which the file has to be copied.
-     * @property isFile             True if the node is a file, false if is a folder.
+     * @property collisionHandle
+     * @property nodeHandle
+     * @property name
+     * @property size
+     * @property folderContent
+     * @property childFolderCount
+     * @property childFileCount
+     * @property lastModified
+     * @property parentHandle
+     * @property isFile
+     * @constructor Create empty Copy
      */
     data class Copy constructor(
         override val collisionHandle: Long,
@@ -148,6 +164,8 @@ sealed class NameCollision : Serializable {
         override val name: String,
         override val size: Long? = null,
         override val folderContent: String? = null,
+        override val childFolderCount: Int = 0,
+        override val childFileCount: Int = 0,
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
@@ -167,6 +185,8 @@ sealed class NameCollision : Serializable {
                 collisionHandle: Long,
                 node: MegaNode,
                 parentHandle: Long,
+                childFolderCount: Int,
+                childFileCount: Int,
                 context: Context,
             ): Copy =
                 Copy(
@@ -178,6 +198,8 @@ sealed class NameCollision : Serializable {
                         node,
                         context
                     ) else null,
+                    childFolderCount = childFolderCount,
+                    childFileCount = childFileCount,
                     lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                     parentHandle = parentHandle,
                     isFile = node.isFile
@@ -186,18 +208,21 @@ sealed class NameCollision : Serializable {
     }
 
     /**
-     * Data class containing all the required to present an import name collision.
+     * Import
      *
-     * @property collisionHandle    The node handle with which there is a name collision.
-     * @property nodeHandle         The node handle of the node to import.
-     * @property chatId             The chat identifier where is the node to import.
-     * @property messageId          The message identifier where is the node to import.
-     * @property name               The name of the node to import.
-     * @property size               The size of the node to import.
-     * @property folderContent      Null as the node is a file.
-     * @property lastModified       The last modified date of the node to import.
-     * @property parentHandle       The parent handle of the node in which the file has to be imported.
-     * @property isFile             True as the node is a file.
+     * @property collisionHandle
+     * @property nodeHandle
+     * @property chatId
+     * @property messageId
+     * @property name
+     * @property size
+     * @property folderContent
+     * @property childFolderCount
+     * @property childFileCount
+     * @property lastModified
+     * @property parentHandle
+     * @property isFile
+     * @constructor Create empty Import
      */
     data class Import constructor(
         override val collisionHandle: Long,
@@ -207,6 +232,8 @@ sealed class NameCollision : Serializable {
         override val name: String,
         override val size: Long? = null,
         override val folderContent: String? = null,
+        override val childFolderCount: Int = 0,
+        override val childFileCount: Int = 0,
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean = true,
@@ -246,16 +273,19 @@ sealed class NameCollision : Serializable {
     }
 
     /**
-     * Data class containing all the required to present a movement name collision.
+     * Movement
      *
-     * @property collisionHandle    The node handle with which there is a name collision.
-     * @property nodeHandle         The node handle of the node to move.
-     * @property name               The name of the node to move.
-     * @property size               The size of the item to upload, copy or move if is a file, null otherwise.
-     * @property folderContent      The content of the item to upload, copy or move if is a folder, null otherwise.
-     * @property lastModified       The last modified date of the node to move.
-     * @property parentHandle       The parent handle of the node in which the file has to be moved.
-     * @property isFile             True if the node is a file, false if is a folder.
+     * @property collisionHandle
+     * @property nodeHandle
+     * @property name
+     * @property size
+     * @property folderContent
+     * @property childFolderCount
+     * @property childFileCount
+     * @property lastModified
+     * @property parentHandle
+     * @property isFile
+     * @constructor Create empty Movement
      */
     data class Movement constructor(
         override val collisionHandle: Long,
@@ -263,6 +293,8 @@ sealed class NameCollision : Serializable {
         override val name: String,
         override val size: Long? = null,
         override val folderContent: String? = null,
+        override val childFolderCount: Int = 0,
+        override val childFileCount: Int = 0,
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
@@ -282,6 +314,8 @@ sealed class NameCollision : Serializable {
                 collisionHandle: Long,
                 node: MegaNode,
                 parentHandle: Long,
+                childFolderCount: Int,
+                childFileCount: Int,
                 context: Context,
             ): Movement = Movement(
                 collisionHandle = collisionHandle,
@@ -289,6 +323,8 @@ sealed class NameCollision : Serializable {
                 name = node.name,
                 size = if (node.isFile) node.size else null,
                 folderContent = if (node.isFolder) getMegaNodeFolderInfo(node, context) else null,
+                childFolderCount = childFolderCount,
+                childFileCount = childFileCount,
                 lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                 parentHandle = parentHandle,
                 isFile = node.isFile
