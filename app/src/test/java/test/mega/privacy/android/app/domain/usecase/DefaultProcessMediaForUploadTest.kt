@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
-import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.inOrder
@@ -45,6 +45,7 @@ class DefaultProcessMediaForUploadTest {
     private lateinit var underTest: ProcessMediaForUpload
 
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
+    private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
     private val getMediaStoreFileTypesUseCase = mock<GetMediaStoreFileTypesUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val updateTimeStamp = mock<UpdateCameraUploadTimeStamp>()
@@ -53,17 +54,16 @@ class DefaultProcessMediaForUploadTest {
     private val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val selectionQuery = mock<GetCameraUploadSelectionQuery>()
-    private val localPathSecondary = mock<GetCameraUploadLocalPathSecondary>()
 
     @Before
     fun setUp() {
         underTest = DefaultProcessMediaForUpload(
             cameraUploadRepository = cameraUploadRepository,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
+            getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getMediaStoreFileTypesUseCase = getMediaStoreFileTypesUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             selectionQuery = selectionQuery,
-            localPathSecondary = localPathSecondary,
             updateTimeStamp = updateTimeStamp,
             getPendingUploadListUseCase = getPendingUploadListUseCase,
             saveSyncRecordsToDB = saveSyncRecordsToDB,
@@ -80,7 +80,7 @@ class DefaultProcessMediaForUploadTest {
                 whenever(selectionQuery(it)).thenReturn("")
             }
             whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-            whenever(localPathSecondary()).thenReturn("")
+            whenever(getSecondaryFolderPathUseCase()).thenReturn("")
             listOf(
                 MediaStoreFileType.IMAGES_INTERNAL,
                 MediaStoreFileType.IMAGES_EXTERNAL,

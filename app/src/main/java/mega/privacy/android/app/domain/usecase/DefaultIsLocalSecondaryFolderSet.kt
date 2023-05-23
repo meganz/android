@@ -6,6 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class DefaultIsLocalSecondaryFolderSet @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
-    private val getLocalPathSecondary: GetCameraUploadLocalPathSecondary,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getDocumentFileWrapper: GetDocumentFileWrapper,
     @ApplicationContext private val context: Context,
 ) : IsLocalSecondaryFolderSet {
@@ -36,7 +37,7 @@ class DefaultIsLocalSecondaryFolderSet @Inject constructor(
                 }
                 file.exists()
             } else {
-                val localPathSecondary = getLocalPathSecondary() ?: return false
+                val localPathSecondary = getSecondaryFolderPathUseCase()
                 File(localPathSecondary).exists()
             }
         } else {

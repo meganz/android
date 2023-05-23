@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -18,6 +20,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import java.util.stream.Stream
 
 /**
  * Test class for [GetSecondaryFolderPathUseCase]
@@ -51,7 +54,7 @@ class GetSecondaryFolderPathUseCaseTest {
     @ValueSource(booleans = [true, false])
     fun `test that the secondary folder path could be located in the SD card`(isInSDCard: Boolean) =
         runTest {
-            val testSDCardPath = "test/sd/card/path"
+            val testSDCardPath = "test/sd/card/path/"
 
             cameraUploadRepository.stub {
                 onBlocking { isSecondaryFolderInSDCard() }.thenReturn(isInSDCard)
@@ -67,7 +70,7 @@ class GetSecondaryFolderPathUseCaseTest {
         }
 
     @ParameterizedTest(name = "path: {0}")
-    @ValueSource(strings = ["", " ", "test/path"])
+    @ValueSource(strings = ["", " ", "test/path/"])
     fun `test that the local secondary folder path is returned`(path: String) = runTest {
         cameraUploadRepository.stub {
             onBlocking { isSecondaryFolderInSDCard() }.thenReturn(false)
@@ -83,7 +86,7 @@ class GetSecondaryFolderPathUseCaseTest {
     @Test
     fun `test that an empty secondary folder path is set and returned if the previously set path does not exist`() =
         runTest {
-            val testPath = "test/path"
+            val testPath = "test/path/"
 
             cameraUploadRepository.stub {
                 onBlocking { isSecondaryFolderInSDCard() }.thenReturn(false)
@@ -98,4 +101,26 @@ class GetSecondaryFolderPathUseCaseTest {
             assertThat(expected).isEmpty()
             verify(cameraUploadRepository, times(1)).setSecondaryFolderLocalPath("")
         }
+
+    @ParameterizedTest(name = "when the original path is {0}, the new path becomes {1}")
+    @MethodSource("providePathParameters")
+    fun `test that the separator is appended in the secondary folder path`(
+        originalPath: String,
+        newPath: String,
+    ) = runTest {
+        cameraUploadRepository.stub {
+            onBlocking { isSecondaryFolderInSDCard() }.thenReturn(true)
+            onBlocking { getSecondaryFolderSDCardUriPath() }.thenReturn(originalPath)
+        }
+        val expectedPath = underTest()
+        assertThat(expectedPath).isEqualTo(newPath)
+    }
+
+    private fun providePathParameters() = Stream.of(
+        Arguments.of("", ""),
+        Arguments.of(" ", " "),
+        Arguments.of("test/path", "test/path/"),
+        Arguments.of("test/path/", "test/path/"),
+        Arguments.of("test/path//", "test/path//")
+    )
 }

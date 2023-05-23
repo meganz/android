@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import nz.mega.sdk.MegaNode
 import java.util.LinkedList
 import java.util.Queue
@@ -26,10 +27,10 @@ import javax.inject.Inject
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
+ * @property getSecondaryFolderPathUseCase [GetSecondaryFolderPathUseCase]
  * @property getMediaStoreFileTypesUseCase [GetMediaStoreFileTypesUseCase]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
  * @property selectionQuery [GetCameraUploadSelectionQuery]
- * @property localPathSecondary [GetCameraUploadLocalPathSecondary]
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
  * @property getPendingUploadListUseCase [GetPendingUploadListUseCase]
  * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
@@ -38,10 +39,10 @@ import javax.inject.Inject
 class DefaultProcessMediaForUpload @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getMediaStoreFileTypesUseCase: GetMediaStoreFileTypesUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val selectionQuery: GetCameraUploadSelectionQuery,
-    private val localPathSecondary: GetCameraUploadLocalPathSecondary,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadListUseCase: GetPendingUploadListUseCase,
     private val saveSyncRecordsToDB: SaveSyncRecordsToDB,
@@ -174,7 +175,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     secondaryPhotos.addAll(
                         cameraUploadRepository.getMediaQueue(
                             mediaStoreFileType = type,
-                            parentPath = localPathSecondary(),
+                            parentPath = getSecondaryFolderPathUseCase(),
                             isVideo = false,
                             selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_PHOTO),
                         )
@@ -209,7 +210,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     secondaryVideos.addAll(
                         cameraUploadRepository.getMediaQueue(
                             mediaStoreFileType = type,
-                            parentPath = localPathSecondary(),
+                            parentPath = getSecondaryFolderPathUseCase(),
                             isVideo = true,
                             selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_VIDEO),
                         )

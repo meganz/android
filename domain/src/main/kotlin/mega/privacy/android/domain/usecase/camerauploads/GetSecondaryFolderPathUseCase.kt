@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -20,11 +21,11 @@ class GetSecondaryFolderPathUseCase @Inject constructor(
      * @return The current Secondary Folder path
      */
     suspend operator fun invoke(): String {
-        val isInSDCard = cameraUploadRepository.isSecondaryFolderInSDCard()
-        return if (isInSDCard) {
-            cameraUploadRepository.getSecondaryFolderSDCardUriPath()
-        } else {
-            getLocalPath()
+        with(cameraUploadRepository) {
+            val isInSDCard = isSecondaryFolderInSDCard()
+            val path =
+                if (isInSDCard) getSecondaryFolderSDCardUriPath() else getLocalPath()
+            return path.addSeparator()
         }
     }
 
@@ -44,5 +45,16 @@ class GetSecondaryFolderPathUseCase @Inject constructor(
             cameraUploadRepository.setSecondaryFolderLocalPath("")
             ""
         }
+    }
+
+    /**
+     * Appends the separator "/" to the Secondary Folder path if it does not exist.
+     * e.g. "/storage/emulated/0/DCIM" becomes "storage/emulated/0/DCIM/"
+     */
+    private fun String.addSeparator(): String {
+        val fileSeparator = File.separator
+        return if (this.trim().isNotBlank() && !this.endsWith(fileSeparator)) {
+            "$this$fileSeparator"
+        } else this
     }
 }

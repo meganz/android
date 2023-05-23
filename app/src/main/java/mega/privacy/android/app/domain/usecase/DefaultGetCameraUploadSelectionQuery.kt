@@ -4,6 +4,7 @@ import android.provider.MediaStore
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -11,13 +12,13 @@ import javax.inject.Inject
  * Default implementation of [GetCameraUploadSelectionQuery]
  *
  * @property cameraUploadRepository [CameraUploadRepository]
- * @property getCameraUploadLocalPathSecondary [GetCameraUploadLocalPathSecondary]
- * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase],
+ * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
+ * @property getSecondaryFolderPathUseCase [GetSecondaryFolderPathUseCase]
  */
 class DefaultGetCameraUploadSelectionQuery @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val getCameraUploadLocalPathSecondary: GetCameraUploadLocalPathSecondary,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
 ) : GetCameraUploadSelectionQuery {
 
     override suspend fun invoke(timestampType: SyncTimeStamp): String? {
@@ -34,7 +35,7 @@ class DefaultGetCameraUploadSelectionQuery @Inject constructor(
         Timber.d("%s timestamp is: %s", timestampType.toString(), currentTimeStamp)
         val localPath = when (timestampType) {
             SyncTimeStamp.PRIMARY_PHOTO, SyncTimeStamp.PRIMARY_VIDEO -> getPrimaryFolderPathUseCase()
-            SyncTimeStamp.SECONDARY_PHOTO, SyncTimeStamp.SECONDARY_VIDEO -> getCameraUploadLocalPathSecondary()
+            SyncTimeStamp.SECONDARY_PHOTO, SyncTimeStamp.SECONDARY_VIDEO -> getSecondaryFolderPathUseCase()
         }
 
         @Suppress("DEPRECATION")
