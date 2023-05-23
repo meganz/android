@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.rubbishbin.view
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -42,6 +44,8 @@ fun RubbishBinComposeView(
     emptyState: Pair<Int, Int>,
     thumbnailViewModel: ThumbnailViewModel
 ) {
+    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
     if (uiState.nodeList.isNotEmpty()) {
         NodesView(
             modifier = Modifier
@@ -55,7 +59,9 @@ fun RubbishBinComposeView(
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
-            thumbnailViewModel = thumbnailViewModel
+            thumbnailViewModel = thumbnailViewModel,
+            listState = listState,
+            gridState = gridState
         )
     } else {
         MegaEmptyView(
