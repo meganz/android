@@ -188,6 +188,13 @@ interface AlbumRepository {
     suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit)
 
     /**
+     * Get serialized MegaNode list
+     *
+     * @return map of MegaNode data
+     */
+    fun getPublicAlbumNodesData(): Map<NodeId, String>
+
+    /**
      * Clear all albums cache
      */
     fun clearCache()

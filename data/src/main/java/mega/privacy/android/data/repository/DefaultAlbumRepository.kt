@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
@@ -88,6 +89,9 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
 
     private val publicNodesMap: MutableMap<NodeId, MegaNode> = mutableMapOf()
+
+    @Volatile
+    private var publicNodesDataMap: Map<NodeId, String> = mapOf()
 
     private var monitorNodeUpdatesJob: Job? = null
 
@@ -395,17 +399,19 @@ internal class DefaultAlbumRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->
                     if (error.errorCode == MegaError.API_OK) {
-                        val userSet = request.megaSet?.toUserSet()
-                        val albumPhotoIds = request.megaSetElementList?.let { elementList ->
-                            (0 until elementList.size()).map { index ->
-                                elementList.get(index).toAlbumPhotoId()
-                            }
-                        }.orEmpty()
+                        launch {
+                            val userSet = request.megaSet?.toUserSet()
+                            val albumPhotoIds = request.megaSetElementList?.let { elementList ->
+                                (0 until elementList.size()).map { index ->
+                                    elementList.get(index).toAlbumPhotoId()
+                                }
+                            }.orEmpty()
 
-                        if (userSet != null) {
-                            continuation.resume(userSet to albumPhotoIds)
-                        } else {
-                            continuation.failWithError(error, "fetchPublicAlbum")
+                            if (userSet != null) {
+                                continuation.resume(userSet to albumPhotoIds)
+                            } else {
+                                continuation.failWithError(error, "fetchPublicAlbum")
+                            }
                         }
                     } else {
                         continuation.failWithError(error, "fetchPublicAlbum")
@@ -437,13 +443,19 @@ internal class DefaultAlbumRepository @Inject constructor(
                 val listener = GetPreviewElementNodeListenerInterface(
                     nodeAlbumPhotoIdMap = nodeAlbumPhotoIdMap,
                     onCompletion = { nodeAlbumPhotoIdPairs ->
-                        publicNodesMap.clear()
+                        launch {
+                            publicNodesMap.clear()
 
-                        val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
-                            publicNodesMap[NodeId(node.handle)] = node
-                            photoMapper(node, albumPhotoId)
+                            val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
+                                publicNodesMap[NodeId(node.handle)] = node
+                                photoMapper(node, albumPhotoId)
+                            }
+
+                            publicNodesDataMap = publicNodesMap.mapValues { (_, node) ->
+                                node.serialize()
+                            }
+                            continuation.resume(photos)
                         }
-                        continuation.resume(photos)
                     }
                 )
 
@@ -515,6 +527,8 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
+    override fun getPublicAlbumNodesData(): Map<NodeId, String> = publicNodesDataMap
+
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = null
@@ -525,6 +539,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         nodeSetsMap.clear()
         albumElements.clear()
         publicNodesMap.clear()
+        publicNodesDataMap = mapOf()
         albumPhotosAddingProgressPool.clear()
         albumPhotosRemovingProgressPool.clear()
 

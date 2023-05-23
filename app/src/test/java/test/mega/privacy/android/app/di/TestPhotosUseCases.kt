@@ -18,6 +18,8 @@ import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPrevie
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import org.mockito.kotlin.mock
 
@@ -68,4 +70,10 @@ object TestPhotosUseCases {
     @Provides
     fun provideDownloadPublicAlbumPhotoPreviewUseCaseUseCase(): DownloadPublicAlbumPhotoPreviewUseCase =
         mock()
+
+    @Provides
+    fun provideGetPublicAlbumNodesDataUseCase(): GetPublicAlbumNodesDataUseCase = mock()
+
+    @Provides
+    fun provideGetPublicAlbumNodeDataUseCase(): GetPublicAlbumNodeDataUseCase = mock()
 }
