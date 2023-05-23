@@ -146,6 +146,7 @@ class SortByHeaderViewModel @Inject constructor(
             _cloudSortOrder.value = getCloudSortOrder()
             _othersSortOrder.value = getOthersSortOrder()
             _offlineSortOrder.value = getOfflineSortOrder()
+            order = Triple(_cloudSortOrder.value, _othersSortOrder.value, _offlineSortOrder.value)
             setOldOrder()
 
             monitorViewType().collect { viewType ->
