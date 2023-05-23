@@ -11,8 +11,6 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
-import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
-import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
@@ -20,12 +18,7 @@ import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolde
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
-import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
-import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
-import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
-import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -259,27 +252,6 @@ abstract class CameraUploadUseCases {
             GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it) }
 
         /**
-         * Provide the [GetNodesByOriginalFingerprint] implementation
-         */
-        @Provides
-        fun provideGetNodesByOriginalFingerprint(megaNodeRepository: MegaNodeRepository): GetNodesByOriginalFingerprint =
-            GetNodesByOriginalFingerprint(megaNodeRepository::getNodesByOriginalFingerprint)
-
-        /**
-         * Provide the [GetNodeByFingerprintAndParentNode] implementation
-         */
-        @Provides
-        fun provideGetNodeByFingerprintAndParentNode(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprintAndParentNode =
-            GetNodeByFingerprintAndParentNode(megaNodeRepository::getNodeByFingerprintAndParentNode)
-
-        /**
-         * Provide the [GetNodeByFingerprint] implementation
-         */
-        @Provides
-        fun provideGetNodeByFingerprint(megaNodeRepository: MegaNodeRepository): GetNodeByFingerprint =
-            GetNodeByFingerprint(megaNodeRepository::getNodeByFingerprint)
-
-        /**
          * Provide the [SetOriginalFingerprint] implementation
          *
          * @param megaNodeRepository [MegaNodeRepository]
@@ -387,12 +359,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCheckEnableCameraUploadsStatus(useCase: DefaultCheckEnableCameraUploadsStatus): CheckEnableCameraUploadsStatus
-
-    /**
-     * Provide the [GetNodeFromCloud] implementation
-     */
-    @Binds
-    abstract fun bindGetNodeFromCloud(getNodeFromCloud: DefaultGetNodeFromCloud): GetNodeFromCloud
 
     /**
      * Provide the [ResetPrimaryTimeline] implementation
@@ -525,12 +491,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSaveSyncRecordsToDB(saveSyncRecordsToDB: DefaultSaveSyncRecordsToDB): SaveSyncRecordsToDB
-
-    /**
-     * Provide the [GetPendingUploadList] implementation
-     */
-    @Binds
-    abstract fun bindGetPendingUploadList(getPendingUploadList: DefaultGetPendingUploadList): GetPendingUploadList
 
     /**
      * Provide the [ProcessMediaForUpload] implementation

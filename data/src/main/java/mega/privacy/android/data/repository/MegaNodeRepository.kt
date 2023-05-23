@@ -6,7 +6,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
 
@@ -130,36 +129,6 @@ interface MegaNodeRepository {
      * @return megaNode in the path or null
      */
     suspend fun getNodeByPath(path: String?, megaNode: MegaNode?): MegaNode?
-
-    /**
-     * Get MegaNode by original fingerprint
-     * @param originalFingerprint
-     * @param parentNode MegaNode
-     * @return MegaNodeList
-     */
-    suspend fun getNodesByOriginalFingerprint(
-        originalFingerprint: String,
-        parentNode: MegaNode?,
-    ): MegaNodeList?
-
-    /**
-     * Get MegaNode by fingerprint and parent node
-     * @param fingerprint
-     * @param parentNode MegaNode
-     * @return MegaNode
-     */
-    suspend fun getNodeByFingerprintAndParentNode(
-        fingerprint: String,
-        parentNode: MegaNode?,
-    ): MegaNode?
-
-    /**
-     * Get MegaNode by fingerprint only
-     * @param fingerprint
-     * @return MegaNode
-     */
-    suspend fun getNodeByFingerprint(fingerprint: String): MegaNode?
-
 
     /**
      * Sets the original fingerprint of a [MegaNode]

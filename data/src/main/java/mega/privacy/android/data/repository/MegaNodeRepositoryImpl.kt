@@ -31,7 +31,6 @@ import mega.privacy.android.domain.usecase.GetLinksSortOrder
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaShare
 import javax.inject.Inject
@@ -201,25 +200,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     override suspend fun getNodeByHandle(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)
     }
-
-    override suspend fun getNodesByOriginalFingerprint(
-        originalFingerprint: String,
-        parentNode: MegaNode?,
-    ): MegaNodeList? = withContext(ioDispatcher) {
-        megaApiGateway.getNodesByOriginalFingerprint(originalFingerprint, parentNode)
-    }
-
-    override suspend fun getNodeByFingerprintAndParentNode(
-        fingerprint: String,
-        parentNode: MegaNode?,
-    ): MegaNode? = withContext(ioDispatcher) {
-        megaApiGateway.getNodeByFingerprintAndParentNode(fingerprint, parentNode)
-    }
-
-    override suspend fun getNodeByFingerprint(fingerprint: String): MegaNode? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getNodeByFingerprint(fingerprint)
-        }
 
     override suspend fun setOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
         withContext(ioDispatcher) {

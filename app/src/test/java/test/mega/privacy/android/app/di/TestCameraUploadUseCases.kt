@@ -9,12 +9,7 @@ import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
-import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
-import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
-import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
-import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -76,8 +71,7 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintUseCase
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -89,12 +83,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideHasCredentials() = mock<HasCredentials>()
-
-    @Provides
-    fun provideHasPreferencesUseCase() = mock<HasPreferencesUseCase>()
-
-    @Provides
-    fun provideHasCameraSyncEnabledUseCase() = mock<HasCameraSyncEnabledUseCase>()
 
     @Provides
     fun provideIsCameraUploadSyncEnabled() = mock<IsCameraUploadSyncEnabled>()
@@ -133,13 +121,7 @@ object TestCameraUploadUseCases {
     fun provideGetVideoSyncRecordsByStatus() = mock<GetVideoSyncRecordsByStatus>()
 
     @Provides
-    fun provideGetNodesByOriginalFingerprint() = mock<GetNodesByOriginalFingerprint>()
-
-    @Provides
-    fun provideGetNodeByFingerprintAndParentNode() = mock<GetNodeByFingerprintAndParentNode>()
-
-    @Provides
-    fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprint>()
+    fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
 
     @Provides
     fun provideSetOriginalFingerprint() = mock<SetOriginalFingerprint>()
@@ -149,9 +131,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetChildMegaNode() = mock<GetChildMegaNode>()
-
-    @Provides
-    fun provideGetNodeFromCloud() = mock<GetNodeFromCloud>()
 
     @Provides
     fun provideResetPrimaryTimeline() = mock<ResetPrimaryTimeline>()
@@ -200,9 +179,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSaveSyncRecordsToDB() = mock<SaveSyncRecordsToDB>()
-
-    @Provides
-    fun provideGetPendingUploadList() = mock<GetPendingUploadList>()
 
     @Provides
     fun provideProcessMediaForUpload() = mock<ProcessMediaForUpload>()

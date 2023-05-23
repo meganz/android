@@ -320,4 +320,42 @@ interface NodeRepository {
      *         is the root node
      */
     suspend fun getParentNode(nodeId: NodeId): UnTypedNode?
+
+    /**
+     * Get [UnTypedNode] by original fingerprint
+     * @param originalFingerprint
+     * @param parentNodeId NodeId
+     * @return [UnTypedNode]
+     */
+    suspend fun getNodeByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNodeId: NodeId?,
+    ): UnTypedNode?
+
+    /**
+     * Get [UnTypedNode] by fingerprint and parent node
+     * @param fingerprint
+     * @param parentNodeId [NodeId]
+     * @return [UnTypedNode]
+     */
+    suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNodeId: NodeId,
+    ): UnTypedNode?
+
+    /**
+     * Get [UnTypedNode] by fingerprint only
+     * @param fingerprint
+     * @return [UnTypedNode]
+     */
+    suspend fun getNodeByFingerprint(fingerprint: String): UnTypedNode?
+
+    /**
+     * Get GPS coordinates from mega node
+     *
+     * @param nodeId [NodeId]
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getNodeGPSCoordinates(nodeId: NodeId): Pair<Double, Double>
 }

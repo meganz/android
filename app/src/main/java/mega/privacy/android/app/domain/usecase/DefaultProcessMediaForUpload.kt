@@ -14,6 +14,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import nz.mega.sdk.MegaNode
 import java.util.LinkedList
@@ -30,7 +31,7 @@ import javax.inject.Inject
  * @property selectionQuery [GetCameraUploadSelectionQuery]
  * @property localPathSecondary [GetCameraUploadLocalPathSecondary]
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
- * @property getPendingUploadList [GetPendingUploadList]
+ * @property getPendingUploadListUseCase [GetPendingUploadListUseCase]
  * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
  * @property cameraUploadRepository [CameraUploadSyncManagerWrapper]
  */
@@ -42,7 +43,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
     private val selectionQuery: GetCameraUploadSelectionQuery,
     private val localPathSecondary: GetCameraUploadLocalPathSecondary,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
-    private val getPendingUploadList: GetPendingUploadList,
+    private val getPendingUploadListUseCase: GetPendingUploadListUseCase,
     private val saveSyncRecordsToDB: SaveSyncRecordsToDB,
     private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
 ) : ProcessMediaForUpload {
@@ -115,7 +116,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                 )
             }
         }
-        val pendingUploadsList = getPendingUploadList(
+        val pendingUploadsList = getPendingUploadListUseCase(
             mediaList = primaryPhotos,
             isSecondary = false,
             isVideo = false,
@@ -147,7 +148,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                 )
             }
         }
-        val pendingVideoUploadsList = getPendingUploadList(
+        val pendingVideoUploadsList = getPendingUploadListUseCase(
             mediaList = primaryVideos,
             isSecondary = false,
             isVideo = true,
@@ -180,7 +181,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     )
                 }
             }
-            val pendingUploadsListSecondary = getPendingUploadList(
+            val pendingUploadsListSecondary = getPendingUploadListUseCase(
                 mediaList = secondaryPhotos,
                 isSecondary = true,
                 isVideo = false,
@@ -215,7 +216,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                     )
                 }
             }
-            val pendingVideoUploadsListSecondary = getPendingUploadList(
+            val pendingVideoUploadsListSecondary = getPendingUploadListUseCase(
                 mediaList = secondaryVideos,
                 isSecondary = true,
                 isVideo = true,

@@ -48,6 +48,7 @@ import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -466,4 +467,45 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaApiGateway.getParentNode(megaNode)?.let { nodeMapper(it) }
         }
     }
+
+    override suspend fun getNodeByOriginalFingerprint(
+        originalFingerprint: String,
+        parentNodeId: NodeId?,
+    ): UnTypedNode? = withContext(ioDispatcher) {
+        val megaNode =
+            parentNodeId?.let { megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue) }
+        megaApiGateway.getNodesByOriginalFingerprint(originalFingerprint, megaNode)?.let {
+            if (it.size() > 0) {
+                return@let nodeMapper(it[0])
+            }
+            return@let null
+        }.also {
+            Timber.d("Found node by original fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node : $it")
+        }
+    }
+
+    override suspend fun getNodeByFingerprintAndParentNode(
+        fingerprint: String,
+        parentNodeId: NodeId,
+    ): UnTypedNode? = withContext(ioDispatcher) {
+        val megaNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+        megaApiGateway.getNodeByFingerprintAndParentNode(fingerprint, megaNode)
+            ?.let { nodeMapper(it) }.also {
+                Timber.d("Found node by fingerprint with the same local fingerprint in node with handle: ${parentNodeId}, node: $it")
+            }
+    }
+
+    override suspend fun getNodeByFingerprint(fingerprint: String) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getNodeByFingerprint(fingerprint)?.let { nodeMapper(it) }
+        }.also {
+            Timber.d("Found node by fingerprint with the same local fingerprint in the account, node: $it")
+        }
+
+    override suspend fun getNodeGPSCoordinates(nodeId: NodeId): Pair<Double, Double> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                Pair(it.latitude, it.longitude)
+            } ?: Pair(0.0, 0.0)
+        }
 }

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.yield
 import mega.privacy.android.domain.entity.CameraUploadMedia
@@ -13,11 +13,6 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
-import nz.mega.sdk.MegaNode
-import timber.log.Timber
 import java.io.File
 import java.util.Queue
 import javax.inject.Inject
@@ -25,9 +20,8 @@ import javax.inject.Inject
 /**
  * Use case to prepare sync record lists for camera upload
  */
-class DefaultGetPendingUploadList @Inject constructor(
-    private val getNodeFromCloud: GetNodeFromCloud,
-    private val getNodeByHandle: GetNodeByHandle,
+class GetPendingUploadListUseCase @Inject constructor(
+    private val getNodeFromCloudUseCase: GetNodeFromCloudUseCase,
     private val getParentNodeUseCase: GetParentNodeUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
@@ -37,43 +31,33 @@ class DefaultGetPendingUploadList @Inject constructor(
     private val shouldCompressVideo: ShouldCompressVideo,
     private val getGPSCoordinates: GetGPSCoordinates,
     private val isNodeInRubbish: IsNodeInRubbish,
-) : GetPendingUploadList {
+    private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase,
+) {
 
-    override suspend fun invoke(
+    suspend operator fun invoke(
         mediaList: Queue<CameraUploadMedia>,
         isSecondary: Boolean,
         isVideo: Boolean,
     ): List<SyncRecord> {
-        Timber.d("GetPendingUploadList - is secondary upload: $isSecondary, is video: $isVideo")
         val pendingList = mutableListOf<SyncRecord>()
         val parentNodeHandle =
             if (isSecondary) getSecondarySyncHandleUseCase() else getPrimarySyncHandleUseCase()
-        Timber.d("Upload to parent node with handle: $parentNodeHandle")
         val type = if (isVideo) SyncRecordType.TYPE_VIDEO else SyncRecordType.TYPE_PHOTO
 
         while (mediaList.size > 0) {
             yield()
             val media = mediaList.poll() ?: continue
             if (media.filePath?.let { mediaLocalPathExists(it, isSecondary) } == true) {
-                Timber.d("Skip media with timestamp: ${media.timestamp}")
                 continue
             }
 
             val sourceFile = media.filePath?.let { File(it) }
             val localFingerPrint = media.filePath?.let { getFingerprintUseCase(it) }
-            var nodeExists: MegaNode? = null
-            try {
-                nodeExists = getNodeByHandle(parentNodeHandle)?.let { node ->
-                    localFingerPrint?.let { fingerprint ->
-                        getNodeFromCloud(fingerprint, node)
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e)
+            val nodeExists = localFingerPrint?.let { fingerprint ->
+                getNodeFromCloudUseCase(fingerprint, NodeId(parentNodeHandle))
             }
 
             if (nodeExists == null) {
-                Timber.d("Possible node with same fingerprint is null")
                 val gpsData = sourceFile?.let {
                     getGPSCoordinates(
                         it.absolutePath,
@@ -99,11 +83,10 @@ class DefaultGetPendingUploadList @Inject constructor(
                     false,
                     isSecondary
                 )
-                Timber.d("Add local file with timestamp: ${record.timestamp} to pending list to upload")
                 pendingList.add(record)
             } else {
-                Timber.d("Possible node with same fingerprint with handle: ${nodeExists.handle}")
-                if (!isNodeInRubbish(nodeExists.handle) && getParentNodeUseCase(NodeId(nodeExists.handle))?.id?.longValue != parentNodeHandle) {
+                if (!isNodeInRubbish(nodeExists.id.longValue) && getParentNodeUseCase(nodeExists.id)?.id?.longValue != parentNodeHandle) {
+                    val (latitude, longitude) = getNodeGPSCoordinatesUseCase(nodeExists.id)
                     val record = SyncRecord(
                         0,
                         media.filePath,
@@ -112,15 +95,14 @@ class DefaultGetPendingUploadList @Inject constructor(
                         nodeExists.fingerprint,
                         media.timestamp,
                         sourceFile?.name,
-                        nodeExists.longitude.toFloat(),
-                        nodeExists.latitude.toFloat(),
+                        latitude.toFloat(),
+                        longitude.toFloat(),
                         SyncStatus.STATUS_PENDING.value,
                         type,
-                        nodeExists.handle,
+                        nodeExists.id.longValue,
                         true,
                         isSecondary
                     )
-                    Timber.d("Add local file with handle: ${record.nodeHandle} to pending list to copy")
                     pendingList.add(record)
                 } else {
                     if (isVideo) {

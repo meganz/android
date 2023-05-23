@@ -13,7 +13,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
-import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
@@ -25,6 +24,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import org.junit.Before
 import org.junit.Test
@@ -48,7 +48,7 @@ class DefaultProcessMediaForUploadTest {
     private val getMediaStoreFileTypesUseCase = mock<GetMediaStoreFileTypesUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val updateTimeStamp = mock<UpdateCameraUploadTimeStamp>()
-    private val getPendingUploadList = mock<GetPendingUploadList>()
+    private val getPendingUploadListUseCase = mock<GetPendingUploadListUseCase>()
     private val saveSyncRecordsToDB = mock<SaveSyncRecordsToDB>()
     private val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
@@ -65,7 +65,7 @@ class DefaultProcessMediaForUploadTest {
             selectionQuery = selectionQuery,
             localPathSecondary = localPathSecondary,
             updateTimeStamp = updateTimeStamp,
-            getPendingUploadList = getPendingUploadList,
+            getPendingUploadListUseCase = getPendingUploadListUseCase,
             saveSyncRecordsToDB = saveSyncRecordsToDB,
             cameraUploadSyncManagerWrapper = cameraUploadSyncManagerWrapper
         )
@@ -196,7 +196,7 @@ class DefaultProcessMediaForUploadTest {
                         MediaStoreFileType.VIDEO_EXTERNAL,
                     )
                 )
-                getPendingUploadList.stub {
+                getPendingUploadListUseCase.stub {
                     onBlocking { invoke(any(), any(), any()) }.doSuspendableAnswer {
                         delay(2000)
                         return@doSuspendableAnswer emptyList()
