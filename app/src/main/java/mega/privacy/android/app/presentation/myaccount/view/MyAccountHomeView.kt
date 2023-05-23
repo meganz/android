@@ -123,8 +123,6 @@ import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_grey_100
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -806,7 +804,7 @@ internal fun UsageMeterSection(
                 append("/${formatSize(size = totalStorage)}")
             },
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+            color = MaterialTheme.colors.onPrimary,
         )
 
         Text(
@@ -819,7 +817,7 @@ internal fun UsageMeterSection(
             },
             text = stringResource(id = R.string.account_storage_label),
             style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
-            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+            color = MaterialTheme.colors.onPrimary,
         )
 
         if (showTransfer) {
@@ -876,7 +874,7 @@ internal fun UsageMeterSection(
                 },
                 text = "${formatSize(size = usedTransfer)}/${formatSize(size = totalTransfer)}",
                 style = MaterialTheme.typography.caption,
-                color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+                color = MaterialTheme.colors.onPrimary,
             )
 
             Text(
@@ -889,7 +887,7 @@ internal fun UsageMeterSection(
                 },
                 text = stringResource(id = R.string.transfer_label),
                 style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Medium),
-                color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+                color = MaterialTheme.colors.onPrimary,
             )
         }
     }
@@ -929,7 +927,7 @@ private fun AccountInfoListItem(
                     start.linkTo(parent.start, 20.dp)
                 },
                 painter = painterResource(id = icon),
-                tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                tint = MaterialTheme.colors.textColorSecondary,
                 contentDescription = stringResource(id = title),
             )
         } else {
@@ -963,7 +961,7 @@ private fun AccountInfoListItem(
                 fontWeight = FontWeight.Medium,
                 fontSize = if (isIconMode) 16.sp else 14.sp
             ),
-            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087
+            color = MaterialTheme.colors.onPrimary
         )
 
         Text(
@@ -982,7 +980,7 @@ private fun AccountInfoListItem(
                 },
             text = description,
             style = MaterialTheme.typography.caption,
-            color = MaterialTheme.colors.grey_alpha_054_white_alpha_054
+            color = MaterialTheme.colors.textColorSecondary
         )
 
         if (withDivider) {

@@ -58,14 +58,12 @@ import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
-import mega.privacy.android.core.ui.theme.extensions.textColorBlackWhite
-import mega.privacy.android.core.ui.theme.extensions.textColorPrimaryReverted
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.extensions.white_grey_alpha_087
 import mega.privacy.android.core.ui.theme.subtitle1
@@ -175,7 +173,7 @@ fun NewUpgradeAccountView(
                     Text(
                         text = uiAccountType.textBuyAccountTypeValue,
                         style = MaterialTheme.typography.button,
-                        color = MaterialTheme.colors.textColorPrimaryReverted,
+                        color = MaterialTheme.colors.primary,
                         fontWeight = FontWeight.Medium,
                     )
                 }
@@ -388,7 +386,7 @@ fun SubscriptionPlansInfoRowNew(
                         fontSize = 11.sp,
                         lineHeight = 14.sp,
                         fontWeight = FontWeight(500),
-                        color = MaterialTheme.colors.textColorBlackWhite,
+                        color = MaterialTheme.colors.black_white,
                         modifier = Modifier
                             .background(
                                 color = MaterialTheme.colors.grey_050_grey_800,
@@ -439,7 +437,7 @@ fun SubscriptionPlansInfoRowNew(
                         baseStyle = body2,
                         styles = hashMapOf(
                             SpanIndicator('A') to SpanStyle(
-                                color = MaterialTheme.colors.textColorBlackWhite,
+                                color = MaterialTheme.colors.black_white,
                                 fontWeight = FontWeight.Medium
                             ),
                             SpanIndicator('B') to SpanStyle(
@@ -453,7 +451,7 @@ fun SubscriptionPlansInfoRowNew(
                         baseStyle = body2,
                         styles = hashMapOf(
                             SpanIndicator('A') to SpanStyle(
-                                color = MaterialTheme.colors.textColorBlackWhite,
+                                color = MaterialTheme.colors.black_white,
                                 fontWeight = FontWeight.Medium
                             ),
                             SpanIndicator('B') to SpanStyle(
@@ -471,7 +469,7 @@ fun SubscriptionPlansInfoRowNew(
                         baseStyle = caption,
                         styles = hashMapOf(
                             SpanIndicator('A') to SpanStyle(
-                                color = MaterialTheme.colors.textColorBlackWhite,
+                                color = MaterialTheme.colors.black_white,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight(500),
                             ),
@@ -503,7 +501,7 @@ private fun FeaturesOfPlans() {
         Text(
             text = "Features of Pro plans",
             style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+            color = MaterialTheme.colors.onPrimary,
             fontWeight = FontWeight.Medium,
         )
         Column(
@@ -513,7 +511,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Password-protected links",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
@@ -522,7 +520,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Links with expiry dates",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
@@ -531,7 +529,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Transfer quota sharing",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
@@ -540,7 +538,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Automatic backups",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
@@ -549,7 +547,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
@@ -558,7 +556,7 @@ private fun FeaturesOfPlans() {
             Text(
                 text = "•  Schedule rubbish bin clearing between 7 days and 10 years",
                 style = body2,
-                color = MaterialTheme.colors.textColorBlackWhite,
+                color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(start = 10.dp)
             )
         }

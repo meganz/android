@@ -63,12 +63,6 @@ val Colors.textColorSecondary: Color
     get() = if (isLight) grey_alpha_054 else white_alpha_054
 
 /**
- * Color [grey_alpha_087] when light and [yellow_700] when dark
- */
-val Colors.grey_alpha_087_white_alpha_087: Color
-    get() = if (isLight) grey_alpha_087 else white_alpha_087
-
-/**
  * Color [grey_alpha_012] when light and [white_alpha_038] when dark
  */
 val Colors.grey_alpha_012_white_alpha_038: Color
@@ -225,25 +219,13 @@ val Colors.grey_alpha_050_white_alpha_050: Color
     get() = if (isLight) grey_alpha_050 else white_alpha_050
 
 /**
- * Color [black] when light and [white] when dark
- */
-val Colors.textColorBlackWhite: Color
-    get() = if (isLight) black else white
-
-/**
  * Color for grey when light [grey_020] and when dark [grey_800]
  */
 val Colors.grey_020_grey_800: Color
     get() = if (isLight) grey_020 else grey_800
 
 /**
- * Text Color Primary reverted (when light [white] and when dark [dark_grey])
- */
-val Colors.textColorPrimaryReverted: Color
-    get() = if (isLight) white else dark_grey
-
-/**
- * Color when light [grey_020] and when dark [grey_700]
+ * Color when light [grey_020] and when dark [black]
  */
 val Colors.grey_020_black: Color
     get() = if (isLight) grey_020 else black
@@ -253,12 +235,6 @@ val Colors.grey_020_black: Color
  */
 val Colors.grey_050_grey_700: Color
     get() = if (isLight) grey_050 else grey_700
-
-/**
- * Color when light [white] and when dark [dark_grey]
- */
-val Colors.white_dark_grey: Color
-    get() = if (isLight) white else dark_grey
 
 /**
  * Color when light [white] and when dark [grey_800]
@@ -279,31 +255,25 @@ val Colors.grey_050_grey_900: Color
     get() = if (isLight) grey_050 else grey_900
 
 /**
- * Color when light [grey_alpha_054] and when dark [white_alpha_054]
- */
-val Colors.grey_alpha_054_white_alpha_054: Color
-    get() = if (isLight) grey_alpha_054 else white_alpha_054
-
-/**
  * Color when light [green_400] and when dark [green_300]
  */
 val Colors.green_400_green_300: Color
     get() = if (isLight) green_400 else green_300
 
 /**
- * Color when light [green_400] and when dark [green_300]
+ * Color when light [orange_600] and when dark [orange_300]
  */
 val Colors.orange_600_orange_300: Color
     get() = if (isLight) orange_600 else orange_300
 
 /**
- * Color when light [green_400] and when dark [green_300]
+ * Color when light [red_300] and when dark [red_200]
  */
 val Colors.red_300_red_200: Color
     get() = if (isLight) red_300 else red_200
 
 /**
- * Color when light [green_400] and when dark [green_300]
+ * Color when light [blue_400] and when dark [blue_300]
  */
 val Colors.blue_400_blue_300: Color
     get() = if (isLight) blue_400 else blue_300

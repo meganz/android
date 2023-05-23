@@ -52,7 +52,6 @@ import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 
 @Composable
 fun PhotosFilterView(
@@ -91,7 +90,7 @@ fun PhotosFilterView(
                 ) {
                     Text(
                         text = stringResource(id = R.string.photos_timeline_filter_remember_preferences),
-                        color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+                        color = MaterialTheme.colors.onPrimary,
                     )
 
                     Checkbox(
