@@ -477,8 +477,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Get Cloud Sort Order
      */
-    fun getOrder() = runBlocking { getCloudSortOrder() }
-
+    suspend fun getOrder() = getCloudSortOrder()
 
     /**
      * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,

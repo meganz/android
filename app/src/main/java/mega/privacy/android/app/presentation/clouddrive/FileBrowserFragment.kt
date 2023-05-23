@@ -58,7 +58,6 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
@@ -66,6 +65,7 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
@@ -377,6 +377,7 @@ class FileBrowserFragment : RotatableFragment() {
                         )
                     }
                 }
+
                 1 -> {
                     val backupNode = backupNodeHandle?.let { megaApi.getNodeByHandle(it) } ?: return
                     fileBackupManager?.defaultActionBackupNodeCallback?.let {
@@ -389,6 +390,7 @@ class FileBrowserFragment : RotatableFragment() {
                         )
                     }
                 }
+
                 else -> Timber.e("Backup warning dialog is not show")
             }
         }
@@ -644,6 +646,7 @@ class FileBrowserFragment : RotatableFragment() {
                     if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
                     megaNodeAdapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
                 }
+
                 ViewType.GRID -> {
                     switchBackToGrid()
                     removeItemDecoration(itemDecoration)
@@ -667,7 +670,7 @@ class FileBrowserFragment : RotatableFragment() {
      * @param node MegaNode
      * @param position position of item clicked
      */
-    private fun openFile(node: MegaNode, position: Int) {
+    private fun openFile(node: MegaNode, position: Int) = lifecycleScope.launch {
         if (MimeTypeList.typeForName(node.name).isImage) {
             val intent = getIntentForParentNode(
                 requireContext(),
@@ -938,7 +941,7 @@ class FileBrowserFragment : RotatableFragment() {
         } else {
             Timber.d("itemClick:isFile:otherOption")
 
-            val managerActivity = requireActivity() as? ManagerActivity ?: return
+            val managerActivity = requireActivity() as? ManagerActivity ?: return@launch
             onNodeTapped(
                 context = requireActivity(),
                 node = node,
@@ -1228,6 +1231,7 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_rename -> {
                     if (documents?.size == 1) {
                         (requireActivity() as? ManagerActivity)?.showRenameDialog(documents[0])
@@ -1235,6 +1239,7 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_copy -> {
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
@@ -1244,6 +1249,7 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_move -> {
                     val nC = NodeController(requireActivity())
                     documents?.map { it.handle }?.let {
@@ -1253,6 +1259,7 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_share_folder -> {
                     documents?.filter { it.isFolder }
                         ?.map { it.handle }?.let {
@@ -1272,11 +1279,13 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_share_out -> {
                     documents?.let { shareNodes(requireContext(), it) }
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                     Timber.d("Public link option")
                     if (documents?.isNotEmpty() == true) {
@@ -1287,6 +1296,7 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_remove_link -> {
                     Timber.d("Remove public link option")
                     if (documents?.isNotEmpty() == true) {
@@ -1299,12 +1309,14 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_send_to_chat -> {
                     Timber.d("Send files to chat")
                     (requireActivity() as? ManagerActivity)?.attachNodesToChats(megaNodeAdapter?.arrayListSelectedNodes)
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_trash -> {
                     documents?.map { it.handle }?.let {
                         handleList.addAll(it)
@@ -1313,18 +1325,22 @@ class FileBrowserFragment : RotatableFragment() {
                         )
                     }
                 }
+
                 R.id.cab_menu_select_all -> {
                     selectAll()
                 }
+
                 R.id.cab_menu_clear_selection -> {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_remove_share -> documents?.let {
                     (requireActivity() as? ManagerActivity)?.showConfirmationRemoveAllSharingContacts(
                         it
                     )
                 }
+
                 R.id.cab_menu_dispute -> {
                     startActivity(
                         Intent(requireContext(), WebViewActivity::class.java)
