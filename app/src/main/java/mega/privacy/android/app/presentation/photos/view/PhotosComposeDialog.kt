@@ -87,7 +87,7 @@ internal fun SortByDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel).uppercase(),
+                    text = stringResource(id = R.string.general_cancel),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
@@ -158,7 +158,7 @@ internal fun FilterDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_cancel).uppercase(),
+                    text = stringResource(id = R.string.general_cancel),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
