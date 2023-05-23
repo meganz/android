@@ -661,13 +661,6 @@
             android:name="mega.privacy.android.app.mediaplayer.SelectSubtitleFileActivity"
             android:launchMode="singleTop" />
 
-        <receiver android:name=".psa.AlarmReceiver"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="android.intent.action.checking.psa" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".presentation.chat.dialog.AskForDisplayOverActivity"
             android:launchMode="singleTask"
