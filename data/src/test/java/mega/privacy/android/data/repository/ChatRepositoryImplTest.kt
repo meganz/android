@@ -41,7 +41,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -96,7 +95,7 @@ class ChatRepositoryImplTest {
             megaChatPeerListMapper = megaChatPeerListMapper,
             connectionStateMapper = connectionStateMapper,
             chatConnectionStatusMapper = chatConnectionStatusMapper,
-            appEventGateway = appEventGateway
+            appEventGateway = appEventGateway,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

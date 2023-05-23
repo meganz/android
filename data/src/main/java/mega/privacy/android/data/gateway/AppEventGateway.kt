@@ -218,4 +218,16 @@ internal interface AppEventGateway {
      * @param badgeCount Number of pending actions the current logged in account has.
      */
     suspend fun broadcastHomeBadgeCount(badgeCount: Int)
+
+    /**
+     * Monitor if successfully joined to a chat.
+     *
+     * @return Flow [Boolean]
+     */
+    fun monitorJoinedSuccessfully(): Flow<Boolean>
+
+    /**
+     * Broadcast if successfully joined to a chat.
+     */
+    suspend fun broadcastJoinedSuccessfully()
 }

@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -68,6 +69,9 @@ class ChatViewModelTest {
         onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
     }
     private val broadcastChatArchivedUseCase = mock<BroadcastChatArchivedUseCase>()
+    private val monitorJoinedSuccessfullyUseCase = mock<MonitorJoinedSuccessfullyUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf(true))
+    }
 
     @Before
     fun setUp() {
@@ -93,7 +97,8 @@ class ChatViewModelTest {
             sendStatisticsMeetingsUseCase = sendStatisticsMeetingsUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
-            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase
+            broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
+            monitorJoinedSuccessfullyUseCase = monitorJoinedSuccessfullyUseCase
         )
     }
 
@@ -150,6 +155,17 @@ class ChatViewModelTest {
                 underTest.onChatArchivedEventConsumed()
                 val updatedState = awaitItem()
                 Truth.assertThat(updatedState.titleChatArchivedEvent).isNull()
+            }
+        }
+
+    @Test
+    fun `test that when joined successfully to a chat then state is also updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorJoinedSuccessfullyUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.isJoiningOrLeaving).isFalse()
             }
         }
 }

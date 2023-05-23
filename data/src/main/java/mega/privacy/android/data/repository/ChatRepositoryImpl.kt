@@ -480,4 +480,10 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getNumUnreadChats() = withContext(ioDispatcher) {
         megaChatApiGateway.getNumUnreadChats()
     }
+
+    override fun monitorJoinedSuccessfully(): Flow<Boolean> =
+        appEventGateway.monitorJoinedSuccessfully()
+
+    override suspend fun broadcastJoinedSuccessfully() =
+        appEventGateway.broadcastJoinedSuccessfully()
 }

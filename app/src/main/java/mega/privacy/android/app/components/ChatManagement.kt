@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_JOINED_SUCCESSFULLY
 import mega.privacy.android.app.constants.EventConstants.EVENT_ENABLE_OR_DISABLE_LOCAL_VIDEO_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_NOT_OUTGOING_CALL
 import mega.privacy.android.app.constants.EventConstants.EVENT_OUTGOING_CALL
@@ -25,6 +24,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.chat.BroadcastJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
@@ -38,11 +38,12 @@ import javax.inject.Singleton
 /**
  * Class for chat management
  *
- * @property applicationScope               [CoroutineScope]
- * @property hangChatCallUseCase            [HangChatCallUseCase]
- * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
- * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
- * @property megaChatApi                    [MegaChatApiAndroid]
+ * @property applicationScope                       [CoroutineScope]
+ * @property hangChatCallUseCase                    [HangChatCallUseCase]
+ * @property sendStatisticsMeetingsUseCase          [SendStatisticsMeetingsUseCase]
+ * @property rtcAudioManagerGateway                 [RTCAudioManagerGateway]
+ * @property megaChatApi                            [MegaChatApiAndroid]
+ * @property broadcastJoinedSuccessfullyUseCase     [BroadcastJoinedSuccessfullyUseCase]
  */
 @Singleton
 class ChatManagement @Inject constructor(
@@ -51,6 +52,7 @@ class ChatManagement @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
+    private val broadcastJoinedSuccessfullyUseCase: BroadcastJoinedSuccessfullyUseCase,
 ) {
     private val chatRoomListener: ChatRoomListener = ChatRoomListener()
     private val app: MegaApplication = getInstance()
@@ -155,7 +157,9 @@ class ChatManagement @Inject constructor(
      */
     fun removeJoiningChatId(joiningChatId: Long) {
         if (joiningChatIds.remove(joiningChatId)) {
-            app.sendBroadcast(Intent(BROADCAST_ACTION_JOINED_SUCCESSFULLY))
+            applicationScope.launch {
+                broadcastJoinedSuccessfullyUseCase()
+            }
         }
     }
 

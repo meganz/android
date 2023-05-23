@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property isPushNotificationSettingsUpdatedEvent     Push notification settings updated event
  * @property scheduledMeeting                           Scheduled Meeting.
  * @property titleChatArchivedEvent                     In case of a chat archived event, title of the chat.
+ * @property isJoiningOrLeaving                         True if user is joining or leaving the chat, false otherwise.
  */
 data class ChatState(
     val chatId: Long = -1L,
@@ -34,4 +35,5 @@ data class ChatState(
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val scheduledMeeting: ChatScheduledMeeting? = null,
     val titleChatArchivedEvent: String? = null,
+    val isJoiningOrLeaving: Boolean = false,
 )

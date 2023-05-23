@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -56,24 +57,27 @@ import javax.inject.Inject
 /**
  * View Model for [mega.privacy.android.app.main.megachat.ChatActivity]
  *
- * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
- * @property startChatCall                      [StartChatCall]
- * @property chatApiGateway                     [MegaChatApiGateway]
- * @property answerChatCall                     [AnswerChatCall]
- * @property passcodeManagement                 [PasscodeManagement]
- * @property cameraGateway                      [CameraGateway]
- * @property chatManagement                     [ChatManagement]
- * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
- * @property startChatCallNoRinging             [StartChatCallNoRinging]
- * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property getScheduledMeetingByChat          [GetScheduledMeetingByChat]
- * @property getChatCall                        [GetChatCall]
- * @property monitorChatCallUpdates             [MonitorChatCallUpdates]
- * @property endCallUseCase                     [EndCallUseCase]
- * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
- * @property isConnected True if the app has some network connection, false otherwise.
- * @property monitorUpdatePushNotificationSettingsUseCase monitors push notification settings update
- * @property deviceGateway                      [DeviceGateway]
+ * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
+ * @property startChatCall                                  [StartChatCall]
+ * @property chatApiGateway                                 [MegaChatApiGateway]
+ * @property answerChatCall                                 [AnswerChatCall]
+ * @property passcodeManagement                             [PasscodeManagement]
+ * @property cameraGateway                                  [CameraGateway]
+ * @property chatManagement                                 [ChatManagement]
+ * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
+ * @property startChatCallNoRinging                         [StartChatCallNoRinging]
+ * @property megaChatApiGateway                             [MegaChatApiGateway]
+ * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
+ * @property getChatCall                                    [GetChatCall]
+ * @property monitorChatCallUpdates                         [MonitorChatCallUpdates]
+ * @property endCallUseCase                                 [EndCallUseCase]
+ * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
+ * @property isConnected                                    True if the app has some network connection, false otherwise.
+ * @property monitorUpdatePushNotificationSettingsUseCase   monitors push notification settings update
+ * @property deviceGateway                                  [DeviceGateway]
+ * @property monitorChatArchivedUseCase                     [MonitorChatArchivedUseCase]
+ * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
+ * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -98,6 +102,7 @@ class ChatViewModel @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
+    private val monitorJoinedSuccessfullyUseCase: MonitorJoinedSuccessfullyUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -135,6 +140,12 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatArchivedUseCase().conflate().collect { chatTitle ->
                 _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
+            }
+        }
+
+        viewModelScope.launch {
+            monitorJoinedSuccessfullyUseCase().conflate().collect {
+                _state.update { it.copy(isJoiningOrLeaving = false) }
             }
         }
     }
@@ -176,6 +187,22 @@ class ChatViewModel @Inject constructor(
      * @return True, if the chat has been initialised. False, otherwise.
      */
     fun isChatInitialised(): Boolean = state.value.isChatInitialised
+
+    /**
+     * Check if joining or leaving the chat.
+     *
+     * @return True, if user is joining or leaving the chat. False, otherwise.
+     */
+    fun isJoiningOrLeaving(): Boolean = _state.value.isJoiningOrLeaving
+
+    /**
+     * Set if the user is joining or leaving the chat.
+     *
+     * @param value True, if user is joining or leaving the chat. False, otherwise.
+     */
+    fun setIsJoiningOrLeaving(value: Boolean) {
+        _state.update { it.copy(isJoiningOrLeaving = value) }
+    }
 
     /**
      * Sets chat id
