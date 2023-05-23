@@ -23,6 +23,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -34,13 +35,10 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
-import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -56,7 +54,11 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -83,7 +85,8 @@ import javax.inject.Inject
  * @property copyNodeUseCase            UseCase required to copy nodes
  * @property moveNodeUseCase            UseCase required to move nodes
  * @property removeNodeUseCase          UseCase required to remove nodes
- * @property checkNameCollisionUseCase  UseCase required to check name collisions
+ * @property checkNameCollision         UseCase required to check name collisions
+ * @property moveNodeToRubbishByHandle  UseCase to move node to rubbish bin
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
@@ -99,7 +102,8 @@ class ImageViewerViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
-    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val checkNameCollision: CheckNameCollision,
+    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -109,7 +113,7 @@ class ImageViewerViewModel @Inject constructor(
 
     val images = MutableLiveData<List<ImageItem>?>()
     private val currentImageId = MutableLiveData<Long?>()
-    private val showToolbar = MutableLiveData<Boolean>(true)
+    private val showToolbar = MutableLiveData(true)
     private val snackBarMessage = SingleLiveEvent<String>()
     private val actionBarMessage = SingleLiveEvent<Int>()
     private val copyMoveException = SingleLiveEvent<Throwable>()
@@ -276,12 +280,16 @@ class ImageViewerViewModel @Inject constructor(
         val subscription = when (imageItem) {
             is ImageItem.PublicNode ->
                 getNodeUseCase.getNodeItem(imageItem.nodePublicLink)
+
             is ImageItem.ChatNode ->
                 getNodeUseCase.getNodeItem(imageItem.chatRoomId, imageItem.chatMessageId)
+
             is ImageItem.OfflineNode ->
                 getNodeUseCase.getOfflineNodeItem(imageItem.handle)
+
             is ImageItem.Node ->
                 getNodeUseCase.getNodeItem(imageItem.handle)
+
             is ImageItem.File -> {
                 // do nothing
                 return
@@ -329,6 +337,7 @@ class ImageViewerViewModel @Inject constructor(
         val subscription = when (imageItem) {
             is ImageItem.PublicNode ->
                 getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
+
             is ImageItem.ChatNode ->
                 getImageUseCase.get(
                     imageItem.chatRoomId,
@@ -336,10 +345,13 @@ class ImageViewerViewModel @Inject constructor(
                     fullSize,
                     highPriority
                 )
+
             is ImageItem.OfflineNode ->
                 getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
+
             is ImageItem.Node ->
                 getImageUseCase.get(imageItem.handle, fullSize, highPriority)
+
             is ImageItem.File ->
                 getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
@@ -432,6 +444,7 @@ class ImageViewerViewModel @Inject constructor(
                             currentIndex == INVALID_POSITION -> {
                                 return@subscribeBy // Not found
                             }
+
                             changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW) -> {
                                 val hasSameParent = (changedNode.parentHandle != null
                                         && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
@@ -447,6 +460,7 @@ class ImageViewerViewModel @Inject constructor(
                                     dirtyNodeHandles.add(changedNode.handle)
                                 }
                             }
+
                             changedNode.hasChanged(MegaNode.CHANGE_TYPE_PARENT) -> {
                                 if (currentIndex != INVALID_POSITION) {
                                     val hasSameParent = (changedNode.parentHandle != null
@@ -456,11 +470,13 @@ class ImageViewerViewModel @Inject constructor(
                                     }
                                 }
                             }
+
                             changedNode.hasChanged(MegaNode.CHANGE_TYPE_REMOVED) -> {
                                 if (currentIndex != INVALID_POSITION) {
                                     items.removeAt(currentIndex)
                                 }
                             }
+
                             else -> {
                                 dirtyNodeHandles.add(changedNode.handle)
                             }
@@ -533,8 +549,10 @@ class ImageViewerViewModel @Inject constructor(
                     return // Nothing to update
                 newCurrentItemPosition != INVALID_POSITION ->
                     currentImageId.notifyObserver()
+
                 newCurrentItemPosition >= existingItems.size ->
                     currentImageId.value = newItems.last().id
+
                 currentItemPosition == 0 ->
                     currentImageId.value = newItems.first().id
             }
@@ -600,18 +618,25 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun copyNode(nodeHandle: Long, newParentHandle: Long) {
-        val node = getExistingNode(nodeHandle) ?: return
-
-        checkNameCollision(
-            node = node,
-            newParentHandle = newParentHandle,
-            type = NameCollisionType.COPY
-        ) {
-            copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
-                .subscribeAndComplete(
-                    completeAction = {
-                        snackBarMessage.value = context.getString(R.string.context_correctly_copied)
-                    }, errorAction = { error -> copyMoveException.value = error })
+        viewModelScope.launch {
+            checkForNameCollision(
+                nodeHandle = nodeHandle,
+                newParentHandle = newParentHandle,
+                type = NameCollisionType.COPY
+            ) {
+                runCatching {
+                    copyNodeUseCase(
+                        nodeToCopy = NodeId(nodeHandle),
+                        newNodeParent = NodeId(newParentHandle),
+                        newNodeName = null,
+                    )
+                }.onSuccess {
+                    snackBarMessage.value = context.getString(R.string.context_correctly_copied)
+                }.onFailure {
+                    copyMoveException.value = it
+                    Timber.e("Error not copied $it")
+                }
+            }
         }
     }
 
@@ -622,60 +647,76 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
     fun moveNode(nodeHandle: Long, newParentHandle: Long) {
-        val node = getExistingNode(nodeHandle) ?: return
-
-        checkNameCollision(
-            node = node,
-            newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVE
-        ) {
-            moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
-                .subscribeAndComplete(
-                    completeAction = {
+        viewModelScope.launch {
+            checkForNameCollision(
+                nodeHandle = nodeHandle,
+                newParentHandle = newParentHandle,
+                type = NameCollisionType.MOVE
+            ) {
+                viewModelScope.launch {
+                    runCatching {
+                        moveNodeUseCase(
+                            nodeToMove = NodeId(nodeHandle),
+                            newNodeParent = NodeId(newParentHandle),
+                        )
+                    }.onSuccess {
                         snackBarMessage.value = context.getString(R.string.context_correctly_moved)
-                    }, errorAction = { error -> copyMoveException.value = error }
-                )
+                    }.onFailure {
+                        Timber.d("Move node failure $it")
+                        copyMoveException.value = it
+                    }
+                }
+            }
         }
     }
 
     /**
      * Checks if there is a name collision before proceeding with the action.
      *
-     * @param node              Node to check the name collision.
+     * @param nodeHandle        Handle of the node to check the name collision.
      * @param newParentHandle   Handle of the parent folder in which the action will be performed.
-     * @param type              [NameCollisionType]
      * @param completeAction    Action to complete after checking the name collision.
      */
-    private fun checkNameCollision(
-        node: MegaNode,
+    private suspend fun checkForNameCollision(
+        nodeHandle: Long,
         newParentHandle: Long,
         type: NameCollisionType,
-        completeAction: (() -> Unit),
+        completeAction: suspend (() -> Unit),
     ) {
-        checkNameCollisionUseCase.check(
-            node = node,
-            parentHandle = newParentHandle,
-            type = type,
-            context = context,
-        ).observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { collisionResult -> collision.value = collisionResult },
-                onError = { error ->
-                    when (error) {
-                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> Timber.e(error)
-                    }
-                }
+        runCatching {
+            checkNameCollision(
+                nodeHandle = NodeId(nodeHandle),
+                parentHandle = NodeId(newParentHandle),
+                type = type,
             )
-            .addTo(composite)
+        }.onSuccess {
+            collision.value = it
+        }.onFailure {
+            when (it) {
+                is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                is MegaNodeException.ParentDoesNotExistException -> {
+                    snackBarMessage.value =
+                        context.getString(R.string.general_error)
+                }
+
+                else -> Timber.e(it)
+            }
+        }
     }
 
+    /**
+     * Move node to rubbish bin
+     */
     fun moveNodeToRubbishBin(nodeHandle: Long) {
-        moveNodeUseCase.moveToRubbishBin(nodeHandle)
-            .subscribeAndComplete(false) {
-                snackBarMessage.value =
-                    context.getString(R.string.context_correctly_moved_to_rubbish)
-            }
+        viewModelScope.launch {
+            runCatching { moveNodeToRubbishByHandle(NodeId(nodeHandle)) }
+                .onSuccess {
+                    snackBarMessage.value =
+                        context.getString(R.string.context_correctly_moved_to_rubbish)
+                }.onFailure {
+                    Timber.e("Move to rubbish bin failed $it")
+                }
+        }
     }
 
     fun removeNode(nodeHandle: Long) {
@@ -727,9 +768,6 @@ class ImageViewerViewModel @Inject constructor(
                 ?.id
         }
     }
-
-    private fun getExistingNode(nodeHandle: Long): MegaNode? =
-        images.value?.find { it.getNodeHandle() == nodeHandle }?.nodeItem?.node
 
     /**
      * Check if transfers are paused.

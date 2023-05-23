@@ -35,38 +35,6 @@ class MoveNodeUseCase @Inject constructor(
 ) {
 
     /**
-     * Moves a node to other location.
-     *
-     * @param handle        The identifier of the MegaNode to move.
-     * @param parentHandle  The parent MegaNode where the node has to be moved.
-     * @return Completable.
-     */
-    @Deprecated(
-        message = "This RXJava version has been deprecated in favour of [MoveNodeUseCase] use case",
-        replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.node.MoveNodeUseCase"),
-        level = DeprecationLevel.WARNING
-    )
-    fun move(handle: Long, parentHandle: Long): Completable =
-        Completable.fromCallable {
-            move(
-                getNodeUseCase.get(handle).blockingGetOrNull(),
-                getNodeUseCase.get(parentHandle).blockingGetOrNull()
-            ).blockingAwait()
-        }
-
-    /**
-     * Moves a node to other location.
-     *
-     * @param node          MegaNode to move.
-     * @param parentHandle  The parent MegaNode where the node has to be moved.
-     * @return Completable.
-     */
-    fun move(node: MegaNode, parentHandle: Long): Completable =
-        Completable.fromCallable {
-            move(node, getNodeUseCase.get(parentHandle).blockingGetOrNull()).blockingAwait()
-        }
-
-    /**
      * Moves a node to the Rubbish Bin.
      *
      * @param handle        The identifier of the MegaNode to move.

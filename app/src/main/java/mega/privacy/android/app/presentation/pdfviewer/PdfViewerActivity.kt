@@ -26,6 +26,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -36,14 +37,13 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
@@ -53,15 +53,8 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -110,9 +103,6 @@ import javax.inject.Inject
  * PDF viewer.
  *
  * @property passCodeFacade            [PasscodeCheck]
- * @property checkNameCollisionUseCase [CheckNameCollisionUseCase]
- * @property moveNodeUseCase           [MoveNodeUseCase]
- * @property copyNodeUseCase           [CopyNodeUseCase]
  * @property dbH                       [LegacyDatabaseHandler]
  * @property password                  Typed password
  * @property maxIntents                Max of intents for a wrong password.
@@ -128,15 +118,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
-
-    @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-
-    @Inject
-    lateinit var moveNodeUseCase: MoveNodeUseCase
-
-    @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -190,6 +171,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
+    private val viewModel by viewModels<PdfViewerViewModel>()
+
     override fun shouldSetStatusBarTextColor() = false
 
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -235,12 +218,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             isDeleteDialogShow = false
             handle = intent.getLongExtra("HANDLE", -1)
             uri = intent.data
-            Timber.d("URI pdf: %s", uri)
             if (uri == null) {
                 Timber.e("Uri null")
                 finish()
                 return
             }
+            Timber.d("URI pdf: $uri")
         }
 
         fromDownload = intent.getBooleanExtra("fromDownloadService", false)
@@ -344,8 +327,51 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
         setupView()
 
+        collectFLows()
         if (savedInstanceState == null) {
             runEnterAnimation(intent)
+        }
+    }
+
+    private fun collectFLows() {
+        collectFlow(viewModel.uiState) { pdfViewerState ->
+            with(pdfViewerState) {
+                if (snackBarMessage != null) {
+                    dismissAlertDialogIfExists(statusDialog)
+                    showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(snackBarMessage),
+                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                    )
+                    viewModel.onConsumeSnackBarMessage()
+                }
+                if (shouldFinishActivity) {
+                    finish()
+                }
+                if (nodeMoveError != null) {
+                    handleCopyMoveError(copyMoveError = nodeMoveError, isCopy = false)
+                    viewModel.onConsumeNodeMoveError()
+                }
+                if (nodeCopyError != null) {
+                    handleCopyMoveError(copyMoveError = nodeCopyError, isCopy = true)
+                    viewModel.onConsumeNodeCopyError()
+                }
+                if (nameCollision != null) {
+                    dismissAlertDialogIfExists(statusDialog)
+                    nameCollisionActivityContract?.launch(arrayListOf(nameCollision))
+                }
+            }
+        }
+    }
+
+    private fun handleCopyMoveError(copyMoveError: Throwable, isCopy: Boolean) {
+        dismissAlertDialogIfExists(statusDialog)
+        if (!manageCopyMoveException(copyMoveError)) {
+            showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                getString(if (isCopy) R.string.context_no_copied else R.string.context_no_moved),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
         }
     }
 
@@ -414,6 +440,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             isOffLine = true
             pathNavigation = intent.getStringExtra("pathNavigation")
         }
+
         Constants.FILE_LINK_ADAPTER -> {
             val serialize = intent.getStringExtra(Constants.EXTRA_SERIALIZE_STRING)
             if (serialize != null) {
@@ -423,6 +450,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             isOffLine = false
             fromChat = false
         }
+
         else -> {
             isOffLine = false
             pathNavigation = null
@@ -438,6 +466,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Timber.d("onNewIntent")
@@ -962,6 +991,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         moveMenuItem.isVisible = true
                         moveToTrashMenuItem.isVisible = true
                     }
+
                     MegaShare.ACCESS_READ -> Timber.d("Access read")
                     MegaShare.ACCESS_READWRITE -> {
                         Timber.d("Access read & write")
@@ -969,6 +999,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         moveMenuItem.isVisible = false
                         moveToTrashMenuItem.isVisible = false
                     }
+
                     else -> {}
                 }
             } else if (type == Constants.RECENTS_ADAPTER) {
@@ -985,11 +1016,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         moveMenuItem.isVisible = false
                         moveToTrashMenuItem.isVisible = false
                     }
+
                     MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
                         renameMenuItem.isVisible = true
                         moveMenuItem.isVisible = true
                         moveToTrashMenuItem.isVisible = true
                     }
+
                     else -> {}
                 }
             } else {
@@ -1080,12 +1113,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                             moveToTrashMenuItem.isVisible = true
                             chatMenuItem.isVisible = true
                         }
+
                         MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ -> {
                             renameMenuItem.isVisible = false
                             moveMenuItem.isVisible = false
                             moveToTrashMenuItem.isVisible = false
                             chatMenuItem.isVisible = false
                         }
+
                         else -> {}
                     }
                 } else {
@@ -1116,6 +1151,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
             }
+
             R.id.pdf_viewer_share -> {
                 if (type == Constants.ZIP_ADAPTER) {
                     FileUtil.shareFile(this, File(uri.toString()))
@@ -1127,15 +1163,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     shareNode(this, megaApi.getNodeByHandle(handle))
                 }
             }
-            R.id.pdf_viewer_download -> {
-                download()
-            }
-            R.id.pdf_viewer_chat -> {
-                nodeAttacher.attachNode(handle)
-            }
-            R.id.pdf_viewer_properties -> {
-                showPropertiesActivity()
-            }
+
+            R.id.pdf_viewer_download -> download()
+
+            R.id.pdf_viewer_chat -> nodeAttacher.attachNode(handle)
+
+            R.id.pdf_viewer_properties -> showPropertiesActivity()
+
             R.id.pdf_viewer_get_link -> {
                 if (showTakenDownNodeActionNotAvailableDialog(
                         megaApi.getNodeByHandle(handle),
@@ -1146,6 +1180,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 }
                 LinksUtil.showGetLinkActivity(this, handle)
             }
+
             R.id.pdf_viewer_remove_link -> {
                 if (showTakenDownNodeActionNotAvailableDialog(
                         megaApi.getNodeByHandle(handle),
@@ -1156,23 +1191,21 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 }
                 showRemoveLink()
             }
+
             R.id.pdf_viewer_rename -> {
                 showRenameNodeDialog(this, megaApi.getNodeByHandle(handle), this, this)
             }
-            R.id.pdf_viewer_move -> {
-                showMove()
-            }
-            R.id.pdf_viewer_copy -> {
-                showCopy()
-            }
+
+            R.id.pdf_viewer_move -> showMove()
+
+            R.id.pdf_viewer_copy -> showCopy()
+
             R.id.pdf_viewer_move_to_trash, R.id.pdf_viewer_remove -> {
                 moveToRubbishOrRemove(handle, this, this)
             }
-            R.id.chat_pdf_viewer_import -> {
-                if (node != null) {
-                    importNode()
-                }
-            }
+
+            R.id.chat_pdf_viewer_import -> importNode()
+
             R.id.chat_pdf_viewer_save_for_offline -> {
                 if (chatC == null) {
                     chatC = ChatController(this)
@@ -1185,6 +1218,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     )
                 }
             }
+
             R.id.chat_pdf_viewer_remove -> {
                 if (msgChat != null && chatId != -1L) {
                     showConfirmationDeleteNode(chatId, msgChat)
@@ -1195,10 +1229,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     }
 
     private fun importNode() {
-        Timber.d("importNode")
-        val intent = Intent(this, FileExplorerActivity::class.java)
-        intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER)
+        node?.let {
+            Timber.d("importNode")
+            val intent = Intent(this, FileExplorerActivity::class.java)
+            intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
+            startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER)
+        }
     }
 
     private fun showConfirmationDeleteNode(chatId: Long, message: MegaChatMessage?) {
@@ -1214,6 +1250,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                         isDeleteDialogShow = false
                         finish()
                     }
+
                     DialogInterface.BUTTON_NEGATIVE ->                     //No button clicked
                         isDeleteDialogShow = false
                 }
@@ -1237,7 +1274,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         for (i in handleList.indices) {
             longArray[i] = handleList[i]
         }
-        intent.putExtra("COPY_FROM", longArray)
+        intent.putExtra(Constants.INTENT_EXTRA_KEY_COPY_FROM, longArray)
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY)
     }
 
@@ -1251,7 +1288,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         for (i in handleList.indices) {
             longArray[i] = handleList[i]
         }
-        intent.putExtra("MOVE_FROM", longArray)
+        intent.putExtra(Constants.INTENT_EXTRA_KEY_MOVE_FROM, longArray)
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE)
     }
 
@@ -1328,7 +1365,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         if (pdfFileName != null && handle != -1L) {
             file = megaApi.getNodeByHandle(handle)
             if (file != null) {
-                Timber.d("Pdf File: %s node file: %s", pdfFileName, file.name)
+                Timber.d("Pdf File: $pdfFileName node file: ${file.name}")
                 if (pdfFileName != file.name) {
                     Timber.d("Update File")
                     pdfFileName = file.name
@@ -1357,104 +1394,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
     }
 
-    /**
-     * Checks if there is a name collision before moving or copying the node.
-     *
-     * @param parentHandle Parent handle of the node in which the node will be moved or copied.
-     * @param type         Type of name collision to check.
-     */
-    private fun checkCollision(parentHandle: Long, type: NameCollisionType) = node?.let {
-        checkNameCollisionUseCase.check(
-            node = it,
-            parentHandle = parentHandle,
-            type = type,
-            context = this
-        )
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { collision: NameCollision ->
-                    dismissAlertDialogIfExists(statusDialog)
-                    val list = ArrayList<NameCollision>()
-                    list.add(collision)
-                    nameCollisionActivityContract?.launch(list)
-                }
-            ) { throwable: Throwable? ->
-                if (throwable is ParentDoesNotExistException) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.general_error),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                } else if (throwable is ChildDoesNotExistsException) {
-                    if (type === NameCollisionType.MOVE) {
-                        move(parentHandle)
-                    } else {
-                        copy(parentHandle)
-                    }
-                }
-            }
-    }
-
-    /**
-     * Moves the node.
-     *
-     * @param parentHandle Parent handle in which the node will be moved.
-     */
-    private fun move(parentHandle: Long) = node?.let {
-        moveNodeUseCase.move(it, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.context_correctly_moved),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-                finish()
-            }
-            ) { throwable: Throwable? ->
-                dismissAlertDialogIfExists(statusDialog)
-                if (!manageCopyMoveException(throwable)) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.context_no_moved),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-    }
-
-    /**
-     * Copies the node.
-     *
-     * @param parentHandle Parent handle in which the node will be copied.
-     */
-    private fun copy(parentHandle: Long) = node?.let {
-        copyNodeUseCase.copy(it, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-                dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    getString(R.string.context_correctly_copied),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-            }
-            ) { throwable: Throwable? ->
-                dismissAlertDialogIfExists(statusDialog)
-                if (!manageCopyMoveException(throwable)) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.context_no_copied),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
         Timber.d("onActivityResult: ${requestCode}____$resultCode")
@@ -1476,7 +1415,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 )
                 return
             }
-            val toHandle = intent.getLongExtra("MOVE_TO", 0)
+            val toHandle = intent.getLongExtra(Constants.INTENT_EXTRA_KEY_MOVE_TO, 0)
             val temp: AlertDialog
             try {
                 temp = createProgressDialog(this, getString(R.string.context_moving))
@@ -1485,7 +1424,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 return
             }
             statusDialog = temp
-            checkCollision(toHandle, NameCollisionType.MOVE)
+            node?.let { megaNode ->
+                viewModel.moveNode(nodeHandle = megaNode.handle, newParentHandle = toHandle)
+            }
         } else if (requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == RESULT_OK) {
             if (!Util.isOnline(this)) {
                 showSnackbar(
@@ -1495,7 +1436,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 )
                 return
             }
-            val toHandle = intent.getLongExtra("COPY_TO", 0)
+            val toHandle = intent.getLongExtra(Constants.INTENT_EXTRA_KEY_COPY_TO, 0)
             val temp: AlertDialog
             try {
                 temp = createProgressDialog(this, getString(R.string.context_copying))
@@ -1504,7 +1445,9 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 return
             }
             statusDialog = temp
-            checkCollision(toHandle, NameCollisionType.COPY)
+            node?.let { megaNode ->
+                viewModel.copyNode(nodeHandle = megaNode.handle, newParentHandle = toHandle)
+            }
         } else if (requestCode == Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK) {
             Timber.d("REQUEST_CODE_SELECT_IMPORT_FOLDER OK")
             if (!Util.isOnline(this)) {
@@ -1520,13 +1463,15 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 )
                 return
             }
-            val toHandle = intent.getLongExtra("IMPORT_TO", 0)
-            checkCollision(toHandle, NameCollisionType.COPY)
+            val toHandle = intent.getLongExtra(Constants.INTENT_EXTRA_KEY_IMPORT_TO, 0)
+            node?.let { megaNode ->
+                viewModel.copyNode(nodeHandle = megaNode.handle, newParentHandle = toHandle)
+            }
         }
     }
 
     override fun onPageChanged(page: Int, pageCount: Int) {
-        Timber.d("page: %d, pageCount: %d", page, pageCount)
+        Timber.d("page: $page, pageCount: $pageCount")
         if (!notChangePage) {
             currentPage = page + 1
             title = "$pdfFileName $currentPage / $pageCount"

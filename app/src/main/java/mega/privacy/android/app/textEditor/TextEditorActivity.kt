@@ -92,7 +92,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         private const val CURSOR_POSITION = "CURSOR_POSITION"
         private const val DISCARD_CHANGES_SHOWN = "DISCARD_CHANGES_SHOWN"
         private const val RENAME_SHOWN = "RENAME_SHOWN"
-        const val TIME_SHOWING_PAGINATION_UI = 4000L
+        private const val TIME_SHOWING_PAGINATION_UI = 4000L
         private const val STATE = "STATE"
         private const val STATE_SHOWN = 0
         private const val STATE_HIDDEN = 1
@@ -268,10 +268,12 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 this,
                 intent.getBooleanExtra(FROM_HOME_PAGE, false)
             )
+
             R.id.action_download -> {
                 checkNotificationsPermission(this)
                 viewModel.downloadFile(nodeSaver)
             }
+
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
             R.id.action_share -> viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
@@ -284,6 +286,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 this,
                 this
             )
+
             R.id.chat_action_import -> importNode()
             R.id.chat_action_save_for_offline -> {
                 checkNotificationsPermission(this)
@@ -295,6 +298,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     this
                 )
             }
+
             R.id.chat_action_remove -> removeAttachmentMessage(
                 this,
                 viewModel.getChatRoom()!!.chatId,
@@ -322,19 +326,26 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.copyNode(toHandle, this)
+                viewModel.getNode()?.handle?.let {
+                    viewModel.copyNode(it, toHandle)
+                }
             }
+
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.moveNode(toHandle, this)
+                viewModel.getNode()?.handle?.let {
+                    viewModel.moveNode(it, toHandle)
+                }
             }
+
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_COPY_TO, INVALID_HANDLE)
                     ?: return
-
-                viewModel.copyNode(toHandle, this)
+                viewModel.getNode()?.handle?.let {
+                    viewModel.copyNode(it, toHandle)
+                }
             }
         }
     }
@@ -383,17 +394,20 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                     menu.findItem(R.id.action_remove).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
+
                 FILE_LINK_ADAPTER, ZIP_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     menu.findItem(R.id.action_share).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
+
                 FOLDER_LINK_ADAPTER, VERSIONS_ADAPTER -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
                     updateLineNumbersMenuOption(menu.findItem(R.id.action_line_numbers))
                 }
+
                 FROM_CHAT -> {
                     menu.toggleAllMenuItemsVisibility(false)
                     menu.findItem(R.id.action_download).isVisible = true
@@ -410,6 +424,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                         menu.findItem(R.id.chat_action_remove).isVisible = true
                     }
                 }
+
                 else -> {
                     if (megaApi.isInRubbish(viewModel.getNode())) {
                         menu.toggleAllMenuItemsVisibility(false)
@@ -422,16 +437,18 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
                     when (viewModel.getNodeAccess()) {
                         MegaShare.ACCESS_OWNER -> {
-                            if (viewModel.getNode()!!.isExported) {
+                            if (viewModel.getNode()?.isExported == true) {
                                 menu.findItem(R.id.action_get_link).isVisible = false
                             } else {
                                 menu.findItem(R.id.action_remove_link).isVisible = false
                             }
                         }
+
                         MegaShare.ACCESS_FULL -> {
                             menu.findItem(R.id.action_get_link).isVisible = false
                             menu.findItem(R.id.action_remove_link).isVisible = false
                         }
+
                         MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                             menu.findItem(R.id.action_remove).isVisible = false
                             menu.findItem(R.id.action_move).isVisible = false
@@ -570,8 +587,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         viewModel.getFileName().observe(this, ::showFileName)
         viewModel.getMode().observe(this, ::showMode)
         viewModel.onContentTextRead().observe(this, ::showContentRead)
-        viewModel.onSnackbarMessage().observe(this) { message ->
-            showSnackbar(message)
+        viewModel.onSnackBarMessage().observe(this) { message ->
+            showSnackbar(getString(message))
         }
         viewModel.getCollision().observe(this) { collision ->
             nameCollisionActivityContract?.launch(arrayListOf(collision))
@@ -869,6 +886,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     /**
      * Shows pagination UI elements and leaves them visible for TIME_SHOWING_PAGINATION_UI.
      */
+    @SuppressLint("StringFormatMatches")
     private fun animatePaginationUI() {
         if (!viewModel.isViewMode() || countDownTimer != null) {
             return
@@ -962,9 +980,11 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 binding.fileEditorToolbar.setBackgroundColor(transparentColor)
                 binding.appBar.elevation = 0f
             }
+
             isDarkMode(this) -> {
                 binding.fileEditorToolbar.setBackgroundColor(toolbarElevationColor)
             }
+
             else -> {
                 binding.fileEditorToolbar.setBackgroundColor(transparentColor)
                 binding.appBar.elevation = elevation
@@ -981,7 +1001,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     private fun manageException(throwable: Throwable) {
         if (!manageCopyMoveException(throwable) && throwable is MegaException) {
-            showSnackbar(throwable.message!!)
+            throwable.message?.let { showSnackbar(it) }
         }
     }
 

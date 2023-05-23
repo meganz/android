@@ -5,35 +5,35 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @ExperimentalCoroutinesApi
@@ -48,23 +48,24 @@ internal class MediaPlayerViewModelTest {
     private val expectedId = 123456L
     private val expectedName = "testName"
     private val expectedUrl = "test url"
-
-    private val copyNodeUseCase = mock<CopyNodeUseCase>()
+    private lateinit var checkNameCollision: CheckNameCollision
+    private lateinit var copyNodeUseCase: CopyNodeUseCase
+    private lateinit var moveNodeUseCase: MoveNodeUseCase
 
     @BeforeAll
     fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher())
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
     }
-
-    private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
 
     @BeforeEach
     fun setUp() {
+        checkNameCollision = mock()
+        copyNodeUseCase = mock()
+        moveNodeUseCase = mock()
         underTest = MediaPlayerViewModel(
-            checkNameCollisionUseCase = checkNameCollisionUseCase,
+            checkNameCollision = checkNameCollision,
             copyNodeUseCase = copyNodeUseCase,
-            moveNodeUseCase = mock(),
+            moveNodeUseCase = moveNodeUseCase,
             ioDispatcher = UnconfinedTestDispatcher(),
             sendStatisticsMediaPlayerUseCase = mock(),
             savedStateHandle = savedStateHandle
@@ -128,8 +129,8 @@ internal class MediaPlayerViewModelTest {
                 parentName = null
             )
         )
+        advanceUntilIdle()
         underTest.state.test {
-            awaitItem()
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isTrue()
@@ -162,8 +163,8 @@ internal class MediaPlayerViewModelTest {
                 parentName = null
             )
         )
+        advanceUntilIdle()
         underTest.state.test {
-            awaitItem()
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isTrue()
@@ -198,75 +199,108 @@ internal class MediaPlayerViewModelTest {
     }
 
     @Test
-    internal fun `test that successful node copy returns success message`() = runTest {
-        val nodeHandle = 1234L
-        val newParentHandle = 5432L
-
-        checkNameCollisionUseCase.stub {
-            on {
-                check(
-                    handle = eq(nodeHandle),
-                    parentHandle = eq(newParentHandle),
-                    type = any(),
-                    context = any()
+    internal fun `test copy complete snack bar is shown when file is copied to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNameCollision(
+                    nodeHandle = NodeId(selectedNode),
+                    parentHandle = NodeId(newParentNode),
+                    type = NameCollisionType.COPY,
                 )
-            }.thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
-        }
-
-        copyNodeUseCase.stub {
-            onBlocking {
-                invoke(
-                    nodeToCopy = NodeId(nodeHandle),
-                    newNodeParent = NodeId(newParentHandle),
-                    newNodeName = null
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
+            whenever(
+                copyNodeUseCase(
+                    nodeToCopy = NodeId(selectedNode),
+                    newNodeParent = NodeId(newParentNode), newNodeName = null
                 )
-            }.thenReturn(NodeId(432L))
+            ).thenReturn(NodeId(selectedNode))
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            testScheduler.advanceUntilIdle()
+            underTest.onSnackbarMessage().test().assertValue(R.string.context_correctly_copied)
         }
-
-        underTest.copyNode(
-            node = null,
-            nodeHandle = nodeHandle,
-            newParentHandle = newParentHandle,
-            mock(),
-        )
-        testScheduler.advanceUntilIdle()
-        underTest.onSnackbarMessage().test().assertHasValue()
-    }
 
     @Test
-    internal fun `test that failed node copy returns failed message`() = runTest {
-        val nodeHandle = 1234L
-        val newParentHandle = 5432L
-
-        checkNameCollisionUseCase.stub {
-            on {
-                check(
-                    handle = eq(nodeHandle),
-                    parentHandle = eq(newParentHandle),
-                    type = any(),
-                    context = any()
+    internal fun `test that onExceptionThrown is triggered when copy failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNameCollision(
+                    nodeHandle = NodeId(selectedNode),
+                    parentHandle = NodeId(newParentNode),
+                    type = NameCollisionType.COPY,
                 )
-            }.thenReturn(Single.error(MegaNodeException.ChildDoesNotExistsException()))
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
+            val runtimeException = RuntimeException("Copy node failed")
+            whenever(
+                copyNodeUseCase(
+                    nodeToCopy = NodeId(selectedNode),
+                    newNodeParent = NodeId(newParentNode), newNodeName = null
+                )
+            ).thenAnswer { throw runtimeException }
+            underTest.copyNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onExceptionThrown().test().assertValue(runtimeException)
         }
 
-        val runtimeException = RuntimeException("Copy node failed")
-        copyNodeUseCase.stub {
-            onBlocking {
-                invoke(
-                    nodeToCopy = NodeId(nodeHandle),
-                    newNodeParent = NodeId(newParentHandle),
-                    newNodeName = null
+    @Test
+    internal fun `test move complete snack bar is shown when file is moved to different directory`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNameCollision(
+                    nodeHandle = NodeId(selectedNode),
+                    parentHandle = NodeId(newParentNode),
+                    type = NameCollisionType.MOVE,
                 )
-            }.thenAnswer { throw runtimeException }
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
+            whenever(
+                moveNodeUseCase(
+                    nodeToMove = NodeId(selectedNode),
+                    newNodeParent = NodeId(newParentNode)
+                )
+            ).thenReturn(NodeId(selectedNode))
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onSnackbarMessage().test().assertValue(R.string.context_correctly_moved)
         }
 
-        underTest.copyNode(
-            node = null,
-            nodeHandle = nodeHandle,
-            newParentHandle = newParentHandle,
-            mock(),
-        )
-        testScheduler.advanceUntilIdle()
-        underTest.onExceptionThrown().test().assertValue(runtimeException)
-    }
+    @Test
+    internal fun `test that onExceptionThrown is triggered when move failed`() =
+        runTest {
+            val selectedNode = 73248538798194
+            val newParentNode = 158401030174851
+            whenever(
+                checkNameCollision(
+                    nodeHandle = NodeId(selectedNode),
+                    parentHandle = NodeId(newParentNode),
+                    type = NameCollisionType.MOVE,
+                )
+            ).thenThrow(MegaNodeException.ChildDoesNotExistsException())
+            val runtimeException = RuntimeException("Move node failed")
+            whenever(
+                moveNodeUseCase(
+                    nodeToMove = NodeId(selectedNode),
+                    newNodeParent = NodeId(newParentNode)
+                )
+            ).thenThrow(runtimeException)
+            underTest.moveNode(
+                nodeHandle = selectedNode,
+                newParentHandle = newParentNode,
+            )
+            advanceUntilIdle()
+            underTest.onExceptionThrown().test().assertValue(runtimeException)
+        }
 }

@@ -77,7 +77,7 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * View Model for [mega.privacy.android.app.main.ContactInfoActivity]
+ * View Model for [ContactInfoActivity]
  *
  * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
  * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]

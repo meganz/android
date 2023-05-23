@@ -26,12 +26,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -69,9 +68,12 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ViewerNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.DownloadBackgroundFile
+import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -97,7 +99,7 @@ import javax.inject.Inject
  * @property megaApi                    Needed to manage nodes.
  * @property megaApiFolder              Needed to manage folder link nodes.
  * @property megaChatApi                Needed to get text file info from chats.
- * @property checkNameCollisionUseCase  UseCase required to check name collisions.
+ * @property checkNameCollision         UseCase required to check name collisions.
  * @property moveNodeUseCase            UseCase required to move nodes.
  * @property copyNodeUseCase            UseCase required to copy nodes.
  * @property downloadBackgroundFile     Use case for downloading the file in background if required.
@@ -108,6 +110,7 @@ class TextEditorViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @MegaApiFolder private val megaApiFolder: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
+    private val checkNameCollision: CheckNameCollision,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
@@ -130,7 +133,7 @@ class TextEditorViewModel @Inject constructor(
     private val mode: MutableLiveData<String> = MutableLiveData()
     private val fileName: MutableLiveData<String> = MutableLiveData()
     private val pagination: MutableLiveData<Pagination> = MutableLiveData()
-    private val snackbarMessage = SingleLiveEvent<String>()
+    private val snackBarMessage = SingleLiveEvent<Int>()
     private val fatalError = SingleLiveEvent<Unit>()
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
@@ -152,7 +155,7 @@ class TextEditorViewModel @Inject constructor(
 
     fun onContentTextRead(): LiveData<Pagination> = pagination
 
-    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+    fun onSnackBarMessage(): LiveData<Int> = snackBarMessage
 
     fun getCollision(): LiveData<NameCollision> = collision
 
@@ -671,28 +674,26 @@ class TextEditorViewModel @Inject constructor(
      *
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun copyNode(newParentHandle: Long, context: Context) {
-        checkNameCollision(
-            newParentHandle = newParentHandle,
-            type = NameCollisionType.COPY,
-            context = context,
-        ) {
-            copyNodeUseCase.copy(
-                node = getNode(),
-                parentHandle = newParentHandle
-            ).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        snackbarMessage.value =
-                            context.getString(R.string.context_correctly_copied)
-                    },
-                    onError = { error ->
-                        throwable.value = error
-                        Timber.e(error, "Not copied: ")
-                    }
-                )
-                .addTo(composite)
+    fun copyNode(nodeHandle: Long, newParentHandle: Long) {
+        viewModelScope.launch {
+            checkForNameCollision(
+                nodeHandle = nodeHandle,
+                newParentHandle = newParentHandle,
+                type = NameCollisionType.COPY
+            ) {
+                runCatching {
+                    copyNodeUseCase(
+                        nodeToCopy = NodeId(nodeHandle),
+                        newNodeParent = NodeId(newParentHandle),
+                        newNodeName = null,
+                    )
+                }.onSuccess {
+                    snackBarMessage.value = R.string.context_correctly_copied
+                }.onFailure {
+                    throwable.value = it
+                    Timber.e("Error not copied $it")
+                }
+            }
         }
     }
 
@@ -701,60 +702,61 @@ class TextEditorViewModel @Inject constructor(
      *
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
-    fun moveNode(newParentHandle: Long, context: Context) {
-        checkNameCollision(
-            newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVE,
-            context = context
-        ) {
-            moveNodeUseCase.move(
-                handle = getNode()?.handle ?: return@checkNameCollision,
-                parentHandle = newParentHandle
-            ).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        snackbarMessage.value =
-                            context.getString(R.string.context_correctly_moved)
-                    },
-                    onError = { error ->
-                        throwable.value = error
-                        Timber.e(error, "Not moved: ")
+    fun moveNode(nodeHandle: Long, newParentHandle: Long) {
+        viewModelScope.launch {
+            checkForNameCollision(
+                nodeHandle = nodeHandle,
+                newParentHandle = newParentHandle,
+                type = NameCollisionType.MOVE,
+            ) {
+                viewModelScope.launch {
+                    runCatching {
+                        moveNodeUseCase(
+                            nodeToMove = NodeId(nodeHandle),
+                            newNodeParent = NodeId(newParentHandle)
+                        )
+                    }.onSuccess {
+                        snackBarMessage.value = R.string.context_correctly_moved
+                    }.onFailure {
+                        throwable.value = it
+                        Timber.e("Not moved: $it")
                     }
-                )
-                .addTo(composite)
+                }
+            }
         }
     }
 
     /**
      * Checks if there is a name collision before proceeding with the action.
      *
+     * @param nodeHandle        Handle of the node to check the name collision.
      * @param newParentHandle   Handle of the parent folder in which the action will be performed.
-     * @param type              [NameCollisionType]
      * @param completeAction    Action to complete after checking the name collision.
      */
-    private fun checkNameCollision(
+    private suspend fun checkForNameCollision(
+        nodeHandle: Long,
         newParentHandle: Long,
         type: NameCollisionType,
-        context: Context,
-        completeAction: (() -> Unit),
+        completeAction: suspend (() -> Unit),
     ) {
-        checkNameCollisionUseCase.check(
-            handle = getNode()?.handle ?: return,
-            parentHandle = newParentHandle,
-            type = type,
-            context = context,
-        ).observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { collisionResult -> collision.value = collisionResult },
-                onError = { error ->
-                    when (error) {
-                        is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
-                        else -> Timber.e(error)
-                    }
-                }
+        runCatching {
+            checkNameCollision(
+                nodeHandle = NodeId(nodeHandle),
+                parentHandle = NodeId(newParentHandle),
+                type = type,
             )
-            .addTo(composite)
+        }.onSuccess {
+            collision.value = it
+        }.onFailure {
+            when (it) {
+                is MegaNodeException.ChildDoesNotExistsException -> completeAction.invoke()
+                is MegaNodeException.ParentDoesNotExistException -> {
+                    snackBarMessage.value = R.string.general_error
+                }
+
+                else -> Timber.e(it)
+            }
+        }
     }
 
     /**
