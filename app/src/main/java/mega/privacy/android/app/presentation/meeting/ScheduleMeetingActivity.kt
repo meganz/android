@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.meeting
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.format.DateFormat
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,6 +36,9 @@ import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.TimeZone
 import javax.inject.Inject
 
 /**
@@ -156,14 +158,22 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         this.startActivity(intentOpenChat)
     }
 
+    /**
+     * Show date picker
+     *
+     * @param isStart
+     */
     private fun showDatePicker(isStart: Boolean) {
         val currentState = viewModel.state.value
         val currentDate = if (isStart) currentState.startDate else currentState.endDate
         val dateValidator = if (isStart) {
             DateValidatorPointForward.now()
         } else {
-            DateValidatorPointForward.from(currentState.startDate.toEpochMilli())
+            DateValidatorPointForward.from(currentState.startDate.toInstant().toEpochMilli())
         }
+
+        val milliseconds = currentDate.toInstant().toEpochMilli()
+        val selection = milliseconds + TimeZone.getDefault().getOffset(milliseconds)
 
         MaterialDatePicker.Builder.datePicker()
             .setTheme(R.style.MaterialCalendarTheme)
@@ -171,51 +181,71 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             .setNegativeButtonText(getString(R.string.button_cancel))
             .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
             .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
-            .setSelection(currentDate.toEpochMilli())
+            .setSelection(selection)
             .setCalendarConstraints(
                 CalendarConstraints.Builder().setValidator(dateValidator).build()
             )
             .build()
             .apply {
                 addOnPositiveButtonClickListener { selection ->
-                    val updatedDate = Instant.ofEpochMilli(selection)
+                    val selectedDate =
+                        ZonedDateTime.from(
+                            Instant.ofEpochMilli(selection).atZone(ZoneId.systemDefault())
+                        )
+
                     if (isStart) {
-                        viewModel.setStartDate(updatedDate)
+                        viewModel.setStartDateTime(selectedDate, true)
                     } else {
-                        viewModel.setEndDate(updatedDate)
+                        viewModel.setEndDateTime(selectedDate, true)
                     }
                 }
                 show(supportFragmentManager, "DatePicker")
             }
     }
 
+    /**
+     * Show time picker
+     *
+     * @param isStart
+     */
     private fun showTimePicker(isStart: Boolean) {
         val currentState = viewModel.state.value
-        val currentDate = (if (isStart) currentState.startDate else currentState.endDate)
-            .atZone(ZoneId.systemDefault())
+        val currentDate = if (isStart) currentState.startDate else currentState.endDate
+        val hourFormatter =
+            DateTimeFormatter
+                .ofPattern("HH")
+                .withZone(ZoneId.systemDefault())
+
+        val minuteFormatter =
+            DateTimeFormatter
+                .ofPattern("mm")
+                .withZone(ZoneId.systemDefault())
+
+        val hourText = hourFormatter.format(currentDate)
+        val minuteText = minuteFormatter.format(currentDate)
 
         MaterialTimePicker.Builder()
             .setTheme(R.style.MaterialTimerTheme)
             .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
             .setTimeFormat(
-                if (DateFormat.is24HourFormat(this))
+                if (viewModel.is24HourFormat)
                     TimeFormat.CLOCK_24H
                 else
                     TimeFormat.CLOCK_12H
             )
-            .setHour(currentDate.hour)
-            .setMinute(currentDate.minute)
+            .setHour(hourText.toInt())
+            .setMinute(minuteText.toInt())
             .setPositiveButtonText(getString(R.string.general_ok))
             .setNegativeButtonText(getString(R.string.button_cancel))
             .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
             .build()
             .apply {
                 addOnPositiveButtonClickListener {
-                    val updatedDate = currentDate.withHour(hour).withMinute(minute).toInstant()
+                    val selectedTime = currentDate.withHour(hour).withMinute(minute)
                     if (isStart) {
-                        viewModel.setStartDate(updatedDate)
+                        viewModel.setStartDateTime(selectedTime, false)
                     } else {
-                        viewModel.setEndDate(updatedDate)
+                        viewModel.setEndDateTime(selectedTime, false)
                     }
                 }
                 show(supportFragmentManager, "TimePicker")

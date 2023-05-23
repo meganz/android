@@ -319,6 +319,7 @@ private fun ActionButton(
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.AddDescription,
                     -> false
+
                     else -> true
                 }
             )
@@ -329,6 +330,7 @@ private fun ActionButton(
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.SendCalendarInvite,
                     -> true
+
                     else -> false
                 }
             )
@@ -473,11 +475,13 @@ private fun ActionOption(
                     ScheduleMeetingAction.MeetingLink -> action.description?.let { description ->
                         subtitle = stringResource(id = description)
                     }
+
                     ScheduleMeetingAction.AddParticipants -> if (state.numOfParticipants > 1) subtitle =
                         stringResource(
                             id = R.string.number_of_participants,
                             state.numOfParticipants
                         )
+
                     ScheduleMeetingAction.Recurrence -> subtitle = when (state.freq) {
                         OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
                         OccurrenceFrequencyType.Daily,

@@ -5,6 +5,8 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 
 /**
@@ -36,8 +38,9 @@ data class ScheduleMeetingState constructor(
     val chatIdToOpenInfoScreen: Long? = null,
     val meetingTitle: String = "",
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
-    val startDate: Instant = Instant.now(),
-    val endDate: Instant = Instant.now().plus(30, ChronoUnit.MINUTES),
+    val startDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
+    val endDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
+        .plus(30, ChronoUnit.MINUTES),
     val participantItemList: List<ContactItem> = emptyList(),
     val enabledMeetingLinkOption: Boolean = false,
     val enabledAllowAddParticipantsOption: Boolean = true,

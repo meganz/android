@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -14,11 +13,17 @@ import java.time.format.DateTimeFormatter
  * @return True, if it's today. False, if not.
  */
 fun ChatScheduledMeeting.isToday(): Boolean {
-    this.getZoneStartTime()?.let {
-        return it.toLocalDate() == LocalDate.now(ZoneId.systemDefault())
-    }
+    val startZonedDateTime = this.getZoneStartTime() ?: return false
 
-    return false
+    val today = Instant.now()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+
+    val startDate = startZonedDateTime.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+
+    return startDate.isEqual(today)
 }
 
 /**
@@ -27,11 +32,16 @@ fun ChatScheduledMeeting.isToday(): Boolean {
  * @return True, if it's tomorrow. False, if not.
  */
 fun ChatScheduledMeeting.isTomorrow(): Boolean {
-    this.getZoneStartTime()?.let {
-        return it.toLocalDate() == LocalDate.now(ZoneId.systemDefault()).plusDays(1)
-    }
+    val startZonedDateTime = this.getZoneStartTime() ?: return false
+    val tomorrow = Instant.now()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate().plusDays(1)
 
-    return false
+    val startDate = startZonedDateTime.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+
+    return startDate.isEqual(tomorrow)
 }
 
 /**
@@ -43,7 +53,7 @@ fun ChatScheduledMeeting.isTomorrow(): Boolean {
 fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String =
     this.startDateTime?.let { startDate ->
         val hourFormatter = getHourFormatter(is24HourFormat)
-        return hourFormatter.format(startDate.parseDate())
+        return hourFormatter.format(startDate.parseUTCDate())
     } ?: ""
 
 /**
@@ -55,7 +65,7 @@ fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String =
 fun ChatScheduledMeeting.getEndTime(is24HourFormat: Boolean): String =
     this.endDateTime?.let { endDate ->
         val hourFormatter = getHourFormatter(is24HourFormat)
-        return hourFormatter.format(endDate.parseDate())
+        return hourFormatter.format(endDate.parseUTCDate())
     } ?: ""
 
 /**
@@ -66,7 +76,7 @@ fun ChatScheduledMeeting.getEndTime(is24HourFormat: Boolean): String =
 fun ChatScheduledMeeting.getCompleteStartDate(): String =
     this.startDateTime?.let { start ->
         val dateFormatter = getCompleteDateFormatter()
-        return dateFormatter.format(start.parseDate())
+        return dateFormatter.format(start.parseUTCDate())
     } ?: ""
 
 /**
@@ -77,7 +87,7 @@ fun ChatScheduledMeeting.getCompleteStartDate(): String =
 fun ChatScheduledMeeting.getStartDate(): String =
     this.startDateTime?.let { start ->
         val dateFormatter = getDateFormatter()
-        return dateFormatter.format(start.parseDate())
+        return dateFormatter.format(start.parseUTCDate())
     } ?: ""
 
 /**
@@ -95,7 +105,7 @@ fun ChatScheduledMeeting.getEndDate(): String {
     }
 
     this.endDateTime?.let { end ->
-        return dateFormatter.format(end.parseDate())
+        return dateFormatter.format(end.parseUTCDate())
     }
 
     return ""
@@ -106,7 +116,7 @@ fun ChatScheduledMeeting.getEndDate(): String {
  *
  * @return [ZonedDateTime]
  */
-fun ChatScheduledMeeting.getZoneStartTime(): ZonedDateTime? = startDateTime?.parseDate()
+fun ChatScheduledMeeting.getZoneStartTime(): ZonedDateTime? = startDateTime?.parseUTCDate()
 
 /**
  * Check if the scheduled meeting is past
@@ -122,11 +132,11 @@ fun ChatScheduledMeeting.isPast(): Boolean {
         .withZoneSameInstant(ZoneOffset.UTC)
 
     this.rules?.let { rules ->
-        return now.isAfter(rules.until.parseDate())
+        return now.isAfter(rules.until.parseUTCDate())
     }
 
     this.endDateTime?.let { endDateTime ->
-        return now.isAfter(endDateTime.parseDate())
+        return now.isAfter(endDateTime.parseUTCDate())
     }
 
     return false
@@ -158,13 +168,13 @@ fun ChatScheduledMeeting.getIntervalValue(): Int {
     return 1
 }
 
-private fun Long.parseDate(): ZonedDateTime =
-    ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
+private fun Long.parseUTCDate(): ZonedDateTime =
+    ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneId.systemDefault())
 
 private fun getUntilDate(until: Long): String? {
     if (until != 0L) {
         val dateFormatter = getDateFormatter()
-        return dateFormatter.format(until.parseDate())
+        return dateFormatter.format(until.parseUTCDate())
     }
 
     return null

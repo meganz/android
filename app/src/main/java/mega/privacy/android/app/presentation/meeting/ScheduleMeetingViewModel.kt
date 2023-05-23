@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
+import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.CreateChatLink
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -31,6 +33,7 @@ import javax.inject.Inject
  * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
  * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
  * @property createChatLink                             [CreateChatLink]
+ * @property deviceGateway                              [DeviceGateway]
  * @property state                                      Current view state as [ScheduleMeetingState]
  */
 @HiltViewModel
@@ -40,10 +43,13 @@ class ScheduleMeetingViewModel @Inject constructor(
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
     private val createChatLink: CreateChatLink,
+    private val deviceGateway: DeviceGateway,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduleMeetingState())
     val state: StateFlow<ScheduleMeetingState> = _state
+
+    val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     /**
      * Monitor connectivity event
@@ -87,6 +93,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                         it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
                     }
                 }
+
                 else -> {
                     _state.update {
                         it.copy(openAddContact = true)
@@ -131,38 +138,54 @@ class ScheduleMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Set start date
+     * Set start date and time
      *
-     * @param newDate   Start Date
+     * @param selectedStartDate   Start date and time
      */
-    fun setStartDate(newDate: Instant) {
-        if (newDate.isBefore(Instant.now())) return
+    fun setStartDateTime(selectedStartDate: ZonedDateTime, isDate: Boolean) {
+
+        val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
+        var newStartZonedDateTime =
+            if (isDate) selectedStartDate.withHour(state.value.startDate.hour)
+                .withMinute(state.value.startDate.minute) else selectedStartDate
+
+        if (newStartZonedDateTime.isBefore(nowZonedDateTime)) {
+            if (isDate) {
+                return
+            }
+
+            newStartZonedDateTime = newStartZonedDateTime.plus(1, ChronoUnit.DAYS)
+        }
 
         _state.update { state ->
-            if (state.endDate.isAfter(newDate)) {
-                state.copy(
-                    startDate = newDate,
+            val newEndDate =
+                if ((state.endDate.isAfter(newStartZonedDateTime))) state.endDate else newStartZonedDateTime.plus(
+                    30,
+                    ChronoUnit.MINUTES
                 )
-            } else {
-                state.copy(
-                    startDate = newDate,
-                    endDate = newDate.plus(1, ChronoUnit.HOURS)
-                )
-            }
+            state.copy(
+                startDate = newStartZonedDateTime,
+                endDate = newEndDate
+            )
         }
     }
 
     /**
-     * Set end date
+     * Set end date and time
      *
-     * @param newDate   End Date
+     * @param selectedEndDate   End date and time
      */
-    fun setEndDate(newDate: Instant) {
-        if (newDate.isBefore(state.value.startDate)) return
+    fun setEndDateTime(selectedEndDate: ZonedDateTime, isDate: Boolean) {
+        val newEndZonedDateTime = if (isDate) selectedEndDate.withHour(state.value.endDate.hour)
+            .withMinute(state.value.endDate.minute) else selectedEndDate
+
+        if (newEndZonedDateTime.isBefore(state.value.startDate)) {
+            return
+        }
 
         _state.update {
             it.copy(
-                endDate = newDate
+                endDate = newEndZonedDateTime
             )
         }
     }
@@ -174,7 +197,6 @@ class ScheduleMeetingViewModel @Inject constructor(
         _state.update {
             it.copy(openAddContact = null)
         }
-
 
     /**
      * Enable or disable allow non-hosts to add participants option
@@ -266,8 +288,8 @@ class ScheduleMeetingViewModel @Inject constructor(
                             waitingRoom = false,
                             openInvite = it.enabledAllowAddParticipantsOption,
                             timezone = ZoneId.systemDefault().id,
-                            startDate = it.startDate.epochSecond,
-                            endDate = it.endDate.epochSecond,
+                            startDate = it.startDate.toEpochSecond(),
+                            endDate = it.endDate.toEpochSecond(),
                             description = it.descriptionText,
                             flags = flags,
                             rules = null,
