@@ -41,6 +41,12 @@ interface FileNode : UnTypedNode {
      */
     val fingerprint: String?
 
+
+    /**
+     * Original Fingerprint
+     */
+    val originalFingerprint: String?
+
     /**
      * Has thumbnail
      */

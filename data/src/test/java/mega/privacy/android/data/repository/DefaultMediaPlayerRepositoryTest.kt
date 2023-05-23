@@ -75,6 +75,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedPreviewPath: String? = null
     private val expectedFullSizePath: String? = null
     private val expectedFingerprint = "fingerprint"
+    private val expectedOriginalFingerprint = "originalFingerprint"
     private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
     private val expectedFileMegaNode = createMegaNode(false)
     private val expectedFolderMegaNode = createMegaNode(true)
@@ -380,6 +381,7 @@ class DefaultMediaPlayerRepositoryTest {
         isNodeKeyDecrypted = isNodeKetDecrypted,
         hasThumbnail = expectedHasThumbnail,
         hasPreview = expectedHasPreview,
+        originalFingerprint = expectedOriginalFingerprint
     )
 
     private suspend fun initTestConditions(megaNode: MegaNode, typeInfo: FileTypeInfo) {

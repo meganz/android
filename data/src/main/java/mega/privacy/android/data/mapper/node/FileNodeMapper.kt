@@ -63,6 +63,7 @@ internal class FileNodeMapper @Inject constructor(
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
         fingerprint = megaNode.fingerprint,
+        originalFingerprint = megaNode.originalFingerprint,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
         hasThumbnail = megaNode.hasThumbnail(),
         hasPreview = megaNode.hasPreview(),

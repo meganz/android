@@ -42,6 +42,7 @@ class NodeMapperTest {
     private val expectedBase64Id = "1L"
     private val expectedModificationTime = 123L
     private val expectedFingerprint = "fingerprint"
+    private val expectedOriginalFingerprint = "expectedOriginalFingerprint"
     private val expectedDuration = 100
     private val expectedPublicLink = "publicLink"
     private val expectedPublicLinkCreationTime = 456L
@@ -167,6 +168,7 @@ class NodeMapperTest {
         parentId: Long = expectedParentId,
         base64Id: String = expectedBase64Id,
         modificationTime: Long = expectedModificationTime,
+        originalFingerprint: String = expectedOriginalFingerprint,
         fingerprint: String = expectedFingerprint,
         duration: Int = expectedDuration,
         isExported: Boolean = true,
@@ -183,6 +185,7 @@ class NodeMapperTest {
             on { this.base64Handle }.thenReturn(base64Id)
             on { this.modificationTime }.thenReturn(modificationTime)
             on { this.fingerprint }.thenReturn(fingerprint)
+            on { this.originalFingerprint }.thenReturn(originalFingerprint)
             on { this.duration }.thenReturn(duration)
             on { this.isFile }.thenReturn(isFile)
             on { this.isFolder }.thenReturn(!isFile)

@@ -24,6 +24,7 @@ internal data class DefaultFileNode(
     override val isTakenDown: Boolean,
     override val isIncomingShare: Boolean,
     override val fingerprint: String?,
+    override val originalFingerprint: String?,
     override val isNodeKeyDecrypted: Boolean,
     override val hasThumbnail: Boolean,
     override val hasPreview: Boolean,
