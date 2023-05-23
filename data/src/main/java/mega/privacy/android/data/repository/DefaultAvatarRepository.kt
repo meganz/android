@@ -66,7 +66,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                 val currentUserHandle = megaApiGateway.myUser?.handle
                 it.users?.find { user ->
                     user.isOwnChange == 0
-                            && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)
+                            && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong())
                             && user.handle == currentUserHandle
                 }
             }

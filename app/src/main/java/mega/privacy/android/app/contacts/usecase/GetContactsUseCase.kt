@@ -198,11 +198,11 @@ class GetContactsUseCase @Inject constructor(
                             when {
                                 index != INVALID_POSITION -> {
                                     when {
-                                        user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) ->
+                                        user.isExternalChange() && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) ->
                                             megaApi.getUserAttribute(user.email, USER_ATTR_ALIAS, userAttrsListener)
-                                        user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ->
+                                        user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ->
                                             megaApi.getUserAttribute(user.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                                        user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ->
+                                        user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ->
                                             megaApi.getUserAttribute(user.email, USER_ATTR_LASTNAME, userAttrsListener)
                                         user.visibility != VISIBILITY_VISIBLE -> {
                                             contacts.removeAt(index)
@@ -210,7 +210,7 @@ class GetContactsUseCase @Inject constructor(
                                         }
                                     }
                                 }
-                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) -> {
+                                user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) -> {
                                     megaApi.getUserAttribute(user, USER_ATTR_ALIAS, userAttrsListener)
                                 }
                                 user.visibility == VISIBILITY_VISIBLE -> { // New contact
@@ -219,7 +219,7 @@ class GetContactsUseCase @Inject constructor(
                                     emitter.onNext(contacts.sortedAlphabetically())
                                     contact.requestMissingFields(userAttrsListener)
                                 }
-                                user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING) -> {
+                                user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()) -> {
                                     mutableListOf<ContactItem.Data>()
                                         .apply { addAll(contacts) }
                                         .forEachIndexed { i, _ ->

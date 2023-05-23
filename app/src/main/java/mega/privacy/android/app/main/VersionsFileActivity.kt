@@ -870,7 +870,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
 
         //Check if the parent handle has changed
         n?.let {
-            if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)) {
+            if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT.toLong())) {
                 val oldParent = megaApi.getParentNode(node)
                 val newParent = megaApi.getParentNode(n)
                 if (oldParent?.handle == newParent?.handle) {
@@ -889,7 +889,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                 } else {
                     null
                 }
-            } else if (n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)) {
+            } else if (n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED.toLong())) {
                 if (thisNode) {
                     if (nodeVersions != null) {
                         node = nodeVersions!![1]

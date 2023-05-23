@@ -590,7 +590,7 @@ private fun getChildNodes(megaUserAlert: MegaUserAlert) =
     }
 
 private fun MegaUserAlert.getScheduledMeetingChanges(): List<ScheduledMeetingChangeType> =
-    ScheduledMeetingChangeType.values().filter { hasSchedMeetingChanged(it.value) }
+    ScheduledMeetingChangeType.values().filter { hasSchedMeetingChanged(it.value.toLong()) }
 
 private fun MegaUserAlert.getDateTimeChanges(
     occurrence: ChatScheduledMeetingOccurr? = null,

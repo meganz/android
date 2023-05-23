@@ -445,7 +445,7 @@ class ImageViewerViewModel @Inject constructor(
                                 return@subscribeBy // Not found
                             }
 
-                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW) -> {
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_NEW.toLong()) -> {
                                 val hasSameParent = (changedNode.parentHandle != null
                                         && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
                                 if (hasSameParent && changedNode.isValidForImageViewer()) {
@@ -461,7 +461,7 @@ class ImageViewerViewModel @Inject constructor(
                                 }
                             }
 
-                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_PARENT) -> {
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_PARENT.toLong()) -> {
                                 if (currentIndex != INVALID_POSITION) {
                                     val hasSameParent = (changedNode.parentHandle != null
                                             && changedNode.parentHandle == items.firstOrNull()?.nodeItem?.node?.parentHandle)
@@ -471,7 +471,7 @@ class ImageViewerViewModel @Inject constructor(
                                 }
                             }
 
-                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_REMOVED) -> {
+                            changedNode.hasChanged(MegaNode.CHANGE_TYPE_REMOVED.toLong()) -> {
                                 if (currentIndex != INVALID_POSITION) {
                                     items.removeAt(currentIndex)
                                 }

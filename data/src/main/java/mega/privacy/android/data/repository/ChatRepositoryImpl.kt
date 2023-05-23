@@ -368,7 +368,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
         .mapNotNull {
             it.users?.find { user ->
-                user.isOwnChange <= 0 && user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL) && user.email == megaApiGateway.accountEmail
+                user.isOwnChange <= 0 && user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL.toLong()) && user.email == megaApiGateway.accountEmail
             }
         }
         .map {
@@ -382,9 +382,10 @@ internal class ChatRepositoryImpl @Inject constructor(
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
         .mapNotNull {
             it.users?.find { user ->
-                user.isOwnChange <= 0 && (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) || user.hasChanged(
-                    MegaUser.CHANGE_TYPE_LASTNAME
-                )) && user.email == megaApiGateway.accountEmail
+                user.isOwnChange <= 0 &&
+                        (user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ||
+                                user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong())) &&
+                        user.email == megaApiGateway.accountEmail
             }
         }
         .map {

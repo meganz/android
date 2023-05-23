@@ -31,7 +31,7 @@ class UserUpdateMapperTest {
     fun `test mapping single change`() {
         val id = 1L
         val user = mock<MegaUser> { on { handle }.thenReturn(id) }
-        whenever(user.changes).thenReturn(MegaUser.CHANGE_TYPE_ALIAS)
+        whenever(user.changes).thenReturn(MegaUser.CHANGE_TYPE_ALIAS.toLong())
 
         val actual = mapMegaUserListToUserUpdate(listOf(user))
 
@@ -45,11 +45,14 @@ class UserUpdateMapperTest {
         val id2 = 2L
         val user1 = mock<MegaUser> {
             on { handle }.thenReturn(id1)
-            on { changes }.thenReturn(MegaUser.CHANGE_TYPE_ALIAS, MegaUser.CHANGE_TYPE_AVATAR)
+            on { changes }.thenReturn(
+                MegaUser.CHANGE_TYPE_ALIAS.toLong(),
+                MegaUser.CHANGE_TYPE_AVATAR.toLong()
+            )
         }
         val user2 = mock<MegaUser> {
             on { handle }.thenReturn(id2)
-            on { changes }.thenReturn(MegaUser.CHANGE_TYPE_ALIAS)
+            on { changes }.thenReturn(MegaUser.CHANGE_TYPE_ALIAS.toLong())
         }
 
         val userList = arrayListOf(user1, user2, user1)
@@ -96,7 +99,9 @@ class UserUpdateMapperTest {
             MegaUser.CHANGE_TYPE_MY_BACKUPS_FOLDER,
             MegaUser.CHANGE_TYPE_COOKIE_SETTINGS,
             MegaUser.CHANGE_TYPE_NO_CALLKIT,
-        ).fold(0) { acc, value -> acc or value }
+        )
+            .map { it.toLong() }
+            .fold(0L) { acc, value -> acc or value }
 
         val id = 1L
         val user = mock<MegaUser> { on { handle }.thenReturn(id) }

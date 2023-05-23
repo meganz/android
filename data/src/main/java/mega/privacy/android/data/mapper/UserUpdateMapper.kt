@@ -23,9 +23,9 @@ internal fun mapMegaUserListToUserUpdate(userList: List<MegaUser>) = UserUpdate(
         }
 )
 
-private fun fromMegaUserChangeFlags(changeFlags: Int) =
-    if (changeFlags == 0) emptyList() // MegaUser visibility change
-    else userChangesMap.filter { it.key and changeFlags != 0 }.values.toList()
+private fun fromMegaUserChangeFlags(changeFlags: Long) =
+    if (changeFlags == 0L) emptyList() // MegaUser visibility change
+    else userChangesMap.filter { (it.key.toLong() and changeFlags) != 0L }.values.toList()
 
 private val userChangesMap = mapOf(
     MegaUser.CHANGE_TYPE_AUTHRING to UserChanges.AuthenticationInformation,

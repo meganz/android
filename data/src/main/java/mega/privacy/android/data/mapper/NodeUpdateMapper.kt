@@ -15,8 +15,8 @@ typealias NodeUpdateMapper = (@JvmSuppressWildcards MegaNode) -> @JvmSuppressWil
  */
 internal fun mapMegaNodeListToNodeUpdate(node: MegaNode) = fromMegaNodeChangeFlags(node.changes)
 
-private fun fromMegaNodeChangeFlags(changeFlags: Int) = nodeChangesMap.filter {
-    it.key and changeFlags != 0
+private fun fromMegaNodeChangeFlags(changeFlags: Long) = nodeChangesMap.filter {
+    it.key.toLong() and changeFlags != 0L
 }.values.toList()
 
 private val nodeChangesMap = mapOf(

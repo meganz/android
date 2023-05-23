@@ -134,14 +134,14 @@ internal class DefaultContactsRepository @Inject constructor(
             .map { usersList ->
                 userUpdateMapper(usersList.filter { user ->
                     (user.handle != megaApiGateway.myUserHandle &&
-                            (user.changes == 0 ||
-                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME) ||
-                                    user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL)) ||
+                            (user.changes == 0L ||
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_FIRSTNAME.toLong()) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_LASTNAME.toLong()) ||
+                                    user.hasChanged(MegaUser.CHANGE_TYPE_EMAIL.toLong())) ||
                             (user.handle == megaApiGateway.myUserHandle &&
-                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS) ||
-                                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING))))
+                                    (user.hasChanged(MegaUser.CHANGE_TYPE_ALIAS.toLong()) ||
+                                            user.hasChanged(MegaUser.CHANGE_TYPE_AUTHRING.toLong()))))
                 })
             }
             .filter { it.changes.isNotEmpty() }

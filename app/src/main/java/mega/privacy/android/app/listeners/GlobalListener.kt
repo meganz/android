@@ -99,28 +99,28 @@ class GlobalListener @Inject constructor(
             val myUserHandle = api.myUserHandle
             val isMyChange =
                 myUserHandle != null && myUserHandle == MegaApiJava.userHandleToBase64(user.handle)
-            if (user.changes == 0 && !isMyChange) {
+            if (user.changes == 0L && !isMyChange) {
                 LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
                     .post(user.handle)
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && user.isOwnChange == 0) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS.toLong()) && user.isOwnChange == 0) {
                 pushNotificationSettingManagement.updateMegaPushNotificationSetting()
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER.toLong()) && isMyChange) {
                 api.getMyChatFilesFolder(GetAttrUserListener(appContext, true))
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS.toLong()) && isMyChange) {
                 api.shouldShowRichLinkWarning(GetAttrUserListener(appContext))
                 api.isRichPreviewsEnabled(GetAttrUserListener(appContext))
                 return@forEach
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME) && isMyChange) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_RUBBISH_TIME.toLong()) && isMyChange) {
                 api.getRubbishBinAutopurgePeriod(GetAttrUserListener(appContext))
                 return@forEach
             }
 
             // Receive the avatar change, send the event
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.isOwnChange == 0) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) && user.isOwnChange == 0) {
                 LiveEventBus.get(EVENT_MEETING_AVATAR_CHANGE, Long::class.java)
                     .post(user.handle)
             }
@@ -147,9 +147,9 @@ class GlobalListener @Inject constructor(
      */
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
         nodeList?.toList()?.forEach { node ->
-            if (node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
+            if (node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE.toLong())) {
                 showSharedFolderNotification(node)
-            } else if (node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK) && node.publicLink != null) {
+            } else if (node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK.toLong()) && node.publicLink != null) {
                 // when activated share, will show rating if it matches the condition
                 RatingHandlerImpl(appContext).showRatingBaseOnSharing()
             }
@@ -315,7 +315,7 @@ class GlobalListener @Inject constructor(
             val sharesIncoming = megaApi.inSharesList ?: return
 
             val notificationTitle = appContext.getString(
-                if (n.hasChanged(MegaNode.CHANGE_TYPE_NEW))
+                if (n.hasChanged(MegaNode.CHANGE_TYPE_NEW.toLong()))
                     R.string.title_incoming_folder_notification
                 else R.string.context_permissions_changed
             )

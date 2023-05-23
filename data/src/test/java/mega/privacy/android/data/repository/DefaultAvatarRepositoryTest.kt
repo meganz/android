@@ -54,7 +54,7 @@ internal class DefaultAvatarRepositoryTest {
     private val contactsRepository = mock<ContactsRepository>()
     private val currentUser = mock<MegaUser> {
         on { it.isOwnChange }.thenReturn(0)
-        on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) }.thenReturn(true)
+        on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) }.thenReturn(true)
         on { it.handle }.thenReturn(CURRENT_USER_HANDLE)
         on { it.email }.thenReturn(CURRENT_USER_EMAIL)
     }
@@ -122,7 +122,7 @@ internal class DefaultAvatarRepositoryTest {
             }
             val anotherUser = mock<MegaUser> {
                 on { it.isOwnChange }.thenReturn(0)
-                on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) }.thenReturn(true)
+                on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR.toLong()) }.thenReturn(true)
                 on { it.email }.thenReturn("anotherUser")
             }
             sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(anotherUser)))
