@@ -92,12 +92,6 @@ class MediaPlayerFragment : Fragment() {
 
     private var playbackPositionDialog: Dialog? = null
 
-    /**
-     * GetFeatureFlagValueUseCase injection
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             serviceGateway = null
@@ -403,11 +397,8 @@ class MediaPlayerFragment : Fragment() {
                     }
                     initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val isShow = getFeatureFlagValueUseCase(feature = AppFeatures.AddSubtitle)
-                                && showSubtitleIcon()
                         setupSubtitleButton(
-                            // Add feature flag, and will be removed after the feature is finished.
-                            isShow = isShow,
+                            isShow = showSubtitleIcon(),
                             isSubtitleShown = viewModel.state.value.isSubtitleShown
                         ) {
                             viewModel.showAddSubtitleDialog()

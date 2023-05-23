@@ -55,11 +55,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * Enable add subtitle feature
-     */
-    AddSubtitle("Enable the feature that adding subtitle", true),
-
-    /**
      * To switch into new photos modularization architecture or not toggle
      */
     PhotosCompose(
