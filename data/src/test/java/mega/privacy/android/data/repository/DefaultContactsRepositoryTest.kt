@@ -165,8 +165,8 @@ class DefaultContactsRepositoryTest {
             assertThat(underTest.getContactCredentials(userEmail)).isEqualTo(expectedCredentials)
         }
 
-    @Test(expected = MegaException::class)
-    fun `test that get contact credentials throws a MegaException if user exists but api returns error`() =
+    @Test
+    fun `test that get contact credentials returns null if user exists but api returns error`() =
         runTest {
             whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
             whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
@@ -174,7 +174,19 @@ class DefaultContactsRepositoryTest {
                     mock(), mock(), error
                 )
             }
-            assertThat(underTest.getContactCredentials(userEmail))
+            val alias = "testAlias"
+            val request = mock<MegaRequest> {
+                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ALIAS)
+                on { name }.thenReturn(alias)
+            }
+
+            whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+            assertThat(underTest.getContactCredentials(userEmail)).isNull()
         }
 
     @Test
@@ -182,23 +194,6 @@ class DefaultContactsRepositoryTest {
         whenever(megaApiGateway.getContact(userEmail)).thenReturn(null)
         assertThat(underTest.getContactCredentials(userEmail)).isNull()
     }
-
-    @Test(expected = MegaException::class)
-    fun `test that get contact credentials fails with MegaException if api returns an error`() =
-        runTest {
-            val request = mock<MegaRequest> {
-                on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
-                on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ED25519_PUBLIC_KEY)
-            }
-
-            whenever(megaApiGateway.getContact(userEmail)).thenReturn(user)
-            whenever(megaApiGateway.getUserCredentials(any(), any())).thenAnswer {
-                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(), request, error
-                )
-            }
-            assertThat(underTest.getContactCredentials(userEmail))
-        }
 
     @Test
     fun `test that get contact alias returns the alias if api returns the alias`() = runTest {

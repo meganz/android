@@ -570,7 +570,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getContactCredentials(userEmail: String) =
         withContext(ioDispatcher) {
             megaApiGateway.getContact(userEmail)?.let { user ->
-                val userCredentials = getUserCredentials(user)
+                val userCredentials = runCatching { getUserCredentials(user) }.getOrNull()
                 val name = runCatching { getUserAlias(user.handle) }.getOrNull()
                     ?: runCatching { getUserFullName(user.handle, skipCache = false) }.getOrNull()
                     ?: userEmail
