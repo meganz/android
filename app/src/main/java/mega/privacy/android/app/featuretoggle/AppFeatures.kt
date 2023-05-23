@@ -15,6 +15,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enable the remember timeline preferences feature
+     */
+    RememberTimelinePreferences(
+        "Remember the Timeline filter preferences",
+        false
+    ),
+
+    /**
      * To switch to Two Factor Authentication compose
      */
     TwoFactorAuthenticationCompose(

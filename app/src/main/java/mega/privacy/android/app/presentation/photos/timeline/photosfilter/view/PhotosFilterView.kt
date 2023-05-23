@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
@@ -32,7 +33,9 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +52,7 @@ import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 
 @Composable
 fun PhotosFilterView(
@@ -56,8 +60,15 @@ fun PhotosFilterView(
     onMediaTypeSelected: (FilterMediaType) -> Unit = {},
     onSourceSelected: (TimelinePhotosSource) -> Unit = {},
     applyFilter: () -> Unit = {},
+    isRememberTimelinePreferencesEnabled: suspend () -> Boolean = { false },
 ) {
     val scrollState = rememberScrollState()
+    var isPrefRemembered by rememberSaveable { mutableStateOf(false) }
+
+    val isRememberTimelinePreferencesEnabled by produceState(initialValue = false) {
+        value = isRememberTimelinePreferencesEnabled()
+    }
+
     Column(
         modifier = Modifier
             .verticalScroll(scrollState)
@@ -71,6 +82,24 @@ fun PhotosFilterView(
                 timelineViewState = timelineViewState,
                 onSourceSelected = onSourceSelected
             )
+
+            if (isRememberTimelinePreferencesEnabled) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(all = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.photos_timeline_filter_remember_preferences),
+                        color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+                    )
+
+                    Checkbox(
+                        checked = isPrefRemembered,
+                        onCheckedChange = { isPrefRemembered = !isPrefRemembered },
+                    )
+                }
+            }
         }
 
         Row(
@@ -89,10 +118,11 @@ fun PhotosFilterView(
             ) {
                 Icon(
                     painter = painterResource(id = if (MaterialTheme.colors.isLight) {
-                        R.drawable.ic_filter_light
-                    } else {
-                        R.drawable.ic_filter_dark
-                    }),
+                            R.drawable.ic_filter_light
+                        } else {
+                            R.drawable.ic_filter_dark
+                        }
+                    ),
                     contentDescription = "Exit filter",
                     tint = if (!MaterialTheme.colors.isLight) {
                         Color.Black
@@ -165,11 +195,12 @@ fun MediaTypeView(
                     )
                 }
 
-                Text(text = when (it) {
-                    FilterMediaType.ALL_MEDIA -> stringResource(id = R.string.filter_button_all_media_type)
-                    FilterMediaType.IMAGES -> stringResource(id = R.string.section_images)
-                    FilterMediaType.VIDEOS -> stringResource(id = R.string.sortby_type_video_first)
-                },
+                Text(
+                    text = when (it) {
+                        FilterMediaType.ALL_MEDIA -> stringResource(id = R.string.filter_button_all_media_type)
+                        FilterMediaType.IMAGES -> stringResource(id = R.string.section_images)
+                        FilterMediaType.VIDEOS -> stringResource(id = R.string.sortby_type_video_first)
+                    },
                     color = if (selected && MaterialTheme.colors.isLight) Color.White
                     else if (selected && !MaterialTheme.colors.isLight) Color.Black
                     else Color.Gray
