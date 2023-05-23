@@ -33,6 +33,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
@@ -59,6 +60,7 @@ class TransfersManagement @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val broadcastFailedTransfer: BroadcastFailedTransfer,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
 ) {
 
     companion object {
@@ -514,6 +516,7 @@ class TransfersManagement @Inject constructor(
                 LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
                     .post(true)
             }
+
             !processing -> {
                 isProcessingFolders = false
                 LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
@@ -564,4 +567,14 @@ class TransfersManagement @Inject constructor(
     }
 
     fun getAreFailedTransfers(): Boolean = areFailedTransfers
+
+    /**
+     * Adds the initial value for transferQueueStatus.
+     * Note: Please don't call this from anywhere, except from the creation of MegaApplication.
+     * The state of the transfer queue is monitored from [BackgroundRequestListener], so it is updated
+     * at the time it changes.
+     */
+    fun initPausedTransfers() = applicationScope.launch {
+        dbH.transferQueueStatus = areTransfersPausedUseCase()
+    }
 }

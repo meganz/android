@@ -17,6 +17,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
@@ -61,6 +62,12 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     @MegaApiFolder
     lateinit var megaApiFolder: MegaApiAndroid
 
+    /**
+     * [LegacyDatabaseHandler]
+     */
+    @Inject
+    lateinit var dbH: LegacyDatabaseHandler
+
     private var adapter: MegaTransfersAdapter? = null
 
     private var actionMode: ActionMode? = null
@@ -102,7 +109,8 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 selectModeInterface = this,
                 transfersViewModel = viewModel,
                 megaApi = megaApi,
-                megaApiFolder = megaApiFolder
+                megaApiFolder = megaApiFolder,
+                dbH = dbH
             )
 
             adapter?.submitList(activeTransfers)

@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
@@ -25,8 +26,6 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
-import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
 import timber.log.Timber
 import kotlin.math.roundToLong
 
@@ -40,6 +39,7 @@ class MegaTransfersAdapter(
     private val transfersViewModel: TransfersViewModel,
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
+    private val dbH: LegacyDatabaseHandler,
 ) : ListAdapter<Transfer, TransferViewHolder>(TRANSFER_DIFF_CALLBACK), RotatableAdapter {
 
     private var multipleSelect: Boolean = false
@@ -160,6 +160,7 @@ class MegaTransfersAdapter(
                     }
                 }
             }
+
             TransferType.TYPE_UPLOAD -> {
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers)
@@ -169,6 +170,7 @@ class MegaTransfersAdapter(
                     )
                 }
             }
+
             TransferType.NONE -> {}
         }
 
@@ -188,7 +190,7 @@ class MegaTransfersAdapter(
         holder.imageViewCompleted.setImageResource(R.drawable.ic_queue)
         holder.progressText.isVisible = true
 
-        if (megaApi.areTransfersPaused(TYPE_DOWNLOAD) || megaApi.areTransfersPaused(TYPE_UPLOAD)) {
+        if (dbH.transferQueueStatus) {
             holder.progressText.text = getProgress(transfer)
             holder.speedText.text = context.getString(R.string.transfer_paused)
 
@@ -206,6 +208,7 @@ class MegaTransfersAdapter(
                         holder.optionPause.setImageResource(R.drawable.ic_play_grey)
                     }
                 }
+
                 TransferState.STATE_ACTIVE -> {
                     holder.progressText.text = getProgress(transfer)
                     holder.speedText.text = Util.getSpeedString(
@@ -216,6 +219,7 @@ class MegaTransfersAdapter(
                     )
                     holder.speedText.isVisible = true
                 }
+
                 TransferState.STATE_COMPLETING,
                 TransferState.STATE_RETRYING,
                 TransferState.STATE_QUEUED,
@@ -240,6 +244,7 @@ class MegaTransfersAdapter(
                             )
                             holder.speedText.isVisible = false
                         }
+
                         transfer.transferState == TransferState.STATE_QUEUED -> {
                             holder.progressText.isVisible = false
                             holder.speedText.isVisible = false
@@ -248,6 +253,7 @@ class MegaTransfersAdapter(
                             holder.textViewCompleted.text =
                                 context.getString(R.string.transfer_queued)
                         }
+
                         else -> {
                             holder.progressText.text = getProgress(transfer)
                             holder.speedText.text =
@@ -261,6 +267,7 @@ class MegaTransfersAdapter(
                         }
                     }
                 }
+
                 else -> {
                     Timber.d("Default status")
                     holder.progressText.isVisible = false

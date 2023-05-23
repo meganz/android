@@ -1136,10 +1136,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             if (!isOverQuota) {
                 val now = System.currentTimeMillis()
                 lastUpdated =
-                    if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(
-                            MegaTransfer.TYPE_DOWNLOAD
-                        )
-                    ) {
+                    if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS || dbH.transferQueueStatus) {
                         now
                     } else {
                         return

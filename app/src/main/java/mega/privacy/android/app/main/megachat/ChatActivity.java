@@ -7100,7 +7100,7 @@ public class ChatActivity extends PasscodeActivity
                 if (adapter == null) {
                     adapter = new MegaChatAdapter(this, chatRoom, messages,
                             messagesPlaying, removedMessages, listView, inviteContactUseCase,
-                            getAvatarUseCase, getNodeUseCase, viewModel);
+                            getAvatarUseCase, getNodeUseCase, viewModel, megaApi, megaChatApi, dbH);
 
                     adapter.setHasStableIds(true);
                     listView.setAdapter(adapter);
@@ -8095,7 +8095,8 @@ public class ChatActivity extends PasscodeActivity
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatAdapter(this, chatRoom, messages, messagesPlaying,
-                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase, viewModel);
+                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase,
+                viewModel, megaApi, megaChatApi, dbH);
 
         adapter.setHasStableIds(true);
         listView.setLayoutManager(mLayoutManager);

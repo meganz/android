@@ -1959,13 +1959,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun updateProgressNotification() {
+    private suspend fun updateProgressNotification() = withContext(ioDispatcher) {
         // refresh UI every 1 seconds to avoid too much workload on main thread
         val now = System.currentTimeMillis()
         lastUpdated = if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS) {
             now
         } else {
-            return
+            return@withContext
         }
 
         @Suppress("DEPRECATION") val pendingTransfers = megaApi.numPendingUploads
@@ -1990,7 +1990,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             broadcastProgress(progressPercent, pendingTransfers)
 
-            message = if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+            message = if (areTransfersPausedUseCase()) {
                 context.getString(
                     R.string.upload_service_notification_paused,
                     inProgress,

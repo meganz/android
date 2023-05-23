@@ -4888,9 +4888,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 DrawerItem.TRANSFERS -> if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded && transfersFragment?.isNotEmptyTransfer() == true) {
-                    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
-                        || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
-                    ) {
+                    if (dbH.transferQueueStatus) {
                         playTransfersMenuIcon?.isVisible = true
                     } else {
                         pauseTransfersMenuIcon?.isVisible = true
@@ -8836,19 +8834,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidgetState()
                     if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
-                        val areDownloadsPaused: Boolean =
-                            megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
-                        val areUploadsPaused: Boolean =
-                            megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                        val areTransfersPaused = dbH.transferQueueStatus
                         refreshFragment(FragmentTag.TRANSFERS.tag)
-                        pauseTransfersMenuIcon?.isVisible =
-                            !(areDownloadsPaused || areUploadsPaused)
-                        playTransfersMenuIcon?.isVisible = areDownloadsPaused || areUploadsPaused
+                        pauseTransfersMenuIcon?.isVisible = !areTransfersPaused
+                        playTransfersMenuIcon?.isVisible = areTransfersPaused
 
                         // For Uploads, when the "Pause All" Button is Clicked, newBackupState = PAUSE_UPLOADS
                         // Otherwise, when the "Resume All" Button is Clicked, newBackupState = ACTIVE
                         val newBackupState: BackupState =
-                            if (areUploadsPaused) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE
+                            if (areTransfersPaused) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE
                         CameraUploadSyncManager.updatePrimaryFolderBackupState(newBackupState)
                         CameraUploadSyncManager.updateSecondaryFolderBackupState(newBackupState)
                     }

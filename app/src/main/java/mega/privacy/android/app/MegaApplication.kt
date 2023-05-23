@@ -203,7 +203,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         setupMegaChatApi()
 
         //Logout check resumed pending transfers
-        transfersManagement.checkResumedPendingTransfers()
+        transfersManagement.apply {
+            checkResumedPendingTransfers()
+            initPausedTransfers()
+        }
         val apiServerValue =
             getSharedPreferences(ChangeApiServerUtil.API_SERVER_PREFERENCES, MODE_PRIVATE)
                 .getInt(ChangeApiServerUtil.API_SERVER, ChangeApiServerUtil.PRODUCTION_SERVER_VALUE)

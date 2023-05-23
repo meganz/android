@@ -65,7 +65,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
         isUploadingMessage = pMsg != null && pMsg.getState() != PendingMessageSingle.STATE_ERROR_UPLOADING && pMsg.getState() != PendingMessageSingle.STATE_ERROR_ATTACHING;
 
         if (isUploadingMessage) {
-            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+            if (dbH.getTransferQueueStatus()) {
                 titleSlidingPanel.setText(R.string.attachment_uploading_state_paused);
                 TextView resumeText = optionRetryLayout.findViewById(R.id.msg_not_sent_retry_text);
                 resumeText.setText(R.string.option_resume_transfers);
@@ -97,7 +97,7 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.msg_not_sent_retry_layout) {
-            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
+            if (dbH.getTransferQueueStatus() && isUploadingMessage) {
                 megaApi.pauseTransfers(false);
                 ((ChatActivity) requireActivity()).updatePausedUploadingMessages();
             } else {

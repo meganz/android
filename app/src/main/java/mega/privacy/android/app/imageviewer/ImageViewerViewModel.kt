@@ -53,12 +53,12 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
-import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

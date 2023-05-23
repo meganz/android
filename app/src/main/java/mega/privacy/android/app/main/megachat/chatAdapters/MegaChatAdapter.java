@@ -152,6 +152,7 @@ import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.R;
@@ -248,6 +249,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private RecyclerView listFragment;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
+    private LegacyDatabaseHandler dbH;
     boolean multipleSelect;
     HashMap<Long, Integer> messagesSelectedInChat = new HashMap<>();
 
@@ -630,7 +632,9 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                            ArrayList<MessageVoiceClip> _messagesPlaying,
                            ArrayList<RemovedMessage> _removedMessages,
                            RecyclerView _listView, InviteContactUseCase inviteContactUseCase,
-                           GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase, ChatViewModel viewModel) {
+                           GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase,
+                           ChatViewModel viewModel, MegaApiAndroid megaApi,
+                           MegaChatApiAndroid megaChatApi, LegacyDatabaseHandler dbH) {
         Timber.d("New adapter");
         this.context = _context;
         this.messages = _messages;
@@ -642,14 +646,9 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.getAvatarUseCase = getAvatarUseCase;
         this.getNodeUseCase = getNodeUseCase;
         this.viewModel =  viewModel;
-
-        if (megaApi == null) {
-            megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
-        }
-
-        if (megaChatApi == null) {
-            megaChatApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaChatApi();
-        }
+        this.megaApi = MegaApplication.getInstance().getMegaApi();
+        this.megaChatApi = MegaApplication.getInstance().getMegaChatApi();
+        this.dbH = MegaApplication.getInstance().getDbH();
 
         listFragment = _listView;
 
@@ -1583,7 +1582,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
 
-            boolean areTransfersPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+            boolean areTransfersPaused = dbH.getTransferQueueStatus();
+
             if (areTransfersPaused
                     && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_UPLOADING
                     && message.getPendingMessage().getState() != PendingMessageSingle.STATE_ERROR_ATTACHING) {
@@ -7443,7 +7443,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         holder.videoTimecontentOwnMessageThumbLand.setVisibility(View.GONE);
                     }
 
-                    boolean areTransfersPaused = megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD);
+                    boolean areTransfersPaused = dbH.getTransferQueueStatus();
 
                     if (message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_UPLOADING || message.getPendingMessage().getState() == PendingMessageSingle.STATE_ERROR_ATTACHING
                             || areTransfersPaused) {

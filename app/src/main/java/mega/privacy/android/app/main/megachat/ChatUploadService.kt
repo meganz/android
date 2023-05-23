@@ -606,7 +606,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                         )
                     }
 
-                    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
+                    if (dbH.transferQueueStatus
                         && !transfersManagement.hasResumeTransfersWarningAlreadyBeenShown
                     ) {
                         sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_RESUME_TRANSFERS))
