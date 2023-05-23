@@ -17,7 +17,13 @@ class CopyRequestMessageMapperImpl @Inject constructor(
      */
     override operator fun invoke(request: CopyRequestResult?): String {
         return when {
-            request == null || request.hasNoData -> throw RuntimeException("No copied data found!")
+            request == null || request.hasNoData -> {
+                context.resources.getQuantityString(
+                    R.plurals.general_copy_snackbar_fail,
+                    0,
+                    0
+                )
+            }
             request.isAllRequestError -> {
                 context.resources.getQuantityString(
                     R.plurals.general_copy_snackbar_fail,
