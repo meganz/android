@@ -3823,20 +3823,20 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override val showCopyright: String?
+    override val shouldShowCopyright: Boolean
         get() {
             val selectQuery =
                 "SELECT $KEY_SHOW_COPYRIGHT FROM $TABLE_ATTRIBUTES WHERE $KEY_ID = '1'"
             try {
                 db.rawQuery(selectQuery, null)?.use { cursor ->
                     if (cursor.moveToFirst()) {
-                        return decrypt(cursor.getString(0))
+                        return decrypt(cursor.getString(0))?.toBoolean() ?: true
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Exception opening or managing DB cursor")
             }
-            return "true"
+            return true
         }
 
     override fun setShowNotifOff(showNotifOff: Boolean) {

@@ -122,7 +122,11 @@ interface DatabaseHandler {
      */
     var askSetDownloadLocation: Boolean
     val useHttpsOnly: String?
-    val showCopyright: String?
+
+    /**
+     * Flag to determine whether user should be shown a copyright page
+     */
+    val shouldShowCopyright: Boolean
 
     /**
      * Set the last public handle type value into the database.

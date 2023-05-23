@@ -216,7 +216,7 @@ class GetLinkViewModel @Inject constructor(
      * @return True if should show it, false otherwise.
      */
     fun shouldShowCopyright(): Boolean =
-        dbH.showCopyright.toBoolean() && (megaApi.publicLinks == null || megaApi.publicLinks.size == 0)
+        dbH.shouldShowCopyright && megaApi.publicLinks.isNullOrEmpty()
 
     /**
      * Updates the flag to show or not [CopyrightFragment] in DB.
