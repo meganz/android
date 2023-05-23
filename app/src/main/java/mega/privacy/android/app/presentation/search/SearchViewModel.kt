@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.SearchNodes
@@ -252,6 +251,7 @@ class SearchViewModel @Inject constructor(
                     SharesTab.LINKS_TAB -> linksParentHandle
                     else -> incomingParentHandle
                 }
+
             DrawerItem.RUBBISH_BIN -> rubbishBinParentHandle
             DrawerItem.INBOX -> inboxParentHandle
             else -> getRootFolder()?.handle ?: INVALID_HANDLE
@@ -345,7 +345,7 @@ class SearchViewModel @Inject constructor(
     /**
      * Get Cloud Sort Order
      */
-    fun getOrder() = runBlocking { getCloudSortOrder() }
+    suspend fun getOrder() = getCloudSortOrder()
 
     /**
      * Handles back click [SearchFragment]

@@ -27,10 +27,12 @@ import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -44,7 +46,6 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
@@ -52,6 +53,7 @@ import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
@@ -494,12 +496,14 @@ class SearchFragment : RotatableFragment() {
                     )
                     closeSelectMode()
                 }
+
                 R.id.cab_menu_rename -> {
                     if (documents.size == 1) {
                         managerActivity.showRenameDialog(documents[0])
                     }
                     closeSelectMode()
                 }
+
                 R.id.cab_menu_copy -> {
                     val handleList = arrayListOf<Long>()
                     for (document in documents) {
@@ -509,6 +513,7 @@ class SearchFragment : RotatableFragment() {
                     nC.chooseLocationToCopyNodes(handleList)
                     closeSelectMode()
                 }
+
                 R.id.cab_menu_move -> {
                     val handleList = arrayListOf<Long>()
                     for (document in documents) {
@@ -518,6 +523,7 @@ class SearchFragment : RotatableFragment() {
                     nC.chooseLocationToMoveNodes(handleList)
                     closeSelectMode()
                 }
+
                 R.id.cab_menu_share_link -> {
                     managerActivity.showGetLinkActivity(documents)
                     closeSelectMode()
@@ -532,6 +538,7 @@ class SearchFragment : RotatableFragment() {
                         closeSelectMode()
                     }
                 }
+
                 R.id.cab_menu_edit_link -> {
                     Timber.d("Edit link option")
                     if (documents[0] == null) {
@@ -541,11 +548,13 @@ class SearchFragment : RotatableFragment() {
                         closeSelectMode()
                     }
                 }
+
                 R.id.cab_menu_send_to_chat -> {
                     Timber.d("Send files to chat")
                     managerActivity.attachNodesToChats(adapter.arrayListSelectedNodes)
                     closeSelectMode()
                 }
+
                 R.id.cab_menu_trash -> {
                     val handleList = arrayListOf<Long>()
                     for (document in documents) {
@@ -553,9 +562,11 @@ class SearchFragment : RotatableFragment() {
                     }
                     managerActivity.askConfirmationMoveToRubbish(handleList)
                 }
+
                 R.id.cab_menu_select_all -> {
                     selectAll()
                 }
+
                 R.id.cab_menu_unselect_all -> {
                     closeSelectMode()
                 }
@@ -880,7 +891,7 @@ class SearchFragment : RotatableFragment() {
      * @param node MegaNode
      * @param position position of item clicked
      */
-    private fun openFile(node: MegaNode, position: Int) {
+    private fun openFile(node: MegaNode, position: Int) = lifecycleScope.launch {
         //Is FILE
         val nodes: List<MegaNode> = state().nodes ?: emptyList()
         if (MimeTypeList.typeForName(node.name).isImage) {
@@ -1139,6 +1150,7 @@ class SearchFragment : RotatableFragment() {
                     if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
                     this@SearchFragment.adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
                 }
+
                 ViewType.GRID -> {
                     switchBackToGrid()
                     removeItemDecoration(itemDecoration)
