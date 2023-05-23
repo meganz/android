@@ -284,7 +284,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
                                                 && (access == MegaShare.ACCESS_FULL
                                                 || access == MegaShare.ACCESS_OWNER)
 
-                                    menu.findItem(R.id.copy).isVisible = false
+                                    menu.findItem(R.id.copy).isVisible = true
                                 }
                             }
                         }
