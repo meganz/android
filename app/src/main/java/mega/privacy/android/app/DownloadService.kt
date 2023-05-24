@@ -257,34 +257,46 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 when (event) {
                     is GetGlobalTransferUseCase.Result.OnTransferStart -> {
                         val transfer = event.transfer
-                        doOnTransferStart(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        rxSubscriptions.add(
+                            doOnTransferStart(transfer)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        )
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
                         val transfer = event.transfer
-                        doOnTransferUpdate(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        rxSubscriptions.add(
+                            doOnTransferUpdate(transfer)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        )
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
                         val transfer = event.transfer
                         val error = event.error
-                        doOnTransferFinish(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        rxSubscriptions.add(
+                            doOnTransferFinish(transfer, error)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        )
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
                         val transfer = event.transfer
                         val error = event.error
-                        doOnTransferTemporaryError(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        rxSubscriptions.add(
+                            doOnTransferTemporaryError(transfer, error)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                        )
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferData -> {}
                     null -> {}
                 }
@@ -549,9 +561,11 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             serialize != null -> {
                 deserialiseNode(serialize)
             }
+
             isFolderLink -> {
                 megaApiFolder.getNodeByHandle(hash)
             }
+
             else -> {
                 megaApi.getNodeByHandle(hash)
             }
