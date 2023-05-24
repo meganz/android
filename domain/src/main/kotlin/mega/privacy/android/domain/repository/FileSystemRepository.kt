@@ -143,6 +143,15 @@ interface FileSystemRepository {
     suspend fun doesFolderExists(folderPath: String): Boolean
 
     /**
+     * Checks for the Folder existence in the SD Card
+     *
+     * @param uriString The Folder path in the SD Card
+     *
+     * @return true if it exists, and false if otherwise
+     */
+    suspend fun isFolderInSDCardAvailable(uriString: String): Boolean
+
+    /**
      * Checks whether the External Storage Directory exists
      *
      * @return true if it exists, and false if otherwise

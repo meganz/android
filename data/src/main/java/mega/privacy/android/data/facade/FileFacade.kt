@@ -12,6 +12,7 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
+import androidx.documentfile.provider.DocumentFile
 import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -75,6 +76,9 @@ class FileFacade @Inject constructor(
     @Deprecated("File already exposes exists() function", ReplaceWith("file?.exists() == true"))
     override suspend fun isFileAvailable(file: File?): Boolean = file?.exists() == true
     override suspend fun isFileAvailable(fileString: String): Boolean = File(fileString).exists()
+    override suspend fun isDocumentFileAvailable(documentFile: DocumentFile?) =
+        documentFile?.exists() == true
+
     override suspend fun doesExternalStorageDirectoryExists(): Boolean =
         Environment.getExternalStorageDirectory() != null
 

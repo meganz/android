@@ -1,9 +1,20 @@
 package mega.privacy.android.data.gateway
 
+import androidx.documentfile.provider.DocumentFile
+
 /**
  * Gateway class that provides SD Card-related implementations
  */
 interface SDCardGateway {
+
+    /**
+     * Retrieves the Directory File from the given SD Card Path
+     *
+     * @param uriString A URI String of a given SD Card Path
+     *
+     * @return A potentially nullable Directory File, represented as a [DocumentFile]
+     */
+    suspend fun getDirectoryFile(uriString: String): DocumentFile?
 
     /**
      * Retrieves the Folder Directory name in the SD Card

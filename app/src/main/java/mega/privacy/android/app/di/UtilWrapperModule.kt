@@ -3,7 +3,6 @@ package mega.privacy.android.app.di
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.documentfile.provider.DocumentFile
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -20,7 +19,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
-import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
@@ -60,15 +58,6 @@ abstract class UtilWrapperModule {
             return object : GetFullPathFileWrapper {
                 override fun getFullPathFromTreeUri(uri: Uri, context: Context): String? {
                     return FileUtil.getFullPathFromTreeUri(uri, context)
-                }
-            }
-        }
-
-        @Provides
-        fun provideGetDocumentFileWrapper(): GetDocumentFileWrapper {
-            return object : GetDocumentFileWrapper {
-                override fun getDocumentFileFromTreeUri(context: Context, uri: Uri): DocumentFile? {
-                    return DocumentFile.fromTreeUri(context, uri)
                 }
             }
         }

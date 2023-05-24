@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway
 
+import androidx.documentfile.provider.DocumentFile
 import java.io.File
 import java.io.IOException
 
@@ -26,7 +27,7 @@ interface FileGateway {
      * Delete folder and sub folders
      *
      */
-    fun deleteFolderAndSubFolders(folder: File?):Boolean
+    fun deleteFolderAndSubFolders(folder: File?): Boolean
 
     /**
      * Is file available
@@ -35,6 +36,15 @@ interface FileGateway {
      * @return
      */
     suspend fun isFileAvailable(file: File?): Boolean
+
+    /**
+     * Checks whether the passed [DocumentFile] is available or not
+     *
+     * @param documentFile A potentially nullable [DocumentFile]
+     *
+     * @return true if the [DocumentFile] is available, and false if otherwise
+     */
+    suspend fun isDocumentFileAvailable(documentFile: DocumentFile?): Boolean
 
     /**
      * Checks whether the External Storage Directory exists

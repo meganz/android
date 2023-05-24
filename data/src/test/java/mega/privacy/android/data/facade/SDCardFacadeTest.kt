@@ -49,6 +49,28 @@ class SDCardFacadeTest {
         reset(context, documentFileWrapper)
     }
 
+    @ParameterizedTest(name = "document file: {0}")
+    @MethodSource("provideDirectoryFileParameters")
+    fun `test that the directory file is retrieved`(documentFile: DocumentFile?) = runTest {
+        mockStatic(Uri::class.java).use { mockedUri ->
+            val testPath = "test/path"
+            val testUri = mock<Uri>()
+
+            mockedUri.`when`<Uri> { Uri.parse(testPath) }.thenReturn(testUri)
+            whenever(documentFileWrapper.fromTreeUri(testUri)).thenReturn(documentFile)
+
+            assertThat(underTest.getDirectoryFile(testPath)).isEqualTo(documentFile)
+        }
+    }
+
+    /**
+     * Provides a list of [DocumentFile] parameters to a Test
+     */
+    private fun provideDirectoryFileParameters() = Stream.of(
+        Arguments.of(mock<DocumentFile>()),
+        Arguments.of(null),
+    )
+
     @ParameterizedTest(name = "can write document file: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that the directory name is retrieved`(canWrite: Boolean) = runTest {

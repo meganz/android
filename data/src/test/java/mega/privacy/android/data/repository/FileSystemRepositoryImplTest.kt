@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -72,6 +73,7 @@ internal class FileSystemRepositoryImplTest {
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
+    private val sdCardGateway = mock<SDCardGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -94,6 +96,7 @@ internal class FileSystemRepositoryImplTest {
             fileVersionsOptionCache = fileVersionsOptionCache,
             streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
+            sdCardGateway = sdCardGateway,
         )
     }
 
@@ -117,6 +120,7 @@ internal class FileSystemRepositoryImplTest {
             fileVersionsOptionCache,
             streamingGateway,
             deviceGateway,
+            sdCardGateway,
         )
     }
 
@@ -321,6 +325,14 @@ internal class FileSystemRepositoryImplTest {
     fun `test that the folder could exist`(folderExists: Boolean) = runTest {
         whenever(fileGateway.isFileAvailable(fileString = any())).thenReturn(folderExists)
         assertThat(underTest.doesFolderExists("test/folder")).isEqualTo(folderExists)
+    }
+
+    @ParameterizedTest(name = "folder exists: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the folder in the SD Card exists`(folderExists: Boolean) = runTest {
+        whenever(sdCardGateway.getDirectoryFile(any())).thenReturn(mock())
+        whenever(fileGateway.isDocumentFileAvailable(any())).thenReturn(folderExists)
+        assertThat(underTest.isFolderInSDCardAvailable("test/folder/path")).isEqualTo(folderExists)
     }
 
     @ParameterizedTest(name = "external directory exists: {0}")

@@ -1,14 +1,9 @@
 package mega.privacy.android.app.domain.usecase
 
-import android.content.Context
-import android.net.Uri
-import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
-import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -21,29 +16,19 @@ import javax.inject.Inject
  */
 class DefaultIsLocalSecondaryFolderSet @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val fileSystemRepository: FileSystemRepository,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
-    private val getDocumentFileWrapper: GetDocumentFileWrapper,
-    @ApplicationContext private val context: Context,
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
 ) : IsLocalSecondaryFolderSet {
-    override suspend fun invoke(): Boolean {
-        return if (isSecondaryFolderEnabled()) {
-            if (cameraUploadRepository.isSecondaryFolderInSDCard()) {
-                val uri = Uri.parse(cameraUploadRepository.getSecondaryFolderSDCardUriPath())
-                val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
-                if (file == null) {
-                    Timber.d("Local Media Folder on SD card is unavailable")
-                    return false
-                }
-                file.exists()
-            } else {
-                val localPathSecondary = getSecondaryFolderPathUseCase()
-                File(localPathSecondary).exists()
-            }
+    override suspend fun invoke() = if (isSecondaryFolderEnabled()) {
+        if (cameraUploadRepository.isSecondaryFolderInSDCard()) {
+            val uriPath = cameraUploadRepository.getSecondaryFolderSDCardUriPath()
+            fileSystemRepository.isFolderInSDCardAvailable(uriPath)
         } else {
-            Timber.d("Not enabled Secondary Folder Upload")
-            cameraUploadRepository.setSecondaryEnabled(false)
-            true
+            fileSystemRepository.doesFolderExists(getSecondaryFolderPathUseCase())
         }
+    } else {
+        cameraUploadRepository.setSecondaryEnabled(false)
+        true
     }
 }

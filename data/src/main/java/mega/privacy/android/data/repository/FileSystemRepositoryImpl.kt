@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -63,6 +64,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
+ * @property sdCardGateway
  */
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -83,6 +85,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
+    private val sdCardGateway: SDCardGateway,
 ) : FileSystemRepository {
 
     override val localDCIMFolderPath: String
@@ -273,6 +276,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun doesFolderExists(folderPath: String) = withContext(ioDispatcher) {
         fileGateway.isFileAvailable(folderPath)
+    }
+
+    override suspend fun isFolderInSDCardAvailable(uriString: String) = withContext(ioDispatcher) {
+        val directoryFile = sdCardGateway.getDirectoryFile(uriString)
+        fileGateway.isDocumentFileAvailable(directoryFile)
     }
 
     override suspend fun doesExternalStorageDirectoryExists() = withContext(ioDispatcher) {
