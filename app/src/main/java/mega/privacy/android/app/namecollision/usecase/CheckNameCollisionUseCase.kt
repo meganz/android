@@ -132,6 +132,14 @@ class CheckNameCollisionUseCase @Inject constructor(
             checkAsync(name = name, parent = getParentOrRootNode(parentHandle))
         }
 
+    suspend fun checkNameCollision(name: String, parentHandle: Long): Long =
+        withContext(ioDispatcher) {
+            checkAsync(
+                name = name,
+                parent = getParentOrRootNode(parentHandle)
+            )
+        }
+
 
     /**
      * Checks if a node with the given name exists on the provided parent node.

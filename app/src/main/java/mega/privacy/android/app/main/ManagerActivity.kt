@@ -7568,38 +7568,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     val parentHandle = currentParentHandle
                     val file = UploadUtil.getTemporalTakePictureFile(this)
                     if (file != null) {
-                        checkNameCollisionUseCase.check(file.name, parentHandle)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(
-                                { handle: Long ->
-                                    val list: ArrayList<NameCollision> = ArrayList()
-                                    list.add(
-                                        NameCollision.Upload.getUploadCollision(
-                                            handle,
-                                            file,
-                                            parentHandle,
-                                        )
-                                    )
-                                    nameCollisionActivityContract?.launch(list)
-                                },
-                                { throwable: Throwable? ->
-                                    if (throwable is MegaNodeException.ParentDoesNotExistException) {
-                                        showSnackbar(
-                                            Constants.SNACKBAR_TYPE,
-                                            getString(R.string.general_error),
-                                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                        )
-                                    } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                                        PermissionUtils.checkNotificationsPermission(this)
-                                        uploadUseCase.upload(this, file, parentHandle)
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(
-                                                { Timber.d("Upload started") },
-                                                { t: Throwable? -> Timber.e(t) })
-                                    }
-                                })
+                        addPhotoToParent(file, parentHandle)
                     }
                 } else {
                     Timber.w("TAKE_PHOTO_CODE--->ERROR!")
@@ -7762,6 +7731,46 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 super.onActivityResult(requestCode, resultCode, intent)
             }
         }
+    }
+
+    private fun addPhotoToParent(file: File, parentHandle: Long) {
+        lifecycleScope.launch {
+            runCatching {
+                checkNameCollisionUseCase.checkNameCollision(file.name, parentHandle)
+            }.onSuccess { handle: Long ->
+                val list: ArrayList<NameCollision> = ArrayList()
+                list.add(
+                    NameCollision.Upload.getUploadCollision(
+                        handle,
+                        file,
+                        parentHandle,
+                    )
+                )
+                nameCollisionActivityContract?.launch(list)
+            }.onFailure { throwable: Throwable? ->
+                if (throwable is MegaNodeException.ParentDoesNotExistException) {
+                    Timber.e(throwable)
+                    showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.general_error),
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
+                    uploadFile(file, parentHandle)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun uploadFile(file: File, parentHandle: Long) {
+        PermissionUtils.checkNotificationsPermission(this)
+        uploadUseCase.upload(this, file, parentHandle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { Timber.d("Upload started") },
+                { t: Throwable? -> Timber.e(t) })
     }
 
     /**

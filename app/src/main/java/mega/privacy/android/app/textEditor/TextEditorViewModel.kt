@@ -12,10 +12,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -596,31 +592,31 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        checkNameCollisionUseCase.check(tempFile.name, parentHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onSuccess = { handle ->
-                    collision.value =
-                        NameCollision.Upload.getUploadCollision(
-                            handle,
-                            tempFile,
-                            parentHandle,
-                        )
-                },
-                onError = { error ->
-                    when (error) {
-                        is MegaNodeException.ParentDoesNotExistException -> {
-                            Timber.e(error)
-                        }
+        viewModelScope.launch {
+            runCatching {
+                checkNameCollisionUseCase.checkNameCollision(
+                    tempFile.name,
+                    parentHandle
+                )
+            }.onSuccess { handle ->
+                collision.value =
+                    NameCollision.Upload.getUploadCollision(
+                        handle,
+                        tempFile,
+                        parentHandle,
+                    )
+            }.onFailure { error ->
+                when (error) {
+                    is MegaNodeException.ParentDoesNotExistException -> {
+                        Timber.e(error)
+                    }
 
-                        is MegaNodeException.ChildDoesNotExistsException -> {
-                            uploadFile(activity, fromHome, tempFile, parentHandle)
-                        }
+                    is MegaNodeException.ChildDoesNotExistsException -> {
+                        uploadFile(activity, fromHome, tempFile, parentHandle)
                     }
                 }
-            )
-            .addTo(composite)
+            }
+        }
     }
 
     /**
