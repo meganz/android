@@ -71,6 +71,10 @@ class PagesLoader {
 
     private Holder getPageAndCoordsByOffset(Holder holder, GridSize grid, float localXOffset,
                                             float localYOffset, boolean endOffset) {
+        // Ensure that pdfView and pdfFile not null before continuing any operation
+        if (pdfView == null || pdfView.pdfFile == null) {
+            return holder;
+        }
         float fixedXOffset = -MathUtils.max(localXOffset, 0);
         float fixedYOffset = -MathUtils.max(localYOffset, 0);
         float offset = pdfView.isSwipeVertical() ? fixedYOffset : fixedXOffset;

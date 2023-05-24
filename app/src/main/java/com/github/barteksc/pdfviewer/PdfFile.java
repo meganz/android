@@ -196,6 +196,12 @@ class PdfFile {
         }
     }
 
+    /**
+     * Retrieves the page at offset. Ensure that PdfFile is not null before calling this function
+     * @param offset Offset value
+     * @param zoom Zoom value
+     * @return The page at offset
+     */
     public int getPageAtOffset(float offset, float zoom) {
         int currentPage = 0;
         for (float off : pageOffsets) {

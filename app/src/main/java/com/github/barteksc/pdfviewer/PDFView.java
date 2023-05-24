@@ -929,7 +929,8 @@ public class PDFView extends RelativeLayout {
     }
 
     void loadPageByOffset() {
-        if (0 == pdfFile.getPagesCount()) {
+        // Ensure that pdfFile is not null before continuing any operation
+        if (pdfFile == null || pdfFile.getPagesCount() == 0) {
             return;
         }
 
@@ -1074,16 +1075,6 @@ public class PDFView extends RelativeLayout {
 
     private void setScrollHandle(ScrollHandle scrollHandle) {
         this.scrollHandle = scrollHandle;
-    }
-
-    /**
-     * Get page number at given offset
-     *
-     * @param positionOffset scroll offset between 0 and 1
-     * @return page number at given offset, starting from 0
-     */
-    public int getPageAtPositionOffset(float positionOffset) {
-        return pdfFile.getPageAtOffset(pdfFile.getDocLen(zoom) * positionOffset, zoom);
     }
 
     public float getMinZoom() {

@@ -80,6 +80,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     }
 
     private boolean checkLinkTapped(float x, float y) {
+        // Ensure that pdfView and pdfFile are not null before continuing any operation
+        if (pdfView == null || pdfView.pdfFile == null) {
+            return false;
+        }
         PdfFile pdfFile = pdfView.pdfFile;
         float mappedX = -pdfView.getCurrentXOffset() + x;
         float mappedY = -pdfView.getCurrentYOffset() + y;
