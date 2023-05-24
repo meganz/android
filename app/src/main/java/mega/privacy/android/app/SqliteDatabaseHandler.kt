@@ -34,7 +34,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
-import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_VERSION
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
@@ -4893,6 +4892,7 @@ class SqliteDatabaseHandler @Inject constructor(
         "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"
 
     companion object {
+        private const val DATABASE_VERSION = 68
         private const val TABLE_PREFERENCES = "preferences"
         private const val TABLE_CREDENTIALS = "credentials"
         private const val TABLE_ATTRIBUTES = "attributes"
