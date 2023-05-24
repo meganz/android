@@ -312,7 +312,6 @@ public class ShareInfo implements Serializable {
 
             file = null;
             String path = uri.getPath();
-            Timber.d("processUri-path: %s", path);
             try {
                 file = new File(path);
             } catch (Exception e) {
