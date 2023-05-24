@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadSelectionQueryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -30,7 +31,7 @@ import javax.inject.Inject
  * @property getSecondaryFolderPathUseCase [GetSecondaryFolderPathUseCase]
  * @property getMediaStoreFileTypesUseCase [GetMediaStoreFileTypesUseCase]
  * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
- * @property selectionQuery [GetCameraUploadSelectionQuery]
+ * @property getCameraUploadSelectionQueryUseCase [GetCameraUploadSelectionQueryUseCase]
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
  * @property getPendingUploadListUseCase [GetPendingUploadListUseCase]
  * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
@@ -42,7 +43,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val getMediaStoreFileTypesUseCase: GetMediaStoreFileTypesUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
-    private val selectionQuery: GetCameraUploadSelectionQuery,
+    private val getCameraUploadSelectionQueryUseCase: GetCameraUploadSelectionQueryUseCase,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadListUseCase: GetPendingUploadListUseCase,
     private val saveSyncRecordsToDB: SaveSyncRecordsToDB,
@@ -112,7 +113,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                         mediaStoreFileType = type,
                         parentPath = getPrimaryFolderPathUseCase(),
                         isVideo = false,
-                        selectionQuery = selectionQuery(SyncTimeStamp.PRIMARY_PHOTO),
+                        selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.PRIMARY_PHOTO),
                     )
                 )
             }
@@ -144,7 +145,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                         mediaStoreFileType = type,
                         parentPath = getPrimaryFolderPathUseCase(),
                         isVideo = true,
-                        selectionQuery = selectionQuery(SyncTimeStamp.PRIMARY_VIDEO),
+                        selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.PRIMARY_VIDEO),
                     )
                 )
             }
@@ -177,7 +178,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                             mediaStoreFileType = type,
                             parentPath = getSecondaryFolderPathUseCase(),
                             isVideo = false,
-                            selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_PHOTO),
+                            selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.SECONDARY_PHOTO),
                         )
                     )
                 }
@@ -212,7 +213,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
                             mediaStoreFileType = type,
                             parentPath = getSecondaryFolderPathUseCase(),
                             isVideo = true,
-                            selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_VIDEO),
+                            selectionQuery = getCameraUploadSelectionQueryUseCase(SyncTimeStamp.SECONDARY_VIDEO),
                         )
                     )
                 }

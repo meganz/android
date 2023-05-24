@@ -704,4 +704,11 @@ interface CameraUploadRepository {
         latitude: Double,
         longitude: Double,
     )
+
+    /**
+     * @param currentTimeStamp
+     * @param localPath
+     * @return selection query
+     */
+    fun getSelectionQuery(currentTimeStamp: Long, localPath: String): String
 }

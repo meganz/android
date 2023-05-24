@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
-import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
@@ -22,6 +21,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadSelectionQueryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -53,7 +53,7 @@ class DefaultProcessMediaForUploadTest {
     private val saveSyncRecordsToDB = mock<SaveSyncRecordsToDB>()
     private val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val selectionQuery = mock<GetCameraUploadSelectionQuery>()
+    private val getCameraUploadSelectionQueryUseCase = mock<GetCameraUploadSelectionQueryUseCase>()
 
     @Before
     fun setUp() {
@@ -63,7 +63,7 @@ class DefaultProcessMediaForUploadTest {
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getMediaStoreFileTypesUseCase = getMediaStoreFileTypesUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
-            selectionQuery = selectionQuery,
+            getCameraUploadSelectionQueryUseCase = getCameraUploadSelectionQueryUseCase,
             updateTimeStamp = updateTimeStamp,
             getPendingUploadListUseCase = getPendingUploadListUseCase,
             saveSyncRecordsToDB = saveSyncRecordsToDB,
@@ -77,7 +77,7 @@ class DefaultProcessMediaForUploadTest {
                 )
             )
             SyncTimeStamp.values().forEach {
-                whenever(selectionQuery(it)).thenReturn("")
+                whenever(getCameraUploadSelectionQueryUseCase(it)).thenReturn("")
             }
             whenever(getPrimaryFolderPathUseCase()).thenReturn("")
             whenever(getSecondaryFolderPathUseCase()).thenReturn("")
