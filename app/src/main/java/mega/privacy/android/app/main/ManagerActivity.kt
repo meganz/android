@@ -10038,8 +10038,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Retries all the failed and cancelled transfers.
      */
     private fun retryAllTransfers() {
+        val retryTransfers = failedAndCancelledTransfers
         dbH.removeFailedOrCancelledTransfers()
-        for (transfer in failedAndCancelledTransfers) {
+        for (transfer in retryTransfers) {
             if (isTransfersCompletedAdded) {
                 completedTransfersFragment?.transferRemoved(transfer, false)
             }
