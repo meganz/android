@@ -28,12 +28,14 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
@@ -66,6 +68,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
@@ -144,6 +147,10 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -352,8 +359,10 @@ internal class UploadService : LifecycleService() {
             when (it) {
                 Constants.ACTION_OVERQUOTA_STORAGE -> isOverQuota =
                     Constants.OVERQUOTA_STORAGE_STATE
+
                 Constants.ACTION_STORAGE_STATE_CHANGED -> isOverQuota =
                     Constants.NOT_OVERQUOTA_STATE
+
                 Constants.ACTION_RESTART_SERVICE -> {
                     val transferData = megaApi.getTransferData(null)
                     if (transferData == null) {
@@ -430,10 +439,12 @@ internal class UploadService : LifecycleService() {
                     + intent.getBooleanExtra(Constants.FROM_HOME_PAGE, false)
                     )
 
-            megaApi.startUpload(
-                file.absolutePath, parentNode, fileName, mTime, appData,
-                true, true, null
-            )
+            withContext(ioDispatcher) {
+                megaApi.startUpload(
+                    file.absolutePath, parentNode, fileName, mTime, appData,
+                    true, true, null
+                )
+            }
         } else {
             val cancelToken = transfersManagement
                 .addScanningTransfer(
@@ -442,10 +453,13 @@ internal class UploadService : LifecycleService() {
                     parentNode,
                     file.isDirectory
                 )
-            megaApi.startUpload(
-                file.absolutePath, parentNode, fileName, mTime, null,
-                false, false, cancelToken
-            )
+
+            withContext(ioDispatcher) {
+                megaApi.startUpload(
+                    file.absolutePath, parentNode, fileName, mTime, null,
+                    false, false, cancelToken
+                )
+            }
         }
     }
 
@@ -532,21 +546,21 @@ internal class UploadService : LifecycleService() {
 
             notificationManager?.notify(notificationId, builderCompatOreo.build())
         } else {
-                notificationBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
-                    .setContentIntent(
-                        PendingIntent.getActivity(
-                            applicationContext,
-                            0,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
+            notificationBuilderCompat
+                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(getInstance(), R.color.red_600_red_300))
+                .setContentIntent(
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-                    .setAutoCancel(true).setTicker(notificationTitle)
-                    .setContentTitle(notificationTitle).setContentText(size)
-                    .setOngoing(false)
-                notificationManager?.notify(notificationId, notificationBuilderCompat.build())
+                )
+                .setAutoCancel(true).setTicker(notificationTitle)
+                .setContentTitle(notificationTitle).setContentText(size)
+                .setOngoing(false)
+            notificationManager?.notify(notificationId, notificationBuilderCompat.build())
         }
     }
 
@@ -654,17 +668,17 @@ internal class UploadService : LifecycleService() {
                 .setOnlyAlertOnce(true)
                 .build()
         } else {
-                notificationBuilderCompat
-                    .setSmallIcon(R.drawable.ic_stat_notify)
-                    .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
-                    .setProgress(100, progressPercent, false)
-                    .setContentIntent(pendingIntent)
-                    .setOngoing(true)
-                    .setContentTitle(message)
-                    .setSubText(info)
-                    .setContentText(actionString)
-                    .setOnlyAlertOnce(true)
-                    .build()
+            notificationBuilderCompat
+                .setSmallIcon(R.drawable.ic_stat_notify)
+                .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
+                .setProgress(100, progressPercent, false)
+                .setContentIntent(pendingIntent)
+                .setOngoing(true)
+                .setContentTitle(message)
+                .setSubText(info)
+                .setContentText(actionString)
+                .setOnlyAlertOnce(true)
+                .build()
         }
         if (!isForeground) {
             Timber.d("Starting foreground")
