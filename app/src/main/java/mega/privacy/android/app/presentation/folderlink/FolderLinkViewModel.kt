@@ -249,11 +249,18 @@ class FolderLinkViewModel @Inject constructor(
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
-                                _state.update {
-                                    it.copy(
-                                        copyResultText = copyRequestMessageMapper(copyRequestResult),
-                                        copyThrowable = copyThrowable
-                                    )
+                                if (copyThrowable != null) {
+                                    _state.update {
+                                        it.copy(copyThrowable = copyThrowable)
+                                    }
+                                } else {
+                                    _state.update {
+                                        it.copy(
+                                            copyResultText = copyRequestMessageMapper(
+                                                copyRequestResult
+                                            )
+                                        )
+                                    }
                                 }
                             }
                     }
