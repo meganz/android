@@ -140,12 +140,12 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param parentNode    Parent node in which to look.
      * @return Single Long with the node handle with which there is a name collision.
      */
-    fun check(name: String, parentNode: MegaNode?): Single<Long> =
+    private fun check(name: String, parentNode: MegaNode?): Single<Long> =
         rxSingle(ioDispatcher) {
             checkAsync(name, parentNode)
         }
 
-    private suspend fun checkAsync(name: String, parent: MegaNode?): Long {
+    suspend fun checkAsync(name: String, parent: MegaNode?): Long {
         contract { returns() implies (parent != null) }
         if (parent == null) {
             throw MegaNodeException.ParentDoesNotExistException()

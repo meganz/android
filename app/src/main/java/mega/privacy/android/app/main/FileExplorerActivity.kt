@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -18,6 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
@@ -25,6 +27,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isLoggingIn
 import mega.privacy.android.app.R
@@ -1906,34 +1909,39 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         }
 
         parentHandle = parentNode?.handle ?: megaApi.rootNode?.handle ?: INVALID_HANDLE
-        checkNameCollisionUseCase.check(file.name, parentNode)
+        lifecycleScope.launch {
+            runCatching { checkNameCollisionUseCase.checkAsync(file.name, parentNode) }
+                .onSuccess { handle: Long ->
+                    val list = ArrayList<NameCollision>()
+                    list.add(getUploadCollision(handle, file, parentHandle))
+                    nameCollisionActivityContract?.launch(list)
+                }.onFailure { throwable: Throwable? ->
+                    if (throwable is ParentDoesNotExistException) {
+                        showSnackbar(getString(R.string.general_text_error))
+                    } else if (throwable is ChildDoesNotExistsException) {
+                        uploadFile(file)
+                    }
+                }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun uploadFile(file: File) {
+        checkNotificationsPermission(this)
+        val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
+        uploadUseCase.upload(this, file, parentHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ handle: Long? ->
-                val list = ArrayList<NameCollision>()
-                list.add(getUploadCollision(handle ?: return@subscribe, file, parentHandle))
-                nameCollisionActivityContract?.launch(list)
-            }) { throwable: Throwable? ->
-                if (throwable is ParentDoesNotExistException) {
-                    showSnackbar(getString(R.string.general_text_error))
-                } else if (throwable is ChildDoesNotExistsException) {
-                    checkNotificationsPermission(this)
-                    val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
-                    uploadUseCase.upload(this, file, parentHandle)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                text,
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                            )
-                            Timber.d("After UPLOAD click - back to Cloud")
-                            backToCloud(parentHandle, 1, null)
-                            finishAndRemoveTask()
-                        }) { t: Throwable? -> Timber.e(t) }
-                }
-            }
+            .subscribe({
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    text,
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                Timber.d("After UPLOAD click - back to Cloud")
+                backToCloud(parentHandle, 1, null)
+                finishAndRemoveTask()
+            }) { t: Throwable? -> Timber.e(t) }
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {

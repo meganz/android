@@ -1,14 +1,17 @@
 package mega.privacy.android.app.modalbottomsheet
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.databinding.BottomSheetQrCodeBinding
@@ -29,7 +32,9 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -98,46 +103,47 @@ class QRCodeSaveBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             showOverDiskQuotaPaywallWarning()
             return
         }
-        val checkNameCollisionDisposable =
-            checkNameCollisionUseCase.check(qrFile.name, parentNode)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { handle: Long ->
-                        val list = ArrayList<NameCollision>()
-                        list.add(
-                            getUploadCollision(handle, qrFile, parentNode?.handle)
-                        )
-                        (requireActivity() as QRCodeActivity).nameCollisionActivityContract?.launch(
-                            list
-                        )
-                    }
-                ) { throwable: Throwable? ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            runCatching { checkNameCollisionUseCase.checkAsync(qrFile.name, parentNode) }
+                .onSuccess { handle: Long ->
+                    val list = ArrayList<NameCollision>()
+                    list.add(
+                        getUploadCollision(handle, qrFile, parentNode?.handle)
+                    )
+                    (requireActivity() as QRCodeActivity).nameCollisionActivityContract?.launch(
+                        list
+                    )
+                }.onFailure { throwable: Throwable? ->
                     if (throwable is ParentDoesNotExistException) {
                         Util.showSnackbar(requireActivity(), getString(R.string.error_upload_qr))
                     } else if (throwable is ChildDoesNotExistsException) {
-                        val info = ShareInfo.infoFromFile(qrFile)
-                        if (info == null) {
-                            Util.showSnackbar(
-                                requireActivity(),
-                                getString(R.string.error_upload_qr)
-                            )
-                            return@subscribe
-                        }
-                        checkNotificationsPermission(requireActivity())
-                        val text = getString(R.string.save_qr_cloud_drive, qrFile.name)
-                        val uploadDisposable =
-                            uploadUseCase.upload(requireActivity(), info, null, parentNode?.handle)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({
-                                    Util.showSnackbar(
-                                        requireActivity(),
-                                        text
-                                    )
-                                }) { t: Throwable? -> Timber.e(t) }
+                        uploadFile(qrFile, parentNode)
                     }
                 }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun uploadFile(qrFile: File, parentNode: MegaNode?) {
+        val info = ShareInfo.infoFromFile(qrFile)
+        if (info == null) {
+            Util.showSnackbar(
+                requireActivity(),
+                getString(R.string.error_upload_qr)
+            )
+            return
+        }
+        checkNotificationsPermission(requireActivity())
+        val text = getString(R.string.save_qr_cloud_drive, qrFile.name)
+        uploadUseCase.upload(requireActivity(), info, null, parentNode?.handle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Util.showSnackbar(
+                    requireActivity(),
+                    text
+                )
+            }) { t: Throwable? -> Timber.e(t) }
     }
 
     private fun saveToFileSystem() {

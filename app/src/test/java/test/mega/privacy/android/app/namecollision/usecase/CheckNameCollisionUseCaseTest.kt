@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.namecollision.usecase
 
+import com.google.common.truth.Truth.assertThat
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -64,18 +66,26 @@ internal class CheckNameCollisionUseCaseTest {
         @Test
         internal fun `test that check with a null parent throws ParentDoesNotExistException`() =
             runTest {
-                underTest.check("name", null).test()
-                    .assertError { it is MegaNodeException.ParentDoesNotExistException }
+                assertThrows<MegaNodeException.ParentDoesNotExistException>() {
+                    underTest.checkAsync(
+                        "name",
+                        null
+                    )
+                }
             }
 
         @Test
-        internal fun `test that check with no child throes ChildDoesNotExistsException`() =
+        internal fun `test that check with no child throws ChildDoesNotExistsException`() =
             runTest {
                 megaApiGateway.stub {
                     onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(null)
                 }
-                underTest.check("name", mock<MegaNode>()).test()
-                    .assertError { it is MegaNodeException.ChildDoesNotExistsException }
+                assertThrows<MegaNodeException.ChildDoesNotExistsException>() {
+                    underTest.checkAsync(
+                        "name",
+                        mock()
+                    )
+                }
             }
 
         @Test
@@ -87,8 +97,8 @@ internal class CheckNameCollisionUseCaseTest {
             megaApiGateway.stub {
                 onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
             }
-            underTest.check("name", mock<MegaNode>()).test()
-                .assertValue(expected)
+            assertThat(underTest.checkAsync("name", mock()))
+                .isEqualTo(expected)
         }
     }
 

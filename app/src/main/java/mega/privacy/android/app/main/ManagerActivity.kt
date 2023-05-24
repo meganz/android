@@ -8486,11 +8486,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (parentNode == null) return
-        checkNameCollisionUseCase.check(file.name, parentNode)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { handle: Long ->
+        lifecycleScope.launch {
+            runCatching { checkNameCollisionUseCase.checkAsync(file.name, parentNode) }
+                .onSuccess { handle: Long ->
                     val list: ArrayList<NameCollision> = ArrayList()
                     list.add(
                         NameCollision.Upload.getUploadCollision(
@@ -8500,8 +8498,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         )
                     )
                     nameCollisionActivityContract?.launch(list)
-                },
-                { throwable: Throwable? ->
+                }.onFailure { throwable: Throwable? ->
                     if (throwable is MegaNodeException.ParentDoesNotExistException) {
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
@@ -8509,21 +8506,30 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                     } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
-                        PermissionUtils.checkNotificationsPermission(this)
-                        val text: String =
-                            resources.getQuantityString(R.plurals.upload_began, 1, 1)
-                        uploadUseCase.upload(this, file, parentNode.handle)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                showSnackbar(
-                                    Constants.SNACKBAR_TYPE,
-                                    text,
-                                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                )
-                            }, { t: Throwable? -> Timber.e(t) })
+                        uploadFile(file, parentNode)
                     }
-                })
+                }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun uploadFile(
+        file: File,
+        parentNode: MegaNode,
+    ) {
+        PermissionUtils.checkNotificationsPermission(this)
+        val text: String =
+            resources.getQuantityString(R.plurals.upload_began, 1, 1)
+        uploadUseCase.upload(this, file, parentNode.handle)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    text,
+                    MEGACHAT_INVALID_HANDLE
+                )
+            }, { t: Throwable? -> Timber.e(t) })
     }
 
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
