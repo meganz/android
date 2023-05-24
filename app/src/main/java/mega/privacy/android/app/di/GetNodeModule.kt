@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.rx3.await
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
@@ -73,7 +72,7 @@ abstract class GetNodeModule {
                     nodeHandle.longValue,
                     parentNodeHandle.longValue,
                     type,
-                ).await()
+                )
             }
 
         /**

@@ -55,18 +55,16 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param type          [NameCollisionType]
      * @return Single Long with the node handle with which there is a name collision.
      */
-    fun check(
+    suspend fun check(
         handle: Long,
         parentHandle: Long,
         type: NameCollisionType,
-    ): Single<NameCollision> =
-        rxSingle(ioDispatcher) {
-            checkNodeCollisionsWithType(
-                node = megaApiGateway.getMegaNodeByHandle(handle),
-                parentNode = getParentOrRootNode(parentHandle),
-                type = type,
-            )
-        }
+    ): NameCollision =
+        checkNodeCollisionsWithType(
+            node = megaApiGateway.getMegaNodeByHandle(handle),
+            parentNode = getParentOrRootNode(parentHandle),
+            type = type,
+        )
 
 
     /**
