@@ -10,14 +10,12 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
-import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -435,12 +433,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetCameraUploadSelectionQuery(getSelectionQuery: DefaultGetCameraUploadSelectionQuery): GetCameraUploadSelectionQuery
-
-    /**
-     * Provide the [IsLocalSecondaryFolderSet] implementation
-     */
-    @Binds
-    abstract fun bindIsLocalSecondaryFolderSet(isLocalSecondaryFolderSet: DefaultIsLocalSecondaryFolderSet): IsLocalSecondaryFolderSet
 
     /**
      * Provide the [ShouldCompressVideo] implementation

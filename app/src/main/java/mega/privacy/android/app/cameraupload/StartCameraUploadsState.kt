@@ -35,9 +35,9 @@ enum class StartCameraUploadsState {
     INVALID_PRIMARY_FOLDER,
 
     /**
-     * The local Secondary Folder does not exist
+     * The Secondary Folder does not exist. This is only called when Secondary uploads are enabled
      */
-    MISSING_LOCAL_SECONDARY_FOLDER,
+    MISSING_SECONDARY_FOLDER,
 
     /**
      * The User is logged out

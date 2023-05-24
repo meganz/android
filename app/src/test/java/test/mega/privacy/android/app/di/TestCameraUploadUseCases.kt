@@ -9,7 +9,6 @@ import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -151,9 +150,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetCameraUploadSelectionQuery() = mock<GetCameraUploadSelectionQuery>()
-
-    @Provides
-    fun provideIsLocalSecondaryFolderSet() = mock<IsLocalSecondaryFolderSet>()
 
     @Provides
     fun provideShouldCompressVideo() = mock<ShouldCompressVideo>()

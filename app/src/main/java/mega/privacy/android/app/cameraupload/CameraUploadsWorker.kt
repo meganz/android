@@ -42,7 +42,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
@@ -162,7 +162,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     companion object {
         private const val FOLDER_REMINDER_PRIMARY = 1908
-        private const val LOCAL_FOLDER_REMINDER_SECONDARY = 1909
+        private const val FOLDER_REMINDER_SECONDARY = 1909
         private const val OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "OVER_QUOTA_NOTIFICATION"
         private const val LOW_BATTERY_LEVEL = 20
         private const val notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS
@@ -192,10 +192,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase
 
     /**
-     * IsLocalSecondaryFolderSet
+     * [IsSecondaryFolderSetUseCase]
      */
     @Inject
-    lateinit var isLocalSecondaryFolderSet: IsLocalSecondaryFolderSet
+    lateinit var isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase
 
     /**
      * IsSecondaryFolderEnabled
@@ -811,7 +811,9 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun hideFolderPathNotifications() {
         if (isPrimaryFolderValid()) notificationManager.cancel(FOLDER_REMINDER_PRIMARY)
-        if (hasLocalSecondaryFolder()) notificationManager.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
+        if (isSecondaryFolderEnabled() && hasSecondaryFolder()) {
+            notificationManager.cancel(FOLDER_REMINDER_SECONDARY)
+        }
     }
 
     /**
@@ -822,7 +824,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * 3. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
      * 4. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
      * 5. The Primary Folder exists and is valid - [isPrimaryFolderValid],
-     * 6. The local Secondary Folder exists - [hasLocalSecondaryFolder],
+     * 6. The Secondary Folder exists when Secondary uploads are enabled - [isSecondaryFolderEnabled] and [hasSecondaryFolder]
      * 7. The user Camera Uploads attribute exists - [missingAttributesChecked],
      * 8. The Primary Folder exists - [areFoldersEstablished],
      * 9. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
@@ -839,7 +841,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
             !isPrimaryFolderValid() -> StartCameraUploadsState.INVALID_PRIMARY_FOLDER
-            !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
+            isSecondaryFolderEnabled() && !hasSecondaryFolder() -> StartCameraUploadsState.MISSING_SECONDARY_FOLDER
             !missingAttributesChecked -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
             !areFoldersEstablished() -> StartCameraUploadsState.UNESTABLISHED_FOLDERS
             else -> StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
@@ -869,9 +871,9 @@ class CameraUploadsWorker @AssistedInject constructor(
                 endService(aborted = true)
             }
 
-            StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER -> {
-                Timber.e("Local Secondary Folder is disabled. Stop Camera Uploads")
-                handleLocalSecondaryFolderDisabled()
+            StartCameraUploadsState.MISSING_SECONDARY_FOLDER -> {
+                Timber.e("Secondary Folder is disabled. Stop Camera Uploads")
+                handleSecondaryFolderDisabled()
                 endService(aborted = true)
             }
 
@@ -937,13 +939,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
     /**
-     * Checks if the local Secondary Folder from [isLocalSecondaryFolderSet] exists
+     * Checks if the Secondary Folder from [isSecondaryFolderSetUseCase] exists
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun hasLocalSecondaryFolder(): Boolean =
-        isLocalSecondaryFolderSet().also {
-            if (!it) Timber.w("Local Secondary Folder is not set")
+    private suspend fun hasSecondaryFolder(): Boolean =
+        isSecondaryFolderSetUseCase().also {
+            if (!it) Timber.w("The Secondary Folder is not set")
         }
 
     /**
@@ -1394,12 +1396,12 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Executes certain behavior when the Local Secondary Folder is disabled
+     * Executes certain behavior when the Secondary Folder is disabled
      */
-    private suspend fun handleLocalSecondaryFolderDisabled() {
+    private suspend fun handleSecondaryFolderDisabled() {
         displayFolderUnavailableNotification(
             R.string.camera_notif_secondary_local_unavailable,
-            LOCAL_FOLDER_REMINDER_SECONDARY
+            FOLDER_REMINDER_SECONDARY
         )
         // Disable Media Uploads only
         resetMediaUploadTimeStamps()
