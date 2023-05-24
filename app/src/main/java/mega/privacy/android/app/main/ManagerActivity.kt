@@ -101,6 +101,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BusinessExpiredAlertActivity
@@ -9387,10 +9388,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Shows or hides the fabButton depending on the current section.
      */
-    fun showFabButton() {
+    fun showFabButton() = lifecycleScope.launch {
         initFabButtonShow = true
         if (drawerItem == null) {
-            return
+            return@launch
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> if (!isInMDMode) {
@@ -9399,12 +9400,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.SHARED_ITEMS -> when (tabItemShares) {
                 SharesTab.INCOMING_TAB -> {
-                    if (!isIncomingAdded) return
-                    val parentNodeInSF: MegaNode? =
-                        megaApi.getNodeByHandle(this.incomingSharesState().incomingHandle)
-                    if (this.incomingSharesState().incomingTreeDepth <= 0 || parentNodeInSF == null) {
+                    if (!isIncomingAdded) return@launch
+                    val parentNodeInSF: MegaNode? = withContext(ioDispatcher) {
+                        megaApi.getNodeByHandle(this@ManagerActivity.incomingSharesState().incomingHandle)
+                    }
+                    if (this@ManagerActivity.incomingSharesState().incomingTreeDepth <= 0 || parentNodeInSF == null) {
                         hideFabButton()
-                        return
+                        return@launch
                     }
                     when (megaApi.getAccess(parentNodeInSF)) {
                         MegaShare.ACCESS_OWNER, MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_FULL -> updateFabAndShow()
@@ -9413,16 +9415,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 SharesTab.OUTGOING_TAB -> {
-                    if (!isOutgoingAdded) return
+                    if (!isOutgoingAdded) return@launch
 
                     // If the user is in the main page of Outgoing Shares, hide the Fab Button
-                    if (this.outgoingSharesState().outgoingTreeDepth <= 0) {
+                    if (this@ManagerActivity.outgoingSharesState().outgoingTreeDepth <= 0) {
                         hideFabButton()
                     } else {
                         // Otherwise, check if the current parent node of the Outgoing Shares section is a Backup folder or not.
                         // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
-                        val outgoingParentNode =
-                            megaApi.getNodeByHandle(this.outgoingSharesState().outgoingHandle)
+                        val outgoingParentNode = withContext(ioDispatcher) {
+                            megaApi.getNodeByHandle(this@ManagerActivity.outgoingSharesState().outgoingHandle)
+                        }
                         if (outgoingParentNode != null && megaApi.isInInbox(outgoingParentNode)) {
                             hideFabButton()
                         } else {
@@ -9432,16 +9435,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
                 SharesTab.LINKS_TAB -> {
-                    if (!isLinksAdded) return
+                    if (!isLinksAdded) return@launch
 
                     // If the user is in the main page of Links, hide the Fab Button
-                    if (this.linksState().linksTreeDepth <= 0) {
+                    if (this@ManagerActivity.linksState().linksTreeDepth <= 0) {
                         hideFabButton()
                     } else {
                         // Otherwise, check if the current parent node of the Links section is a Backup folder or not.
                         // Hide the Fab button if it is a Backup folder. Otherwise, show the Fab button.
-                        val linksParentNode =
-                            megaApi.getNodeByHandle(this.linksState().linksHandle)
+                        val linksParentNode = withContext(ioDispatcher) {
+                            megaApi.getNodeByHandle(this@ManagerActivity.linksState().linksHandle)
+                        }
                         if (linksParentNode != null && megaApi.isInInbox(linksParentNode)) {
                             hideFabButton()
                         } else {
