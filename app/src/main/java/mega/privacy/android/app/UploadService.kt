@@ -364,7 +364,7 @@ internal class UploadService : LifecycleService() {
                     Constants.NOT_OVERQUOTA_STATE
 
                 Constants.ACTION_RESTART_SERVICE -> {
-                    val transferData = megaApi.getTransferData(null)
+                    val transferData = withContext(ioDispatcher) { megaApi.getTransferData(null) }
                     if (transferData == null) {
                         stopForeground()
                         return
@@ -372,7 +372,9 @@ internal class UploadService : LifecycleService() {
                     val uploadsInProgress = transferData.numUploads
                     var i = 0
                     while (i < uploadsInProgress) {
-                        val transfer = megaApi.getTransferByTag(transferData.getUploadTag(i))
+                        val transfer = withContext(ioDispatcher) {
+                            megaApi.getTransferByTag(transferData.getUploadTag(i))
+                        }
                         if (transfer == null || isCUOrChatTransfer(transfer)) {
                             i++
                             continue
