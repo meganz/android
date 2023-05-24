@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
@@ -120,7 +122,7 @@ class FavouritesViewHolder(
                                 }
                             }
                         } ?: itemThumbnail.setImageResource(favourite.icon)
-                        itemFilename.text = favourite.typedNode.name
+                        textViewSettings(textView = itemFilename, favourite = favourite)
                         itemImgLabel.setImageDrawable(
                             ResourcesCompat.getDrawable(
                                 context.resources,
@@ -188,6 +190,22 @@ class FavouritesViewHolder(
         }
     }
 
+    /**
+     * TextView set text and text color
+     * @param textView TextView
+     * @param favourite Favourite
+     */
+    private fun textViewSettings(textView: TextView, favourite: Favourite) {
+        textView.apply {
+            text = favourite.typedNode.name
+            setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    if (favourite.typedNode.isTakenDown) R.color.red_800_red_400 else R.color.grey_087_white_087
+                )
+            )
+        }
+    }
 }
 
 /**

@@ -132,6 +132,7 @@ class ActionModeCallback constructor(
             control.copy().isVisible = true
         } else {
             control.saveToDevice().isVisible = false
+            control.trash().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
         }
 
         control.move().isVisible = true

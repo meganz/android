@@ -58,9 +58,8 @@
         <ImageView
             android:id="@+id/folder_grid_taken_down"
             style="@style/taken_down_icon"
-            android:src="@drawable/ic_input_warning"
+            android:src="@drawable/ic_taken_down"
             android:visibility="visible"
-            app:tint="@color/red_600_red_300"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/folder_grid_three_dots"
             app:layout_constraintTop_toTopOf="parent"
@@ -166,8 +165,7 @@
                 android:layout_height="16dp"
                 android:layout_gravity="end|center_vertical"
                 android:background="@null"
-                android:src="@drawable/ic_input_warning"
-                app:tint="@color/red_600_red_300"
+                android:src="@drawable/ic_taken_down"
                 tools:ignore="ContentDescription" />
 
             <ImageView

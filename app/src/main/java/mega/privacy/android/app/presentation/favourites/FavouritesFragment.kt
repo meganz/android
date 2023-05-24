@@ -410,7 +410,11 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     private fun activateActionMode() {
         if (actionModeCallback == null) {
             actionModeCallback =
-                FavouriteActionModeCallback((requireActivity() as ManagerActivity), viewModel)
+                FavouriteActionModeCallback(
+                    (requireActivity() as ManagerActivity),
+                    viewModel,
+                    requireContext()
+                )
         }
         actionModeCallback?.run {
             actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(this)

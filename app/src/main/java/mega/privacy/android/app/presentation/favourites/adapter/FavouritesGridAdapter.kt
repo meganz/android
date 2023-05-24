@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
@@ -215,11 +216,10 @@ class FavouritesGridViewHolder(
         with(textView) {
             text = info.typedNode.name
             setTextColor(
-                if (info.typedNode.isTakenDown) {
-                    context.getColor(R.color.red_600_red_300)
-                } else {
-                    context.getColor(R.color.grey_087_white_087)
-                }
+                ContextCompat.getColor(
+                    context,
+                    if (info.typedNode.isTakenDown) R.color.red_800_red_400 else R.color.grey_087_white_087
+                )
             )
         }
     }

@@ -1,11 +1,16 @@
 package mega.privacy.android.app.presentation.favourites
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
@@ -19,6 +24,7 @@ import timber.log.Timber
 class FavouriteActionModeCallback(
     private val mainActivity: ManagerActivity,
     private val viewModel: FavouritesViewModel,
+    private val context: Context,
 ) :
     ActionMode.Callback {
 
@@ -50,37 +56,54 @@ class FavouriteActionModeCallback(
                 R.id.cab_menu_download -> {
                     mainActivity.saveNodesToDevice(selectedNodes, false, false, false, false)
                 }
+
                 R.id.cab_menu_copy -> {
                     NodeController(mainActivity).chooseLocationToCopyNodes(nodeHandles)
                 }
+
                 R.id.cab_menu_move -> {
                     NodeController(mainActivity).chooseLocationToMoveNodes(nodeHandles)
                 }
+
                 R.id.cab_menu_share_out -> {
                     MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
                 }
+
                 R.id.cab_menu_share_link -> {
                     Timber.d("Public link option")
                     LinksUtil.showGetLinkActivity(mainActivity, nodeHandles.toLongArray())
                 }
+
                 R.id.cab_menu_send_to_chat -> {
                     Timber.d("Send files to chat")
                     mainActivity.attachNodesToChats(selectedNodes)
                 }
+
                 R.id.cab_menu_trash -> {
                     mainActivity.askConfirmationMoveToRubbish(
                         nodeHandles
                     )
                 }
+
                 R.id.cab_menu_select_all -> viewModel.selectAll()
                 R.id.cab_menu_remove_favourites -> {
                     viewModel.favouritesRemoved(nodeHandles)
                 }
+
                 R.id.cab_menu_rename -> {
                     mainActivity.showRenameDialog(selectedNodes.first())
                 }
+
                 R.id.cab_menu_share_folder -> {
                     NodeController(mainActivity).selectContactToShareFolders(nodeHandles)
+                }
+
+                R.id.cab_menu_dispute -> {
+                    context.startActivity(
+                        Intent(context, WebViewActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            .setData(Uri.parse(Constants.DISPUTE_URL))
+                    )
                 }
             }
         }
