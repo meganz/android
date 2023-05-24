@@ -13,10 +13,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
-import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.app.presentation.photos.compose.albumcontent.applyFilter
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -34,11 +32,15 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
+import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -52,6 +54,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
+    private val getCameraSortOrder: GetCameraSortOrder,
+    private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val getNodeByHandle: GetNodeByHandle,
@@ -60,7 +64,8 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
-) : ViewModel() {
+
+    ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
     val state = _state.asStateFlow()
@@ -68,6 +73,12 @@ class MediaDiscoveryViewModel @Inject constructor(
     private var fetchPhotosJob: Job? = null
 
     init {
+        checkMDSetting()
+        loadSortRule()
+        fetchPhotos()
+    }
+
+    private fun checkMDSetting() {
         viewModelScope.launch {
             monitorMediaDiscoveryView().collectLatest { mediaDiscoveryViewSettings ->
                 _state.update {
@@ -78,8 +89,24 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }
             }
         }
+    }
 
-        fetchPhotos()
+    private fun loadSortRule() {
+        viewModelScope.launch {
+            val sortOrder = getCameraSortOrder()
+            val sort = mapSortOrderToSort(sortOrder)
+            _state.update {
+                it.copy(
+                    currentSort = sort
+                )
+            }
+        }
+    }
+
+    private fun saveSortRule(sort: Sort) {
+        viewModelScope.launch {
+            setCameraSortOrder(mapSortToSortOrder(sort))
+        }
     }
 
     private fun fetchPhotos() {
@@ -158,6 +185,18 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
+    private fun mapSortOrderToSort(sortOrder: SortOrder): Sort = when (sortOrder) {
+        SortOrder.ORDER_MODIFICATION_DESC -> Sort.NEWEST
+        SortOrder.ORDER_MODIFICATION_ASC -> Sort.OLDEST
+        else -> Sort.NEWEST
+    }
+
+    private fun mapSortToSortOrder(sort: Sort): SortOrder = when (sort) {
+        Sort.NEWEST -> SortOrder.ORDER_MODIFICATION_DESC
+        Sort.OLDEST -> SortOrder.ORDER_MODIFICATION_ASC
+        else -> SortOrder.ORDER_MODIFICATION_DESC
+    }
+
     private fun shouldBack(uiPhotoList: MutableList<UIPhoto>) =
         _state.value.currentMediaType == FilterMediaType.ALL_MEDIA
                 && uiPhotoList.isEmpty()
@@ -216,6 +255,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             it.copy(currentSort = sort)
         }
         handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+        saveSortRule(sort)
     }
 
     fun setCurrentMediaType(mediaType: FilterMediaType) {
