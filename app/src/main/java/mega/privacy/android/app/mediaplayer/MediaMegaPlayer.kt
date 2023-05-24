@@ -24,8 +24,12 @@ class MediaMegaPlayer(player: ExoPlayer) : ForwardingPlayer(player) {
     }
 
     override fun setPlayWhenReady(playWhenReady: Boolean) {
-        if (canProceed()) {
-            super.setPlayWhenReady(playWhenReady)
+        if (!playWhenReady) {
+            super.setPlayWhenReady(false)
+        } else {
+            if (canProceed()) {
+                super.setPlayWhenReady(true)
+            }
         }
     }
 
