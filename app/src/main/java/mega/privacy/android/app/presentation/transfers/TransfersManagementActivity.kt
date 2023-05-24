@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.activity.viewModels
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -155,7 +157,16 @@ open class TransfersManagementActivity : PasscodeActivity() {
                     val uploadServiceIntent = Intent(this, UploadService::class.java).apply {
                         action = Constants.ACTION_OVERQUOTA_STORAGE
                     }
-                    ContextCompat.startForegroundService(this, uploadServiceIntent)
+                    val isStarted =
+                        ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                    val shouldStartForegroundService =
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                                (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || isStarted)
+                    if (shouldStartForegroundService) {
+                        ContextCompat.startForegroundService(this, uploadServiceIntent)
+                    } else {
+                        startService(uploadServiceIntent)
+                    }
                 }
             }
         }
@@ -171,6 +182,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             show && transfersManagement.shouldShowScanningTransfersDialog() -> {
                 startShowScanningDialogTimer()
             }
+
             !show && !transfersManagement.shouldShowScanningTransfersDialog() -> {
                 if (scanningDialogTimer == null) {
                     scanningTransfersDialog?.dismiss()
