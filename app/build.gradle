@@ -137,12 +137,25 @@ android {
         release {
             //  minifyEnabled false
             //  proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            firebaseAppDistribution {
+                appId = "1:268821755439:android:9b611c50c9f7a503"
+                releaseNotes = readReleaseNotes()
+                groups = readTesterGroupList()
+                testers = readTesters()
+            }
         }
 
         qa {
             initWith debug
             debuggable true
             matchingFallbacks = ['debug', 'release']
+            applicationIdSuffix = ".qa"
+            firebaseAppDistribution {
+                appId = "1:268821755439:android:1e977881202351664e78da"
+                releaseNotes = readReleaseNotes()
+                groups = readTesterGroupList()
+                testers = readTesters()
+            }
         }
     }
 
@@ -183,12 +196,6 @@ android {
     productFlavors {
         gms {
             dimension "service"
-            firebaseAppDistribution {
-                appId = "1:268821755439:android:9b611c50c9f7a503"
-                releaseNotes = readReleaseNotes()
-                groups = readTesterGroupList()
-                testers = readTesters()
-            }
         }
     }
 

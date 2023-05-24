@@ -555,7 +555,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="mega.privacy.android.app.providers.fileprovider"
+            android:authorities="${applicationId}.providers.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
