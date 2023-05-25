@@ -253,6 +253,10 @@ class SqliteDatabaseHandler @Inject constructor(
         db.execSQL(CREATE_BACKUP_TABLE)
     }
 
+    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // do nothing
+    }
+
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         Timber.i("Database upgraded from %d to %d", oldVersion, newVersion)
 
