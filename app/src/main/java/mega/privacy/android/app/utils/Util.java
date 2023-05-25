@@ -221,7 +221,7 @@ public class Util {
     }
 
     public static boolean isRoaming(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
             NetworkInfo ni = cm.getActiveNetworkInfo();
             if (ni != null) {
@@ -503,7 +503,7 @@ public class Util {
      * @see ConnectivityManager to check the available network types available.
      */
     private static boolean isOnNetwork(Context context, int networkType) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = null;
@@ -525,7 +525,7 @@ public class Util {
         if (context == null) return true;
 
         ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         if (netInfo != null && netInfo.isConnectedOrConnecting()) {
             return true;
@@ -690,7 +690,7 @@ public class Util {
 
                 // Ensure get the IP from the current active network interface
                 ConnectivityManager cm =
-                        (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                        (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
                 String activeInterfaceName = cm.getLinkProperties(cm.getActiveNetwork()).getInterfaceName();
                 if (interfaceName.compareTo(activeInterfaceName) != 0) {
                     continue;
