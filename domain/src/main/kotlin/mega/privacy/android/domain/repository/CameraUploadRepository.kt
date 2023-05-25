@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
@@ -664,8 +665,12 @@ interface CameraUploadRepository {
      * @param state       backup state
      */
     suspend fun updateBackup(
-        backupId: Long, backupType: Int, targetNode: Long, localFolder: String?,
-        backupName: String, state: Int,
+        backupId: Long,
+        backupType: Int,
+        targetNode: Long,
+        localFolder: String?,
+        backupName: String,
+        state: BackupState,
     ): Long
 
     /**

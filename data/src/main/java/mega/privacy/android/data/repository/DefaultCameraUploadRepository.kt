@@ -26,12 +26,14 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -75,6 +77,7 @@ import kotlin.coroutines.Continuation
  * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
+ * @property backupStateIntMapper [BackupStateIntMapper]
  * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
  * @property uploadOptionMapper [UploadOptionMapper]
  * @property uploadOptionIntMapper [UploadOptionIntMapper]
@@ -96,6 +99,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
+    private val backupStateIntMapper: BackupStateIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
     private val videoAttachmentMapper: VideoAttachmentMapper,
@@ -680,7 +684,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         targetNode: Long,
         localFolder: String?,
         backupName: String,
-        state: Int,
+        state: BackupState,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("updateBackup") { it.parentHandle }
@@ -690,7 +694,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 targetNode,
                 localFolder,
                 backupName,
-                state,
+                backupStateIntMapper(state),
                 MegaError.API_OK,
                 listener,
             )

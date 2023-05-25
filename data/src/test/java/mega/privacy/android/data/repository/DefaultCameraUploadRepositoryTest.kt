@@ -18,6 +18,7 @@ import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
+import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -81,6 +82,7 @@ class DefaultCameraUploadRepositoryTest {
     private val heartbeatStatusIntMapper = mock<HeartbeatStatusIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
+    private val backupStateIntMapper = mock<BackupStateIntMapper>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val uploadOptionIntMapper = mock<UploadOptionIntMapper>()
@@ -123,6 +125,7 @@ class DefaultCameraUploadRepositoryTest {
             videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
             syncStatusIntMapper = ::syncStatusToInt,
+            backupStateIntMapper = backupStateIntMapper,
             videoCompressorGateway = videoCompressorGateway,
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,

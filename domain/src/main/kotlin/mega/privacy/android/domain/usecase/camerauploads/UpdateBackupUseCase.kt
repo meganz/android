@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
@@ -10,20 +11,22 @@ class UpdateBackupUseCase @Inject constructor(private val cameraUploadRepository
 
     /**
      * invoke function
-     * @param backupId    backup id identifying the backup to be updated
-     * @param localFolder Local path of the folder
-     * @param state       backup state
+     * @param backupId      Backup id identifying the backup to be updated
+     * @param localFolder   Local path of the folder
+     * @param backupState   Backup state
      */
     suspend operator fun invoke(
-        backupId: Long, localFolder: String?,
-        backupName: String, state: Int,
+        backupId: Long,
+        localFolder: String?,
+        backupName: String,
+        backupState: BackupState,
     ) = cameraUploadRepository.updateBackup(
         backupId = backupId,
         backupType = cameraUploadRepository.getInvalidBackupType(),
         targetNode = cameraUploadRepository.getInvalidHandle(),
         localFolder = localFolder,
         backupName = backupName,
-        state = state,
+        state = backupState,
     ).also {
         cameraUploadRepository.getBackupById(it)?.let { backup ->
             cameraUploadRepository.updateLocalBackup(backup)

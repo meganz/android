@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,7 +33,7 @@ class UpdateBackupUseCaseTest {
             val expected = 1L
             val backupId = 1L
             val backupName = "backup"
-            val state = 1
+            val backupState = BackupState.ACTIVE
             whenever(cameraUploadRepository.getInvalidBackupType()).thenReturn(-1)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(-1L)
             whenever(
@@ -42,11 +43,11 @@ class UpdateBackupUseCaseTest {
                     cameraUploadRepository.getInvalidHandle(),
                     null,
                     backupName,
-                    state,
+                    backupState,
                 )
             ).thenReturn(expected)
             whenever(cameraUploadRepository.getBackupById(expected)).thenReturn(mock())
-            val actual = underTest(backupId, null, backupName, state)
+            val actual = underTest(backupId, null, backupName, backupState)
             assertThat(actual).isEqualTo(expected)
             verify(cameraUploadRepository).getBackupById(expected)
             verify(cameraUploadRepository).updateLocalBackup(any())

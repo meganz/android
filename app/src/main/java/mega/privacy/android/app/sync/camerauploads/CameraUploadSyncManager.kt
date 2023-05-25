@@ -461,6 +461,10 @@ object CameraUploadSyncManager {
      *
      * @param backupState The Backup State
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in R.string.section_photo_sync as backupName",
+        replaceWith = ReplaceWith("UpdateCameraUploadsBackupUseCase")
+    )
     fun updatePrimaryFolderBackupState(backupState: BackupState) {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup state")
@@ -484,6 +488,10 @@ object CameraUploadSyncManager {
      *
      * @param backupState The Backup State
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in R.string.section_secondary_media_uploads as backupName",
+        replaceWith = ReplaceWith("UpdateMediaUploadsBackupUseCase")
+    )
     fun updateSecondaryFolderBackupState(backupState: BackupState) {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup state")
