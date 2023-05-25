@@ -44,6 +44,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val isTakenDown = megaNode.isTakenDown
             override val isIncomingShare = megaNode.isInShare
             override val fingerprint = megaNode.fingerprint
+            override val originalFingerprint = megaNode.originalFingerprint
             override val isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted
             override val hasThumbnail = megaNode.hasThumbnail()
             override val hasPreview = megaNode.hasPreview()
