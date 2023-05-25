@@ -4810,4 +4810,8 @@
     <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title">Device center</string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title">Device center</string>
 </resources>

@@ -245,6 +245,31 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/device_center_section"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/device_center_section_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="start|center_vertical"
+                    android:text="@string/home_side_menu_device_center_title"
+                    android:textAppearance="?attr/textAppearanceSubtitle2" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/grey_012_white_012" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
                 android:id="@+id/offline_section"
                 android:layout_width="match_parent"
                 android:layout_height="56dp">

@@ -632,6 +632,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var contactsSection: RelativeLayout
     private lateinit var notificationsSection: RelativeLayout
     private lateinit var syncSection: RelativeLayout
+    private lateinit var deviceCenterSection: RelativeLayout
     private lateinit var rubbishBinSection: RelativeLayout
     private lateinit var settingsSection: RelativeLayout
     private lateinit var upgradeAccount: Button
@@ -1171,6 +1172,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         notificationsSectionText = findViewById(R.id.notification_section_text)
         contactsSectionText = findViewById(R.id.contacts_section_text)
         syncSection = findViewById(R.id.sync_section)
+        deviceCenterSection = findViewById(R.id.device_center_section)
         rubbishBinSection = findViewById(R.id.rubbish_bin_section)
         settingsSection = findViewById(R.id.settings_section)
         upgradeAccount = findViewById(R.id.upgrade_navigation_view)
@@ -1264,6 +1266,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         findViewById<View>(R.id.offline_section).setOnClickListener(this)
         findViewById<View>(R.id.transfers_section).setOnClickListener(this)
         syncSection.setOnClickListener(this)
+        deviceCenterSection.setOnClickListener(this)
         rubbishBinSection.setOnClickListener(this)
         settingsSection.setOnClickListener(this)
         upgradeAccount.setOnClickListener(this)
@@ -2283,6 +2286,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.enabledFlags.contains(AppFeatures.AndroidSync)) {
                 syncSection.visibility = View.VISIBLE
                 syncNavigator.startSyncService(this)
+            }
+            if (managerState.enabledFlags.contains(AppFeatures.DeviceCenter)) {
+                deviceCenterSection.visibility = View.VISIBLE
             }
             if (managerState.nodeUpdateReceived) {
                 // Invalidate the menu will collapse/expand the search view and set the query text to ""
@@ -4161,6 +4167,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setToolbarTitle()
                 showFabButton()
             }
+
+            // Functionality will be added once the Device Center Fragment has been created
+            // For now, the Dashboard Side Menu will be closed
+            DrawerItem.DEVICE_CENTER -> Unit
 
             DrawerItem.SYNC -> {
                 syncFragment =
@@ -7223,6 +7233,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 bottomItemBeforeOpenFullscreenOffline = bottomNavigationCurrentItem
                 openFullscreenOfflineFragment(pathNavigationOffline)
             }
+
+            // Functionality will be added once the Device Center Fragment has been created
+            // For now, the Dashboard Side Menu will be closed
+            R.id.device_center_section -> Unit
 
             R.id.transfers_section -> {
                 sectionClicked = true

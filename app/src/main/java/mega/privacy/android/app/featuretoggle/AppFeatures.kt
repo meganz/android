@@ -15,6 +15,16 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables the Device Center functionality by displaying "Device center" in the Dashboard
+     * Side Menu
+     */
+    DeviceCenter(
+        "Enables the Device Center in the Dashboard Side Menu. The Device Center shows " +
+                "the list of Devices that have uploaded content through Camera Uploads or Backups.",
+        false,
+    ),
+
+    /**
      * Enable the remember timeline preferences feature
      */
     RememberTimelinePreferences(
