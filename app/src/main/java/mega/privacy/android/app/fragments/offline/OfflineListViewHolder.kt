@@ -1,6 +1,5 @@
 package mega.privacy.android.app.fragments.offline
 
-import android.graphics.Color
 import android.net.Uri
 import android.view.View
 import android.widget.FrameLayout
@@ -14,20 +13,15 @@ import mega.privacy.android.app.utils.Util.dp2px
 
 class OfflineListViewHolder(
     private val binding: OfflineItemListBinding,
-    listener: OfflineAdapterListener,
-    itemGetter: (Int) -> OfflineNode
-) : OfflineViewHolder(binding.root, listener, itemGetter) {
-
-    init {
-        binding.threeDots.setOnClickListener {
-            val position = bindingAdapterPosition
-            listener.onOptionsClicked(position, itemGetter(position))
-        }
-    }
-
+    onNodeClicked: (Int, OfflineNode) -> Unit,
+    onNodeLongClicked: (Int, OfflineNode) -> Unit,
+    private val onNodeOptionsClicked: (Int, OfflineNode) -> Unit,
+) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
     override fun bind(position: Int, node: OfflineNode) {
         super.bind(position, node)
-
+        binding.threeDots.setOnClickListener {
+            onNodeOptionsClicked(bindingAdapterPosition, node)
+        }
         binding.thumbnail.apply {
             isVisible = true
 

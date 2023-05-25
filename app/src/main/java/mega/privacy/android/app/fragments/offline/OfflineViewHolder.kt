@@ -5,30 +5,28 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class OfflineViewHolder(
     itemView: View,
-    protected val listener: OfflineAdapterListener,
-    protected val itemGetter: (Int) -> OfflineNode
+    private val onNodeClicked: (Int, OfflineNode) -> Unit,
+    private val onNodeLongClicked: (Int, OfflineNode) -> Unit,
 ) : RecyclerView.ViewHolder(itemView) {
 
-    init {
+
+    open fun bind(position: Int, node: OfflineNode) {
+        node.uiDirty = false
         itemView.setOnClickListener {
-            handleNodeClicked(bindingAdapterPosition)
+            handleNodeClicked(bindingAdapterPosition, node)
         }
 
         itemView.setOnLongClickListener {
-            handleNodeLongClicked(bindingAdapterPosition)
+            handleNodeLongClicked(bindingAdapterPosition, node)
             true
         }
     }
 
-    open fun bind(position: Int, node: OfflineNode) {
-        node.uiDirty = false
+    open fun handleNodeClicked(position: Int, node: OfflineNode) {
+        onNodeClicked(position, node)
     }
 
-    open fun handleNodeClicked(position: Int) {
-        listener.onNodeClicked(position, itemGetter(position))
-    }
-
-    open fun handleNodeLongClicked(position: Int) {
-        listener.onNodeLongClicked(position, itemGetter(position))
+    open fun handleNodeLongClicked(position: Int, node: OfflineNode) {
+        onNodeLongClicked(position, node)
     }
 }

@@ -7,9 +7,9 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 class OfflineSortedByViewHolder(
     private val binding: SortByHeaderBinding,
     private val sortByViewModel: SortByHeaderViewModel,
-    listener: OfflineAdapterListener,
-    itemGetter: (Int) -> OfflineNode
-) : OfflineViewHolder(binding.root, listener, itemGetter) {
+    onNodeClicked: (Int, OfflineNode) -> Unit,
+    onNodeLongClicked: (Int, OfflineNode) -> Unit,
+) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
 
     override fun bind(position: Int, node: OfflineNode) {
         binding.apply {
@@ -18,13 +18,5 @@ class OfflineSortedByViewHolder(
             this.sortByHeaderViewModel = sortByViewModel
             this.enterMediaDiscovery.isVisible = false
         }
-    }
-
-    override fun handleNodeClicked(position: Int) {
-        // don't handle click
-    }
-
-    override fun handleNodeLongClicked(position: Int) {
-        // don't handle long click
     }
 }

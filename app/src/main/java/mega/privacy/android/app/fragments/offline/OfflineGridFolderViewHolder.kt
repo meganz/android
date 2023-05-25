@@ -7,23 +7,20 @@ import mega.privacy.android.app.databinding.OfflineItemGridFolderBinding
 
 class OfflineGridFolderViewHolder(
     private val binding: OfflineItemGridFolderBinding,
-    listener: OfflineAdapterListener,
-    itemGetter: (Int) -> OfflineNode
-) : OfflineViewHolder(binding.root, listener, itemGetter) {
-
-    init {
-        binding.threeDots.setOnClickListener {
-            val position = bindingAdapterPosition
-            listener.onOptionsClicked(position, itemGetter(position))
-        }
-    }
-
+    onNodeClicked: (Int, OfflineNode) -> Unit,
+    onNodeLongClicked: (Int, OfflineNode) -> Unit,
+    private val onNodeOptionsClicked: (Int, OfflineNode) -> Unit,
+) : OfflineViewHolder(binding.root, onNodeClicked, onNodeLongClicked) {
     override fun bind(position: Int, node: OfflineNode) {
         super.bind(position, node)
 
         if (node == OfflineNode.PLACE_HOLDER) {
             binding.root.visibility = View.INVISIBLE
             return
+        }
+
+        binding.threeDots.setOnClickListener {
+            onNodeOptionsClicked(bindingAdapterPosition, node)
         }
 
         binding.root.visibility = View.VISIBLE

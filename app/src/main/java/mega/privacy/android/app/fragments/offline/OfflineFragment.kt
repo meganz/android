@@ -339,6 +339,31 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
         }
     }
 
+    fun onNodeClicked(position: Int, node: OfflineNode) {
+        var firstVisiblePosition: Int
+        if (isListViewOrRootFolder()) {
+            firstVisiblePosition =
+                (binding.offlineBrowserList.layoutManager as LinearLayoutManager)
+                    .findFirstCompletelyVisibleItemPosition()
+        } else {
+            firstVisiblePosition =
+                binding.offlineBrowserGrid.findFirstCompletelyVisibleItemPosition()
+            if (firstVisiblePosition == INVALID_POSITION) {
+                firstVisiblePosition =
+                    binding.offlineBrowserGrid.findFirstVisibleItemPosition()
+            }
+        }
+        viewModel.onNodeClicked(position, node, firstVisiblePosition)
+    }
+
+    fun onNodeLongClicked(position: Int, node: OfflineNode) {
+        viewModel.onNodeLongClicked(position, node)
+    }
+
+    fun onNodeOptionsClicked(position: Int, node: OfflineNode) {
+        viewModel.onNodeLongClicked(position, node)
+    }
+
     /**
      * Sets display parameters for [OfflineViewModel]
      *
@@ -364,32 +389,9 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
             OfflineAdapter(
                 isList = isListViewOrRootFolder(),
                 sortByHeaderViewModel = sortByHeaderViewModel,
-                listener = object : OfflineAdapterListener {
-                    override fun onNodeClicked(position: Int, node: OfflineNode) {
-                        var firstVisiblePosition: Int
-                        if (isListViewOrRootFolder()) {
-                            firstVisiblePosition =
-                                (binding.offlineBrowserList.layoutManager as LinearLayoutManager)
-                                    .findFirstCompletelyVisibleItemPosition()
-                        } else {
-                            firstVisiblePosition =
-                                binding.offlineBrowserGrid.findFirstCompletelyVisibleItemPosition()
-                            if (firstVisiblePosition == INVALID_POSITION) {
-                                firstVisiblePosition =
-                                    binding.offlineBrowserGrid.findFirstVisibleItemPosition()
-                            }
-                        }
-                        viewModel.onNodeClicked(position, node, firstVisiblePosition)
-                    }
-
-                    override fun onNodeLongClicked(position: Int, node: OfflineNode) {
-                        viewModel.onNodeLongClicked(position, node)
-                    }
-
-                    override fun onOptionsClicked(position: Int, node: OfflineNode) {
-                        viewModel.onNodeOptionsClicked(position, node)
-                    }
-                },
+                onNodeClicked = this::onNodeClicked,
+                onNodeLongClicked = this::onNodeLongClicked,
+                onNodeOptionsClicked = this::onNodeOptionsClicked
             )
 
         adapter?.setHasStableIds(true)

@@ -15,7 +15,9 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 class OfflineAdapter(
     var isList: Boolean,
     private val sortByHeaderViewModel: SortByHeaderViewModel,
-    private val listener: OfflineAdapterListener
+    private val onNodeClicked: (Int, OfflineNode) -> Unit,
+    private val onNodeLongClicked: (Int, OfflineNode) -> Unit,
+    private val onNodeOptionsClicked: (Int, OfflineNode) -> Unit,
 ) : ListAdapter<OfflineNode, OfflineViewHolder>(OfflineNodeDiffCallback()), DragThumbnailGetter {
 
     fun getOfflineNodes(): List<MegaOffline> = currentList.map { it.node }
@@ -35,19 +37,29 @@ class OfflineAdapter(
         return when (viewType) {
             TYPE_GRID_FOLDER -> OfflineGridFolderViewHolder(
                 OfflineItemGridFolderBinding.inflate(inflater, parent, false),
-                listener, this::getItem
+                onNodeClicked,
+                onNodeLongClicked,
+                onNodeOptionsClicked
             )
+
             TYPE_GRID_FILE -> OfflineGridFileViewHolder(
                 OfflineItemGridFileBinding.inflate(inflater, parent, false),
-                listener, this::getItem
+                onNodeClicked,
+                onNodeLongClicked,
+                onNodeOptionsClicked
             )
+
             TYPE_HEADER -> OfflineSortedByViewHolder(
                 SortByHeaderBinding.inflate(inflater, parent, false), sortByHeaderViewModel,
-                listener, this::getItem
+                onNodeClicked,
+                onNodeLongClicked
             )
+
             else -> OfflineListViewHolder(
                 OfflineItemListBinding.inflate(inflater, parent, false),
-                listener, this::getItem
+                onNodeClicked,
+                onNodeLongClicked,
+                onNodeOptionsClicked
             )
         }
     }
@@ -84,12 +96,4 @@ class OfflineAdapter(
         const val TYPE_GRID_FILE = 3
         const val TYPE_HEADER = 4
     }
-}
-
-interface OfflineAdapterListener {
-    fun onNodeClicked(position: Int, node: OfflineNode)
-
-    fun onNodeLongClicked(position: Int, node: OfflineNode)
-
-    fun onOptionsClicked(position: Int, node: OfflineNode)
 }
