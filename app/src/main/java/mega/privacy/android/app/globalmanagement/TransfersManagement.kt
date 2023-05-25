@@ -13,6 +13,8 @@ import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getColor
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -55,7 +57,6 @@ import javax.inject.Singleton
 @Singleton
 class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val dbH: DatabaseHandler,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val broadcastFailedTransfer: BroadcastFailedTransfer,
@@ -310,13 +311,18 @@ class TransfersManagement @Inject constructor(
 
         Handler(Looper.getMainLooper()).postDelayed({
             try {
+                val active =
+                    ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)
+                val shouldStartForeground =
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+                            (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || active) //starting with Android 12 only active apps can startForegroundService
                 @Suppress("DEPRECATION")
                 if (megaApi.numPendingDownloads > 0) {
                     val downloadServiceIntent =
                         Intent(app, DownloadService::class.java)
                             .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !activityLifecycleHandler.isActivityVisible) {
+                    if (shouldStartForeground) {
                         app.startForegroundService(downloadServiceIntent)
                     } else {
                         app.startService(downloadServiceIntent)
@@ -331,7 +337,7 @@ class TransfersManagement @Inject constructor(
                     val chatUploadServiceIntent = Intent(app, ChatUploadService::class.java)
                         .setAction(Constants.ACTION_RESTART_SERVICE)
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !activityLifecycleHandler.isActivityVisible) {
+                    if (shouldStartForeground) {
                         app.startForegroundService(uploadServiceIntent)
                         app.startForegroundService(chatUploadServiceIntent)
                     } else {

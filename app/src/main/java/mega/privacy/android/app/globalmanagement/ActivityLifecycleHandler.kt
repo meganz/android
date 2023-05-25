@@ -107,6 +107,10 @@ class ActivityLifecycleHandler @Inject constructor(
     /**
      * Is activity visible
      */
+    @Deprecated(
+        message = "This method is deprecated because it seems to don't work properly and there's a better way to check if the app is active or not",
+        replaceWith = ReplaceWith("ProcessLifecycleOwner.get().lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)")
+    )
     val isActivityVisible: Boolean
         get() = currentActivity != null
 }
