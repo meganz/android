@@ -34,10 +34,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
-import mega.privacy.android.domain.usecase.meeting.DefaultAnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
-import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
@@ -46,7 +43,6 @@ import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurr
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
-import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 
 /**
  * Chats module.
@@ -80,18 +76,6 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindOpenOrStartChatCall(useCase: DefaultOpenOrStartCall): OpenOrStartCall
-
-    /**
-     * Open call or start call and open it
-     */
-    @Binds
-    abstract fun bindStartChatCallNoRinging(useCase: DefaultStartChatCallNoRinging): StartChatCallNoRinging
-
-    /**
-     * Answer call
-     */
-    @Binds
-    abstract fun bindAnswerChatCall(useCase: DefaultAnswerChatCall): AnswerChatCall
 
     companion object {
         /**

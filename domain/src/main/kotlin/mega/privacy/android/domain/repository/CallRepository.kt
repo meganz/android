@@ -25,6 +25,14 @@ interface CallRepository {
     suspend fun getChatCall(chatId: Long?): ChatCall?
 
     /**
+     * Get chat call by call id
+     *
+     * @param callId    Call Id
+     * @return          [ChatCall]
+     */
+    suspend fun getChatCallByCallId(callId: Long): ChatCall?
+
+    /**
      * Open call or start call and open it
      *
      * @param chatId        Chat Id
@@ -77,6 +85,18 @@ interface CallRepository {
      */
     suspend fun hangChatCall(
         callId: Long,
+    ): ChatRequest
+
+    /**
+     * Hold chat call
+     *
+     * @param chatId        Chat Id
+     * @param setOnHold     Flag to set call on hold
+     * @return              [ChatRequest]
+     */
+    suspend fun holdChatCall(
+        chatId: Long,
+        setOnHold: Boolean,
     ): ChatRequest
 
     /**
@@ -211,4 +231,11 @@ interface CallRepository {
      *         returns all calls regardless their state if state is [ChatCallStatus.Unknown]
      */
     suspend fun getCallHandleList(state: ChatCallStatus): List<Long>
+
+    /**
+     * Get a list with the ids of active calls
+     *
+     * @return A list of ids of active calls
+     */
+    suspend fun getChatCallIds(): List<Long>
 }

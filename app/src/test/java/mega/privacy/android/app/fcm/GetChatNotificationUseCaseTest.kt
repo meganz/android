@@ -23,9 +23,9 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class GetNotificationUseCaseTest {
+class GetChatNotificationUseCaseTest {
 
-    private lateinit var underTest: GetNotificationUseCase
+    private lateinit var underTest: GetChatNotificationUseCase
 
     private val getChatRoomUseCase: GetChatRoom = mock()
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -35,7 +35,7 @@ class GetNotificationUseCaseTest {
         Dispatchers.setMain(testDispatcher)
 
         val context: Context = ApplicationProvider.getApplicationContext()
-        underTest = GetNotificationUseCase(
+        underTest = GetChatNotificationUseCase(
             context,
             getChatRoomUseCase,
             testDispatcher

@@ -22,13 +22,13 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
-import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
@@ -47,12 +47,12 @@ class ChatViewModelTest {
     private val startChatCall: StartChatCall = mock()
     private val chatApiGateway: MegaChatApiGateway = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val answerChatCall: AnswerChatCall = mock()
+    private val answerChatCallUseCase: AnswerChatCallUseCase = mock()
     private val passcodeManagement: PasscodeManagement = mock()
     private val cameraGateway: CameraGateway = mock()
     private val chatManagement: ChatManagement = mock()
     private val rtcAudioManagerGateway: RTCAudioManagerGateway = mock()
-    private val startChatCallNoRinging: StartChatCallNoRinging = mock()
+    private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase = mock()
     private val openOrStartCall: OpenOrStartCall = mock()
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat = mock()
@@ -81,13 +81,13 @@ class ChatViewModelTest {
             startChatCall = startChatCall,
             chatApiGateway = chatApiGateway,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            answerChatCall = answerChatCall,
+            answerChatCallUseCase = answerChatCallUseCase,
             passcodeManagement = passcodeManagement,
             cameraGateway = cameraGateway,
             deviceGateway = deviceGateway,
             chatManagement = chatManagement,
             rtcAudioManagerGateway = rtcAudioManagerGateway,
-            startChatCallNoRinging = startChatCallNoRinging,
+            startChatCallNoRingingUseCase = startChatCallNoRingingUseCase,
             openOrStartCall = openOrStartCall,
             megaChatApiGateway = megaChatApiGateway,
             getScheduledMeetingByChat = getScheduledMeetingByChat,

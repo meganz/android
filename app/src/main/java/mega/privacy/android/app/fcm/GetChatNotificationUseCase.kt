@@ -12,9 +12,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CHAT_ID_OF_INCOMING_CALL
 import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2
+import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -28,7 +31,7 @@ import javax.inject.Inject
  * @property context
  * @property getChatRoom
  */
-class GetNotificationUseCase @Inject constructor(
+class GetChatNotificationUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val getChatRoom: GetChatRoom,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
@@ -45,6 +48,7 @@ class GetNotificationUseCase @Inject constructor(
             when (pushMessage) {
                 is ScheduledMeetingPushMessage -> {
                     val chatId = pushMessage.chatRoomHandle
+                    val schedId = pushMessage.schedId
                     val channelId = NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2
                     val showMeetingIntent = getShowChatIntent(chatId)
                     val title = pushMessage.getChatRoomTitle()
@@ -74,7 +78,7 @@ class GetNotificationUseCase @Inject constructor(
                                     NotificationCompat.Action.Builder(
                                         null,
                                         context.getString(R.string.action_join),
-                                        getJoinMeetingIntent(chatId)
+                                        getJoinMeetingIntent(chatId, schedId)
                                     ).build()
                                 )
                                 addAction(
@@ -130,11 +134,12 @@ class GetNotificationUseCase @Inject constructor(
      * @param chatId    Meeting's Chat Id
      * @return          PendingIntent
      */
-    private fun getJoinMeetingIntent(chatId: Long): PendingIntent {
+    private fun getJoinMeetingIntent(chatId: Long, schedId: Long): PendingIntent {
         val intent = Intent(context, MeetingActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            action = MeetingActivity.MEETING_ACTION_JOIN
-            putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
+            action = CallNotificationIntentService.START_SCHED_MEET
+            putExtra(CHAT_ID_OF_INCOMING_CALL, chatId)
+            putExtra(SCHEDULED_MEETING_ID, schedId)
+
         }
         return PendingIntentCompat.getActivity(
             context,

@@ -42,13 +42,13 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
-import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
@@ -60,12 +60,12 @@ import javax.inject.Inject
  * @property monitorStorageStateEventUseCase                [MonitorStorageStateEventUseCase]
  * @property startChatCall                                  [StartChatCall]
  * @property chatApiGateway                                 [MegaChatApiGateway]
- * @property answerChatCall                                 [AnswerChatCall]
+ * @property answerChatCallUseCase                          [AnswerChatCallUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property cameraGateway                                  [CameraGateway]
  * @property chatManagement                                 [ChatManagement]
  * @property rtcAudioManagerGateway                         [RTCAudioManagerGateway]
- * @property startChatCallNoRinging                         [StartChatCallNoRinging]
+ * @property startChatCallNoRingingUseCase                  [StartChatCallNoRingingUseCase]
  * @property megaChatApiGateway                             [MegaChatApiGateway]
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
@@ -85,12 +85,12 @@ class ChatViewModel @Inject constructor(
     private val startChatCall: StartChatCall,
     private val chatApiGateway: MegaChatApiGateway,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val answerChatCall: AnswerChatCall,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val startChatCallNoRinging: StartChatCallNoRinging,
+    private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val openOrStartCall: OpenOrStartCall,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
@@ -336,7 +336,7 @@ class ChatViewModel @Inject constructor(
             _state.value.schedId?.let { schedId ->
                 if (schedId != megaChatApiGateway.getChatInvalidHandle()) {
                     Timber.d("Start scheduled meeting")
-                    startChatCallNoRinging(
+                    startChatCallNoRingingUseCase(
                         chatId = _state.value.chatId,
                         schedId = schedId,
                         enabledVideo = false,
@@ -397,7 +397,7 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             Timber.d("Answer call")
-            answerChatCall(
+            answerChatCallUseCase(
                 chatId = chatId,
                 video = video,
                 audio = audio

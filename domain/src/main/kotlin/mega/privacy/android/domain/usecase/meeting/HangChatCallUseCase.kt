@@ -18,12 +18,12 @@ class HangChatCallUseCase @Inject constructor(
      * @param callId id of the call which should be cut
      * @return [ChatCall]
      */
-    suspend operator fun invoke(callId: Long): ChatCall? {
-        if (callId == -1L) return null
-
-        return runCatching {
-            callRepository.hangChatCall(callId)
-        }.fold(onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
-            onFailure = { null })
-    }
+    suspend operator fun invoke(callId: Long): ChatCall? =
+        when (callId) {
+            -1L -> error("Invalid Call Id")
+            else -> {
+                val chatCallRequest = callRepository.hangChatCall(callId)
+                callRepository.getChatCall(chatCallRequest.chatHandle)
+            }
+        }
 }

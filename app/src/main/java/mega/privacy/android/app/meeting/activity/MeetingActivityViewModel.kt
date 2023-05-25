@@ -54,7 +54,7 @@ import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_M
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.usecase.CheckChatLink
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -77,7 +77,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MeetingActivityViewModel @Inject constructor(
     private val meetingActivityRepository: MeetingActivityRepository,
-    private val answerChatCall: AnswerChatCall,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
     getLocalAudioChangesUseCase: GetLocalAudioChangesUseCase,
     private val getCallUseCase: GetCallUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
@@ -752,7 +752,7 @@ class MeetingActivityViewModel @Inject constructor(
             cameraGateway.setFrontCamera()
 
             viewModelScope.launch {
-                answerChatCall(
+                answerChatCallUseCase(
                     chatId = chatId,
                     video = enableVideo,
                     audio = enableAudio

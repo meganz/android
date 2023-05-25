@@ -53,7 +53,7 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnections: RetryPendingConnections,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
-    private val getNotificationUseCase: GetNotificationUseCase,
+    private val getChatNotificationUseCase: GetChatNotificationUseCase,
     private val createNotificationChannels: CreateChatNotificationChannelsUseCase,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val notificationManager: NotificationManagerCompat,
@@ -111,7 +111,7 @@ class PushMessageWorker @AssistedInject constructor(
 
                 is ScheduledMeetingPushMessage -> {
                     if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
-                        runCatching { getNotificationUseCase(pushMessage) }
+                        runCatching { getChatNotificationUseCase(pushMessage) }
                             .onSuccess { result ->
                                 notificationManager.notify(result.first, result.second)
                             }

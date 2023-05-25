@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
@@ -257,6 +256,15 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatCall(chatId: Long): MegaChatCall? =
         chatApi.getChatCall(chatId)
 
+    override fun getChatCallByCallId(callId: Long): MegaChatCall? =
+        chatApi.getChatCallByCallId(callId)
+
+    override fun getChatCalls(state: Int): MegaHandleList? =
+        chatApi.getChatCalls(state)
+
+    override fun getChatCallIds(): MegaHandleList? =
+        chatApi.chatCallsIds
+
     override fun startChatCall(
         chatId: Long,
         enabledVideo: Boolean,
@@ -283,6 +291,12 @@ internal class MegaChatApiFacade @Inject constructor(
         callId: Long,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.hangChatCall(callId, listener)
+
+    override fun holdChatCall(
+        chatId: Long,
+        setOnHold: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setCallOnHold(chatId, setOnHold, listener)
 
     override fun setChatVideoInDevice(
         device: String,
@@ -406,8 +420,6 @@ internal class MegaChatApiFacade @Inject constructor(
     ) = chatApi.archiveChat(chatId, archive, listener)
 
     override suspend fun refreshUrl() = chatApi.refreshUrl()
-
-    override fun getChatCalls(state: Int): MegaHandleList? = chatApi.getChatCalls(state)
 
     override fun createChatroomAndSchedMeeting(
         peerList: MegaChatPeerList,

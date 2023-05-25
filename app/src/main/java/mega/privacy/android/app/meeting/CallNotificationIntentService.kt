@@ -1,27 +1,21 @@
 package mega.privacy.android.app.meeting
 
 import android.Manifest
-import dagger.hilt.android.AndroidEntryPoint
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
-import javax.inject.Inject
-import mega.privacy.android.app.objects.PasscodeManagement
-import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaApiAndroid
-import mega.privacy.android.app.MegaApplication
-import nz.mega.sdk.MegaChatApiJava
-import timber.log.Timber
-import nz.mega.sdk.MegaChatCall
-import mega.privacy.android.app.meeting.listeners.HangChatCallListener
-import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener
+import mega.privacy.android.app.meeting.listeners.HangChatCallListener.OnCallHungUpCallback
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener
+import mega.privacy.android.app.meeting.listeners.SetCallOnHoldListener.OnCallOnHoldCallback
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
@@ -30,15 +24,22 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
-import java.lang.IllegalArgumentException
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.StartScheduledMeetingUseCase
+import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatApiJava
+import nz.mega.sdk.MegaChatCall
+import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Service which should be for call notifications.
  *
  * @property passcodeManagement         [PasscodeManagement]
  * @property rtcAudioManagerGateway     [RTCAudioManagerGateway]
- * @property answerChatCall             [AnswerChatCall]
+ * @property answerChatCallUseCase          [AnswerChatCallUseCase]
+ * @property startScheduledMeetingUseCase   [StartScheduledMeetingUseCase]
  * @property ioDispatcher               [CoroutineDispatcher]
  * @property coroutineScope             [CoroutineScope]
  * @property megaApi                    [MegaApiAndroid]
@@ -54,7 +55,10 @@ class CallNotificationIntentService : Service(),
     lateinit var passcodeManagement: PasscodeManagement
 
     @Inject
-    lateinit var answerChatCall: AnswerChatCall
+    lateinit var answerChatCallUseCase: AnswerChatCallUseCase
+
+    @Inject
+    lateinit var startScheduledMeetingUseCase: StartScheduledMeetingUseCase
 
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
@@ -78,24 +82,23 @@ class CallNotificationIntentService : Service(),
 
     var app: MegaApplication? = null
 
-    /**
-     * Coroutine Scope for camera upload work
-     */
-    private var coroutineScope: CoroutineScope? = null
+    private val coroutineScope: CoroutineScope by lazy {
+        CoroutineScope(ioDispatcher)
+    }
 
     private var chatIdIncomingCall: Long = 0
     private var callIdIncomingCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private var chatIdCurrentCall: Long = 0
     private var callIdCurrentCall = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private var isTraditionalCall = true
+    private var schedIdIncomingCall: Long = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+
 
     /**
      * Service starts
      */
     override fun onCreate() {
         super.onCreate()
-
-        coroutineScope = CoroutineScope(ioDispatcher)
 
         app = application as MegaApplication
     }
@@ -122,7 +125,7 @@ class CallNotificationIntentService : Service(),
     override fun onDestroy() {
         Timber.d("Service destroys.")
         super.onDestroy()
-        coroutineScope?.cancel()
+        coroutineScope.cancel()
     }
 
     private fun onHandleIntent(intent: Intent?) {
@@ -144,6 +147,12 @@ class CallNotificationIntentService : Service(),
                 Constants.CHAT_ID_OF_INCOMING_CALL,
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
+
+            schedIdIncomingCall = extras.getLong(
+                Constants.SCHEDULED_MEETING_ID,
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+
             megaChatApi.getChatCall(chatIdIncomingCall)?.let { incomingCall ->
                 callIdIncomingCall = incomingCall.callId
                 clearIncomingCallNotification(callIdIncomingCall)
@@ -163,6 +172,12 @@ class CallNotificationIntentService : Service(),
                     if (call != null && call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT) {
                         Timber.d("Answering incoming call ...")
                         answerCall(chatIdIncomingCall)
+                    } else {
+                        Timber.d("Hanging up current call ... ")
+                        megaChatApi.hangChatCall(
+                            call.callId,
+                            HangChatCallListener(this, this)
+                        )
                     }
                 } else {
                     if (currentCall == null) {
@@ -176,10 +191,24 @@ class CallNotificationIntentService : Service(),
                         )
                     }
                 }
+
+                START_SCHED_MEET -> {
+                    if (!hasPermissions(
+                            this@CallNotificationIntentService,
+                            Manifest.permission.RECORD_AUDIO
+                        )
+                    ) {
+                        stopSelf()
+                        return
+                    }
+                    processMeetingCall()
+                }
+
                 DECLINE -> {
                     Timber.d("Hanging up incoming call ... ")
                     megaChatApi.hangChatCall(callIdIncomingCall, HangChatCallListener(this, this))
                 }
+
                 IGNORE -> {
                     Timber.d("Ignore incoming call... ")
                     megaChatApi.setIgnoredCall(chatIdIncomingCall)
@@ -187,6 +216,7 @@ class CallNotificationIntentService : Service(),
                     clearIncomingCallNotification(callIdIncomingCall)
                     stopSelf()
                 }
+
                 HOLD_ANSWER, HOLD_JOIN -> if (currentCall == null || currentCall.isOnHold) {
                     Timber.d("Answering incoming call ...")
                     answerCall(chatIdIncomingCall)
@@ -198,7 +228,39 @@ class CallNotificationIntentService : Service(),
                         SetCallOnHoldListener(this, this)
                     )
                 }
+
                 else -> throw IllegalArgumentException("Unsupported action: $action")
+            }
+        }
+    }
+
+    /**
+     * Process Meeting Chat Call
+     */
+    private fun processMeetingCall() {
+        coroutineScope.launch {
+            runCatching {
+                requireNotNull(
+                    startScheduledMeetingUseCase(
+                        chatId = chatIdIncomingCall,
+                        schedId = schedIdIncomingCall,
+                        enableVideo = false,
+                        enableAudio = false
+                    )
+                )
+            }.onSuccess { call ->
+                if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
+                    openMeetingInProgress(
+                        this@CallNotificationIntentService,
+                        call.chatId,
+                        true,
+                        passcodeManagement
+                    )
+                }
+                stopSelf()
+            }.onFailure { error ->
+                Timber.e(error)
+                stopSelf()
             }
         }
     }
@@ -249,8 +311,8 @@ class CallNotificationIntentService : Service(),
             return
         }
 
-        coroutineScope?.launch {
-            answerChatCall(
+        coroutineScope.launch {
+            answerChatCallUseCase(
                 chatId = chatId,
                 video = false,
                 audio = isTraditionalCall
@@ -266,7 +328,7 @@ class CallNotificationIntentService : Service(),
                         clearIncomingCallNotification(callChatId)
                         stopSelf()
                     }
-                coroutineScope?.cancel()
+                coroutineScope.cancel()
             }
         }
     }
@@ -279,5 +341,6 @@ class CallNotificationIntentService : Service(),
         const val IGNORE = "IGNORE"
         const val HOLD_JOIN = "HOLD_JOIN"
         const val END_JOIN = "END_JOIN"
+        const val START_SCHED_MEET = "START_SCHED_MEET"
     }
 }

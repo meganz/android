@@ -86,6 +86,11 @@ internal class CallRepositoryImpl @Inject constructor(
             null
         }
 
+    override suspend fun getChatCallByCallId(callId: Long): ChatCall? =
+        withContext(dispatcher) {
+            megaChatApiGateway.getChatCallByCallId(callId)?.let(chatCallMapper::invoke)
+        }
+
     override suspend fun startCallRinging(
         chatId: Long,
         enabledVideo: Boolean,
@@ -155,6 +160,23 @@ internal class CallRepositoryImpl @Inject constructor(
 
             megaChatApiGateway.hangChatCall(
                 callId, callback
+            )
+        }
+    }
+
+    override suspend fun holdChatCall(
+        chatId: Long,
+        setOnHold: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.holdChatCall(
+                chatId,
+                setOnHold,
+                callback
             )
         }
     }
@@ -341,5 +363,9 @@ internal class CallRepositoryImpl @Inject constructor(
     override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
         megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(state))
             ?.let { handleListMapper(it) } ?: emptyList()
+    }
+
+    override suspend fun getChatCallIds(): List<Long> = withContext(dispatcher) {
+        megaChatApiGateway.getChatCallIds()?.let(handleListMapper::invoke) ?: emptyList()
     }
 }

@@ -263,6 +263,36 @@ interface MegaChatApiGateway {
     fun getChatCall(chatId: Long): MegaChatCall?
 
     /**
+     * Get the MegaChatCall that has a specific id
+     *
+     * @param callId    Call Id
+     * @return          Chat call
+     */
+    fun getChatCallByCallId(callId: Long): MegaChatCall?
+
+    /**
+     * Get a list with the ids of chat-rooms where there are active calls
+     *
+     * The list of ids can be retrieved for calls in one specific state by setting
+     * the parameter callState. If state is -1, it returns all calls regardless their state.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param state of calls that you want receive, -1 to consider all states
+     * @return A list of handles with the ids of chat-rooms where there are active calls
+     */
+    fun getChatCalls(state: Int): MegaHandleList?
+
+    /**
+     * Get a list with the ids of active calls
+     *
+     * You take the ownership of the returned value.
+     *
+     * @return A list of ids of active calls
+     */
+    fun getChatCallIds(): MegaHandleList?
+
+    /**
      * Start new call.
      *
      * @param chatId  The chat id.
@@ -317,6 +347,19 @@ interface MegaChatApiGateway {
      */
     fun hangChatCall(
         callId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Hold chat call
+     *
+     * @param chatId        Chat Id
+     * @param setOnHold     Flag to set call on hold
+     * @param listener      Listener
+     */
+    fun holdChatCall(
+        chatId: Long,
+        setOnHold: Boolean,
         listener: MegaChatRequestListenerInterface,
     )
 
@@ -571,19 +614,6 @@ interface MegaChatApiGateway {
      * via MegaApi::changeApiUrl.
      */
     suspend fun refreshUrl()
-
-    /**
-     * Get a list with the ids of chat-rooms where there are active calls
-     *
-     * The list of ids can be retrieved for calls in one specific state by setting
-     * the parameter callState. If state is -1, it returns all calls regardless their state.
-     *
-     * You take the ownership of the returned value.
-     *
-     * @param state of calls that you want receive, -1 to consider all states
-     * @return A list of handles with the ids of chat-rooms where there are active calls
-     */
-    fun getChatCalls(state: Int): MegaHandleList?
 
     /**
      * Creates a chatroom and a scheduled meeting for that chatroom

@@ -204,24 +204,29 @@ class MeetingActivity : BaseActivity() {
 
     private fun initIntent() {
         intent?.let { it ->
-            if (it.action == CallNotificationIntentService.ANSWER) {
+            if (it.action == CallNotificationIntentService.START_SCHED_MEET) {
                 it.extras?.let { extra ->
                     val chatIdIncomingCall = extra.getLong(
                         Constants.CHAT_ID_OF_INCOMING_CALL,
                         MEGACHAT_INVALID_HANDLE
                     )
 
-                    val answerIntent = Intent(this, CallNotificationIntentService::class.java)
-                    answerIntent.putExtra(Constants.CHAT_ID_OF_CURRENT_CALL,
-                        MEGACHAT_INVALID_HANDLE)
-                    answerIntent.putExtra(Constants.CHAT_ID_OF_INCOMING_CALL, chatIdIncomingCall)
-                    answerIntent.action = it.action
-                    startService(answerIntent)
+                    val schedIdIncomingCall = extra.getLong(
+                        Constants.SCHEDULED_MEETING_ID,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+
+                    val intent = Intent(this, CallNotificationIntentService::class.java).apply {
+                        action = it.action
+                        putExtra(Constants.CHAT_ID_OF_CURRENT_CALL, MEGACHAT_INVALID_HANDLE)
+                        putExtra(Constants.CHAT_ID_OF_INCOMING_CALL, chatIdIncomingCall)
+                        putExtra(Constants.SCHEDULED_MEETING_ID, schedIdIncomingCall)
+                    }
+                    startService(intent)
                     finish()
                     return
                 }
             }
-
             val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
             meetingViewModel.updateChatRoomId(chatId)
 

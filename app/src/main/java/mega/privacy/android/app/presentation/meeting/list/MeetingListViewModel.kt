@@ -33,9 +33,9 @@ import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
-import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,9 +49,9 @@ import javax.inject.Inject
  * @property getLastMessageUseCase              [GetLastMessageUseCase]
  * @property meetingLastTimestampMapper         [MeetingLastTimestampMapper]
  * @property scheduledMeetingTimestampMapper    [ScheduledMeetingTimestampMapper]
- * @property startChatCallNoRinging             [StartChatCallNoRinging]
+ * @property startChatCallNoRingingUseCase      [StartChatCallNoRingingUseCase]
  * @property openOrStartCall                    [OpenOrStartCall]
- * @property answerChatCall                     [AnswerChatCall]
+ * @property answerChatCallUseCase              [AnswerChatCallUseCase]
  * @property deviceGateway                      [DeviceGateway]
  * @property chatManagement                     [ChatManagement]
  * @property passcodeManagement                 [PasscodeManagement]
@@ -68,9 +68,9 @@ class MeetingListViewModel @Inject constructor(
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
     private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
-    private val startChatCallNoRinging: StartChatCallNoRinging,
+    private val startChatCallNoRingingUseCase: StartChatCallNoRingingUseCase,
     private val openOrStartCall: OpenOrStartCall,
-    private val answerChatCall: AnswerChatCall,
+    private val answerChatCallUseCase: AnswerChatCallUseCase,
     private val deviceGateway: DeviceGateway,
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
@@ -166,7 +166,7 @@ class MeetingListViewModel @Inject constructor(
     fun joinSchedMeeting(chatId: Long) {
         viewModelScope.launch {
             Timber.d("Answer meeting")
-            answerChatCall(
+            answerChatCallUseCase(
                 chatId = chatId,
                 video = false,
                 audio = true
@@ -204,7 +204,7 @@ class MeetingListViewModel @Inject constructor(
                 }
             } else {
                 Timber.d("Start scheduled meeting")
-                startChatCallNoRinging(
+                startChatCallNoRingingUseCase(
                     chatId = chatId,
                     schedId = schedId,
                     enabledVideo = false,
