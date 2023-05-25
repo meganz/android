@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -20,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -27,6 +29,7 @@ import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUse
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -34,9 +37,11 @@ import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
+import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
@@ -50,6 +55,7 @@ import org.junit.jupiter.api.Test
 import org.junit.rules.TestRule
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -88,6 +94,9 @@ internal class LoginViewModelTest {
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
     private val stopCameraUploadUseCase: StopCameraUploadUseCase = mock()
+    private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
+    private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
+    private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -117,6 +126,9 @@ internal class LoginViewModelTest {
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
+            monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase,
+            saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
+            clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase
         )
     }
 
@@ -268,4 +280,34 @@ internal class LoginViewModelTest {
             }
         }
     }
+
+    @Test
+    fun `test that call correct functions when calling setTemporalEmail`() = runTest {
+        val ephemeral = mock<EphemeralCredentials>()
+        val newEphemeral = mock<EphemeralCredentials>()
+        val temporalEmail = "email"
+        whenever(monitorEphemeralCredentialsUseCase()).thenReturn(flowOf(ephemeral))
+        whenever(ephemeral.copy(email = temporalEmail)).thenReturn(newEphemeral)
+        underTest.setTemporalEmail(temporalEmail)
+        advanceUntilIdle()
+        verify(clearEphemeralCredentialsUseCase).invoke()
+        verify(saveEphemeralCredentialsUseCase).invoke(newEphemeral)
+    }
+
+    @Test
+    fun `test that call correct functions when calling saveEphemeral`() = runTest {
+        val ephemeral = mock<EphemeralCredentials>()
+        underTest.saveEphemeral(ephemeral)
+        advanceUntilIdle()
+        verify(clearEphemeralCredentialsUseCase).invoke()
+        verify(saveEphemeralCredentialsUseCase).invoke(ephemeral)
+    }
+
+    @Test
+    fun `test that clearEphemeralCredentialsUseCase invoke when calling clearEphemeral`() =
+        runTest {
+            underTest.clearEphemeral()
+            advanceUntilIdle()
+            verify(clearEphemeralCredentialsUseCase).invoke()
+        }
 }

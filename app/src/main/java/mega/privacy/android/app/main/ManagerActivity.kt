@@ -98,7 +98,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -337,6 +339,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaAccountDetails
@@ -453,6 +456,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var syncNavigator: SyncNavigator
+
+    @Inject
+    lateinit var monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase
 
     private val subscriptions = CompositeDisposable()
 
@@ -1416,7 +1422,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun checkDatabaseValues(): Boolean {
-        if (dbH.ephemeral != null) {
+        val ephemeral =
+            runBlocking { runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }.getOrNull() }
+        if (ephemeral != null) {
             refreshSession()
             return true
         }

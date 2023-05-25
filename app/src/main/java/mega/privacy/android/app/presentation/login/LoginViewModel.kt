@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -33,6 +34,7 @@ import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -51,6 +53,7 @@ import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUse
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
@@ -59,9 +62,11 @@ import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
+import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.SaveEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
@@ -101,6 +106,9 @@ class LoginViewModel @Inject constructor(
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
+    private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
+    private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -470,6 +478,7 @@ class LoginViewModel @Inject constructor(
             return
         }
 
+        LoginActivity.isBackFromLoginPage = false
         MegaApplication.isLoggingIn = true
 
         _state.update {
@@ -790,6 +799,48 @@ class LoginViewModel @Inject constructor(
      */
     fun onFirstTime2FAConsumed() =
         _state.update { state -> state.copy(isFirstTime2FA = consumed) }
+
+    /**
+     * Get ephemeral
+     *
+     */
+    suspend fun getEphemeral() =
+        runCatching { monitorEphemeralCredentialsUseCase().firstOrNull() }.getOrNull()
+
+    /**
+     * Set temporal email
+     *
+     * @param email
+     */
+    fun setTemporalEmail(email: String) {
+        viewModelScope.launch {
+            runCatching {
+                val ephemeral = monitorEphemeralCredentialsUseCase().firstOrNull() ?: return@launch
+                clearEphemeralCredentialsUseCase()
+                saveEphemeralCredentialsUseCase(ephemeral.copy(email = email))
+            }.onFailure { Timber.e(it) }
+        }
+    }
+
+    /**
+     * Save ephemeral
+     *
+     * @param ephemeral
+     */
+    fun saveEphemeral(ephemeral: EphemeralCredentials) {
+        viewModelScope.launch {
+            runCatching {
+                clearEphemeralCredentialsUseCase()
+                saveEphemeralCredentialsUseCase(ephemeral)
+            }.onFailure { Timber.e(it) }
+        }
+    }
+    fun clearEphemeral() {
+        viewModelScope.launch {
+            runCatching { clearEphemeralCredentialsUseCase() }
+                .onFailure { Timber.e(it) }
+        }
+    }
 
     companion object {
         /**

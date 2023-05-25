@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.LegacyDatabaseHandler
@@ -24,6 +25,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.FragmentCreateAccountBinding
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.utils.ColorUtils.resetEditTextUnderlineColor
 import mega.privacy.android.app.utils.ColorUtils.setEditTextUnderlineColor
@@ -161,6 +163,8 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
 
     private val loginActivity: LoginActivity?
         get() = (requireActivity() as? LoginActivity)
+
+    private val viewModel: LoginViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -532,7 +536,6 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                     createAccountProgressBar.isVisible = false
                 }
             } else {
-                dbH.clearEphemeral()
                 val ephemeral = EphemeralCredentials(
                     request.email,
                     request.password,
@@ -540,7 +543,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                     request.name,
                     request.text
                 )
-                dbH.saveEphemeral(ephemeral)
+                viewModel.saveEphemeral(ephemeral)
 
                 if (createAccountEmailText.text != null && createAccountNameText.text != null
                     && createAccountLastNameText.text != null && createAccountPasswordText.text != null

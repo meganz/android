@@ -12,8 +12,10 @@ import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -93,6 +95,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     override fun onDestroy() {
         Timber.d("onDestroy")
+        megaApi.removeRequestListener(this)
         chatRequestHandler.setIsLoggingRunning(false)
         super.onDestroy()
     }
@@ -105,30 +108,32 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (savedInstanceState != null) {
-            Timber.d("Bundle is NOT NULL")
-            visibleFragment =
-                savedInstanceState.getInt(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-        } else {
-            visibleFragment =
-                intent?.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    ?: Constants.LOGIN_FRAGMENT
-            Timber.d("There is an intent! VisibleFragment: %s", visibleFragment)
-        }
-
-        dbH.ephemeral?.let {
-            visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT
-            emailTemp = it.email
-            passwdTemp = it.password
-            sessionTemp = it.session
-            firstNameTemp = it.firstName
-            lastNameTemp = it.lastName
-            megaApi.resumeCreateAccount(sessionTemp, this)
-        }
-
         setupObservers()
-        isBackFromLoginPage = false
-        showFragment(visibleFragment)
+
+        lifecycleScope.launch {
+            if (savedInstanceState != null) {
+                Timber.d("Bundle is NOT NULL")
+                visibleFragment =
+                    savedInstanceState.getInt(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+            } else {
+                visibleFragment =
+                    intent?.getIntExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                        ?: Constants.LOGIN_FRAGMENT
+                Timber.d("There is an intent! VisibleFragment: %s", visibleFragment)
+            }
+
+            viewModel.getEphemeral()?.let {
+                visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT
+                emailTemp = it.email
+                passwdTemp = it.password
+                sessionTemp = it.session
+                firstNameTemp = it.firstName
+                lastNameTemp = it.lastName
+                megaApi.resumeCreateAccount(sessionTemp, this@LoginActivity)
+            }
+
+            showFragment(visibleFragment)
+        }
     }
 
     private fun setupObservers() {
@@ -332,12 +337,9 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
      *
      * @param emailTemp The temporal email.
      */
-    fun setTemporalEmail(emailTemp: String?) {
+    fun setTemporalEmail(emailTemp: String) {
         this.emailTemp = emailTemp
-        val ephemeral = dbH.ephemeral ?: return
-
-        dbH.clearEphemeral()
-        dbH.saveEphemeral(ephemeral.copy(email = emailTemp))
+        viewModel.setTemporalEmail(emailTemp)
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
@@ -377,7 +379,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
      */
     fun cancelConfirmationAccount() {
         Timber.d("cancelConfirmationAccount")
-        dbH.clearEphemeral()
+        viewModel.clearEphemeral()
         dbH.clearCredentials()
         cancelledConfirmationProcess = true
         passwdTemp = null

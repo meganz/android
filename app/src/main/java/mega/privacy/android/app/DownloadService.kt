@@ -1561,7 +1561,8 @@ Error: ${e.errorCode} ${e.errorString}"""
             isForeground = false
             stopForeground(true)
             mNotificationManager.cancel(Constants.NOTIFICATION_DOWNLOAD)
-            TransferOverQuotaNotification(transfersManagement).show()
+            transfersManagement.isTransferOverQuotaBannerShown = true
+            TransferOverQuotaNotification.show(applicationContext)
         }
     }
 

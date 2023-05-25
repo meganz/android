@@ -60,6 +60,7 @@ interface DatabaseHandler {
     //get the credential of last login
     val credentials: UserCredentials?
 
+    @Deprecated("Call to MonitorEphemeralCredentialsUseCase instead")
     val ephemeral: EphemeralCredentials?
     /**
      * Gets preferences.

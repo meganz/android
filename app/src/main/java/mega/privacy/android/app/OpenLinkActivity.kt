@@ -85,6 +85,7 @@ import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -124,6 +125,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
+
+    /**
+     * Clear ephemeral credentials use case
+     */
+    @Inject
+    lateinit var clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase
 
     private var urlConfirmationLink: String? = null
 
@@ -589,7 +596,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     Timber.d("END logout sdk request - wait chat logout")
                     MegaApplication.urlConfirmationLink?.let {
                         Timber.d("Confirmation link - show confirmation screen")
-                        dbH.clearEphemeral()
+                        lifecycleScope.launch {
+                            clearEphemeralCredentialsUseCase()
+                        }
                         AccountController.logoutConfirmed(this, sharingScope)
                         startActivity(
                             Intent(this, LoginActivity::class.java)
