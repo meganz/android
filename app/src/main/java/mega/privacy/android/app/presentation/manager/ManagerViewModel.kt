@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.*
+import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
@@ -97,7 +98,7 @@ import javax.inject.Inject
  * @property broadcastUploadPauseState
  * @property getExtendedAccountDetail
  * @property getPricing
- * @property getFullAccountInfo
+ * @property getFullAccountInfoUseCase
  * @property getActiveSubscription
  * @property getFeatureFlagValueUseCase
  * @property getUnverifiedIncomingShares
@@ -136,7 +137,7 @@ class ManagerViewModel @Inject constructor(
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
-    private val getFullAccountInfo: GetFullAccountInfo,
+    private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val getActiveSubscription: GetActiveSubscription,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
@@ -548,7 +549,7 @@ class ManagerViewModel @Inject constructor(
         Timber.d("askForFullAccountInfo")
         viewModelScope.launch {
             runCatching {
-                getFullAccountInfo()
+                getFullAccountInfoUseCase()
             }.onFailure {
                 Timber.w("Exception getting account info.", it)
             }

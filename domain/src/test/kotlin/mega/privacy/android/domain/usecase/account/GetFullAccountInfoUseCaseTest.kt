@@ -10,35 +10,32 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
-import mega.privacy.android.domain.usecase.impl.DefaultGetFullAccountInfo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetFullAccountInfoTest {
-    private lateinit var underTest: DefaultGetFullAccountInfo
+class GetFullAccountInfoUseCaseTest {
+    private lateinit var underTest: GetFullAccountInfoUseCase
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val getPricing: GetPricing = mock()
     private val getNumberOfSubscription: GetNumberOfSubscription = mock()
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
     private val getPaymentMethod: GetPaymentMethod = mock()
-    private val getSpecificAccountDetail: GetSpecificAccountDetail = mock()
+    private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase = mock()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetFullAccountInfo(
+        underTest = GetFullAccountInfoUseCase(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getPricing = getPricing,
             getNumberOfSubscription = getNumberOfSubscription,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             getPaymentMethod = getPaymentMethod,
-            getSpecificAccountDetail = getSpecificAccountDetail,
+            getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
         )
     }
 
@@ -48,11 +45,11 @@ class DefaultGetFullAccountInfoTest {
             val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Unknown)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
-            verify(getPaymentMethod, times(1)).invoke(true)
-            verify(getAccountDetailsUseCase, times(1)).invoke(true)
-            verifyNoMoreInteractions(getSpecificAccountDetail)
-            verify(getPricing, times(1)).invoke(true)
-            verify(getNumberOfSubscription, times(1)).invoke(true)
+            verify(getPaymentMethod).invoke(true)
+            verify(getAccountDetailsUseCase).invoke(true)
+            verifyNoMoreInteractions(getSpecificAccountDetailUseCase)
+            verify(getPricing).invoke(true)
+            verify(getNumberOfSubscription).invoke(true)
         }
     }
 
@@ -62,15 +59,15 @@ class DefaultGetFullAccountInfoTest {
             val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Green)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
-            verify(getPaymentMethod, times(1)).invoke(true)
-            verify(getSpecificAccountDetail, times(1)).invoke(
+            verify(getPaymentMethod).invoke(true)
+            verify(getSpecificAccountDetailUseCase).invoke(
                 storage = false,
                 transfer = true,
                 pro = true,
             )
             verifyNoMoreInteractions(getAccountDetailsUseCase)
-            verify(getPricing, times(1)).invoke(true)
-            verify(getNumberOfSubscription, times(1)).invoke(true)
+            verify(getPricing).invoke(true)
+            verify(getNumberOfSubscription).invoke(true)
         }
     }
 }

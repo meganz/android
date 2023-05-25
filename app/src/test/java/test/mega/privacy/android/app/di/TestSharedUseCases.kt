@@ -9,13 +9,13 @@ import mega.privacy.android.app.di.SharedUseCaseModule
 import mega.privacy.android.app.domain.usecase.CheckAccessErrorExtended
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import org.mockito.kotlin.mock
 
@@ -36,9 +36,6 @@ object TestSharedUseCases {
     fun provideGetExtendedAccountDetail() = mock<GetExtendedAccountDetail>()
 
     @Provides
-    fun provideGetSpecificAccountDetail() = mock<GetSpecificAccountDetail>()
-
-    @Provides
     fun provideGetPaymentMethod() = mock<GetPaymentMethod>()
 
     @Provides
@@ -46,9 +43,6 @@ object TestSharedUseCases {
 
     @Provides
     fun provideGetNumberOfSubscription() = mock<GetNumberOfSubscription>()
-
-    @Provides
-    fun provideGetFullAccountInfo() = mock<GetFullAccountInfo>()
 
     @Provides
     fun provideGetFileVersionsOption() = mock<GetFileVersionsOption>()

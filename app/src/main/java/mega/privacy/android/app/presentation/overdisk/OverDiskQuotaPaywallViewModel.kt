@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.GetSpecificAccountDetail
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -19,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OverDiskQuotaPaywallViewModel @Inject constructor(
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
-    private val getSpecificAccountDetail: GetSpecificAccountDetail,
+    private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     private val getPricing: GetPricing,
 ) : ViewModel() {
     private val _pricing = MutableStateFlow(Pricing(emptyList()))
@@ -42,7 +43,11 @@ class OverDiskQuotaPaywallViewModel @Inject constructor(
     fun requestStorageDetailIfNeeded() {
         viewModelScope.launch {
             if (isDatabaseEntryStale()) {
-                getSpecificAccountDetail(storage = true, transfer = false, pro = false)
+                runCatching {
+                    getSpecificAccountDetailUseCase(storage = true, transfer = false, pro = false)
+                }.onFailure {
+                    Timber.w("Exception getting account detail: $it")
+                }
             }
         }
     }

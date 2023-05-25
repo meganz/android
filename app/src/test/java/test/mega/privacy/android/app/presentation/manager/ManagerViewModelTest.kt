@@ -46,12 +46,12 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.GetIncomingContactRequestsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -215,7 +215,7 @@ class ManagerViewModelTest {
     }
 
     private val getPricing = mock<GetPricing>()
-    private val getFullAccountInfo = mock<GetFullAccountInfo>()
+    private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -243,7 +243,7 @@ class ManagerViewModelTest {
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
             getPricing = getPricing,
-            getFullAccountInfo = getFullAccountInfo,
+            getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             getActiveSubscription = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
@@ -637,7 +637,7 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that an exception from get full account info is not propagated`() = runTest {
-        whenever(getFullAccountInfo()).thenAnswer { throw MegaException(1, "It's broken") }
+        whenever(getFullAccountInfoUseCase()).thenAnswer { throw MegaException(1, "It's broken") }
 
         with(underTest) {
             askForFullAccountInfo()

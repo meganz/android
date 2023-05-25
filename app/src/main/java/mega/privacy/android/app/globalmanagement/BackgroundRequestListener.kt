@@ -15,7 +15,7 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERI
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetFullAccountInfo
+import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -41,7 +41,7 @@ import javax.inject.Inject
  * @property transfersManagement [TransfersManagement]
  * @property pushNotificationSettingManagement [PushNotificationSettingManagement]
  * @property applicationScope [CoroutineScope]
- * @property getFullAccountInfo [GetFullAccountInfo]
+ * @property getFullAccountInfoUseCase [GetFullAccountInfoUseCase]
  * @property broadcastFetchNodesFinishUseCase [BroadcastFetchNodesFinishUseCase]
  * @property scheduleCameraUploadUseCase [ScheduleCameraUploadUseCase]
  */
@@ -54,7 +54,7 @@ class BackgroundRequestListener @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getFullAccountInfo: GetFullAccountInfo,
+    private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
     private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
@@ -222,7 +222,7 @@ class BackgroundRequestListener @Inject constructor(
     private fun askForFullAccountInfo() {
         Timber.d("askForFullAccountInfo")
         applicationScope.launch {
-            runCatching { getFullAccountInfo() }.onFailure {
+            runCatching { getFullAccountInfoUseCase() }.onFailure {
                 Timber.w("Exception getting full account info.", it)
             }
         }
