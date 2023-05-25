@@ -147,6 +147,18 @@ class HomepageFragment : Fragment() {
         }
     }
 
+    private val pageChangeCallback by lazy {
+        object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
+                bottomSheetBehavior.invalidateScrollingChild(
+                    // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
+                    currentSelectedTabFragment?.view
+                )
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -227,6 +239,7 @@ class HomepageFragment : Fragment() {
 
         searchInputView.stopCallAnimation()
         startScreenDialog?.dismiss()
+        viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
     }
 
     /**
@@ -388,16 +401,7 @@ class HomepageFragment : Fragment() {
 
         // Pass selected page view to HomepageBottomSheetBehavior which would seek for
         // the nested scrolling child views and deal with the logic of nested scrolling
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-
-            override fun onPageSelected(position: Int) {
-                currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
-                bottomSheetBehavior.invalidateScrollingChild(
-                    // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
-                    currentSelectedTabFragment?.view
-                )
-            }
-        })
+        viewPager.registerOnPageChangeCallback(pageChangeCallback)
 
         setupBottomSheetBackground()
     }
