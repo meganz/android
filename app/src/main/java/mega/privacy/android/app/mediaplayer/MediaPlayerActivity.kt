@@ -11,7 +11,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
@@ -47,8 +46,6 @@ import timber.log.Timber
  */
 @AndroidEntryPoint
 abstract class MediaPlayerActivity : PasscodeActivity() {
-    internal lateinit var binding: ActivityMediaPlayerBinding
-
     internal val viewModel: MediaPlayerViewModel by viewModels()
 
     internal var searchMenuItem: MenuItem? = null
@@ -395,26 +392,14 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
         }.launch(intent)
     }
 
-    internal fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-
-        supportActionBar?.setHomeButtonEnabled(true)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = ""
-
-        binding.toolbar.setNavigationOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
-    }
+    internal abstract fun setupToolbar()
 
     /**
      * Set toolbar title
      *
      * @param title toolbar title
      */
-    internal fun setToolbarTitle(title: String) {
-        binding.toolbar.title = title
-    }
+    internal abstract fun setToolbarTitle(title: String)
 
     /**
      * Hide tool bar

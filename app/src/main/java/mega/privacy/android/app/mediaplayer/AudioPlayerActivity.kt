@@ -20,17 +20,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.util.Util
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
+import mega.privacy.android.app.databinding.ActivityAudioPlayerBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -81,6 +77,7 @@ import timber.log.Timber
  * to avoid crash when set requestedOrientation.
  */
 class AudioPlayerActivity : MediaPlayerActivity() {
+    private lateinit var binding: ActivityAudioPlayerBinding
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
@@ -114,23 +111,21 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                 refreshMenuOptionsVisibility()
 
-                service.serviceGateway.metadataUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { metadata ->
-                        binding.toolbar.title =
-                            if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                                metadata.title ?: metadata.nodeName
-                            } else {
-                                ""
-                            }
-                        dragToExit.nodeChanged(
-                            service.playerServiceViewModelGateway.getCurrentPlayingHandle()
-                        )
-                    }.launchIn(lifecycleScope)
+                collectFlow(service.serviceGateway.metadataUpdate()) { metadata ->
+                    binding.toolbar.title =
+                        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            metadata.title ?: metadata.nodeName
+                        } else {
+                            ""
+                        }
+                    dragToExit.nodeChanged(
+                        service.playerServiceViewModelGateway.getCurrentPlayingHandle()
+                    )
+                }
 
-                service.playerServiceViewModelGateway.errorUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { errorCode ->
-                        this@AudioPlayerActivity.onError(errorCode)
-                    }.launchIn(lifecycleScope)
+                collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { errorCode ->
+                    this@AudioPlayerActivity.onError(errorCode)
+                }
             }
         }
     }
@@ -171,7 +166,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             nodeSaver.restoreState(savedInstanceState)
         }
 
-        binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
+        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
         binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
@@ -418,7 +413,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             R.id.properties -> {
                 serviceGateway?.getCurrentMediaItem()?.localConfiguration?.uri?.let { uri ->
                     navController.navigate(
-                        MediaPlayerFragmentDirections.actionPlayerToTrackInfo(
+                        AudioPlayerFragmentDirections.actionPlayerToTrackInfo(
                             adapterType = adapterType,
                             fromIncomingShare = adapterType == INCOMING_SHARES_ADAPTER,
                             handle = playingHandle,
@@ -596,6 +591,24 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         nodeSaver.handleRequestPermissionsResult(requestCode = requestCode)
     }
 
+    override fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+
+        supportActionBar?.run {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            title = ""
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    override fun setToolbarTitle(title: String) {
+        binding.toolbar.title = title
+    }
+
     override fun hideToolbar(animate: Boolean) {
         with(binding.toolbar) {
             if (animate) {
@@ -703,9 +716,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun onDragActivated(activated: Boolean) {
         getFragmentFromNavHost(
             navHostId = R.id.nav_host_fragment,
-            fragmentClass = MediaPlayerFragment::class.java
+            fragmentClass = AudioPlayerFragment::class.java
         )
-            ?.onDragActivated(dragToExit = dragToExit, activated = activated)
+            ?.onDragActivated(activated = activated)
     }
 
     private fun onError(code: Int) {

@@ -21,6 +21,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
@@ -33,18 +34,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.updatePadding
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.databinding.ActivityMediaPlayerBinding
+import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
@@ -106,7 +103,11 @@ import timber.log.Timber
  * to avoid crash when set requestedOrientation.
  */
 class VideoPlayerActivity : MediaPlayerActivity() {
+    private lateinit var binding: ActivityVideoPlayerBinding
+
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
+
+    private val videoViewModel: VideoPlayerViewModel by viewModels()
 
     private var serviceBound = false
 
@@ -140,47 +141,43 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 refreshMenuOptionsVisibility()
 
-                service.serviceGateway.metadataUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { metadata ->
-                        binding.toolbar.title =
-                            if (configuration.orientation == ORIENTATION_LANDSCAPE) {
-                                metadata.title ?: metadata.nodeName
-                            } else {
-                                ""
-                            }
-                        dragToExit.nodeChanged(
-                            service.playerServiceViewModelGateway.getCurrentPlayingHandle()
-                        )
-                    }.launchIn(lifecycleScope)
+                collectFlow(service.serviceGateway.metadataUpdate()) { metadata ->
+                    binding.toolbar.title =
+                        if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+                            metadata.title ?: metadata.nodeName
+                        } else {
+                            ""
+                        }
+                    dragToExit.nodeChanged(
+                        service.playerServiceViewModelGateway.getCurrentPlayingHandle()
+                    )
+                }
 
-                service.serviceGateway.videoSizeUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-                    .onEach { (width, height) ->
-                        val rotationMode = Settings.System.getInt(
-                            contentResolver,
-                            ACCELEROMETER_ROTATION,
-                            SCREEN_BRIGHTNESS_MODE_MANUAL
-                        )
+                collectFlow(service.serviceGateway.videoSizeUpdate()) { (width, height) ->
+                    val rotationMode = Settings.System.getInt(
+                        contentResolver,
+                        ACCELEROMETER_ROTATION,
+                        SCREEN_BRIGHTNESS_MODE_MANUAL
+                    )
 
-                        currentOrientation =
-                            if (width > height) {
-                                SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                            } else {
-                                SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                            }
+                    currentOrientation =
+                        if (width > height) {
+                            SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                        } else {
+                            SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                        }
 
-                        requestedOrientation =
-                            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                                SCREEN_ORIENTATION_SENSOR
-                            } else {
-                                currentOrientation
-                            }
-                    }.launchIn(lifecycleScope)
+                    requestedOrientation =
+                        if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                            SCREEN_ORIENTATION_SENSOR
+                        } else {
+                            currentOrientation
+                        }
+                }
 
-                service.playerServiceViewModelGateway.errorUpdate()
-                    .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED).onEach { errorCode ->
-                        this@VideoPlayerActivity.onError(errorCode)
-                    }.launchIn(lifecycleScope)
+                collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { errorCode ->
+                    this@VideoPlayerActivity.onError(errorCode)
+                }
             }
         }
     }
@@ -224,7 +221,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         currentOrientation = configuration.orientation
         observeRotationSettingsChange()
 
-        binding = ActivityMediaPlayerBinding.inflate(layoutInflater)
+        binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
 
         setContentView(dragToExit.wrapContentView(binding.root))
         dragToExit.observeThumbnailLocation(this, intent)
@@ -237,7 +234,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 )
             collapseIcon?.setTint(Color.WHITE)
         }.post {
-            updateToolbar(viewModel.isLockUpdate.value)
+            updateToolbar(videoViewModel.isLockUpdate.value)
         }
 
         val navHostFragment =
@@ -264,7 +261,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             RunOnUIThreadUtils.post {
                 getFragmentFromNavHost(
                     navHostId = R.id.nav_host_fragment,
-                    fragmentClass = MediaPlayerFragment::class.java
+                    fragmentClass = VideoPlayerFragment::class.java
                 )?.runEnterAnimation(dragToExit)
             }
         }
@@ -311,11 +308,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         })
                 }
             }
+        }
 
-            isLockUpdate.flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-                .onEach { isLock ->
-                    updateToolbar(isLock)
-                }.launchIn(lifecycleScope)
+        collectFlow(videoViewModel.isLockUpdate) { isLock ->
+            updateToolbar(isLock)
         }
     }
 
@@ -445,7 +441,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
         when (item.itemId) {
             R.id.save_to_device -> {
-                viewModel.sendSaveToDeviceButtonClickedEvent()
+                videoViewModel.sendSaveToDeviceButtonClickedEvent()
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
                         handle = playingHandle,
@@ -503,7 +499,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             R.id.properties -> {
-                viewModel.sendInfoButtonClickedEvent()
+                videoViewModel.sendInfoButtonClickedEvent()
                 val intent: Intent
                 if (adapterType == OFFLINE_ADAPTER) {
                     intent = Intent(this, OfflineFileInfoActivity::class.java).apply {
@@ -556,7 +552,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             R.id.share -> {
-                viewModel.sendShareButtonClickedEvent()
+                videoViewModel.sendShareButtonClickedEvent()
                 when (adapterType) {
                     OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                         val mediaItem = serviceGateway?.getCurrentMediaItem()
@@ -588,13 +584,13 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             R.id.send_to_chat -> {
-                viewModel.sendSendToChatButtonClickedEvent()
+                videoViewModel.sendSendToChatButtonClickedEvent()
                 nodeAttacher.attachNode(handle = playingHandle)
                 return true
             }
 
             R.id.get_link -> {
-                viewModel.sendGetLinkButtonClickedEvent()
+                videoViewModel.sendGetLinkButtonClickedEvent()
                 if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
                         node = megaApi.getNodeByHandle(playingHandle),
                         context = this
@@ -606,7 +602,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
 
             R.id.remove_link -> {
-                viewModel.sendRemoveLinkButtonClickedEvent()
+                videoViewModel.sendRemoveLinkButtonClickedEvent()
                 megaApi.getNodeByHandle(playingHandle)?.let { node ->
                     if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
                         AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
@@ -716,6 +712,24 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         nodeSaver.handleRequestPermissionsResult(requestCode = requestCode)
+    }
+
+    override fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+
+        supportActionBar?.run {
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+            title = ""
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+    }
+
+    override fun setToolbarTitle(title: String) {
+        binding.toolbar.title = title
     }
 
     override fun hideToolbar(animate: Boolean) {
@@ -908,7 +922,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     private fun onDragActivated(activated: Boolean) {
         getFragmentFromNavHost(
             navHostId = R.id.nav_host_fragment,
-            fragmentClass = MediaPlayerFragment::class.java
+            fragmentClass = VideoPlayerFragment::class.java
         )?.onDragActivated(dragToExit = dragToExit, activated = activated)
     }
 

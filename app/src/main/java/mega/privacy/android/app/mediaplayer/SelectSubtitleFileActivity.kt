@@ -9,7 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.mediaplayer.MediaPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_INFO
+import mega.privacy.android.app.mediaplayer.VideoPlayerFragment.Companion.INTENT_KEY_SUBTITLE_FILE_INFO
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -44,6 +44,9 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * onCreate lifecycle function
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)

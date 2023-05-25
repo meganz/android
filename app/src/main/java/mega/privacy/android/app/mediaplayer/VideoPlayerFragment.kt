@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
@@ -27,75 +28,63 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
-import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
-import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.Util.isOnline
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 /**
- * MediaPlayer Fragment
+ * The Fragment for the video player
  */
 @AndroidEntryPoint
-class MediaPlayerFragment : Fragment() {
-    private var audioPlayerVH: AudioPlayerViewHolder? = null
-    private var videoPlayerVH: VideoPlayerViewHolder? = null
+class VideoPlayerFragment : Fragment() {
+    private var playerViewHolder: VideoPlayerViewHolder? = null
 
-    private val viewModel: MediaPlayerViewModel by activityViewModels()
+    private lateinit var binding: FragmentVideoPlayerBinding
+
+    private val viewModel: VideoPlayerViewModel by activityViewModels()
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
-    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
+    private var serviceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
 
     private var delayHideToolbarCanceled = false
 
     private var videoPlayerView: StyledPlayerView? = null
-
-    private var isAudioPlayer = false
-
     private var playbackPositionDialog: Dialog? = null
+
+    private var toolbarVisible = true
+
+    private var retryFailedDialog: AlertDialog? = null
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
             serviceGateway = null
-            playerServiceViewModelGateway = null
+            serviceViewModelGateway = null
         }
 
         /**
@@ -104,33 +93,30 @@ class MediaPlayerFragment : Fragment() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
                 serviceGateway = service.serviceGateway
-                playerServiceViewModelGateway = service.playerServiceViewModelGateway
+                serviceViewModelGateway = service.playerServiceViewModelGateway
 
                 setupPlayer()
                 observeFlow()
             }
         }
     }
+
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 updateLoadingAnimation(state)
             }
             // The subtitle button is enable after the video is in buffering state
-            videoPlayerVH?.subtitleButtonEnable(state >= Player.STATE_BUFFERING)
+            playerViewHolder?.subtitleButtonEnable(state >= Player.STATE_BUFFERING)
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
-            if (view != null && reason != MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+            if (view != null && reason != Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
                 viewModel.updateCurrentMediaId(mediaItem?.mediaId)
             }
         }
     }
-
-    private var toolbarVisible = true
-
-    private var retryFailedDialog: AlertDialog? = null
 
     private val selectSubtitleFileActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -143,46 +129,39 @@ class MediaPlayerFragment : Fragment() {
             }
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        context?.bindService(
+            Intent(
+                requireContext(),
+                VideoPlayerService::class.java
+            ).putExtra(Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
+            connection,
+            Context.BIND_AUTO_CREATE
+        )
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View =
-        if (isAudioPlayer) {
-            val binding = FragmentAudioPlayerBinding.inflate(inflater, container, false)
-            audioPlayerVH = AudioPlayerViewHolder(binding)
-            binding.root
-        } else {
-            val binding = FragmentVideoPlayerBinding.inflate(inflater, container, false)
-            videoPlayerVH = VideoPlayerViewHolder(binding)
-            binding.root
-        }
+    ): View = FragmentVideoPlayerBinding.inflate(inflater, container, false).let {
+        binding = it
+        playerViewHolder = VideoPlayerViewHolder(binding)
+        binding.root
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         observeFlow()
-
-        if (isAudioPlayer) {
-            delayHideToolbar()
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isAudioPlayer = activity is AudioPlayerActivity
-        val playerServiceIntent = Intent(
-            requireContext(),
-            if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
-        )
-        playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
-        requireContext().bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onResume() {
         super.onResume()
 
-        if (serviceGateway != null && playerServiceViewModelGateway != null) {
+        if (serviceGateway != null && serviceViewModelGateway != null) {
             setupPlayer()
         }
 
@@ -191,15 +170,13 @@ class MediaPlayerFragment : Fragment() {
             delayHideToolbar()
         }
 
-        if (isVideoPlayer()) {
-            (requireActivity() as MediaPlayerActivity).setDraggable(true)
-        }
+        (activity as? VideoPlayerActivity)?.setDraggable(true)
     }
 
     override fun onPause() {
         super.onPause()
         viewModel.updateAddSubtitleState()
-        if (isVideoPlayer() && serviceGateway?.playing() == true) {
+        if (serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
             viewModel.updateVideoPlayerPausedForPlaylist(true)
         }
@@ -209,9 +186,8 @@ class MediaPlayerFragment : Fragment() {
         super.onDestroyView()
         playlistObserved = false
         // Close the dialog after fragment is destroyed to avoid adding dialog view repeatedly after screen is rotated.
-        playbackPositionDialog?.let {
-            if (it.isShowing)
-                it.dismiss()
+        playbackPositionDialog?.run {
+            if (isShowing) dismiss()
         }
     }
 
@@ -220,27 +196,17 @@ class MediaPlayerFragment : Fragment() {
 
         serviceGateway?.removeListener(playerListener)
         serviceGateway = null
-        requireContext().unbindService(connection)
+        context?.unbindService(connection)
     }
 
     private fun observeFlow() {
         if (view != null) {
             serviceGateway?.let { gateway ->
-                gateway.metadataUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { metadata ->
-                    if (isAudioPlayer) {
-                        audioPlayerVH?.displayMetadata(metadata)
-                    } else {
-                        videoPlayerVH?.displayMetadata(metadata)
-                    }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                collectFlow(gateway.metadataUpdate()) { metadata ->
+                    playerViewHolder?.displayMetadata(metadata)
+                }
 
-                gateway.playbackPositionStateUpdate().flowWithLifecycle(
-                    viewLifecycleOwner.lifecycle,
-                    Lifecycle.State.RESUMED
-                ).onEach { state ->
+                collectFlow(gateway.playbackPositionStateUpdate()) { state ->
                     if (state.showPlaybackDialog) {
                         playbackPositionDialog =
                             MaterialAlertDialogBuilder(requireContext())
@@ -285,42 +251,36 @@ class MediaPlayerFragment : Fragment() {
                                     show()
                                 }
                     }
-                }.launchIn(viewLifecycleOwner.lifecycleScope)
+                }
             }
-            playerServiceViewModelGateway?.let {
+
+            serviceViewModelGateway?.let {
                 if (!playlistObserved) {
                     playlistObserved = true
-                    it.playlistUpdate().flowWithLifecycle(
-                        viewLifecycleOwner.lifecycle,
-                        Lifecycle.State.RESUMED
-                    ).onEach { info ->
+                    collectFlow(it.playlistUpdate()) { info ->
                         Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
+                        playerViewHolder?.togglePlaylistEnabled(info.first)
+                    }
 
-                        audioPlayerVH?.togglePlaylistEnabled(requireContext(), info.first)
-                        videoPlayerVH?.togglePlaylistEnabled(info.first)
-                    }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-                    it.retryUpdate().flowWithLifecycle(
-                        viewLifecycleOwner.lifecycle,
-                        Lifecycle.State.RESUMED
-                    ).onEach { isRetry ->
+                    collectFlow(it.retryUpdate()) { isRetry ->
                         when {
                             !isRetry && retryFailedDialog == null -> {
-                                retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
-                                    .setCancelable(false)
-                                    .setMessage(
-                                        getString(
-                                            if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
-                                            else R.string.error_fail_to_open_file_no_network
+                                retryFailedDialog =
+                                    MaterialAlertDialogBuilder(requireContext())
+                                        .setCancelable(false)
+                                        .setMessage(
+                                            getString(
+                                                if (Util.isOnline(requireContext()))
+                                                    R.string.error_fail_to_open_file_general
+                                                else
+                                                    R.string.error_fail_to_open_file_no_network
+                                            )
                                         )
-                                    )
-                                    .setPositiveButton(
-                                        getString(R.string.general_ok)
-                                    ) { _, _ ->
-                                        serviceGateway?.stopAudioPlayer()
-                                        requireActivity().finish()
-                                    }
-                                    .show()
+                                        .setPositiveButton(getString(R.string.general_ok)) { _, _ ->
+                                            serviceGateway?.stopAudioPlayer()
+                                            requireActivity().finish()
+                                        }
+                                        .show()
                             }
 
                             isRetry -> {
@@ -328,21 +288,17 @@ class MediaPlayerFragment : Fragment() {
                                 retryFailedDialog = null
                             }
                         }
-                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    }
 
-                    it.mediaPlaybackUpdate().flowWithLifecycle(
-                        viewLifecycleOwner.lifecycle,
-                        Lifecycle.State.RESUMED
-                    ).onEach { isPaused ->
-                        if (isVideoPlayer()) {
-                            // The keepScreenOn is true when the video is playing, otherwise it's false.
-                            videoPlayerView?.keepScreenOn = !isPaused
-                        }
-                    }.launchIn(viewLifecycleOwner.lifecycleScope)
+                    collectFlow(it.mediaPlaybackUpdate()) { isPaused ->
+                        // The keepScreenOn is true when the video is playing, otherwise it's false.
+                        videoPlayerView?.keepScreenOn = !isPaused
+                    }
                 }
             }
+
             collectFlow(viewModel.state) { state ->
-                videoPlayerVH?.updateSubtitleButtonUI(state.isSubtitleShown)
+                playerViewHolder?.updateSubtitleButtonUI(state.isSubtitleShown)
                 serviceGateway?.setPlayWhenReady(!state.isSubtitleDialogShown)
                 if (!state.isSubtitleDialogShown) {
                     delayHideToolbar()
@@ -362,86 +318,76 @@ class MediaPlayerFragment : Fragment() {
     }
 
     private fun setupPlayer() {
-        if (isAudioPlayer) {
-            val viewHolder = audioPlayerVH ?: return
-
-            serviceGateway?.run {
-                setupPlayerView(this, viewHolder.binding.playerView, false)
-                viewHolder.layoutArtwork()
-            }
-
-            playerServiceViewModelGateway?.run {
-                viewHolder.setupPlaylistButton(requireContext(), getPlaylistItems()) {
-                    findNavController().navigate(R.id.action_player_to_playlist)
+        playerViewHolder?.let { viewHolder ->
+            videoPlayerView = viewHolder.binding.playerView
+            with(viewHolder) {
+                // we need setup control buttons again, because reset player would reset PlayerControlView
+                serviceViewModelGateway?.run {
+                    setupPlaylistButton(getPlaylistItems()) {
+                        (activity as? VideoPlayerActivity)?.setDraggable(false)
+                        findNavController().navigate(R.id.action_player_to_playlist)
+                    }
                 }
-            }
-        } else {
-            videoPlayerVH?.let { viewHolder ->
-                videoPlayerView = viewHolder.binding.playerView
-                with(viewHolder) {
-                    // we need setup control buttons again, because reset player would reset PlayerControlView
-                    playerServiceViewModelGateway?.run {
-                        setupPlaylistButton(getPlaylistItems()) {
-                            (requireActivity() as MediaPlayerActivity).setDraggable(false)
-                            findNavController().navigate(R.id.action_player_to_playlist)
-                        }
-                    }
-                    setupLockUI(viewModel.isLockUpdate.value) { isLock ->
-                        viewModel.updateLockStatus(isLock)
-                        if (isLock) {
-                            delayHideWhenLocked()
-                            viewModel.sendScreenLockedEvent()
-                        } else {
-                            viewModel.sendScreenUnlockedEvent()
-                        }
-                    }
-                    initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        setupSubtitleButton(
-                            isShow = showSubtitleIcon(),
-                            isSubtitleShown = viewModel.state.value.isSubtitleShown
-                        ) {
-                            viewModel.showAddSubtitleDialog()
-                        }
-                    }
 
-                    setupScreenshotButton {
-                        val rootPath =
-                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
-                        val screenshotsFolderPath =
-                            "${rootPath}${File.separator}$MEGA_SCREENSHOTS_FOLDER_NAME${File.separator}"
-                        viewHolder.binding.playerView.videoSurfaceView?.let { view ->
-                            viewModel.screenshotWhenVideoPlaying(
-                                requireActivity().window.decorView,
-                                screenshotsFolderPath,
-                                view
-                            ) { bitmap ->
-                                viewModel.sendSnapshotButtonClickedEvent()
-                                requireActivity().runOnUiThread {
-                                    showCaptureScreenshotAnimation(
-                                        view = binding.screenshotScaleAnimationView,
-                                        layout = binding.screenshotScaleAnimationLayout,
-                                        bitmap = bitmap
-                                    )
-                                    (requireActivity() as VideoPlayerActivity)
-                                        .showSnackbarForVideoPlayer(
-                                            getString(R.string.media_player_video_snackbar_screenshot_saved)
-                                        )
-                                }
+                setupLockUI(viewModel.isLockUpdate.value) { isLock ->
+                    viewModel.updateLockStatus(isLock)
+                    if (isLock) {
+                        delayHideWhenLocked()
+                        viewModel.sendScreenLockedEvent()
+                    } else {
+                        viewModel.sendScreenUnlockedEvent()
+                    }
+                }
+
+                initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    setupSubtitleButton(
+                        // Add feature flag, and will be removed after the feature is finished.
+                        isShow = showSubtitleIcon(),
+                        isSubtitleShown = viewModel.state.value.isSubtitleShown
+                    ) {
+                        viewModel.showAddSubtitleDialog()
+                    }
+                }
+
+                setupScreenshotButton {
+                    val rootPath =
+                        getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
+                    val screenshotsFolderPath =
+                        "${rootPath}${File.separator}${MEGA_SCREENSHOTS_FOLDER_NAME}${File.separator}"
+                    viewHolder.binding.playerView.videoSurfaceView?.let { view ->
+                        viewModel.screenshotWhenVideoPlaying(
+                            captureAreaView = requireActivity().window.decorView,
+                            rootFolderPath = screenshotsFolderPath,
+                            captureView = view
+                        ) { bitmap ->
+                            viewModel.sendSnapshotButtonClickedEvent()
+                            requireActivity().runOnUiThread {
+                                showCaptureScreenshotAnimation(
+                                    view = binding.screenshotScaleAnimationView,
+                                    layout = binding.screenshotScaleAnimationLayout,
+                                    bitmap = bitmap
+                                )
+                                (activity as? VideoPlayerActivity)?.showSnackbarForVideoPlayer(
+                                    getString(R.string.media_player_video_snackbar_screenshot_saved)
+                                )
                             }
                         }
                     }
                 }
-                serviceGateway?.run {
-                    setupPlayerView(this, viewHolder.binding.playerView, true)
-
-                    if (viewModel.state.value.videoPlayerPausedForPlaylistState) {
-                        setPlayWhenReady(true)
-                        viewModel.updateVideoPlayerPausedForPlaylist(false)
-                    }
-                }
-                initRepeatToggleButtonForVideo(viewHolder)
             }
+
+            serviceGateway?.run {
+                setupPlayerView(this, viewHolder.binding.playerView)
+
+                if (viewModel.state.value.videoPlayerPausedForPlaylistState) {
+                    setPlayWhenReady(true)
+                    viewModel.updateVideoPlayerPausedForPlaylist(false)
+                }
+            }
+
+            initRepeatToggleButtonForVideo(viewHolder)
         }
     }
 
@@ -454,11 +400,12 @@ class MediaPlayerFragment : Fragment() {
             layout.isVisible = true
         }
         view.setImageBitmap(bitmap)
-        val scaleY = if (requireActivity().configuration.orientation == ORIENTATION_LANDSCAPE) {
-            SCREENSHOT_SCALE_LANDSCAPE
-        } else {
-            SCREENSHOT_SCALE_PORTRAIT
-        }
+        val scaleY =
+            if (requireActivity().configuration.orientation == ORIENTATION_LANDSCAPE) {
+                SCREENSHOT_SCALE_LANDSCAPE
+            } else {
+                SCREENSHOT_SCALE_PORTRAIT
+            }
         val anim: Animation = ScaleAnimation(
             SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the X axis scaling
             SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the Y axis scaling
@@ -479,9 +426,7 @@ class MediaPlayerFragment : Fragment() {
                 }, SCREENSHOT_DURATION)
             }
 
-            override fun onAnimationRepeat(p0: Animation?) {
-            }
-
+            override fun onAnimationRepeat(p0: Animation?) {}
         })
         anim.fillAfter = true
         anim.duration = ANIMATION_DURATION
@@ -490,9 +435,11 @@ class MediaPlayerFragment : Fragment() {
 
     private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
         serviceGateway?.run {
-            val defaultRepeatMode = when (requireContext().defaultSharedPreferences.getInt(
-                KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal
-            )) {
+            val defaultRepeatMode = when (
+                requireContext().defaultSharedPreferences.getInt(
+                    KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal
+                )
+            ) {
                 RepeatToggleMode.REPEAT_NONE.ordinal -> RepeatToggleMode.REPEAT_NONE
                 RepeatToggleMode.REPEAT_ONE.ordinal -> RepeatToggleMode.REPEAT_ONE
                 else -> RepeatToggleMode.REPEAT_ALL
@@ -510,8 +457,7 @@ class MediaPlayerFragment : Fragment() {
                 defaultRepeatMode
             ) { repeatToggleButton ->
                 val repeatToggleMode =
-                    playerServiceViewModelGateway?.videoRepeatToggleMode()
-                        ?: RepeatToggleMode.REPEAT_NONE
+                    serviceViewModelGateway?.videoRepeatToggleMode() ?: RepeatToggleMode.REPEAT_NONE
 
                 if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                     setRepeatModeForVideo(RepeatToggleMode.REPEAT_ONE)
@@ -528,27 +474,22 @@ class MediaPlayerFragment : Fragment() {
     private fun setupPlayerView(
         mediaPlayerServiceGateway: MediaPlayerServiceGateway,
         playerView: StyledPlayerView,
-        isVideoPlayer: Boolean,
     ) {
         mediaPlayerServiceGateway.setupPlayerView(
             playerView = playerView,
-            isAudioPlayer = isAudioPlayer,
-            controllerHideOnTouch = isVideoPlayer,
-            showShuffleButton = !isVideoPlayer,
+            isAudioPlayer = false,
+            controllerHideOnTouch = true,
+            showShuffleButton = false,
         )
 
         playerView.setOnClickListener {
             if (toolbarVisible) {
                 hideToolbar()
-                if (isVideoPlayer()) {
-                    playerView.hideController()
-                }
+                playerView.hideController()
             } else {
                 delayHideToolbarCanceled = true
                 showToolbar()
-                if (isVideoPlayer()) {
-                    playerView.showController()
-                }
+                playerView.showController()
                 if (viewModel.isLockUpdate.value) {
                     delayHideToolbar()
                 }
@@ -558,49 +499,41 @@ class MediaPlayerFragment : Fragment() {
         mediaPlayerServiceGateway.addPlayerListener(playerListener)
     }
 
-    private fun updateLoadingAnimation(@Player.State playbackState: Int) {
-        audioPlayerVH?.updateLoadingAnimation(playbackState)
-        videoPlayerVH?.updateLoadingAnimation(playbackState)
-    }
+    private fun updateLoadingAnimation(@Player.State playbackState: Int) =
+        playerViewHolder?.updateLoadingAnimation(playbackState)
 
     private fun delayHideToolbar() {
         delayHideToolbarCanceled = false
 
-        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
+        RunOnUIThreadUtils.runDelay(Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
             if (isResumed && !delayHideToolbarCanceled) {
                 hideToolbar()
-                videoPlayerVH?.hideController()
+                playerViewHolder?.hideController()
             }
         }
     }
 
     private fun delayHideWhenLocked() {
-        runDelay(AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
+        RunOnUIThreadUtils.runDelay(Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS) {
             if (viewModel.isLockUpdate.value) {
                 hideToolbar()
-                videoPlayerVH?.hideController()
+                playerViewHolder?.hideController()
             }
         }
     }
 
     private fun hideToolbar(animate: Boolean = true) {
-        activity?.let {
-            toolbarVisible = false
-            (it as? MediaPlayerActivity)?.hideToolbar(animate)
-        }
+        toolbarVisible = false
+        (activity as? VideoPlayerActivity)?.hideToolbar(animate)
     }
 
     private fun showToolbar() {
         toolbarVisible = true
-        val mediaPlayerActivity = requireActivity() as MediaPlayerActivity
-        if (isAudioPlayer) {
-            mediaPlayerActivity.showToolbar()
+        val activity = activity as? VideoPlayerActivity
+        if (viewModel.isLockUpdate.value) {
+            activity?.showSystemUI()
         } else {
-            if (viewModel.isLockUpdate.value) {
-                mediaPlayerActivity.showSystemUI()
-            } else {
-                mediaPlayerActivity.showToolbar()
-            }
+            activity?.showToolbar()
         }
     }
 
@@ -610,14 +543,14 @@ class MediaPlayerFragment : Fragment() {
      * @param dragToExit DragToExitSupport
      */
     fun runEnterAnimation(dragToExit: DragToExitSupport) {
-        val binding = videoPlayerVH?.binding ?: return
+        val binding = playerViewHolder?.binding ?: return
 
         dragToExit.runEnterAnimation(requireActivity().intent, binding.playerView) {
             if (it) {
                 updateViewForAnimation()
             } else if (isResumed) {
                 showToolbar()
-                videoPlayerVH?.showController()
+                playerViewHolder?.showController()
 
                 binding.root.setBackgroundColor(Color.BLACK)
 
@@ -637,23 +570,22 @@ class MediaPlayerFragment : Fragment() {
             delayHideToolbarCanceled = true
             updateViewForAnimation()
 
-            val videoSurfaceView = videoPlayerVH?.binding?.playerView?.videoSurfaceView ?: return
-            dragToExit.setCurrentView(videoSurfaceView)
+            playerViewHolder?.binding?.playerView?.videoSurfaceView.let { videoSurfaceView ->
+                dragToExit.setCurrentView(videoSurfaceView)
+            }
         } else {
-            runDelay(300L) {
-                videoPlayerVH?.binding?.root?.setBackgroundColor(Color.BLACK)
+            RunOnUIThreadUtils.runDelay(300L) {
+                playerViewHolder?.binding?.root?.setBackgroundColor(Color.BLACK)
             }
         }
     }
 
     private fun updateViewForAnimation() {
         hideToolbar(animate = false)
-        videoPlayerVH?.hideController()
+        playerViewHolder?.hideController()
 
-        videoPlayerVH?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
+        playerViewHolder?.binding?.root?.setBackgroundColor(Color.TRANSPARENT)
     }
-
-    private fun isVideoPlayer() = playerServiceViewModelGateway?.isAudioPlayer() == false
 
     /**
      * Init the add subtitle dialog
@@ -668,7 +600,7 @@ class MediaPlayerFragment : Fragment() {
                     AddSubtitleDialog(
                         selectOptionState = viewModel.selectOptionState,
                         matchedSubtitleFileUpdate = {
-                            playerServiceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem()
+                            serviceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem()
                         },
                         subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
                         onOffClicked = {
@@ -708,8 +640,8 @@ class MediaPlayerFragment : Fragment() {
     private fun showSubtitleIcon() =
         activity?.intent?.getIntExtra(
             Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-            INVALID_VALUE
-        ) != OFFLINE_ADAPTER
+            Constants.INVALID_VALUE
+        ) != Constants.OFFLINE_ADAPTER
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"

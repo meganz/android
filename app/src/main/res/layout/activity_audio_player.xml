@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/media_player" />
+        app:navGraph="@navigation/navigation_audio_player" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

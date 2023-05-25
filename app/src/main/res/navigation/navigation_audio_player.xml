@@ -6,7 +6,7 @@
     app:startDestination="@id/main_player">
     <fragment
         android:id="@+id/main_player"
-        android:name="mega.privacy.android.app.mediaplayer.MediaPlayerFragment"
+        android:name="mega.privacy.android.app.mediaplayer.AudioPlayerFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_player">
         <action
