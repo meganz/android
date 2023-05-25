@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.filenode
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.FileSystemRepository
 import org.junit.jupiter.api.BeforeEach
@@ -16,7 +17,7 @@ import java.io.File
 class IsValidNodeFileUseCaseTest {
 
     private val fileSystemRepository = mock<FileSystemRepository>()
-    private val node = mock<TypedFileNode>()
+    private val node = mock<FileNode>()
     private val file = mock<File>()
     val underTest = IsValidNodeFileUseCase(fileSystemRepository)
 

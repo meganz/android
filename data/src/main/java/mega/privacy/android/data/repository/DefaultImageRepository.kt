@@ -37,6 +37,7 @@ import mega.privacy.android.data.extensions.getScreenSize
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.isVideo
 import mega.privacy.android.data.extensions.toException
+import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -81,6 +82,7 @@ internal class DefaultImageRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val fileGateway: FileGateway,
+    private val cacheFolderGateway: CacheFolderGateway,
 ) : ImageRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -316,6 +318,15 @@ internal class DefaultImageRepository @Inject constructor(
                 isFullyLoaded = true
             )
         }
+
+    override fun getThumbnailPath(): String =
+        cacheFolderGateway.getThumbnailCacheFolder()?.path ?: ""
+
+    override fun getPreviewPath(): String =
+        cacheFolderGateway.getPreviewCacheFolder()?.path ?: ""
+
+    override fun getFullImagePath(): String =
+        cacheFolderGateway.getFullSizeCacheFolder()?.path ?: ""
 
     private suspend fun getOrGeneratePreview(
         previewFileName: String,

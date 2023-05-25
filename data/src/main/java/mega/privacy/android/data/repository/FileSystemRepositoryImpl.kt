@@ -286,4 +286,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun doesExternalStorageDirectoryExists() = withContext(ioDispatcher) {
         fileGateway.doesExternalStorageDirectoryExists()
     }
+
+    override suspend fun doesFileExist(path: String) = withContext(ioDispatcher){
+        File(path).exists()
+    }
 }

@@ -157,4 +157,12 @@ interface FileSystemRepository {
      * @return true if it exists, and false if otherwise
      */
     suspend fun doesExternalStorageDirectoryExists(): Boolean
+
+    /**
+     * Does file exist
+     *
+     * @param path
+     * @return true if file exists, else false
+     */
+    suspend fun doesFileExist(path: String): Boolean
 }

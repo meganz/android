@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.filenode
 
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.FileSystemRepository
 import java.io.File
@@ -19,7 +20,7 @@ class IsValidNodeFileUseCase @Inject constructor(private val fileSystemRepositor
      * @return Boolean
      */
     suspend operator fun invoke(
-        node: TypedFileNode,
+        node: FileNode,
         file: File,
     ): Boolean =
         file.canRead() && file.length() == node.size && node.fingerprint == fileSystemRepository.getFingerprint(

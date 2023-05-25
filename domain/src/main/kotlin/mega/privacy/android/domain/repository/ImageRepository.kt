@@ -142,4 +142,19 @@ interface ImageRepository {
         file: File,
         highPriority: Boolean,
     ): ImageResult
+
+    /**
+     * Get Thumbnail Cache Path
+     */
+    fun getThumbnailPath(): String
+
+    /**
+     * Get Preview Cache Path
+     */
+    fun getPreviewPath(): String
+
+    /**
+     * Get Full Image Cache Path
+     */
+    fun getFullImagePath(): String
 }
