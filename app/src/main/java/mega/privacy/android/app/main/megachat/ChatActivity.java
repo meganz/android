@@ -305,6 +305,7 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import kotlin.Unit;
@@ -820,6 +821,8 @@ public class ChatActivity extends PasscodeActivity
      * Current contact online status.
      */
     private int contactOnlineStatus;
+
+    private CompositeDisposable internalComposite = new CompositeDisposable();
 
     @Override
     public void storedUnhandledData(ArrayList<AndroidMegaChatMessage> preservedData) {
@@ -1473,7 +1476,7 @@ public class ChatActivity extends PasscodeActivity
         LiveEventBus.get(EVENT_CALL_COMPOSITION_CHANGE, MegaChatCall.class).observe(this, callCompositionChangeObserver);
         LiveEventBus.get(EVENT_UPDATE_WAITING_FOR_OTHERS, Pair.class).observe(this, waitingForOthersBannerObserver);
 
-        getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
+        internalComposite.add(getParticipantsChangesUseCase.checkIfIAmAloneOnAnyCall()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
@@ -1493,19 +1496,19 @@ public class ChatActivity extends PasscodeActivity
                         }
                     }
 
-                }, Timber::e);
+                }, Timber::e));
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall.class).observe(this, callOnHoldObserver);
         LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair.class).observe(this, sessionOnHoldObserver);
 
-        getCallStatusChangesUseCase.callCannotBeRecovered()
+        internalComposite.add(getCallStatusChangesUseCase.callCannotBeRecovered()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result) -> {
                     if (result) {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.calls_chat_screen_unable_to_reconnect_the_call), MEGACHAT_INVALID_HANDLE);
                     }
-                });
+                }));
 
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
         leftChatFilter.addAction(ACTION_LEFT_CHAT);
@@ -1584,14 +1587,14 @@ public class ChatActivity extends PasscodeActivity
                             fileIntent.putExtra(Intent.EXTRA_STREAM, data.getData());
                             fileIntent.setType(data.getType());
 
-                            filePrepareUseCase.prepareFiles(fileIntent)
+                            internalComposite.add(filePrepareUseCase.prepareFiles(fileIntent)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((shareInfo, throwable) -> {
                                         if (throwable == null) {
                                             onIntentProcessed(shareInfo);
                                         }
-                                    });
+                                    }));
                         }
                     }
                 });
@@ -3980,14 +3983,14 @@ public class ChatActivity extends PasscodeActivity
                 return;
             }
 
-            filePrepareUseCase.prepareFiles(intent)
+            internalComposite.add(filePrepareUseCase.prepareFiles(intent)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((shareInfo, throwable) -> {
                         if (throwable == null) {
                             onIntentProcessed(shareInfo);
                         }
-                    });
+                    }));
         } else if (requestCode == REQUEST_CODE_SELECT_CHAT) {
             isForwardingMessage = false;
             if (resultCode != RESULT_OK) return;
@@ -4098,7 +4101,7 @@ public class ChatActivity extends PasscodeActivity
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
-        checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, idChat, toHandle)
+        internalComposite.add(checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, idChat, toHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -4113,7 +4116,7 @@ public class ChatActivity extends PasscodeActivity
                         List<MegaNode> nodesWithoutCollision = result.getSecond();
 
                         if (!nodesWithoutCollision.isEmpty()) {
-                            copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                            internalComposite.add(copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {
@@ -4127,12 +4130,12 @@ public class ChatActivity extends PasscodeActivity
                                                         ? copyRequestMessageMapper.invoke(copyResult)
                                                         : getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
-                                    });
+                                    }));
                         }
                     } else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
                     }
-                });
+                }));
     }
 
     public void retryNodeAttachment(long nodeHandle) {
@@ -5080,7 +5083,7 @@ public class ChatActivity extends PasscodeActivity
                         boolean isOnlineNotAnonymousAndNotRemoved = viewModel.isConnected() && !chatC.isInAnonymousMode() && !isRemovedMsg;
                         if (nodeList != null && nodeList.size() > 0 && isOnlineNotAnonymousAndNotRemoved) {
                             if (isMyOwnMsg) {
-                                getNodeUseCase.checkNodeAvailable(nodeList.get(0).getHandle())
+                                internalComposite.add(getNodeUseCase.checkNodeAvailable(nodeList.get(0).getHandle())
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((result, throwable) -> {
@@ -5100,7 +5103,7 @@ public class ChatActivity extends PasscodeActivity
                                                     importIcon.setVisible(false);
                                                 }
                                             }
-                                        });
+                                        }));
                             } else {
                                 showOptionsForAvailableNode();
                             }
@@ -5232,7 +5235,7 @@ public class ChatActivity extends PasscodeActivity
             boolean isOnlineNotUploadingNotAnonymousNotRemoved = viewModel.isConnected() && isNotUploadingNotAnonymousNotRemoved;
 
             if (someNodeIsAttachmentAndSent) {
-                getNodeUseCase.checkNodesAvailable(selected)
+                internalComposite.add(getNodeUseCase.checkNodesAvailable(selected)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((result, throwable) -> {
@@ -5261,7 +5264,7 @@ public class ChatActivity extends PasscodeActivity
 
                                 }
                             }
-                        });
+                        }));
 
             } else {
                 if (allNodeAttachments && isOnlineNotUploadingNotAnonymousNotRemoved) {
@@ -5704,7 +5707,7 @@ public class ChatActivity extends PasscodeActivity
                                 MegaNodeList nodeList = m.getMessage().getMegaNodeList();
                                 if (nodeList.size() == 1) {
                                     if (m.getMessage().getUserHandle() == myUserHandle) {
-                                        getNodeUseCase.get(nodeList.get(0).getHandle())
+                                        internalComposite.add(getNodeUseCase.get(nodeList.get(0).getHandle())
                                                 .subscribeOn(Schedulers.io())
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe((result, throwable) -> {
@@ -5714,7 +5717,7 @@ public class ChatActivity extends PasscodeActivity
                                                     } else {
                                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.error_file_not_available), MEGACHAT_INVALID_HANDLE);
                                                     }
-                                                });
+                                                }));
                                     } else {
                                         MegaNode node = chatC.authorizeNodeIfPreview(nodeList.get(0), chatRoom);
                                         nodeAttachmentClicked(node, m.getMessage().getMsgId(), screenPosition, positionInMessages);
@@ -5804,7 +5807,7 @@ public class ChatActivity extends PasscodeActivity
      * @param contactName Name of the contact.
      */
     private void checkIfInvitationIsAlreadySent(String email, String contactName) {
-        inviteContactUseCase.isContactRequestAlreadySent(email)
+        internalComposite.add(inviteContactUseCase.isContactRequestAlreadySent(email)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((alreadyInvited, throwable) -> {
@@ -5817,7 +5820,7 @@ public class ChatActivity extends PasscodeActivity
                             showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
                         }
                     }
-                });
+                }));
     }
 
     /**
@@ -6281,26 +6284,26 @@ public class ChatActivity extends PasscodeActivity
         ChatLinkInfoListener listener = null;
         if (isFileLink(link)) {
             Timber.d("isFileLink");
-            getPublicNodeUseCase.get(link)
+            internalComposite.add(getPublicNodeUseCase.get(link)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((richLink, throwable) -> {
                         if (throwable == null) {
                             setRichLinkInfo(msg.getMsgId(), richLink);
                         }
-                    });
+                    }));
 
             return MEGA_FILE_LINK;
         } else {
             Timber.d("isFolderLink");
-            getPublicLinkInformationUseCase.get(link, this)
+            internalComposite.add(getPublicLinkInformationUseCase.get(link, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((richLink, throwable) -> {
                         if (throwable == null) {
                             setRichLinkInfo(msg.getMsgId(), richLink);
                         }
-                    });
+                    }));
 
             return MEGA_FOLDER_LINK;
         }
@@ -8307,6 +8310,7 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     protected void onDestroy() {
+        internalComposite.clear();
         destroySpeakerAudioManger();
         cleanBuffers();
         if (handlerEmojiKeyboard != null) {
