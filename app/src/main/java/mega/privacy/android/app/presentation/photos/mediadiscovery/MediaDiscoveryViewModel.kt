@@ -254,7 +254,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         _state.update {
             it.copy(currentSort = sort)
         }
-        handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+        if (_state.value.sourcePhotos.isNotEmpty()) {
+            handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+        }
         saveSortRule(sort)
     }
 
@@ -262,7 +264,9 @@ class MediaDiscoveryViewModel @Inject constructor(
         _state.update {
             it.copy(currentMediaType = mediaType)
         }
-        handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+        if (_state.value.sourcePhotos.isNotEmpty()) {
+            handlePhotoItems(sortAndFilterPhotos(_state.value.sourcePhotos))
+        }
     }
 
     fun onTimeBarTabSelected(timeBarTab: TimeBarTab) {

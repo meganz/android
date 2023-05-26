@@ -91,7 +91,7 @@ class MediaDiscoveryFragment : Fragment() {
 
     private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
     internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
-    private val mediaDiscoveryZoomViewModel: MediaDiscoveryZoomViewModel by activityViewModels()
+    private val mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel by activityViewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -198,8 +198,14 @@ class MediaDiscoveryFragment : Fragment() {
                 }
 
                 launch {
-                    mediaDiscoveryZoomViewModel.state.collect { zoomLevel ->
+                    mediaDiscoveryGlobalStateViewModel.state.collect { zoomLevel ->
                         mediaDiscoveryViewModel.updateZoomLevel(zoomLevel)
+                    }
+                }
+
+                launch {
+                    mediaDiscoveryGlobalStateViewModel.filterState.collect { filterType ->
+                        mediaDiscoveryViewModel.setCurrentMediaType(filterType)
                     }
                 }
             }
@@ -242,7 +248,7 @@ class MediaDiscoveryFragment : Fragment() {
                 },
                 selectedOption = uiState.currentMediaType,
                 onOptionSelected = {
-                    viewModel.setCurrentMediaType(it)
+                    mediaDiscoveryGlobalStateViewModel.storeCurrentMediaType(it)
                 }
             )
         }
@@ -557,11 +563,11 @@ class MediaDiscoveryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_zoom_in -> {
-                mediaDiscoveryZoomViewModel.zoomIn()
+                mediaDiscoveryGlobalStateViewModel.zoomIn()
             }
 
             R.id.action_zoom_out -> {
-                mediaDiscoveryZoomViewModel.zoomOut()
+                mediaDiscoveryGlobalStateViewModel.zoomOut()
             }
 
             R.id.action_menu_sort_by -> {

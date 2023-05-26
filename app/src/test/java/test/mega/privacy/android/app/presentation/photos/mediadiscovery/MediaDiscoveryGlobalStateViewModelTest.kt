@@ -4,18 +4,18 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryZoomViewModel
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import org.junit.Before
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class MediaDiscoveryZoomViewModelTest {
-    private lateinit var underTest: MediaDiscoveryZoomViewModel
+class MediaDiscoveryGlobalStateViewModelTest {
+    private lateinit var underTest: MediaDiscoveryGlobalStateViewModel
 
     @Before
     fun setUp() {
-        underTest = MediaDiscoveryZoomViewModel()
+        underTest = MediaDiscoveryGlobalStateViewModel()
     }
 
     @Test
