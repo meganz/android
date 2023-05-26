@@ -36,6 +36,7 @@ import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -121,6 +122,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
     FileLinkActivity fileLinkActivity = this;
 
+    private DecryptAlertDialog decryptAlertDialog = null;
+
     Toolbar tB;
     ActionBar aB;
     DisplayMetrics outMetrics;
@@ -133,6 +136,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     long toHandle = 0;
     long fragmentHandle = -1;
 
+    private boolean isDecryptionKeyDialogShown = false;
+    private final String KEY_IS_DECRYPTION_KEY_DIALOG_SHOWN = "isDecryptionKeyDialogShownKey";
     CoordinatorLayout fragmentContainer;
     AppBarLayout appBarLayout;
     CollapsingToolbarLayout collapsingToolbar;
@@ -173,7 +178,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         if (megaApi != null) {
             megaApi.removeRequestListener(this);
         }
-
+        decryptAlertDialog.dismiss();
         nodeSaver.destroy();
 
         super.onDestroy();
@@ -208,7 +213,11 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         }
 
         if (savedInstanceState != null) {
+            isDecryptionKeyDialogShown = savedInstanceState.getBoolean(KEY_IS_DECRYPTION_KEY_DIALOG_SHOWN, false);
             nodeSaver.restoreState(savedInstanceState);
+            if (isDecryptionKeyDialogShown) {
+                askForDecryptionKeyDialog();
+            }
         }
 
         setContentView(R.layout.activity_file_link);
@@ -282,7 +291,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
+        outState.putBoolean(KEY_IS_DECRYPTION_KEY_DIALOG_SHOWN, isDecryptionKeyDialogShown);
         nodeSaver.saveState(outState);
     }
 
@@ -374,15 +383,29 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         }
     }
 
+
     public void askForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog");
 
         DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
-        builder.setListener(this).setTitle(getString(R.string.alert_decryption_key))
+        decryptAlertDialog = builder.setListener(this).setTitle(getString(R.string.alert_decryption_key))
                 .setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
                 .setMessage(getString(R.string.message_decryption_key))
                 .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
-                .build().show(getSupportFragmentManager(), TAG_DECRYPT);
+                .build();
+        decryptAlertDialog.onDismiss(new DialogInterface() {
+            @Override
+            public void cancel() {
+                isDecryptionKeyDialogShown = false;
+            }
+
+            @Override
+            public void dismiss() {
+                isDecryptionKeyDialogShown = false;
+            }
+        });
+        decryptAlertDialog.show(getSupportFragmentManager(), TAG_DECRYPT);
+        isDecryptionKeyDialogShown = true;
     }
 
     private void decrypt() {
@@ -572,7 +595,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                     if (decryptionIntroduced) {
                         Timber.w("Incorrect key, ask again!");
                         decryptionIntroduced = false;
-                        askForDecryptionKeyDialog();
+                        if (!isDecryptionKeyDialogShown)
+                            askForDecryptionKeyDialog();
                         return;
                     } else {
                         // Invalid Link
@@ -584,7 +608,8 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                     dialogBuilder.setTitle(getString(R.string.general_error_file_not_found));
                 } else if (e.getErrorCode() == MegaError.API_EINCOMPLETE) {
                     decryptionIntroduced = false;
-                    askForDecryptionKeyDialog();
+                    if (!isDecryptionKeyDialogShown)
+                        askForDecryptionKeyDialog();
                     return;
                 } else {
                     dialogBuilder.setTitle(getString(R.string.general_error_word));
@@ -928,6 +953,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
         nodeSaver.handleRequestPermissionsResult(requestCode);
     }
+
 
     @Override
     public void onDialogPositiveClick(String key) {
