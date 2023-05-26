@@ -55,7 +55,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -231,7 +230,7 @@ class DefaultContactsRepositoryTest {
         }
         val result =
             underTest.getUserFirstName(handle = userHandle, skipCache = true, shouldNotify = false)
-        verify(megaLocalRoomGateway, times(1)).setContactFistName(userHandle, testName)
+        verify(megaLocalRoomGateway).updateContactFistNameByHandle(userHandle, testName)
         verifyNoInteractions(contactWrapper)
 
         assertThat(result).isEqualTo(testName)
@@ -718,7 +717,7 @@ class DefaultContactsRepositoryTest {
                 underTest.updateCurrentUserFirstName(expectedNewFirstName)
             )
 
-            verify(localStorageGateway, times(1)).saveMyFirstName(expectedNewFirstName)
+            verify(localStorageGateway).saveMyFirstName(expectedNewFirstName)
         }
 
     @Test
@@ -740,7 +739,7 @@ class DefaultContactsRepositoryTest {
                 underTest.updateCurrentUserLastName(expectedNewLastName)
             )
 
-            verify(localStorageGateway, times(1)).saveMyLastName(expectedNewLastName)
+            verify(localStorageGateway).saveMyLastName(expectedNewLastName)
         }
 
     @Test
@@ -761,7 +760,7 @@ class DefaultContactsRepositoryTest {
     fun `test that clear contact database when call clearContactDatabase`() =
         runTest {
             underTest.clearContactDatabase()
-            verify(databaseHandler, times(1)).clearContacts()
+            verify(databaseHandler).clearContacts()
         }
 
     @Test
@@ -774,7 +773,7 @@ class DefaultContactsRepositoryTest {
                 "lastName",
                 "nickname",
             )
-            verify(megaLocalRoomGateway, times(1)).saveContact(any())
+            verify(megaLocalRoomGateway).insertContact(any())
         }
 
     @Test
@@ -797,7 +796,7 @@ class DefaultContactsRepositoryTest {
                 underTest.getContactEmail(handle)
             )
 
-            verify(megaLocalRoomGateway, times(1)).setContactMail(handle, expectedEmail)
+            verify(megaLocalRoomGateway).updateContactMailByHandle(handle, expectedEmail)
         }
 
     @Test

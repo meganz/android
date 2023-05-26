@@ -12,32 +12,32 @@ interface MegaLocalRoomGateway {
      *
      * @param contact
      */
-    suspend fun saveContact(contact: Contact)
+    suspend fun insertContact(contact: Contact)
 
     /**
      * Set contact name
      *
      * @param firstName
-     * @param mail
+     * @param email
      * @return
      */
-    suspend fun setContactName(firstName: String?, mail: String?)
+    suspend fun updateContactNameByEmail(firstName: String?, email: String?)
 
     /**
      * Set contact last name
      *
      * @param lastName
-     * @param mail
+     * @param email
      */
-    suspend fun setContactLastName(lastName: String?, mail: String?)
+    suspend fun updateContactLastNameByEmail(lastName: String?, email: String?)
 
     /**
      * Set contact mail
      *
      * @param handle
-     * @param mail
+     * @param email
      */
-    suspend fun setContactMail(handle: Long, mail: String?)
+    suspend fun updateContactMailByHandle(handle: Long, email: String?)
 
     /**
      * Set contact fist name
@@ -45,7 +45,7 @@ interface MegaLocalRoomGateway {
      * @param handle
      * @param firstName
      */
-    suspend fun setContactFistName(handle: Long, firstName: String?)
+    suspend fun updateContactFistNameByHandle(handle: Long, firstName: String?)
 
     /**
      * Set contact last name
@@ -53,7 +53,7 @@ interface MegaLocalRoomGateway {
      * @param handle
      * @param lastName
      */
-    suspend fun setContactLastName(handle: Long, lastName: String?)
+    suspend fun updateContactLastNameByHandle(handle: Long, lastName: String?)
 
     /**
      * Set contact nickname
@@ -61,7 +61,7 @@ interface MegaLocalRoomGateway {
      * @param handle
      * @param nickname
      */
-    suspend fun setContactNickname(handle: Long, nickname: String?)
+    suspend fun updateContactNicknameByHandle(handle: Long, nickname: String?)
 
     /**
      * Find contact by handle
@@ -69,21 +69,21 @@ interface MegaLocalRoomGateway {
      * @param handle
      * @return
      */
-    suspend fun findContactByHandle(handle: Long): Contact?
+    suspend fun getContactByHandle(handle: Long): Contact?
 
     /**
      * Find contact by email
      *
-     * @param mail
+     * @param email
      * @return
      */
-    suspend fun findContactByEmail(mail: String?): Contact?
+    suspend fun getContactByEmail(email: String?): Contact?
 
     /**
      * Clear contacts
      *
      */
-    suspend fun clearContacts()
+    suspend fun deleteAllContacts()
 
     /**
      * Get contact count

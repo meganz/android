@@ -2495,15 +2495,15 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun setContactNickname(nickname: String?, handle: Long) {
         applicationScope.launch {
-            megaLocalRoomGateway.setContactNickname(handle, nickname)
+            megaLocalRoomGateway.updateContactNicknameByHandle(handle, nickname)
         }
     }
 
     override fun findContactByHandle(handleParam: Long): Contact? =
-        runBlocking { megaLocalRoomGateway.findContactByHandle(handleParam) }
+        runBlocking { megaLocalRoomGateway.getContactByHandle(handleParam) }
 
     override fun findContactByEmail(mail: String?): Contact? =
-        runBlocking { megaLocalRoomGateway.findContactByEmail(mail) }
+        runBlocking { megaLocalRoomGateway.getContactByEmail(mail) }
 
     override fun setOfflineFile(offline: MegaOffline): Long {
         Timber.d("setOfflineFile: %s", offline.handle)
@@ -4077,7 +4077,7 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun clearContacts() {
         applicationScope.launch {
-            megaLocalRoomGateway.clearContacts()
+            megaLocalRoomGateway.deleteAllContacts()
         }
     }
 

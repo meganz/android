@@ -101,9 +101,9 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
                         databaseEntryPoint.applicationScope().launch {
                             if (!email.isNullOrBlank()) {
-                                databaseEntryPoint.localRoomGateway.setContactName(
+                                databaseEntryPoint.localRoomGateway.updateContactNameByEmail(
                                     firstName = text,
-                                    mail = email
+                                    email = email
                                 )
                             }
                             api.getContact(email)?.let {
@@ -114,9 +114,9 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     MegaApiJava.USER_ATTR_LASTNAME -> if (e.errorCode == MegaError.API_OK) {
                         databaseEntryPoint.applicationScope().launch {
                             if (!email.isNullOrBlank()) {
-                                databaseEntryPoint.localRoomGateway.setContactLastName(
+                                databaseEntryPoint.localRoomGateway.updateContactLastNameByEmail(
                                     lastName = text,
-                                    mail = email
+                                    email = email
                                 )
                             }
                             api.getContact(email)?.let {

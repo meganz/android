@@ -15,60 +15,60 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val contactModelMapper: ContactModelMapper,
     private val encryptData: EncryptData,
 ) : MegaLocalRoomGateway {
-    override suspend fun saveContact(contact: Contact) {
-        contactDao.insertOrUpdate(contactEntityMapper(contact))
+    override suspend fun insertContact(contact: Contact) {
+        contactDao.insertOrUpdateContact(contactEntityMapper(contact))
     }
 
-    override suspend fun setContactName(firstName: String?, mail: String?) {
-        if (mail.isNullOrBlank()) return
-        contactDao.getByEmail(encryptData(mail))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(firstName = encryptData(firstName)))
+    override suspend fun updateContactNameByEmail(firstName: String?, email: String?) {
+        if (email.isNullOrBlank()) return
+        contactDao.getContactByEmail(encryptData(email))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
         }
     }
 
-    override suspend fun setContactLastName(lastName: String?, mail: String?) {
-        if (mail.isNullOrBlank()) return
-        contactDao.getByEmail(encryptData(mail))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(lastName = encryptData(lastName)))
+    override suspend fun updateContactLastNameByEmail(lastName: String?, email: String?) {
+        if (email.isNullOrBlank()) return
+        contactDao.getContactByEmail(encryptData(email))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
         }
     }
 
-    override suspend fun setContactMail(handle: Long, mail: String?) {
-        contactDao.getByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(mail = encryptData(mail)))
+    override suspend fun updateContactMailByHandle(handle: Long, email: String?) {
+        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(mail = encryptData(email)))
         }
     }
 
-    override suspend fun setContactFistName(handle: Long, firstName: String?) {
-        contactDao.getByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(firstName = encryptData(firstName)))
+    override suspend fun updateContactFistNameByHandle(handle: Long, firstName: String?) {
+        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(firstName = encryptData(firstName)))
         }
     }
 
-    override suspend fun setContactLastName(handle: Long, lastName: String?) {
-        contactDao.getByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(lastName = encryptData(lastName)))
+    override suspend fun updateContactLastNameByHandle(handle: Long, lastName: String?) {
+        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(lastName = encryptData(lastName)))
         }
     }
 
-    override suspend fun setContactNickname(handle: Long, nickname: String?) {
-        contactDao.getByHandle(encryptData(handle.toString()))?.let { entity ->
-            contactDao.insertOrUpdate(entity.copy(nickName = encryptData(nickname)))
+    override suspend fun updateContactNicknameByHandle(handle: Long, nickname: String?) {
+        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { entity ->
+            contactDao.insertOrUpdateContact(entity.copy(nickName = encryptData(nickname)))
         }
     }
 
-    override suspend fun findContactByHandle(handle: Long): Contact? =
-        contactDao.getByHandle(encryptData(handle.toString()))?.let { contactModelMapper(it) }
+    override suspend fun getContactByHandle(handle: Long): Contact? =
+        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { contactModelMapper(it) }
 
-    override suspend fun findContactByEmail(mail: String?): Contact? =
-        contactDao.getByEmail(encryptData(mail))?.let { contactModelMapper(it) }
+    override suspend fun getContactByEmail(email: String?): Contact? =
+        contactDao.getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }
 
-    override suspend fun clearContacts() = contactDao.deleteAll()
+    override suspend fun deleteAllContacts() = contactDao.deleteAllContact()
 
-    override suspend fun getContactCount() = contactDao.getCount()
+    override suspend fun getContactCount() = contactDao.getContactCount()
 
     override suspend fun getAllContacts(): List<Contact> {
-        val entities = contactDao.getAll().first()
+        val entities = contactDao.getAllContact().first()
         return entities.map { contactModelMapper(it) }
     }
 }

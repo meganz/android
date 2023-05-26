@@ -10,20 +10,20 @@ import mega.privacy.android.data.database.entity.ContactEntity
 @Dao
 internal interface ContactDao {
     @Query("SELECT * FROM contacts")
-    fun getAll(): Flow<List<ContactEntity>>
+    fun getAllContact(): Flow<List<ContactEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdate(entity: ContactEntity)
+    suspend fun insertOrUpdateContact(entity: ContactEntity)
 
     @Query("SELECT * FROM contacts WHERE mail = :email")
-    suspend fun getByEmail(email: String?): ContactEntity?
+    suspend fun getContactByEmail(email: String?): ContactEntity?
 
     @Query("SELECT * FROM contacts WHERE handle = :handle")
-    suspend fun getByHandle(handle: String?): ContactEntity?
+    suspend fun getContactByHandle(handle: String?): ContactEntity?
 
     @Query("DELETE FROM contacts")
-    suspend fun deleteAll()
+    suspend fun deleteAllContact()
 
     @Query("SELECT COUNT(id) FROM contacts")
-    suspend fun getCount(): Int
+    suspend fun getContactCount(): Int
 }

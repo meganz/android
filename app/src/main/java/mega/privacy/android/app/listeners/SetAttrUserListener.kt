@@ -68,18 +68,18 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
 
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
                         databaseEntryPoint.applicationScope().launch {
-                            databaseEntryPoint.localRoomGateway.setContactName(
+                            databaseEntryPoint.localRoomGateway.updateContactNameByEmail(
                                 firstName = text,
-                                mail = email
+                                email = email
                             )
                         }
                     }
 
                     MegaApiJava.USER_ATTR_LASTNAME -> if (e.errorCode == MegaError.API_OK) {
                         databaseEntryPoint.applicationScope().launch {
-                            databaseEntryPoint.localRoomGateway.setContactLastName(
+                            databaseEntryPoint.localRoomGateway.updateContactLastNameByEmail(
                                 lastName = text,
-                                mail = email
+                                email = email
                             )
                         }
                     }
@@ -87,7 +87,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
                     MegaApiJava.USER_ATTR_ALIAS -> when (e.errorCode) {
                         MegaError.API_OK -> {
                             databaseEntryPoint.applicationScope().launch {
-                                databaseEntryPoint.localRoomGateway.setContactNickname(
+                                databaseEntryPoint.localRoomGateway.updateContactNicknameByHandle(
                                     nodeHandle,
                                     text
                                 )
@@ -103,7 +103,7 @@ class SetAttrUserListener(private val context: Context) : MegaRequestListenerInt
 
                         MegaError.API_ENOENT -> {
                             databaseEntryPoint.applicationScope().launch {
-                                databaseEntryPoint.localRoomGateway.setContactNickname(
+                                databaseEntryPoint.localRoomGateway.updateContactNicknameByHandle(
                                     nodeHandle,
                                     null
                                 )

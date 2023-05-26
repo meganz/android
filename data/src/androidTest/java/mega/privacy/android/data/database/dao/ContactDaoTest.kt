@@ -45,8 +45,8 @@ class ContactDaoTest {
             firstName = "Hai",
             lastName = "Luong"
         )
-        contactDao.insertOrUpdate(contact)
-        val actual = contactDao.getByEmail("lh@mega.co.nz")
+        contactDao.insertOrUpdateContact(contact)
+        val actual = contactDao.getContactByEmail("lh@mega.co.nz")
         Truth.assertThat(actual?.handle).isEqualTo(contact.handle)
         Truth.assertThat(actual?.mail).isEqualTo(contact.mail)
         Truth.assertThat(actual?.nickName).isEqualTo(contact.nickName)
@@ -64,8 +64,8 @@ class ContactDaoTest {
             firstName = "Hai",
             lastName = "Luong"
         )
-        contactDao.insertOrUpdate(contact)
-        val actual = contactDao.getByHandle("handle")
+        contactDao.insertOrUpdateContact(contact)
+        val actual = contactDao.getContactByHandle("handle")
         Truth.assertThat(actual?.handle).isEqualTo(contact.handle)
         Truth.assertThat(actual?.mail).isEqualTo(contact.mail)
         Truth.assertThat(actual?.nickName).isEqualTo(contact.nickName)
@@ -84,10 +84,10 @@ class ContactDaoTest {
                 firstName = "Hai${it}",
                 lastName = "Luong${it}"
             )
-            contactDao.insertOrUpdate(contact)
+            contactDao.insertOrUpdateContact(contact)
             contact
         }
-        contactDao.getAll().first().forEachIndexed { i, entity ->
+        contactDao.getAllContact().first().forEachIndexed { i, entity ->
             Truth.assertThat(entity.handle).isEqualTo(contacts[i].handle)
             Truth.assertThat(entity.mail).isEqualTo(contacts[i].mail)
             Truth.assertThat(entity.nickName).isEqualTo(contacts[i].nickName)
@@ -107,9 +107,9 @@ class ContactDaoTest {
                 firstName = "Hai${it}",
                 lastName = "Luong${it}"
             )
-            contactDao.insertOrUpdate(contact)
+            contactDao.insertOrUpdateContact(contact)
         }
-        contactDao.deleteAll()
-        Truth.assertThat(contactDao.getAll().first().size).isEqualTo(0)
+        contactDao.deleteAllContact()
+        Truth.assertThat(contactDao.getAllContact().first().size).isEqualTo(0)
     }
 }

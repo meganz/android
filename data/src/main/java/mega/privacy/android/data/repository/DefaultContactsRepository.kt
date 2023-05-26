@@ -293,7 +293,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                megaLocalRoomGateway.setContactFistName(handle, request.text)
+                megaLocalRoomGateway.updateContactFistNameByHandle(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyFirstNameUpdate(context, handle)
                 }
@@ -321,7 +321,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                megaLocalRoomGateway.setContactLastName(handle, request.text)
+                megaLocalRoomGateway.updateContactLastNameByHandle(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyLastNameUpdate(context, handle)
                 }
@@ -686,7 +686,7 @@ internal class DefaultContactsRepository @Inject constructor(
         lastName: String,
         nickname: String?,
     ) = withContext(ioDispatcher) {
-        val contact = megaLocalRoomGateway.findContactByHandle(handle)
+        val contact = megaLocalRoomGateway.getContactByHandle(handle)
             ?.copy(email = email, firstName = firstName, lastName = lastName, nickname = nickname)
             ?: Contact(
                 userId = handle,
@@ -694,7 +694,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 lastName = lastName,
                 firstName = firstName
             )
-        megaLocalRoomGateway.saveContact(contact)
+        megaLocalRoomGateway.insertContact(contact)
     }
 
     override suspend fun getContactDatabaseSize(): Int = withContext(ioDispatcher) {
@@ -709,7 +709,7 @@ internal class DefaultContactsRepository @Inject constructor(
             megaApiGateway.getUserEmail(handle, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
-            megaLocalRoomGateway.setContactMail(handle, it)
+            megaLocalRoomGateway.updateContactMailByHandle(handle, it)
         }
     }
 
@@ -744,7 +744,7 @@ internal class DefaultContactsRepository @Inject constructor(
             )
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
-            megaLocalRoomGateway.setContactNickname(userHandle, it)
+            megaLocalRoomGateway.updateContactNicknameByHandle(userHandle, it)
         }
     }
 
@@ -772,7 +772,7 @@ internal class DefaultContactsRepository @Inject constructor(
             val oldNickname = localContacts[it.handle]?.nickname
             val newNickname = alias[it.handle]
             if (oldNickname != newNickname) {
-                megaLocalRoomGateway.setContactNickname(it.handle, newNickname)
+                megaLocalRoomGateway.updateContactNicknameByHandle(it.handle, newNickname)
                 contactWrapper.notifyNicknameUpdate(context, it.handle)
             }
         }
