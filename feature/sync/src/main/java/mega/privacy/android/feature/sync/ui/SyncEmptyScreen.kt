@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
 
 @Composable
@@ -54,7 +54,7 @@ internal fun SyncEmptyScreen(getStartedClicked: () -> Unit) {
                 .padding(bottom = 32.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.grey_alpha_054_white_alpha_054)
+            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
         )
         Box(
             Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
