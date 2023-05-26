@@ -43,8 +43,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
@@ -348,6 +350,29 @@ private fun ActionButton(
                     else -> false
                 }
             )
+
+
+            if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
+                Text(
+                    modifier = Modifier
+                        .padding(
+                            start = 72.dp,
+                            end = 16.dp,
+                            top = 8.dp,
+                            bottom = 8.dp
+                        ),
+                    style = MaterialTheme.typography.subtitle2,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Normal,
+                    text = stringResource(
+                        id = R.string.meetings_schedule_meeting_recurrence_monthly_description,
+                        state.startDate.dayOfMonth
+                    ),
+                    color = MaterialTheme.colors.textColorSecondary
+                )
+
+                CustomDivider(withStartPadding = true)
+            }
         }
     }
 }
@@ -497,11 +522,10 @@ private fun ActionOption(
                         )
 
                     ScheduleMeetingAction.Recurrence -> subtitle = when (state.rulesSelected.freq) {
-                        OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
-                        OccurrenceFrequencyType.Daily -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_daily_label)
-                        OccurrenceFrequencyType.Weekly -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
-                        OccurrenceFrequencyType.Monthly,
-                        -> null
+                        OccurrenceFrequencyType.Invalid -> stringResource(id = OccurrenceFrequencyType.Invalid.StringId)
+                        OccurrenceFrequencyType.Daily -> stringResource(id = OccurrenceFrequencyType.Daily.StringId)
+                        OccurrenceFrequencyType.Weekly -> stringResource(id = OccurrenceFrequencyType.Weekly.StringId)
+                        OccurrenceFrequencyType.Monthly -> stringResource(id = OccurrenceFrequencyType.Monthly.StringId)
                     }
 
                     else -> {}
@@ -582,13 +606,17 @@ private fun RecurringMeetingDialog(
             radioOptions = listOf(
                 RecurringMeetingType.Never,
                 RecurringMeetingType.Daily,
-                RecurringMeetingType.Weekly
+                RecurringMeetingType.Weekly,
+                RecurringMeetingType.Monthly,
+                RecurringMeetingType.Custom
             ),
             initialSelectedOption = state.recurringMeetingOptionSelected,
             onOptionSelected = onOptionSelected,
             onDismissRequest = onDiscard,
             optionDescriptionMapper = { option ->
                 when (option) {
+                    RecurringMeetingType.Custom -> stringResource(id = RecurringMeetingType.Custom.StringId)
+                    RecurringMeetingType.Monthly -> stringResource(id = RecurringMeetingType.Monthly.StringId)
                     RecurringMeetingType.Weekly -> stringResource(id = RecurringMeetingType.Weekly.StringId)
                     RecurringMeetingType.Daily -> stringResource(id = RecurringMeetingType.Daily.StringId)
                     else -> stringResource(id = RecurringMeetingType.Never.StringId)

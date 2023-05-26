@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -27,7 +28,6 @@ import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeeting
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -139,17 +139,29 @@ class ScheduleMeetingViewModel @Inject constructor(
      * @param optionSelected Recurrence option selected
      */
     fun onRecurrenceOptionSelected(optionSelected: RecurringMeetingType) {
+        if (optionSelected == RecurringMeetingType.Custom)
+            return
+
         dismissDialog()
 
-        val weekdayList: List<Weekday>? =
-            if (optionSelected == RecurringMeetingType.Weekly) listOf(weekDayMapper(LocalDate.now().dayOfWeek)) else null
         _state.update { state ->
+            val weekdayList: List<Weekday>? =
+                if (optionSelected == RecurringMeetingType.Weekly) listOf(weekDayMapper(state.startDate.dayOfWeek)) else null
+
+            val monthDayList: List<Int>? =
+                if (optionSelected == RecurringMeetingType.Monthly) listOf(state.startDate.dayOfMonth) else null
+
             state.copy(
                 rulesSelected = state.rulesSelected.copy(
-                    freq = occurrenceFrequencyTypeMapper(optionSelected), weekDayList = weekdayList
-                ), recurringMeetingOptionSelected = optionSelected
+                    freq = occurrenceFrequencyTypeMapper(optionSelected),
+                    weekDayList = weekdayList,
+                    monthDayList = monthDayList
+                ),
+                recurringMeetingOptionSelected = optionSelected,
             )
         }
+
+        checkMonthlyRecurrenceWarningBeShown()
     }
 
     /**
@@ -192,7 +204,6 @@ class ScheduleMeetingViewModel @Inject constructor(
      * @param selectedStartDate   Start date and time
      */
     fun setStartDateTime(selectedStartDate: ZonedDateTime, isDate: Boolean) {
-
         val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
         var newStartZonedDateTime =
             if (isDate) selectedStartDate.withHour(state.value.startDate.hour)
@@ -212,12 +223,28 @@ class ScheduleMeetingViewModel @Inject constructor(
                     30,
                     ChronoUnit.MINUTES
                 )
+
             state.copy(
                 startDate = newStartZonedDateTime,
-                endDate = newEndDate
+                endDate = newEndDate,
             )
         }
+
+        checkMonthlyRecurrenceWarningBeShown()
     }
+
+    /**
+     * Check if the warning related to monthly recurrence should be displayed.
+     */
+    private fun checkMonthlyRecurrenceWarningBeShown() =
+        _state.update { state ->
+            val shouldShown = state.rulesSelected.freq == OccurrenceFrequencyType.Monthly &&
+                    (state.startDate.dayOfMonth == MONTH_WITH_29_DAYS ||
+                            state.startDate.dayOfMonth == MONTH_WITH_30_DAYS ||
+                            state.startDate.dayOfMonth == MONTH_WITH_31_DAYS)
+
+            state.copy(showMonthlyRecurrenceWarning = shouldShown)
+        }
 
     /**
      * Set end date and time
@@ -405,4 +432,11 @@ class ScheduleMeetingViewModel @Inject constructor(
                 recurringMeetingDialog = false
             )
         }
+
+    companion object {
+        private const val MONTH_WITH_31_DAYS = 31
+        private const val MONTH_WITH_30_DAYS = 30
+        private const val MONTH_WITH_29_DAYS = 29
+
+    }
 }

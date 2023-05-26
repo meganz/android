@@ -4808,6 +4808,12 @@
     <string name="album_import_input_decryption_key_title">Enter decryption key</string>
     <!-- Input decryption key dialog description for album import -->
     <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
+    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title">Device center</string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title">Device center</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Every day</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4820,10 +4826,8 @@
     <string name="meetings_schedule_meeting_recurrence_daily_label">Daily</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
     <string name="meetings_schedule_meeting_recurrence_weekly_label">Weekly</string>
-    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
-    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device center</string>
-    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device center</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_label">Monthly</string>
+    <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_description">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</string>
 </resources>
