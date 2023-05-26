@@ -77,6 +77,7 @@
             android:ellipsize="middle"
             android:singleLine="true"
             android:text="@{item.node.name}"
+            android:textColor="@{item.node.isTakenDown() ? @color/red_800_red_400 : @color/grey_087_white_087}"
             style="@style/textAppearanceSubtitle1"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintHorizontal_bias="0"
