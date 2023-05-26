@@ -486,4 +486,9 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastJoinedSuccessfully() =
         appEventGateway.broadcastJoinedSuccessfully()
+
+    override fun monitorLeaveChat(): Flow<Long> = appEventGateway.monitorLeaveChat()
+
+    override suspend fun broadcastLeaveChat(chatId: Long) =
+        appEventGateway.broadcastLeaveChat(chatId)
 }

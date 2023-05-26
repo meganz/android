@@ -855,11 +855,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      */
     private fun notifyShouldLeaveChat() =
         chat?.let { chatRoom ->
-            sendBroadcast(
-                Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT)
-                    .setAction(BroadcastConstants.ACTION_LEFT_CHAT)
-                    .putExtra(Constants.CHAT_ID, chatRoom.chatId)
-            )
+            viewModel.launchBroadcastLeaveChat(chatRoom.chatId)
             finish()
         }
 

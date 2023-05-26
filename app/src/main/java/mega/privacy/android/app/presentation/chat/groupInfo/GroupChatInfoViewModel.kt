@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
+import mega.privacy.android.domain.usecase.chat.BroadcastLeaveChatUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -53,6 +54,7 @@ import javax.inject.Inject
  * @property sendStatisticsMeetingsUseCase                  [SendStatisticsMeetingsUseCase]
  * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
+ * @property broadcastLeaveChatUseCase                      [BroadcastLeaveChatUseCase]
  * @property state                                          Current view state as [GroupInfoState]
  */
 @HiltViewModel
@@ -69,6 +71,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
+    private val broadcastLeaveChatUseCase: BroadcastLeaveChatUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -255,5 +258,14 @@ class GroupChatInfoViewModel @Inject constructor(
      */
     fun launchBroadcastChatArchived(chatTitle: String) = viewModelScope.launch {
         broadcastChatArchivedUseCase(chatTitle)
+    }
+
+    /**
+     * Launch broadcast notifying that should leave a chat
+     *
+     * @param chatId [Long] ID of the chat to leave.
+     */
+    fun launchBroadcastLeaveChat(chatId: Long) = viewModelScope.launch {
+        broadcastLeaveChatUseCase(chatId)
     }
 }

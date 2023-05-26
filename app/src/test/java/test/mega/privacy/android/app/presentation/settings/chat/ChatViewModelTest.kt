@@ -18,10 +18,12 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -72,6 +74,10 @@ class ChatViewModelTest {
     private val monitorJoinedSuccessfullyUseCase = mock<MonitorJoinedSuccessfullyUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf(true))
     }
+    private val monitorLeaveChatUseCase = mock<MonitorLeaveChatUseCase> {
+        onBlocking { invoke() }.thenReturn(flowOf(1234L))
+    }
+    private val leaveChat = mock<LeaveChat>()
 
     @Before
     fun setUp() {
@@ -98,7 +104,9 @@ class ChatViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
             broadcastChatArchivedUseCase = broadcastChatArchivedUseCase,
-            monitorJoinedSuccessfullyUseCase = monitorJoinedSuccessfullyUseCase
+            monitorJoinedSuccessfullyUseCase = monitorJoinedSuccessfullyUseCase,
+            monitorLeaveChatUseCase = monitorLeaveChatUseCase,
+            leaveChat = leaveChat,
         )
     }
 
@@ -166,6 +174,18 @@ class ChatViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 Truth.assertThat(state.isJoiningOrLeaving).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the state is updated when leaving a chat`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(leaveChat).invoke(1234L)
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.isJoiningOrLeaving).isFalse()
+                Truth.assertThat(state.joiningOrLeavingAction).isNull()
             }
         }
 }

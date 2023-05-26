@@ -230,4 +230,18 @@ internal interface AppEventGateway {
      * Broadcast if successfully joined to a chat.
      */
     suspend fun broadcastJoinedSuccessfully()
+
+    /**
+     * Monitor if should leave a chat.
+     *
+     * @return Flow [Long] ID of the chat to leave.
+     */
+    fun monitorLeaveChat(): Flow<Long>
+
+    /**
+     * Broadcast that should leave a chat.
+     *
+     * @param chatId [Long] ID of the chat to leave.
+     */
+    suspend fun broadcastLeaveChat(chatId: Long)
 }

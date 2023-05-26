@@ -37,6 +37,7 @@ internal class AppEventFacade @Inject constructor(
     private val chatArchived = MutableSharedFlow<String>()
     private val homeBadgeCount = MutableSharedFlow<Int>()
     private val isJoinedSuccessfullyToChat = MutableSharedFlow<Boolean>()
+    private val leaveChat = MutableSharedFlow<Long>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
     private val _finishActivity = MutableSharedFlow<Boolean>()
@@ -147,6 +148,10 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastJoinedSuccessfully() =
         isJoinedSuccessfullyToChat.emit(true)
+
+    override fun monitorLeaveChat(): Flow<Long> = leaveChat.toSharedFlow(appScope)
+
+    override suspend fun broadcastLeaveChat(chatId: Long) = leaveChat.emit(chatId)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

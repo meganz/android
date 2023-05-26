@@ -5,7 +5,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static mega.privacy.android.app.activities.GiphyPickerActivity.GIF_DATA;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_IMPORT;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_CHAT;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
@@ -13,7 +12,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE;
-import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_RETRY_PENDING_MESSAGE;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_UPDATE_HISTORY_BY_RT;
 import static mega.privacy.android.app.constants.BroadcastConstants.ERROR_MESSAGE_TEXT;
@@ -264,6 +262,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -470,7 +469,6 @@ public class ChatActivity extends PasscodeActivity
     private static final String LAST_MESSAGE_SEEN = "LAST_MESSAGE_SEEN";
     private static final String GENERAL_UNREAD_COUNT = "GENERAL_UNREAD_COUNT";
     private static final String SELECTED_ITEMS = "selectedItems";
-    private static final String JOINING_OR_LEAVING_ACTION = "JOINING_OR_LEAVING_ACTION";
     private static final String OPENING_AND_JOINING_ACTION = "OPENING_AND_JOINING_ACTION";
     private static final String ERROR_REACTION_DIALOG = "ERROR_REACTION_DIALOG";
     private static final String TYPE_ERROR_REACTION = "TYPE_ERROR_REACTION";
@@ -801,7 +799,6 @@ public class ChatActivity extends PasscodeActivity
     private MegaNode myChatFilesFolder;
     private TextUtils.TruncateAt typeEllipsize = TextUtils.TruncateAt.END;
 
-    private String joiningOrLeavingAction;
     private boolean openingAndJoining;
 
     private AudioFocusRequest request;
@@ -929,7 +926,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     public void confirmLeaveChat(long chatId) {
         stopReproductions();
-        setJoiningOrLeaving(getString(R.string.leaving_label));
+        setJoiningOrLeaving(R.string.leaving_label);
         megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this, this));
     }
 
@@ -940,7 +937,7 @@ public class ChatActivity extends PasscodeActivity
 
     @Override
     public void leaveChatSuccess() {
-        viewModel.setIsJoiningOrLeaving(false);
+        viewModel.setIsJoiningOrLeaving(false, null);
     }
 
     @Override
@@ -1043,7 +1040,7 @@ public class ChatActivity extends PasscodeActivity
             } else if (errorCode == MegaChatError.ERROR_EXIST) {
                 if (megaChatApi.getChatRoom(idChat).isActive()) {
                     //I'm already participant
-                    viewModel.setIsJoiningOrLeaving(false);
+                    viewModel.setIsJoiningOrLeaving(false, null);
                     openingAndJoining = false;
                 }
                 if (!isAlreadyJoining(idChat) && !isAlreadyJoining(request.getUserHandle())) {
@@ -1296,25 +1293,6 @@ public class ChatActivity extends PasscodeActivity
         }
     };
 
-    private final BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_LEFT_CHAT)) {
-                long extraIdChat = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
-                if (extraIdChat != MEGACHAT_INVALID_HANDLE) {
-                    megaChatApi.leaveChat(extraIdChat, new RemoveFromChatRoomListener(chatActivity, chatActivity));
-
-                    if (idChat == extraIdChat) {
-                        setJoiningOrLeaving(getString(R.string.leaving_label));
-                    }
-                }
-            }
-        }
-    };
-
     private BroadcastReceiver closeChatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1509,10 +1487,6 @@ public class ChatActivity extends PasscodeActivity
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.calls_chat_screen_unable_to_reconnect_the_call), MEGACHAT_INVALID_HANDLE);
                     }
                 }));
-
-        IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
-        leftChatFilter.addAction(ACTION_LEFT_CHAT);
-        registerReceiver(leftChatReceiver, leftChatFilter);
 
         IntentFilter closeChatFilter = new IntentFilter(ACTION_CLOSE_CHAT_AFTER_IMPORT);
         closeChatFilter.addAction(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS);
@@ -2072,6 +2046,15 @@ public class ChatActivity extends PasscodeActivity
                 finish();
             }
 
+            if (chatState.getJoiningOrLeavingAction() != null) {
+                setJoiningOrLeavingView(chatState.getJoiningOrLeavingAction());
+            }
+
+            if (chatState.getSnackbarMessage() != null) {
+                showSnackbar(SNACKBAR_TYPE, getString(chatState.getSnackbarMessage()), MEGACHAT_INVALID_HANDLE);
+                viewModel.onSnackbarMessageConsumed();
+            }
+
             return Unit.INSTANCE;
         });
         ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
@@ -2100,7 +2083,7 @@ public class ChatActivity extends PasscodeActivity
 
                     if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK) && MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
                         openingAndJoining = true;
-                        setJoiningOrLeaving(getString(R.string.joining_label));
+                        setJoiningOrLeaving(R.string.joining_label);
                     }
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -2162,7 +2145,6 @@ public class ChatActivity extends PasscodeActivity
 
                         }
 
-                        joiningOrLeavingAction = savedInstanceState.getString(JOINING_OR_LEAVING_ACTION);
                         openingAndJoining = savedInstanceState.getBoolean(OPENING_AND_JOINING_ACTION, false);
                         errorReactionsDialogIsShown = savedInstanceState.getBoolean(ERROR_REACTION_DIALOG, false);
                         typeErrorReaction = savedInstanceState.getLong(TYPE_ERROR_REACTION, REACTION_ERROR_DEFAULT_VALUE);
@@ -2715,7 +2697,6 @@ public class ChatActivity extends PasscodeActivity
                 messagesContainerLayout.setLayoutParams(params);
                 fragmentVoiceClip.setVisibility(View.GONE);
                 joiningLeavingLayout.setVisibility(View.VISIBLE);
-                joiningLeavingText.setText(joiningOrLeavingAction);
                 break;
 
             case SHOW_JOIN_LAYOUT:
@@ -4471,7 +4452,7 @@ public class ChatActivity extends PasscodeActivity
             if (chatC.isInAnonymousMode()) {
                 ifAnonymousModeLogin(true);
             } else if (!isAlreadyJoining(idChat)) {
-                setJoiningOrLeaving(getString(R.string.joining_label));
+                setJoiningOrLeaving(R.string.joining_label);
                 megaChatApi.autojoinPublicChat(idChat, this);
             }
         } else if (id == R.id.start_or_join_meeting_banner) {
@@ -5922,7 +5903,7 @@ public class ChatActivity extends PasscodeActivity
                 }
             } else {
                 //Hide field to write
-                viewModel.setIsJoiningOrLeaving(false);
+                viewModel.setIsJoiningOrLeaving(false, null);
                 setChatSubtitle();
                 supportInvalidateOptionsMenu();
             }
@@ -8179,7 +8160,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
         } else if (request.getType() == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
-            viewModel.setIsJoiningOrLeaving(false);
+            viewModel.setIsJoiningOrLeaving(false, null);
 
             if (e.getErrorCode() == MegaChatError.ERROR_OK) {
                 if (request.getUserHandle() != MEGACHAT_INVALID_HANDLE) {
@@ -8350,7 +8331,6 @@ public class ChatActivity extends PasscodeActivity
         unregisterReceiver(historyTruncatedByRetentionTimeReceiver);
         unregisterReceiver(voiceclipDownloadedReceiver);
         unregisterReceiver(userNameReceiver);
-        unregisterReceiver(leftChatReceiver);
         unregisterReceiver(closeChatReceiver);
         unregisterReceiver(chatUploadStartedReceiver);
         unregisterReceiver(errorCopyingNodesReceiver);
@@ -8634,7 +8614,6 @@ public class ChatActivity extends PasscodeActivity
 
         }
         outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
-        outState.putString(JOINING_OR_LEAVING_ACTION, joiningOrLeavingAction);
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
         outState.putLong(TYPE_ERROR_REACTION, typeErrorReaction);
@@ -9890,23 +9869,28 @@ public class ChatActivity extends PasscodeActivity
      */
     private void checkIfIsAlreadyJoiningOrLeaving() {
         if (MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
-            viewModel.setIsJoiningOrLeaving(true);
-            joiningOrLeavingAction = getString(R.string.joining_label);
+            viewModel.setIsJoiningOrLeaving(true, R.string.joining_label);
         } else if (MegaApplication.getChatManagement().isAlreadyLeaving(idChat)) {
-            viewModel.setIsJoiningOrLeaving(true);
-            joiningOrLeavingAction = getString(R.string.leaving_label);
+            viewModel.setIsJoiningOrLeaving(true, R.string.leaving_label);
         }
     }
 
     /**
-     * Initializes the joining or leaving UI depending on the action received.
+     * Sets the joining or leaving state depending on the action received.
      *
-     * @param action String which indicates if the UI to set is the joining or leaving state.
+     * @param actionId String ID which indicates if the state to set is the joining or leaving.
      */
-    private void setJoiningOrLeaving(String action) {
-        viewModel.setIsJoiningOrLeaving(true);
-        joiningOrLeavingAction = action;
-        joiningLeavingText.setText(action);
+    private void setJoiningOrLeaving(@StringRes int actionId) {
+        viewModel.setIsJoiningOrLeaving(true, actionId);
+    }
+
+    /**
+     * Sets the joining or leaving UI depending on the action received.
+     *
+     * @param actionId String ID which indicates if the UI to set is the joining or leaving state.
+     */
+    private void setJoiningOrLeavingView(@StringRes int actionId) {
+        joiningLeavingText.setText(getString(actionId));
         setBottomLayout(SHOW_JOINING_OR_LEFTING_LAYOUT);
         invalidateOptionsMenu();
     }

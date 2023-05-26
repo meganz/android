@@ -91,4 +91,13 @@ class AppEventFacadeTest {
             assertThat(awaitItem()).isNotNull()
         }
     }
+
+    @Test
+    fun `test that broadcast leave chat state fires an event`() = runTest {
+        val chatId = 1234L
+        underTest.monitorLeaveChat().test {
+            underTest.broadcastLeaveChat(chatId)
+            assertThat(awaitItem()).isEqualTo(chatId)
+        }
+    }
 }

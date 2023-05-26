@@ -66,6 +66,10 @@ class MegaChatRequestHandler @Inject constructor(
      */
     override fun onRequestStart(api: MegaChatApiJava?, request: MegaChatRequest) {
         Timber.d("onRequestStart (CHAT): %s", request.requestString)
+
+        if (request.type == MegaChatRequest.TYPE_REMOVE_FROM_CHATROOM) {
+            chatManagement.addLeavingChatId(request.chatHandle)
+        }
     }
 
     /**

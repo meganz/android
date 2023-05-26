@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,11 +18,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.model.ChatState
+import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.usecase.call.EndCallUseCase
@@ -37,11 +40,14 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
+import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -51,6 +57,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
+import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -78,6 +85,8 @@ import javax.inject.Inject
  * @property monitorChatArchivedUseCase                     [MonitorChatArchivedUseCase]
  * @property broadcastChatArchivedUseCase                   [BroadcastChatArchivedUseCase]
  * @property monitorJoinedSuccessfullyUseCase               [MonitorJoinedSuccessfullyUseCase]
+ * @property monitorLeaveChatUseCase                        [MonitorLeaveChatUseCase]
+ * @property leaveChat                                      [LeaveChat]
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -103,6 +112,8 @@ class ChatViewModel @Inject constructor(
     private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
     private val broadcastChatArchivedUseCase: BroadcastChatArchivedUseCase,
     private val monitorJoinedSuccessfullyUseCase: MonitorJoinedSuccessfullyUseCase,
+    private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
+    private val leaveChat: LeaveChat,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -148,7 +159,44 @@ class ChatViewModel @Inject constructor(
                 _state.update { it.copy(isJoiningOrLeaving = false) }
             }
         }
+
+        viewModelScope.launch {
+            monitorLeaveChatUseCase().conflate().collect { chatId ->
+                if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
+                    if (state.value.chatId == chatId) {
+                        _state.update { state ->
+                            state.copy(
+                                isJoiningOrLeaving = true,
+                                joiningOrLeavingAction = R.string.leaving_label
+                            )
+                        }
+                    }
+                    performLeaveChat(chatId)
+                }
+            }
+        }
     }
+
+    /**
+     * Leave a chat
+     *
+     * @param chatId    [Long] ID of the chat to leave.
+     */
+    private fun performLeaveChat(chatId: Long) = viewModelScope.launch {
+        runCatching { leaveChat(chatId) }
+            .onSuccess { setIsJoiningOrLeaving(false, null) }
+            .onFailure {
+                if (it is MegaException) {
+                    _state.update { state -> state.copy(snackbarMessage = it.getErrorStringId()) }
+                }
+            }
+    }
+
+    /**
+     * Sets snackbarMessage in state as consumed.
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update { state -> state.copy(snackbarMessage = null) }
 
     /**
      * Call button clicked
@@ -200,8 +248,8 @@ class ChatViewModel @Inject constructor(
      *
      * @param value True, if user is joining or leaving the chat. False, otherwise.
      */
-    fun setIsJoiningOrLeaving(value: Boolean) {
-        _state.update { it.copy(isJoiningOrLeaving = value) }
+    fun setIsJoiningOrLeaving(value: Boolean, @StringRes actionId: Int?) {
+        _state.update { it.copy(isJoiningOrLeaving = value, joiningOrLeavingAction = actionId) }
     }
 
     /**
