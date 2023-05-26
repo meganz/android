@@ -33,7 +33,7 @@ import javax.inject.Inject
  * @property moveNodeUseCase        Required for moving MegaNodes to the Rubbish Bin.
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
-class CopyNodeUseCase @Inject constructor(
+class LegacyCopyNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,

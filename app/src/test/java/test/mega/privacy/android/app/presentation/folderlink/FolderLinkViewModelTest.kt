@@ -22,7 +22,7 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
@@ -58,7 +58,7 @@ class FolderLinkViewModelTest {
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val loginToFolderUseCase = mock<LoginToFolderUseCase>()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
-    private val copyNodeUseCase: CopyNodeUseCase = mock()
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
     private val hasCredentials: HasCredentials = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
@@ -93,7 +93,7 @@ class FolderLinkViewModelTest {
             monitorViewType,
             loginToFolderUseCase,
             checkNameCollisionUseCase,
-            copyNodeUseCase,
+            legacyCopyNodeUseCase,
             copyRequestMessageMapper,
             hasCredentials,
             rootNodeExistsUseCase,

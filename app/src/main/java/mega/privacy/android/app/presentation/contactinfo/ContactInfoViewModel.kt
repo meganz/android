@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -127,7 +127,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val createShareKey: CreateShareKey,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -695,7 +695,7 @@ class ContactInfoViewModel @Inject constructor(
 
     @SuppressLint("CheckResult")
     private fun copyNodes(handlesWithoutCollision: LongArray, toHandle: Long) {
-        copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+        legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->

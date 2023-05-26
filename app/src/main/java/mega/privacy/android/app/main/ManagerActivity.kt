@@ -267,7 +267,7 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogS
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
@@ -434,7 +434,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var uploadUseCase: UploadUseCase
 
     @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
+    lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
@@ -7553,7 +7553,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 nameCollisionActivityContract?.launch(collisions)
                             }
                             if (handlesWithoutCollision.isNotEmpty()) {
-                                copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+                                legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->

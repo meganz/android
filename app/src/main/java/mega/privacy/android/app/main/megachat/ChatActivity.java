@@ -387,7 +387,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
@@ -547,7 +547,7 @@ public class ChatActivity extends PasscodeActivity
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
-    CopyNodeUseCase copyNodeUseCase;
+    LegacyCopyNodeUseCase legacyCopyNodeUseCase;
     @Inject
     GetParticipantsChangesUseCase getParticipantsChangesUseCase;
     @Inject
@@ -4116,7 +4116,7 @@ public class ChatActivity extends PasscodeActivity
                         List<MegaNode> nodesWithoutCollision = result.getSecond();
 
                         if (!nodesWithoutCollision.isEmpty()) {
-                            internalComposite.add(copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                            internalComposite.add(legacyCopyNodeUseCase.copy(nodesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {

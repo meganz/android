@@ -92,7 +92,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -113,7 +113,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
-    CopyNodeUseCase copyNodeUseCase;
+    LegacyCopyNodeUseCase legacyCopyNodeUseCase;
     @Inject
     DatabaseHandler dbH;
 
@@ -693,7 +693,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
      * Copies a node.
      */
     private void copyNode() {
-        copyNodeUseCase.copy(document, target, null)
+        legacyCopyNodeUseCase.copy(document, target, null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {

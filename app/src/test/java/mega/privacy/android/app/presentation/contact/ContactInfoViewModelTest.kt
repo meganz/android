@@ -22,7 +22,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -101,7 +101,7 @@ class ContactInfoViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private lateinit var createShareKey: CreateShareKey
     private lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-    private lateinit var copyNodeUseCase: CopyNodeUseCase
+    private lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
     private lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
@@ -178,7 +178,7 @@ class ContactInfoViewModelTest {
             createShareKey = createShareKey,
             monitorNodeUpdates = monitorNodeUpdates,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            copyNodeUseCase = copyNodeUseCase,
+            legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
         )
     }
@@ -210,7 +210,7 @@ class ContactInfoViewModelTest {
         createChatRoomUseCase = mock()
         createShareKey = mock()
         copyRequestMessageMapper = mock()
-        copyNodeUseCase = mock()
+        legacyCopyNodeUseCase = mock()
         checkNameCollisionUseCase = mock()
     }
 

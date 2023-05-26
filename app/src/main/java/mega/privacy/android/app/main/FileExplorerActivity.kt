@@ -70,7 +70,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision.Upload.Companio
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
@@ -133,7 +133,7 @@ import javax.inject.Inject
  * @property getChatChangesUseCase     [GetChatChangesUseCase]
  * @property checkNameCollisionUseCase [CheckNameCollisionUseCase]
  * @property uploadUseCase             [UploadUseCase]
- * @property copyNodeUseCase           [CopyNodeUseCase]
+ * @property legacyCopyNodeUseCase           [LegacyCopyNodeUseCase]
  * @property isList                    True if the view is in list mode, false if it is in grid mode.
  * @property mode                      Mode for opening the file explorer: [UPLOAD], [MOVE], [COPY], [CAMERA], [IMPORT], [SELECT], [SELECT_CAMERA_FOLDER], [SHARE_LINK] or [SAVE]
  * @property isMultiselect             True if it should allow multiple selection, false otherwise.
@@ -162,7 +162,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     lateinit var uploadUseCase: UploadUseCase
 
     @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
+    lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
 
     private val viewModel by viewModels<FileExplorerViewModel>()
 
@@ -1553,7 +1553,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     filesChecked++
                 } else {
 //					File is in Cloud --> Copy in My Chat Files
-                    copyNodeUseCase.copy(node, myChatFilesNode, null)
+                    legacyCopyNodeUseCase.copy(node, myChatFilesNode, null)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({

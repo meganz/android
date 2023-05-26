@@ -107,7 +107,7 @@ import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
@@ -148,7 +148,7 @@ public class ContactFileListActivity extends PasscodeActivity
     @Inject
     UploadUseCase uploadUseCase;
     @Inject
-    CopyNodeUseCase copyNodeUseCase;
+    LegacyCopyNodeUseCase legacyCopyNodeUseCase;
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
     @Inject
@@ -709,7 +709,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             long[] handlesWithoutCollision = result.getSecond();
 
                             if (handlesWithoutCollision.length > 0) {
-                                copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+                                legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((copyResult, copyThrowable) -> {

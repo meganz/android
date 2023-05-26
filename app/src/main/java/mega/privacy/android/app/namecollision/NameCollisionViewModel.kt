@@ -26,7 +26,7 @@ import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
@@ -46,7 +46,7 @@ import javax.inject.Inject
  * @property getNameCollisionResultUseCase  Required for getting all the needed info for present a collision.
  * @property uploadUseCase                  Required for uploading files.
  * @property moveNodeUseCase                Required for moving nodes.
- * @property copyNodeUseCase                Required for copying nodes.
+ * @property legacyCopyNodeUseCase                Required for copying nodes.
  * @property getNodeUseCase                 Required for getting node from handle
  */
 @HiltViewModel
@@ -55,7 +55,7 @@ class NameCollisionViewModel @Inject constructor(
     private val getNameCollisionResultUseCase: GetNameCollisionResultUseCase,
     private val uploadUseCase: UploadUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getNodeUseCase: GetNodeUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
@@ -608,7 +608,7 @@ class NameCollisionViewModel @Inject constructor(
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
-        copyNodeUseCase.copy(currentCollision.value ?: return, rename)
+        legacyCopyNodeUseCase.copy(currentCollision.value ?: return, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -633,7 +633,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param rename    True if should rename the nodes, false otherwise.
      */
     private fun copy(list: MutableList<NameCollisionResult>, rename: Boolean) {
-        copyNodeUseCase.copy(list, rename)
+        legacyCopyNodeUseCase.copy(list, rename)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(

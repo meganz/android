@@ -101,7 +101,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
-import mega.privacy.android.app.usecase.CopyNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -130,7 +130,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
-    CopyNodeUseCase copyNodeUseCase;
+    LegacyCopyNodeUseCase legacyCopyNodeUseCase;
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
 
@@ -1151,7 +1151,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         List<MegaNode> nodesWithoutCollision = result.getSecond();
 
                         if (!nodesWithoutCollision.isEmpty()) {
-                            copyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                            legacyCopyNodeUseCase.copy(nodesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {

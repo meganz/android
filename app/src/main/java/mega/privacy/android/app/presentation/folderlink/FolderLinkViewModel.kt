@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -64,7 +64,7 @@ class FolderLinkViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val loginToFolderUseCase: LoginToFolderUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
-    private val copyNodeUseCase: CopyNodeUseCase,
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentials: HasCredentials,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
@@ -245,7 +245,7 @@ class FolderLinkViewModel @Inject constructor(
                     }
                     val nodesWithoutCollisions: List<MegaNode> = result.second
                     if (nodesWithoutCollisions.isNotEmpty()) {
-                        copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
+                        legacyCopyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
