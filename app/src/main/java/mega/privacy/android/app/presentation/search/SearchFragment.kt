@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewM
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -963,7 +964,7 @@ class SearchFragment : RotatableFragment() {
                     intentInternalIntentPair.first.setDataAndType(
                         FileProvider.getUriForFile(
                             requireActivity(),
-                            "mega.privacy.android.app.providers.fileprovider",
+                            AUTHORITY_STRING_FILE_PROVIDER,
                             mediaFile
                         ),
                         MimeTypeList.typeForName(node.name).type
@@ -1048,7 +1049,7 @@ class SearchFragment : RotatableFragment() {
                     pdfIntent.setDataAndType(
                         FileProvider.getUriForFile(
                             requireActivity(),
-                            "mega.privacy.android.app.providers.fileprovider",
+                            AUTHORITY_STRING_FILE_PROVIDER,
                             mediaFile
                         ),
                         MimeTypeList.typeForName(node.name).type

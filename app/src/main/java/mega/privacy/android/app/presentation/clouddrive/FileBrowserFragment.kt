@@ -736,7 +736,7 @@ class FileBrowserFragment : RotatableFragment() {
                     Timber.d("itemClick:FileProviderOption")
                     val mediaFileUri = FileProvider.getUriForFile(
                         requireContext(),
-                        FILE_PROVIDER_AUTHORITY,
+                        Constants.AUTHORITY_STRING_FILE_PROVIDER,
                         mediaFile
                     )
                     if (mediaFileUri == null) {
@@ -855,7 +855,7 @@ class FileBrowserFragment : RotatableFragment() {
                     pdfIntent.setDataAndType(
                         FileProvider.getUriForFile(
                             requireContext(),
-                            FILE_PROVIDER_AUTHORITY,
+                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
                             mediaFile
                         ),
                         MimeTypeList.typeForName(
@@ -1508,7 +1508,5 @@ class FileBrowserFragment : RotatableFragment() {
 
         private const val DURATION_ANIMATION = 1000
         private const val DELAY_RECYCLERVIEW_POST = 500
-        private const val FILE_PROVIDER_AUTHORITY =
-            "mega.privacy.android.app.providers.fileprovider"
     }
 }

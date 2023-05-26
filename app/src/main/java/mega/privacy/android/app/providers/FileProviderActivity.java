@@ -1,6 +1,7 @@
 package mega.privacy.android.app.providers;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.Constants.NODE_HANDLES;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
@@ -937,7 +938,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                         copyFile(new File(localPath), fileToShare);
 
                         if (fileToShare.exists()) {
-                            Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
+                            Uri contentUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, fileToShare);
                             grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             Timber.d("CONTENT URI: %s", contentUri);
                             if (totalTransfers == 0) {
@@ -1632,7 +1633,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
             //Get the URI of the file
             File fileToShare = new File(transfer.getPath());
             //		File newFile = new File(fileToShare, "default_image.jpg");
-            Uri contentUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", fileToShare);
+            Uri contentUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, fileToShare);
             grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
             if (totalTransfers == 0) {

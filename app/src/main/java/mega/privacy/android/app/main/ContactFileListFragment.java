@@ -70,6 +70,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
@@ -509,7 +510,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
                         if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            mediaIntent.setDataAndType(FileProvider.getUriForFile(context, Constants.AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             mediaIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         }
@@ -565,7 +566,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
                     if (localPath != null) {
                         File mediaFile = new File(localPath);
                         if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
-                            pdfIntent.setDataAndType(FileProvider.getUriForFile(context, "mega.privacy.android.app.providers.fileprovider", mediaFile), MimeTypeList.typeForName(file.getName()).getType());
+                            pdfIntent.setDataAndType(FileProvider.getUriForFile(context, Constants.AUTHORITY_STRING_FILE_PROVIDER, mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         } else {
                             pdfIntent.setDataAndType(Uri.fromFile(mediaFile), MimeTypeList.typeForName(file.getName()).getType());
                         }

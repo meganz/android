@@ -8,6 +8,7 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.ChatUtil.manageTextFileIntent;
 import static mega.privacy.android.app.utils.ColorUtils.getColorHexString;
 import static mega.privacy.android.app.utils.Constants.ACTION_REFRESH_PARENTHANDLE_BROWSER;
+import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.BUFFER_COMP;
 import static mega.privacy.android.app.utils.Constants.FORWARD_ONLY_OPTION;
 import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
@@ -92,7 +93,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
 import mega.privacy.android.app.main.ManagerActivity;
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -101,6 +101,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -537,7 +538,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 File mediaFile = new File(localPath);
                                 if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     Timber.d("FileProviderOption");
-                                    Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                                    Uri mediaFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
                                     if (mediaFileUri == null) {
                                         Timber.e("ERROR: NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));
@@ -625,7 +626,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                 File mediaFile = new File(localPath);
                                 if (localPath.contains(Environment.getExternalStorageDirectory().getPath())) {
                                     Timber.d("File Provider Option");
-                                    Uri mediaFileUri = FileProvider.getUriForFile(this, "mega.privacy.android.app.providers.fileprovider", mediaFile);
+                                    Uri mediaFileUri = FileProvider.getUriForFile(this, AUTHORITY_STRING_FILE_PROVIDER, mediaFile);
                                     if (mediaFileUri == null) {
                                         Timber.e("ERROR: NULL media file Uri");
                                         showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error));

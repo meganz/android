@@ -48,11 +48,11 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -347,6 +347,7 @@ class InboxFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_copy -> {
                     val handleList = ArrayList(selectedNodes.map { it.handle })
                     NodeController(requireActivity()).also {
@@ -355,18 +356,22 @@ class InboxFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_select_all -> {
                     selectAll()
                 }
+
                 R.id.cab_menu_unselect_all -> {
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_share_link -> {
                     (requireActivity() as ManagerActivity).showGetLinkActivity(selectedNodes)
                     clearSelections()
                     hideMultipleSelect()
                 }
+
                 R.id.cab_menu_share_out -> {
                     shareNodes(requireActivity(), selectedNodes)
                     clearSelections()
@@ -596,7 +601,7 @@ class InboxFragment : RotatableFragment() {
                     mediaIntent.setDataAndType(
                         FileProvider.getUriForFile(
                             requireActivity(),
-                            "mega.privacy.android.app.providers.fileprovider",
+                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
                             mediaFile
                         ),
                         MimeTypeList.typeForName(node.name).type
@@ -661,7 +666,7 @@ class InboxFragment : RotatableFragment() {
                     pdfIntent.setDataAndType(
                         FileProvider.getUriForFile(
                             requireActivity(),
-                            "mega.privacy.android.app.providers.fileprovider",
+                            Constants.AUTHORITY_STRING_FILE_PROVIDER,
                             mediaFile
                         ),
                         MimeTypeList.typeForName(

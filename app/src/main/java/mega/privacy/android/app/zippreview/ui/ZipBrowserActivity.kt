@@ -34,9 +34,10 @@ import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -240,10 +241,13 @@ class ZipBrowserActivity : PasscodeActivity() {
                 when {
                     isImage ->
                         imageFileOpen(position, file)
+
                     isVideoMimeType || isAudio ->
                         mediaFileOpen(file, position)
+
                     isPdf ->
                         pdfFileOpen(file, position)
+
                     isOpenableTextFile(file.length()) -> {
                         startActivity(
                             Intent(
@@ -254,6 +258,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                                 .putExtra(INTENT_EXTRA_KEY_PATH, file.absolutePath)
                         )
                     }
+
                     else -> otherFileOpen(file)
                 }
             }
@@ -337,7 +342,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                 mediaIntent.setDataAndType(
                     FileProvider.getUriForFile(
                         this@ZipBrowserActivity,
-                        URI_FILE_PROVIDER,
+                        AUTHORITY_STRING_FILE_PROVIDER,
                         file
                     ), type
                 )
@@ -360,7 +365,7 @@ class ZipBrowserActivity : PasscodeActivity() {
                 intentShare.setDataAndType(
                     FileProvider.getUriForFile(
                         this@ZipBrowserActivity,
-                        URI_FILE_PROVIDER,
+                        AUTHORITY_STRING_FILE_PROVIDER,
                         file
                     ), type
                 )
@@ -400,7 +405,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             pdfIntent.setDataAndType(
                 FileProvider.getUriForFile(
                     this@ZipBrowserActivity,
-                    URI_FILE_PROVIDER,
+                    AUTHORITY_STRING_FILE_PROVIDER,
                     file
                 ), type
             )
@@ -420,7 +425,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         viewIntent.setDataAndType(
             FileProvider.getUriForFile(
                 this@ZipBrowserActivity,
-                URI_FILE_PROVIDER,
+                AUTHORITY_STRING_FILE_PROVIDER,
                 file
             ), type
         )
@@ -432,7 +437,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             intentShare.setDataAndType(
                 FileProvider.getUriForFile(
                     this@ZipBrowserActivity,
-                    URI_FILE_PROVIDER,
+                    AUTHORITY_STRING_FILE_PROVIDER,
                     file
                 ), type
             )
@@ -471,11 +476,6 @@ class ZipBrowserActivity : PasscodeActivity() {
          * Intent key for nodeHandle of zip file
          */
         const val EXTRA_HANDLE_ZIP = "HANDLE_ZIP"
-
-        /**
-         * File provider uri
-         */
-        const val URI_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider"
 
         /**
          * Type audio

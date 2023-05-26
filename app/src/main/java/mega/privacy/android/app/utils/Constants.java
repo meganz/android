@@ -1,5 +1,7 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.BuildConfig.APPLICATION_ID;
+
 import java.io.File;
 import java.util.regex.Pattern;
 
@@ -473,7 +475,7 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID = "AudioPlayerNotification";
     public static final String CHAT_FOLDER = "My chat files";
-    public static final String AUTHORITY_STRING_FILE_PROVIDER = "mega.privacy.android.app.providers.fileprovider";
+    public static final String AUTHORITY_STRING_FILE_PROVIDER = APPLICATION_ID + ".providers.fileprovider";
     public static final String TYPE_TEXT_PLAIN = "text/plain";
 
     public static final int RICH_WARNING_TRUE = 1;
