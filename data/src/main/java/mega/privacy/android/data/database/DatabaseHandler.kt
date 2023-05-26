@@ -315,6 +315,8 @@ interface DatabaseHandler {
     fun setLastPublicHandleTimeStamp()
     fun setInvalidateSdkCache(invalidateSdkCache: Boolean)
     fun clearCredentials()
+
+    @Deprecated("Call to ClearEphemeralCredentialsUseCase instead")
     fun clearEphemeral()
     fun clearPreferences()
     fun clearAttributes()

@@ -652,12 +652,6 @@ interface MegaLocalStorageGateway {
     suspend fun saveCredentials(userCredentials: UserCredentials)
 
     /**
-     * Clears ephemeral.
-     */
-    suspend fun clearEphemeral()
-
-
-    /**
      * Clear account credentials.
      */
     suspend fun clearCredentials()

@@ -8,7 +8,6 @@ import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.backup.Backup
-import mega.privacy.android.domain.entity.login.EphemeralCredentials
 
 /**
  * Legacy database handler
@@ -22,7 +21,6 @@ interface LegacyDatabaseHandler : DatabaseHandler {
 
     val sdTransfers: ArrayList<SDTransfer>
 
-    fun saveEphemeral(ephemeralCredentials: EphemeralCredentials)
     fun batchInsertMegaContacts(contacts: List<MegaContactGetter.MegaContact>?)
     fun setChatItemPreferences(chatPrefs: ChatItemPreferences)
     fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences?

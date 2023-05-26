@@ -1121,19 +1121,6 @@ class SqliteDatabaseHandler @Inject constructor(
         }
     }
 
-    override fun saveEphemeral(ephemeralCredentials: EphemeralCredentials) {
-        val values = ContentValues().apply {
-            with(ephemeralCredentials) {
-                email?.let { put(KEY_EMAIL, encrypt(it)) }
-                password?.let { put(KEY_PASSWORD, encrypt(it)) }
-                session?.let { put(KEY_SESSION, encrypt(it)) }
-                firstName?.let { put(KEY_FIRST_NAME, encrypt(it)) }
-                lastName?.let { put(KEY_LAST_NAME, encrypt(it)) }
-            }
-        }
-        db.insert(TABLE_EPHEMERAL, null, values)
-    }
-
     override fun saveMyEmail(email: String?) {
         Timber.d("saveEmail: %s", email)
         val selectQuery = "SELECT * FROM $TABLE_CREDENTIALS"

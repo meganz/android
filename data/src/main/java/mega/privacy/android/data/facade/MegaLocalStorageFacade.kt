@@ -371,8 +371,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun saveCredentials(userCredentials: UserCredentials) =
         dbHandler.saveCredentials(userCredentials)
 
-    override suspend fun clearEphemeral() = dbHandler.clearEphemeral()
-
     override suspend fun clearCredentials() = dbHandler.clearCredentials()
 
     override suspend fun clearPreferences() = dbHandler.clearPreferences()
