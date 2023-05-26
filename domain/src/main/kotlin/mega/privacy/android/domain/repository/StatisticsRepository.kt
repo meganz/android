@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.repository
 
+import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
+
 /**
  * The MEGA Stats Repository
  */
@@ -60,4 +62,11 @@ interface StatisticsRepository {
      * Set the media discovery folder click count
      */
     suspend fun setMediaDiscoveryClickCountFolder(clickCountFolder: Int, mediaHandle: Long)
+
+    /**
+     * Log event
+     *
+     * @param event
+     */
+    suspend fun logEvent(event: AnalyticsEvent)
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.data.di
 
 import android.webkit.MimeTypeMap
+import com.google.gson.GsonBuilder
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -423,5 +424,11 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
+
+        /**
+         * Provide gson builder
+         */
+        @Provides
+        fun provideGsonBuilder(): GsonBuilder = GsonBuilder()
     }
 }
