@@ -12,7 +12,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
-import mega.privacy.android.app.domain.usecase.GetChildMegaNode
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -261,13 +260,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetParentMegaNode(megaNodeRepository: MegaNodeRepository): GetParentMegaNode =
             GetParentMegaNode(megaNodeRepository::getParentNode)
-
-        /**
-         * Provide the [GetChildMegaNode] implementation
-         */
-        @Provides
-        fun provideGetChildMegaNode(megaNodeRepository: MegaNodeRepository): GetChildMegaNode =
-            GetChildMegaNode(megaNodeRepository::getChildNode)
 
         /**
          * Provide the [IsNodeInRubbish] implementation

@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
-import mega.privacy.android.app.domain.usecase.GetChildMegaNode
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -125,9 +124,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetParentMegaNode() = mock<GetParentMegaNode>()
-
-    @Provides
-    fun provideGetChildMegaNode() = mock<GetChildMegaNode>()
 
     @Provides
     fun provideResetPrimaryTimeline() = mock<ResetPrimaryTimeline>()

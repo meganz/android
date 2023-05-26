@@ -358,4 +358,13 @@ interface NodeRepository {
      * @return a pair with latitude and longitude coordinates
      */
     suspend fun getNodeGPSCoordinates(nodeId: NodeId): Pair<Double, Double>
+
+    /**
+     * Get the child node with the provided name
+     *
+     * @param parentNodeId
+     * @param name
+     * @return mega node or null if doesn't exist
+     */
+    suspend fun getChildNode(parentNodeId: NodeId?, name: String?): UnTypedNode?
 }

@@ -4,11 +4,13 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -23,7 +25,7 @@ import javax.inject.Inject
  * @property getSyncRecordByFingerprint [GetSyncRecordByFingerprint]
  * @property deleteSyncRecordByLocalPath [DeleteSyncRecordByLocalPath]
  * @property areUploadFileNamesKeptUseCase [AreUploadFileNamesKeptUseCase]
- * @property getChildMegaNode [GetChildMegaNode]
+ * @property getChildNodeUseCase [GetChildNodeUseCase]
  * @property fileNameExists [FileNameExists]
  * @property saveSyncRecord [SaveSyncRecord]
  * @property timeWrapper [TimeWrapper]
@@ -32,7 +34,7 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
     private val getSyncRecordByFingerprint: GetSyncRecordByFingerprint,
     private val deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
-    private val getChildMegaNode: GetChildMegaNode,
+    private val getChildNodeUseCase: GetChildNodeUseCase,
     private val fileNameExists: FileNameExists,
     private val saveSyncRecord: SaveSyncRecord,
     private val timeWrapper: TimeWrapper,
@@ -95,7 +97,10 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                         fileName = getNoneDuplicatedDeviceFileName(tempFileName, photoIndex)
                         Timber.d("Keep file name as in device, name index is: %s", photoIndex)
                         photoIndex++
-                        inCloud = getChildMegaNode(parent, fileName) != null
+                        inCloud = getChildNodeUseCase(
+                            parent?.let { NodeId(parent.handle) },
+                            fileName
+                        ) != null
                         fileName?.let {
                             inDatabase = fileNameExists(it, isSecondary)
                         }
@@ -110,7 +115,10 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                         )
                         Timber.d("Use MEGA name, name index is: %s", photoIndex)
                         photoIndex++
-                        inCloud = getChildMegaNode(parent, fileName) != null
+                        inCloud = getChildNodeUseCase(
+                            parent?.let { NodeId(parent.handle) },
+                            fileName
+                        ) != null
                         inDatabase = fileNameExists(fileName, isSecondary)
                     } while (inCloud || inDatabase)
                 }

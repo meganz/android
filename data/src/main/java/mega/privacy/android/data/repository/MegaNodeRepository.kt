@@ -97,15 +97,6 @@ interface MegaNodeRepository {
     suspend fun getParentNode(node: MegaNode): MegaNode?
 
     /**
-     * Get the child node with the provided name
-     *
-     * @param parentNode
-     * @param name
-     * @return mega node or null if doesn't exist
-     */
-    suspend fun getChildNode(parentNode: MegaNode?, name: String?): MegaNode?
-
-    /**
      * Get children of a parent node
      *
      * @param parentNode parent node

@@ -508,4 +508,11 @@ internal class NodeRepositoryImpl @Inject constructor(
                 Pair(it.latitude, it.longitude)
             } ?: Pair(0.0, 0.0)
         }
+
+    override suspend fun getChildNode(parentNodeId: NodeId?, name: String?) =
+        withContext(ioDispatcher) {
+            val parent = parentNodeId
+                ?.let { megaApiGateway.getMegaNodeByHandle(it.longValue) }
+            megaApiGateway.getChildNode(parent, name)?.let { nodeMapper(it) }
+        }
 }
