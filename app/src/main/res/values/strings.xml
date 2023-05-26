@@ -4808,6 +4808,18 @@
     <string name="album_import_input_decryption_key_title">Enter decryption key</string>
     <!-- Input decryption key dialog description for album import -->
     <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Every day</string>
+    <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Every week</string>
+    <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Every month</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Custom</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
+    <string name="meetings_schedule_meeting_recurrence_daily_label">Daily</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
+    <string name="meetings_schedule_meeting_recurrence_weekly_label">Weekly</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->

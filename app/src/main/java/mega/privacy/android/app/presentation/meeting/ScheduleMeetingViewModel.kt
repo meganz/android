@@ -10,17 +10,24 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.meeting.mapper.OccurrenceFrequencyTypeMapper
+import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
+import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingType
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -33,6 +40,9 @@ import javax.inject.Inject
  * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
  * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
  * @property createChatLink                             [CreateChatLink]
+ * @property occurrenceFrequencyTypeMapper              [OccurrenceFrequencyTypeMapper]
+ * @property weekDayMapper                              [WeekDayMapper]
+ * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property deviceGateway                              [DeviceGateway]
  * @property state                                      Current view state as [ScheduleMeetingState]
  */
@@ -43,6 +53,9 @@ class ScheduleMeetingViewModel @Inject constructor(
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
     private val createChatLink: CreateChatLink,
+    private val occurrenceFrequencyTypeMapper: OccurrenceFrequencyTypeMapper,
+    private val weekDayMapper: WeekDayMapper,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val deviceGateway: DeviceGateway,
 ) : ViewModel() {
 
@@ -63,6 +76,23 @@ class ScheduleMeetingViewModel @Inject constructor(
      * @return
      */
     fun isOnline(): Boolean = monitorConnectivityUseCase().value
+
+    init {
+        viewModelScope.launch {
+            getFeatureFlagValue(AppFeatures.ScheduleMeeting).let { flag ->
+                _state.update { it.copy(scheduledMeetingEnabled = flag) }
+            }
+        }
+    }
+
+    /**
+     * Recurring meeting button clicked
+     */
+    fun onRecurrenceTap() {
+        _state.update { state ->
+            state.copy(recurringMeetingDialog = !state.recurringMeetingDialog)
+        }
+    }
 
     /**
      * Enable or disable meeting link option
@@ -100,6 +130,25 @@ class ScheduleMeetingViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Recurrence meeting changed
+     *
+     * @param optionSelected Recurrence option selected
+     */
+    fun onRecurrenceOptionSelected(optionSelected: RecurringMeetingType) {
+        dismissDialog()
+
+        val weekdayList: List<Weekday>? =
+            if (optionSelected == RecurringMeetingType.Weekly) listOf(weekDayMapper(LocalDate.now().dayOfWeek)) else null
+        _state.update { state ->
+            state.copy(
+                rulesSelected = state.rulesSelected.copy(
+                    freq = occurrenceFrequencyTypeMapper(optionSelected), weekDayList = weekdayList
+                ), recurringMeetingOptionSelected = optionSelected
+            )
         }
     }
 
@@ -292,7 +341,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                             endDate = it.endDate.toEpochSecond(),
                             description = it.descriptionText,
                             flags = flags,
-                            rules = null,
+                            rules = it.rulesSelected,
                             attributes = null
                         )
                     }
@@ -353,6 +402,7 @@ class ScheduleMeetingViewModel @Inject constructor(
         _state.update { state ->
             state.copy(
                 discardMeetingDialog = false,
+                recurringMeetingDialog = false
             )
         }
 }

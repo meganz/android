@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.core.ui.extensions.composeLet
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
@@ -42,9 +41,9 @@ fun <T> ConfirmationWithRadioButtonsDialog(
     radioOptions: List<T>?,
     onOptionSelected: (T) -> Unit,
     onDismissRequest: () -> Unit,
+    buttonText: String,
     modifier: Modifier = Modifier,
     titleText: String = "",
-    buttonText: String? = null,
     initialSelectedOption: T? = null,
     optionDescriptionMapper: @Composable (T) -> String = { it.toString() },
     properties: DialogProperties = DialogProperties(),
@@ -123,24 +122,22 @@ fun <T> ConfirmationWithRadioButtonsDialog(
                     }
                 }
 
-                buttonText?.composeLet { buttonText ->
-                    Box(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        contentAlignment = Alignment.CenterEnd,
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    contentAlignment = Alignment.CenterEnd,
+                ) {
+                    TextButton(
+                        onClick = onDismissRequest,
                     ) {
-                        TextButton(
-                            onClick = onDismissRequest,
-                        ) {
-                            Text(
-                                text = buttonText,
-                                style = MaterialTheme.typography.button.copy(
-                                    color = MaterialTheme.colors.secondary,
-                                    textAlign = TextAlign.End
-                                )
+                        Text(
+                            text = buttonText,
+                            style = MaterialTheme.typography.button.copy(
+                                color = MaterialTheme.colors.secondary,
+                                textAlign = TextAlign.End
                             )
-                        }
+                        )
                     }
                 }
             }

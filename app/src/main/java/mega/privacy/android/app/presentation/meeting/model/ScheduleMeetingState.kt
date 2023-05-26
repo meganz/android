@@ -2,8 +2,8 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.ScheduleMeetingViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -15,7 +15,6 @@ import java.time.temporal.ChronoUnit
  * @property openAddContact                         True, if should open Add contact screen. False, if not.
  * @property chatIdToOpenInfoScreen                 Chat id to open the scheduled meeting info screen.
  * @property meetingTitle                           Meeting title.
- * @property freq                                   [OccurrenceFrequencyType].
  * @property startDate                              Start Date.
  * @property endDate                                End Date.
  * @property participantItemList                    List of participants handles.
@@ -32,12 +31,15 @@ import java.time.temporal.ChronoUnit
  * @property descriptionText                        Description text.
  * @property isEmptyTitleError                      True, if an attempt has been made to create a meeting without a title. False, if not.
  * @property allowAddParticipants                   True, if can add participants. False, if not.
+ * @property recurringMeetingDialog                 True if show recurring meeting dialog, false if not.
+ * @property recurringMeetingOptionSelected         [RecurringMeetingType] current option selected.
+ * @property scheduledMeetingEnabled                True if the flag feature schedule meeting is enabled. False, if not.
+ * @property rulesSelected                          [ChatScheduledRules] selected.
  */
 data class ScheduleMeetingState constructor(
     val openAddContact: Boolean? = null,
     val chatIdToOpenInfoScreen: Long? = null,
     val meetingTitle: String = "",
-    val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val startDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
     val endDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
         .plus(30, ChronoUnit.MINUTES),
@@ -54,6 +56,10 @@ data class ScheduleMeetingState constructor(
     val isEditingDescription: Boolean = false,
     val isEmptyTitleError: Boolean = false,
     val allowAddParticipants: Boolean = true,
+    val recurringMeetingDialog: Boolean = false,
+    val recurringMeetingOptionSelected: RecurringMeetingType = RecurringMeetingType.Never,
+    val scheduledMeetingEnabled: Boolean = false,
+    val rulesSelected: ChatScheduledRules = ChatScheduledRules(),
 ) {
     /**
      * Check if it's valid title

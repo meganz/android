@@ -60,7 +60,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.view.ContactStatus
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
@@ -74,6 +73,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoS
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MarqueeText
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -240,15 +240,13 @@ private fun LeaveGroupAlertDialog(
     onLeave: () -> Unit,
 ) {
     if (state.leaveGroupDialog) {
-        SimpleDialog(
-            title = R.string.title_confirmation_leave_group_chat,
-            description = R.string.confirmation_leave_group_chat,
-            confirmButton = R.string.general_leave,
-            dismissButton = R.string.general_cancel,
-            shouldDismissOnBackPress = true,
-            shouldDismissOnClickOutside = true,
+        MegaAlertDialog(
+            title = stringResource(id = R.string.title_confirmation_leave_group_chat),
+            text = stringResource(id = R.string.confirmation_leave_group_chat),
+            confirmButtonText = stringResource(id = R.string.general_leave),
+            cancelButtonText = stringResource(id = R.string.general_cancel),
+            onConfirm = onLeave,
             onDismiss = onDismiss,
-            onConfirmButton = onLeave
         )
     }
 }
@@ -267,29 +265,24 @@ private fun AddParticipantsAlertDialog(
     onInvite: () -> Unit,
 ) {
 
-    if (state.addParticipantsNoContactsDialog) {
-        SimpleDialog(
-            title = R.string.chat_add_participants_no_contacts_title,
-            description = R.string.chat_add_participants_no_contacts_message,
-            confirmButton = R.string.contact_invite,
-            dismissButton = R.string.button_cancel,
-            shouldDismissOnBackPress = true,
-            shouldDismissOnClickOutside = true,
+    if (state.addParticipantsNoContactsDialog || state.addParticipantsNoContactsLeftToAddDialog) {
+        MegaAlertDialog(
+            title = stringResource(
+                id = if (state.addParticipantsNoContactsDialog)
+                    R.string.chat_add_participants_no_contacts_title
+                else
+                    R.string.chat_add_participants_no_contacts_left_to_add_title
+            ),
+            text = stringResource(
+                id = if (state.addParticipantsNoContactsDialog)
+                    R.string.chat_add_participants_no_contacts_message
+                else
+                    R.string.chat_add_participants_no_contacts_left_to_add_message
+            ),
+            confirmButtonText = stringResource(id = R.string.contact_invite),
+            cancelButtonText = stringResource(id = R.string.button_cancel),
+            onConfirm = onInvite,
             onDismiss = onDismiss,
-            onConfirmButton = onInvite
-        )
-    }
-
-    if (state.addParticipantsNoContactsLeftToAddDialog) {
-        SimpleDialog(
-            title = R.string.chat_add_participants_no_contacts_left_to_add_title,
-            description = R.string.chat_add_participants_no_contacts_left_to_add_message,
-            confirmButton = R.string.contact_invite,
-            dismissButton = R.string.button_cancel,
-            shouldDismissOnBackPress = true,
-            shouldDismissOnClickOutside = true,
-            onDismiss = onDismiss,
-            onConfirmButton = onInvite
         )
     }
 }
@@ -546,6 +539,7 @@ private fun ActionButton(
                     }
                 }
             }
+
             ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> {
                 if (state.isHost && state.isPublic) {
                     Text(
@@ -574,6 +568,7 @@ private fun ActionButton(
                     CustomDivider(withStartPadding = false)
                 }
             }
+
             ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation,
             -> {
                 if (state.isHost && !state.isPublic) {
@@ -601,6 +596,7 @@ private fun ActionButton(
                     CustomDivider(withStartPadding = false)
                 }
             }
+
             ScheduledMeetingInfoAction.MeetingLink,
             -> {
                 if (state.isHost && state.isPublic) {
@@ -613,6 +609,7 @@ private fun ActionButton(
                     CustomDivider(withStartPadding = true)
                 }
             }
+
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> {
                 if (state.isHost) {
                     ActionOption(
@@ -624,6 +621,7 @@ private fun ActionButton(
                     CustomDivider(withStartPadding = true)
                 }
             }
+
             ScheduledMeetingInfoAction.ManageChatHistory -> {
                 if (state.isHost) {
                     ActionOption(
@@ -636,6 +634,7 @@ private fun ActionButton(
 
                 }
             }
+
             ScheduledMeetingInfoAction.ChatNotifications -> {
                 ActionOption(
                     state = state,
@@ -645,6 +644,7 @@ private fun ActionButton(
                 )
                 CustomDivider(withStartPadding = true)
             }
+
             ScheduledMeetingInfoAction.ShareFiles -> {
                 ActionOption(
                     state = state,
@@ -1073,18 +1073,21 @@ private fun ParticipantsPermissionView(participant: ChatParticipant) {
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
+
         ChatRoomPermission.Standard -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_write),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
+
         ChatRoomPermission.ReadOnly -> {
             Icon(
                 painter = painterResource(id = R.drawable.ic_permissions_read_only),
                 contentDescription = "Permissions icon",
                 tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
         }
+
         else -> {}
     }
 }

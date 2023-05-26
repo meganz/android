@@ -137,8 +137,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onDismiss = { viewModel.dismissDialog() },
                 onSnackbarShown = viewModel::snackbarShown,
                 onDiscardMeetingDialog = { finish() },
-                onDescriptionValueChange = { text -> viewModel.onDescriptionChange(text) },
-                onTitleValueChange = { text -> viewModel.onTitleChange(text) },
+                onDescriptionValueChange = { viewModel.onDescriptionChange(it) },
+                onTitleValueChange = { viewModel.onTitleChange(it) },
+                onSelectRecurrenceDialog = { viewModel.onRecurrenceOptionSelected(it) }
             )
         }
     }
@@ -257,7 +258,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     private fun onActionTap(action: ScheduleMeetingAction) {
         when (action) {
-            ScheduleMeetingAction.Recurrence -> Timber.d("Recurrence option")
+            ScheduleMeetingAction.Recurrence -> viewModel.onRecurrenceTap()
             ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
             ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
             ScheduleMeetingAction.SendCalendarInvite -> viewModel.onSendCalendarInviteTap()

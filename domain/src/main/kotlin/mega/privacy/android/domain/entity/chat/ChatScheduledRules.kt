@@ -15,10 +15,10 @@ import mega.privacy.android.domain.entity.meeting.Weekday
  * @property monthWeekDayList   [MonthWeekDayItem] list that allows to specify one or multiple weekday offset.
  */
 data class ChatScheduledRules(
-    val freq: OccurrenceFrequencyType,
+    val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val interval: Int = 0,
     val until: Long = 0L,
-    val weekDayList: List<Weekday>? = null,
+    val weekDayList: List<Weekday>? = listOf(Weekday.Wednesday),
     val monthDayList: List<Int>? = null,
-    val monthWeekDayList: List<MonthWeekDayItem>? = null,
+    val monthWeekDayList: List<MonthWeekDayItem>? = emptyList(),
 )

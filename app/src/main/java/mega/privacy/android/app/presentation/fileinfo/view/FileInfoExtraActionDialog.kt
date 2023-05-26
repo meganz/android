@@ -34,6 +34,7 @@ internal fun ExtraActionDialog(
             ),
             initialSelectedOption = action.selected,
             titleText = stringResource(id = R.string.file_properties_shared_folder_permissions),
+            buttonText = stringResource(id = R.string.general_cancel),
             onOptionSelected = {
                 onPermissionSelected(it, action.emails)
             },

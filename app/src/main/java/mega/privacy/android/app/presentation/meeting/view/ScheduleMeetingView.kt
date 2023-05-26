@@ -46,22 +46,26 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
+import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.extensions.title
+import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingType
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MegaSwitch
+import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -97,6 +101,7 @@ internal fun ScheduleMeetingView(
     onDiscardMeetingDialog: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
+    onSelectRecurrenceDialog: (RecurringMeetingType) -> Unit,
 ) {
 
     is24hourFormat = DateFormat.is24HourFormat(LocalContext.current)
@@ -130,6 +135,12 @@ internal fun ScheduleMeetingView(
             state = state,
             onKeepEditing = { onDismiss() },
             onDiscard = { onDiscardMeetingDialog() })
+
+        RecurringMeetingDialog(
+            state = state,
+            onOptionSelected = onSelectRecurrenceDialog,
+            onDiscard = onDismiss
+        )
 
         LazyColumn(
             state = listState,
@@ -300,7 +311,10 @@ private fun ActionButton(
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            if (action != ScheduleMeetingAction.AddParticipants || state.allowAddParticipants) {
+            if ((action != ScheduleMeetingAction.Recurrence && action != ScheduleMeetingAction.AddParticipants) ||
+                (action == ScheduleMeetingAction.Recurrence && state.scheduledMeetingEnabled) ||
+                (action == ScheduleMeetingAction.AddParticipants && state.allowAddParticipants)
+            ) {
                 onButtonClicked(action)
             }
         }) {
@@ -482,10 +496,10 @@ private fun ActionOption(
                             state.numOfParticipants
                         )
 
-                    ScheduleMeetingAction.Recurrence -> subtitle = when (state.freq) {
+                    ScheduleMeetingAction.Recurrence -> subtitle = when (state.rulesSelected.freq) {
                         OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
-                        OccurrenceFrequencyType.Daily,
-                        OccurrenceFrequencyType.Weekly,
+                        OccurrenceFrequencyType.Daily -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_daily_label)
+                        OccurrenceFrequencyType.Weekly -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
                         OccurrenceFrequencyType.Monthly,
                         -> null
                     }
@@ -538,15 +552,48 @@ private fun DiscardMeetingAlertDialog(
     onDiscard: () -> Unit,
 ) {
     if (state.discardMeetingDialog) {
-        SimpleDialog(
-            title = null,
-            description = R.string.meetings_schedule_meeting_discard_meeting_dialog_title,
-            confirmButton = R.string.meetings_schedule_meeting_discard_meeting_dialog_discard_option,
-            dismissButton = R.string.meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option,
-            shouldDismissOnBackPress = true,
-            shouldDismissOnClickOutside = true,
+        MegaAlertDialog(
+            text = stringResource(id = R.string.meetings_schedule_meeting_discard_meeting_dialog_title),
+            confirmButtonText = stringResource(id = R.string.meetings_schedule_meeting_discard_meeting_dialog_discard_option),
+            cancelButtonText = stringResource(id = R.string.meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option),
+            onConfirm = onDiscard,
             onDismiss = onKeepEditing,
-            onConfirmButton = onDiscard
+        )
+    }
+}
+
+/**
+ * Dialogue to recurring meeting
+ *
+ * @param state                     [ScheduledMeetingInfoState]
+ * @param onOptionSelected          When continue editing the meeting.
+ * @param onDiscard                 When discard the meeting.
+ */
+@Composable
+private fun RecurringMeetingDialog(
+    state: ScheduleMeetingState,
+    onOptionSelected: (RecurringMeetingType) -> Unit,
+    onDiscard: () -> Unit,
+) {
+    if (state.recurringMeetingDialog) {
+        ConfirmationWithRadioButtonsDialog(
+            titleText = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
+            buttonText = stringResource(id = R.string.general_cancel),
+            radioOptions = listOf(
+                RecurringMeetingType.Never,
+                RecurringMeetingType.Daily,
+                RecurringMeetingType.Weekly
+            ),
+            initialSelectedOption = state.recurringMeetingOptionSelected,
+            onOptionSelected = onOptionSelected,
+            onDismissRequest = onDiscard,
+            optionDescriptionMapper = { option ->
+                when (option) {
+                    RecurringMeetingType.Weekly -> stringResource(id = RecurringMeetingType.Weekly.StringId)
+                    RecurringMeetingType.Daily -> stringResource(id = RecurringMeetingType.Daily.StringId)
+                    else -> stringResource(id = RecurringMeetingType.Never.StringId)
+                }
+            }
         )
     }
 }
@@ -561,7 +608,7 @@ fun PreviewDiscardMeetingAlertDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DiscardMeetingAlertDialog(state = ScheduleMeetingState(
             meetingTitle = "Title meeting",
-            freq = OccurrenceFrequencyType.Invalid,
+            rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
             buttons = ScheduleMeetingAction.values().asList(),
             snackBar = null,
@@ -571,6 +618,28 @@ fun PreviewDiscardMeetingAlertDialog() {
             onDiscard = {})
     }
 }
+
+/**
+ * Recurring Meeting Dialog Preview
+ */
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewRecurringMeetingDialog")
+@Composable
+fun PreviewRecurringMeetingDialog() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        RecurringMeetingDialog(state = ScheduleMeetingState(
+            meetingTitle = "Title meeting",
+            rulesSelected = ChatScheduledRules(),
+            participantItemList = emptyList(),
+            buttons = ScheduleMeetingAction.values().asList(),
+            snackBar = null,
+            discardMeetingDialog = true,
+        ),
+            onOptionSelected = {},
+            onDiscard = {})
+    }
+}
+
 
 /**
  * Schedule meeting View Preview
@@ -583,7 +652,7 @@ private fun PreviewScheduleMeetingView() {
         ScheduleMeetingView(
             state = ScheduleMeetingState(
                 meetingTitle = "Title meeting",
-                freq = OccurrenceFrequencyType.Invalid,
+                rulesSelected = ChatScheduledRules(),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
                 snackBar = null
@@ -600,7 +669,8 @@ private fun PreviewScheduleMeetingView() {
             onSnackbarShown = {},
             onDiscardMeetingDialog = {},
             onDescriptionValueChange = { },
-            onTitleValueChange = { }
+            onTitleValueChange = { },
+            onSelectRecurrenceDialog = { }
         )
     }
 }

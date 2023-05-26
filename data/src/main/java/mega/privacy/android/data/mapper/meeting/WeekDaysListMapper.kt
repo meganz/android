@@ -6,25 +6,14 @@ import javax.inject.Inject
 
 /**
  * Mapper to convert [MegaIntegerList] to list of weekdays
+ *
+ * @property weekDayMapper  [WeekDayMapper]
  */
-internal class WeekDaysListMapper @Inject constructor() {
+internal class WeekDaysListMapper @Inject constructor(private val weekDayMapper: WeekDayMapper) {
     operator fun invoke(integerList: MegaIntegerList): List<Weekday> {
         val list = mutableListOf<Weekday>()
         for (i in 0 until integerList.size()) {
-            val weekDay: Weekday? = when (integerList.get(i).toInt()) {
-                1 -> Weekday.Monday
-                2 -> Weekday.Tuesday
-                3 -> Weekday.Wednesday
-                4 -> Weekday.Thursday
-                5 -> Weekday.Friday
-                6 -> Weekday.Saturday
-                7 -> Weekday.Sunday
-                else -> null
-            }
-
-            weekDay?.let {
-                list.add(it)
-            }
+            list.add(weekDayMapper(integerList.get(i).toInt()))
         }
 
         return list
