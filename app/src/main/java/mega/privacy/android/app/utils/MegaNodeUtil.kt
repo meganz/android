@@ -535,13 +535,6 @@ object MegaNodeUtil {
             R.drawable.ic_folder_list
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
-        } else if (isSubRootBackupFolder(node)) {
-            val nodeType = checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi, node)
-            if (nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
-                R.drawable.ic_folder_list
-            } else {
-                R.drawable.ic_folder_list
-            }
         } else {
             R.drawable.ic_folder_list
         }
