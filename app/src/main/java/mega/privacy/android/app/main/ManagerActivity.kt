@@ -98,9 +98,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -338,6 +340,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
@@ -459,6 +462,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private val subscriptions = CompositeDisposable()
 
@@ -3347,17 +3354,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         supportActionBar?.title = title
     }
 
-    fun setToolbarTitle() {
+    fun setToolbarTitle() = lifecycleScope.launch {
         Timber.d("setToolbarTitle")
         if (drawerItem == null) {
-            return
+            return@launch
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
                 supportActionBar?.subtitle = null
                 Timber.d("Cloud Drive SECTION")
-                val parentNode =
+                val parentNode = withContext(ioDispatcher) {
                     megaApi.getNodeByHandle(this@ManagerActivity.fileBrowserState().fileBrowserHandle)
+                }
                 if (parentNode != null) {
                     if (megaApi.rootNode != null) {
                         if ((parentNode.handle == megaApi.rootNode?.handle
@@ -3423,7 +3431,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         resources.getString(R.string.home_side_menu_backups_title)
                     viewModel.setIsFirstNavigationLevel(true)
                 } else {
-                    val node = megaApi.getNodeByHandle(this.inboxState().inboxHandle)
+                    val node = withContext(ioDispatcher) {
+                        megaApi.getNodeByHandle(this@ManagerActivity.inboxState().inboxHandle)
+                    }
                     supportActionBar?.title = node?.name
                     viewModel.setIsFirstNavigationLevel(false)
                 }
@@ -3494,7 +3504,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.HOMEPAGE -> {
                 run {
-                    this.isFirstNavigationLevel = false
+                    this@ManagerActivity.isFirstNavigationLevel = false
                     var titleId = -1
                     when (homepageScreen) {
                         HomepageScreen.FAVOURITES -> titleId = R.string.favourites_category_title
