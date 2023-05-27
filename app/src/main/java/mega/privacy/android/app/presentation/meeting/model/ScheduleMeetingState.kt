@@ -36,6 +36,7 @@ import java.time.temporal.ChronoUnit
  * @property scheduledMeetingEnabled                True if the flag feature schedule meeting is enabled. False, if not.
  * @property rulesSelected                          [ChatScheduledRules] selected.
  * @property showMonthlyRecurrenceWarning           True, if the text on the monthly recurrence warning should be displayed. False, if not.
+ * @property isCreatingMeeting                      True, if the meeting is being created. False, if not.
  */
 data class ScheduleMeetingState constructor(
     val openAddContact: Boolean? = null,
@@ -62,6 +63,7 @@ data class ScheduleMeetingState constructor(
     val scheduledMeetingEnabled: Boolean = false,
     val rulesSelected: ChatScheduledRules = ChatScheduledRules(),
     val showMonthlyRecurrenceWarning: Boolean = false,
+    val isCreatingMeeting: Boolean = false,
 ) {
     /**
      * Check if it's valid title

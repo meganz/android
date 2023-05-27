@@ -114,6 +114,10 @@ class ScheduleMeetingViewModel @Inject constructor(
      * Add participants to the schedule meeting.
      */
     fun onAddParticipantsTap() {
+        _state.update {
+            it.copy(allowAddParticipants = false)
+        }
+
         Timber.d("Add participants to the schedule meeting")
         viewModelScope.launch {
             val contactList = getVisibleContactsUseCase()
@@ -191,7 +195,6 @@ class ScheduleMeetingViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     participantItemList = list,
-                    allowAddParticipants = true,
                     snackBar = if (list.isEmpty()) null else R.string.number_of_participants
                 )
             }
@@ -275,6 +278,14 @@ class ScheduleMeetingViewModel @Inject constructor(
         }
 
     /**
+     * Allow add participant option
+     */
+    fun allowAddParticipantsOption() =
+        _state.update {
+            it.copy(allowAddParticipants = true)
+        }
+
+    /**
      * Enable or disable allow non-hosts to add participants option
      */
     fun onAllowNonHostAddParticipantsTap() =
@@ -347,6 +358,9 @@ class ScheduleMeetingViewModel @Inject constructor(
         }
 
         if (state.value.meetingTitle.isNotEmpty()) {
+            _state.update { state ->
+                state.copy(isCreatingMeeting = true)
+            }
             viewModelScope.launch {
                 runCatching {
                     _state.value.let {
@@ -374,6 +388,9 @@ class ScheduleMeetingViewModel @Inject constructor(
                     }
                 }.onFailure { exception ->
                     Timber.e(exception)
+                    _state.update { state ->
+                        state.copy(isCreatingMeeting = false)
+                    }
                 }.onSuccess {
                     it.chatHandle?.let { id ->
                         if (state.value.enabledMeetingLinkOption) {

@@ -427,7 +427,11 @@ private fun ScheduleMeetingAppBar(
                     modifier = Modifier
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
-                    IconButton(onClick = { onAcceptClicked() }) {
+                    IconButton(onClick = {
+                        if (!state.isCreatingMeeting) {
+                            onAcceptClicked()
+                        }
+                    }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",

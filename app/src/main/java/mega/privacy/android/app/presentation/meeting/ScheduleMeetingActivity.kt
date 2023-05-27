@@ -60,6 +60,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
 
+    private var materialTimePicker: MaterialTimePicker? = null
+    private var materialDatePicker: MaterialDatePicker<Long>? = null
+
     /**
      * Perform Activity initialization
      */
@@ -107,6 +110,8 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
         addContactLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                viewModel.allowAddParticipantsOption()
+
                 if (result.resultCode == RESULT_OK) {
                     result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                         ?.let { contactsData ->
@@ -165,6 +170,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
      * @param isStart
      */
     private fun showDatePicker(isStart: Boolean) {
+        if (materialTimePicker != null || materialDatePicker != null)
+            return
+
         val currentState = viewModel.state.value
         val currentDate = if (isStart) currentState.startDate else currentState.endDate
         val dateValidator = if (isStart) {
@@ -176,7 +184,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         val milliseconds = currentDate.toInstant().toEpochMilli()
         val selection = milliseconds + TimeZone.getDefault().getOffset(milliseconds)
 
-        MaterialDatePicker.Builder.datePicker()
+        materialDatePicker = MaterialDatePicker.Builder.datePicker()
             .setTheme(R.style.MaterialCalendarTheme)
             .setPositiveButtonText(getString(R.string.general_ok))
             .setNegativeButtonText(getString(R.string.button_cancel))
@@ -188,6 +196,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             )
             .build()
             .apply {
+                addOnDismissListener {
+                    materialDatePicker = null
+                }
                 addOnPositiveButtonClickListener { selection ->
                     val selectedDate =
                         ZonedDateTime.from(
@@ -210,6 +221,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
      * @param isStart
      */
     private fun showTimePicker(isStart: Boolean) {
+        if (materialTimePicker != null || materialDatePicker != null)
+            return
+
         val currentState = viewModel.state.value
         val currentDate = if (isStart) currentState.startDate else currentState.endDate
         val hourFormatter =
@@ -225,7 +239,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         val hourText = hourFormatter.format(currentDate)
         val minuteText = minuteFormatter.format(currentDate)
 
-        MaterialTimePicker.Builder()
+        materialTimePicker = MaterialTimePicker.Builder()
             .setTheme(R.style.MaterialTimerTheme)
             .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
             .setTimeFormat(
@@ -241,6 +255,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
             .build()
             .apply {
+                addOnDismissListener {
+                    materialTimePicker = null
+                }
                 addOnPositiveButtonClickListener {
                     val selectedTime = currentDate.withHour(hour).withMinute(minute)
                     if (isStart) {
