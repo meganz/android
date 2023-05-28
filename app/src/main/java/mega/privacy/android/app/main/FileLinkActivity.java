@@ -696,7 +696,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
      * Checks if there is any name collision before copying the node.
      */
     private void checkCollisionBeforeCopying() {
-        checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
+        composite.add(checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(collision -> {
@@ -711,14 +711,14 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                                 copyNode();
                             }
                         }
-                );
+                ));
     }
 
     /**
      * Copies a node.
      */
     private void copyNode() {
-        legacyCopyNodeUseCase.copy(document, target, null)
+        composite.add(legacyCopyNodeUseCase.copy(document, target, null)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
@@ -733,7 +733,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                                 finish();
                             }
                         }
-                );
+                ));
     }
 
     public void showFile() {

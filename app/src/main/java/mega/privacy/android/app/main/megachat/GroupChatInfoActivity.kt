@@ -35,6 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -326,7 +327,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 if (chatRoom.isPreview || !chatRoom.isActive) {
                     endCallForAllShouldBeVisible = false
                 } else {
-                    val callSubscription = getCallUseCase.isThereACallAndIAmModerator(
+                    getCallUseCase.isThereACallAndIAmModerator(
                         chatRoom.chatId
                     )
                         .subscribeOn(Schedulers.io())
@@ -340,7 +341,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                             }
 
                         }) { error: Throwable -> Timber.e("Error $error") }
-                    composite.add(callSubscription)
+                        .addTo(composite)
                 }
             }
 
@@ -1603,7 +1604,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and and OnChatPresenceLastGreen make the necessary changes
      */
     private fun checkChatChanges() {
-        val chatSubscription = getChatChangesUseCase.get()
+        getChatChangesUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ next: GetChatChangesUseCase.Result? ->
@@ -1631,9 +1632,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     onChatPresenceLastGreen(userHandle, lastGreen)
                 }
             }) { t: Throwable? -> Timber.e(t) }
-
-        composite.add(chatSubscription)
-
+            .addTo(composite)
     }
 
     fun getChatRoom() = megaChatApi.getChatRoom(chatHandle)

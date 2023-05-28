@@ -1137,7 +1137,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
         statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.general_importing));
         statusDialog.show();
 
-        checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, chatId, toHandle)
+        composite.add(checkNameCollisionUseCase.checkMessagesToImport(importMessagesHandles, chatId, toHandle)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -1152,7 +1152,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                         List<MegaNode> nodesWithoutCollision = result.getSecond();
 
                         if (!nodesWithoutCollision.isEmpty()) {
-                            legacyCopyNodeUseCase.copy(nodesWithoutCollision, toHandle)
+                            composite.add(legacyCopyNodeUseCase.copy(nodesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe((copyResult, copyThrowable) -> {
@@ -1166,12 +1166,12 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                                         ? copyRequestMessageMapper.invoke(copyResult)
                                                         : getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
-                                    });
+                                    }));
                         }
                     } else {
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.import_success_error), MEGACHAT_INVALID_HANDLE);
                     }
-                });
+                }));
     }
 
     @Override

@@ -789,7 +789,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             return;
         }
 
-        checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
+        composite.add(checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -809,13 +809,13 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                             PermissionUtils.checkNotificationsPermission(this);
                             String text = getResources().getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
-                            uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
+                            composite.add(uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(() -> showSnackbar(text), Timber::e);
+                                    .subscribe(() -> showSnackbar(text), Timber::e));
                         }
                     }
-                });
+                }));
     }
 
     @Override

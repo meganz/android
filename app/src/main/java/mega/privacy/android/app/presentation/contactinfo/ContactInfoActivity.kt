@@ -37,6 +37,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
@@ -1473,7 +1474,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Receive changes to OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
      */
     private fun checkChatChanges() {
-        val chatSubscription = getChatChangesUseCase.get()
+        getChatChangesUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ next: GetChatChangesUseCase.Result? ->
@@ -1494,6 +1495,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     viewModel.updateLastGreen(userHandle, lastGreen)
                 }
             }) { t: Throwable? -> Timber.e(t) }
-        composite.add(chatSubscription)
+            .addTo(composite)
     }
 }

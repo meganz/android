@@ -107,8 +107,8 @@ import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
@@ -615,7 +615,7 @@ public class ContactFileListActivity extends PasscodeActivity
             return;
         }
 
-        moveNodeUseCase.moveToRubbishBin(handleList, this)
+        composite.add(moveNodeUseCase.moveToRubbishBin(handleList, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -623,7 +623,7 @@ public class ContactFileListActivity extends PasscodeActivity
                         showMovementResult(result, handleList.get(0));
                         showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
                     }
-                });
+                }));
     }
 
     /**
@@ -694,7 +694,7 @@ public class ContactFileListActivity extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
+            composite.add(checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -709,7 +709,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             long[] handlesWithoutCollision = result.getSecond();
 
                             if (handlesWithoutCollision.length > 0) {
-                                legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
+                                composite.add(legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((copyResult, copyThrowable) -> {
@@ -724,10 +724,10 @@ public class ContactFileListActivity extends PasscodeActivity
                                             } else {
                                                 manageCopyMoveException(copyThrowable);
                                             }
-                                        });
+                                        }));
                             }
                         }
-                    });
+                    }));
         } else if (requestCode == REQUEST_CODE_SELECT_FOLDER_TO_MOVE && resultCode == RESULT_OK) {
             if (intent == null) {
                 return;
@@ -749,7 +749,7 @@ public class ContactFileListActivity extends PasscodeActivity
             }
             statusDialog = temp;
 
-            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
+            composite.add(checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -764,7 +764,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             long[] handlesWithoutCollision = result.getSecond();
 
                             if (handlesWithoutCollision.length > 0) {
-                                moveNodeUseCase.move(handlesWithoutCollision, toHandle)
+                                composite.add(moveNodeUseCase.move(handlesWithoutCollision, toHandle)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((moveResult, moveThrowable) -> {
@@ -774,10 +774,10 @@ public class ContactFileListActivity extends PasscodeActivity
                                             } else {
                                                 manageCopyMoveException(moveThrowable);
                                             }
-                                        });
+                                        }));
                             }
                         }
-                    });
+                    }));
         } else if (requestCode == REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
             if (intent == null) {
                 return;
@@ -791,14 +791,14 @@ public class ContactFileListActivity extends PasscodeActivity
                 return;
             }
 
-            filePrepareUseCase.prepareFiles(intent)
+            composite.add(filePrepareUseCase.prepareFiles(intent)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((shareInfo, throwable) -> {
                         if (throwable == null) {
                             onIntentProcessed(shareInfo);
                         }
-                    });
+                    }));
         } else if (requestCode == REQUEST_CODE_GET_FOLDER) {
             getFolder(this, resultCode, intent, parentHandle);
         } else if (requestCode == REQUEST_CODE_GET_FOLDER_CONTENT) {
@@ -816,7 +816,7 @@ public class ContactFileListActivity extends PasscodeActivity
                 long parentHandle = contactFileListFragment.getParentHandle();
                 File file = getTemporalTakePictureFile(this);
                 if (file != null) {
-                    checkNameCollisionUseCase.check(file.getName(), parentHandle)
+                    composite.add(checkNameCollisionUseCase.check(file.getName(), parentHandle)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(handle -> {
@@ -830,13 +830,13 @@ public class ContactFileListActivity extends PasscodeActivity
                                             showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error));
                                         } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                             PermissionUtils.checkNotificationsPermission(this);
-                                            uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
+                                            composite.add(uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe(() -> Timber.d("Upload started"),
-                                                            Timber::e);
+                                                            Timber::e));
                                         }
-                                    });
+                                    }));
                 }
             } else {
                 Timber.w("TAKE_PHOTO_CODE--->ERROR!");
@@ -884,7 +884,7 @@ public class ContactFileListActivity extends PasscodeActivity
             return;
         }
 
-        checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
+        composite.add(checkNameCollisionUseCase.checkShareInfoList(infos, parentNode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -903,13 +903,13 @@ public class ContactFileListActivity extends PasscodeActivity
                         if (!withoutCollisions.isEmpty()) {
                             String text = getResources().getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
-                            uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
+                            composite.add(uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text), Timber::e);
+                                    .subscribe(() -> showSnackbar(SNACKBAR_TYPE, text), Timber::e));
                         }
                     }
-                });
+                }));
     }
 
     @Override
@@ -937,7 +937,7 @@ public class ContactFileListActivity extends PasscodeActivity
     public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
         for (MegaNode node : nodes) {
             if (node.isInShare() && parentHandle == node.getHandle()) {
-                getNodeUseCase.get(parentHandle)
+                composite.add(getNodeUseCase.get(parentHandle)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe((result, throwable) -> {
@@ -946,7 +946,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             } else {
                                 finish();
                             }
-                        });
+                        }));
             } else {
                 updateNodes();
             }

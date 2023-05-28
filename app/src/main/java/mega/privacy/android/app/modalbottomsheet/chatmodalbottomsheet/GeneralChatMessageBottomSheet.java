@@ -39,6 +39,8 @@ import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.R;
@@ -102,6 +104,8 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     private LinearLayout deleteSeparator;
 
     private AlertDialog cannotOpenFileDialog;
+
+    private CompositeDisposable rxSubscriptions = new CompositeDisposable();
 
     @Inject
     GetNodeUseCase getNodeUseCase;
@@ -310,6 +314,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
     @Override
     public void onDestroyView() {
         AlertDialogUtil.dismissAlertDialogIfExists(cannotOpenFileDialog);
+        rxSubscriptions.clear();
         super.onDestroyView();
     }
 
@@ -473,7 +478,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
      */
     private void getNode(MegaChatMessage megaChatMessage) {
         if (megaChatMessage.getUserHandle() == megaChatApi.getMyUserHandle()) {
-            getNodeUseCase.get(message.getMessage().getMegaNodeList().get(0).getHandle())
+            Disposable disposable = getNodeUseCase.get(message.getMessage().getMegaNodeList().get(0).getHandle())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -502,6 +507,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
                         checkSeparatorsVisibility();
                     });
+            rxSubscriptions.add(disposable);
         } else {
             nodeList = megaChatMessage.getMegaNodeList();
             if (nodeList == null || nodeList.size() == 0) {

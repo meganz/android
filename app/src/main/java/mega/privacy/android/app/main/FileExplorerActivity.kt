@@ -26,6 +26,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -1574,6 +1575,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                             manageCopyMoveException(throwable)
                         }
+                        .addTo(composite)
                 }
             } else {
                 uploadInfos.add(info)
@@ -1684,6 +1686,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     Timber.d("finish!!!")
                                     finishAndRemoveTask()
                                 }) { t: Throwable? -> Timber.e(t) }
+                                .addTo(composite)
                         }
                     },
                     { throwable: Throwable ->
@@ -1692,6 +1695,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         Timber.e(throwable)
                     }
                 )
+                .addTo(composite)
         }
     }
 
@@ -1944,6 +1948,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 backToCloud(parentHandle, 1, null)
                 finishAndRemoveTask()
             }) { t: Throwable? -> Timber.e(t) }
+            .addTo(composite)
     }
 
     override fun finishRenameActionWithSuccess(newName: String) {
@@ -2409,6 +2414,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     },
                     { throwable: Throwable -> Timber.e(throwable) }
                 )
+                .addTo(composite)
         } else {
             onIntentProcessed(filePreparedInfos)
         }
@@ -2652,7 +2658,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
      * Receive changes to OnChatPresenceLastGreen and make the necessary changes
      */
     fun checkChatChanges() {
-        val chatSubscription = getChatChangesUseCase.get()
+        getChatChangesUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .filter { result: GetChatChangesUseCase.Result? -> result is GetChatChangesUseCase.Result.OnChatPresenceLastGreen }
@@ -2660,8 +2666,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             .subscribe({ (userHandle, lastGreen): GetChatChangesUseCase.Result.OnChatPresenceLastGreen ->
                 onChatPresenceLastGreen(userHandle, lastGreen)
             }) { t: Throwable? -> Timber.e(t) }
-
-        composite.add(chatSubscription)
+            .addTo(composite)
     }
 
     companion object {

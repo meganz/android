@@ -97,6 +97,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
@@ -2567,6 +2568,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 },
                 { throwable: Throwable -> Timber.e(throwable) }
             )
+            .addTo(composite)
     }
 
     /**
@@ -2656,6 +2658,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             }
+            .addTo(composite)
     }
 
     fun askForAccess() {
@@ -5699,6 +5702,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 },
                 { throwable: Throwable -> Timber.e(throwable) }
             )
+            .addTo(composite)
     }
 
     private fun proceedWithRestoration(nodes: List<MegaNode>) {
@@ -5718,6 +5722,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.e(throwable)
                 }
             )
+            .addTo(composite)
     }
 
     /**
@@ -5832,8 +5837,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                             )
                         },
-                        { throwable: Throwable -> Timber.e(throwable) }
-                    )
+                        { throwable: Throwable -> Timber.e(throwable) })
+                    .addTo(composite)
+
             }
         } else {
             builder.setMessage(resources.getString(R.string.confirmation_delete_from_mega))
@@ -5852,6 +5858,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         },
                         { throwable: Throwable -> Timber.e(throwable) }
                     )
+                    .addTo(composite)
+
             }
         }
         builder.setNegativeButton(R.string.general_cancel, null)
@@ -7362,6 +7370,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         },
                         { throwable: Throwable -> Timber.e(throwable) }
                     )
+                    .addTo(composite)
             }
 
             requestCode == Constants.REQUEST_CODE_GET_FOLDER -> {
@@ -7536,10 +7545,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                             }
                                         }
                                     }
+                                    .addTo(composite)
                             }
                         },
                         { throwable: Throwable -> Timber.e(throwable) }
                     )
+                    .addTo(composite)
             }
 
             requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == Activity.RESULT_OK -> {
@@ -7574,10 +7585,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                             copyResult?.let { showCopyResult(it) }
                                         }
                                     }
+                                    .addTo(composite)
                             }
                         },
                         { throwable: Throwable -> Timber.e(throwable) }
                     )
+                    .addTo(composite)
             }
 
             requestCode == Constants.REQUEST_CODE_REFRESH_API_SERVER && resultCode == Activity.RESULT_OK -> {
@@ -7804,6 +7817,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             .subscribe(
                 { Timber.d("Upload started") },
                 { t: Throwable? -> Timber.e(t) })
+            .addTo(composite)
     }
 
     /**
@@ -8398,6 +8412,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     .subscribe(
                                         { Timber.d("Upload started") },
                                         { t: Throwable? -> Timber.e(t) })
+                                    .addTo(composite)
                             }
                         }
                     }
@@ -8412,6 +8427,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 }
             )
+            .addTo(composite)
     }
 
     private fun requestContactsPermissions(info: ShareInfo?, parentNode: MegaNode?) {
@@ -8572,6 +8588,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     MEGACHAT_INVALID_HANDLE
                 )
             }, { t: Throwable? -> Timber.e(t) })
+            .addTo(composite)
     }
 
     override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {
@@ -9933,6 +9950,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     Timber.e(throwable, "Retry transfer failed.")
                                 }
                             )
+                            .addTo(composite)
                     }
 
                     null -> {
@@ -9950,6 +9968,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     .subscribe(
                         { Timber.d("Transfer retried.") },
                         { t: Throwable? -> Timber.e(t) })
+                    .addTo(composite)
             }
 
             else -> {
@@ -10351,7 +10370,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * Receive changes to OnChatListItemUpdate, OnChatOnlineStatusUpdate and OnChatConnectionStateUpdate and make the necessary changes
      */
     private fun checkChatChanges() {
-        val chatSubscription: Disposable = getChatChangesUseCase.get()
+        getChatChangesUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ next: GetChatChangesUseCase.Result? ->
@@ -10371,7 +10390,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     onChatConnectionStateUpdate(chatId, newState)
                 }
             }, { t: Throwable? -> Timber.e(t) })
-        composite.add(chatSubscription)
+            .addTo(composite)
     }
 
     /**
