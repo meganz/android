@@ -19,6 +19,7 @@ buildscript {
         classpath plugin.paparazzi
         classpath plugin.jfrog
         classpath plugin.junit5
+        classpath plugin.kotlin.gradle
     }
 }
 

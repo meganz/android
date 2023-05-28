@@ -1,0 +1,66 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'mega.privacy.android.analytics'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVerion
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion androidx.versions.compose.compiler.get()
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    compileOptions {
+        // Sets Java compatibility to JavaVersion in Project Root
+        sourceCompatibility rootProject.javaVersion
+        targetCompatibility rootProject.javaVersion
+    }
+
+    kotlin {
+        jvmToolchain(rootProject.jdk as Integer)
+    }
+
+    kotlinOptions {
+        jvmTarget = rootProject.jdk
+        suppressWarnings = shouldSuppressWarnings()
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+
+    lint {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
+
+}
+
+dependencies {
+    lintChecks project(':lint')
+
+    implementation platform(androidx.compose.bom)
+    implementation androidx.bundles.compose.bom
+    implementation lib.kotlin.ktx
+    implementation androidx.appcompat
+
+    testImplementation testlib.junit
+    testImplementation testlib.junit.test.ktx
+    androidTestImplementation testlib.junit.test.ktx
+
+    testImplementation testlib.compose.junit
+    testImplementation testlib.mockito
+    testImplementation testlib.mockito.kotlin
+    testImplementation testlib.mockito.android
+}

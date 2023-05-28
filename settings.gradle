@@ -24,3 +24,4 @@ if (!shouldUsePrebuiltSdk() || isCiBuild()) {
 include ':nocturn'
 include ':liveeventbus-x'
 include ':xray'
+include ':analytics'
