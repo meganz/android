@@ -21,6 +21,7 @@ import mega.privacy.android.app.zippreview.domain.ZipTreeNode
 import mega.privacy.android.app.zippreview.ui.ZipInfoUIO
 import timber.log.Timber
 import java.io.File
+import java.nio.charset.Charset
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -152,7 +153,16 @@ class ZipBrowserViewModel @Inject constructor(
         // Log the zip file path
         crashReporter.log("Path of ZipFile(viewModelInit) is $zipFullPath")
         try {
-            zipFile = ZipFile(zipFullPath)
+            zipFile = try {
+                // Construct ZipFile with UTF-8
+                val zipFile = ZipFile(zipFullPath)
+                // Try reading the Zip File with UTF-8 Charset
+                zipFile.entries().toList()
+                zipFile
+            } catch (e: IllegalArgumentException) {
+                // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for 7-ZIP)
+                ZipFile(zipFullPath, Charset.forName("Cp437"))
+            }
             rootFolderPath = unzipRootPath.split("/").last()
             viewModelScope.launch {
                 zipFileRepository.initZipTreeNode(zipFile)
@@ -210,6 +220,7 @@ class ZipBrowserViewModel @Inject constructor(
                 //If zip folder doesn't exist, unpacked the zip file.
                 unpackedZipFile(zipInfoUIO, position)
             }
+
             StatusItemClicked.OPEN_FILE -> {
                 //If the zip file name is start with ".", it cannot be unzip. So show the alert.
                 if (zipInfoUIO.fileType == FileType.ZIP && zipInfoUIO.name.startsWith(".")) {
@@ -225,6 +236,7 @@ class ZipBrowserViewModel @Inject constructor(
                 currentZipInfo = zipInfoUIO
                 updateZipInfoList(context, zipInfoUIO.path)
             }
+
             StatusItemClicked.ITEM_NOT_EXIST -> {
                 Timber.e("zip entry position $position file not exists")
                 _showAlert.value = true
