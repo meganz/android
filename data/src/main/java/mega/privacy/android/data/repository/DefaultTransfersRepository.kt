@@ -301,4 +301,8 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
         appEventGateway.broadcastTransfersFinished(transfersFinishedState)
+
+    override fun monitorStopTransfersWork() = appEventGateway.monitorStopTransfersWork()
+
+    override suspend fun broadcastStopTransfersWork() = appEventGateway.broadcastStopTransfersWork()
 }

@@ -22,7 +22,6 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
-import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.main.megachat.ChatUploadService
 import mega.privacy.android.app.presentation.extensions.getState
@@ -37,6 +36,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
+import mega.privacy.android.domain.usecase.transfer.BroadcastStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -62,6 +62,7 @@ class TransfersManagement @Inject constructor(
     private val broadcastFailedTransfer: BroadcastFailedTransfer,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    private val broadcastStopTransfersWorkUseCase: BroadcastStopTransfersWorkUseCase,
 ) {
 
     companion object {
@@ -547,7 +548,7 @@ class TransfersManagement @Inject constructor(
         Handler(Looper.getMainLooper()).postDelayed({
             shouldBreakTransfersProcessing = false
             isProcessingTransfers = false
-            LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java).post(true)
+            applicationScope.launch { broadcastStopTransfersWorkUseCase() }
         }, WAIT_TIME_BEFORE_UPDATE)
     }
 

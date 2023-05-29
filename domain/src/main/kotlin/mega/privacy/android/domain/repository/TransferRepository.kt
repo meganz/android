@@ -208,4 +208,14 @@ interface TransferRepository {
      * Broadcasts transfers finished.
      */
     suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState)
+
+    /**
+     * Monitors when transfers management have to stop.
+     */
+    fun monitorStopTransfersWork(): Flow<Boolean>
+
+    /**
+     * Broadcasts when transfers management have to stop.
+     */
+    suspend fun broadcastStopTransfersWork()
 }

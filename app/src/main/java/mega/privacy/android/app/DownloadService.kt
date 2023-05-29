@@ -18,8 +18,6 @@ import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
@@ -30,6 +28,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -37,7 +36,6 @@ import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES
 import mega.privacy.android.app.constants.BroadcastConstants.NUMBER_FILES
-import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.fragments.offline.OfflineFragment
@@ -78,6 +76,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -145,6 +144,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
 
     @Inject
+    lateinit var monitorStopTransfersWorkUseCase: MonitorStopTransfersWorkUseCase
+
+    @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
 
     @Inject
@@ -193,13 +195,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      * Contains the info of a node that to be opened in-app.
      */
     private var autoPlayInfo: AutoPlayInfo? = null
-    private val stopServiceObserver = Observer { finish: Boolean ->
-        if (finish && megaApi.numPendingDownloads == 0) {
-            stopForeground()
-        }
-    }
 
     private var monitorPausedTransfersJob: Job? = null
+    private var monitorStopTransfersWorkJob: Job? = null
 
     @SuppressLint("NewApi")
     override fun onCreate() {
@@ -245,8 +243,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 )
             }
         }
-        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
-            .observeForever(stopServiceObserver)
+
+        monitorStopTransfersWorkJob = applicationScope.launch {
+            monitorStopTransfersWorkUseCase().conflate().collect {
+                @Suppress("DEPRECATION")
+                if (megaApi.numPendingDownloads == 0) stopForeground()
+            }
+        }
     }
 
     private fun setRxSubscription() {
@@ -353,9 +356,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
         rxSubscriptions.clear()
         stopForeground()
-        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
-            .removeObserver(stopServiceObserver)
         monitorPausedTransfersJob?.cancel()
+        monitorStopTransfersWorkJob?.cancel()
         super.onDestroy()
     }
 

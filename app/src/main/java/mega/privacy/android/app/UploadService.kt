@@ -19,9 +19,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -33,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -40,7 +39,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
-import mega.privacy.android.app.constants.EventConstants.EVENT_FINISH_SERVICE_IF_NO_TRANSFERS
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -73,6 +71,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -127,6 +126,9 @@ internal class UploadService : LifecycleService() {
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
 
     @Inject
+    lateinit var monitorStopTransfersWorkUseCase: MonitorStopTransfersWorkUseCase
+
+    @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
 
     @Inject
@@ -179,14 +181,9 @@ internal class UploadService : LifecycleService() {
 
     // the flag to determine the rating dialog is showed for this upload action
     private var isRatingShowed = false
-    private val stopServiceObserver = Observer { finish: Boolean ->
-        @Suppress("DEPRECATION")
-        if (finish && megaApi.numPendingUploads == 0) {
-            stopForeground()
-        }
-    }
 
     private var monitorPausedTransfersJob: Job? = null
+    private var monitorStopTransfersWorkJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -221,8 +218,13 @@ internal class UploadService : LifecycleService() {
             }
         }
 
-        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
-            .observeForever(stopServiceObserver)
+        monitorStopTransfersWorkJob = applicationScope.launch {
+            monitorStopTransfersWorkUseCase().conflate().collect {
+                @Suppress("DEPRECATION")
+                if (megaApi.numPendingUploads == 0) stopForeground()
+            }
+        }
+
         val subscription = getGlobalTransferUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -275,6 +277,7 @@ internal class UploadService : LifecycleService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         Timber.d("onStartCommand")
         canceled = false
         if (intent == null) {
@@ -299,6 +302,7 @@ internal class UploadService : LifecycleService() {
     }
 
     override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
         return null
     }
 
@@ -345,9 +349,8 @@ internal class UploadService : LifecycleService() {
         releaseLocks()
         megaChatApi.saveCurrentState()
         rxSubscriptions.clear()
-        LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
-            .removeObserver(stopServiceObserver)
         monitorPausedTransfersJob?.cancel()
+        monitorStopTransfersWorkJob?.cancel()
         super.onDestroy()
     }
 

@@ -244,4 +244,16 @@ internal interface AppEventGateway {
      * @param chatId [Long] ID of the chat to leave.
      */
     suspend fun broadcastLeaveChat(chatId: Long)
+
+    /**
+     * Monitors when transfers management have to stop.
+     *
+     * @return Flow [Boolean]
+     */
+    fun monitorStopTransfersWork(): Flow<Boolean>
+
+    /**
+     * Broadcasts if transfers management have to stop.
+     */
+    suspend fun broadcastStopTransfersWork()
 }
