@@ -45,9 +45,11 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.model.FullImageDownloadResult
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
@@ -69,10 +71,13 @@ import kotlin.coroutines.resumeWithException
  *
  * @param context Context
  * @param megaApiGateway MegaApiGateway
+ * @param megaChatApiGateway MegaChatApiGateway
  * @param ioDispatcher CoroutineDispatcher
  * @param cacheGateway CacheGateway
  * @param fileManagementPreferencesGateway FileManagementPreferencesGateway
  * @param fileGateway FileGateway
+ * @param cacheFolderGateway CacheFolderGateway
+ * @param imageNodeMapper ImageNodeMapper
  */
 internal class DefaultImageRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -83,6 +88,7 @@ internal class DefaultImageRepository @Inject constructor(
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val fileGateway: FileGateway,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val imageNodeMapper: ImageNodeMapper,
 ) : ImageRepository {
 
     private var thumbnailFolderPath: String? = null
@@ -327,6 +333,71 @@ internal class DefaultImageRepository @Inject constructor(
 
     override fun getFullImagePath(): String =
         cacheFolderGateway.getFullSizeCacheFolder()?.path ?: ""
+
+    override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
+        withContext(ioDispatcher) {
+            getImageNode { megaApiGateway.getMegaNodeByHandle(handle) }
+        }
+
+    override suspend fun getImageNodeForPublicLink(nodeFileLink: String): ImageNode =
+        withContext(ioDispatcher) {
+            getImageNode { getPublicMegaNode(nodeFileLink) }
+        }
+
+    override suspend fun getImageNodeForChatMessage(
+        chatRoomId: Long,
+        chatMessageId: Long,
+    ): ImageNode =
+        withContext(ioDispatcher) {
+            getImageNode { getChatMegaNode(chatRoomId, chatMessageId) }
+        }
+
+    private suspend fun getImageNode(getMegaNode: suspend () -> MegaNode?): ImageNode =
+        withContext(ioDispatcher) {
+            val megaNode = getMegaNode()
+                ?: throw IllegalArgumentException("Node not found")
+            imageNodeMapper(
+                megaNode, megaApiGateway::hasVersion
+            )
+        }
+
+    private suspend fun getPublicMegaNode(nodeFileLink: String) =
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        if (!request.flag) {
+                            continuation.resumeWith(Result.success(request.publicMegaNode))
+                        } else {
+                            continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
+                        }
+                    } else {
+                        continuation.failWithException(error.toException("getPublicMegaNode"))
+                    }
+                }
+            )
+            megaApiGateway.getPublicNode(nodeFileLink, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+
+    private fun getChatMegaNode(chatRoomId: Long, chatMessageId: Long): MegaNode? {
+        val chatMessage = megaChatApiGateway.getMessage(chatRoomId, chatMessageId)
+            ?: megaChatApiGateway.getMessageFromNodeHistory(chatRoomId, chatMessageId)
+
+        val megaNode = chatMessage?.let {
+            val node = chatMessage.megaNodeList.get(0)
+            val chatRoom = megaChatApiGateway.getChatRoom(chatRoomId)
+
+            if (chatRoom?.isPreview == true) {
+                megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken)
+            } else {
+                node
+            }
+        }
+        return megaNode
+    }
 
     private suspend fun getOrGeneratePreview(
         previewFileName: String,
