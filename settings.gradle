@@ -18,6 +18,7 @@ include ':screenshot'
 include ':data'
 include ':lint'
 include ':feature:sync'
+include ':feature:devicecenter'
 if (!shouldUsePrebuiltSdk() || isCiBuild()) {
     include ':sdk'
 }

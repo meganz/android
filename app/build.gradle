@@ -423,6 +423,7 @@ dependencies {
     lintChecks project(':lint')
 
     implementation(project(":feature:sync"))
+    implementation(project(":feature:devicecenter"))
 }
 
 
