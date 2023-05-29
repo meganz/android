@@ -77,8 +77,6 @@ public class ThumbnailUtils {
     public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
     public static Boolean isDeviceMemoryLow = false;
 
-    static HashMap<Long, ThumbnailDownloadListenerThumbnailInterface> listenersThumbnailInterface = new HashMap<>();
-
     public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap, final int pixels) {
         Timber.d("getRoundedRectBitmap");
         final Bitmap result = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -1323,7 +1321,6 @@ public class ThumbnailUtils {
         }
 
         ThumbnailDownloadListenerThumbnailInterface listener = new ThumbnailDownloadListenerThumbnailInterface(context, viewHolder, adapter);
-        listenersThumbnailInterface.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
 
