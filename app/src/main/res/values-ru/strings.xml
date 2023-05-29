@@ -993,20 +993,20 @@
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until turn it off again. -->
     <string name="mute_chatroom_notification_option_forever">Пока я не включу их снова</string>
     <!-- Message when a chat has been silenced, for a specific time, successfully. For example: Chat notifications will be muted for 1 hour -->
-    <string name="success_muting_a_chat_for_specific_time">Уведомления чата будут отключены на %s</string>
+    <string name="success_muting_a_chat_for_specific_time">Уведомления чата станут беззвучными на %s</string>
     <!-- Message to indicate the chat has been muted, until a specific time (24 hours format). Plural, used for any format different to 01:XX, e.g. 14:15 -->
     <plurals name="success_muting_chat_until_specific_time">
-        <item quantity="one">Уведомления чата будут отключены до %1$s</item>
-        <item quantity="few">Уведомления чата будут отключены до %1$s</item>
-        <item quantity="many">Уведомления чата будут отключены до %1$s</item>
-        <item quantity="other">Уведомления чата будут отключены до %1$s</item>
+        <item quantity="one">Уведомления чата будут беззвучными до %1$s</item>
+        <item quantity="few">Уведомления чата будут беззвучными до %1$s</item>
+        <item quantity="many">Уведомления чата будут беззвучными до %1$s</item>
+        <item quantity="other">Уведомления чата будут беззвучными до %1$s</item>
     </plurals>
     <!-- Message to indicate the chat has been muted, until a specific day and time (24 hours format). Plural, used for any format different to 01:XX, e.g. Chat notifications will be muted until tomorrow at 08:00 -->
     <plurals name="success_muting_chat_until_specific_date_and_time">
-        <item quantity="one">Уведомления чата будут отключены до %1$s %2$s</item>
-        <item quantity="few">Уведомления чата будут отключены до %1$s %2$s</item>
-        <item quantity="many">Уведомления чата будут отключены до %1$s %2$s</item>
-        <item quantity="other">Уведомления чата будут отключены до %1$s %2$s</item>
+        <item quantity="one">Уведомления чата будут беззвучными до %1$s %2$s</item>
+        <item quantity="few">Уведомления чата будут беззвучными до %1$s %2$s</item>
+        <item quantity="many">Уведомления чата будут беззвучными до %1$s %2$s</item>
+        <item quantity="other">Уведомления чата будут беззвучными до %1$s %2$s</item>
     </plurals>
     <!-- Message when select the option Do not disturb but the notifications are already muted -->
     <string name="notifications_are_already_muted">Уведомления чата отключены</string>
@@ -5242,4 +5242,26 @@
     <string name="album_import_input_decryption_key_title">Введите ключ дешифрирования</string>
     <!-- Input decryption key dialog description for album import -->
     <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
+    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title"></string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Каждый день</string>
+    <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Каждую неделю</string>
+    <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Каждый месяц</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Другой срок</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
+    <string name="meetings_schedule_meeting_recurrence_daily_label">Ежедневно</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
+    <string name="meetings_schedule_meeting_recurrence_weekly_label">Еженедельно</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_label">Ежемесячно</string>
+    <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
 </resources>
