@@ -77,12 +77,6 @@ public class ThumbnailUtils {
     public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
     public static Boolean isDeviceMemoryLow = false;
 
-    static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<>();
-    static HashMap<Long, ThumbnailDownloadListenerGridBrowser> listenersGrid = new HashMap<>();
-    static HashMap<Long, ThumbnailDownloadListenerExplorer> listenersExplorer = new HashMap<>();
-    static HashMap<Long, ThumbnailDownloadListenerProvider> listenersProvider = new HashMap<>();
-    static HashMap<Long, ThumbnailDownloadListenerTransfer> listenersTransfer = new HashMap<>();
-
     static HashMap<Long, ThumbnailDownloadListenerThumbnailInterface> listenersThumbnailInterface = new HashMap<>();
 
     public static Bitmap getRoundedRectBitmap(Context context, final Bitmap bitmap, final int pixels) {
@@ -640,7 +634,6 @@ public class ThumbnailUtils {
             return thumbnailCache.get(document.getHandle());
         }
         ThumbnailDownloadListenerListBrowser listener = new ThumbnailDownloadListenerListBrowser(context, viewHolder, adapter);
-        listenersList.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
 
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
@@ -655,7 +648,6 @@ public class ThumbnailUtils {
         }
 
         ThumbnailDownloadListenerGridBrowser listener = new ThumbnailDownloadListenerGridBrowser(context, viewHolder, adapter);
-        listenersGrid.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
         Timber.d("Will download here: %s", thumbFile.getAbsolutePath());
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
@@ -670,7 +662,6 @@ public class ThumbnailUtils {
         }
 
         ThumbnailDownloadListenerTransfer listener = new ThumbnailDownloadListenerTransfer(context, viewHolder, adapter);
-        listenersTransfer.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
         Timber.d("Will download here: %s", thumbFile.getAbsolutePath());
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
@@ -685,7 +676,6 @@ public class ThumbnailUtils {
         }
 
         ThumbnailDownloadListenerExplorer listener = new ThumbnailDownloadListenerExplorer(context, viewHolder, adapter);
-        listenersExplorer.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
 
@@ -699,7 +689,6 @@ public class ThumbnailUtils {
         }
 
         ThumbnailDownloadListenerProvider listener = new ThumbnailDownloadListenerProvider(context, viewHolder, adapter);
-        listenersProvider.put(document.getHandle(), listener);
         File thumbFile = new File(getThumbFolder(context), document.getBase64Handle() + ".jpg");
         megaApi.getThumbnail(document, thumbFile.getAbsolutePath(), listener);
 
