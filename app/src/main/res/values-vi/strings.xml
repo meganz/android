@@ -1114,7 +1114,7 @@
     <!-- title of the menu for an uploading message with attachment -->
     <string name="title_message_uploading_options">Đăng tải tệp đính kèm</string>
     <!-- message shown when a chat has no messages -->
-    <string name="no_conversation_history">Không có lịch sử trò chuyện</string>
+    <string name="no_conversation_history">Không có lịch&#160;sử trò&#160;chuyện</string>
     <!-- Text to indicate that one participant is typing or multiple participants are typing at the same time in a chat room. The "%1$s" placeholder is to put the name(s) of the participant(s). The [A][/A] format marks are to put the text in a different color. -->
     <plurals name="user_typing">
         <item quantity="other">%1$s [A]đang viết&#8230;[/A]</item>
@@ -1251,7 +1251,7 @@
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
     <string name="add_to_cloud_node_chat">Lưu vào Ổ Mây</string>
     <!-- Menu option -->
-    <string name="general_view_contacts">Xem sổ liên lạc</string>
+    <string name="general_view_contacts">Xem sổ liên&#160;lạc</string>
     <!-- Menu option -->
     <string name="import_success_error">Lỗi. Chưa thêm vào Ổ Mây được</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
@@ -1471,7 +1471,7 @@
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">Mẫu mã thiết bị</string>
     <!-- mail body -->
-    <string name="settings_feedback_body_android_version">Phiên bản Android</string>
+    <string name="settings_feedback_body_android_version">Phiên&#160;bản Android</string>
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">Tệp văn bản mới</string>
     <!-- Input field description in the create file dialog. -->
@@ -1679,7 +1679,7 @@
     <!-- Title of the section Versions for files -->
     <string name="title_section_versions">Phiên bản lưu</string>
     <!-- Header of the item to show the current version of a file in a list -->
-    <string name="header_current_section_item">Phiên bản hiện tại</string>
+    <string name="header_current_section_item">Phiên&#160;bản hiện&#160;tại</string>
     <!--  -->
     <plurals name="header_previous_section_item">
         <item quantity="other">Lich sử phiên bản của các tệp tin</item>
@@ -1956,7 +1956,7 @@
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">Lỗi phát sinh. Mục không thể khôi phục.</string>
     <!-- menu item from contact section to send a message to a contact -->
-    <string name="context_send_message">Gửi tin nhắn</string>
+    <string name="context_send_message">Gửi tin&#160;nhắn</string>
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Hành động này không thể hoàn tất vì sẽ chiếm dụng toàn bộ không gian lưu trữ của tài khoản. Có muốn tiến hành nâng cấp hạng tài khoản để tiếp tục hay không?</string>
     <!-- Title of the section Archived chats -->
@@ -2518,7 +2518,7 @@
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Việc phát nội dung phương tiện số không thực hiện được khi có cuộc gọi đang diễn ra.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
-    <string name="ongoing_call_messages">Cuộc gọI đang diễn ra</string>
+    <string name="ongoing_call_messages">Cuộc gọi đang diễn ra</string>
     <!-- Title of the layout to join a group call from the chat screen. -->
     <string name="join_call_layout_in_group_call">Chạm vào để tham gia cuộc gọi nhóm.</string>
     <!-- Title of the layout to return to a call -->
@@ -2658,7 +2658,7 @@
     <!-- Alert shown to an admin user of a business account in My Account section -->
     <string name="business_management_alert">Bộ quản lý nhân viên cỉ hỗ trợ trên phiên bản trình duyệt web dành cho máy tính.</string>
     <!-- Title of usage storage details section in My Account -->
-    <string name="usage_storage_details_label">Liệt kê lượng dùng</string>
+    <string name="usage_storage_details_label">Liệt&#160;kê lượng dùng</string>
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Truyền Tải</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
@@ -2690,7 +2690,7 @@
     <!-- Alert shown to the user when they is trying to create an empty group for attach a file -->
     <string name="error_creating_group_and_attaching_file">Xin chọn một hay nhiều tên liên lạc.</string>
     <!-- Label showing the number of contacts attached in a chat conversation, placeholder is the number of contacts -->
-    <string name="contacts_sent">Gửi đến %s tên liên lạc.</string>
+    <string name="contacts_sent">Đã gửi %s tên liên&#160;lạc.</string>
     <!-- Name by default of the folder where the files sent to the chat are stored in the cloud -->
     <string name="my_chat_files_folder">Tệp đã gửi trong chát</string>
     <!-- Error shown when it was not possible to create a folder for any reason -->
@@ -2724,7 +2724,7 @@
     <!-- title of a dialog to edit or remove the nickname -->
     <string name="nickname_title">Biêt danh</string>
     <!-- Text related to verified phone number. Used as title or cell description. -->
-    <string name="phonenumber_title">Số điện thoại</string>
+    <string name="phonenumber_title">Số điện&#160;thoại</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
     <string name="reconnecting_message">Đang kết nối lại</string>
     <!-- Text is displayed while a voice clip is being recorded -->
@@ -2766,7 +2766,7 @@
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Tệp tin không có tìm thấy trong Ổ Mây của bạn.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
-    <string name="over_disk_quota_paywall_header">Hết không gian lưu trữ</string>
+    <string name="over_disk_quota_paywall_header">Không&#160;gian lưu&#160;trữ đầy</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_title">Dữ liệu của bạn có nguy cơ bị xóa!</string>
     <!-- Text of the Over Disk Quota Paywall warning with multiple email notification. Placeholders: 1 user email, 2 and 3 list of email notification dates, 4 number of files, 5 files size (including units) and 6 required PRO plan -->
@@ -2858,13 +2858,13 @@
     <!-- Label indicating there is not available GIFs due to down server -->
     <string name="server_down_giphy">Không có ảnh GIF nào. Xin thử lại sau</string>
     <!-- Label indicating the end of Giphy list. The format placeholders are to showing it in different colors. -->
-    <string name="end_of_results_giphy">[A]Hết[/A] kết quả</string>
+    <string name="end_of_results_giphy">[A]Hết[/A] kết&#160;quả</string>
     <!-- Title of a dialog to confirm the action of resume all transfers -->
     <string name="warning_resume_transfers">Tiếp tục các truyền tải?</string>
     <!-- Option to  resume all transfers -->
     <string name="option_resume_transfers">Tiếp tục các truyền tải</string>
     <!-- Option to  cancel a transfer -->
-    <string name="option_cancel_transfer">Hủy truyền tải</string>
+    <string name="option_cancel_transfer">Hủy truyền&#160;tải</string>
     <!-- Message of a dialog to confirm the action of resume all transfers -->
     <string name="warning_message_resume_transfers">Các truyền tải bị ngừng sẽ được tiếp tục tải lên.</string>
     <!-- Indicator of the progress in a download/upload. Please, don’t remove the place holders: the first one is to set the percentage, the second one is to set the size of the file. Example 33% of 33.3 MB -->
@@ -4568,13 +4568,13 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Cuộc họp bắt&#160;đầu ngay bây&#160;giờ</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">Có muốn chia&#160;sẻ chìa&#160;khóa giải&#160;mã luôn không?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">Chìa&#160;khóa giải&#160;mã đã được xuất ra và sẽ được chia&#160;sẻ với đường liên&#160;kết.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">Chỉ chia&#160;sẻ đường liên&#160;kết</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">Chia&#160;sẻ đường liên&#160;kết và chìa&#160;khóa</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="other">Chia sẻ đường liên kết</item>
@@ -4589,8 +4589,7 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with, will lose access to the album.</item>
-        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+        <item quantity="other">Tất&#160;cả những người bạn đã chia&#160;sẻ các đường liên&#160;kết này sẽ không&#160;thể truy&#160;cập vào album được nữa</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4599,5 +4598,27 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Nhập chìa khóa giải mã</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Để truy&#160;cập vào album, nhập chìa&#160;khóa giải&#160;mã. Nếu bạn không có, hãy liên&#160;hệ với người đã chia&#160;sẻ đường liên&#160;kết cho bạn.</string>
+    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
+    <string name="photos_timeline_filter_remember_preferences">Ghi&#160;nhớ các tùy&#160;chỉnh</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title"></string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Mỗi ngày</string>
+    <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Mỗi tuần</string>
+    <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Mỗi tháng</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Tùy chỉnh</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
+    <string name="meetings_schedule_meeting_recurrence_daily_label">Hằng ngày</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
+    <string name="meetings_schedule_meeting_recurrence_weekly_label">Hằng tuần</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_label">Hàng tháng</string>
+    <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
 </resources>

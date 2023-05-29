@@ -5618,13 +5618,13 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">يبدأ الاجتماع الآن</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">مشاركة مفتاح فك التشفير أيضا؟</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">تم تصدير مفتاح فك التشفير وستتم مشاركته مع الرابط</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">شارك الرابط فقط</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">شارك الرابط مع المفتاح</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="zero">شارك الرابط</item>
@@ -5636,8 +5636,12 @@
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="zero">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="one">تم نسخ الرابط إلى الحافظة</item>
+        <item quantity="two">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="few">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="many">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="other">تم نسخ الروابط إلى الحافظة</item>
     </plurals>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_title">
@@ -5650,8 +5654,12 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with, will lose access to the album.</item>
-        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+        <item quantity="zero">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="one">سيفقد الأشخاص الذين شاركت معهم هذا الرابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="two">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="few">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="many">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
+        <item quantity="other">سيفقد الأشخاص الذين شاركت معهم هذه الروابط إمكانية الوصول إلى الألبومات.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -5665,5 +5673,27 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">أدخل مفتاح فك التشفير</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">للوصول إلى الألبوم ، أدخل مفتاح فك التشفير. إذا لم يكن لديك، فاتصل بالشخص الذي شارك الرابط معك.</string>
+    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
+    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title"></string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">كل يوم</string>
+    <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">كل أسبوع</string>
+    <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">كل شهر</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">تخصيص</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
+    <string name="meetings_schedule_meeting_recurrence_daily_label">يومياً</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
+    <string name="meetings_schedule_meeting_recurrence_weekly_label">أسبوعياً</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_label">شهرياً</string>
+    <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
 </resources>

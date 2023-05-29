@@ -5242,4 +5242,26 @@
     <string name="album_import_input_decryption_key_title">Wprowadź klucz deszyfrujący</string>
     <!-- Input decryption key dialog description for album import -->
     <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
+    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
+    <string name="home_side_menu_device_center_title"></string>
+    <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
+    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Każdego dnia</string>
+    <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Każdego tygodnia</string>
+    <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Każdego miesiąca</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Dowolne</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
+    <string name="meetings_schedule_meeting_recurrence_daily_label">Codziennie</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs weekly -->
+    <string name="meetings_schedule_meeting_recurrence_weekly_label">Tygodniowo</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_label">Miesięcznie</string>
+    <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
+    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
 </resources>
