@@ -133,6 +133,7 @@ android {
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ext.enableCrashlytics = false
             ext.alwaysUpdateBuildId = false
+            buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/Dev\"")
         }
         release {
             //  minifyEnabled false
@@ -143,6 +144,7 @@ android {
                 groups = readTesterGroupList()
                 testers = readTesters()
             }
+            buildConfigField("String", "ENVIRONMENT", "\"\"")
         }
 
         qa {
@@ -150,6 +152,7 @@ android {
             debuggable true
             matchingFallbacks = ['debug', 'release']
             applicationIdSuffix = ".qa"
+            buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
             firebaseAppDistribution {
                 appId = "1:268821755439:android:1e977881202351664e78da"
                 releaseNotes = readReleaseNotes()

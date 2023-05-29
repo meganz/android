@@ -48,7 +48,8 @@ class AppModule {
             e.printStackTrace()
         }
 
-        return MegaApiAndroid(MegaApplication.APP_KEY, BuildConfig.USER_AGENT, path)
+        val userAgent = "${BuildConfig.USER_AGENT} ${BuildConfig.ENVIRONMENT}".trim()
+        return MegaApiAndroid(MegaApplication.APP_KEY, userAgent, path)
     }
 
     @MegaApiFolder
