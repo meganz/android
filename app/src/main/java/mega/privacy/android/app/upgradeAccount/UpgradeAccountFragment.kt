@@ -14,18 +14,25 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.globalmanagement.MyAccountInfo
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.upgradeAccount.view.NewUpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.billing.PaymentUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.billing.BillingEvent
+import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -42,9 +49,11 @@ class UpgradeAccountFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    @Inject
+    lateinit var myAccountInfo: MyAccountInfo
+
     private val upgradeAccountViewModel by activityViewModels<UpgradeAccountViewModel>()
 
-    // define activity view model here, we don't need to create new every time fragment recreate
     private val billingViewModel by activityViewModels<BillingViewModel>()
 
     internal lateinit var upgradeAccountActivity: UpgradeAccountActivity
@@ -64,6 +73,12 @@ class UpgradeAccountFragment : Fragment() {
     ) = ComposeView(requireContext()).apply {
         setContent { UpgradeAccountBody() }
         setupObservers()
+        viewLifecycleOwner.collectFlow(billingViewModel.billingUpdateEvent) {
+            if (it is BillingEvent.OnPurchaseUpdate) {
+                onPurchasesUpdated(it.purchases)
+                billingViewModel.markHandleBillingEvent()
+            }
+        }
     }
 
 
@@ -80,8 +95,18 @@ class UpgradeAccountFragment : Fragment() {
                 NewUpgradeAccountView(
                     state = uiState,
                     onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
-                    onButtonClicked = { onUpgradeClick(it) },
+                    onButtonClicked = {
+                        billingViewModel.startPurchase(
+                            upgradeAccountActivity,
+                            upgradeAccountViewModel.getProductId(
+                                uiState.isMonthlySelected,
+                                convertAccountTypeToInt(uiState.chosenPlan)
+                            )
+                        )
+                    },
                     onTOSClicked = { redirectToTOSPage() },
+                    onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
+                    onChoosingPlanType = upgradeAccountViewModel::onSelectingPlanType
                 )
             } else {
                 UpgradeAccountView(
@@ -166,5 +191,41 @@ class UpgradeAccountFragment : Fragment() {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .setData(Uri.parse(Constants.TERMS_OF_SERVICE_URL))
         )
+    }
+
+    private fun onPurchasesUpdated(
+        purchases: List<MegaPurchase>,
+    ) {
+        if (purchases.isNotEmpty()) {
+            val purchase = purchases.first()
+            //payment may take time to process, we will not give privilege until it has been fully processed
+            val sku = purchase.sku
+            if (billingViewModel.isPurchased(purchase)) {
+                //payment has been processed
+                Timber.d(
+                    "Purchase $sku successfully, subscription type is: "
+                            + PaymentUtils.getSubscriptionType(
+                        sku,
+                        upgradeAccountActivity
+                    ) + ", subscription renewal type is: "
+                            + PaymentUtils.getSubscriptionRenewalType(sku, upgradeAccountActivity)
+                )
+                RatingHandlerImpl(upgradeAccountActivity).updateTransactionFlag(true)
+            } else {
+                //payment is being processed or in unknown state
+                Timber.d("Purchase %s is being processed or in unknown state.", sku)
+            }
+        } else {
+            //down grade case
+            Timber.d("Downgrade, the new subscription takes effect when the old one expires.")
+        }
+
+        if (myAccountInfo.isUpgradeFromAccount()) {
+            val intent = Intent(upgradeAccountActivity, MyAccountActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            upgradeAccountActivity.startActivity(intent)
+        } else {
+            upgradeAccountActivity.onBackPressedDispatcher.onBackPressed()
+        }
     }
 }

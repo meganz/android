@@ -16,6 +16,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
@@ -137,5 +138,42 @@ class UpgradeAccountViewModel @Inject constructor(
 
     fun setShowBuyNewSubscriptionDialog(showBuyNewSubscriptionDialog: Boolean) {
         _state.update { it.copy(showBuyNewSubscriptionDialog = showBuyNewSubscriptionDialog) }
+    }
+
+    /**
+     * On selecting monthly or yearly plan
+     *
+     * @param isMonthly
+     */
+    fun onSelectingMonthlyPlan(isMonthly: Boolean) =
+        _state.update {
+            it.copy(isMonthlySelected = isMonthly)
+        }
+
+    /**
+     * On selecting monthly or yearly plan
+     *
+     * @param chosenPlan
+     */
+    fun onSelectingPlanType(chosenPlan: AccountType) =
+        _state.update {
+            it.copy(chosenPlan = chosenPlan)
+        }
+
+    /**
+     * Get product id for payment
+     *
+     */
+    fun getProductId(isMonthly: Boolean, upgradeType: Int): String {
+        val skus = getSkus(upgradeType)
+        return if (isMonthly) skus.first else skus.second
+    }
+
+    private fun getSkus(upgradeType: Int) = when (upgradeType) {
+        Constants.PRO_I -> Skus.SKU_PRO_I_MONTH to Skus.SKU_PRO_I_YEAR
+        Constants.PRO_II -> Skus.SKU_PRO_II_MONTH to Skus.SKU_PRO_II_YEAR
+        Constants.PRO_III -> Skus.SKU_PRO_III_MONTH to Skus.SKU_PRO_III_YEAR
+        Constants.PRO_LITE -> Skus.SKU_PRO_LITE_MONTH to Skus.SKU_PRO_LITE_YEAR
+        else -> "" to ""
     }
 }

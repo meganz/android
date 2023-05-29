@@ -78,9 +78,11 @@ import java.util.Locale
 @Composable
 fun NewUpgradeAccountView(
     state: UpgradeAccountState,
-    onBackPressed: () -> Unit,
-    onButtonClicked: (AccountType) -> Unit,
-    onTOSClicked: () -> Unit,
+    onBackPressed: () -> Unit = {},
+    onButtonClicked: () -> Unit = {},
+    onTOSClicked: () -> Unit = {},
+    onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit = {},
+    onChoosingPlanType: (chosenPlan: AccountType) -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     var isMonthly by rememberSaveable { mutableStateOf(false) }
@@ -112,7 +114,10 @@ fun NewUpgradeAccountView(
             )
             MonthlyYearlyTabs(
                 isMonthly = isMonthly
-            ) { isMonthly = it }
+            ) {
+                isMonthly = it
+                onChoosingMonthlyYearlyPlan(it)
+            }
             Box(
                 modifier = Modifier
                     .padding(
@@ -144,7 +149,11 @@ fun NewUpgradeAccountView(
                 val isRecommended = remember {
                     derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
                 }
-                if (isRecommended.value && !isPreselectedPlanOnce) chosenPlan = it.accountType
+                if (isRecommended.value && !isPreselectedPlanOnce) {
+                    chosenPlan = it.accountType
+                    onChoosingMonthlyYearlyPlan(isMonthly)
+                    onChoosingPlanType(it.accountType)
+                }
                 SubscriptionPlansInfoRowNew(
                     proPlan = it.accountType,
                     subscription = it,
@@ -153,6 +162,8 @@ fun NewUpgradeAccountView(
                     onPlanClicked = {
                         chosenPlan = it.accountType
                         isPreselectedPlanOnce = true
+                        onChoosingMonthlyYearlyPlan(isMonthly)
+                        onChoosingPlanType(it.accountType)
                     },
                     chosenPlan = chosenPlan,
                     isMonthly = isMonthly,
@@ -163,7 +174,7 @@ fun NewUpgradeAccountView(
 
             if (chosenPlan != AccountType.FREE) {
                 TextButton(
-                    onClick = { onButtonClicked(chosenPlan) },
+                    onClick = { onButtonClicked() },
                     modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth(),
@@ -661,10 +672,7 @@ fun PreviewUpgradeAccountViewNew() {
                     upgradeType = Constants.INVALID_VALUE,
                     currentPayment = null,
                 ),
-            ),
-            onBackPressed = {},
-            onButtonClicked = {},
-            onTOSClicked = {},
+            )
         )
     }
 }

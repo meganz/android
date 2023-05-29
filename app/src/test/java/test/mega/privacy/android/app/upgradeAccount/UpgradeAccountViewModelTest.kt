@@ -330,4 +330,52 @@ class UpgradeAccountViewModelTest {
                 )
             }
         }
+
+    @Test
+    fun `test that isMonthlySelected state is set to True`() =
+        runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.onSelectingMonthlyPlan(true)
+
+            underTest.state.test {
+                val isMonthlySelected = awaitItem().isMonthlySelected
+                assertThat(isMonthlySelected).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isMonthlySelected state is set to False`() =
+        runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.onSelectingMonthlyPlan(false)
+
+            underTest.state.test {
+                val isMonthlySelected = awaitItem().isMonthlySelected
+                assertThat(isMonthlySelected).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that chosenPlan state is set to the plan selected by user`() =
+        runTest {
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            underTest.onSelectingPlanType(AccountType.PRO_II)
+
+            underTest.state.test {
+                val chosenPlan = awaitItem().chosenPlan
+                assertThat(chosenPlan).isEqualTo(AccountType.PRO_II)
+            }
+        }
 }
