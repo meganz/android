@@ -7351,7 +7351,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 Timber.d("Intent action: %s", intent.action)
                 Timber.d("Intent type: %s", intent.type)
-                intent.action = Intent.ACTION_GET_CONTENT
+                intent.action = Intent.ACTION_OPEN_DOCUMENT
                 processFileDialog = showProcessFileDialog(this, intent)
                 filePrepareUseCase.prepareFiles(intent)
                     .subscribeOn(Schedulers.io())
