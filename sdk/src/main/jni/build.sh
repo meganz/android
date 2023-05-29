@@ -82,19 +82,19 @@ SQLITE_DOWNLOAD_URL=https://www.sqlite.org/${SQLITE_YEAR}/${SQLITE_SOURCE_FILE}
 SQLITE_SHA1="350fa5ccedc70f4979d7f954fba9525542809ba2"
 
 CURL=curl
-CURL_VERSION=7.67.0
-C_ARES_VERSION=1.15.0
+CURL_VERSION=8.1.1
+C_ARES_VERSION=1.19.1
 CURL_EXTRA="--disable-dict --disable-file --disable-ftp --disable-gopher --disable-imap --disable-ldap --disable-ldaps --disable-mime --disable-netrc --disable-pop3 --disable-proxy --disable-rtsp --disable-smb --disable-smtp --disable-telnet --disable-tftp --disable-manual"
 CURL_SOURCE_FILE=curl-${CURL_VERSION}.tar.gz
 CURL_SOURCE_FOLDER=curl-${CURL_VERSION}
 CURL_DOWNLOAD_URL=http://curl.haxx.se/download/${CURL_SOURCE_FILE}
-CURL_SHA1="a91652f1eaa810866dce55b2d177c5b20f4aa7a7"
+CURL_SHA1="5ff2ecaa4a68ecc06434644ce76d9837e99e7d1d"
 
 ARES_SOURCE_FILE=c-ares-${C_ARES_VERSION}.tar.gz
 ARES_SOURCE_FOLDER=c-ares-${C_ARES_VERSION}
 ARES_CONFIGURED=${CURL}/${ARES_SOURCE_FOLDER}/Makefile.inc
 ARES_DOWNLOAD_URL=http://c-ares.haxx.se/download/${ARES_SOURCE_FILE}
-ARES_SHA1="74a50c02b7f051c4fb66c0f60f187350f196d908"
+ARES_SHA1="99566278e4ed4b261891aa62c8b88227bf1a2823"
 
 CRASHLYTICS=crashlytics
 CRASHLYTICS_DOWNLOAD_URL=https://raw.githubusercontent.com/firebase/firebase-android-sdk/master/firebase-crashlytics-ndk/src/main/jni/libcrashlytics/include/crashlytics/external/crashlytics.h
@@ -554,8 +554,8 @@ if [ ! -f ${CURL}/${CURL_SOURCE_FILE}.ready ]; then
     ln -sf ${ARES_SOURCE_FOLDER} ${CURL}/ares
 
     echo "* Patching c-ares to include crashlytics"
-    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
-        patch -p0 ${CURL}/ares/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
+    if ! patch -R -p0 -s -f --dry-run ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}; then
+        patch -p0 ${CURL}/ares/src/lib/ares_android.c < ${CURL}/ares_android_c.patch &>> ${LOG_FILE}
     fi
 
     for ABI in ${BUILD_ARCHS}; do

@@ -6,7 +6,7 @@ index bf77131..6f834ce 100644
  #include "ares_android.h"
  #include "ares_private.h"
  
-+#include "../../mega/sdk/third_party/crashlyticsC.h"
++#include "../../../mega/sdk/third_party/crashlyticsC.h"
 +
  static JavaVM *android_jvm = NULL;
  static jobject android_connectivity_manager = NULL;
