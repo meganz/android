@@ -80,7 +80,6 @@ import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -120,9 +119,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @Inject
     @MegaApiFolder
     lateinit var megaApiFolder: MegaApiAndroid
-
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
 
     @IoDispatcher
     @Inject
@@ -345,7 +341,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         Timber.d("onDestroy")
         releaseLocks()
         megaApi.removeRequestListener(this)
-        megaChatApi.saveCurrentState()
         // remove all the generated folders in cache folder on SD card.
         val fs = externalCacheDirs
         if (fs.size > 1 && fs[1] != null) {

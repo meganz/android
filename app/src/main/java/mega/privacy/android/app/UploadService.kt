@@ -75,7 +75,6 @@ import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -113,12 +112,6 @@ internal class UploadService : LifecycleService() {
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
-
-    /**
-     * MEGAchat API
-     */
-    @Inject
-    lateinit var megaChatApi: MegaChatApiAndroid
 
     /**
      * Monitor paused transfers.
@@ -352,7 +345,6 @@ internal class UploadService : LifecycleService() {
     override fun onDestroy() {
         Timber.d("onDestroy")
         releaseLocks()
-        megaChatApi.saveCurrentState()
         rxSubscriptions.clear()
         monitorPausedTransfersJob?.cancel()
         monitorStopTransfersWorkJob?.cancel()

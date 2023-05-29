@@ -294,7 +294,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             Timber.e(ex)
         }
         megaApi.removeRequestListener(this)
-        megaChatApi.saveCurrentState()
         rxSubscriptions.clear()
         super.onDestroy()
     }
