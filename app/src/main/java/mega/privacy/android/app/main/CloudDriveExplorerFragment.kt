@@ -21,8 +21,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -46,6 +50,7 @@ import mega.privacy.android.app.utils.Util.isScreenInPortrait
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
@@ -80,6 +85,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    @IoDispatcher
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     private val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
     private val fileExplorerViewModel by activityViewModels<FileExplorerViewModel>()
@@ -189,7 +198,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                     activity.hideTabs(false, CLOUD_FRAGMENT)
                     activity.clearQuerySearch()
                     initOriginalData()
-                    updateNodesByAdapter(originalData)
                 }
             }
             clearSelections()
@@ -236,9 +244,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         savedInstanceState: Bundle?,
     ): View {
         Timber.d("onCreateView $this")
-        binding = FragmentFileexplorerlistBinding.inflate(LayoutInflater.from(requireContext()),
+        binding = FragmentFileexplorerlistBinding.inflate(
+            LayoutInflater.from(requireContext()),
             container,
-            false)
+            false
+        )
 
         binding.actionText.setOnClickListener { buttonClicked() }
         binding.cancelText.setOnClickListener {
@@ -280,14 +290,16 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
         }
 
-        adapter = MegaExplorerAdapter(context = requireActivity(),
+        adapter = MegaExplorerAdapter(
+            context = requireActivity(),
             fragment = this,
             nodes = nodes,
             parentHandle = parentHandle,
             recyclerView = recyclerView,
             selectFile = selectFile,
             sortByViewModel = sortByHeaderViewModel,
-            megaApi = megaApi)
+            megaApi = megaApi
+        )
 
         gridLayoutManager?.let {
             it.spanSizeLookup = adapter.getSpanSizeLookup(it.spanCount)
@@ -345,20 +357,22 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
                     activateButton(modeCloud == FileExplorerActivity.COPY || parentNode == null || parentNode.handle != parentHandle)
                 }
             }
+
             FileExplorerActivity.UPLOAD -> binding.actionText.text =
                 getString(R.string.context_upload)
+
             FileExplorerActivity.IMPORT -> binding.actionText.text =
                 getString(R.string.add_to_cloud)
+
             FileExplorerActivity.SAVE -> binding.actionText.text = getString(R.string.save_action)
             FileExplorerActivity.SELECT -> {
                 binding.optionsExplorerLayout.isVisible = false
                 activateButton(shouldShowOptionsBar(megaApi.getNodeByHandle(parentHandle)))
                 binding.actionText.text = getString(R.string.general_select)
             }
+
             else -> binding.actionText.text = getString(R.string.general_select)
         }
-
-        updateNodesByAdapter(originalData)
 
         (requireActivity() as FileExplorerActivity).let {
             if (it.shouldRestartSearch) {
@@ -372,8 +386,10 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         emptyRootText =
             formatEmptyScreenText(requireContext(), getString(R.string.context_empty_cloud_drive))
-        emptyGeneralText = formatEmptyScreenText(requireContext(),
-            getString(R.string.file_browser_empty_folder_new))
+        emptyGeneralText = formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.file_browser_empty_folder_new)
+        )
         updateEmptyScreen()
 
         with(sortByHeaderViewModel) {
@@ -414,27 +430,32 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             binding.fileListViewBrowser.isVisible = isList
             binding.fileGridViewBrowser.isVisible = !isList
             initOriginalData()
-            updateNodesByAdapter(originalData)
         }
 
     /**
      * Original data is initialized
      */
-    private fun initOriginalData() {
-        megaApi.getNodeByHandle(parentHandle)?.let { chosenNode ->
-            if (chosenNode.type != MegaNode.TYPE_ROOT) {
-                originalData.clear()
-                originalData.addAll(megaApi.getChildren(chosenNode, order))
+    private fun initOriginalData() =
+        lifecycleScope.launch {
+            val chosenNode = withContext(ioDispatcher) { megaApi.getNodeByHandle(parentHandle) }
+            ensureActive()
+            if (chosenNode != null && chosenNode.type != MegaNode.TYPE_ROOT) {
+                updateChildNodes(chosenNode)
                 Timber.d("chosenNode is: ${chosenNode.name}")
-                return
+            } else {
+                megaApi.rootNode?.let { rootNode ->
+                    setParentHandle(rootNode.handle)
+                    updateChildNodes(rootNode)
+                }
             }
         }
 
-        megaApi.rootNode?.let { rootNode ->
-            setParentHandle(rootNode.handle)
-            originalData.clear()
-            originalData.addAll(megaApi.getChildren(rootNode, order))
-        }
+    private suspend fun updateChildNodes(node: MegaNode) {
+        val childNodes = withContext(ioDispatcher) { megaApi.getChildren(node, order) }
+        setParentHandle(node.handle)
+        originalData.clear()
+        originalData.addAll(childNodes)
+        updateNodesByAdapter(childNodes)
     }
 
     /**
@@ -475,9 +496,11 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             } else {
                 emptyGeneralText
             }
-            ColorUtils.setImageViewAlphaIfDark(requireContext(),
+            ColorUtils.setImageViewAlphaIfDark(
+                requireContext(),
                 binding.fileListEmptyImage,
-                DARK_IMAGE_ALPHA)
+                DARK_IMAGE_ALPHA
+            )
         }
     }
 
@@ -768,11 +791,15 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
     fun orderNodes(order: Int) {
         this.order = order
         originalData.clear()
-        originalData.addAll(megaApi.getChildren(if (parentHandle == INVALID_HANDLE) {
-            megaApi.rootNode
-        } else {
-            megaApi.getNodeByHandle(parentHandle)
-        }, order))
+        originalData.addAll(
+            megaApi.getChildren(
+                if (parentHandle == INVALID_HANDLE) {
+                    megaApi.rootNode
+                } else {
+                    megaApi.getNodeByHandle(parentHandle)
+                }, order
+            )
+        )
         updateNodesByAdapter(originalData)
     }
 
@@ -800,11 +827,13 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             searchCancelToken = initNewSearch()
             searchCancelToken?.let {
                 disposable?.dispose()
-                disposable = searchNodesUseCase.get(query = searchString,
+                disposable = searchNodesUseCase.get(
+                    query = searchString,
                     parentHandleSearch = INVALID_HANDLE,
                     parentHandle = parentHandle,
                     searchType = TYPE_CLOUD_EXPLORER,
-                    megaCancelToken = it)
+                    megaCancelToken = it
+                )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ searchedNodes ->
@@ -867,7 +896,6 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         }
         if (shouldResetNodes) {
             initOriginalData()
-            updateNodesByAdapter(nodes)
         }
     }
 
