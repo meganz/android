@@ -873,7 +873,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     }
 
     private fun checkFragmentScroll(position: Int) =
-        (mTabsAdapterExplorer?.getFragment(position) as CheckScrollInterface).checkScroll()
+        mTabsAdapterExplorer?.getFragment(position)?.let {
+            (it as CheckScrollInterface).checkScroll()
+        }
 
 
     /**
