@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
@@ -57,10 +58,7 @@ fun GenericTextField(
     modifier: Modifier = Modifier,
     text: String,
     errorText: String? = null,
-) = Column(modifier = modifier) {
-    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-    val isError = errorText != null
-    val colors = TextFieldDefaults.textFieldColors(
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(
         textColor = MaterialTheme.colors.onPrimary,
         backgroundColor = Color.Transparent,
         cursorColor = MaterialTheme.colors.secondary,
@@ -68,7 +66,11 @@ fun GenericTextField(
         errorIndicatorColor = MaterialTheme.colors.error,
         focusedIndicatorColor = MaterialTheme.colors.secondary,
         unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
-    )
+    ),
+    singleLine: Boolean = true
+) = Column(modifier = modifier) {
+    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    val isError = errorText != null
     val customTextSelectionColors = TextSelectionColors(
         handleColor = MaterialTheme.colors.secondary,
         backgroundColor = MaterialTheme.colors.secondary
@@ -90,13 +92,13 @@ fun GenericTextField(
             ),
             keyboardActions = keyboardActions,
             interactionSource = interactionSource,
-            singleLine = true,
+            singleLine = singleLine,
         ) {
             TextFieldDefaults.TextFieldDecorationBox(
                 value = text,
                 innerTextField = it,
                 enabled = true,
-                singleLine = true,
+                singleLine = singleLine,
                 interactionSource = interactionSource,
                 visualTransformation = VisualTransformation.None,
                 isError = isError,
