@@ -237,6 +237,7 @@ dependencies {
     debugImplementation project(':xray')
     qaImplementation project(':screenshot')
     implementation project(':liveeventbus-x')
+    implementation project(':analytics')
 
     // Jetbrains
     implementation lib.anko.commons

@@ -39,9 +39,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.analytics.event.PhotosScreenView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -84,10 +87,12 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getNotification
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.analytics.TrackScreenViewUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
@@ -134,6 +139,9 @@ class PhotosFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
+
+    @Inject
+    lateinit var trackScreenViewUseCase: TrackScreenViewUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,6 +207,15 @@ class PhotosFragment : Fragment() {
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
+        lifecycleScope.launch {
+            Firebase.crashlytics.log("Screen: ${PhotosScreenView.name}")
+            trackScreenViewUseCase(
+                ScreenViewEventIdentifier(
+                    name = PhotosScreenView.name,
+                    uniqueIdentifier = PhotosScreenView.uniqueIdentifier
+                )
+            )
+        }
         super.onResume()
     }
 
@@ -224,11 +241,13 @@ class PhotosFragment : Fragment() {
                                 TimeBarTab.All -> {
                                     photosViewModel.setMenuShowing(true)
                                 }
+
                                 else -> {
                                     photosViewModel.setMenuShowing(false)
                                 }
                             }
                         }
+
                         PhotosTab.Albums -> {
                             photosViewModel.setMenuShowing(false)
                             if (timelineViewModel.state.value.enableCameraUploadPageShowing) {
@@ -341,6 +360,7 @@ class PhotosFragment : Fragment() {
             TimeBarTab.All -> {
                 photosViewModel.setMenuShowing(true)
             }
+
             else -> {
                 photosViewModel.setMenuShowing(false)
             }
@@ -441,14 +461,17 @@ class PhotosFragment : Fragment() {
                 timelineViewModel.zoomIn()
                 true
             }
+
             R.id.action_zoom_out -> { // -
                 timelineViewModel.zoomOut()
                 true
             }
+
             R.id.action_photos_filter -> {
                 openFilterFragment()
                 true
             }
+
             R.id.action_photos_sortby -> {
                 timelineViewModel.showingSortByDialog(true)
                 showSortByDialog(
@@ -464,11 +487,14 @@ class PhotosFragment : Fragment() {
                 )
                 true
             }
+
             R.id.action_import -> {
-                val intent = AlbumScreenWrapperActivity.createAlbumImportDeeplinkScreen(requireContext())
+                val intent =
+                    AlbumScreenWrapperActivity.createAlbumImportDeeplinkScreen(requireContext())
                 startActivity(intent)
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -477,7 +503,8 @@ class PhotosFragment : Fragment() {
         timelineViewModel.updateFilterState(
             showFilterDialog = true,
             scrollStartIndex = viewComposeCoordinator.lazyGridState?.firstVisibleItemIndex ?: 0,
-            scrollStartOffset = viewComposeCoordinator.lazyGridState?.firstVisibleItemScrollOffset ?: 0,
+            scrollStartOffset = viewComposeCoordinator.lazyGridState?.firstVisibleItemScrollOffset
+                ?: 0,
         )
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }

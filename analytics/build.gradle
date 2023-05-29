@@ -50,6 +50,9 @@ android {
 dependencies {
     lintChecks project(':lint')
 
+    implementation project(':domain')
+
+    implementation lib.javax.inject
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
     implementation lib.kotlin.ktx
