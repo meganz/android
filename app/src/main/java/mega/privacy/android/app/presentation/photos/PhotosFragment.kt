@@ -44,6 +44,7 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.PhotosScreenView
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -87,12 +88,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getNotification
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.analytics.TrackScreenViewUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
@@ -139,9 +138,6 @@ class PhotosFragment : Fragment() {
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
-    @Inject
-    lateinit var trackScreenViewUseCase: TrackScreenViewUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,15 +203,8 @@ class PhotosFragment : Fragment() {
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
-        lifecycleScope.launch {
-            Firebase.crashlytics.log("Screen: ${PhotosScreenView.name}")
-            trackScreenViewUseCase(
-                ScreenViewEventIdentifier(
-                    name = PhotosScreenView.name,
-                    uniqueIdentifier = PhotosScreenView.uniqueIdentifier
-                )
-            )
-        }
+        Analytics.tracker.trackScreenView(PhotosScreenView)
+        Firebase.crashlytics.log("Screen: ${PhotosScreenView.name}")
         super.onResume()
     }
 

@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -53,6 +54,10 @@ dependencies {
     implementation project(':domain')
 
     implementation lib.javax.inject
+    kapt google.hilt.android.compiler
+    implementation google.hilt.core
+    implementation google.hilt.android
+
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
     implementation lib.kotlin.ktx
