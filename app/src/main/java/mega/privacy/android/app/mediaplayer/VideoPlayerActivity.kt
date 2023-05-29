@@ -315,25 +315,30 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
+    private val rotationContentObserver by lazy(LazyThreadSafetyMode.NONE) {
+        object : ContentObserver(Handler(mainLooper)) {
+            override fun onChange(selfChange: Boolean) {
+                val rotationMode = Settings.System.getInt(
+                    contentResolver,
+                    ACCELEROMETER_ROTATION,
+                    SCREEN_BRIGHTNESS_MODE_MANUAL
+                )
+                requestedOrientation =
+                    if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                        SCREEN_ORIENTATION_SENSOR
+                    } else {
+                        currentOrientation
+                    }
+            }
+        }
+    }
+
     private fun observeRotationSettingsChange() {
         contentResolver.registerContentObserver(
             Settings.System.getUriFor(ACCELEROMETER_ROTATION),
             true,
-            object : ContentObserver(Handler(mainLooper)) {
-                override fun onChange(selfChange: Boolean) {
-                    val rotationMode = Settings.System.getInt(
-                        contentResolver,
-                        ACCELEROMETER_ROTATION,
-                        SCREEN_BRIGHTNESS_MODE_MANUAL
-                    )
-                    requestedOrientation =
-                        if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                            SCREEN_ORIENTATION_SENSOR
-                        } else {
-                            currentOrientation
-                        }
-                }
-            })
+            rotationContentObserver
+        )
     }
 
     private fun showNotAllowPlayAlert() {
@@ -379,6 +384,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     override fun onDestroy() {
         super.onDestroy()
 
+        contentResolver.unregisterContentObserver(rotationContentObserver)
         if (isFinishing) {
             serviceGateway?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
