@@ -603,15 +603,6 @@ interface CameraUploadRepository {
     suspend fun stopCameraUploadSyncHeartbeatWorkers()
 
     /**
-     * number of pending uploads
-     */
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form.",
-    )
-    fun getNumberOfPendingUploads(): Int
-
-    /**
      * compress videos
      * @param records list of [SyncRecord]
      * @return flow of [VideoCompressionState]

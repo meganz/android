@@ -617,12 +617,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workerGateway.cancelCameraUploadAndHeartbeatWorkRequest()
     }
 
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override fun getNumberOfPendingUploads() = megaApiGateway.numberOfPendingUploads
-
     override fun compressVideos(
         root: String,
         quality: VideoQuality,

@@ -68,6 +68,7 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.GetNumberOfPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
@@ -148,6 +149,9 @@ internal class UploadService : LifecycleService() {
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var getNumberOfPendingUploadsUseCase: GetNumberOfPendingUploadsUseCase
+
     private val intentFlow = MutableSharedFlow<Intent>()
 
     private var isForeground = false
@@ -214,8 +218,9 @@ internal class UploadService : LifecycleService() {
 
         monitorStopTransfersWorkJob = applicationScope.launch {
             monitorStopTransfersWorkUseCase().conflate().collect {
-                @Suppress("DEPRECATION")
-                if (megaApi.numPendingUploads == 0) stopForeground()
+                applicationScope.launch {
+                    if (getNumberOfPendingUploadsUseCase() == 0) stopForeground()
+                }
             }
         }
 
@@ -330,13 +335,14 @@ internal class UploadService : LifecycleService() {
                 )
             )
         } else {
+            @Suppress("DEPRECATION")
             createInitialServiceNotification(Notification.Builder(this))
         }
     }
 
     private fun stopForeground() {
         isForeground = false
-        stopForeground(true)
+        stopForeground(STOP_FOREGROUND_REMOVE)
         notificationManager?.cancel(Constants.NOTIFICATION_UPLOAD)
         notificationManager?.cancel(Constants.NOTIFICATION_UPLOAD_FOLDER)
         stopSelf()
@@ -387,7 +393,7 @@ internal class UploadService : LifecycleService() {
                     uploadCount = mapProgressFileTransfers.size
                     if (uploadCount > 0) {
                         isForeground = false
-                        stopForeground(true)
+                        stopForeground(STOP_FOREGROUND_REMOVE)
                         notificationManager?.cancel(Constants.NOTIFICATION_UPLOAD)
                     }
                 }
@@ -490,10 +496,12 @@ internal class UploadService : LifecycleService() {
                 sendUploadFinishBroadcast()
             }
         }
-        @Suppress("DEPRECATION")
-        if (megaApi.numPendingUploads <= 0) {
-            Timber.d("Reset total uploads")
-            megaApi.resetTotalUploads()
+        applicationScope.launch {
+            if (getNumberOfPendingUploadsUseCase() <= 0) {
+                Timber.d("Reset total uploads")
+                @Suppress("DEPRECATION")
+                megaApi.resetTotalUploads()
+            }
         }
         resetUploadNumbers()
         Timber.d("Stopping service!")
@@ -647,7 +655,7 @@ internal class UploadService : LifecycleService() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val notification: Notification? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notification: Notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 Constants.NOTIFICATION_CHANNEL_UPLOAD_ID,
                 Constants.NOTIFICATION_CHANNEL_UPLOAD_NAME,
@@ -834,9 +842,10 @@ internal class UploadService : LifecycleService() {
                     }
                 }
                 transfer.appData?.let {
-                    @Suppress("Deprecation")
-                    if (megaApi.numPendingUploads == 0) {
-                        onQueueComplete(false)
+                    applicationScope.launch {
+                        if (getNumberOfPendingUploadsUseCase() == 0) {
+                            onQueueComplete(false)
+                        }
                     }
                     return@fromCallable null
                 }
@@ -1176,7 +1185,7 @@ internal class UploadService : LifecycleService() {
                 )
             }
         } else {
-            notificationBuilderCompat?.let { builder ->
+            notificationBuilderCompat.let { builder ->
                 builder
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setContentIntent(

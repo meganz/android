@@ -74,7 +74,6 @@ import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
-import mega.privacy.android.domain.usecase.GetNumberOfPendingUploads
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
@@ -330,14 +329,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideCreateCameraUploadFolder(fileSystemRepository: FileSystemRepository): CreateCameraUploadFolder =
             CreateCameraUploadFolder(fileSystemRepository::createFolder)
-
-        /**
-         * Provide the [GetNumberOfPendingUploads] implementation
-         */
-        @Provides
-        @Suppress("DEPRECATION")
-        fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
-            GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
     }
 
     /**
