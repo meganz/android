@@ -11,7 +11,6 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
-import com.android.billingclient.api.BillingFlowParams.ProrationMode
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ProductDetails
@@ -135,8 +134,8 @@ internal class BillingFacade @Inject constructor(
         Timber.d("oldSku is:%s, new sku is:%s", oldSku, skuDetails)
         Timber.d("Obfuscated account id is:%s", obfuscatedAccountId)
         //if user is upgrading, it take effect immediately otherwise wait until current plan expired
-        val prorationMode =
-            if (MegaPurchase(skuDetails.sku).level > MegaPurchase(oldSku).level) ProrationMode.IMMEDIATE_WITH_TIME_PRORATION else ProrationMode.DEFERRED
+        val replacementMode =
+            if (MegaPurchase(skuDetails.sku).level > MegaPurchase(oldSku).level) SubscriptionUpdateParams.ReplacementMode.WITH_TIME_PRORATION else SubscriptionUpdateParams.ReplacementMode.DEFERRED
         val productDetails: ProductDetails =
             productDetailsListCache.get().orEmpty().find { it.productId == productId }
                 ?: throw ProductNotFoundException()
@@ -157,7 +156,7 @@ internal class BillingFacade @Inject constructor(
             if (oldSku != null && purchaseToken != null) {
                 val builder =
                     SubscriptionUpdateParams.newBuilder()
-                        .setReplaceProrationMode(prorationMode)
+                        .setSubscriptionReplacementMode(replacementMode)
                         .setOldPurchaseToken(purchaseToken)
                 purchaseParamsBuilder.setSubscriptionUpdateParams(builder.build())
             }
