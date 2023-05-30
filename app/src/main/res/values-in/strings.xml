@@ -4504,9 +4504,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Nama rapat wajib diisi</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Masukan hingga 30&#160;karakter</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Masukan hingga 3.000&#160;karakter</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Rapat dijadwalkan</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4554,7 +4554,7 @@
         <item quantity="other">tidak dapat hapus selamanya %1$d barang</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Masukan waktu</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Undangan rapat</string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -4568,21 +4568,20 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Rapat dimulai sekarang</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">Bagikan kunci dekripsi juga?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">Kunci dekripsi telah diekspor dan akan dibagikan dengan tautan.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">Bagikan tautan saja</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">Bagikan tautan dan kunci</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="other">Bagikan link</item>
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="other">Tautan disalin ke papan klip</item>
     </plurals>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_title">
@@ -4590,8 +4589,7 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with, will lose access to the album.</item>
-        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+        <item quantity="other">Orang yang anda bagikan tautan ini akan kehilangan akses ke album.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4600,19 +4598,19 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Masukkan kunci dekripsi</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Untuk mengakses album, masukkan kunci dekripsi. Jika anda tidak memilikinya, hubungi orang yang membagikan tautan tersebut dengan anda.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">Ingat preferensi</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
     <string name="device_center_list_of_devices_toolbar_title"></string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Every day</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Setiap hari</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Every week</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Setiap minggu</string>
     <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Every month</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Setiap bulan</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Kustom</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
