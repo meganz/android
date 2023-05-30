@@ -11,7 +11,6 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import org.mockito.kotlin.mock
@@ -28,7 +27,6 @@ object TestWrapperModule {
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
-    val timeWrapper = mock<TimeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
 
     @Provides
@@ -48,9 +46,6 @@ object TestWrapperModule {
 
     @Provides
     fun provideFetchNodeWrapper(): FetchNodeWrapper = fetchNodeWrapper
-
-    @Provides
-    fun provideTimeWrapper(): TimeWrapper = timeWrapper
 
     @Provides
     fun provideAvatarWrapper(): AvatarWrapper = avatarWrapper

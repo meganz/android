@@ -706,7 +706,13 @@ class DefaultContactsRepositoryTest {
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedNewFirstName)
             }
-            whenever(megaApiGateway.setUserAttribute(any(), any(), any())).thenAnswer {
+            whenever(
+                megaApiGateway.setUserAttribute(
+                    any(),
+                    anyString(),
+                    any()
+                )
+            ).thenAnswer {
                 ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     api = mock(), request = request, error = success
                 )
@@ -728,7 +734,13 @@ class DefaultContactsRepositoryTest {
             val request = mock<MegaRequest> {
                 on { text }.thenReturn(expectedNewLastName)
             }
-            whenever(megaApiGateway.setUserAttribute(any(), any(), any())).thenAnswer {
+            whenever(
+                megaApiGateway.setUserAttribute(
+                    any(),
+                    anyString(),
+                    any()
+                )
+            ).thenAnswer {
                 ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     api = mock(), request = request, error = success
                 )

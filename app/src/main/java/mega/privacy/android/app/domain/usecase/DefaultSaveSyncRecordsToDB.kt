@@ -2,11 +2,11 @@ package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.FileNameExists
+import mega.privacy.android.domain.usecase.GetDeviceCurrentNanoTimeUseCase
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -28,7 +28,7 @@ import javax.inject.Inject
  * @property getChildNodeUseCase [GetChildNodeUseCase]
  * @property fileNameExists [FileNameExists]
  * @property saveSyncRecord [SaveSyncRecord]
- * @property timeWrapper [TimeWrapper]
+ * @property getDeviceCurrentNanoTimeUseCase [GetDeviceCurrentNanoTimeUseCase]
  */
 class DefaultSaveSyncRecordsToDB @Inject constructor(
     private val getSyncRecordByFingerprint: GetSyncRecordByFingerprint,
@@ -37,7 +37,7 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
     private val getChildNodeUseCase: GetChildNodeUseCase,
     private val fileNameExists: FileNameExists,
     private val saveSyncRecord: SaveSyncRecord,
-    private val timeWrapper: TimeWrapper,
+    private val getDeviceCurrentNanoTimeUseCase: GetDeviceCurrentNanoTimeUseCase,
 ) : SaveSyncRecordsToDB {
 
     override suspend fun invoke(
@@ -131,7 +131,7 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                     }
                 }
                 file.fileName = fileName
-                val newPath = "$rootPath${timeWrapper.nanoTime}.$extension"
+                val newPath = "$rootPath${getDeviceCurrentNanoTimeUseCase()}.$extension"
                 file.newPath = newPath
                 Timber.d("Save file to database, new path is: %s", newPath)
                 saveSyncRecord(file)

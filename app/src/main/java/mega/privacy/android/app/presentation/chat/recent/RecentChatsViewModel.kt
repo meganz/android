@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.GetLastContactPermissionDismissedTime
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetLastContactPermissionDismissedTime
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
 /**
@@ -22,14 +22,15 @@ import javax.inject.Inject
  * @property setLastContactPermissionDismissedTime use case for setting the time when contact permission popup has been last dismissed
  * @property getLastContactPermissionDismissedTime use case for getting the time when contact permission popup has been last dismissed
  * @property ioDispatcher
- * @property timeWrapper get the current time
+ * @property getDeviceCurrentTimeUseCase get the current time
+ * @property monitorConnectivityUseCase to monitor internet connectivity
  */
 @HiltViewModel
 class RecentChatsViewModel @Inject constructor(
     private val setLastContactPermissionDismissedTime: SetLastContactPermissionDismissedTime,
     private val getLastContactPermissionDismissedTime: GetLastContactPermissionDismissedTime,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val timeWrapper: TimeWrapper,
+    private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RecentChatsState())
@@ -50,7 +51,7 @@ class RecentChatsViewModel @Inject constructor(
             getLastContactPermissionDismissedTime()
                 .flowOn(ioDispatcher)
                 .collect { lastDismissedTime ->
-                    handleLastDismissedTime(timeWrapper.now, lastDismissedTime)
+                    handleLastDismissedTime(getDeviceCurrentTimeUseCase(), lastDismissedTime)
                 }
         }
     }
@@ -60,7 +61,7 @@ class RecentChatsViewModel @Inject constructor(
      */
     fun setLastDismissedRequestContactTime() {
         viewModelScope.launch(ioDispatcher) {
-            setLastContactPermissionDismissedTime(timeWrapper.now)
+            setLastContactPermissionDismissedTime(getDeviceCurrentTimeUseCase())
         }
     }
 

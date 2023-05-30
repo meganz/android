@@ -72,7 +72,13 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
         deviceGateway.getDeviceMemory()
     }
 
-    override suspend fun getIsFirstLaunch() = withContext(ioDispatcher){
+    override suspend fun getIsFirstLaunch() = withContext(ioDispatcher) {
         megaLocalStorageGateway.getFirstTime()
     }
+
+    override val now: Long
+        get() = deviceGateway.now
+
+    override val nanoTime: Long
+        get() = deviceGateway.nanoTime
 }

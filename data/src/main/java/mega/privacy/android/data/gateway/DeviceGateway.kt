@@ -66,4 +66,14 @@ interface DeviceGateway {
      * @return true if 24 hour time format is selected, false otherwise.
      */
     fun is24HourFormat(): Boolean
+
+    /**
+     * get current time
+     */
+    val now: Long
+
+    /**
+     * get nano time
+     */
+    val nanoTime: Long
 }

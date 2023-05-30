@@ -23,7 +23,6 @@ import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
@@ -87,18 +86,6 @@ abstract class UtilWrapperModule {
                 override fun getThumbnailFile(context: Context, handle: String) =
                     OfflineUtils.getThumbnailFile(context, handle, megaApiGateway)
             }
-        }
-
-        /**
-         * provide time manager
-         */
-        @Provides
-        fun provideTimeWrapper() = object : TimeWrapper {
-            override val now: Long
-                get() = System.currentTimeMillis()
-
-            override val nanoTime: Long
-                get() = System.nanoTime()
         }
 
         /**

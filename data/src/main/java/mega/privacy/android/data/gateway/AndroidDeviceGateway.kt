@@ -65,4 +65,10 @@ internal class AndroidDeviceGateway @Inject constructor(
 
     override fun is24HourFormat(): Boolean =
         DateFormat.is24HourFormat(context)
+
+    override val now: Long
+        get() = System.currentTimeMillis()
+
+    override val nanoTime: Long
+        get() = System.nanoTime()
 }
