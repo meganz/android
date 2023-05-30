@@ -5198,13 +5198,13 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Встреча начинается</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">Поделиться ключом дешифрования тоже?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">Ключ дешифрования экспортирован и будет передан вместе со ссылкой.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">Поделиться только ссылкой</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">Поделиться ссылкой и ключом</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="one">Поделиться ссылкой</item>
@@ -5228,8 +5228,10 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with, will lose access to the album.</item>
-        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+        <item quantity="one">Люди, с которыми вы поделились этой ссылкой, потеряют доступ к альбому.</item>
+        <item quantity="few">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
+        <item quantity="many">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
+        <item quantity="other">Люди, с которыми вы поделились этими ссылками, потеряют доступ к альбомам.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -5241,9 +5243,9 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Введите ключ дешифрирования</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Для доступа к альбому введите ключ дешифрования. Если у вас его нет, обратитесь к человеку, который поделился с вами ссылкой.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">Запомнить настройки</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
