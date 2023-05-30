@@ -51,11 +51,15 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.yield
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.content.SlideShowInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -100,6 +104,12 @@ class SlideshowFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackScreenView(SlideShowInfo)
+        Firebase.crashlytics.log("Screen view: ${SlideShowInfo.name}")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

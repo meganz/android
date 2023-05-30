@@ -10,3 +10,11 @@ object PhotosScreenInfo : ScreenInfo {
     override val name = "screen_photos"
 }
 
+/**
+ * SlideShowInfo
+ */
+object SlideShowInfo : ScreenInfo {
+    override val uniqueIdentifier = 201
+    override val name = "screen_slideshow"
+}
+
