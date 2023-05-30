@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -2024,6 +2025,49 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun setUserAttribute(type: Int, value: String, listener: MegaRequestListenerInterface)
+
+    /**
+     * Set a private attribute of the current user
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type
+     * - MegaRequest::getMegaStringMap - Returns the new value for the attribute
+     *
+     * You can remove existing records/keypairs from the following attributes:
+     *  - MegaApi::ATTR_ALIAS
+     *  - MegaApi::ATTR_DEVICE_NAMES
+     *  - MegaApi::USER_ATTR_APPS_PREFS
+     *  - MegaApi::USER_ATTR_CC_PREFS
+     * by adding a keypair into MegaStringMap whit the key to remove and an empty C-string null terminated as value.
+     *
+     * @param type Attribute type
+     *
+     * Valid values are:
+     *
+     * MegaApi::USER_ATTR_AUTHRING = 3
+     * Get the authentication ring of the user (private)
+     * MegaApi::USER_ATTR_LAST_INTERACTION = 4
+     * Get the last interaction of the contacts of the user (private)
+     * MegaApi::USER_ATTR_KEYRING = 7
+     * Get the key ring of the user: private keys for Cu25519 and Ed25519 (private)
+     * MegaApi::USER_ATTR_RICH_PREVIEWS = 18
+     * Get whether user generates rich-link messages or not (private)
+     * MegaApi::USER_ATTR_RUBBISH_TIME = 19
+     * Set number of days for rubbish-bin cleaning scheduler (private non-encrypted)
+     * MegaApi::USER_ATTR_GEOLOCATION = 22
+     * Set whether the user can send geolocation messages (private)
+     * MegaApi::ATTR_ALIAS = 27
+     * Set the list of users's aliases (private)
+     * MegaApi::ATTR_DEVICE_NAMES = 30
+     * Set the list of device names (private)
+     * MegaApi::ATTR_APPS_PREFS = 38
+     * Set the apps prefs (private)
+     *
+     * @param value New attribute value
+     * @param listener MegaRequestListener to track this request
+     */
+    fun setUserAttribute(type: Int, value: MegaStringMap, listener: MegaRequestListenerInterface)
 
     /**
      * Reset the number of total downloads

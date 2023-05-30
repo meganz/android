@@ -33,6 +33,7 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -1014,6 +1015,12 @@ internal class MegaApiFacade @Inject constructor(
         type: Int,
         value: String,
         listener: MegaRequestListenerInterface,
+    ) = megaApi.setUserAttribute(type, value, listener)
+
+    override fun setUserAttribute(
+        type: Int,
+        value: MegaStringMap,
+        listener: MegaRequestListenerInterface
     ) = megaApi.setUserAttribute(type, value, listener)
 
     @Suppress("DEPRECATION")
