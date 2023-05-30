@@ -1,9 +1,14 @@
 package mega.privacy.android.analytics.tracker
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.event.ScreenView
 import mega.privacy.android.analytics.event.TabSelected
+import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEventIdentifier
@@ -29,6 +34,22 @@ class AnalyticsTrackerImpl @Inject constructor(
 
     @Volatile
     private var currentViewId: String? = null
+
+    private val eventSource =
+        Channel<AnalyticsEvent>(capacity = 50, onBufferOverflow = BufferOverflow.DROP_OLDEST) {
+            Timber.w("Unable to deliver analytics event $it due to buffer overflow")
+        }
+
+    init {
+        appScope.launch {
+            eventSource.consumeAsFlow()
+                .distinctUntilChanged()
+                .collect {
+                    trackEventUseCase(it)
+                }
+
+        }
+    }
 
     override fun trackScreenView(screen: ScreenView) {
         appScope.launch {
@@ -69,7 +90,7 @@ class AnalyticsTrackerImpl @Inject constructor(
             if (latestViewId == null) {
                 Timber.w("Tab selected analytics not sent due to null view ID")
             } else {
-                trackEventUseCase(TabSelectedEvent(identifier, latestViewId))
+                eventSource.send(TabSelectedEvent(identifier, latestViewId))
             }
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.account.CameraUploadsBusinessAlertDialog
@@ -66,7 +67,9 @@ fun PhotosScreen(
     LaunchedEffect(pagerState.currentPage) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
-            pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
+            val photosTab = PhotosTab.values()[page]
+            pagerState.scrollToPage(photosTab.ordinal)
+            Analytics.tracker.trackTabSelected(photosTab.analyticsInfo)
         }
     }
 

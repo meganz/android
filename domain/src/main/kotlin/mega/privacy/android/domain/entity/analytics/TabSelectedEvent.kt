@@ -7,7 +7,7 @@ package mega.privacy.android.domain.entity.analytics
  * @property viewId
  * @constructor Create empty Tab selected event
  */
-class TabSelectedEvent(
+data class TabSelectedEvent(
     private val identifier: TabSelectedEventIdentifier,
     override val viewId: String,
 ) : AnalyticsEvent() {
