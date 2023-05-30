@@ -490,7 +490,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     if (error.errorCode == MegaError.API_OK) {
                                         // Some times checking node.isExported immediately will still
                                         // get true, so let's add some delay here.
-                                        RunOnUIThreadUtils.runDelay(100L) {
+                                        RunOnUIThreadUtils.runDelay(500L) {
                                             refreshMenuOptionsVisibility()
                                         }
                                     }
