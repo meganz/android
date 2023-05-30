@@ -8,7 +8,6 @@ import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
 import android.view.Surface
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
@@ -535,8 +534,8 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
     ): Int {
         return when (quality) {
             VideoQuality.LOW -> (bitrate * 0.2).roundToInt()
-            VideoQuality.MEDIUM -> (bitrate * 0.3).roundToInt()
-            VideoQuality.HIGH -> (bitrate * 0.4).roundToInt()
+            VideoQuality.MEDIUM -> (bitrate * 0.5).roundToInt()
+            VideoQuality.HIGH -> (bitrate * 0.9).roundToInt()
             VideoQuality.ORIGINAL -> bitrate
         }
     }
@@ -584,14 +583,17 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                 newWidth = generateWidthHeightValue(width, 0.5)
                 newHeight = generateWidthHeightValue(height, 0.5)
             }
+
             width >= 1280 || height >= 1280 -> {
                 newWidth = generateWidthHeightValue(width, 0.75)
                 newHeight = generateWidthHeightValue(height, 0.75)
             }
+
             width >= 960 || height >= 960 -> {
                 newWidth = generateWidthHeightValue(width, 0.95)
                 newHeight = generateWidthHeightValue(height, 0.95)
             }
+
             else -> {
                 newWidth = generateWidthHeightValue(width, 0.9)
                 newHeight = generateWidthHeightValue(height, 0.9)
