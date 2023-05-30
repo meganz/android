@@ -50,19 +50,24 @@ android {
 
 dependencies {
     lintChecks project(':lint')
-
     implementation project(':domain')
 
+    // DI
     implementation lib.javax.inject
     kapt google.hilt.android.compiler
     implementation google.hilt.core
     implementation google.hilt.android
 
+    // Framework
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
     implementation lib.kotlin.ktx
     implementation androidx.appcompat
 
+    // Logging
+    implementation lib.bundles.logging
+
+    // Testing
     testImplementation testlib.junit
     testImplementation testlib.junit.test.ktx
     androidTestImplementation testlib.junit.test.ktx

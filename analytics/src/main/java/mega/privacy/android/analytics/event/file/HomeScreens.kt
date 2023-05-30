@@ -1,4 +1,6 @@
-package mega.privacy.android.analytics.event
+package mega.privacy.android.analytics.event.file
+
+import mega.privacy.android.analytics.event.ScreenView
 
 /**
  * Home
