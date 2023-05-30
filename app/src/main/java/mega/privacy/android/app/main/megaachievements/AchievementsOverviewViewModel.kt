@@ -3,9 +3,9 @@ package mega.privacy.android.app.main.megaachievements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -38,17 +38,7 @@ class AchievementsOverviewViewModel @Inject constructor(
 
     init {
         logAchievementsEnabled()
-        getAchievementsOverview()
-        updateAddPhoneReward()
-    }
-
-    private fun updateAddPhoneReward() {
-        viewModelScope.launch {
-            val phoneRewardEnabled = isAddPhoneRewardEnabled()
-            _state.update {
-                it.copy(hasAddPhoneReward = phoneRewardEnabled)
-            }
-        }
+        getAchievementsInformation()
     }
 
     private fun logAchievementsEnabled() {
@@ -57,10 +47,14 @@ class AchievementsOverviewViewModel @Inject constructor(
         }
     }
 
-    private fun getAchievementsOverview() {
+    private fun getAchievementsInformation() {
         viewModelScope.launch {
-            runCatching { getAccountAchievementsOverview() }
-                .onSuccess { overview ->
+            runCatching {
+                val achievementsOverview = async { getAccountAchievementsOverview() }
+                val phoneRewardEnabled = async { isAddPhoneRewardEnabled() }
+                Pair(achievementsOverview.await(), phoneRewardEnabled.await())
+            }
+                .onSuccess { (overview, isEnabled) ->
                     _state.value = AchievementsUIState(
                         achievementsOverview = overview,
                         currentStorage = overview.currentStorageInBytes,
@@ -71,6 +65,7 @@ class AchievementsOverviewViewModel @Inject constructor(
                         installAppStorage = overview.installAppStorage(),
                         installAppAwardDaysLeft = overview.installAppAwardDaysLeft(),
                         installAppAwardStorage = overview.installAppAwardStorage(),
+                        hasAddPhoneReward = isEnabled,
                         addPhoneStorage = overview.addPhoneStorage(),
                         addPhoneAwardDaysLeft = overview.addPhoneAwardDaysLeft(),
                         addPhoneAwardStorage = overview.addPhoneAwardStorage(),

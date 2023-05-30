@@ -31,6 +31,14 @@ class AchievementsOverviewViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
+    private val fakeAchievements = AchievementsOverview(
+        allAchievements = listOf(),
+        awardedAchievements = listOf(),
+        currentStorageInBytes = 0L,
+        achievedStorageFromReferralsInBytes = 0L,
+        achievedTransferFromReferralsInBytes = 0L
+    )
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
@@ -56,16 +64,16 @@ class AchievementsOverviewViewModelTest {
     }
 
     @Test
-    fun `test that state contains content when the use case returns a successful result`() =
+    fun `test that state contains content when the achievements overview use case returns achievements`() =
         runTest {
-            val achievements = AchievementsOverview(listOf(), listOf(), 0L, 0L, 0L)
+            whenever(getAccountAchievementsOverview()).thenReturn(fakeAchievements)
+            whenever(isAddPhoneRewardEnabled()).thenReturn(false)
             val expectedUiContent =
                 AchievementsUIState(
-                    achievementsOverview = achievements,
+                    achievementsOverview = fakeAchievements,
                     areAllRewardsExpired = true,
                     currentStorage = 0,
                 )
-            whenever(getAccountAchievementsOverview()).thenReturn(achievements)
 
             underTest.state.test {
                 val initialState = awaitItem()
@@ -75,26 +83,48 @@ class AchievementsOverviewViewModelTest {
         }
 
     @Test
-    fun `test that state contains add phone reward when the add phone reward enabled use case returns true`() =
+    fun `test that state add phone reward is enabled when the add phone reward enabled use case returns true`() =
         runTest {
-            val expectedUiContent = AchievementsUIState(hasAddPhoneReward = true)
+            whenever(getAccountAchievementsOverview()).thenReturn(fakeAchievements)
+            whenever(isAddPhoneRewardEnabled()).thenReturn(true)
+            val expectedUiContent =
+                AchievementsUIState(
+                    achievementsOverview = fakeAchievements,
+                    areAllRewardsExpired = true,
+                    currentStorage = 0,
+                    hasAddPhoneReward = true,
+                )
+
+            underTest.state.test {
+                val initialState = awaitItem()
+                val contentState = awaitItem()
+                assertEquals(expectedUiContent, contentState)
+            }
+        }
+
+    @Test
+    fun `test that state contains an error when the get achievements overview use case returns an exception`() =
+        runTest {
+            whenever(getAccountAchievementsOverview()).thenThrow(RuntimeException("Error"))
             whenever(isAddPhoneRewardEnabled()).thenReturn(true)
 
             underTest.state.test {
                 val initialState = awaitItem()
-                val contentState = awaitItem()
-                assertEquals(expectedUiContent, contentState)
+                val errorState = awaitItem()
+                assertEquals(AchievementsUIState(showError = true), errorState)
             }
         }
 
     @Test
-    fun `test that state contains an error when the use case returns an exception`() = runTest {
-        whenever(getAccountAchievementsOverview()).thenThrow(RuntimeException("Error"))
+    fun `test that state contains an error when the add phone reward enabled use case returns an exception`() =
+        runTest {
+            whenever(getAccountAchievementsOverview()).thenReturn(fakeAchievements)
+            whenever(isAddPhoneRewardEnabled()).thenThrow(RuntimeException("Error"))
 
-        underTest.state.test {
-            val initialState = awaitItem()
-            val errorState = awaitItem()
-            assertEquals(AchievementsUIState(showError = true), errorState)
+            underTest.state.test {
+                val initialState = awaitItem()
+                val errorState = awaitItem()
+                assertEquals(AchievementsUIState(showError = true), errorState)
+            }
         }
-    }
 }
