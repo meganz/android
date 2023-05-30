@@ -149,23 +149,15 @@ class ScheduleMeetingViewModel @Inject constructor(
         dismissDialog()
 
         _state.update { state ->
-            val weekdayList: List<Weekday>? =
-                if (optionSelected == RecurringMeetingType.Weekly) listOf(weekDayMapper(state.startDate.dayOfWeek)) else null
-
-            val monthDayList: List<Int>? =
-                if (optionSelected == RecurringMeetingType.Monthly) listOf(state.startDate.dayOfMonth) else null
-
             state.copy(
                 rulesSelected = state.rulesSelected.copy(
                     freq = occurrenceFrequencyTypeMapper(optionSelected),
-                    weekDayList = weekdayList,
-                    monthDayList = monthDayList
                 ),
                 recurringMeetingOptionSelected = optionSelected,
             )
         }
 
-        checkMonthlyRecurrenceWarningBeShown()
+        checkRules()
     }
 
     /**
@@ -227,27 +219,45 @@ class ScheduleMeetingViewModel @Inject constructor(
                     ChronoUnit.MINUTES
                 )
 
+
+
             state.copy(
                 startDate = newStartZonedDateTime,
                 endDate = newEndDate,
             )
         }
 
-        checkMonthlyRecurrenceWarningBeShown()
+        checkRules()
     }
 
     /**
-     * Check if the warning related to monthly recurrence should be displayed.
+     * Update recurrence rules when the start date is updated
      */
-    private fun checkMonthlyRecurrenceWarningBeShown() =
+    private fun checkRules() {
         _state.update { state ->
+            val weekdayList: List<Weekday>? =
+                if (state.rulesSelected.freq == OccurrenceFrequencyType.Weekly) listOf(
+                    weekDayMapper(
+                        state.startDate.dayOfWeek
+                    )
+                ) else null
+
+            val monthDayList: List<Int>? =
+                if (state.rulesSelected.freq == OccurrenceFrequencyType.Monthly) listOf(state.startDate.dayOfMonth) else null
+
             val shouldShown = state.rulesSelected.freq == OccurrenceFrequencyType.Monthly &&
                     (state.startDate.dayOfMonth == MONTH_WITH_29_DAYS ||
                             state.startDate.dayOfMonth == MONTH_WITH_30_DAYS ||
                             state.startDate.dayOfMonth == MONTH_WITH_31_DAYS)
 
-            state.copy(showMonthlyRecurrenceWarning = shouldShown)
+            state.copy(
+                rulesSelected = state.rulesSelected.copy(
+                    weekDayList = weekdayList,
+                    monthDayList = monthDayList,
+                ), showMonthlyRecurrenceWarning = shouldShown
+            )
         }
+    }
 
     /**
      * Set end date and time

@@ -18,7 +18,7 @@ data class ChatScheduledRules(
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val interval: Int = 0,
     val until: Long = 0L,
-    val weekDayList: List<Weekday>? = listOf(Weekday.Wednesday),
+    val weekDayList: List<Weekday>? = null,
     val monthDayList: List<Int>? = null,
     val monthWeekDayList: List<MonthWeekDayItem>? = emptyList(),
 )

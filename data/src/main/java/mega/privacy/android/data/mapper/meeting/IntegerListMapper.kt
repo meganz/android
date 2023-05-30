@@ -9,7 +9,7 @@ import javax.inject.Inject
 internal class IntegerListMapper @Inject constructor() {
     operator fun invoke(integerList: MegaIntegerList): List<Int> = mutableListOf<Int>().apply {
         if (integerList.size() > 0) {
-            for (i in 0..integerList.size()) {
+            for (i in 0 until integerList.size()) {
                 add(integerList.get(i).toInt())
             }
         }

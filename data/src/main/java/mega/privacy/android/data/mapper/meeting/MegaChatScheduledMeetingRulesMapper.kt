@@ -26,7 +26,8 @@ internal class MegaChatScheduledMeetingRulesMapper @Inject constructor(
                 rules.interval,
                 rules.until,
                 megaIntegerWeekDaysListMapper(rules.weekDayList),
-                megaIntegerListMapper(rules.monthDayList)
+                megaIntegerListMapper(rules.monthDayList),
+                null
             )
         }
 }
