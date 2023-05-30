@@ -623,9 +623,8 @@ class ImageViewerViewModel @Inject constructor(
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
     fun importNode(newParentHandle: Long) = viewModelScope.launch {
-        val importNode =
-            images.value?.find { it.getNodeHandle() == currentImageId.value }?.nodeItem?.node
-                ?: return@launch
+        val importNode = images.value?.find { it.id == currentImageId.value }?.nodeItem?.node
+            ?: return@launch
         val parentNode = getNodeByHandle(newParentHandle)
         checkNameCollisionUseCase.check(
             node = importNode,
