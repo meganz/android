@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -232,36 +233,40 @@ internal class UploadService : LifecycleService() {
                 when (event) {
                     is GetGlobalTransferUseCase.Result.OnTransferStart -> {
                         val transfer = event.transfer
-                        rxSubscriptions.add(doOnTransferStart(transfer)
+                        doOnTransferStart(transfer)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
                         val transfer = event.transfer
-                        rxSubscriptions.add(doOnTransferUpdate(transfer)
+                        doOnTransferUpdate(transfer)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
                         val transfer = event.transfer
                         val error = event.error
-                        rxSubscriptions.add(doOnTransferFinish(transfer, error)
+                        doOnTransferFinish(transfer, error)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
                         val transfer = event.transfer
                         val error = event.error
-                        rxSubscriptions.add(doOnTransferTemporaryError(transfer, error)
+                        doOnTransferTemporaryError(transfer, error)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) })
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     else -> {}

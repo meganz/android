@@ -734,7 +734,7 @@ class ImageViewerViewModel @Inject constructor(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onError = Timber::e
-                    )
+                    ).addTo(composite)
             }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri.toUri())

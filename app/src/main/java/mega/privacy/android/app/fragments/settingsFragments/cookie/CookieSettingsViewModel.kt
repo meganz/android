@@ -98,7 +98,7 @@ class CookieSettingsViewModel @Inject constructor(
                     updateResult.value = false
                     getCookieSettings()
                 }
-            )
+            ).addTo(composite)
     }
 
     /**

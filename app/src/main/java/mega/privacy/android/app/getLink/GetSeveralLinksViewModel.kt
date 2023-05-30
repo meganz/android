@@ -118,6 +118,7 @@ class GetSeveralLinksViewModel @Inject constructor(
                     onSuccess = { exportedNodes -> notifyExportedNodes(exportedNodes) },
                     onError = { error -> Timber.e(error) }
                 )
+                .addTo(composite)
         } else {
             exportingNodes.value = false
         }

@@ -34,7 +34,7 @@ class CookieDialogHandler @Inject constructor(
     private val checkCookieBannerEnabledUseCase: CheckCookieBannerEnabledUseCase,
 ) : LifecycleEventObserver {
 
-    private val disposable = CompositeDisposable()
+    private val rxSubscriptions = CompositeDisposable()
     private var dialog: AlertDialog? = null
 
     /**
@@ -62,7 +62,7 @@ class CookieDialogHandler @Inject constructor(
      * @param action    Action to be invoked with the Boolean result
      */
     private fun checkDialogSettings(action: (Boolean) -> Unit) {
-        disposable.clear()
+        rxSubscriptions.clear()
 
         checkCookieBannerEnabledUseCase.check()
             .concatMap { getCookieSettingsUseCase.shouldShowDialog() }
@@ -74,7 +74,7 @@ class CookieDialogHandler @Inject constructor(
                 },
                 onError = Timber::e
             )
-            .addTo(disposable)
+            .addTo(rxSubscriptions)
     }
 
     private fun createDialog(context: Context) {
@@ -118,6 +118,7 @@ class CookieDialogHandler @Inject constructor(
                 },
                 onError = Timber::e
             )
+            .addTo(rxSubscriptions)
     }
 
     fun onResume() {
@@ -129,7 +130,7 @@ class CookieDialogHandler @Inject constructor(
     }
 
     fun onDestroy() {
-        disposable.clear()
+        rxSubscriptions.clear()
         dialog?.dismiss()
         dialog = null
     }

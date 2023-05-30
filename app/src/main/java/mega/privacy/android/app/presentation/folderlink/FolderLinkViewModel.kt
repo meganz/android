@@ -10,6 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,6 +87,8 @@ class FolderLinkViewModel @Inject constructor(
      */
     private val _state = MutableStateFlow(FolderLinkState())
 
+    private val rxSubscriptions = CompositeDisposable()
+
     /**
      * The FolderLink UI State accessible outside the ViewModel
      */
@@ -109,6 +113,11 @@ class FolderLinkViewModel @Inject constructor(
 
     init {
         checkViewType()
+    }
+
+    override fun onCleared() {
+        rxSubscriptions.clear()
+        super.onCleared()
     }
 
     /**
@@ -262,11 +271,12 @@ class FolderLinkViewModel @Inject constructor(
                                         )
                                     }
                                 }
-                            }
+                            }.addTo(rxSubscriptions)
                     }
                 },
                 { throwable: Throwable -> Timber.e(throwable) }
-            )
+            ).addTo(rxSubscriptions)
+
     }
 
     /**

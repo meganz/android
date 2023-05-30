@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -691,6 +692,7 @@ class ContactInfoViewModel @Inject constructor(
                 },
                 { throwable: Throwable -> Timber.e(throwable) }
             )
+            .addTo(composite)
     }
 
     @SuppressLint("CheckResult")
@@ -708,6 +710,7 @@ class ContactInfoViewModel @Inject constructor(
                     _state.update { it.copy(copyError = copyThrowable) }
                 }
             }
+            .addTo(composite)
     }
 
     companion object {

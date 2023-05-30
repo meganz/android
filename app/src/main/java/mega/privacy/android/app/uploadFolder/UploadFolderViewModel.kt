@@ -402,7 +402,7 @@ class UploadFolderViewModel @Inject constructor(
             .subscribeBy(
                 onError = { error -> Timber.e(error, "Cannot upload anything") },
                 onSuccess = { results -> checkNameCollisions(results) }
-            )
+            ).addTo(composite)
     }
 
     /**

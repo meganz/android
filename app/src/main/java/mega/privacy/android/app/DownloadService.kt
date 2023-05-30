@@ -23,6 +23,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -253,58 +254,54 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     }
 
     private fun setRxSubscription() {
-        val subscription = getGlobalTransferUseCase.get()
+        getGlobalTransferUseCase.get()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ event: GetGlobalTransferUseCase.Result? ->
                 when (event) {
                     is GetGlobalTransferUseCase.Result.OnTransferStart -> {
                         val transfer = event.transfer
-                        rxSubscriptions.add(
-                            doOnTransferStart(transfer)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                        )
+                        doOnTransferStart(transfer)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
                         val transfer = event.transfer
-                        rxSubscriptions.add(
-                            doOnTransferUpdate(transfer)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                        )
+                        doOnTransferUpdate(transfer)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
                         val transfer = event.transfer
                         val error = event.error
-                        rxSubscriptions.add(
-                            doOnTransferFinish(transfer, error)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                        )
+                        doOnTransferFinish(transfer, error)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
                         val transfer = event.transfer
                         val error = event.error
-                        rxSubscriptions.add(
-                            doOnTransferTemporaryError(transfer, error)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                        )
+                        doOnTransferTemporaryError(transfer, error)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
+                            .addTo(rxSubscriptions)
                     }
 
                     is GetGlobalTransferUseCase.Result.OnTransferData -> {}
                     null -> {}
                 }
             }) { t: Throwable? -> Timber.e(t) }
-        rxSubscriptions.add(subscription)
+            .addTo(rxSubscriptions)
     }
 
     private fun startForeground() {
@@ -371,13 +368,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             stopForeground()
             return START_NOT_STICKY
         }
-        rxSubscriptions.add(Single.just(intent)
+        Single.just(intent)
             .observeOn(Schedulers.single())
             .subscribe({ intent: Intent -> onHandleIntent(intent) }) { t: Throwable? ->
                 Timber.e(
                     t
                 )
-            })
+            }.addTo(rxSubscriptions)
         return START_NOT_STICKY
     }
 
