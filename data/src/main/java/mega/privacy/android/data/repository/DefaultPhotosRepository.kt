@@ -129,7 +129,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                     photosCache[NodeId(photo.id)] = photo
                 }
 
-                photosStateFlow.value = photos
+                photosStateFlow.update { photos }
                 refreshPhotosStateFlow.value = false
             }.launchIn(appScope)
     }
