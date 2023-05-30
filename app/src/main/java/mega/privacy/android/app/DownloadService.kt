@@ -76,6 +76,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -151,6 +152,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
+
+    @Inject
+    lateinit var cancelAllDownloadTransfersUseCase: CancelAllDownloadTransfersUseCase
 
     @Inject
     lateinit var completedTransferMapper: CompletedTransferMapper
@@ -353,13 +357,24 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         super.onDestroy()
     }
 
+    private fun cancelDownloadTransfers() {
+        applicationScope.launch {
+            runCatching {
+                cancelAllDownloadTransfersUseCase()
+                cancel()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         Timber.d("onStartCommand")
         canceled = false
         if (intent.action == ACTION_CANCEL) {
             Timber.d("Cancel intent")
             canceled = true
-            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
+            cancelDownloadTransfers()
             stopForeground()
             return START_NOT_STICKY
         }
@@ -1580,12 +1595,7 @@ Error: ${e.errorCode} ${e.errorString}"""
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
-        if (request.type == MegaRequest.TYPE_CANCEL_TRANSFERS) {
-            Timber.d("TYPE_CANCEL_TRANSFERS finished")
-            if (e.errorCode == MegaError.API_OK) {
-                cancel()
-            }
-        } else if (request.type == MegaRequest.TYPE_LOGIN) {
+        if (request.type == MegaRequest.TYPE_LOGIN) {
             if (e.errorCode == MegaError.API_OK) {
                 Timber.d("Logged in. Setting account auth token for folder links.")
                 megaApiFolder.accountAuth = megaApi.accountAuth

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property enabledFlags
  * @property isPushNotificationSettingsUpdatedEvent
  * @property titleChatArchivedEvent
+ * @property cancelTransfersResult
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -40,4 +41,5 @@ data class ManagerState(
     val enabledFlags: Set<Feature> = emptySet(),
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val titleChatArchivedEvent: String? = null,
+    val cancelTransfersResult: Result<Unit>? = null,
 )

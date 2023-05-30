@@ -97,7 +97,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
@@ -2272,6 +2271,24 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    private fun handleAllTransfersCanceled(cancelTransfersResult: Result<Unit>) {
+        viewModel.onCancelTransfersResultConsumed()
+        if (cancelTransfersResult.isSuccess) {
+            hideTransfersWidget()
+            if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
+                pauseTransfersMenuIcon?.isVisible = false
+                playTransfersMenuIcon?.isVisible = false
+                cancelAllTransfersMenuItem?.isVisible = false
+            }
+        } else {
+            showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                getString(R.string.error_general_nodes),
+                -1
+            )
+        }
+    }
+
     /**
      * collecting Flows from ViewModels
      */
@@ -2280,6 +2297,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.state,
             Lifecycle.State.STARTED
         ) { managerState: ManagerState ->
+            if (managerState.cancelTransfersResult != null) {
+                handleAllTransfersCanceled(managerState.cancelTransfersResult)
+            }
             if (managerState.shouldAlertUserAboutSecurityUpgrade) {
                 SecurityUpgradeDialogFragment.newInstance()
                     .show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
@@ -8959,25 +8979,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            MegaRequest.TYPE_CANCEL_TRANSFERS -> {
-                Timber.d("MegaRequest.TYPE_CANCEL_TRANSFERS")
-                //After cancelling all the transfers
-                if (e.errorCode == MegaError.API_OK) {
-                    hideTransfersWidget()
-                    if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
-                        pauseTransfersMenuIcon?.isVisible = false
-                        playTransfersMenuIcon?.isVisible = false
-                        cancelAllTransfersMenuItem?.isVisible = false
-                    }
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_general_nodes),
-                        -1
-                    )
-                }
-            }
-
             MegaRequest.TYPE_CREATE_FOLDER -> {
                 dismissAlertDialogIfExists(statusDialog)
                 if (e.errorCode == MegaError.API_OK) {
@@ -9333,8 +9334,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             .setPositiveButton(
                 R.string.cancel_all_action
             ) { _: DialogInterface?, _: Int ->
-                megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this)
-                megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this)
+                viewModel.cancelAllTransfers()
                 viewModel.stopCameraUpload(aborted = false)
                 refreshFragment(FragmentTag.TRANSFERS.tag)
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)

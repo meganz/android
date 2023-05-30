@@ -386,6 +386,14 @@ internal class MegaApiFacade @Inject constructor(
         }
     }
 
+    override fun cancelAllDownloadTransfers(listener: MegaRequestListenerInterface?) {
+        if (listener != null) {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, listener)
+        } else {
+            megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
+        }
+    }
+
     override fun cancelAllUploadTransfers(listener: MegaRequestListenerInterface?) {
         if (listener != null) {
             megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, listener)
@@ -1212,7 +1220,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun shouldShowPasswordReminderDialog(
         atLogout: Boolean,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.shouldShowPasswordReminderDialog(atLogout, listener)
 
     override suspend fun isForeignNode(handle: Long) = megaApi.isForeignNode(handle)

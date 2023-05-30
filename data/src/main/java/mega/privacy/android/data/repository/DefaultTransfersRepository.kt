@@ -125,6 +125,17 @@ internal class DefaultTransfersRepository @Inject constructor(
         },
     )
 
+
+    override suspend fun cancelAllDownloadTransfers() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("cancelAllDownloadTransfers") {}
+            megaApiGateway.cancelAllDownloadTransfers(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     override suspend fun cancelAllUploadTransfers() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("cancelAllUploadTransfers") {}

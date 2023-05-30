@@ -80,6 +80,11 @@ interface TransferRepository {
     suspend fun cancelAllUploadTransfers()
 
     /**
+     * Cancels all download transfers
+     */
+    suspend fun cancelAllDownloadTransfers()
+
+    /**
      * Cancel Transfer by Tag
      * @param transferTag   Tag that identifies the transfer
      */

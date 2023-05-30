@@ -529,6 +529,13 @@ interface MegaApiGateway {
     fun cancelTransfer(transfer: MegaTransfer, listener: MegaRequestListenerInterface?)
 
     /**
+     * Cancels all [MegaTransfer] downloads
+     *
+     * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
+     */
+    fun cancelAllDownloadTransfers(listener: MegaRequestListenerInterface?)
+
+    /**
      * Cancels all [MegaTransfer] uploads
      *
      * @param listener a [MegaRequestListenerInterface] for callback purposes. It can be nullable
