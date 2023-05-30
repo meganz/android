@@ -81,6 +81,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -104,7 +105,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -589,6 +589,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
+    private var deviceCenterFragment: DeviceCenterFragment? = null
     private var inboxFragment: InboxFragment? = null
     private var incomingSharesFragment: MegaNodeBaseFragment? = null
     private var outgoingSharesFragment: MegaNodeBaseFragment? = null
@@ -3405,6 +3406,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.setIsFirstNavigationLevel(false)
             }
 
+            DrawerItem.DEVICE_CENTER -> {
+                supportActionBar?.let {
+                    it.subtitle = null
+                    it.title = getString(R.string.device_center_list_of_devices_toolbar_title)
+                }
+                viewModel.setIsFirstNavigationLevel(false)
+            }
+
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
                 val node =
@@ -4190,9 +4199,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
             }
 
-            // Functionality will be added once the Device Center Fragment has been created
-            // For now, the Dashboard Side Menu will be closed
-            DrawerItem.DEVICE_CENTER -> Unit
+            DrawerItem.DEVICE_CENTER -> {
+                deviceCenterFragment =
+                    supportFragmentManager.findFragmentByTag(FragmentTag.DEVICE_CENTER.tag) as? DeviceCenterFragment
+                        ?: DeviceCenterFragment.newInstance()
+                setBottomNavigationMenuItemChecked(NO_BNV)
+                supportInvalidateOptionsMenu()
+                deviceCenterFragment?.let { replaceFragment(it, FragmentTag.DEVICE_CENTER.tag) }
+            }
 
             DrawerItem.SYNC -> {
                 syncFragment =
@@ -5031,7 +5045,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return when (item.itemId) {
             android.R.id.home -> {
                 if (isFirstNavigationLevel && drawerItem !== DrawerItem.SEARCH) {
-                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
+                    if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER || drawerItem === DrawerItem.RUBBISH_BIN || drawerItem === DrawerItem.INBOX || drawerItem === DrawerItem.NOTIFICATIONS || drawerItem === DrawerItem.TRANSFERS) {
                         backToDrawerItem(bottomNavigationCurrentItem)
                         if (transfersToImageViewer) {
                             switchImageViewerToFront()
@@ -5052,7 +5066,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 fileBrowserComposeFragment?.onBackPressed()
                             }
                         }
-                    } else if (drawerItem === DrawerItem.SYNC) {
+                    } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
                         onBackPressedDispatcher.onBackPressed()
                     } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
@@ -5401,7 +5415,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
 
             }
-        } else if (drawerItem === DrawerItem.SYNC) {
+        } else if (drawerItem === DrawerItem.SYNC || drawerItem === DrawerItem.DEVICE_CENTER) {
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
             rubbishBinComposeFragment = getRubbishBinComposeFragment()
@@ -7261,9 +7275,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 openFullscreenOfflineFragment(pathNavigationOffline)
             }
 
-            // Functionality will be added once the Device Center Fragment has been created
-            // For now, the Dashboard Side Menu will be closed
-            R.id.device_center_section -> Unit
+            R.id.device_center_section -> {
+                sectionClicked = true
+                drawerItem = DrawerItem.DEVICE_CENTER
+            }
 
             R.id.transfers_section -> {
                 sectionClicked = true

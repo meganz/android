@@ -71,4 +71,9 @@ dependencies {
     implementation google.hilt.android
     kapt google.hilt.android.compiler
     kapt androidx.hilt.compiler
+
+    testImplementation testlib.junit
+    testImplementation testlib.junit.test.ktx
+    testImplementation testlib.espresso
+    testImplementation testlib.compose.junit
 }
