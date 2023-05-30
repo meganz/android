@@ -1,12 +1,12 @@
 package mega.privacy.android.analytics.event.content
 
-import mega.privacy.android.analytics.event.TabSelected
+import mega.privacy.android.analytics.event.TabInfo
 
 /**
  * TimelineTabSelected
  */
-object TimelineTabSelected: TabSelected{
-    override val screenView = PhotosScreenView
+object TimelineTabInfo : TabInfo {
+    override val screenInfo = PhotosScreenInfo
     override val name = "tab_timeline"
     override val uniqueIdentifier = 200
 }
@@ -14,8 +14,8 @@ object TimelineTabSelected: TabSelected{
 /**
  * AlbumsTabSelected
  */
-object AlbumsTabSelected: TabSelected{
-    override val screenView = PhotosScreenView
+object AlbumsTabInfo : TabInfo {
+    override val screenInfo = PhotosScreenInfo
     override val name = "tab_albums"
     override val uniqueIdentifier = 201
 }

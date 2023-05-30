@@ -6,8 +6,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.event.ScreenView
-import mega.privacy.android.analytics.event.TabSelected
+import mega.privacy.android.analytics.event.ScreenInfo
+import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
@@ -51,7 +51,7 @@ class AnalyticsTrackerImpl @Inject constructor(
         }
     }
 
-    override fun trackScreenView(screen: ScreenView) {
+    override fun trackScreenView(screen: ScreenInfo) {
         appScope.launch {
             val identifier = ScreenViewEventIdentifier(
                 name = screen.name,
@@ -68,11 +68,11 @@ class AnalyticsTrackerImpl @Inject constructor(
         }
     }
 
-    override fun trackTabSelected(tab: TabSelected) {
+    override fun trackTabSelected(tab: TabInfo) {
         appScope.launch {
 
             val identifier = TabSelectedEventIdentifier(
-                screenName = tab.screenView.name,
+                screenName = tab.screenInfo.name,
                 tabName = tab.name,
                 uniqueIdentifier = tab.uniqueIdentifier
             )

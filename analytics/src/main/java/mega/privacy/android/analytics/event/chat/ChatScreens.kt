@@ -1,11 +1,11 @@
 package mega.privacy.android.analytics.event.chat
 
-import mega.privacy.android.analytics.event.ScreenView
+import mega.privacy.android.analytics.event.ScreenInfo
 
 /**
  * Chat
  */
-object ChatScreenView : ScreenView {
+object ChatScreenInfo : ScreenInfo {
     override val uniqueIdentifier = 300
     override val name = "screen_chat"
 }

@@ -3,8 +3,8 @@ package mega.privacy.android.analytics.tracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import mega.privacy.android.analytics.event.ScreenView
-import mega.privacy.android.analytics.event.TabSelected
+import mega.privacy.android.analytics.event.ScreenInfo
+import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.usecase.analytics.GetViewIdUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackEventUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackScreenViewUseCase
@@ -57,13 +57,13 @@ internal class AnalyticsTrackerImplTest {
         getViewIdUseCase.stub {
             onBlocking { invoke() }.thenReturn("viewId")
         }
-        val screen = mock<ScreenView> {
+        val screen = mock<ScreenInfo> {
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(12)
         }
 
         underTest.trackTabSelected(mock {
-            on { screenView }.thenReturn(screen)
+            on { screenInfo }.thenReturn(screen)
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(2)
         })
@@ -78,14 +78,14 @@ internal class AnalyticsTrackerImplTest {
         trackScreenViewUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn(expectedViewId)
         }
-        val screen = mock<ScreenView> {
+        val screen = mock<ScreenInfo> {
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(12)
         }
         underTest.trackScreenView(screen)
 
         underTest.trackTabSelected(mock {
-            on { screenView }.thenReturn(screen)
+            on { screenInfo }.thenReturn(screen)
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(2)
         })
@@ -99,19 +99,19 @@ internal class AnalyticsTrackerImplTest {
         trackScreenViewUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn("viewId")
         }
-        val screen = mock<ScreenView> {
+        val screen = mock<ScreenInfo> {
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(12)
         }
         underTest.trackScreenView(screen)
 
-        val tabSelected = mock<TabSelected> {
-            on { screenView }.thenReturn(screen)
+        val tabInfo = mock<TabInfo> {
+            on { screenInfo }.thenReturn(screen)
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(2)
         }
-        underTest.trackTabSelected(tabSelected)
-        underTest.trackTabSelected(tabSelected)
+        underTest.trackTabSelected(tabInfo)
+        underTest.trackTabSelected(tabInfo)
 
         verifyBlocking(trackEventUseCase, times(1)) { invoke(any()) }
         verifyNoMoreInteractions(trackEventUseCase)
@@ -122,19 +122,19 @@ internal class AnalyticsTrackerImplTest {
         trackScreenViewUseCase.stub {
             onBlocking { invoke(any()) }.thenReturn("viewId")
         }
-        val screen = mock<ScreenView> {
+        val screen = mock<ScreenInfo> {
             on { name }.thenReturn("")
             on { uniqueIdentifier }.thenReturn(12)
         }
         underTest.trackScreenView(screen)
 
-        val tabSelected = mock<TabSelected> {
-            on { screenView }.thenReturn(screen)
+        val tabInfo = mock<TabInfo> {
+            on { screenInfo }.thenReturn(screen)
             on { name }.thenReturn("", "new")
             on { uniqueIdentifier }.thenReturn(2)
         }
-        underTest.trackTabSelected(tabSelected)
-        underTest.trackTabSelected(tabSelected)
+        underTest.trackTabSelected(tabInfo)
+        underTest.trackTabSelected(tabInfo)
 
         verifyBlocking(trackEventUseCase, times(2)) { invoke(any()) }
     }

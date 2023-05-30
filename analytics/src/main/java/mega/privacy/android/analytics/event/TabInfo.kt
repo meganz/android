@@ -3,11 +3,11 @@ package mega.privacy.android.analytics.event
 /**
  * Tab selected
  */
-interface TabSelected {
+interface TabInfo {
     /**
      * ScreenView
      */
-    val screenView: ScreenView
+    val screenInfo: ScreenInfo
 
     /**
      * Name

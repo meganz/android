@@ -45,7 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.content.PhotosScreenView
+import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -203,8 +203,8 @@ class PhotosFragment : Fragment() {
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
-        Analytics.tracker.trackScreenView(PhotosScreenView)
-        Firebase.crashlytics.log("Screen: ${PhotosScreenView.name}")
+        Analytics.tracker.trackScreenView(PhotosScreenInfo)
+        Firebase.crashlytics.log("Screen: ${PhotosScreenInfo.name}")
         super.onResume()
     }
 

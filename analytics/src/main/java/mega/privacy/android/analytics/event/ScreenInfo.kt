@@ -5,7 +5,7 @@ package mega.privacy.android.analytics.event
  *
  * @constructor Create empty Screen view
  */
-interface ScreenView {
+interface ScreenInfo {
     /**
      * Name
      */

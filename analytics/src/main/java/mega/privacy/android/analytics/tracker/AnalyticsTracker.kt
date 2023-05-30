@@ -1,7 +1,7 @@
 package mega.privacy.android.analytics.tracker
 
-import mega.privacy.android.analytics.event.ScreenView
-import mega.privacy.android.analytics.event.TabSelected
+import mega.privacy.android.analytics.event.ScreenInfo
+import mega.privacy.android.analytics.event.TabInfo
 
 /**
  * Analytics tracker
@@ -12,12 +12,12 @@ interface AnalyticsTracker {
      *
      * @param screen
      */
-    fun trackScreenView(screen: ScreenView)
+    fun trackScreenView(screen: ScreenInfo)
 
     /**
      * Track tab selected
      *
      * @param tab
      */
-    fun trackTabSelected(tab: TabSelected)
+    fun trackTabSelected(tab: TabInfo)
 }
