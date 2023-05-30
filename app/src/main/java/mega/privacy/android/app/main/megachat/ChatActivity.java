@@ -8270,6 +8270,9 @@ public class ChatActivity extends PasscodeActivity
         }
         if (!messages.isEmpty()) {
             messages.clear();
+            if (adapter != null) {
+                adapter.setMessages(messages);
+            }
         }
         if (!removedMessages.isEmpty()) {
             removedMessages.clear();
