@@ -40,6 +40,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
+import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -151,6 +152,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var getNumberOfPendingUploadsUseCase: GetNumberOfPendingUploadsUseCase
+
+    @Inject
+    lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -291,7 +295,10 @@ internal class UploadService : LifecycleService() {
         intent.action?.takeIf { it == ACTION_CANCEL }?.let {
             Timber.d("Cancel intent")
             canceled = true
-            megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
+            applicationScope.launch {
+                runCatching { cancelAllUploadTransfersUseCase() }
+                    .onFailure { Timber.w("Exception cancelling uploads: $it") }
+            }
             stopForeground()
             return START_NOT_STICKY
         }

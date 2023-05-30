@@ -9,7 +9,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
-import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.data.repository.TransfersRepository
@@ -60,16 +59,6 @@ abstract class TransfersModule {
         @Provides
         fun provideCancelTransfer(transfersRepository: TransfersRepository): CancelTransfer =
             CancelTransfer(transfersRepository::cancelTransfer)
-
-        /**
-         * Provides the [CancelAllUploadTransfers] implementation
-         *
-         * @param transfersRepository [TransferRepository]
-         * @return [CancelAllUploadTransfers]
-         */
-        @Provides
-        fun provideCancelAllUploadTransfers(transfersRepository: TransferRepository): CancelAllUploadTransfers =
-            CancelAllUploadTransfers(transfersRepository::cancelAllUploadTransfers)
 
         /**
          * Provides the [StartUpload] implementation

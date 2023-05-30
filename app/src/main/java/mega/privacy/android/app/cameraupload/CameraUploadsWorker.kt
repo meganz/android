@@ -39,7 +39,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
+import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
@@ -430,7 +430,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Cancel All Upload Transfers
      */
     @Inject
-    lateinit var cancelAllUploadTransfers: CancelAllUploadTransfers
+    lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
 
     /**
      * Copy Node
@@ -772,11 +772,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfers],
+     * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfersUseCase],
      * and call [ResetTotalUploads] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
-        runCatching { cancelAllUploadTransfers() }
+        runCatching { cancelAllUploadTransfersUseCase() }
             .onSuccess {
                 Timber.d("Cancel all transfers successful")
                 resetTotalUploads()
