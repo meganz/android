@@ -336,9 +336,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 when {
                     imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(context, imageItem.handle)
+
                     file != null -> FileUtil.shareFile(context, file)
                     imageItem is ImageItem.PublicNode ->
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
+
                     node != null ->
                         viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
                             if (!link.isNullOrBlank()) {
@@ -388,10 +390,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 isVisible = imageItem.shouldShowRubbishBinOption()
                 if (nodeItem?.isFromRubbishBin == true) {
                     setText(R.string.general_remove)
-                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_remove, 0, 0, 0);
+                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_remove, 0, 0, 0)
                 } else {
                     setText(R.string.context_move_to_trash)
-                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_rubbish_bin, 0, 0, 0);
+                    setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_rubbish_bin, 0, 0, 0)
                 }
                 setOnClickListener { showAlertDialog(AlertDialogType.TYPE_RUBBISH_BIN) }
             }
@@ -444,7 +446,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     val copyHandle = result.first.firstOrNull()
                     val toHandle = result.second
                     if (copyHandle != null && copyHandle != INVALID_HANDLE && toHandle != INVALID_HANDLE) {
-                        viewModel.copyNode(copyHandle, toHandle)
+                        viewModel.importNode(toHandle)
                         dismissAllowingStateLoss()
                     }
                 }
@@ -475,6 +477,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     )
                     .show()
             }
+
             AlertDialogType.TYPE_RUBBISH_BIN -> {
                 val isFromRubbishBin = imageItem.nodeItem?.isFromRubbishBin ?: return
                 val buttonText: Int
@@ -504,6 +507,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     )
                     .show()
             }
+
             AlertDialogType.TYPE_REMOVE_CHAT_NODE -> {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getString(R.string.confirmation_delete_one_message))

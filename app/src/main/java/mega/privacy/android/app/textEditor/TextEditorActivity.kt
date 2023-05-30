@@ -326,8 +326,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.getNode()?.handle?.let {
-                    viewModel.copyNode(it, toHandle)
+                viewModel.getNode()?.let {
+                    viewModel.importNode(it, toHandle)
                 }
             }
 

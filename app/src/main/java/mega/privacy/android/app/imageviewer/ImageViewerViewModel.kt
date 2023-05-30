@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
@@ -35,10 +36,12 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
@@ -103,6 +106,9 @@ class ImageViewerViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
     private val checkNameCollision: CheckNameCollision,
+    private val getNodeByHandle: GetNodeByHandle,
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
@@ -609,6 +615,46 @@ class ImageViewerViewModel @Inject constructor(
             )
             .addTo(composite)
         return result
+    }
+
+    /**
+     * Imports a node if there is no name collision.
+     *
+     * @param newParentHandle   Parent handle in which the node will be copied.
+     */
+    fun importNode(newParentHandle: Long) = viewModelScope.launch {
+        val importNode =
+            images.value?.find { it.getNodeHandle() == currentImageId.value }?.nodeItem?.node
+                ?: return@launch
+        val parentNode = getNodeByHandle(newParentHandle)
+        checkNameCollisionUseCase.check(
+            node = importNode,
+            parentNode = parentNode,
+            type = NameCollisionType.COPY,
+        ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { collisionResult -> collision.value = collisionResult },
+                onError = { error ->
+                    when (error) {
+                        is MegaNodeException.ChildDoesNotExistsException -> {
+                            legacyCopyNodeUseCase.copy(
+                                node = importNode,
+                                parentHandle = newParentHandle
+                            ).subscribeAndComplete(
+                                completeAction = {
+                                    snackBarMessage.value =
+                                        context.getString(R.string.context_correctly_copied)
+                                },
+                                errorAction = { copyError ->
+                                    copyMoveException.value = copyError
+                                })
+                        }
+
+                        else -> Timber.e(error)
+                    }
+                }
+            )
+            .addTo(composite)
     }
 
     /**

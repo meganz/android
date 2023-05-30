@@ -104,7 +104,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
             val node = getChatMessageNode()
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
             if (node != null && toHandle != null) {
-                viewModel.copyNode(node = node, newParentHandle = toHandle)
+                viewModel.importNode(node = node, newParentHandle = toHandle)
             }
         }
 

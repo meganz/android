@@ -4,12 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.NodeId
@@ -31,6 +39,9 @@ class MediaPlayerViewModel @Inject constructor(
     private val checkNameCollision: CheckNameCollision,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
+    private val getNodeByHandle: GetNodeByHandle,
+    private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -99,6 +110,66 @@ class MediaPlayerViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Imports a node if there is no name collision.
+     *
+     * @param node              Node handle to copy.
+     * @param newParentHandle   Parent handle in which the node will be copied.
+     */
+    fun importNode(node: MegaNode, newParentHandle: Long) =
+        viewModelScope.launch {
+            val parentNode = getNodeByHandle(newParentHandle)
+            checkNameCollisionUseCase.check(
+                node = node,
+                parentNode = parentNode,
+                type = NameCollisionType.COPY,
+            ).observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onSuccess = { collisionResult -> collision.value = collisionResult },
+                    onError = { error ->
+                        when (error) {
+                            is MegaNodeException.ChildDoesNotExistsException -> {
+                                legacyCopyNodeUseCase.copy(
+                                    node = node,
+                                    parentHandle = newParentHandle
+                                ).subscribeAndComplete(
+                                    completeAction = {
+                                        snackbarMessage.value =
+                                            R.string.context_correctly_copied
+                                    },
+                                    errorAction = { copyError ->
+                                        throwable.value = copyError
+                                    })
+                            }
+
+                            else -> Timber.e(error)
+                        }
+                    }
+                )
+                .addTo(composite)
+        }
+
+
+    private fun Completable.subscribeAndComplete(
+        addToComposite: Boolean = false,
+        completeAction: (() -> Unit)? = null,
+        errorAction: ((Throwable) -> Unit)? = null,
+    ) {
+        subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onComplete = {
+                    completeAction?.invoke()
+                },
+                onError = { error ->
+                    errorAction?.invoke(error)
+                    Timber.e(error)
+                }
+            ).also {
+                if (addToComposite) it.addTo(composite)
+            }
+    }
 
     /**
      * Moves a node if there is no name collision.
