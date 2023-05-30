@@ -225,7 +225,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
      */
     override fun onPause() {
         super.onPause()
-
         requireContext().unregisterReceiver(receiverRefreshOffline)
     }
 
@@ -361,7 +360,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     }
 
     fun onNodeOptionsClicked(position: Int, node: OfflineNode) {
-        viewModel.onNodeLongClicked(position, node)
+        viewModel.onNodeOptionsClicked(position, node)
     }
 
     /**
