@@ -58,6 +58,7 @@ dependencies {
     implementation androidx.appcompat
     implementation google.material
     implementation google.accompanist.systemui
+    implementation androidx.compose.activity
     implementation androidx.lifecycle.runtime
     implementation lib.showkase
     implementation lib.compose.state.events

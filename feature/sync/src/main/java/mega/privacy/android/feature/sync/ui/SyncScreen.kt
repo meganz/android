@@ -1,10 +1,6 @@
 package mega.privacy.android.feature.sync.ui
 
 import android.content.res.Configuration
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState.LOADING
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState.RUNNING
@@ -47,7 +44,7 @@ fun SyncScreen(
     isDark: Boolean,
 ) {
     val state by syncViewModel.state.collectAsState()
-    val folderPicker = getFolderPicker {
+    val folderPicker = launchFolderPicker {
         syncViewModel.handleAction(SyncAction.LocalFolderSelected(it))
     }
 
@@ -72,16 +69,6 @@ fun SyncScreen(
         )
     }
 }
-
-@Composable
-private fun getFolderPicker(
-    onFolderSelected: (Uri) -> Unit,
-): ActivityResultLauncher<Uri?> =
-    rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { directoryUri ->
-        directoryUri?.let {
-            onFolderSelected(it)
-        }
-    }
 
 /**
  * UI of Sync screen
