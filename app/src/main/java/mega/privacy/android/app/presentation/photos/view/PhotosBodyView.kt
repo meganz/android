@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalPagerApi::class)
-
 package mega.privacy.android.app.presentation.photos.view
 
 import androidx.compose.animation.AnimatedVisibility
@@ -7,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -28,10 +27,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
@@ -40,7 +38,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 /**
  * Main Photos Body View
  */
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotosBodyView(
     tabs: List<PhotosTab> = listOf(),
@@ -150,6 +148,7 @@ fun PhotosTabs(
 /**
  * Page content view for Timeline or Album, depending on the selected tab
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PagerView(
     tabs: List<PhotosTab>,
@@ -161,7 +160,7 @@ fun PagerView(
     albumsViewState: AlbumsViewState,
 ) {
     HorizontalPager(
-        count = tabs.size,
+        pageCount = tabs.size,
         state = pagerState,
         modifier = modifier,
         userScrollEnabled = timelineViewState.selectedPhotoCount == 0 && albumsViewState.selectedAlbumIds.isEmpty(),

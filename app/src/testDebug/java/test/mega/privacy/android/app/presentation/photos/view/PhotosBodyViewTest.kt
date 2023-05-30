@@ -4,8 +4,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.rememberPagerState
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import test.mega.privacy.android.app.onNodeWithText
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class PhotosBodyViewTest {

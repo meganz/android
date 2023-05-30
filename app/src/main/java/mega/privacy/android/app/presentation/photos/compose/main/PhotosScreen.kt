@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.photos.compose.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -8,8 +10,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PhotosScreen(
     /** A temporary field to support compatibility between view and compose architecture. */
