@@ -66,6 +66,7 @@ dependencies {
 
     implementation lib.kotlin.ktx
     implementation lib.logging.timber
+    implementation androidx.hilt.navigation
     implementation androidx.appcompat
     implementation androidx.fragment
     implementation google.material
@@ -77,6 +78,7 @@ dependencies {
     implementation androidx.bundles.compose.bom
     implementation lib.compose.state.events
     implementation google.hilt.android
+    implementation google.accompanist.navigationanimation
     kapt google.hilt.android.compiler
     kapt androidx.hilt.compiler
 
