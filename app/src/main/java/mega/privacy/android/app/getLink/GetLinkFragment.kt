@@ -153,18 +153,24 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             viewModel.copyLink { copyInfo -> copyToClipboard(copyInfo) }
         }
 
-        binding.copyKeyButton.setOnClickListener {
+        binding.copyKeyIcon.setOnClickListener {
             viewModel.copyLinkKey { copyInfo ->
                 copyToClipboard(copyInfo)
             }
         }
 
-        binding.copyKeyButton.isVisible = false
+        binding.copyLinkIcon.setOnClickListener {
+            binding.copyLinkButton.performClick()
+        }
+
+        binding.copyKeyIcon.isVisible = false
 
         binding.copyPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
             viewModel.copyLinkPassword { copyInfo -> copyToClipboard(copyInfo) }
         }
+
+        binding.expiryDateSwitch.isVisible = viewModel.isPro()
 
         if (viewModel.isPro()) {
             binding.expiryDateProOnlyText.isVisible = false
@@ -233,6 +239,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         } else {
             binding.decryptedKeyLayout.setOnClickListener(null)
             binding.decryptedKeySwitch.setOnClickListener(null)
+            binding.decryptedKeySwitch.setOnCheckedChangeListener(null)
             binding.decryptedKeySwitch.isEnabled = false
 
             binding.expiryDateLayout.setOnClickListener(null)
@@ -242,7 +249,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.keySeparator.isVisible = false
 
             binding.copyLinkButton.isVisible = false
-            binding.copyKeyButton.isVisible = false
+            binding.copyKeyIcon.isVisible = false
         }
     }
 
@@ -280,6 +287,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
         }
 
+        binding.passwordProtectionArrow.isVisible = isPasswordSet.not() && viewModel.isPro()
         binding.passwordProtectionSetText.visibility = visibility
         binding.passwordProtectionSetText.text = if (isPasswordSet) password else null
         binding.passwordProtectionSetToggle.visibility = visibility
@@ -360,7 +368,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         binding.keyLayout.visibility = visibility
         binding.keySeparator.visibility = visibility
-        binding.copyKeyButton.visibility = visibility
+        binding.copyKeyIcon.visibility = visibility
 
         binding.keyText.text =
             if (binding.decryptedKeySwitch.isChecked) viewModel.getLinkKey() else null
