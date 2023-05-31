@@ -7989,7 +7989,8 @@ public class ChatActivity extends PasscodeActivity
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
         while (itr.hasPrevious()) {
-            if (pendingMsgId == itr.previous().getMessage().getTempId()) {
+            MegaChatMessage message = itr.previous().getMessage();
+            if (message != null && pendingMsgId == message.getTempId()) {
                 return itr.nextIndex();
             }
         }
