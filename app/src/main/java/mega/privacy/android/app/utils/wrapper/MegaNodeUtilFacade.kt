@@ -170,10 +170,9 @@ class MegaNodeUtilFacade @Inject constructor(
 
     override fun showTakenDownDialog(
         isFolder: Boolean,
-        currentPosition: Int,
-        listener: NodeTakenDownDialogListener,
+        listener: NodeTakenDownDialogListener?,
         context: Context,
-    ) = MegaNodeUtil.showTakenDownDialog(isFolder, currentPosition, listener, context)
+    ) = MegaNodeUtil.showTakenDownDialog(isFolder, listener, context)
 
     override fun selectFolderToMove(activity: Activity, handles: LongArray) {
         MegaNodeUtil.selectFolderToMove(activity, handles)

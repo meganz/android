@@ -344,15 +344,13 @@ interface MegaNodeUtilWrapper {
      * show dialog
      *
      * @param isFolder        the clicked node
-     * @param currentPosition the view position in adapter
      * @param listener        the listener to handle all clicking event
      * @param context         the context where adapter resides
      * @return the dialog object to be handled by adapter to be dismissed, in case of window leaking situation
      */
     fun showTakenDownDialog(
         isFolder: Boolean,
-        currentPosition: Int,
-        listener: NodeTakenDownDialogListener,
+        listener: NodeTakenDownDialogListener? = null,
         context: Context,
     ): AlertDialog
 

@@ -34,7 +34,9 @@ class RubbishBinComposeFragmentTest {
                 onItemClicked = {},
                 sortOrder = "Name",
                 emptyState = Pair(R.drawable.rubbish_bin_empty, R.string.context_empty_rubbish_bin),
-                thumbnailViewModel = mock()
+                thumbnailViewModel = mock(),
+                onLinkClicked = {},
+                onDisputeTakeDownClicked = {}
             )
         }
         composeRule.onNodeWithTag(NODES_EMPTY_VIEW_VISIBLE).assertIsDisplayed()

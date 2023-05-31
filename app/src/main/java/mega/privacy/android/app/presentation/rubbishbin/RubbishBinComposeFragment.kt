@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
@@ -112,7 +115,9 @@ class RubbishBinComposeFragment : Fragment() {
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
-                        thumbnailViewModel = thumbnailViewModel
+                        thumbnailViewModel = thumbnailViewModel,
+                        onLinkClicked = ::navigateToLink,
+                        onDisputeTakeDownClicked = ::navigateToLink
                     )
                 }
                 updateActionModeTitle(
@@ -357,5 +362,17 @@ class RubbishBinComposeFragment : Fragment() {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.refreshNodes()
         })
+    }
+
+    /**
+     * Clicked on link
+     * @param link
+     */
+    private fun navigateToLink(link: String) {
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setData(uriUrl)
+        startActivity(launchBrowser)
     }
 }

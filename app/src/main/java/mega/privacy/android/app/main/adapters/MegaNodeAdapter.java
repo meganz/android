@@ -11,7 +11,6 @@ import static mega.privacy.android.app.utils.Constants.LINKS_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_CONTACT_NAME_PORT;
 import static mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER;
-import static mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER;
 import static mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
@@ -1281,7 +1280,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             threeDotsClicked(currentPosition, n, sd);
         } else if (id == R.id.file_list_item_layout || id == R.id.file_grid_item_layout) {
             if (n.isTakenDown() && !isMultipleSelect()) {
-                takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
+                takenDownDialog = showTakenDownDialog(n.isFolder(), this, context);
                 unHandledItem = currentPosition;
             } else if (n.isFile() && !isOnline(context) && getLocalFile(n) == null) {
                 if (isOffline(context)) {
@@ -1513,12 +1512,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (takenDownDialog != null) {
             takenDownDialog.dismiss();
         }
-    }
-
-    @Override
-    public void onOpenClicked(int currentPosition) {
-        unHandledItem = -1;
-        fileClicked(currentPosition);
     }
 
     @Override

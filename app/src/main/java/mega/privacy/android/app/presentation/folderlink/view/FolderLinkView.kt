@@ -138,7 +138,9 @@ internal fun FolderLinkView(
     onResetMoreOptionNode: () -> Unit,
     onResetOpenMoreOption: () -> Unit,
     emptyViewString: String,
-    thumbnailViewModel: ThumbnailViewModel
+    thumbnailViewModel: ThumbnailViewModel,
+    onLinkClicked: (String) -> Unit,
+    onDisputeTakeDownClicked: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -258,7 +260,9 @@ internal fun FolderLinkView(
                     showSortOrder = false,
                     listState = listState,
                     gridState = gridState,
-                    thumbnailViewModel = thumbnailViewModel
+                    thumbnailViewModel = thumbnailViewModel,
+                    onLinkClicked = onLinkClicked,
+                    onDisputeTakeDownClicked = onDisputeTakeDownClicked
                 )
                 ImportDownloadView(
                     Modifier

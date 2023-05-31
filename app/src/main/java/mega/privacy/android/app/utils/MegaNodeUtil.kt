@@ -7,11 +7,15 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
+import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
+import android.text.util.Linkify
+import android.view.View
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
@@ -38,16 +42,15 @@ import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.EDIT_MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.VIEW_MODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
 import mega.privacy.android.app.utils.Constants.BUFFER_COMP
-import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -1087,7 +1090,6 @@ object MegaNodeUtil {
      * show dialog
      *
      * @param isFolder        the clicked node
-     * @param currentPosition the view position in adapter
      * @param listener        the listener to handle all clicking event
      * @param context         the context where adapter resides
      * @return the dialog object to be handled by adapter to be dismissed, in case of window leaking situation
@@ -1095,62 +1097,62 @@ object MegaNodeUtil {
     @JvmStatic
     fun showTakenDownDialog(
         isFolder: Boolean,
-        currentPosition: Int,
-        listener: NodeTakenDownDialogListener,
+        listener: NodeTakenDownDialogListener? = null,
         context: Context,
     ): AlertDialog {
         val builder = MaterialAlertDialogBuilder(context)
-        val inflater = LayoutInflater.from(context)
-        val v = inflater.inflate(R.layout.dialog_three_vertical_buttons, null)
 
-        builder.setView(v)
-
-        val title = v.findViewById<TextView>(R.id.dialog_title)
-        val text = v.findViewById<TextView>(R.id.dialog_text)
-        val openButton = v.findViewById<Button>(R.id.dialog_first_button)
-        val disputeButton = v.findViewById<Button>(R.id.dialog_second_button)
-        val cancelButton = v.findViewById<Button>(R.id.dialog_third_button)
-
-        val params = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+        builder.setTitle(
+            if (isFolder) context.getString(R.string.dialog_taken_down_folder_title) else context.getString(
+                R.string.dialog_taken_down_file_title
+            )
         )
-        params.gravity = Gravity.END
+        val text =
+            if (isFolder) context.getString(R.string.dialog_taken_down_folder_description) else context.getString(
+                R.string.dialog_taken_down_file_description
+            )
+        val startIndex = text.indexOf("[A]")
+        var formatterText = text.replace("[A]", "")
+        val endIndex = formatterText.indexOf("[/A]")
+        formatterText = formatterText.replace("[/A]", "")
+        val urlSpan = SpannableString(formatterText)
 
-        title.text = context.getString(R.string.general_error_word)
-        text.text = context.getString(
-            if (isFolder) R.string.message_folder_takedown_pop_out_notification
-            else R.string.message_file_takedown_pop_out_notification
+        val clickableSpan = object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                val openTermsIntent = Intent(context, WebViewActivity::class.java)
+                openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                openTermsIntent.data = Uri.parse(Constants.TAKEDOWN_URL)
+                context.startActivity(openTermsIntent)
+            }
+        }
+        urlSpan.setSpan(
+            clickableSpan,
+            startIndex,
+            endIndex,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
-        openButton.text = context.getString(R.string.context_open_link)
-        disputeButton.text = context.getString(R.string.dispute_takendown_file)
-        cancelButton.text = context.getString(R.string.general_cancel)
-
+        builder.setMessage(urlSpan)
+        builder.setPositiveButton(context.getString(R.string.general_ok)) { dialog, _ ->
+            dialog.dismiss()
+            listener?.onCancelClicked()
+        }
+        builder.setNegativeButton(context.getString(R.string.dispute_takendown_file)) { dialog, _ ->
+            val openTermsIntent = Intent(context, WebViewActivity::class.java)
+            openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            openTermsIntent.data = Uri.parse(Constants.DISPUTE_URL)
+            context.startActivity(openTermsIntent)
+            dialog.dismiss()
+            listener?.onDisputeClicked()
+        }
         val dialog = builder.create()
         dialog.setCancelable(false)
         dialog.setCanceledOnTouchOutside(false)
-        openButton.setOnClickListener {
-            listener.onOpenClicked(currentPosition)
-            dialog.dismiss()
-        }
-
-        disputeButton.setOnClickListener {
-            listener.onDisputeClicked()
-            val openTermsIntent = Intent(context, WebViewActivity::class.java)
-            openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            openTermsIntent.data = Uri.parse(DISPUTE_URL)
-            context.startActivity(openTermsIntent)
-            dialog.dismiss()
-        }
-
-        cancelButton.setOnClickListener {
-            listener.onCancelClicked()
-            dialog.dismiss()
-        }
 
         dialog.show()
-
+        val messageText = dialog.findViewById<TextView>(android.R.id.message)
+        messageText?.let {
+            it.movementMethod = LinkMovementMethod.getInstance()
+        }
         return dialog
     }
 

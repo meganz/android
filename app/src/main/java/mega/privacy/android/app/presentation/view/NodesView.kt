@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
 import java.io.File
 
@@ -232,6 +234,8 @@ private fun NodeListView(
  * @param onChangeViewTypeClick changeViewType Click
  * @param onSortOrderClick change sort order click
  * @param sortOrder current sort name
+ * @param onLinkClicked
+ * @param onDisputeTakeDownClicked
 */
  */
 @Composable
@@ -250,22 +254,31 @@ fun NodesView(
     showSortOrder: Boolean = true,
     listState: LazyListState = LazyListState(),
     gridState: LazyGridState = LazyGridState(),
-    thumbnailViewModel: ThumbnailViewModel?
+    thumbnailViewModel: ThumbnailViewModel?,
+    onLinkClicked: (String) -> Unit,
+    onDisputeTakeDownClicked: (String) -> Unit
 ) {
+    val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     if (isListView) {
         NodeListView(
             modifier = modifier,
             nodeUIItemList = nodeUIItems,
             stringUtilWrapper = stringUtilWrapper,
             onMenuClick = onMenuClick,
-            onItemClicked = onItemClicked,
+            onItemClicked = {
+                if (it.isTakenDown) {
+                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                } else {
+                    onItemClicked(it)
+                }
+            },
             onLongClick = onLongClick,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
             listState = listState,
-            thumbnailViewModel = thumbnailViewModel
+            thumbnailViewModel = thumbnailViewModel,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = spanCount)
@@ -273,7 +286,13 @@ fun NodesView(
             modifier = modifier,
             nodeUIItems = newList,
             onMenuClick = onMenuClick,
-            onItemClicked = onItemClicked,
+            onItemClicked = {
+                if (it.isTakenDown) {
+                    takenDownDialog.value = Pair(true, it.node is FolderNode)
+                } else {
+                    onItemClicked(it)
+                }
+            },
             onLongClick = onLongClick,
             spanCount = spanCount,
             sortOrder = sortOrder,
@@ -282,6 +301,18 @@ fun NodesView(
             showSortOrder = showSortOrder,
             gridState = gridState,
             thumbnailViewModel = thumbnailViewModel
+        )
+    }
+    if (takenDownDialog.value.first) {
+        TakeDownDialog(
+            isFolder = takenDownDialog.value.second, onConfirm = {
+                takenDownDialog.value = Pair(false, false)
+            }, onDeny = {
+                takenDownDialog.value = Pair(false, false)
+                onDisputeTakeDownClicked.invoke(Constants.DISPUTE_URL)
+            }, onLinkClick = {
+                onLinkClicked(it)
+            }
         )
     }
 }

@@ -54,6 +54,7 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaChatApiJava
@@ -78,6 +79,8 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     @Inject
     lateinit var megaUtilWrapper: MegaUtilWrapper
 
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
     /**
      * Used to access Open File functions
      */
@@ -504,14 +507,21 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
     }
 
     private fun openFavourite(item: Favourite) {
-        when (item) {
-            is FavouriteFile -> openNode(item)
-            is FavouriteFolder -> {
-                findNavController().navigate(
-                    HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
-                        item.typedNode.id.longValue
+        if (item.typedNode.isTakenDown) {
+            megaNodeUtilWrapper.showTakenDownDialog(
+                isFolder = item is FavouriteFolder,
+                context = requireContext(),
+            )
+        } else {
+            when (item) {
+                is FavouriteFile -> openNode(item)
+                is FavouriteFolder -> {
+                    findNavController().navigate(
+                        HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
+                            item.typedNode.id.longValue
+                        )
                     )
-                )
+                }
             }
         }
     }

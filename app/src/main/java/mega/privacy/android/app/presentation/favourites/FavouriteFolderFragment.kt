@@ -27,10 +27,12 @@ import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadState
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
+import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.app.presentation.favourites.model.FavouritesEventState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import javax.inject.Inject
 
 /**
@@ -43,6 +45,8 @@ class FavouriteFolderFragment : Fragment() {
     private lateinit var binding: FragmentFavouriteFolderBinding
     private lateinit var adapter: FavouritesAdapter
 
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
     /**
      * MegaUtilWrapper variable
      */
@@ -85,7 +89,16 @@ class FavouriteFolderFragment : Fragment() {
      */
     private fun setupAdapter() {
         adapter = FavouritesAdapter(
-            onItemClicked = viewModel::openFile,
+            onItemClicked = {
+                if (it.typedNode.isTakenDown) {
+                    megaNodeUtilWrapper.showTakenDownDialog(
+                        isFolder = it is FavouriteFolder,
+                        context = requireContext(),
+                    )
+                } else {
+                    viewModel.openFile(it)
+                }
+            },
             onThreeDotsClicked = viewModel::threeDotsClicked,
             getThumbnail = thumbnailViewModel::getThumbnail
         )

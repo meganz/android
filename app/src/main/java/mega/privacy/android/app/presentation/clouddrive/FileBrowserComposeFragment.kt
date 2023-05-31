@@ -151,7 +151,9 @@ class FileBrowserComposeFragment : Fragment() {
                         ),
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
-                        thumbnailViewModel = thumbnailViewModel
+                        thumbnailViewModel = thumbnailViewModel,
+                        onLinkClicked = ::navigateToLink,
+                        onDisputeTakeDownClicked = ::navigateToLink
                     )
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)
@@ -489,5 +491,17 @@ class FileBrowserComposeFragment : Fragment() {
                 )
             }
         }
+    }
+
+    /**
+     * Clicked on link
+     * @param link
+     */
+    private fun navigateToLink(link: String) {
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setData(uriUrl)
+        startActivity(launchBrowser)
     }
 }

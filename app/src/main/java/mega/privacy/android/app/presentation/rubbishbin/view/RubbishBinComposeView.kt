@@ -42,7 +42,9 @@ fun RubbishBinComposeView(
     onChangeViewTypeClick: () -> Unit,
     sortOrder: String,
     emptyState: Pair<Int, Int>,
-    thumbnailViewModel: ThumbnailViewModel
+    thumbnailViewModel: ThumbnailViewModel,
+    onLinkClicked: (String) -> Unit,
+    onDisputeTakeDownClicked: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -61,7 +63,9 @@ fun RubbishBinComposeView(
             onChangeViewTypeClick = onChangeViewTypeClick,
             thumbnailViewModel = thumbnailViewModel,
             listState = listState,
-            gridState = gridState
+            gridState = gridState,
+            onLinkClicked = onLinkClicked,
+            onDisputeTakeDownClicked = onDisputeTakeDownClicked
         )
     } else {
         MegaEmptyView(

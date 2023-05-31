@@ -14,8 +14,11 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -59,6 +62,7 @@ import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.displayMetrics
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
@@ -86,6 +90,9 @@ class VideoFragment : Fragment(), HomepageSearchable {
 
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: ActionModeCallback
+
+    @Inject
+    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     /**
      * Used to access SDK-related functions
@@ -492,6 +499,17 @@ class VideoFragment : Fragment(), HomepageSearchable {
         sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
             viewModel.onOrderChange()
         })
+
+        lifecycleScope.launch {
+            itemOperationViewModel.openDisputeNodeEvent.collectLatest {
+                it.node?.let { node ->
+                    megaNodeUtilWrapper.showTakenDownDialog(
+                        isFolder = node.isFolder,
+                        context = requireContext(),
+                    )
+                }
+            }
+        }
     }
 
     /**

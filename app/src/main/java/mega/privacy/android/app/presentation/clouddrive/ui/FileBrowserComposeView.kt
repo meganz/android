@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.clouddrive.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -31,6 +30,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param onSortOrderClick
  * @param onChangeViewTypeClick
  * @param thumbnailViewModel
+ * @param onDisputeTakeDownClicked
+ * @param onLinkClicked
  */
 @Composable
 fun FileBrowserComposeView(
@@ -43,7 +44,9 @@ fun FileBrowserComposeView(
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
-    thumbnailViewModel: ThumbnailViewModel
+    thumbnailViewModel: ThumbnailViewModel,
+    onLinkClicked: (String) -> Unit,
+    onDisputeTakeDownClicked: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -62,7 +65,9 @@ fun FileBrowserComposeView(
             onChangeViewTypeClick = onChangeViewTypeClick,
             thumbnailViewModel = thumbnailViewModel,
             listState = listState,
-            gridState = gridState
+            gridState = gridState,
+            onLinkClicked = onLinkClicked,
+            onDisputeTakeDownClicked = onDisputeTakeDownClicked
         )
     } else {
         MegaEmptyView(

@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.main.DecryptAlertDialog
@@ -173,7 +174,9 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onResetMoreOptionNode = viewModel::resetMoreOptionNode,
                 onResetOpenMoreOption = viewModel::resetOpenMoreOption,
                 emptyViewString = getEmptyViewString(),
-                thumbnailViewModel = thumbnailViewModel
+                thumbnailViewModel = thumbnailViewModel,
+                onDisputeTakeDownClicked = ::navigateToLink,
+                onLinkClicked = ::navigateToLink
             )
         }
     }
@@ -389,6 +392,17 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         }
     }
 
+    /**
+     * Clicked on link
+     * @param link
+     */
+    private fun navigateToLink(link: String) {
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(this, WebViewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setData(uriUrl)
+        startActivity(launchBrowser)
+    }
     companion object {
         private const val TAG_DECRYPT = "decrypt"
     }
