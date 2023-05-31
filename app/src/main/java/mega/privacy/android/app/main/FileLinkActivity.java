@@ -178,7 +178,9 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         if (megaApi != null) {
             megaApi.removeRequestListener(this);
         }
-        decryptAlertDialog.dismiss();
+        if (decryptAlertDialog != null) {
+            decryptAlertDialog.dismiss();
+        }
         nodeSaver.destroy();
 
         super.onDestroy();
