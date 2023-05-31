@@ -32,6 +32,12 @@ android {
         targetCompatibility rootProject.javaVersion
     }
 
+    testOptions {
+        unitTests{
+            includeAndroidResources = true
+        }
+    }
+
     kotlin {
         jvmToolchain(rootProject.jdk as Integer)
     }
@@ -52,6 +58,8 @@ android {
 dependencies {
     lintChecks project(':lint')
 
+    testImplementation project(':core-ui-test')
+
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
     implementation lib.kotlin.ktx
@@ -64,6 +72,10 @@ dependencies {
     implementation lib.compose.state.events
     kapt lib.showkase.processor
 
+    testImplementation testlib.bundles.ui.test
+    testImplementation testlib.bundles.unit.test
+    testImplementation testlib.arch.core.test
+    testImplementation testlib.test.core.ktx
     testImplementation testlib.junit
     testImplementation testlib.junit.test.ktx
     testImplementation testlib.espresso
@@ -71,7 +83,4 @@ dependencies {
     androidTestImplementation testlib.espresso
 
     testImplementation testlib.compose.junit
-    testImplementation testlib.mockito
-    testImplementation testlib.mockito.kotlin
-    testImplementation testlib.mockito.android
 }
