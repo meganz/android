@@ -179,6 +179,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
+import static mega.privacy.android.app.utils.OnSingleClickListener.*;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.DATE;
@@ -405,6 +406,7 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
+import mega.privacy.android.app.utils.OnSingleClickListener;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1675,7 +1677,7 @@ public class ChatActivity extends PasscodeActivity
 
         joinChatLinkLayout = findViewById(R.id.join_chat_layout_chat_layout);
         joinButton = findViewById(R.id.join_button);
-        joinButton.setOnClickListener(this);
+        setOnSingleClickListener(joinButton, this);
 
         joiningLeavingLayout = findViewById(R.id.joining_leaving_layout_chat_layout);
         joiningLeavingText = findViewById(R.id.joining_leaving_text_chat_layout);
@@ -1707,7 +1709,7 @@ public class ChatActivity extends PasscodeActivity
 
         startOrJoinMeetingBanner = findViewById(R.id.start_or_join_meeting_banner);
         startOrJoinMeetingBanner.setVisibility(View.GONE);
-        startOrJoinMeetingBanner.setOnClickListener(this);
+        setOnSingleClickListener(startOrJoinMeetingBanner, this);
 
         /*Recording views*/
         recordingLayout = findViewById(R.id.recording_layout);

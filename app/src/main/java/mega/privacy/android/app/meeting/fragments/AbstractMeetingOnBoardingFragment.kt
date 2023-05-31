@@ -31,6 +31,7 @@ import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN_WITH_KEYBO
 import mega.privacy.android.app.utils.Constants.MEETING_NAME_MARGIN_TOP
 import mega.privacy.android.app.utils.Constants.MIN_MEETING_HEIGHT_CHANGE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
+import mega.privacy.android.app.utils.OnSingleClickListener.Companion.setOnSingleClickListener
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -192,7 +193,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
     private fun initBinding() {
         binding = MeetingOnBoardingFragmentBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
-        binding.btnStartJoinMeeting.setOnClickListener {
+        binding.btnStartJoinMeeting.setOnSingleClickListener {
             permissionsRequester = permissionsBuilder(
                 arrayOf(Manifest.permission.RECORD_AUDIO)
             )
