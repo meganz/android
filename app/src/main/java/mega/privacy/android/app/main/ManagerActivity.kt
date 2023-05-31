@@ -129,7 +129,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_IN
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -777,15 +776,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             val call: MegaChatCall = megaChatApi.getChatCallByCallId(sessionAndCall.first as Long)
             updateVisibleCallElements(call.chatid)
         }
-    private val refreshObserver = Observer { refreshed: Boolean? ->
-        if (refreshed == true) {
-            if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-                fileBrowserViewModel.refreshNodes()
-            } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
-                refreshIncomingShares()
-            }
-        }
-    }
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -2136,8 +2126,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             EVENT_SESSION_ON_HOLD_CHANGE,
             android.util.Pair::class.java
         ).observe(this, sessionOnHoldObserver)
-        LiveEventBus.get(EVENT_REFRESH, Boolean::class.java)
-            .observeForever(refreshObserver)
         observePsa()
     }
 
@@ -3232,8 +3220,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(receiverUpdateOrder)
         unregisterReceiver(receiverCUAttrChanged)
-        LiveEventBus.get(EVENT_REFRESH, Boolean::class.java)
-            .removeObserver(refreshObserver)
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
         cancelSearch()

@@ -10,7 +10,6 @@ import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -29,7 +28,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -83,6 +81,7 @@ import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
@@ -171,6 +170,7 @@ class MyAccountViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
+    private val broadcastRefreshSessionUseCase: BroadcastRefreshSessionUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -658,7 +658,7 @@ class MyAccountViewModel @Inject constructor(
                     }.onFailure {
                         Timber.e(it)
                     }
-                    LiveEventBus.get<Boolean>(EVENT_REFRESH).post(true)
+                    broadcastRefreshSessionUseCase()
                 }
             }
 

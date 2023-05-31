@@ -6,10 +6,12 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
@@ -33,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -66,6 +69,7 @@ class FileBrowserViewModelTest {
     private val handleOptionClickMapper: HandleOptionClickMapper = mock()
     private val monitorViewType: MonitorViewType = mock()
     private val setViewType: SetViewType = mock()
+    private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -89,7 +93,8 @@ class FileBrowserViewModelTest {
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             getOptionsForToolbarMapper = getOptionsForToolbarMapper,
-            handleOptionClickMapper = handleOptionClickMapper
+            handleOptionClickMapper = handleOptionClickMapper,
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase
         )
     }
 
@@ -422,5 +427,18 @@ class FileBrowserViewModelTest {
         )
         underTest.onOptionItemClicked(item = menuItem)
         verify(handleOptionClickMapper).invoke(menuItem, emptyList())
+    }
+
+    @Test
+    fun `test that isPendingRefresh as true when monitorRefreshSessionUseCase emit`() = runTest {
+        val flow = MutableSharedFlow<Unit>()
+        whenever(monitorRefreshSessionUseCase()).thenReturn(flow)
+        initViewModel()
+        advanceUntilIdle()
+        underTest.state.test {
+            Truth.assertThat(awaitItem().isPendingRefresh).isFalse()
+            flow.emit(Unit)
+            Truth.assertThat(awaitItem().isPendingRefresh).isTrue()
+        }
     }
 }

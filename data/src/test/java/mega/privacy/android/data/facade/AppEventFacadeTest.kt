@@ -100,4 +100,12 @@ class AppEventFacadeTest {
             assertThat(awaitItem()).isEqualTo(chatId)
         }
     }
+
+    @Test
+    fun `test that broadcast refresh session fires an event`() = runTest {
+        underTest.monitorRefreshSession().test {
+            underTest.broadcastRefreshSession()
+            assertThat(awaitItem()).isEqualTo(Unit)
+        }
+    }
 }

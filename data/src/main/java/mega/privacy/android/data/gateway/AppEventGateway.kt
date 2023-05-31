@@ -256,4 +256,17 @@ internal interface AppEventGateway {
      * Broadcasts if transfers management have to stop.
      */
     suspend fun broadcastStopTransfersWork()
+
+    /**
+     * Broadcast refresh session
+     *
+     */
+    suspend fun broadcastRefreshSession()
+
+    /**
+     * Monitor refresh session
+     *
+     * @return
+     */
+    fun monitorRefreshSession(): Flow<Unit>
 }

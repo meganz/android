@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
+import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -68,6 +69,7 @@ class FileBrowserViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper,
     private val handleOptionClickMapper: HandleOptionClickMapper,
+    private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -88,6 +90,15 @@ class FileBrowserViewModel @Inject constructor(
         refreshNodes()
         monitorFileBrowserChildrenNodes()
         checkViewType()
+        monitorRefreshSession()
+    }
+
+    private fun monitorRefreshSession() {
+        viewModelScope.launch {
+            monitorRefreshSessionUseCase().collect {
+                setPendingRefreshNodes()
+            }
+        }
     }
 
     /**

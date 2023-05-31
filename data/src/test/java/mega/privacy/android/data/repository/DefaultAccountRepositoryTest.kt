@@ -1009,4 +1009,18 @@ class DefaultAccountRepositoryTest {
             underTest.monitorEphemeralCredentials()
             verify(ephemeralCredentialsGateway).monitorEphemeralCredentials()
         }
+
+    @Test
+    fun `test that appEventGateway monitorRefreshSession invoke when calling monitorRefreshSession`() =
+        runTest {
+            underTest.monitorRefreshSession()
+            verify(appEventGateway).monitorRefreshSession()
+        }
+
+    @Test
+    fun `test that appEventGateway broadcastRefreshSession invoke when calling broadcastRefreshSession`() =
+        runTest {
+            underTest.broadcastRefreshSession()
+            verify(appEventGateway).broadcastRefreshSession()
+        }
 }

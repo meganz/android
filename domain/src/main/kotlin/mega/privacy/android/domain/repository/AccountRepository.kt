@@ -411,4 +411,17 @@ interface AccountRepository {
      *
      */
     suspend fun clearEphemeral()
+
+    /**
+     * Broadcast refresh session
+     *
+     */
+    suspend fun broadcastRefreshSession()
+
+    /**
+     * Monitor refresh session
+     *
+     * @return
+     */
+    fun monitorRefreshSession(): Flow<Unit>
 }

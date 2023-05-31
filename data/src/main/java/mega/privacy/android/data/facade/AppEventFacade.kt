@@ -45,6 +45,7 @@ internal class AppEventFacade @Inject constructor(
 
     private val updateUpgradeSecurityState = MutableStateFlow(false)
     private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransfer>()
+    private val _monitorRefreshSession = MutableSharedFlow<Unit>()
 
     override val monitorCameraUploadPauseState =
         _monitorCameraUploadPauseState.toSharedFlow(appScope)
@@ -157,6 +158,10 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorStopTransfersWork() = stopTransfersWork.toSharedFlow(appScope)
 
     override suspend fun broadcastStopTransfersWork() = stopTransfersWork.emit(true)
+
+    override suspend fun broadcastRefreshSession() = _monitorRefreshSession.emit(Unit)
+
+    override fun monitorRefreshSession() = _monitorRefreshSession.asSharedFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

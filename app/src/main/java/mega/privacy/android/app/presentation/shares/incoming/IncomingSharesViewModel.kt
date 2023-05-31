@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetVerifiedIncomingSharesUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -45,6 +46,7 @@ class IncomingSharesViewModel @Inject constructor(
     monitorContactUpdates: MonitorContactUpdates,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getVerifiedIncomingSharesUseCase: GetVerifiedIncomingSharesUseCase,
+    private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
 ) : ViewModel() {
 
     /** private UI state */
@@ -91,6 +93,15 @@ class IncomingSharesViewModel @Inject constructor(
                 if (updates.changes.values.any { it.contains(UserChanges.AuthenticationInformation) }) {
                     refreshIncomingSharesNode()
                 }
+            }
+        }
+        monitorRefreshSession()
+    }
+
+    private fun monitorRefreshSession() {
+        viewModelScope.launch {
+            monitorRefreshSessionUseCase().collect {
+                refreshIncomingSharesNode()
             }
         }
     }
