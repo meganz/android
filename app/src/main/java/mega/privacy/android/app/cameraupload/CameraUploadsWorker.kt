@@ -28,7 +28,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -39,10 +39,8 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
@@ -124,6 +122,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
@@ -133,6 +132,7 @@ import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -143,6 +143,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -1115,12 +1116,12 @@ class CameraUploadsWorker @AssistedInject constructor(
             if (file.type == SyncRecordType.TYPE_PHOTO && !file.isCopyOnly) {
                 if (!areLocationTagsEnabledUseCase()) {
                     var shouldContinue = false
-                    flowOf(
+                    flow<String> {
                         createTempFileAndRemoveCoordinatesUseCase(
                             tempRoot,
                             file
                         )
-                    ).retryWhen { cause, attempt ->
+                    }.retryWhen { cause, attempt ->
                         if (cause is NotEnoughStorageException) {
                             if (attempt >= 60) {
                                 @Suppress("DEPRECATION")
@@ -1145,6 +1146,11 @@ class CameraUploadsWorker @AssistedInject constructor(
                         }
                     }.catch {
                         Timber.e("Temporary File creation exception$it")
+                        if (it is FileNotFoundException) {
+                            file.localPath?.let { newPath ->
+                                deleteSyncRecord(newPath, isSecondary = isSecondary)
+                            }
+                        }
                         shouldContinue = true
                     }.collect()
                     if (shouldContinue) continue
