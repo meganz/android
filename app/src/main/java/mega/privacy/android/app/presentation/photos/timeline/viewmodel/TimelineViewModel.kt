@@ -45,8 +45,6 @@ import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatU
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
-import java.time.LocalDateTime
-import java.util.Collections
 import javax.inject.Inject
 
 /**
@@ -214,9 +212,9 @@ class TimelineViewModel @Inject constructor(
         sourcePhotos: List<Photo>,
         showingPhotos: List<Photo>,
     ) {
-        sortPhotos(showingPhotos)
-        val photosListItems = handleAllPhotoItems(showingPhotos = showingPhotos)
-        val dayPhotos = groupPhotosByDay(sortedPhotos = showingPhotos)
+        val sortedPhotos = sortPhotos(showingPhotos)
+        val photosListItems = handleAllPhotoItems(showingPhotos = sortedPhotos)
+        val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
         val yearCardList = createYearsCardList(dayPhotos = dayPhotos)
         val monthCardList = createMonthsCardList(dayPhotos = dayPhotos)
         val dayCardList = createDaysCardList(dayPhotos = dayPhotos)
@@ -226,7 +224,7 @@ class TimelineViewModel @Inject constructor(
                 photos = sourcePhotos,
                 photosListItems = photosListItems,
                 loadPhotosDone = true,
-                currentShowingPhotos = showingPhotos,
+                currentShowingPhotos = sortedPhotos,
                 yearsCardPhotos = yearCardList,
                 monthsCardPhotos = monthCardList,
                 daysCardPhotos = dayCardList,
@@ -280,18 +278,11 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    private fun sortPhotos(photos: List<Photo>) {
-        if (_state.value.currentSort == Sort.NEWEST) {
-            Collections.sort(
-                photos,
-                Comparator.comparing<Photo?, LocalDateTime?> { photo -> photo.modificationTime }
-                    .reversed()
-            )
+    private fun sortPhotos(photos: List<Photo>): List<Photo> {
+        return if (_state.value.currentSort == Sort.NEWEST) {
+            photos.sortedByDescending { it.modificationTime }
         } else {
-            Collections.sort(
-                photos,
-                Comparator.comparing { photo -> photo.modificationTime }
-            )
+            photos.sortedBy { it.modificationTime }
         }
     }
 
