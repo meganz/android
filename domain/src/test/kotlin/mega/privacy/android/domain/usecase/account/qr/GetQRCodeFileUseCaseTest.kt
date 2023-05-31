@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.account.qr
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,16 +14,16 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetQRCodeFileTest {
+class GetQRCodeFileUseCaseTest {
 
-    private lateinit var underTest: DefaultGetQRCodeFile
+    private lateinit var underTest: GetQRCodeFileUseCase
 
     private val qrCodeRepository: QRCodeRepository = mock()
     private val accountRepository: AccountRepository = mock()
 
     @Before
     fun setup() {
-        underTest = DefaultGetQRCodeFile(
+        underTest = GetQRCodeFileUseCase(
             qrCodeRepository = qrCodeRepository,
             accountRepository = accountRepository,
             ioDispatcher = UnconfinedTestDispatcher()

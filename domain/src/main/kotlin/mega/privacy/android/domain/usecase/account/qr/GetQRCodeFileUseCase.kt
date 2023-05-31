@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.account.qr
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -9,21 +9,26 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * Implementation of [GetQRCodeFile]
+ * Use case for getting the QR code file of the logged in account.
  */
-class DefaultGetQRCodeFile @Inject constructor(
+class GetQRCodeFileUseCase @Inject constructor(
     private val qrCodeRepository: QRCodeRepository,
     private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : GetQRCodeFile {
+) {
 
-    companion object {
-        private const val QR_IMAGE_FILE_NAME = "QR_code_image.jpg"
-    }
-
-    override suspend fun invoke(): File? = withContext(ioDispatcher) {
+    /**
+     * Invoke.
+     *
+     * @return QR file. A non-null file is returned even if it does not exist.
+     */
+    suspend operator fun invoke(): File? = withContext(ioDispatcher) {
         accountRepository.getAccountEmail()?.let { email ->
             qrCodeRepository.getQRFile(email + QR_IMAGE_FILE_NAME)
         }
+    }
+
+    companion object {
+        private const val QR_IMAGE_FILE_NAME = "QR_code_image.jpg"
     }
 }

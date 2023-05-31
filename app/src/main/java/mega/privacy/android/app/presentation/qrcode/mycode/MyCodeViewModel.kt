@@ -25,8 +25,8 @@ import mega.privacy.android.domain.usecase.DeleteQRCode
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
-import mega.privacy.android.domain.usecase.GetQRCodeFile
 import mega.privacy.android.domain.usecase.ResetContactLink
+import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class MyCodeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val copyToClipBoard: CopyToClipBoard,
     private val createContactLink: CreateContactLink,
-    private val getQRCodeFile: GetQRCodeFile,
+    private val getQRCodeFileUseCase: GetQRCodeFileUseCase,
     private val deleteQRCode: DeleteQRCode,
     private val resetContactLink: ResetContactLink,
     private val avatarMapper: AvatarMapper,
@@ -172,7 +172,7 @@ class MyCodeViewModel @Inject constructor(
     }
 
     private suspend fun loadQRCodeBitmapFromCache(): Bitmap? =
-        getQRCodeFile()
+        getQRCodeFileUseCase()
             ?.takeIf { it.exists() }
             ?.let { loadBitmapFromFile(it) }
 
@@ -271,7 +271,7 @@ class MyCodeViewModel @Inject constructor(
     }
 
     private suspend fun saveQRCodeToFile(bitmap: Bitmap) {
-        getQRCodeFile()?.let { file ->
+        getQRCodeFileUseCase()?.let { file ->
             saveBitmapToFile(bitmap, file)
         }
     }
@@ -324,7 +324,7 @@ class MyCodeViewModel @Inject constructor(
     fun startSharing() {
         viewModelScope.launch {
             runCatching {
-                getQRCodeFile()
+                getQRCodeFileUseCase()
                     ?.takeIf { it.exists() }
                     ?.let { localFile ->
                         _uiState.update {

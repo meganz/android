@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.account.qr.GetQRCodeFileUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -21,7 +22,7 @@ class DefaultDeleteQRCodeTest {
 
     private val accountRepository: AccountRepository = mock()
     private val nodeRepository: NodeRepository = mock()
-    private val getQRCodeFile: GetQRCodeFile = mock()
+    private val getQRCodeFileUseCase: GetQRCodeFileUseCase = mock()
 
     @Before
     fun setup() {
@@ -29,7 +30,7 @@ class DefaultDeleteQRCodeTest {
             accountRepository = accountRepository,
             nodeRepository = nodeRepository,
             ioDispatcher = UnconfinedTestDispatcher(),
-            getQRCodeFile = getQRCodeFile
+            getQRCodeFileUseCase = getQRCodeFileUseCase
 
         )
     }
@@ -42,7 +43,7 @@ class DefaultDeleteQRCodeTest {
         val qrCodeFile: File = mock()
 
         whenever(nodeRepository.convertBase64ToHandle(any())).thenReturn(handle)
-        whenever(getQRCodeFile.invoke()).thenReturn(qrCodeFile)
+        whenever(getQRCodeFileUseCase.invoke()).thenReturn(qrCodeFile)
 
         underTest(contactLink)
         verify(accountRepository).deleteContactLink(handle)

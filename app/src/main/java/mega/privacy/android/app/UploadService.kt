@@ -46,13 +46,11 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment
 import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
-import mega.privacy.android.app.utils.CacheFolderManager.buildQrFile
 import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpty
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFile
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
@@ -68,6 +66,7 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
@@ -159,6 +158,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
+
+    @Inject
+    lateinit var checkUploadedQRCodeFileUseCase: CheckUploadedQRCodeFileUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -1050,13 +1052,13 @@ internal class UploadService : LifecycleService() {
                             isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
                         }
                     }
-                    val qrFileName = megaApi.myEmail + MyCodeFragment.QR_IMAGE_FILE_NAME
-                    buildQrFile(applicationContext, transfer.fileName)
-                        ?.takeIf { it.exists() && it.name != qrFileName }
-                        ?.let {
-                            Timber.d("Delete file!: ${it.absolutePath}")
-                            it.delete()
-                        }
+
+                    applicationScope.launch {
+                        runCatching { checkUploadedQRCodeFileUseCase(transfer.fileName) }
+                            .onSuccess { Timber.d("File deleted $it: ${transfer.path}") }
+                            .onFailure { Timber.w("Exception checking uploaded QR code file.") }
+                    }
+
                     if (error.errorCode == MegaError.API_OK) {
                         // Get the uploaded file from cache root directory.
                         getCacheFile(applicationContext, "", transfer.fileName)
