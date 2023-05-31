@@ -37,6 +37,8 @@ import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -276,6 +278,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
     }
 
+    @OptIn(FlowPreview::class)
     private fun setupObserver() {
         with(viewModel) {
             getCollision().observe(this@VideoPlayerActivity) { collision ->
@@ -306,6 +309,250 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                 viewModel.renameUpdate(null)
                             }
                         })
+                }
+            }
+        }
+
+        collectFlow(viewModel.menuClickEventFlow.debounce { (menuId) ->
+            if (menuId == R.id.share) {
+                TIMEOUT_FOR_SHARED_MENU_ITEM
+            } else {
+                TIMEOUT_FOR_DEFAULT_MENU_ITEM
+            }
+        }) { (menuId, adapterType, playingHandle, launchIntent) ->
+            when (menuId) {
+                R.id.save_to_device -> {
+                    videoViewModel.sendSaveToDeviceButtonClickedEvent()
+                    when (adapterType) {
+                        OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
+                            handle = playingHandle,
+                            fromMediaViewer = true
+                        )
+
+                        ZIP_ADAPTER -> {
+                            val mediaItem = serviceGateway?.getCurrentMediaItem()
+                            mediaItem?.localConfiguration?.uri?.let { uri ->
+                                playerServiceGateway?.getPlaylistItem(mediaItem.mediaId)
+                                    ?.let { playlistItem ->
+                                        nodeSaver.saveUri(
+                                            uri = uri,
+                                            name = playlistItem.nodeName,
+                                            size = playlistItem.size,
+                                            fromMediaViewer = true
+                                        )
+                                    }
+                            }
+                        }
+
+                        FROM_CHAT -> {
+                            getChatMessageNode()?.let { node ->
+                                nodeSaver.saveNode(
+                                    node = node,
+                                    highPriority = true,
+                                    fromMediaViewer = true,
+                                    needSerialize = true
+                                )
+                            }
+                        }
+
+                        FILE_LINK_ADAPTER -> {
+                            launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
+                                MegaNode.unserialize(serialize)?.let { currentDocument ->
+                                    Timber.d("currentDocument NOT NULL")
+                                    nodeSaver.saveNode(
+                                        currentDocument,
+                                        isFolderLink = false,
+                                        fromMediaViewer = true,
+                                        needSerialize = true
+                                    )
+                                } ?: Timber.w("currentDocument is NULL")
+                            }
+                        }
+
+                        else -> {
+                            nodeSaver.saveHandle(
+                                handle = playingHandle,
+                                isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
+                                fromMediaViewer = true
+                            )
+                        }
+                    }
+                }
+
+                R.id.properties -> {
+                    videoViewModel.sendInfoButtonClickedEvent()
+                    val intent: Intent
+                    if (adapterType == OFFLINE_ADAPTER) {
+                        intent = Intent(this, OfflineFileInfoActivity::class.java).apply {
+                            putExtra(HANDLE, playingHandle.toString())
+                        }
+                        Timber.d("onOptionsItemSelected properties offline handle $playingHandle")
+                    } else {
+                        val node = megaApi.getNodeByHandle(playingHandle)
+                        intent = Intent(this, FileInfoActivity::class.java).apply {
+                            putExtra(HANDLE, playingHandle)
+                            putExtra(NAME, node?.name)
+                        }
+
+                        val fromIncoming =
+                            (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) &&
+                                    NodeController(this).nodeComesFromIncoming(node)
+
+                        when {
+                            adapterType == INCOMING_SHARES_ADAPTER || fromIncoming -> {
+                                intent.putExtra(
+                                    INTENT_EXTRA_KEY_FROM,
+                                    FROM_INCOMING_SHARES
+                                )
+                                intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
+                            }
+
+                            adapterType == INBOX_ADAPTER -> {
+                                intent.putExtra(
+                                    INTENT_EXTRA_KEY_FROM,
+                                    FROM_INBOX
+                                )
+                            }
+                        }
+                    }
+                    startActivity(intent)
+                }
+
+                R.id.chat_import -> {
+                    selectImportFolderLauncher.launch(
+                        Intent(this, FileExplorerActivity::class.java).apply {
+                            action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
+                        }
+                    )
+                }
+
+                R.id.share -> {
+                    videoViewModel.sendShareButtonClickedEvent()
+                    when (adapterType) {
+                        OFFLINE_ADAPTER, ZIP_ADAPTER -> {
+                            val mediaItem = serviceGateway?.getCurrentMediaItem()
+                            playerServiceGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
+                                ?.let { nodeName ->
+                                    mediaItem?.localConfiguration?.uri?.let { uri ->
+                                        FileUtil.shareUri(this, nodeName, uri)
+                                    }
+                                }
+                        }
+
+                        FILE_LINK_ADAPTER -> {
+                            MegaNodeUtil.shareLink(
+                                context = this,
+                                fileLink = launchIntent.getStringExtra(URL_FILE_LINK)
+                            )
+                        }
+
+                        else -> {
+                            playerServiceGateway?.run {
+                                MegaNodeUtil.shareNode(
+                                    context = this@VideoPlayerActivity,
+                                    node = megaApi.getNodeByHandle(getCurrentPlayingHandle())
+                                )
+                            }
+                        }
+                    }
+                }
+
+                R.id.send_to_chat -> {
+                    videoViewModel.sendSendToChatButtonClickedEvent()
+                    nodeAttacher.attachNode(handle = playingHandle)
+                }
+
+                R.id.get_link -> {
+                    videoViewModel.sendGetLinkButtonClickedEvent()
+                    if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
+                            node = megaApi.getNodeByHandle(playingHandle),
+                            context = this
+                        )
+                    ) {
+                        LinksUtil.showGetLinkActivity(this, playingHandle)
+                    }
+                }
+
+                R.id.remove_link -> {
+                    videoViewModel.sendRemoveLinkButtonClickedEvent()
+                    megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                        if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
+                            AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
+                                megaApi.disableExport(
+                                    node,
+                                    OptionalMegaRequestListenerInterface(
+                                        onRequestFinish = { _, error ->
+                                            if (error.errorCode == MegaError.API_OK) {
+                                                // Some times checking node.isExported immediately will still
+                                                // get true, so let's add some delay here.
+                                                RunOnUIThreadUtils.runDelay(500L) {
+                                                    refreshMenuOptionsVisibility()
+                                                }
+                                            }
+                                        })
+                                )
+                            }
+                        }
+                    }
+                }
+
+                R.id.chat_save_for_offline -> {
+                    PermissionUtils.checkNotificationsPermission(this)
+                    getChatMessage().let { (chatId, message) ->
+                        message?.let {
+                            ChatController(this).saveForOffline(
+                                it.megaNodeList,
+                                megaChatApi.getChatRoom(chatId),
+                                true,
+                                this
+                            )
+                        }
+                    }
+                }
+
+                R.id.rename -> {
+                    viewModel.renameUpdate(node = megaApi.getNodeByHandle(playingHandle))
+                }
+
+                R.id.move -> {
+                    selectFolderToMoveLauncher.launch(
+                        Intent(this, FileExplorerActivity::class.java).apply {
+                            action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
+                            putExtra(
+                                Constants.INTENT_EXTRA_KEY_MOVE_FROM,
+                                longArrayOf(playingHandle)
+                            )
+                        }
+                    )
+                }
+
+                R.id.copy -> {
+                    if (getStorageState() == StorageState.PayWall) {
+                        AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+                    } else {
+                        selectFolderToCopyLauncher.launch(
+                            Intent(this, FileExplorerActivity::class.java).apply {
+                                action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
+                                putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
+                            }
+                        )
+                    }
+                }
+
+                R.id.move_to_trash -> {
+                    if (adapterType == FROM_CHAT) {
+                        getChatMessage().let { (chatId, message) ->
+                            message?.let {
+                                ChatUtil.removeAttachmentMessage(this, chatId, it)
+                            }
+                        }
+                    } else {
+                        MegaNodeDialogUtil.moveToRubbishOrRemove(
+                            handle = playingHandle,
+                            activity = this,
+                            snackbarShower = this
+                        )
+                    }
                 }
             }
         }
@@ -446,249 +693,32 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         when (item.itemId) {
-            R.id.save_to_device -> {
-                videoViewModel.sendSaveToDeviceButtonClickedEvent()
-                when (adapterType) {
-                    OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(
-                        handle = playingHandle,
-                        fromMediaViewer = true
-                    )
-
-                    ZIP_ADAPTER -> {
-                        val mediaItem = serviceGateway?.getCurrentMediaItem()
-                        val uri = mediaItem?.localConfiguration?.uri ?: return false
-                        val playlistItem =
-                            playerServiceGateway?.getPlaylistItem(mediaItem.mediaId) ?: return false
-                        nodeSaver.saveUri(
-                            uri = uri,
-                            name = playlistItem.nodeName,
-                            size = playlistItem.size,
-                            fromMediaViewer = true
-                        )
-                    }
-
-                    FROM_CHAT -> {
-                        getChatMessageNode()?.let { node ->
-                            nodeSaver.saveNode(
-                                node = node,
-                                highPriority = true,
-                                fromMediaViewer = true,
-                                needSerialize = true
-                            )
-                        }
-                    }
-
-                    FILE_LINK_ADAPTER -> {
-                        launchIntent.getStringExtra(EXTRA_SERIALIZE_STRING)?.let { serialize ->
-                            MegaNode.unserialize(serialize)?.let { currentDocument ->
-                                Timber.d("currentDocument NOT NULL")
-                                nodeSaver.saveNode(
-                                    currentDocument,
-                                    isFolderLink = false,
-                                    fromMediaViewer = true,
-                                    needSerialize = true
-                                )
-                            } ?: Timber.w("currentDocument is NULL")
-                        }
-                    }
-
-                    else -> {
-                        nodeSaver.saveHandle(
-                            handle = playingHandle,
-                            isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
-                            fromMediaViewer = true
-                        )
-                    }
-                }
-
-                return true
-            }
-
-            R.id.properties -> {
-                videoViewModel.sendInfoButtonClickedEvent()
-                val intent: Intent
-                if (adapterType == OFFLINE_ADAPTER) {
-                    intent = Intent(this, OfflineFileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, playingHandle.toString())
-                    }
-                    Timber.d("onOptionsItemSelected properties offline handle $playingHandle")
-                } else {
+            R.id.save_to_device,
+            R.id.properties,
+            R.id.chat_import,
+            R.id.share,
+            R.id.send_to_chat,
+            R.id.get_link,
+            R.id.remove_link,
+            R.id.chat_save_for_offline,
+            R.id.rename,
+            R.id.move,
+            R.id.copy,
+            R.id.move_to_trash,
+            -> {
+                if (item.itemId == R.id.properties && adapterType != OFFLINE_ADAPTER) {
                     val node = megaApi.getNodeByHandle(playingHandle)
                     if (node == null) {
                         Timber.e("onOptionsItemSelected properties non-offline null node")
                         return false
                     }
-                    intent = Intent(this, FileInfoActivity::class.java).apply {
-                        putExtra(HANDLE, playingHandle)
-                        putExtra(NAME, node.name)
-                    }
-
-                    val fromIncoming =
-                        (adapterType == SEARCH_ADAPTER || adapterType == RECENTS_ADAPTER) &&
-                                NodeController(this).nodeComesFromIncoming(node)
-
-                    when {
-                        adapterType == INCOMING_SHARES_ADAPTER || fromIncoming -> {
-                            intent.putExtra(
-                                INTENT_EXTRA_KEY_FROM,
-                                FROM_INCOMING_SHARES
-                            )
-                            intent.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, false)
-                        }
-
-                        adapterType == INBOX_ADAPTER -> {
-                            intent.putExtra(
-                                INTENT_EXTRA_KEY_FROM,
-                                FROM_INBOX
-                            )
-                        }
-                    }
                 }
-                startActivity(intent)
-                return true
-            }
-
-            R.id.chat_import -> {
-                selectImportFolderLauncher.launch(
-                    Intent(this, FileExplorerActivity::class.java).apply {
-                        action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
-                    }
+                viewModel.updateMenuClickEventFlow(
+                    menuId = item.itemId,
+                    adapterType = adapterType,
+                    playingHandle = playingHandle,
+                    launchIntent = launchIntent
                 )
-                return true
-            }
-
-            R.id.share -> {
-                videoViewModel.sendShareButtonClickedEvent()
-                when (adapterType) {
-                    OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                        val mediaItem = serviceGateway?.getCurrentMediaItem()
-                        val nodeName =
-                            playerServiceGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
-                                ?: return false
-                        val uri = mediaItem?.localConfiguration?.uri ?: return false
-
-                        FileUtil.shareUri(this, nodeName, uri)
-                    }
-
-                    FILE_LINK_ADAPTER -> {
-                        MegaNodeUtil.shareLink(
-                            context = this,
-                            fileLink = launchIntent.getStringExtra(URL_FILE_LINK)
-                        )
-                    }
-
-                    else -> {
-                        playerServiceGateway?.run {
-                            MegaNodeUtil.shareNode(
-                                context = this@VideoPlayerActivity,
-                                node = megaApi.getNodeByHandle(getCurrentPlayingHandle())
-                            )
-                        }
-                    }
-                }
-                return true
-            }
-
-            R.id.send_to_chat -> {
-                videoViewModel.sendSendToChatButtonClickedEvent()
-                nodeAttacher.attachNode(handle = playingHandle)
-                return true
-            }
-
-            R.id.get_link -> {
-                videoViewModel.sendGetLinkButtonClickedEvent()
-                if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(
-                        node = megaApi.getNodeByHandle(playingHandle),
-                        context = this
-                    )
-                ) {
-                    LinksUtil.showGetLinkActivity(this, playingHandle)
-                }
-                return true
-            }
-
-            R.id.remove_link -> {
-                videoViewModel.sendRemoveLinkButtonClickedEvent()
-                megaApi.getNodeByHandle(playingHandle)?.let { node ->
-                    if (!MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog(node, this)) {
-                        AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
-                            megaApi.disableExport(
-                                node,
-                                OptionalMegaRequestListenerInterface(
-                                    onRequestFinish = { _, error ->
-                                        if (error.errorCode == MegaError.API_OK) {
-                                            // Some times checking node.isExported immediately will still
-                                            // get true, so let's add some delay here.
-                                            RunOnUIThreadUtils.runDelay(500L) {
-                                                refreshMenuOptionsVisibility()
-                                            }
-                                        }
-                                    })
-                            )
-                        }
-                    }
-                }
-                return true
-            }
-
-            R.id.chat_save_for_offline -> {
-                PermissionUtils.checkNotificationsPermission(this)
-                getChatMessage().let { (chatId, message) ->
-                    message?.let {
-                        ChatController(this).saveForOffline(
-                            it.megaNodeList,
-                            megaChatApi.getChatRoom(chatId),
-                            true,
-                            this
-                        )
-                    }
-                }
-                return true
-            }
-
-            R.id.rename -> {
-                viewModel.renameUpdate(node = megaApi.getNodeByHandle(playingHandle))
-                return true
-            }
-
-            R.id.move -> {
-                selectFolderToMoveLauncher.launch(
-                    Intent(this, FileExplorerActivity::class.java).apply {
-                        action = FileExplorerActivity.ACTION_PICK_MOVE_FOLDER
-                        putExtra(Constants.INTENT_EXTRA_KEY_MOVE_FROM, longArrayOf(playingHandle))
-                    }
-                )
-                return true
-            }
-
-            R.id.copy -> {
-                if (getStorageState() == StorageState.PayWall) {
-                    AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
-                } else {
-                    selectFolderToCopyLauncher.launch(
-                        Intent(this, FileExplorerActivity::class.java).apply {
-                            action = FileExplorerActivity.ACTION_PICK_COPY_FOLDER
-                            putExtra(INTENT_EXTRA_KEY_COPY_FROM, longArrayOf(playingHandle))
-                        }
-                    )
-                }
-                return true
-            }
-
-            R.id.move_to_trash -> {
-                if (adapterType == FROM_CHAT) {
-                    getChatMessage().let { (chatId, message) ->
-                        message?.let {
-                            ChatUtil.removeAttachmentMessage(this, chatId, it)
-                        }
-                    }
-                } else {
-                    MegaNodeDialogUtil.moveToRubbishOrRemove(
-                        handle = playingHandle,
-                        activity = this,
-                        snackbarShower = this
-                    )
-                }
                 return true
             }
         }

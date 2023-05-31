@@ -445,5 +445,8 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
          * The zero value for translation Y
          */
         const val TRANSLATION_Y_ZERO = 0F
+
+        internal const val TIMEOUT_FOR_DEFAULT_MENU_ITEM: Long = 100
+        internal const val TIMEOUT_FOR_SHARED_MENU_ITEM: Long = 500
     }
 }

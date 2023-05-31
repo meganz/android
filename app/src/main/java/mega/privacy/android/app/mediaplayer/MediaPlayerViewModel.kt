@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -9,11 +10,13 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -47,6 +50,37 @@ class MediaPlayerViewModel @Inject constructor(
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<Int>()
+
+    /**
+     * The flow for clicked event
+     */
+    val menuClickEventFlow = MutableSharedFlow<MediaPlayerMenuClickedEvent>()
+
+    /**
+     * Update clicked event flow
+     *
+     * @param menuId menu view id
+     * @param adapterType the type of adapter
+     * @param playingHandle the current playing item handle
+     * @param launchIntent the launched Intent
+     */
+    fun updateMenuClickEventFlow(
+        menuId: Int,
+        adapterType: Int,
+        playingHandle: Long,
+        launchIntent: Intent,
+    ) {
+        viewModelScope.launch {
+            menuClickEventFlow.emit(
+                MediaPlayerMenuClickedEvent(
+                    menuId = menuId,
+                    adapterType = adapterType,
+                    playingHandle = playingHandle,
+                    launchIntent = launchIntent
+                )
+            )
+        }
+    }
 
     fun getCollision(): LiveData<NameCollision> = collision
     fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
