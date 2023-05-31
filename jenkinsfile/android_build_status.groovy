@@ -343,6 +343,12 @@ pipeline {
                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         println("APP_COVERAGE = ${APP_COVERAGE}")
 
+                        sh "./gradlew feature:devicecenter:testDebugUnitTest"
+
+                        sh "./gradlew feature:sync:testDebugUnitTest"
+
+                        sh "./gradlew core-ui:testDebugUnitTest"
+
                         // below code is only run when UnitTest is OK, before test reports are cleaned up.
                         // If UnitTest is failed, summary is collected at post.failure{} phase
                         // We have to collect the report here, before they are cleaned in the last stage.

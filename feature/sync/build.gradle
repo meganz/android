@@ -32,6 +32,12 @@ android {
         targetCompatibility rootProject.javaVersion
     }
 
+    testOptions {
+        unitTests{
+            includeAndroidResources = true
+        }
+    }
+
     kotlin {
         jvmToolchain(rootProject.jdk as Integer)
     }
@@ -50,6 +56,8 @@ android {
 }
 
 dependencies {
+    testImplementation project(':core-ui-test')
+
     lintChecks project(':lint')
 
     implementation(project(":domain"))
@@ -77,4 +85,8 @@ dependencies {
     testImplementation testlib.espresso
     testImplementation testlib.compose.junit
 
+    testImplementation testlib.bundles.ui.test
+    testImplementation testlib.bundles.unit.test
+    testImplementation testlib.arch.core.test
+    testImplementation testlib.test.core.ktx
 }

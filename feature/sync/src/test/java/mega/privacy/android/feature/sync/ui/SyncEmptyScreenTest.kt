@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.sync.R
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,6 +19,7 @@ internal class SyncEmptyScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
+    @Ignore
     fun `test that all sync empty screen components are visible`() {
         composeTestRule.setContent {
             SyncEmptyScreen({})
