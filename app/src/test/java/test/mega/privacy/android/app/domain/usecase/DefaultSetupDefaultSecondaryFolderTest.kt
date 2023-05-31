@@ -6,7 +6,7 @@ import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolde
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import org.junit.Before
@@ -32,7 +32,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     }
     private val getUploadFolderHandle = mock<GetUploadFolderHandle>()
     private val getDefaultNodeHandleUseCase = mock<GetDefaultNodeHandleUseCase>()
-    private val isNodeInRubbishOrDeleted = mock<IsNodeInRubbishOrDeleted>()
+    private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
     private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
 
     @Before
@@ -41,7 +41,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             cameraUploadRepository = cameraUploadRepository,
             getUploadFolderHandle = getUploadFolderHandle,
             getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
-            isNodeInRubbishOrDeleted = isNodeInRubbishOrDeleted,
+            isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
             setupSecondaryFolder = setupSecondaryFolder
         )
     }
@@ -50,7 +50,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is valid and default handle is invalid that no new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(validHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(false)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
             verifyNoInteractions(setupSecondaryFolder)
@@ -60,7 +60,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is valid and not deleted and default handle is valid, that no new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(validHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(false)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
             verifyNoInteractions(setupSecondaryFolder)
@@ -70,7 +70,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is invalid and deleted and default handle is invalid, that no new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(invalidHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(true)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
             verifyNoInteractions(setupSecondaryFolder)
@@ -80,7 +80,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is valid and deleted and default handle is invalid, that no new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(validHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(true)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
             verifyNoInteractions(setupSecondaryFolder)
@@ -90,7 +90,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is invalid and not deleted and default handle is invalid, that no new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(invalidHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(false)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
             verifyNoInteractions(setupSecondaryFolder)
@@ -100,7 +100,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is valid and deleted and default handle is valid that a new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(validHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(true)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
             verify(setupSecondaryFolder, times(1)).invoke(validHandle)
@@ -110,7 +110,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is invalid and not deleted and default handle is valid, that a new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(invalidHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(false)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
             verify(setupSecondaryFolder, times(1)).invoke(validHandle)
@@ -120,7 +120,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     fun `test that if secondary folder handle is invalid and deleted and default handle is valid, that a new secondary folder gets setup`() =
         runTest {
             whenever(getUploadFolderHandle(isPrimary = false)).thenReturn(invalidHandle)
-            whenever(isNodeInRubbishOrDeleted(any())).thenReturn(true)
+            whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
             verify(setupSecondaryFolder, times(1)).invoke(validHandle)

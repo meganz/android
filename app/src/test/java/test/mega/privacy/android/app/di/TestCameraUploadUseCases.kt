@@ -39,7 +39,6 @@ import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -231,9 +230,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
-
-    @Provides
-    fun provideIsNodeInRubbishOrDeleted() = mock<IsNodeInRubbishOrDeleted>()
 
     @Provides
     fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()

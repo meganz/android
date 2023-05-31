@@ -82,7 +82,6 @@ import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -299,13 +298,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideBroadcastCameraUploadProgress(cameraUploadRepository: CameraUploadRepository): BroadcastCameraUploadProgress =
             BroadcastCameraUploadProgress(cameraUploadRepository::broadcastCameraUploadProgress)
-
-        /**
-         * Provide the [IsNodeInRubbishOrDeleted] implementation
-         */
-        @Provides
-        fun provideIsNodeInRubbishOrDeleted(nodeRepository: NodeRepository): IsNodeInRubbishOrDeleted =
-            IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation

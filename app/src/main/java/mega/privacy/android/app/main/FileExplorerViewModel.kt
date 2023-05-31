@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -299,19 +298,17 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getCopyTargetPath() {
         viewModelScope.launch {
-            runCatching { getCopyLatestTargetPathUseCase() }
-                .onSuccess { latestCopyPath ->
-                    latestCopyTargetPath = latestCopyPath
-                    latestCopyTargetPath?.let {
-                        val accessPermission = getNodeAccessPermission(NodeId(it))
-                        latestCopyTargetPathTab = if (accessPermission == AccessPermission.OWNER)
-                            FileExplorerActivity.CLOUD_TAB
-                        else
-                            FileExplorerActivity.INCOMING_TAB
-                    }
-                    _copyTargetPathFlow.emit(latestCopyTargetPath ?: -1)
-                }
-                .onFailure { Timber.e(it) }
+            latestCopyTargetPath = runCatching { getCopyLatestTargetPathUseCase() }.getOrNull()
+            latestCopyTargetPath?.let {
+                val accessPermission =
+                    runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()
+                latestCopyTargetPathTab =
+                    if (accessPermission == null || accessPermission == AccessPermission.OWNER)
+                        FileExplorerActivity.CLOUD_TAB
+                    else
+                        FileExplorerActivity.INCOMING_TAB
+            }
+            _copyTargetPathFlow.emit(latestCopyTargetPath ?: -1)
         }
     }
 
@@ -320,19 +317,17 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun getMoveTargetPath() {
         viewModelScope.launch {
-            runCatching { getMoveLatestTargetPathUseCase() }
-                .onSuccess { latestMovePath ->
-                    latestMoveTargetPath = latestMovePath
-                    latestMoveTargetPath?.let {
-                        val accessPermission = getNodeAccessPermission(NodeId(it))
-                        latestMoveTargetPathTab = if (accessPermission == AccessPermission.OWNER)
-                            FileExplorerActivity.CLOUD_TAB
-                        else
-                            FileExplorerActivity.INCOMING_TAB
-                    }
-                    _moveTargetPathFlow.emit(latestMoveTargetPath ?: -1)
-                }
-                .onFailure { Timber.e(it) }
+            latestMoveTargetPath = runCatching { getMoveLatestTargetPathUseCase() }.getOrNull()
+            latestMoveTargetPath?.let {
+                val accessPermission =
+                    runCatching { getNodeAccessPermission(NodeId(it)) }.getOrNull()
+                latestMoveTargetPathTab =
+                    if (accessPermission == null || accessPermission == AccessPermission.OWNER)
+                        FileExplorerActivity.CLOUD_TAB
+                    else
+                        FileExplorerActivity.INCOMING_TAB
+            }
+            _moveTargetPathFlow.emit(latestMoveTargetPath ?: -1)
         }
     }
 

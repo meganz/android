@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.camerauploads
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -31,7 +31,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
-    private val isNodeInRubbishOrDeleted = mock<IsNodeInRubbishOrDeleted>()
+    private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
     private val resetCameraUploadTimelines = mock<ResetCameraUploadTimelines>()
     private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
     private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
@@ -41,7 +41,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
         underTest = EstablishCameraUploadsSyncHandlesUseCase(
             cameraUploadRepository = cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
-            isNodeInRubbishOrDeleted = isNodeInRubbishOrDeleted,
+            isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
             resetCameraUploadTimelines = resetCameraUploadTimelines,
             setPrimarySyncHandle = setPrimarySyncHandle,
             setSecondarySyncHandle = setSecondarySyncHandle,
@@ -53,7 +53,7 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
         reset(
             cameraUploadRepository,
             getCameraUploadsSyncHandlesUseCase,
-            isNodeInRubbishOrDeleted,
+            isNodeInRubbishOrDeletedUseCase,
             resetCameraUploadTimelines,
             setPrimarySyncHandle,
             setSecondarySyncHandle,
@@ -69,8 +69,8 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
         val testPair = Pair(10L, 20L)
 
         whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(testPair)
-        whenever(isNodeInRubbishOrDeleted(testPair.first)).thenReturn(primaryHandleDeleted)
-        whenever(isNodeInRubbishOrDeleted(testPair.second)).thenReturn(secondaryHandleDeleted)
+        whenever(isNodeInRubbishOrDeletedUseCase(testPair.first)).thenReturn(primaryHandleDeleted)
+        whenever(isNodeInRubbishOrDeletedUseCase(testPair.second)).thenReturn(secondaryHandleDeleted)
 
         underTest()
 

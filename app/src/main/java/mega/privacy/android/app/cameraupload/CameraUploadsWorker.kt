@@ -100,7 +100,7 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -406,7 +406,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Is Node In Rubbish or deleted
      */
     @Inject
-    lateinit var isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted
+    lateinit var isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase
 
     /**
      * Monitor charging stop status
@@ -970,7 +970,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isPrimaryFolderInRubbish = isNodeInRubbishOrDeleted(primarySyncHandle)
+        val isPrimaryFolderInRubbish = isNodeInRubbishOrDeletedUseCase(primarySyncHandle)
         val result =
             !isPrimaryFolderInRubbish || (getPrimaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Primary Folder Established $result")
@@ -987,7 +987,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
-        val isSecondaryFolderInRubbish = isNodeInRubbishOrDeleted(getSecondaryFolderHandle())
+        val isSecondaryFolderInRubbish = isNodeInRubbishOrDeletedUseCase(getSecondaryFolderHandle())
         val result =
             !isSecondaryFolderInRubbish || (getSecondaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
         Timber.d("Secondary Folder Established $result")

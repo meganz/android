@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
@@ -15,7 +15,7 @@ import javax.inject.Inject
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property getCameraUploadsSyncHandlesUseCase [GetCameraUploadsSyncHandlesUseCase]
- * @property isNodeInRubbishOrDeleted [IsNodeInRubbishOrDeleted]
+ * @property isNodeInRubbishOrDeletedUseCase [IsNodeInRubbishOrDeletedUseCase]
  * @property resetCameraUploadTimelines [ResetCameraUploadTimelines]
  * @property setPrimarySyncHandle [SetPrimarySyncHandle]
  * @property setSecondarySyncHandle [SetSecondarySyncHandle]
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
-    private val isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted,
+    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
     private val resetCameraUploadTimelines: ResetCameraUploadTimelines,
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
@@ -52,7 +52,7 @@ class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
      * and false if it belongs to the Primary Folder (Camera Uploads)
      */
     private suspend fun processSyncHandle(handle: Long, isSecondary: Boolean) {
-        if (!isNodeInRubbishOrDeleted(handle)) {
+        if (!isNodeInRubbishOrDeletedUseCase(handle)) {
             resetCameraUploadTimelines(
                 handleInAttribute = handle,
                 isSecondary = isSecondary,
