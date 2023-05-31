@@ -76,7 +76,7 @@ import javax.inject.Inject
  * @property getChatMessageUseCase  ChatMessageUseCase required to retrieve node information
  * @property preferences            App preferences to get Mobile Data high resolution setting
  */
-class GetImageUseCase @Inject constructor(
+class LegacyGetImageUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,

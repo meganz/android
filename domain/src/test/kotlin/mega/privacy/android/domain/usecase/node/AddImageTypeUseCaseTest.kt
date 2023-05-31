@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.node
 
+import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
@@ -154,7 +155,7 @@ internal class AddImageTypeUseCaseTest {
         }
 
         @Test
-        fun `test that if the file exists download preview is not triggered`() = runTest {
+        fun `test that if the file exists download full image is not triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
             val result = underTest(imageNode)
@@ -164,27 +165,36 @@ internal class AddImageTypeUseCaseTest {
         }
 
         @Test
-        fun `test that if the file doesn't exists download preview is triggered`() = runTest {
+        fun `test that if the file doesn't exists download full image is triggered`() = runTest {
             whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
             whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
             val result = underTest(imageNode)
-            result.fetchFullImage(false) {}
-            // as the file doesn't exist, download is needed
-            verify(downloadFullImageLambda).invoke(any(), any(), any())
+            result.fetchFullImage(false) {}.test {
+                // as the file doesn't exist, download is needed
+                verify(downloadFullImageLambda).invoke(any(), any(), any())
+                cancelAndIgnoreRemainingEvents()
+            }
+
         }
 
         @Test
-        fun `test that if the file is downloaded then download preview is not triggered again`() =
+        fun `test that if the file is downloaded then download full image is not triggered again`() =
             runTest {
                 whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
                 whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
                 val result = underTest(imageNode)
-                result.fetchFullImage(false) {}
+                result.fetchFullImage(false) {}.test {
+                    // as the file doesn't exist, download is needed
+                    verify(downloadFullImageLambda).invoke(any(), any(), any())
+                    cancelAndIgnoreRemainingEvents()
+                }
                 //now we can assume the file is downloaded, so it exists.
                 whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
-                result.fetchFullImage(false) {}
-                // lambda should be triggered only once, the second will return the already downloaded file
-                verify(downloadFullImageLambda).invoke(any(), any(), any())
+                result.fetchFullImage(false) {}.test {
+                    // lambda should be triggered only once, the second will return the already downloaded file
+                    verify(downloadFullImageLambda).invoke(any(), any(), any())
+                    cancelAndIgnoreRemainingEvents()
+                }
             }
     }
 }

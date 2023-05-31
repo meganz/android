@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.node
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -35,7 +36,7 @@ class AddImageTypeUseCase @Inject constructor(
         downloadThumbnail: suspend (String) -> String,
         nodeName: String,
     ): suspend () -> String = {
-        val path = "${imageRepository.getThumbnailPath()}${File.separator}${nodeName}.jpg"
+        val path = "${imageRepository.getThumbnailPath()}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -47,7 +48,7 @@ class AddImageTypeUseCase @Inject constructor(
         downloadPreview: suspend (String) -> String,
         nodeName: String,
     ): suspend () -> String = {
-        val path = "${imageRepository.getPreviewPath()}${File.separator}${nodeName}.jpg"
+        val path = "${imageRepository.getPreviewPath()}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -55,22 +56,33 @@ class AddImageTypeUseCase @Inject constructor(
         }
     }
 
-    private suspend fun getFetchFullImageFunction(node: ImageNode): suspend (Boolean, () -> Unit) -> Flow<ImageProgress> =
+    private fun getFetchFullImageFunction(node: ImageNode): (Boolean, () -> Unit) -> Flow<ImageProgress> =
         { isPriority, resetDownloads ->
-            val path =
-                "${imageRepository.getFullImagePath()}${File.separator}${node.base64Id}.${node.type.extension}"
-            val fullSizeFile = File(path)
-            if (!isValidNodeFileUseCase(node, fullSizeFile)) {
-                fileSystemRepository.deleteFile(fullSizeFile)
-            }
-            if (fileSystemRepository.doesFileExist(path)) {
-                flow { emit(ImageProgress.Completed(path)) }
-            } else {
-                node.downloadFullImage(
-                    path,
-                    isPriority,
-                    resetDownloads
-                )
+            flow {
+                val path =
+                    "${imageRepository.getFullImagePath()}${File.separator}${node.base64Id}.${node.type.extension}"
+                val fullSizeFile = File(path)
+                if (!isValidNodeFileUseCase(node, fullSizeFile)) {
+                    fileSystemRepository.deleteFile(fullSizeFile)
+                }
+                if (fileSystemRepository.doesFileExist(path)) {
+                    emit(ImageProgress.Completed(path))
+                } else {
+                    emitAll(
+                        node.downloadFullImage(
+                            path,
+                            isPriority,
+                            resetDownloads
+                        )
+                    )
+                }
             }
         }
+
+    companion object {
+        /**
+         * JPG Extension
+         */
+        const val EXTENSION_JPG = ".jpg"
+    }
 }

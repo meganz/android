@@ -81,7 +81,7 @@ internal class ImageViewerViewModelTest {
         }
         context = mock()
         underTest = ImageViewerViewModel(
-            getImageUseCase = mock(),
+            legacyGetImageUseCase = mock(),
             getImageHandlesUseCase = mock(),
             getGlobalChangesUseCase = getGlobalChangesUseCase,
             getNodeUseCase = mock(),

@@ -20,5 +20,5 @@ class TypedImageNode(
     /**
      *  Fetch Full Image
      */
-    val fetchFullImage: suspend (Boolean, () -> Unit) -> Flow<ImageProgress>,
+    val fetchFullImage: (Boolean, () -> Unit) -> Flow<ImageProgress>,
 ) : TypedFileNode, FileNode by imageNode

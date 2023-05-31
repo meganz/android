@@ -33,7 +33,7 @@ import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
-import mega.privacy.android.app.imageviewer.usecase.GetImageUseCase
+import mega.privacy.android.app.imageviewer.usecase.LegacyGetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -72,7 +72,7 @@ import javax.inject.Inject
  * This is shared between ImageViewerActivity behaving as the main container and
  * each individual ImageViewerPageFragment representing a single image within the ViewPager.
  *
- * @property getImageUseCase            Needed to retrieve each individual image based on a node
+ * @property legacyGetImageUseCase      Needed to retrieve each individual image based on a node
  * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
@@ -93,7 +93,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
-    private val getImageUseCase: GetImageUseCase,
+    private val legacyGetImageUseCase: LegacyGetImageUseCase,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -342,10 +342,10 @@ class ImageViewerViewModel @Inject constructor(
         val highPriority = itemId == getCurrentImageItem()?.id
         val subscription = when (imageItem) {
             is ImageItem.PublicNode ->
-                getImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
+                legacyGetImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
 
             is ImageItem.ChatNode ->
-                getImageUseCase.get(
+                legacyGetImageUseCase.get(
                     imageItem.chatRoomId,
                     imageItem.chatMessageId,
                     fullSize,
@@ -353,13 +353,13 @@ class ImageViewerViewModel @Inject constructor(
                 )
 
             is ImageItem.OfflineNode ->
-                getImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
+                legacyGetImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
 
             is ImageItem.Node ->
-                getImageUseCase.get(imageItem.handle, fullSize, highPriority)
+                legacyGetImageUseCase.get(imageItem.handle, fullSize, highPriority)
 
             is ImageItem.File ->
-                getImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
+                legacyGetImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
         }
 
         subscription
