@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.HasPendingUploads
-import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.ResetTotalDownloads
 
@@ -89,16 +88,6 @@ abstract class TransfersModule {
         @Provides
         fun provideGetNumPendingTransfers(transfersRepository: TransferRepository): GetNumPendingTransfers =
             GetNumPendingTransfers(transfersRepository::getNumPendingTransfers)
-
-        /**
-         * Provides the [IsCompletedTransfersEmpty] implementation
-         *
-         * @param transfersRepository [TransferRepository]
-         * @return [IsCompletedTransfersEmpty]
-         */
-        @Provides
-        fun provideIsCompletedTransfersEmpty(transfersRepository: TransferRepository): IsCompletedTransfersEmpty =
-            IsCompletedTransfersEmpty(transfersRepository::isCompletedTransfersEmpty)
 
         /**
          * Provides the [AreAllTransfersPaused] implementation

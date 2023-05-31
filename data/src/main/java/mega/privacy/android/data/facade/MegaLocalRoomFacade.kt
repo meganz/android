@@ -85,4 +85,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
                     .apply { sortWith(compareByDescending { it.timestamp }) }
                     .let { if (size != null) it.take(size) else it }
             }
+
+    override suspend fun getCompletedTransfersCount() =
+        completedTransferDao.getCompletedTransfersCount()
 }

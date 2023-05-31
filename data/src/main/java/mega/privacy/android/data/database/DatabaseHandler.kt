@@ -364,11 +364,6 @@ interface DatabaseHandler {
     fun findContactByEmail(mail: String?): Contact?
 
     /**
-     * Is completed transfers empty
-     */
-    val isCompletedTransfersEmpty: Boolean
-
-    /**
      * Get offline information
      *
      * @param handle

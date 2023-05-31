@@ -6,7 +6,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -43,7 +42,6 @@ class DefaultTransfersRepositoryTest {
     private lateinit var underTest: DefaultTransfersRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val databaseHandler = mock<DatabaseHandler>()
     private val transferEventMapper = mock<TransferEventMapper>()
     private val cancelToken = mock<MegaCancelToken>()
     private val appEventGateway: AppEventGateway = mock()
@@ -58,7 +56,6 @@ class DefaultTransfersRepositoryTest {
         underTest = DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            dbH = databaseHandler,
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
             transferMapper = transferMapper,
@@ -416,4 +413,18 @@ class DefaultTransfersRepositoryTest {
         underTest.resetTotalUploads()
         verify(megaApiGateway).resetTotalUploads()
     }
+
+    @Test
+    fun `test that isCompletedTransfersEmpty returns false if completed transfers db contains items`() =
+        runTest {
+            whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(1)
+            assertThat(underTest.isCompletedTransfersEmpty()).isFalse()
+        }
+
+    @Test
+    fun `test that isCompletedTransfersEmpty returns true if completed transfers db does not contain items`() =
+        runTest {
+            whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(0)
+            assertThat(underTest.isCompletedTransfersEmpty()).isTrue()
+        }
 }

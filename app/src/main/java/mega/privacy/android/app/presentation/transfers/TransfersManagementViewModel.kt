@@ -25,10 +25,10 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
-import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
 import javax.inject.Inject
 
 /**
@@ -37,7 +37,7 @@ import javax.inject.Inject
  * @property getNumPendingDownloadsNonBackgroundUseCase    [GetNumPendingDownloadsNonBackgroundUseCase]
  * @property getNumPendingUploads                   [GetNumPendingUploads]
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
- * @property isCompletedTransfersEmpty              [IsCompletedTransfersEmpty]
+ * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
  * @property areAllTransfersPaused                  [AreAllTransfersPaused]
  * @property broadcastPausedTransfers               [BroadcastPausedTransfers]
  */
@@ -47,7 +47,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val getNumPendingUploads: GetNumPendingUploads,
     private val getNumPendingTransfers: GetNumPendingTransfers,
-    private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
+    private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPaused: AreAllTransfersPaused,
     private val broadcastPausedTransfers: BroadcastPausedTransfers,
     private val transfersInfoMapper: TransfersInfoMapper,
@@ -136,7 +136,7 @@ class TransfersManagementViewModel @Inject constructor(
     fun checkIfShouldShowCompletedTab() {
         viewModelScope.launch {
             shouldShowCompletedTab.value =
-                !isCompletedTransfersEmpty() && getNumPendingTransfers() <= 0
+                !isCompletedTransfersEmptyUseCase() && getNumPendingTransfers() <= 0
         }
     }
 

@@ -2130,21 +2130,6 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     /**
-     * Gets the size = MAX_TRANSFERS completed transfers
-     * order by timestamp descendant
-     *
-     * @return The list of the completed transfers
-     */
-    private val completedTransfers: List<CompletedTransfer?>
-        get() {
-            val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
-            val transfers = getCompletedTransfers(selectQuery).apply {
-                sortWith(compareByDescending { it.timestamp })
-            }.take(MAX_TRANSFERS)
-            return transfers
-        }
-
-    /**
      * Gets the completed transfers which have as state cancelled or failed.
      *
      * @return The list the cancelled or failed transfers.
@@ -4692,9 +4677,6 @@ class SqliteDatabaseHandler @Inject constructor(
         db.execSQL("DROP TABLE IF EXISTS $TABLE_BACKUPS")
         onCreate(db)
     }
-
-    override val isCompletedTransfersEmpty: Boolean
-        get() = completedTransfers.isEmpty()
 
     override suspend fun getOfflineInformation(handle: Long): OfflineInformation? {
         val selectQuery =

@@ -107,4 +107,8 @@ interface MegaLocalRoomGateway {
      */
     suspend fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
+    /**
+     * Get the completed transfers count
+     */
+    suspend fun getCompletedTransfersCount(): Int
 }

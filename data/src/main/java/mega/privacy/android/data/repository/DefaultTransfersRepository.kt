@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
@@ -45,7 +44,6 @@ import javax.inject.Inject
  *
  * @param megaApiGateway    [MegaApiGateway]
  * @param ioDispatcher      [IoDispatcher]
- * @param dbH               [DatabaseHandler]
  * @param transferEventMapper [TransferEventMapper]
  * @param transferMapper [TransferEventMapper]
  * @param appEventGateway [AppEventGateway]
@@ -54,7 +52,6 @@ import javax.inject.Inject
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
     private val transferMapper: TransferMapper,
     private val appEventGateway: AppEventGateway,
@@ -216,7 +213,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override suspend fun isCompletedTransfersEmpty(): Boolean = withContext(ioDispatcher) {
-        dbH.isCompletedTransfersEmpty
+        megaLocalRoomGateway.getCompletedTransfersCount() == 0
     }
 
     override suspend fun areTransfersPaused(): Boolean = withContext(ioDispatcher) {
