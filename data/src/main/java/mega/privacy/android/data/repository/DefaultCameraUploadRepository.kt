@@ -689,6 +689,32 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
+    override suspend fun sendBackupHeartbeatSync(
+        backupId: Long,
+        progress: Int,
+        ups: Int,
+        downs: Int,
+        timeStamp: Long,
+        lastNode: Long,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("sendBackupHeartbeatSync") { }
+            megaApiGateway.sendBackupHeartbeat(
+                backupId = backupId,
+                status = HeartbeatStatus.SYNCING.value,
+                progress = progress,
+                ups = ups,
+                downs = downs,
+                ts = timeStamp,
+                lastNode = lastNode,
+                listener = listener
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     override suspend fun getCuBackUp() = withContext(ioDispatcher) {
         localStorageGateway.getCuBackUp()
     }

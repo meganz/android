@@ -643,6 +643,24 @@ interface CameraUploadRepository {
     )
 
     /**
+     * Send heartbeat sync with current progress
+     * @param backupId  backup id identifying the backup
+     * @param progress  current progress of uploads
+     * @param ups       Number of pending upload transfers
+     * @param downs     Number of pending download transfers
+     * @param timeStamp Last action timestamp
+     * @param lastNode  Last node handle to be synced
+     */
+    suspend fun sendBackupHeartbeatSync(
+        backupId: Long,
+        progress: Int,
+        ups: Int,
+        downs: Int,
+        timeStamp: Long,
+        lastNode: Long,
+    )
+
+    /**
      * Update the information about a registered backup for Backup Centre
      * @param backupId    backup id identifying the backup to be updated
      * @param backupType  back up type requested for the service

@@ -622,6 +622,10 @@ object CameraUploadSyncManager {
      *
      * @param records Pending upload/copy files.
      */
+    @Deprecated(
+        message = "Move to camera uploads worker and replace activeHeartbeatTask observable with use case",
+        replaceWith = ReplaceWith("SendBackupHeartBeatSyncUseCase")
+    )
     fun startActiveHeartbeat(records: List<SyncRecord>) {
         if (records.isEmpty()) {
             return
