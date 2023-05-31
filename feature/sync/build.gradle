@@ -89,4 +89,7 @@ dependencies {
     testImplementation testlib.bundles.unit.test
     testImplementation testlib.arch.core.test
     testImplementation testlib.test.core.ktx
+    testImplementation testlib.mockito
+    testImplementation testlib.mockito.kotlin
+    testImplementation testlib.mockito.android
 }

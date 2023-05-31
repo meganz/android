@@ -2,4 +2,5 @@
 <resources>
     <string name="start_screen_setting" />
     <string name="general_select" />
+    <string name="sync_button_label">Sync</string>
 </resources>

@@ -19,17 +19,17 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.teal_300_alpha_090
 import mega.privacy.android.feature.sync.R
 
 
@@ -47,7 +47,7 @@ internal fun InputSyncInformationView(
         modifier = modifier
             .border(
                 1.dp,
-                MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+                MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 RoundedCornerShape(12.dp)
             )
     ) {
@@ -72,7 +72,7 @@ internal fun InputSyncInformationView(
         )
 
         Divider(
-            color = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
             thickness = 1.dp
         )
 
@@ -85,7 +85,7 @@ internal fun InputSyncInformationView(
         )
 
         Divider(
-            color = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
             thickness = 1.dp,
             modifier = Modifier.padding(start = 72.dp)
         )
@@ -101,7 +101,7 @@ internal fun InputSyncInformationView(
         )
 
         Divider(
-            color = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
             thickness = 1.dp,
             modifier = Modifier.padding(start = 72.dp)
         )
@@ -130,7 +130,8 @@ private fun TwoLinesItem(
         Image(
             painter = painterResource(imageResource),
             contentDescription = null,
-            modifier = Modifier.padding(start = 24.dp, end = 24.dp)
+            modifier = Modifier.padding(start = 24.dp, end = 24.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
         )
         Column {
             Text(
@@ -142,7 +143,7 @@ private fun TwoLinesItem(
                     bottomDefaultText
                 },
                 style = if (bottomText.isEmpty()) {
-                    MaterialTheme.typography.body2.copy(color = teal_300_alpha_090)
+                    MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.teal_300_teal_200)
                 } else {
                     MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary)
                 },
