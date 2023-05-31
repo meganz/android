@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
@@ -26,21 +27,25 @@ internal class DefaultMonitorTransfersSizeTest {
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
     private val transferRepository = mock<TransferRepository>()
     private val transfer = Transfer(
-        transferState = TransferState.STATE_ACTIVE,
-        transferType = TransferType.TYPE_UPLOAD,
+        type = TransferType.TYPE_DOWNLOAD,
         transferredBytes = 2000L,
         totalBytes = 1000L,
-        tag = 1,
-        isFinished = false,
+        localPath = "localPath",
+        parentPath = "parentPath",
+        nodeHandle = 1L,
+        parentHandle = 2L,
         fileName = "fileName",
-        isStreamingTransfer = false,
-        isFolderTransfer = false,
-        notificationNumber = 1L,
-        priority = BigInteger.ONE,
-        handle = 1L,
+        stage = TransferStage.STAGE_SCANNING,
+        tag = 1,
         speed = 1L,
+        isForeignOverQuota = false,
+        isStreamingTransfer = false,
+        isFinished = false,
+        isFolderTransfer = false,
         appData = "",
-        isForeignOverQuota = false
+        state = TransferState.STATE_ACTIVE,
+        priority = BigInteger.ONE,
+        notificationNumber = 1L,
     )
 
     @Before
@@ -52,7 +57,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit Upload TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_UPLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_UPLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(type = TransferType.TYPE_UPLOAD))
             underTest = DefaultMonitorTransfersSize(
                 repository = transferRepository
             )
@@ -73,7 +78,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit Download TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_DOWNLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_DOWNLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(type = TransferType.TYPE_DOWNLOAD))
             underTest = DefaultMonitorTransfersSize(
                 repository = transferRepository
             )
@@ -106,7 +111,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
             collectJob.cancel()
         }
 
@@ -126,7 +131,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
             collectJob.cancel()
         }
 
@@ -146,7 +151,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
             collectJob.cancel()
         }
 
@@ -169,7 +174,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
             collectJob.cancel()
         }
 
@@ -195,9 +200,11 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(eventTwo)
             globalTransferFlow.emit(eventThree)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes * 3)
-            assertEquals(transfersSizeInfo.value.totalSizeTransferred,
-                transfer.transferredBytes * 3)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
+            assertEquals(
+                transfersSizeInfo.value.totalSizeTransferred,
+                transfer.transferredBytes * 3
+            )
+            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
             collectJob.cancel()
         }
 }

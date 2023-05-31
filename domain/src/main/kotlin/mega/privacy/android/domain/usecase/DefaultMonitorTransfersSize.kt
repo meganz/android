@@ -25,11 +25,13 @@ class DefaultMonitorTransfersSize @Inject constructor(
             var totalTransferred: Long = 0
 
             val megaTransfers = transferMap.values.toList()
-            megaTransfers.forEach { (bytes, transferredBytes, transferState) ->
-                totalBytes += bytes
-                totalTransferred +=
-                    if (transferState == TransferState.STATE_COMPLETED) bytes
-                    else transferredBytes
+            megaTransfers.forEach { itemTransfer ->
+                with(itemTransfer) {
+                    totalBytes += this.totalBytes
+                    totalTransferred +=
+                        if (state == TransferState.STATE_COMPLETED) this.totalBytes
+                        else transferredBytes
+                }
             }
             // we only clear cache when all transfer done
             // if we remove in OnTransferFinish it can cause the progress show incorrectly
@@ -37,7 +39,7 @@ class DefaultMonitorTransfersSize @Inject constructor(
                 transferMap.clear()
             }
             TransfersSizeInfo(
-                transferType = transfer.transferType,
+                transferType = transfer.type,
                 totalSizePendingTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred
             )

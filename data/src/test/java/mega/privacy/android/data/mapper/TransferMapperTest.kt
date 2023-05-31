@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaTransfer
@@ -14,38 +15,46 @@ internal class TransferMapperTest {
     @Test
     fun `test that transfer mapper returns correctly`() {
         val megaTransfer = mock<MegaTransfer> {
-            on { tag }.thenReturn(Random.nextInt())
             on { type }.thenReturn(MegaTransfer.TYPE_DOWNLOAD)
-            on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
-            on { totalBytes }.thenReturn(Random.nextLong())
             on { transferredBytes }.thenReturn(Random.nextLong())
-            on { isFinished }.thenReturn(Random.nextBoolean())
-            on { fileName }.thenReturn("myFileName")
+            on { totalBytes }.thenReturn(Random.nextLong())
+            on { path }.thenReturn("path")
+            on { parentPath }.thenReturn("parentPath")
             on { nodeHandle }.thenReturn(Random.nextLong())
-            on { isFolderTransfer }.thenReturn(Random.nextBoolean())
-            on { priority }.thenReturn(BigInteger.ONE)
-            on { isStreamingTransfer }.thenReturn(true)
-            on { notificationNumber }.thenReturn(Random.nextLong())
+            on { parentHandle }.thenReturn(Random.nextLong())
+            on { fileName }.thenReturn("myFileName")
+            on { stage }.thenReturn(MegaTransfer.STAGE_SCAN.toLong())
+            on { tag }.thenReturn(Random.nextInt())
             on { speed }.thenReturn(Random.nextLong())
-            on { appData }.thenReturn("appData")
             on { isForeignOverquota }.thenReturn(Random.nextBoolean())
+            on { isStreamingTransfer }.thenReturn(true)
+            on { isFinished }.thenReturn(Random.nextBoolean())
+            on { isFolderTransfer }.thenReturn(Random.nextBoolean())
+            on { appData }.thenReturn("appData")
+            on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
+            on { priority }.thenReturn(BigInteger.ONE)
+            on { notificationNumber }.thenReturn(Random.nextLong())
         }
         val expected = Transfer(
-            tag = megaTransfer.tag,
-            transferType = TransferType.TYPE_DOWNLOAD,
-            totalBytes = megaTransfer.totalBytes,
+            type = TransferType.TYPE_DOWNLOAD,
             transferredBytes = megaTransfer.transferredBytes,
-            isFinished = megaTransfer.isFinished,
-            transferState = TransferState.STATE_COMPLETED,
+            totalBytes = megaTransfer.totalBytes,
+            localPath = megaTransfer.path,
+            parentPath = megaTransfer.parentPath,
+            nodeHandle = megaTransfer.nodeHandle,
+            parentHandle = megaTransfer.parentHandle,
             fileName = megaTransfer.fileName,
-            handle = megaTransfer.nodeHandle,
-            isFolderTransfer = megaTransfer.isFolderTransfer,
-            priority = megaTransfer.priority,
-            isStreamingTransfer = megaTransfer.isStreamingTransfer,
-            notificationNumber = megaTransfer.notificationNumber,
+            stage = TransferStage.STAGE_SCANNING,
+            tag = megaTransfer.tag,
             speed = megaTransfer.speed,
+            isForeignOverQuota = megaTransfer.isForeignOverquota,
+            isStreamingTransfer = megaTransfer.isStreamingTransfer,
+            isFinished = megaTransfer.isFinished,
+            isFolderTransfer = megaTransfer.isFolderTransfer,
             appData = megaTransfer.appData.orEmpty(),
-            isForeignOverQuota = megaTransfer.isForeignOverquota
+            state = TransferState.STATE_COMPLETED,
+            priority = megaTransfer.priority,
+            notificationNumber = megaTransfer.notificationNumber,
         )
         Truth.assertThat(TransferMapper().invoke(megaTransfer)).isEqualTo(expected)
     }

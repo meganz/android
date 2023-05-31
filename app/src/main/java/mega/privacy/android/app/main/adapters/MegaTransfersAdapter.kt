@@ -102,7 +102,7 @@ class MegaTransfersAdapter(
         }
         holder.textViewFileName.text = transfer.fileName
         val isItemChecked = isItemChecked(transfer)
-        when (transfer.transferType) {
+        when (transfer.type) {
             TransferType.TYPE_DOWNLOAD -> {
                 holder.progressText.setTextColor(
                     ContextCompat.getColor(
@@ -110,11 +110,11 @@ class MegaTransfersAdapter(
                         R.color.green_500_green_400
                     )
                 )
-                holder.document = transfer.handle
+                holder.document = transfer.nodeHandle
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers)
-                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.handle)
-                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.handle)
+                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.nodeHandle)
+                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.nodeHandle)
                     // If node that gets from MegaApi is null, getting the node from megaApiFolder
                     val node = nodeFromMegaApi ?: nodeFromMegaApiFolder
                     if (node != null) {
@@ -194,11 +194,11 @@ class MegaTransfersAdapter(
             holder.progressText.text = getProgress(transfer)
             holder.speedText.text = context.getString(R.string.transfer_paused)
 
-            if (!isMultipleSelect() && transfer.transferState == TransferState.STATE_PAUSED) {
+            if (!isMultipleSelect() && transfer.state == TransferState.STATE_PAUSED) {
                 holder.optionPause.setImageResource(R.drawable.ic_play_grey)
             }
         } else {
-            when (transfer.transferState) {
+            when (transfer.state) {
                 TransferState.STATE_PAUSED -> {
                     holder.progressText.text = getProgress(transfer)
                     holder.speedText.text = context.getString(R.string.transfer_paused)
@@ -225,8 +225,8 @@ class MegaTransfersAdapter(
                 TransferState.STATE_QUEUED,
                 -> {
                     when {
-                        (transfer.transferType == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
-                                || (transfer.transferType == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
+                        (transfer.type == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
+                                || (transfer.type == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
                         -> {
                             holder.progressText.setTextColor(
                                 ContextCompat.getColor(
@@ -237,7 +237,7 @@ class MegaTransfersAdapter(
                             holder.progressText.text = String.format(
                                 "%s %s",
                                 getProgress(transfer),
-                                if (transfer.transferType == TransferType.TYPE_DOWNLOAD)
+                                if (transfer.type == TransferType.TYPE_DOWNLOAD)
                                     context.getString(R.string.label_transfer_over_quota)
                                 else
                                     context.getString(R.string.label_storage_over_quota)
@@ -245,7 +245,7 @@ class MegaTransfersAdapter(
                             holder.speedText.isVisible = false
                         }
 
-                        transfer.transferState == TransferState.STATE_QUEUED -> {
+                        transfer.state == TransferState.STATE_QUEUED -> {
                             holder.progressText.isVisible = false
                             holder.speedText.isVisible = false
                             holder.imageViewCompleted.isVisible = true
@@ -258,7 +258,7 @@ class MegaTransfersAdapter(
                             holder.progressText.text = getProgress(transfer)
                             holder.speedText.text =
                                 context.getString(
-                                    if (transfer.transferState == TransferState.STATE_COMPLETING)
+                                    if (transfer.state == TransferState.STATE_COMPLETING)
                                         R.string.transfer_completing
                                     else
                                         R.string.transfer_retrying

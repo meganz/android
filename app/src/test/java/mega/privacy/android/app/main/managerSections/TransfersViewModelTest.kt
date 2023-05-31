@@ -102,7 +102,7 @@ internal class TransfersViewModelTest {
                     on { isStreamingTransfer }.thenReturn(false)
                     on { appData }.thenReturn("")
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
-                    on { transferState }.thenReturn(TransferState.STATE_COMPLETED)
+                    on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }
                 transfers.add(transfer)
                 whenever(getTransferByTagUseCase(i)).thenReturn(transfer)
@@ -130,7 +130,7 @@ internal class TransfersViewModelTest {
                     on { isStreamingTransfer }.thenReturn(false)
                     on { appData }.thenReturn("")
                     on { priority }.thenReturn(BigInteger.valueOf(i.toLong()))
-                    on { transferState }.thenReturn(TransferState.STATE_COMPLETED)
+                    on { state }.thenReturn(TransferState.STATE_COMPLETED)
                 }
                 transfers.add(transfer)
                 whenever(getTransferByTagUseCase(i)).thenReturn(transfer)

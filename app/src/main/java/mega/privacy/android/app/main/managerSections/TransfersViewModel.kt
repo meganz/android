@@ -238,7 +238,7 @@ class TransfersViewModel @Inject constructor(
     private fun activeTransferFinishMovement(success: Boolean, transferTag: Int) =
         viewModelScope.launch(ioDispatcher) {
             getTransferByTagUseCase(transferTag).let { transfer ->
-                if (transfer != null && transfer.transferState >= TransferState.STATE_COMPLETING) {
+                if (transfer != null && transfer.state >= TransferState.STATE_COMPLETING) {
                     val current = activeTransfer.value.toMutableList()
                     val transferPosition = current.indexOfFirst { it.tag == transferTag }
                     if (transferPosition != INVALID_POSITION) {

@@ -9235,8 +9235,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.w("Transfer object is null.")
             return
         }
-        Timber.d("Resume transfer - Node handle: %s", mT.handle)
-        megaApi.pauseTransferByTag(mT.tag, mT.transferState != TransferState.STATE_PAUSED, this)
+        Timber.d("Resume transfer - Node handle: %s", mT.nodeHandle)
+        megaApi.pauseTransferByTag(mT.tag, mT.state != TransferState.STATE_PAUSED, this)
     }
 
     /**

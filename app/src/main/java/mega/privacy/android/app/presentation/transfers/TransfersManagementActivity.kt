@@ -143,7 +143,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
 
 
     private fun handleTransferTemporaryError(transfer: Transfer, error: MegaException) {
-        Timber.w("onTransferTemporaryError: ${transfer.handle} - ${transfer.tag}")
+        Timber.w("onTransferTemporaryError: ${transfer.nodeHandle} - ${transfer.tag}")
         if (error is QuotaExceededMegaException) {
             if (error.value != 0L) {
                 Timber.d("TRANSFER OVER QUOTA ERROR: ${error.errorCode}")
@@ -152,7 +152,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 Timber.w("STORAGE OVER QUOTA ERROR: ${error.errorCode}")
                 //work around - SDK does not return over quota error for folder upload,
                 //so need to be notified from global listener
-                if (transfer.transferType == TransferType.TYPE_UPLOAD) {
+                if (transfer.type == TransferType.TYPE_UPLOAD) {
                     if (transfer.isForeignOverQuota) return
                     val uploadServiceIntent = Intent(this, UploadService::class.java).apply {
                         action = Constants.ACTION_OVERQUOTA_STORAGE
