@@ -54,8 +54,8 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirectio
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -172,23 +172,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
 
         setupView()
         observeLiveData()
-
-        if (viewModel.path == "" || viewModel.path == args.path) {
-            setViewModelDisplayParam(args.path)
-        } else {
-            setViewModelDisplayParam(viewModel.path)
-        }
-
-        observeDragSupportEvents(viewLifecycleOwner, recyclerView ?: return, VIEWER_FROM_OFFLINE)
-    }
-
-    /**
-     * onStart
-     */
-    override fun onStart() {
-        super.onStart()
-
-
         callManager {
             if (args.rootFolderOnly) {
                 it.pagerOfflineFragmentOpened(this)
@@ -196,6 +179,13 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                 it.fullscreenOfflineFragmentOpened(this)
             }
         }
+        if (viewModel.path == "" || viewModel.path == args.path) {
+            setViewModelDisplayParam(args.path)
+        } else {
+            setViewModelDisplayParam(viewModel.path)
+        }
+
+        observeDragSupportEvents(viewLifecycleOwner, recyclerView ?: return, VIEWER_FROM_OFFLINE)
     }
 
     /**
@@ -229,12 +219,11 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
     }
 
     /**
-     * onStop
+     * onDestroyView
      */
-    override fun onStop() {
-        super.onStop()
-
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.clearEmptySearchQuery()
         callManager {
             if (args.rootFolderOnly) {
                 it.pagerOfflineFragmentClosed(this)
@@ -242,15 +231,6 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                 it.fullscreenOfflineFragmentClosed(this)
             }
         }
-    }
-
-    /**
-     * onDestroyView
-     */
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        viewModel.clearEmptySearchQuery()
     }
 
     /**

@@ -4392,12 +4392,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun fullscreenOfflineFragmentClosed(fragment: OfflineFragment) {
         if (fragment === fullscreenOfflineFragment) {
+            fullscreenOfflineFragment = null
             if (bottomItemBeforeOpenFullscreenOffline != Constants.INVALID_VALUE && !mStopped) {
                 backToDrawerItem(bottomItemBeforeOpenFullscreenOffline)
                 bottomItemBeforeOpenFullscreenOffline = Constants.INVALID_VALUE
             }
             pathNavigationOffline = "/"
-            fullscreenOfflineFragment = null
             // workaround for flicker of AppBarLayout: if we go back to homepage from fullscreen
             // offline, and hide AppBarLayout when immediately on go back, we will see the flicker
             // of AppBarLayout, hide AppBarLayout when fullscreen offline is closed is better.
