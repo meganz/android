@@ -316,4 +316,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorStopTransfersWork() = appEventGateway.monitorStopTransfersWork()
 
     override suspend fun broadcastStopTransfersWork() = appEventGateway.broadcastStopTransfersWork()
+
+    override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
+        megaApiGateway.resetTotalUploads()
+    }
 }

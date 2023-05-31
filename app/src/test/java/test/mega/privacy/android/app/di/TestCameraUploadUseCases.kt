@@ -54,7 +54,6 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
-import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -247,9 +246,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCreateCameraUploadFolder() = mock<CreateCameraUploadFolder>()
-
-    @Provides
-    fun provideResetTotalUploads() = mock<ResetTotalUploads>()
 
     @Provides
     fun provideCompressVideos() = mock<CompressVideos>()

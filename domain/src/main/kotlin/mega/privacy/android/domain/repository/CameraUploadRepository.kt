@@ -393,11 +393,6 @@ interface CameraUploadRepository {
     suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord>
 
     /**
-     * Reset total uploads
-     */
-    suspend fun resetTotalUploads()
-
-    /**
      * Checks whether compressing videos require the device to be charged or not
      *
      * @return true if the device needs to be charged to compress videos, and false if otherwise

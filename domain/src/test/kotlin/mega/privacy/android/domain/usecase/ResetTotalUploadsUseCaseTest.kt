@@ -2,7 +2,8 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.repository.TransferRepository
+import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -11,17 +12,17 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultResetTotalUploadsTest {
-    private lateinit var underTest: ResetTotalUploads
+class ResetTotalUploadsUseCaseTest {
+    private lateinit var underTest: ResetTotalUploadsUseCase
 
     private val hasPendingUploads = mock<HasPendingUploads>()
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val transferRepository = mock<TransferRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultResetTotalUploads(
+        underTest = ResetTotalUploadsUseCase(
             hasPendingUploads = hasPendingUploads,
-            cameraUploadRepository = cameraUploadRepository,
+            transferRepository = transferRepository,
         )
     }
 
@@ -31,7 +32,7 @@ class DefaultResetTotalUploadsTest {
 
         underTest()
 
-        verify(cameraUploadRepository).resetTotalUploads()
+        verify(transferRepository).resetTotalUploads()
     }
 
     @Test
@@ -40,6 +41,6 @@ class DefaultResetTotalUploadsTest {
 
         underTest()
 
-        verifyNoInteractions(cameraUploadRepository)
+        verifyNoInteractions(transferRepository)
     }
 }

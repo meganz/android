@@ -56,7 +56,6 @@ import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.DefaultResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.DefaultResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.DefaultResetSecondaryTimeline
-import mega.privacy.android.domain.usecase.DefaultResetTotalUploads
 import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
@@ -98,7 +97,6 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
-import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -526,16 +524,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindRestoreSecondaryTimestamps(defaultRestoreSecondaryTimestamps: DefaultRestoreSecondaryTimestamps): RestoreSecondaryTimestamps
-
-    /**
-     * Provide the [ResetTotalUploads] implementation
-     *
-     * @param resetTotalUploads [DefaultResetTotalUploads]
-     *
-     * @return [ResetTotalUploads]
-     */
-    @Binds
-    abstract fun bindResetTotalUploads(resetTotalUploads: DefaultResetTotalUploads): ResetTotalUploads
 
     /**
      * Provide the [CompressVideos] implementation

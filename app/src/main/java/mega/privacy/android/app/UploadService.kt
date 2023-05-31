@@ -40,7 +40,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR
 import mega.privacy.android.app.constants.BroadcastConstants.SNACKBAR_TEXT
-import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.globalmanagement.TransfersManagement
@@ -69,12 +68,14 @@ import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.transfer.GetNumberOfPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.GetNumberOfPendingUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
+import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -152,6 +153,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var getNumberOfPendingUploadsUseCase: GetNumberOfPendingUploadsUseCase
+
+    @Inject
+    lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
 
     @Inject
     lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
@@ -504,11 +508,7 @@ internal class UploadService : LifecycleService() {
             }
         }
         applicationScope.launch {
-            if (getNumberOfPendingUploadsUseCase() <= 0) {
-                Timber.d("Reset total uploads")
-                @Suppress("DEPRECATION")
-                megaApi.resetTotalUploads()
-            }
+            resetTotalUploadsUseCase()
         }
         resetUploadNumbers()
         Timber.d("Stopping service!")

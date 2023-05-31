@@ -223,4 +223,9 @@ interface TransferRepository {
      * Broadcasts when transfers management have to stop.
      */
     suspend fun broadcastStopTransfersWork()
+
+    /**
+     * Reset total uploads
+     */
+    suspend fun resetTotalUploads()
 }

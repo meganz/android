@@ -108,7 +108,6 @@ import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
-import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
@@ -135,6 +134,7 @@ import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -478,7 +478,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Reset Total Uploads
      */
     @Inject
-    lateinit var resetTotalUploads: ResetTotalUploads
+    lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
 
     /**
      * Camera Service Wake Lock Handler
@@ -766,7 +766,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         runCatching { cancelTransferByTagUseCase(transfer.tag) }
             .onSuccess {
                 Timber.d("Transfer cancellation successful")
-                resetTotalUploads()
+                resetTotalUploadsUseCase()
             }
             .onFailure { error -> Timber.e("Transfer cancellation error: $error") }
     }
@@ -779,7 +779,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         runCatching { cancelAllUploadTransfersUseCase() }
             .onSuccess {
                 Timber.d("Cancel all transfers successful")
-                resetTotalUploads()
+                resetTotalUploadsUseCase()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
 
@@ -1372,7 +1372,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun onQueueComplete() {
         Timber.d("Stopping foreground!")
-        resetTotalUploads()
+        resetTotalUploadsUseCase()
         totalUploaded = 0
         totalToUpload = 0
         reportUploadFinish()
@@ -1789,7 +1789,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
             @Suppress("DEPRECATION")
-            resetTotalUploads()
+            resetTotalUploadsUseCase()
             totalUploaded = 0
             totalToUpload = 0
             totalVideoSize = getTotalVideoSizeInMB(fullList)

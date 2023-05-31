@@ -397,4 +397,11 @@ class DefaultTransfersRepositoryTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    @Suppress("DEPRECATION")
+    fun `test that reset total uploads is invoked`() = runTest {
+        underTest.resetTotalUploads()
+        verify(megaApiGateway).resetTotalUploads()
+    }
 }

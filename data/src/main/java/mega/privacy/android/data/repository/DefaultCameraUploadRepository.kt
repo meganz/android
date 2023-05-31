@@ -148,15 +148,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.setCameraSyncFileUpload(uploadOptionIntMapper(uploadOption))
     }
 
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                " * provide more data and avoid race conditions. They could change or be removed in the current form."
-    )
-    override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
-        megaApiGateway.resetTotalUploads()
-    }
-
     override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
         withContext(ioDispatcher) {
             localStorageGateway.deleteAllSyncRecords(syncRecordTypeIntMapper(syncRecordType))
