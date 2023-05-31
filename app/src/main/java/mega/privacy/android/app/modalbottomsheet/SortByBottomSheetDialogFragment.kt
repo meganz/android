@@ -1,7 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.os.Bundle
@@ -23,10 +22,7 @@ import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
-import mega.privacy.android.app.utils.Constants.IS_CLOUD_ORDER
-import mega.privacy.android.app.utils.Constants.NEW_ORDER
 import mega.privacy.android.app.utils.Constants.ORDER_CAMERA
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
@@ -271,12 +267,5 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun updateFileExplorerOrder(order: Int) {
         (requireActivity() as FileExplorerActivity).refreshOrderNodes(order)
-
-        requireActivity().sendBroadcast(
-            Intent(BROADCAST_ACTION_INTENT_UPDATE_ORDER).putExtra(
-                IS_CLOUD_ORDER,
-                orderType == ORDER_CLOUD || orderType == ORDER_FAVOURITES
-            ).putExtra(NEW_ORDER, order)
-        )
     }
 }

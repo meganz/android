@@ -713,19 +713,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
 
-    private val receiverUpdateOrder: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER != intent.action) {
-                return
-            }
-            if (intent.getBooleanExtra(Constants.IS_CLOUD_ORDER, true)) {
-                refreshCloudOrder()
-            } else {
-                refreshOthersOrder()
-            }
-        }
-    }
-
     private val receiverCUAttrChanged: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             synchronized(this) {
@@ -2132,14 +2119,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun registerBroadcastReceivers() {
         registerContactUpdateReceiver()
         registerCameraUploadAttributeChangedReceiver()
-        registerOrderUpdatedReceiver()
-    }
-
-    private fun registerOrderUpdatedReceiver() {
-        registerReceiver(
-            receiverUpdateOrder,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER)
-        )
     }
 
     private fun registerCameraUploadAttributeChangedReceiver() {
@@ -3218,7 +3197,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         composite.clear()
         isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
-        unregisterReceiver(receiverUpdateOrder)
         unregisterReceiver(receiverCUAttrChanged)
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
