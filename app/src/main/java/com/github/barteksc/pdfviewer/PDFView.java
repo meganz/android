@@ -266,7 +266,8 @@ public class PDFView extends RelativeLayout {
     private void load(DocumentSource docSource, String password, int[] userPages) {
 
         if (!recycled) {
-            throw new IllegalStateException("Don't call load on a PDF View without recycling it first.");
+            Timber.e("Don't call load on a PDF View without recycling it first.");
+            return;
         }
 
         recycled = false;
