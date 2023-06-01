@@ -46,7 +46,7 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
@@ -131,7 +131,7 @@ internal class UploadService : LifecycleService() {
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
+    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
 
     @Inject
     lateinit var getRootFolder: GetRootFolder
@@ -831,7 +831,7 @@ internal class UploadService : LifecycleService() {
                 if (!transfer.isFolderTransfer) {
                     val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
                     runBlocking {
-                        addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                        addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
                     }
                     val appData = transfer.appData
                     if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_TXT_FILE)) {

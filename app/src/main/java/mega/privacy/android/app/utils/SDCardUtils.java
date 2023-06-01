@@ -18,7 +18,7 @@ import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.objects.SDTransfer;
-import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper;
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper;
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaTransfer;
@@ -193,7 +193,7 @@ public class SDCardUtils {
                 }
 
                 AndroidCompletedTransfer androidCompletedTransfer = new AndroidCompletedTransfer(sdtransfer, app);
-                CompletedTransfer completedTransfer = new CompletedTransferMapper().invoke(androidCompletedTransfer);
+                CompletedTransfer completedTransfer = new LegacyCompletedTransferMapper().invoke(androidCompletedTransfer);
                 dbH.addCompletedTransferWithCheck(completedTransfer);
             }
         }).start();

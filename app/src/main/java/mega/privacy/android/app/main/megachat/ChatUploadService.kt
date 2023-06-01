@@ -41,7 +41,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result.OnTransferFinish
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result.OnTransferStart
@@ -127,7 +127,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
 
     @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
+    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
 
     private var isForeground = false
     private var canceled = false
@@ -1091,7 +1091,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                     }
                     val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
                     runBlocking {
-                        addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                        addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
                     }
                     mapProgressTransfers!![transfer.tag] = transfer
 

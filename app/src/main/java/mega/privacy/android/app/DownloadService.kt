@@ -47,7 +47,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -157,7 +157,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     lateinit var cancelAllDownloadTransfersUseCase: CancelAllDownloadTransfersUseCase
 
     @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
+    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -1340,7 +1340,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             completedTransfer.path = targetPath
                         }
                         runBlocking {
-                            addCompletedTransferUseCase(completedTransferMapper(completedTransfer))
+                            addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
                         }
                     }
                     if (transfer.state == MegaTransfer.STATE_FAILED) {

@@ -46,7 +46,7 @@ import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
+import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
@@ -558,7 +558,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Should be removed once [AndroidCompletedTransfer] removed from codebase
      */
     @Inject
-    lateinit var completedTransferMapper: CompletedTransferMapper
+    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
 
     /**
      * Set coordinates for image files
@@ -1677,7 +1677,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val path = transfer.path
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
             val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, context)
-            addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
+            addCompletedTransferUseCase(legacyCompletedTransferMapper(androidCompletedTransfer))
         }
 
         if (e.errorCode == MegaError.API_OK) {
