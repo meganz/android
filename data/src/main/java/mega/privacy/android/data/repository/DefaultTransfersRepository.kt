@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
+import mega.privacy.android.data.extensions.transferListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -24,6 +25,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -126,6 +128,38 @@ internal class DefaultTransfersRepository @Inject constructor(
             channel.trySend(GlobalTransfer.OnTransferData(transfer, buffer))
         },
     )
+
+    override fun startDownload(
+        nodeId: NodeId,
+        localPath: String,
+        appData: String?,
+        shouldStartFirst: Boolean,
+    ) = callbackFlow {
+        runCatching {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+        }.getOrNull()?.let { megaNode ->
+            val cancelToken = MegaCancelToken.createInstance()
+            val listener = this.transferListener("Download node") {
+                transferMapper(it)
+            }
+            megaApiGateway.startDownload(
+                node = megaNode,
+                localPath = localPath,
+                fileName = megaNode.name,
+                appData = appData,
+                startFirst = shouldStartFirst,
+                cancelToken = cancelToken,
+                listener = listener
+            )
+
+            awaitClose {
+                cancelToken?.cancel()
+                megaApiGateway.removeTransferListener(listener)
+            }
+        }
+    }
+        .flowOn(ioDispatcher)
+        .cancellable()
 
 
     override suspend fun cancelAllDownloadTransfers() = withContext(ioDispatcher) {

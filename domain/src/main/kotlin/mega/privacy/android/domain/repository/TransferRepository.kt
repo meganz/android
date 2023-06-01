@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -235,4 +236,20 @@ interface TransferRepository {
      * Reset total uploads
      */
     suspend fun resetTotalUploads()
+
+
+    /**
+     * Start downloading a node to desired destination and returns a flow to expose download progress
+     *
+     * @param nodeId      The id of the node we want to download, it can be a folder
+     * @param localPath   Full destination path of the node, including file name if it's a file node. All nested folders must exist.
+     * @param appData     Custom app data to save in the MegaTransfer object.
+     * @param shouldStartFirst  Puts the transfer on top of the download queue.
+     */
+    fun startDownload(
+        nodeId: NodeId,
+        localPath: String,
+        appData: String?,
+        shouldStartFirst: Boolean,
+    ): Flow<Transfer>
 }

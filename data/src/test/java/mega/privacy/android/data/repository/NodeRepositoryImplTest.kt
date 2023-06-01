@@ -115,7 +115,7 @@ class NodeRepositoryImplTest {
             streamingGateway = streamingGateway,
             nodeUpdateMapper = nodeUpdateMapper,
             accessPermissionMapper = accessPermissionMapper,
-            nodeShareKeyResultMapper = nodeShareKeyResultMapper
+            nodeShareKeyResultMapper = nodeShareKeyResultMapper,
         )
     }
 

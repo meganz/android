@@ -26,9 +26,9 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.SyncRecord
@@ -287,7 +287,11 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.doesExternalStorageDirectoryExists()
     }
 
-    override suspend fun doesFileExist(path: String) = withContext(ioDispatcher){
+    override suspend fun doesFileExist(path: String) = withContext(ioDispatcher) {
         File(path).exists()
+    }
+
+    override suspend fun getParent(path: String): String = withContext(ioDispatcher) {
+        File(path).parent ?: path
     }
 }

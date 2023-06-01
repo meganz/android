@@ -66,10 +66,10 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 assertThat(underTest.invoke(node)).isEqualTo(
-                    offlineBackupDir + File.separator +
-                            grandParentName + File.separator +
-                            parentName + File.separator +
-                            nodeName
+                    OFFLINE_BACKUP_DIR + File.separator +
+                            GRAND_PARENT_NAME + File.separator +
+                            PARENT_NAME + File.separator +
+                            NODE_NAME
                 )
             }
 
@@ -79,9 +79,9 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 assertThat(underTest.invoke(parent)).isEqualTo(
-                    offlineBackupDir + File.separator +
-                            grandParentName + File.separator +
-                            parentName
+                    OFFLINE_BACKUP_DIR + File.separator +
+                            GRAND_PARENT_NAME + File.separator +
+                            PARENT_NAME
                 )
             }
 
@@ -91,7 +91,7 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(nodeRepository.getBackupFolderId()).thenReturn(parentId)
-                assertThat(underTest.invoke(node)).doesNotContain(grandParentName)
+                assertThat(underTest.invoke(node)).doesNotContain(GRAND_PARENT_NAME)
             }
     }
 
@@ -110,10 +110,10 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 assertThat(underTest.invoke(node)).isEqualTo(
-                    offlineDir + File.separator +
-                            grandParentName + File.separator +
-                            parentName + File.separator +
-                            nodeName
+                    OFFLINE_DIR + File.separator +
+                            GRAND_PARENT_NAME + File.separator +
+                            PARENT_NAME + File.separator +
+                            NODE_NAME
                 )
             }
 
@@ -123,9 +123,9 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 assertThat(underTest.invoke(parent)).isEqualTo(
-                    offlineDir + File.separator +
-                            grandParentName + File.separator +
-                            parentName
+                    OFFLINE_DIR + File.separator +
+                            GRAND_PARENT_NAME + File.separator +
+                            PARENT_NAME
                 )
             }
 
@@ -135,7 +135,7 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(nodeRepository.getRootNode()).thenReturn(grandParent)
-                assertThat(underTest.invoke(node)).doesNotContain(grandParentName)
+                assertThat(underTest.invoke(node)).doesNotContain(GRAND_PARENT_NAME)
             }
 
 
@@ -145,20 +145,20 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(grandParent.isIncomingShare).thenReturn(true)
-                assertThat(underTest.invoke(node)).startsWith(offlineDir + File.separator + grandParent.id.longValue.toString())
+                assertThat(underTest.invoke(node)).startsWith(OFFLINE_DIR + File.separator + grandParent.id.longValue.toString())
             }
     }
 
 
     private fun stubNodes() {
         whenever(node.id).thenReturn(nodeId)
-        whenever(node.name).thenReturn(nodeName)
+        whenever(node.name).thenReturn(NODE_NAME)
         whenever(node.parentId).thenReturn(parentId)
         whenever(parent.id).thenReturn(parentId)
-        whenever(parent.name).thenReturn(parentName)
+        whenever(parent.name).thenReturn(PARENT_NAME)
         whenever(parent.parentId).thenReturn(grandParentId)
         whenever(grandParent.id).thenReturn(grandParentId)
-        whenever(grandParent.name).thenReturn(grandParentName)
+        whenever(grandParent.name).thenReturn(GRAND_PARENT_NAME)
     }
 
     private suspend fun stubFolderTree() {
@@ -168,26 +168,26 @@ class GetOfflinePathUseCaseTest {
 
     private suspend fun stubNotInBackup() {
         whenever(isNodeInInbox(any())).thenReturn(false)
-        whenever(fileSystemRepository.getOfflinePath()).thenReturn(offlineDir)
+        whenever(fileSystemRepository.getOfflinePath()).thenReturn(OFFLINE_DIR)
         whenever(nodeRepository.getBackupFolderId()).thenReturn(invalidId)
     }
 
     private suspend fun stubInBackup() {
         whenever(isNodeInInbox(any())).thenReturn(true)
-        whenever(fileSystemRepository.getOfflineInboxPath()).thenReturn(offlineBackupDir)
+        whenever(fileSystemRepository.getOfflineInboxPath()).thenReturn(OFFLINE_BACKUP_DIR)
         whenever(nodeRepository.getBackupFolderId()).thenReturn(grandParentId)
     }
 
     companion object {
-        val nodeId = NodeId(1L)
-        val parentId = NodeId(2L)
-        val grandParentId = NodeId(3L)
-        val invalidId = NodeId(-1L)
-        const val nodeName = "node.txt"
-        const val parentName = "parent"
-        const val grandParentName = "grand parent"
-        const val offlineDir = "/MEGA Offline"
-        const val offlineBackupDir = "/MEGA Offline/in"
+        private val nodeId = NodeId(1L)
+        private val parentId = NodeId(2L)
+        private val grandParentId = NodeId(3L)
+        private val invalidId = NodeId(-1L)
+        private const val NODE_NAME = "node.txt"
+        private const val PARENT_NAME = "parent"
+        private const val GRAND_PARENT_NAME = "grand parent"
+        private const val OFFLINE_DIR = "/MEGA Offline"
+        private const val OFFLINE_BACKUP_DIR = "/MEGA Offline/in"
     }
 
 }

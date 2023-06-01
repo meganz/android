@@ -165,4 +165,9 @@ interface FileSystemRepository {
      * @return true if file exists, else false
      */
     suspend fun doesFileExist(path: String): Boolean
+
+    /**
+     * Returns the parent path of the file represented by path
+     */
+    suspend fun getParent(path: String): String
 }
