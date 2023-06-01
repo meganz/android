@@ -1430,20 +1430,26 @@ class CameraUploadsWorker @AssistedInject constructor(
             retry--
         }
 
-        // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
-        // app that a Login Procedure is occurring
-        MegaApplication.isLoggingIn = true
-        val result = runCatching { backgroundFastLoginUseCase() }
-        MegaApplication.isLoggingIn = false
+        if (!MegaApplication.isLoggingIn) {
+            // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
+            // app that a Login Procedure is occurring
+            MegaApplication.isLoggingIn = true
+            val result = runCatching { backgroundFastLoginUseCase() }
+            MegaApplication.isLoggingIn = false
 
-        if (result.isSuccess) {
-            Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
-            MegaApplication.getInstance().checkEnabledCookies()
-            Timber.d("Start process")
-            startWorker()
+            if (result.isSuccess) {
+                Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
+                MegaApplication.getInstance().checkEnabledCookies()
+                Timber.d("Start process")
+                startWorker()
+            } else {
+                Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop process")
+                endService(aborted = true)
+            }
         } else {
-            Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop process")
+            Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
             endService(aborted = true)
+
         }
     }
 
