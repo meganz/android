@@ -659,14 +659,6 @@ public class Util {
         return sdf.format(new Date(timeStamp)) + fileName.substring(fileName.lastIndexOf('.'));
     }
 
-    public static String getPhotoSyncNameWithIndex(long timeStamp, String fileName, int photoIndex) {
-        if (photoIndex == 0) {
-            return getPhotoSyncName(timeStamp, fileName);
-        }
-        DateFormat sdf = new SimpleDateFormat(DATE_AND_TIME_PATTERN, Locale.getDefault());
-        return sdf.format(new Date(timeStamp)) + "_" + photoIndex + fileName.substring(fileName.lastIndexOf('.'));
-    }
-
     public static int getNumberOfNodes(MegaNode parent, MegaApiAndroid megaApi) {
         int numberOfNodes = 0;
 

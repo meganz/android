@@ -1,7 +1,6 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.yield
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -9,18 +8,17 @@ import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetDeviceCurrentNanoTimeUseCase
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.SaveSyncRecord
-import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.node.GetChildNodeUseCase
-import nz.mega.sdk.MegaNode
-import timber.log.Timber
 import java.io.File
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 /**
- * Default implementation of [SaveSyncRecordsToDB]
+ * Use case to save [SaveSyncRecord] to database
  *
- * This is a helper Use Case to save Sync Records to the Database, and will be replaced by a Worker
- * after refactoring CameraUploadsService
  *
  * @property getSyncRecordByFingerprint [GetSyncRecordByFingerprint]
  * @property deleteSyncRecordByLocalPath [DeleteSyncRecordByLocalPath]
@@ -30,7 +28,7 @@ import javax.inject.Inject
  * @property saveSyncRecord [SaveSyncRecord]
  * @property getDeviceCurrentNanoTimeUseCase [GetDeviceCurrentNanoTimeUseCase]
  */
-class DefaultSaveSyncRecordsToDB @Inject constructor(
+class SaveSyncRecordsToDBUseCase @Inject constructor(
     private val getSyncRecordByFingerprint: GetSyncRecordByFingerprint,
     private val deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
@@ -38,17 +36,24 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
     private val fileNameExists: FileNameExists,
     private val saveSyncRecord: SaveSyncRecord,
     private val getDeviceCurrentNanoTimeUseCase: GetDeviceCurrentNanoTimeUseCase,
-) : SaveSyncRecordsToDB {
+) {
 
-    override suspend fun invoke(
+
+    /**
+     * invoke
+     * @param list of [SyncRecord]
+     * @param primaryUploadNodeId [NodeId]
+     * @param secondaryUploadNodeId [NodeId]
+     * @param rootPath
+     */
+    suspend operator fun invoke(
         list: List<SyncRecord>,
-        primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         rootPath: String?,
     ) {
         for (file in list) {
             run {
-                Timber.d("Handle with local file which timestamp is: %s", file.timestamp)
                 yield()
 
                 val exist = getSyncRecordByFingerprint(
@@ -60,12 +65,10 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                     exist.timestamp?.let { existTime ->
                         file.timestamp?.let { fileTime ->
                             if (existTime < fileTime) {
-                                Timber.d("Got newer time stamp.")
                                 exist.localPath?.let {
                                     deleteSyncRecordByLocalPath(it, exist.isSecondary)
                                 }
                             } else {
-                                Timber.w("Duplicate sync records.")
                                 return@run
                             }
                         }
@@ -73,11 +76,10 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                 }
 
                 val isSecondary = file.isSecondary
-                val parent = if (isSecondary) secondaryUploadNode else primaryUploadNode
+                val parentNodeId = if (isSecondary) secondaryUploadNodeId else primaryUploadNodeId
                 if (!file.isCopyOnly) {
                     val resFile = file.localPath?.let { File(it) }
                     if (resFile != null && !resFile.exists()) {
-                        Timber.w("File does not exist, remove from database.")
                         file.localPath?.let {
                             deleteSyncRecordByLocalPath(it, isSecondary)
                         }
@@ -95,10 +97,9 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                     do {
                         yield()
                         fileName = getNoneDuplicatedDeviceFileName(tempFileName, photoIndex)
-                        Timber.d("Keep file name as in device, name index is: %s", photoIndex)
                         photoIndex++
                         inCloud = getChildNodeUseCase(
-                            parent?.let { NodeId(parent.handle) },
+                            parentNodeId,
                             fileName
                         ) != null
                         fileName?.let {
@@ -108,15 +109,14 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                 } else {
                     do {
                         yield()
-                        fileName = Util.getPhotoSyncNameWithIndex(
+                        fileName = getPhotoSyncNameWithIndex(
                             getLastModifiedTime(file),
                             file.localPath,
                             photoIndex
                         )
-                        Timber.d("Use MEGA name, name index is: %s", photoIndex)
                         photoIndex++
                         inCloud = getChildNodeUseCase(
-                            parent?.let { NodeId(parent.handle) },
+                            parentNodeId,
                             fileName
                         ) != null
                         inDatabase = fileNameExists(fileName, isSecondary)
@@ -133,7 +133,6 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
                 file.fileName = fileName
                 val newPath = "$rootPath${getDeviceCurrentNanoTimeUseCase()}.$extension"
                 file.newPath = newPath
-                Timber.d("Save file to database, new path is: %s", newPath)
                 saveSyncRecord(file)
             }
         }
@@ -157,4 +156,36 @@ class DefaultSaveSyncRecordsToDB @Inject constructor(
         }
         return "${name}_$index$extension"
     }
+
+    private fun getPhotoSyncNameWithIndex(
+        timeStamp: Long,
+        fileName: String?,
+        photoIndex: Int,
+    ): String {
+        if (photoIndex == 0) {
+            return getPhotoSyncName(timeStamp, fileName)
+        }
+        val sdf: DateFormat = SimpleDateFormat(
+            DATE_AND_TIME_PATTERN,
+            Locale.getDefault()
+        )
+        return sdf.format(Date(timeStamp)) + "_" + photoIndex + fileName?.substring(
+            fileName.lastIndexOf(
+                '.'
+            )
+        )
+    }
+
+    private fun getPhotoSyncName(timeStamp: Long, fileName: String?): String {
+        val sdf: DateFormat = SimpleDateFormat(
+            DATE_AND_TIME_PATTERN,
+            Locale.getDefault()
+        )
+        return sdf.format(Date(timeStamp)) + fileName?.substring(fileName.lastIndexOf('.'))
+    }
+
+    private companion object {
+        const val DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss"
+    }
+
 }

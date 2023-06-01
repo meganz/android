@@ -12,7 +12,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
-import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
@@ -26,16 +25,17 @@ import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesU
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SaveSyncRecordsToDBUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.inOrder
-import org.mockito.internal.verification.Times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.util.LinkedList
 import java.util.Queue
@@ -50,7 +50,7 @@ class DefaultProcessMediaForUploadTest {
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val updateTimeStamp = mock<UpdateCameraUploadTimeStamp>()
     private val getPendingUploadListUseCase = mock<GetPendingUploadListUseCase>()
-    private val saveSyncRecordsToDB = mock<SaveSyncRecordsToDB>()
+    private val saveSyncRecordsToDBUseCase = mock<SaveSyncRecordsToDBUseCase>()
     private val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val getCameraUploadSelectionQueryUseCase = mock<GetCameraUploadSelectionQueryUseCase>()
@@ -66,7 +66,7 @@ class DefaultProcessMediaForUploadTest {
             getCameraUploadSelectionQueryUseCase = getCameraUploadSelectionQueryUseCase,
             updateTimeStamp = updateTimeStamp,
             getPendingUploadListUseCase = getPendingUploadListUseCase,
-            saveSyncRecordsToDB = saveSyncRecordsToDB,
+            saveSyncRecordsToDBUseCase = saveSyncRecordsToDBUseCase,
             cameraUploadSyncManagerWrapper = cameraUploadSyncManagerWrapper
         )
         runBlocking {
@@ -213,14 +213,8 @@ class DefaultProcessMediaForUploadTest {
                 } catch (e: Exception) {
                     Truth.assertThat(e).isInstanceOf(CancellationException::class.java)
                 }
-                verify(saveSyncRecordsToDB, Times(0)).invoke(any(), any(), any(), any())
-                verify(saveSyncRecordsToDB, Times(0)).invoke(any(), any(), any(), any())
-                verify(cameraUploadSyncManagerWrapper, Times(0)).updatePrimaryFolderBackupState(
-                    BackupState.ACTIVE
-                )
-                verify(cameraUploadSyncManagerWrapper, Times(0)).updateSecondaryFolderBackupState(
-                    BackupState.ACTIVE
-                )
+                verifyNoInteractions(saveSyncRecordsToDBUseCase)
+                verifyNoInteractions(cameraUploadSyncManagerWrapper)
             }
             runCurrent()
             advanceTimeBy(3000)

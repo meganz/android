@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesU
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SaveSyncRecordsToDBUseCase
 import nz.mega.sdk.MegaNode
 import java.util.LinkedList
 import java.util.Queue
@@ -34,7 +36,7 @@ import javax.inject.Inject
  * @property getCameraUploadSelectionQueryUseCase [GetCameraUploadSelectionQueryUseCase]
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
  * @property getPendingUploadListUseCase [GetPendingUploadListUseCase]
- * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
+ * @property saveSyncRecordsToDBUseCase [SaveSyncRecordsToDBUseCase]
  * @property cameraUploadRepository [CameraUploadSyncManagerWrapper]
  */
 class DefaultProcessMediaForUpload @Inject constructor(
@@ -46,7 +48,7 @@ class DefaultProcessMediaForUpload @Inject constructor(
     private val getCameraUploadSelectionQueryUseCase: GetCameraUploadSelectionQueryUseCase,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadListUseCase: GetPendingUploadListUseCase,
-    private val saveSyncRecordsToDB: SaveSyncRecordsToDB,
+    private val saveSyncRecordsToDBUseCase: SaveSyncRecordsToDBUseCase,
     private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
 ) : ProcessMediaForUpload {
 
@@ -123,10 +125,10 @@ class DefaultProcessMediaForUpload @Inject constructor(
             isSecondary = false,
             isVideo = false,
         )
-        saveSyncRecordsToDB(
+        saveSyncRecordsToDBUseCase(
             list = pendingUploadsList,
-            primaryUploadNode = primaryUploadNode,
-            secondaryUploadNode = secondaryUploadNode,
+            primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
+            secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
             rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_PHOTO)
@@ -155,10 +157,10 @@ class DefaultProcessMediaForUpload @Inject constructor(
             isSecondary = false,
             isVideo = true,
         )
-        saveSyncRecordsToDB(
+        saveSyncRecordsToDBUseCase(
             list = pendingVideoUploadsList,
-            primaryUploadNode = primaryUploadNode,
-            secondaryUploadNode = secondaryUploadNode,
+            primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
+            secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
             rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_VIDEO)
@@ -188,10 +190,10 @@ class DefaultProcessMediaForUpload @Inject constructor(
                 isSecondary = true,
                 isVideo = false,
             )
-            saveSyncRecordsToDB(
+            saveSyncRecordsToDBUseCase(
                 list = pendingUploadsListSecondary,
-                primaryUploadNode = primaryUploadNode,
-                secondaryUploadNode = secondaryUploadNode,
+                primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
+                secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
                 rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_PHOTO)
@@ -223,10 +225,10 @@ class DefaultProcessMediaForUpload @Inject constructor(
                 isSecondary = true,
                 isVideo = true,
             )
-            saveSyncRecordsToDB(
+            saveSyncRecordsToDBUseCase(
                 list = pendingVideoUploadsListSecondary,
-                primaryUploadNode = primaryUploadNode,
-                secondaryUploadNode = secondaryUploadNode,
+                primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
+                secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
                 rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)
