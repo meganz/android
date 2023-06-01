@@ -14,7 +14,7 @@ class OnSingleClickListener(
 ) : View.OnClickListener {
 
     companion object {
-        private const val TIME_BETWEEN_CLICKS_IN_MS = 1200L
+        private const val TIME_BETWEEN_CLICKS_IN_MS = 2000L
 
         /**
          * Register a callback to be invoked when this view is clicked.
