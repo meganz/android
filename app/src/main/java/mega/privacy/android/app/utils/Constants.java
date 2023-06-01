@@ -12,8 +12,6 @@ public class Constants {
     public static final String PIN_ALPHANUMERIC = "alphanumeric";
 
     public static final int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
-    public static final int PHOTOS_UPLOAD_JOB_ID = 10096;
-    public static final int BOOT_JOB_ID = 10097;
 
     public static final int REQUEST_CODE_GET_FILES = 1000;
     public static final int REQUEST_CODE_SELECT_FOLDER_TO_MOVE = 1001;
@@ -25,36 +23,26 @@ public class Constants {
     public static final int TAKE_PHOTO_CODE = 1010;
     public static final int WRITE_SD_CARD_REQUEST_CODE = 1011;
     public static final int REQUEST_CODE_SELECT_FILE = 1012;
-    public static final int SET_PIN = 1013;
     public static final int REQUEST_CODE_TREE = 1014;
     public static final int TAKE_PICTURE_PROFILE_CODE = 1015;
     public static final int CHOOSE_PICTURE_PROFILE_CODE = 1016;
     public static final int REQUEST_INVITE_CONTACT_FROM_DEVICE = 1017;
     public static final int REQUEST_CREATE_CHAT = 1018;
     public static final int REQUEST_ADD_PARTICIPANTS = 1019;
-    public static final int ENABLE_CHAT = 1020;
     public static final int REQUEST_SEND_CONTACTS = 1021;
-    public static final int REQUEST_CODE_IMPORT_CHAT_NODE = 1022;
-    public static final int REQUEST_CODE_IMPORT_CHAT_NODE_LIST = 1023;
     public static final int REQUEST_CODE_SELECT_CHAT = 1025;
     public static final int REQUEST_CODE_GET_CONTACTS = 1026;
     public static final int REQUEST_CODE_FILE_INFO = 1027;
     public static final int REQUEST_CODE_REFRESH_API_SERVER = 1028;
     public static final int REQUEST_CODE_DELETE_VERSIONS_HISTORY = 1029;
     public static final int REQUEST_CODE_SEND_LOCATION = 1030;
-    public static final int REQUEST_CODE_COUNTRY_PICKER = 1031;
-    public static final int REQUEST_CODE_VERIFY_CODE = 1032;
-    public static final int REQUEST_CODE_SMS_VERIFICATION = 1033;
-    public static final int REQUEST_CODE_SEND_LINK = 1035;
     public static final int REQUEST_CODE_SCAN_DOCUMENT = 1036;
-    public static final int REQUEST_CODE_SEND_SEVERAL_LINKS = 1037;
     public static final int REQUEST_CODE_GET_FOLDER = 1038;
     public static final int REQUEST_CODE_GET_FOLDER_CONTENT = 1039;
 
     public static final String ACTION_REFRESH_AFTER_BLOCKED = "ACTION_REFRESH_AFTER_BLOCKED";
     public static final String ACTION_REFRESH = "ACTION_REFRESH";
     public static final String ACTION_REFRESH_API_SERVER = "ACTION_REFRESH_API_SERVER";
-    public static final String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
     public static final String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
     public static final String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 
@@ -94,30 +82,14 @@ public class Constants {
     public static final String PREFERENCE_VARIANT_REACTION = "variant-reaction-manager";
 
     //MultipleRequestListener options
-    public static final int MULTIPLE_MOVE = 0;
     public static final int MULTIPLE_SEND_RUBBISH = 1;
-    //one file to many contacts
-    public static final int MULTIPLE_CONTACTS_SEND_INBOX = 2;
-    //many files to one contacts
-    public static final int MULTIPLE_FILES_SEND_INBOX = 3;
     public static final int MULTIPLE_COPY = 4;
-    public static final int MULTIPLE_REMOVE_SHARING_CONTACTS = 5;
-    //one folder to many contacts
-    public static final int MULTIPLE_CONTACTS_SHARE = 6;
-    //one contact, many files
-    public static final int MULTIPLE_FILE_SHARE = 7;
     public static final int MULTIPLE_LEAVE_SHARE = 8;
-
-    public static final int MULTIPLE_REMOVE_CONTACT_SHARED_FOLDER = 9;
-    public static final int MULTIPLE_CHAT_IMPORT = 10;
-    public static final int MULTIPLE_CHANGE_PERMISSION = 12;
 
     public static final int CANCEL_ACCOUNT_2FA = 4000;
     public static final int CHANGE_MAIL_2FA = 4001;
     public static final int DISABLE_2FA = 4002;
     public static final int CHANGE_PASSWORD_2FA = 4003;
-
-    public static final int OVERQUOTA_ALERT = 5003;
 
     public static final int TOUR_FRAGMENT = 6000;
     public static final int LOGIN_FRAGMENT = 6001;
@@ -129,8 +101,6 @@ public class Constants {
     public static final int INVITE_FRIENDS_FRAGMENT = 8002;
     public static final int INFO_ACHIEVEMENTS_FRAGMENT = 8003;
 
-    public static final int SCROLL_TO_POSITION = 9000;
-    public static final int UPDATE_IMAGE_DRAG = 9001;
     public static final int UPDATE_ACCOUNT_DETAILS = 9003;
 
     public static final int REQUEST_WRITE_STORAGE = 1;
@@ -144,8 +114,6 @@ public class Constants {
 
     public static final int REQUEST_READ_WRITE_STORAGE = 9;
 
-    public static final int WRITE_LOG = 13;
-
     public static final int RECORD_VOICE_CLIP = 11;
     public static final int REQUEST_STORAGE_VOICE_CLIP = 12;
     public static final int REQUEST_CAMERA_TAKE_PICTURE = 13;
@@ -154,7 +122,6 @@ public class Constants {
     public static final int LOCATION_PERMISSION_REQUEST_CODE = 15;
     public static final int REQUEST_BT_CONNECT = 16;
     public static final int REQUEST_CAMERA_SHOW_PREVIEW = 17;
-    public static final int REQUEST_ACCESS_MEDIA_LOCATION = 17;
 
     public static final int TYPE_START_RECORD = 1;
     public static final int TYPE_END_RECORD = 2;
@@ -178,16 +145,10 @@ public class Constants {
     public static final int SECONDS_IN_DAY = SECONDS_IN_HOUR * 24;
     public static final int SECONDS_IN_WEEK = SECONDS_IN_DAY * 7;
     public static final int SECONDS_IN_MONTH_30 = SECONDS_IN_DAY * 30;
-    public static final int SECONDS_IN_MONTH_31 = SECONDS_IN_DAY * 31;
     public static final int SECONDS_IN_YEAR = SECONDS_IN_DAY * 365;
 
     public static final long SECONDS_TO_WAIT_ALONE_ON_THE_CALL = 2 * SECONDS_IN_MINUTE;
     public static final long SECONDS_TO_WAIT_FOR_OTHERS_TO_JOIN_THE_CALL = 5 * SECONDS_IN_MINUTE;
-
-    public static final int COLOR_STATUS_BAR_ACCENT = 1;
-    public static final int COLOR_STATUS_BAR_ZERO_DELAY = 2;
-    public static final int COLOR_STATUS_BAR_ZERO = 3;
-    public static final int COLOR_STATUS_BAR_SEARCH_DELAY = 4;
 
     public static final String CONTACT_LINK_BASE_URL = "https://mega.nz/C!";
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
@@ -215,7 +176,6 @@ public class Constants {
     public static final String ACTION_PARK_ACCOUNT = "PARK_ACCOUNT";
     public static final String ACTION_RESET_PASS_FROM_PARK_ACCOUNT = "RESET_PASS_FROM_PARK_ACCOUNT";
     public static final String ACTION_CHANGE_MAIL = "CHANGE_MAIL";
-    public static final String ACTION_CHANGE_AVATAR = "CHANGE_AVATAR";
     public static final String ACTION_IPC = "IPC";
     public static final String ACTION_SHOW_MY_ACCOUNT = "ACTION_SHOW_MY_ACCOUNT";
     public static final String ACTION_CHAT_NOTIFICATION_MESSAGE = "ACTION_CHAT_MESSAGE";
@@ -244,8 +204,6 @@ public class Constants {
     public static final String TYPE_REACTION = "TYPE_REACTION";
     public static final String INVALID_REACTION = "INVALID_REACTION";
 
-    public static final String ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD = "ACTION_RECOVERY_KEY_COPY_TO_CLIPBOARD";
-
     public static final String ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT = "REQUEST_DOWNLOAD_FOLDER_LOGOUT";
 
     public static final String ACTION_STORAGE_STATE_CHANGED = "ACTION_STORAGE_STATE_CHANGED";
@@ -259,8 +217,6 @@ public class Constants {
     public static final String ACTION_SHARE_NODE = "ACTION_SHARE_NODE";
     public static final String ACTION_REMOVE_LINK = "ACTION_REMOVE_LINK";
 
-    public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_POSITION = "INTENT_FILTER_UPDATE_POSITION";
-    public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_IMAGE_DRAG = "INTENT_FILTER_UPDATE_IMAGE_DRAG";
     public static final String BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN = "INTENT_FILTER_UPDATE_FULL_SCREEN";
 
     public static final String BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS = "INTENT_UPDATE_ACCOUNT_DETAILS";
@@ -269,9 +225,6 @@ public class Constants {
     public static final String BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE = "INTENT_SIGNAL_PRESENCE";
     public static final String BROADCAST_ACTION_INTENT_VOICE_CLIP_DOWNLOADED = "INTENT_VOICE_CLIP_DOWNLOADED";
     public static final String BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED = "INTENT_BUSINESS_EXPIRED";
-    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED = "INTENT_CHAT_ARCHIVED";
-    public static final String BROADCAST_ACTION_INTENT_CHAT_ARCHIVED_GROUP = "INTENT_CHAT_ARCHIVED_GROUP";
-    public static final String BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION = "BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION";
     public static final String BROADCAST_ACTION_INTENT_UPDATE_USER_DATA = "BROADCAST_ACTION_INTENT_UPDATE_USER_DATA";
 
     public static final String INTENT_EXTRA_KEY_PLACEHOLDER = "placeholder";
@@ -279,7 +232,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_OFFLINE_HANDLE = "INTENT_EXTRA_KEY_OFFLINE_HANDLE";
     public static final String INTENT_EXTRA_KEY_FILE_NAME = "FILENAME";
     public static final String INTENT_EXTRA_KEY_SCREEN_POSITION = "screenPosition";
-    public static final String INTENT_EXTRA_KEY_SCREEN_POSITION_FOR_SWIPE_DISMISS = "screenPositionForSwipeDismiss";
     public static final String INTENT_EXTRA_KEY_ADAPTER_TYPE = "adapterType";
     public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
@@ -296,7 +248,6 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY = "offlinePathDirectory";
     public static final String INTENT_EXTRA_KEY_PATH = "path";
     public static final String INTENT_EXTRA_KEY_PATH_NAVIGATION = "pathNavigation";
-    public static final String INTENT_EXTRA_KEY_IS_LIST = "isList";
     public static final String INTENT_EXTRA_KEY_IS_PLAYLIST = "IS_PLAYLIST";
     public static final String INTENT_EXTRA_KEY_REBUILD_PLAYLIST = "REBUILD_PLAYLIST";
     public static final String INTENT_EXTRA_KEY_FROM = "from";
@@ -318,12 +269,10 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_FIRST_LEVEL = "firstLevel";
     public static final String INTENT_EXTRA_KEY_CHAT_ID = "chatId";
     public static final String INTENT_EXTRA_KEY_MSG_ID = "msgId";
-    public static final String INTENT_EXTRA_KEY_ENABLED = "enabled";
     public static final String INTENT_EXTRA_KEY_CONTACT_TYPE = "contactType";
     public static final String INTENT_EXTRA_KEY_CHAT = "chat";
     public static final String INTENT_EXTRA_KEY_TOOL_BAR_TITLE = "aBtitle";
     public static final String INTENT_EXTRA_IS_FROM_MEETING = "extra_is_from_meeting";
-    public static final String INTENT_EXTRA_MEETING_PARTICIPANTS = "participants_in_a_meeting";
     public static final String INTENT_EXTRA_KEY_URI = "INTENT_EXTRA_KEY_URI";
     public static final String INTENT_EXTRA_KEY_SHOW_NEARBY_FILES = "INTENT_EXTRA_KEY_SHOW_NEARBY_FILES";
     public static final String INTENT_EXTRA_KEY_IS_FILE_VERSION = "INTENT_EXTRA_KEY_IS_FILE_VERSION";
@@ -334,7 +283,6 @@ public class Constants {
     public static final int FILE_BROWSER_ADAPTER = 2000;
     public static final int CONTACT_FILE_ADAPTER = 2001;
     public static final int RUBBISH_BIN_ADAPTER = 2002;
-    public static final int SHARED_WITH_ME_ADAPTER = 2003;
     public static final int OFFLINE_ADAPTER = 2004;
     public static final int FOLDER_LINK_ADAPTER = 2005;
     public static final int SEARCH_ADAPTER = 2006;
@@ -343,21 +291,14 @@ public class Constants {
     public static final int OUTGOING_SHARES_ADAPTER = 2009;
     public static final int INCOMING_SHARES_ADAPTER = 2010;
     public static final int INBOX_ADAPTER = 2011;
-    public static final int INCOMING_REQUEST_ADAPTER = 2012;
-    public static final int OUTGOING_REQUEST_ADAPTER = 2013;
-    public static final int CAMERA_UPLOAD_ADAPTER = 2014;
     public static final int INCOMING_SHARES_PROVIDER_ADAPTER = 2016;
     public static final int CLOUD_DRIVE_PROVIDER_ADAPTER = 2017;
     public static final int SEARCH_BY_ADAPTER = 2018;
     public static final int FILE_LINK_ADAPTER = 2019;
     public static final int FROM_CHAT = 2020;
     public static final int CONTACT_SHARED_FOLDER_ADAPTER = 2021;
-    public static final int FILE_INFO_SHARED_CONTACT_ADAPTER = 2022;
-    public static final int GENERAL_OTHERS_ADAPTER = 2023;
     public static final int RECENTS_ADAPTER = 2024;
     public static final int LINKS_ADAPTER = 2025;
-    public static final int PHOTOS_BROWSE_ADAPTER = 2026;
-    public static final int PHOTOS_SEARCH_ADAPTER = 2027;
     public static final int AUDIO_BROWSE_ADAPTER = 2028;
     public static final int AUDIO_SEARCH_ADAPTER = 2029;
     public static final int DOCUMENTS_BROWSE_ADAPTER = 2030;
@@ -367,27 +308,21 @@ public class Constants {
     public static final int RECENTS_BUCKET_ADAPTER = 2034;
     public static final int VERSIONS_ADAPTER = 2035;
     public static final int FROM_IMAGE_VIEWER = 2036;
-    public static final int MEDIA_BROWSE_ADAPTER = 2037;
-    public static final int ALBUM_CONTENT_ADAPTER = 2038;
     public static final int FAVOURITES_ADAPTER = 2039;
     public static final int FROM_MEDIA_DISCOVERY = 2040;
 
-    public static final int VIEWER_FROM_PHOTOS = 1;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;
     public static final int VIEWER_FROM_OUTGOING_SHARES = 3;
     public static final int VIEWER_FROM_LINKS = 4;
-    public static final int VIEWER_FROM_DOCUMENTS = 5;
     public static final int VIEWER_FROM_VIDEOS = 6;
     public static final int VIEWER_FROM_OFFLINE = 7;
     public static final int VIEWER_FROM_RECETS_BUCKET = 8;
-    public static final int VIEWER_FROM_CUMU = 9;
     public static final int VIEWER_FROM_RECETS = 10;
     public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
     public static final int VIEWER_FROM_FOLDER_LINK = 12;
     public static final int VIEWER_FROM_ZIP_BROWSER = 13;
     public static final int VIEWER_FROM_FILE_BROWSER = 14;
     public static final int VIEWER_FROM_INBOX = 15;
-    public static final int VIEWER_FROM_RUBBISH_BIN = 16;
     public static final int VIEWER_FROM_SEARCH = 17;
     public static final int VIEWER_FROM_FILE_VERSIONS = 18;
 
@@ -400,14 +335,6 @@ public class Constants {
     public static final String NOTIFICATIONS_DISABLED = "NOTIFICATIONS_DISABLED";
     public static final String NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING";
     public static final String NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING = "NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING";
-    public static final int PAYMENT_METHODS_MIN_DIFFERENCE = 720;
-    public static final int PRICING_MIN_DIFFERENCE = 720;
-
-    public static final String HISTORY_RETENTION_DISABLED = "HISTORY_RETENTION_DISABLED";
-    public static final String HISTORY_RETENTION_1_DAY = "HISTORY_RETENTION_1_DAY";
-    public static final String HISTORY_RETENTION_1_WEEK = "HISTORY_RETENTION_1_WEEK";
-    public static final String HISTORY_RETENTION_1_MONTH = "HISTORY_RETENTION_1_MONTH";
-    public static final String HISTORY_RETENTION_CUSTOM = "HISTORY_RETENTION_CUSTOM";
 
     public static final int CONTACT_TYPE_MEGA = 0;
     public static final int CONTACT_TYPE_DEVICE = 1;
@@ -415,12 +342,7 @@ public class Constants {
 
     public static final int TYPE_VOICE_CLIP = 3;
 
-    public static final int SELECT_RINGTONE = 2000;
-    public static final int SELECT_NOTIFICATION_SOUND = SELECT_RINGTONE + 1;
-
     public static final int DEVICE_ANDROID = 1;
-    public static final int DEVICE_HUAWEI = 4;
-    public static final int DEVICE_IOS = 2;
 
     public static final int NOTIFICATION_SUMMARY_CHAT = 0;
     public static final int NOTIFICATION_UPLOAD = 1;
@@ -428,18 +350,15 @@ public class Constants {
     public static final int NOTIFICATION_CAMERA_UPLOADS = 3;
     public static final int NOTIFICATION_DOWNLOAD_FINAL = 4;
     public static final int NOTIFICATION_UPLOAD_FINAL = 5;
-    public static final int NOTIFICATION_CAMERA_UPLOADS_FINAL = 6;
     public static final int NOTIFICATION_PUSH_CLOUD_DRIVE = 7;
     public static final int NOTIFICATION_GENERAL_PUSH_CHAT = 8;
     public static final int NOTIFICATION_SUMMARY_INCOMING_CONTACT = 9;
-    public static final int NOTIFICATION_STREAMING_OVERQUOTA = 10;
     public static final int NOTIFICATION_CALL_IN_PROGRESS = 11;
     public static final int NOTIFICATION_MISSED_CALL = 12;
     public static final int NOTIFICATION_SUMMARY_ACCEPTANCE_CONTACT = 13;
     public static final int NOTIFICATION_STORAGE_OVERQUOTA = 14;
     public static final int NOTIFICATION_CHAT_UPLOAD = 15;
     public static final int NOTIFICATION_UPLOAD_FOLDER = 16;
-    public static final int NOTIFICATION_UPLOAD_FINAL_FOLDER = 17;
 
     public static final int SUCCESSFUL_VOICE_CLIP_TRANSFER = 1;
     public static final int ERROR_VOICE_CLIP_TRANSFER = 2;
@@ -471,7 +390,6 @@ public class Constants {
     public static final String NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME = "MEGA Cloud Drive";
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID = "ChatUploadServiceNotification";
     public static final String NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME = "MEGA Chat Upload";
-    public static final String NOTIFICATION_CHANNEL_FCM_FETCHING_MESSAGE = "MEGA Fetching Incoming Messages";
     public static final String NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID = "AudioPlayerNotification";
     public static final String CHAT_FOLDER = "My chat files";
     public static final String AUTHORITY_STRING_FILE_PROVIDER = APPLICATION_ID + ".providers.fileprovider";
@@ -485,7 +403,6 @@ public class Constants {
 
     public static int TYPE_LEFT = -1;
     public static int TYPE_JOIN = 1;
-    public static int TYPE_NETWORK_QUALITY = 2;
     public static int TYPE_AUDIO = 3;
     public static int TYPE_VIDEO = 4;
 
@@ -496,7 +413,6 @@ public class Constants {
     public static final String URL_E2EE = "https://mega.nz/security";
 
     public static final int MIN_ITEMS_SCROLLBAR = 30;
-    public static final int MIN_ITEMS_SCROLLBAR_GRID = 200;
     public static final int MIN_ITEMS_SCROLLBAR_CHAT = 20;
     public static final int MIN_ITEMS_SCROLLBAR_CONTACT = 20;
 
@@ -517,8 +433,6 @@ public class Constants {
     public static final String APP_DATA_INDICATOR = ">";
     //Indicates the data after it, is a new transfer parameter
     public static final String APP_DATA_SEPARATOR = "-";
-    //Indicates the data after it, is a new AppData due to a repeated transfer
-    public static final String APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!";
     public static final String APP_DATA_BACKGROUND_TRANSFER = "BACKGROUND_TRANSFER";
 
     public static final String AVATAR_PRIMARY_COLOR = "AVATAR_PRIMARY_COLOR";
@@ -570,9 +484,6 @@ public class Constants {
 
     public static final int NOT_CALL_PERMISSIONS_SNACKBAR_TYPE = 10;
 
-    public static final int INFO_ANIMATION = 3000;
-    public static final int QUICK_INFO_ANIMATION = 500;
-
     public static final int HEADER_VIEW_TYPE = 0;
     public static final int ITEM_VIEW_TYPE = 1;
     public static final int ITEM_PROGRESS = 2;
@@ -595,13 +506,10 @@ public class Constants {
     public static final String SHOW_SNACKBAR = "SHOW_SNACKBAR";
     public static final String CHAT_ID = "CHAT_ID";
     public static final String MESSAGE_ID = "messageId";
-    public static final String CALL_ID = "callId";
     public static final String CHAT_ID_OF_CURRENT_CALL = "chatHandleInProgress";
     public static final String CHAT_ID_OF_INCOMING_CALL = "chatHandleToAnswer";
-    public static final String SECOND_CALL = "SECOND_CALL";
     public static final String PEER_ID = "peerId";
     public static final String CLIENT_ID = "clientId";
-    public static final String CHAT_TITLE = "CHAT_TITLE";
     public static final String SELECTED_CONTACTS = "SELECTED_CONTACTS";
     public static final String NODE_HANDLES = "NODE_HANDLES";
     public static final String NAME = "name";
@@ -619,10 +527,7 @@ public class Constants {
     public static final String URL_FILE_LINK = "URL_FILE_LINK";
     public static final String OPEN_SCAN_QR = "OPEN_SCAN_QR";
     public static final String INVITE_CONTACT = "INVITE_CONTACT";
-    public static final String TYPE_CAMERA = "TYPE_CAMERA";
     public static final String CHAT_LINK_EXTRA = "CHAT_LINK";
-    public static final String WAITING_FOR_CALL = "WAITING_FOR_CALL";
-    public static final String USER_WAITING_FOR_CALL = "USER_WAITING_FOR_CALL";
     public static final String TYPE_CALL_PERMISSION = "TYPE_CALL_PERMISSION";
     public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
     public static final String EXTRA_VOLUME_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE";
@@ -638,7 +543,6 @@ public class Constants {
     public static final int INVALID_TYPE_PERMISSIONS = -1;
     public static final int INVALID_VOLUME = -1;
     public static final int INVALID_DIMENSION = -1;
-    public static final int INVALID_VIEW_TYPE = -1;
     public static final int INVALID_CALL_STATUS = -1;
     public static final int INVALID_CALL = -1;
 
@@ -652,13 +556,10 @@ public class Constants {
 
     public static final int MAX_WIDTH_CONTACT_NAME_LAND = 450;
     public static final int MAX_WIDTH_CONTACT_NAME_PORT = 200;
-    public static final int MAX_WIDTH_CONTACT_NAME_GRID_LAND = 150;
-    public static final int MAX_WIDTH_CONTACT_NAME_GRID_PORT = 120;
     public static final int EMOJI_SIZE = 20;
     public static final int EMOJI_SIZE_MEDIUM = 25;
     public static final int EMOJI_SIZE_HIGH = 30;
     public static final int EMOJI_SIZE_EXTRA_HIGH = 35;
-    public static final int EMOJI_AVATAR_CALL_SMALL = 40;
     public static final int MAX_ALLOWED_CHARACTERS_AND_EMOJIS = 28;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND = 350;
     public static final int MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT = 200;
@@ -855,32 +756,11 @@ public class Constants {
 
     public static final String OFFLINE_ROOT = "/";
 
-    public static final int SEARCH_BY_DATE_FILTER_POS_TYPE = 0;
-    public static final int SEARCH_BY_DATE_FILTER_POS_THE_DAY = 1;
-    public static final int SEARCH_BY_DATE_FILTER_POS_MONTH_OR_YEAR = 2;
-    public static final int SEARCH_BY_DATE_FILTER_POS_START_DAY = 3;
-    public static final int SEARCH_BY_DATE_FILTER_POS_END_DAY = 4;
-
-    public static final long SEARCH_BY_DATE_FILTER_TYPE_ONE_DAY = 1;
-    public static final long SEARCH_BY_DATE_FILTER_TYPE_LAST_MONTH_OR_YEAR = 2;
-    public static final long SEARCH_BY_DATE_FILTER_TYPE_BETWEEN_TWO_DAYS = 3;
-
-    public static final long SEARCH_BY_DATE_FILTER_LAST_MONTH = 1;
-    public static final long SEARCH_BY_DATE_FILTER_LAST_YEAR = 2;
-
-    public static final long AUDIO_PLAYER_BACKGROUND_PLAY_HINT_FADE_OUT_DURATION_MS = 3000;
     public static final long AUDIO_PLAYER_TRACK_NAME_FADE_DURATION_MS = 200;
     public static final long AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS = 3000;
     public static final long MEDIA_PLAYER_TOOLBAR_SHOW_HIDE_DURATION_MS = 400;
 
-    public static final long GET_THUMBNAIL_THROTTLE_MS = 50;
-
-    // 15360 GB = 15TB
-    public static final int BUSINESS_ACCOUNT_STORAGE_SPACE_AMOUNT = 15360;
-
     public static final int MAX_BADGE_NUM = 9;
-
-    public static final int START_CALL_AUDIO_ENABLE = 1;
 
     /** Event Keys */
     public static final String EVENT_NODES_CHANGE = "nodes_change";
@@ -907,9 +787,6 @@ public class Constants {
     public static final int OVERQUOTA_STORAGE_STATE = 1;
     public static final int PRE_OVERQUOTA_STORAGE_STATE = 2;
 
-    //Sort order management
-    public static final String NEW_ORDER = "NEW_ORDER";
-    public static final String IS_CLOUD_ORDER = "IS_CLOUD_ORDER";
     public static final int ORDER_CLOUD = 0;
     public static final int ORDER_OTHERS = 1;
     public static final int ORDER_CAMERA = 2;
@@ -925,12 +802,6 @@ public class Constants {
 
     /** The param type returned by checkChatLink denoting the link is for a meeting room */
     public final static int LINK_IS_FOR_MEETING = 1;
-
-    // The name of the preference to retrieve.
-    public final static String KEY_SHOW_EDUCATION = "show_education";
-
-    // SharedPreference file name
-    public final static String MEETINGS_PREFERENCE = "meeting_preference";
 
     public static final float MEETING_NAME_MARGIN_TOP = 16f;
 
