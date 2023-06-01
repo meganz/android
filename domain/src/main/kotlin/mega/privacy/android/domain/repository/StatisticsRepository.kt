@@ -20,7 +20,7 @@ interface StatisticsRepository {
      * Send an event to the stats server.
      *
      * @param eventId      Event type
-     * @param message      Event message
+     * @param message      Event message. If the message contains quotes, they must be escaped quotes.
      * @param addJourneyId True if JourneyID should be included. Otherwise, false.
      * @param viewId       ViewID value (C-string null-terminated) to be sent with the event.
      *                     This value should have been generated with [this.generateViewId].
