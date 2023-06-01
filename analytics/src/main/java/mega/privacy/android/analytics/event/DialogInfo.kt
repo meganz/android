@@ -3,7 +3,7 @@ package mega.privacy.android.analytics.event
 /**
  * Dialog display
  */
-interface DialogInfo: AnalyticsInfo {
+interface DialogInfo : AnalyticsInfo {
     /**
      * Name
      */

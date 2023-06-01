@@ -1,5 +1,6 @@
 package mega.privacy.android.analytics.tracker
 
+import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 
@@ -20,4 +21,19 @@ interface AnalyticsTracker {
      * @param tab
      */
     fun trackTabSelected(tab: TabInfo)
+
+    /**
+     * Track dialog displayed
+     *
+     * @param dialog
+     * @param screen
+     */
+    fun trackDialogDisplayed(dialog: DialogInfo, screen: ScreenInfo)
+
+    /**
+     * Track dialog displayed
+     *
+     * @param dialog
+     */
+    fun trackDialogDisplayed(dialog: DialogInfo)
 }

@@ -9,7 +9,7 @@ package mega.privacy.android.domain.entity.analytics
  */
 class DialogDisplayedEvent(
     private val identifier: DialogDisplayedEventIdentifier,
-    override val viewId: String,
+    override val viewId: String?,
 ) : AnalyticsEvent() {
     override val eventTypeIdentifier = 3000
     override val uniqueEventIdentifier: Int

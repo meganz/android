@@ -6,9 +6,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
+import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
+import mega.privacy.android.domain.entity.analytics.DialogDisplayedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEventIdentifier
@@ -92,6 +95,25 @@ class AnalyticsTrackerImpl @Inject constructor(
             } else {
                 eventSource.send(TabSelectedEvent(identifier, latestViewId))
             }
+        }
+    }
+
+    override fun trackDialogDisplayed(dialog: DialogInfo) {
+        trackDialog(dialog)
+    }
+
+    override fun trackDialogDisplayed(dialog: DialogInfo, screen: ScreenInfo) {
+        trackDialog(dialog, screen)
+    }
+
+    private fun trackDialog(dialog: DialogInfo, screen: ScreenInfo? = null) {
+        appScope.launch {
+            val identifier = DialogDisplayedEventIdentifier(
+                dialogName = dialog.name,
+                uniqueIdentifier = dialog.uniqueIdentifier,
+                screenName = screen?.name
+            )
+            trackEventUseCase(DialogDisplayedEvent(identifier, currentViewId))
         }
     }
 

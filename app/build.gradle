@@ -239,6 +239,8 @@ dependencies {
     implementation project(':liveeventbus-x')
     implementation project(':analytics')
 
+    testImplementation project(':core-ui-test')
+
     // Jetbrains
     implementation lib.anko.commons
     implementation lib.coroutines.android

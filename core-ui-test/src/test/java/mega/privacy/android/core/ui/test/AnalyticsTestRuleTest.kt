@@ -2,8 +2,8 @@ package mega.privacy.android.core.ui.test
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
-import mega.privacy.android.analytics.event.TabInfo
 import org.junit.Rule
 import org.junit.Test
 
@@ -30,13 +30,11 @@ internal class AnalyticsTestRuleTest {
     internal fun `test that events are listed in order`() {
         val intRange = Array(5) { it }
         intRange.map {
-            val event = object : TabInfo {
-                override val screenInfo: ScreenInfo
-                    get() = TODO("Not yet implemented")
+            val event = object : DialogInfo {
                 override val name = it.toString()
                 override val uniqueIdentifier = it
             }
-            Analytics.tracker.trackTabSelected(event)
+            Analytics.tracker.trackDialogDisplayed(event)
         }
 
         assertThat(underTest.events.map { it.info.uniqueIdentifier }).containsExactly(*intRange)

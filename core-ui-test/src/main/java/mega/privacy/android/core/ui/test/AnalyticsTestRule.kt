@@ -2,6 +2,7 @@ package mega.privacy.android.core.ui.test
 
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.AnalyticsInfo
+import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
@@ -33,6 +34,14 @@ class AnalyticsTestRule(tracker: AnalyticsTracker? = null) : TestRule {
 
         override fun trackTabSelected(tab: TabInfo) {
             events.add(AnalyticsCall(tab))
+        }
+
+        override fun trackDialogDisplayed(dialog: DialogInfo, screen: ScreenInfo) {
+            events.add(AnalyticsCall(dialog, listOf(screen)))
+        }
+
+        override fun trackDialogDisplayed(dialog: DialogInfo) {
+            events.add(AnalyticsCall(dialog))
         }
     }
 

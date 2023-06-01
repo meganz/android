@@ -12,11 +12,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
+import mega.privacy.android.core.ui.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -26,8 +28,11 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class AlbumsViewTest {
+
+    val composeRule = createComposeRule()
+
     @get:Rule
-    var composeRule = createComposeRule()
+    var ruleChain: RuleChain = RuleChain.outerRule(AnalyticsTestRule()).around(composeRule)
 
     private val isUserAlbumsEnabled = { true }
 

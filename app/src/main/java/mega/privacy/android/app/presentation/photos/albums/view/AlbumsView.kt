@@ -66,6 +66,10 @@ import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.content.DeleteAlbumsConfirmationDialogInfo
+import mega.privacy.android.analytics.event.content.PhotosScreenInfo
+import mega.privacy.android.analytics.event.content.RemoveLinksConfirmationDialogInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -409,6 +413,9 @@ fun DeleteAlbumsConfirmationDialog(
 ) {
     val isLight = MaterialTheme.colors.isLight
 
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackDialogDisplayed(DeleteAlbumsConfirmationDialogInfo, PhotosScreenInfo)
+    }
     MegaDialog(
         titleString = pluralStringResource(
             id = R.plurals.photos_album_delete_confirmation_title,
@@ -464,6 +471,9 @@ fun RemoveLinksConfirmationDialog(
     onCancel: () -> Unit,
     onRemove: () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackDialogDisplayed(RemoveLinksConfirmationDialogInfo, PhotosScreenInfo)
+    }
     MegaAlertDialog(
         title = pluralStringResource(
             id = R.plurals.album_share_remove_links_dialog_title,
@@ -511,5 +521,5 @@ private fun isAlbumSelected(
 ): Boolean = album.id is Album.UserAlbum && album.id.id in selectedAlbumIds
 
 private fun isAlbumExported(
-    album: UIAlbum
+    album: UIAlbum,
 ): Boolean = album.id is Album.UserAlbum && album.id.isExported

@@ -138,4 +138,47 @@ internal class AnalyticsTrackerImplTest {
 
         verifyBlocking(trackEventUseCase, times(2)) { invoke(any()) }
     }
+
+    @Test
+    internal fun `test that track dialog uses existing view id if it exists`() {
+        val expectedViewId = "viewId"
+        trackScreenViewUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(expectedViewId)
+        }
+        val screen = mock<ScreenInfo> {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(12)
+        }
+        underTest.trackScreenView(screen)
+
+        underTest.trackDialogDisplayed(mock {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(2)
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == expectedViewId }) }
+    }
+
+    @Test
+    internal fun `test that track dialog uses null view id if it does not exists`() {
+        underTest.trackDialogDisplayed(mock {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(2)
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == null }) }
+    }
+
+    @Test
+    internal fun `test that track dialog uses screen name if passed`() {
+        val expected = "expected screen name"
+        underTest.trackDialogDisplayed(mock {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(2)
+        },
+            mock { on { name }.thenReturn(expected) }
+        )
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { data().containsValue(expected) }) }
+    }
 }
