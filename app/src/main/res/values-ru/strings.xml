@@ -672,7 +672,7 @@
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Локальная папка камеры</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
-    <string name="settings_mega_camera_upload_folder">MEGA-папка загрузок из камеры</string>
+    <string name="settings_mega_camera_upload_folder">Папка MEGA «Загрузки из камеры»</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
     <string name="settings_local_secondary_folder">Вторичная локальная папка</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
@@ -1392,7 +1392,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Пользователя нет в контактах</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Использовать мобильный интернет</string>
+    <string name="camera_uploads_cellular_connection">Использовать мобильные данные</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Загружать видео</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -5266,4 +5266,12 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Ежемесячно</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_title">Невозможно открыть файл</string>
+    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_description"></string>
+    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_description"></string>
 </resources>

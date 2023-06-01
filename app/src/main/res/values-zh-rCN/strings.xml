@@ -4621,4 +4621,12 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">每月</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_title">无法打开文件</string>
+    <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
+    <string name="dialog_taken_down_folder_description"></string>
+    <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
+    <string name="dialog_taken_down_file_description"></string>
 </resources>
