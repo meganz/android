@@ -22,4 +22,5 @@ class AnalyticsEventMessageMapper @Inject constructor(
      * @return
      */
     operator fun invoke(event: AnalyticsEvent): String = gson.toJson(event.data())
+        .replace("\"", "\\\"")
 }

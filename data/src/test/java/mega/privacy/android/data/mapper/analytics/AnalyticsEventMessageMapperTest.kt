@@ -31,6 +31,7 @@ internal class AnalyticsEventMessageMapperTest {
         }
 
         val expected = """{"string":"string","int":1,"long":1,"null":null,"array":[1,2,3]}"""
+            .replace("\"", "\\\"")
 
         assertThat(underTest(event)).isEqualTo(expected)
     }
