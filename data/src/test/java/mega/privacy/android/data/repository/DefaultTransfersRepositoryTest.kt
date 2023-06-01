@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -47,6 +48,7 @@ class DefaultTransfersRepositoryTest {
     private val transferMapper: TransferMapper = mock()
     private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val workerManagerGateway = mock<WorkManagerGateway>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     @Before
     fun setUp() {
@@ -59,6 +61,7 @@ class DefaultTransfersRepositoryTest {
             transferMapper = transferMapper,
             localStorageGateway = localStorageGateway,
             workerManagerGateway = workerManagerGateway,
+            megaLocalRoomGateway = megaLocalRoomGateway,
         )
     }
 

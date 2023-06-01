@@ -1,6 +1,8 @@
 package mega.privacy.android.data.gateway
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 
 /**
  * Mega local room gateway
@@ -97,4 +99,12 @@ interface MegaLocalRoomGateway {
      *
      */
     suspend fun getAllContacts(): List<Contact>
+
+    /**
+     * Get all completed transfers
+     *
+     * @param size the limit size of the list. If null, the limit does not apply
+     */
+    suspend fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+
 }

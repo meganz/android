@@ -1,11 +1,14 @@
 package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.EncryptData
+import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
 import javax.inject.Inject
 
@@ -13,6 +16,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val contactDao: ContactDao,
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
+    private val completedTransferDao: CompletedTransferDao,
+    private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val encryptData: EncryptData,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
@@ -71,4 +76,13 @@ internal class MegaLocalRoomFacade @Inject constructor(
         val entities = contactDao.getAllContact().first()
         return entities.map { contactModelMapper(it) }
     }
+
+    override suspend fun getAllCompletedTransfers(size: Int?) =
+        completedTransferDao.getAllCompletedTransfers()
+            .map { list ->
+                list.map { completedTransferModelMapper(it) }
+                    .toMutableList()
+                    .apply { sortWith(compareByDescending { it.timestamp }) }
+                    .let { if (size != null) it.take(size) else it }
+            }
 }

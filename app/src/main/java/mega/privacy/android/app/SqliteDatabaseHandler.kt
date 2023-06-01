@@ -2135,7 +2135,7 @@ class SqliteDatabaseHandler @Inject constructor(
      *
      * @return The list of the completed transfers
      */
-    override val completedTransfers: List<CompletedTransfer?>
+    private val completedTransfers: List<CompletedTransfer?>
         get() {
             val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS"
             val transfers = getCompletedTransfers(selectQuery).apply {

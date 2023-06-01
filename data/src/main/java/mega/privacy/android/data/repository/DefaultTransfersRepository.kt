@@ -15,6 +15,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -55,6 +56,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val workerManagerGateway: WorkManagerGateway,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : TransfersRepository, TransferRepository {
 
     override suspend fun cancelTransfer(transfer: MegaTransfer) {
@@ -297,6 +299,11 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorCompletedTransfer(): Flow<CompletedTransfer> =
         appEventGateway.monitorCompletedTransfer
+
+    override suspend fun getAllCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getAllCompletedTransfers(size)
+        }
 
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
         withContext(ioDispatcher) {

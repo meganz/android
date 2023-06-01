@@ -168,13 +168,6 @@ interface DatabaseHandler {
     var attributes: MegaAttributes?
 
     /**
-     * Gets the completed transfers.
-     *
-     * @return The list with the completed transfers.
-     */
-    val completedTransfers: List<CompletedTransfer?>
-
-    /**
      * Gets the completed transfers which have as state cancelled or failed.
      *
      * @return The list the cancelled or failed transfers.

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
@@ -50,6 +52,7 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase,
     monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
 ) : ViewModel() {
@@ -308,9 +311,9 @@ class TransfersViewModel @Inject constructor(
     /**
      * Set the completed transfers
      */
-    private fun setCompletedTransfers() {
+    private fun setCompletedTransfers() = viewModelScope.launch {
         completedTransfers.clear()
-        completedTransfers.addAll(dbH.completedTransfers)
+        completedTransfers.addAll(getAllCompletedTransfersUseCase(MAX_TRANSFERS).first())
         _completedState.update {
             CompletedTransfersState.TransfersUpdated(completedTransfers.toList())
         }

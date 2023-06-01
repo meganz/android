@@ -17,6 +17,7 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.transfer.GetAllCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
@@ -49,6 +50,7 @@ internal class TransfersViewModelTest {
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
     private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
+    private val getAllCompletedTransfersUseCase: GetAllCompletedTransfersUseCase = mock()
 
     @Before
     fun setUp() {
@@ -67,6 +69,7 @@ internal class TransfersViewModelTest {
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
             getTransferByTagUseCase = getTransferByTagUseCase,
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
+            getAllCompletedTransfersUseCase = getAllCompletedTransfersUseCase,
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
         )
@@ -153,12 +156,15 @@ internal class TransfersViewModelTest {
         runTest {
             val expected = mock<CompletedTransfer>()
 
-            whenever(dbH.completedTransfers).thenReturn(emptyList())
+            whenever(getAllCompletedTransfersUseCase(any())).thenReturn(
+                flow { emit(emptyList()) }
+            )
             whenever(monitorCompletedTransferEventUseCase()).thenReturn(
                 flow { emit(expected) }
             )
 
             underTest.completedState.test {
+                assertThat(awaitItem()).isEqualTo(CompletedTransfersState.Default)
                 assertThat(awaitItem()).isEqualTo(CompletedTransfersState.TransfersUpdated(emptyList()))
                 assertThat(awaitItem()).isEqualTo(
                     CompletedTransfersState.TransferFinishUpdated(
