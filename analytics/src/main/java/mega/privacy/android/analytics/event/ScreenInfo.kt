@@ -5,7 +5,7 @@ package mega.privacy.android.analytics.event
  *
  * @constructor Create empty Screen view
  */
-interface ScreenInfo {
+interface ScreenInfo : AnalyticsInfo {
     /**
      * Name
      */
@@ -14,6 +14,6 @@ interface ScreenInfo {
     /**
      * Unique identifier
      */
-    val uniqueIdentifier: Int
+    override val uniqueIdentifier: Int
 
 }

@@ -1,14 +1,9 @@
 package mega.privacy.android.analytics.event
 
 /**
- * Tab selected
+ * Dialog display
  */
-interface TabInfo : AnalyticsInfo {
-    /**
-     * ScreenView
-     */
-    val screenInfo: ScreenInfo
-
+interface DialogInfo: AnalyticsInfo {
     /**
      * Name
      */

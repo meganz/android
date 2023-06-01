@@ -46,4 +46,9 @@ android {
 dependencies {
 
     implementation project(':app')
+    implementation project(':analytics')
+
+    implementation testlib.bundles.ui.test
+    implementation testlib.bundles.unit.test
+    implementation testlib.compose.junit
 }
