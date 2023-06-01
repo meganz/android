@@ -393,17 +393,23 @@ class ChatViewModel @Inject constructor(
             _state.value.schedId?.let { schedId ->
                 if (schedId != megaChatApiGateway.getChatInvalidHandle()) {
                     Timber.d("Start scheduled meeting")
-                    startChatCallNoRingingUseCase(
-                        chatId = _state.value.chatId,
-                        schedId = schedId,
-                        enabledVideo = false,
-                        enabledAudio = true
-                    )?.let { call ->
-                        call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                            ?.let {
-                                Timber.d("Meeting started")
-                                openCurrentCall(call = call)
-                            }
+                    runCatching {
+                        startChatCallNoRingingUseCase(
+                            chatId = _state.value.chatId,
+                            schedId = schedId,
+                            enabledVideo = false,
+                            enabledAudio = true
+                        )
+                    }.onSuccess { call ->
+                        call?.let {
+                            call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                                ?.let {
+                                    Timber.d("Meeting started")
+                                    openCurrentCall(call = call)
+                                }
+                        }
+                    }.onFailure {
+                        Timber.e(it)
                     }
                 }
             }

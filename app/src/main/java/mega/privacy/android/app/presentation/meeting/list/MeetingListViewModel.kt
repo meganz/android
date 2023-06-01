@@ -204,16 +204,22 @@ class MeetingListViewModel @Inject constructor(
                 }
             } else {
                 Timber.d("Start scheduled meeting")
-                startChatCallNoRingingUseCase(
-                    chatId = chatId,
-                    schedId = schedId,
-                    enabledVideo = false,
-                    enabledAudio = true
-                )?.let { call ->
-                    call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                        ?.let {
-                            openCurrentCall(call)
-                        }
+                runCatching {
+                    startChatCallNoRingingUseCase(
+                        chatId = chatId,
+                        schedId = schedId,
+                        enabledVideo = false,
+                        enabledAudio = true
+                    )
+                }.onSuccess { call ->
+                    call?.let {
+                        call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                            ?.let {
+                                openCurrentCall(call)
+                            }
+                    }
+                }.onFailure {
+                    Timber.e(it)
                 }
             }
         }
