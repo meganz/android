@@ -4200,6 +4200,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 setBottomNavigationMenuItemChecked(NO_BNV)
                 supportInvalidateOptionsMenu()
                 syncFragment?.let { replaceFragment(it, FragmentTag.SYNC.tag) }
+                showFabButton()
             }
 
             DrawerItem.HOMEPAGE -> {
