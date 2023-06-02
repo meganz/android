@@ -22,8 +22,8 @@ import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
+import mega.privacy.android.app.upgradeAccount.view.LegacyUpgradeAccountView
 import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
-import mega.privacy.android.app.upgradeAccount.view.NewUpgradeAccountView
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.billing.PaymentUtils
@@ -92,10 +92,10 @@ class UpgradeAccountFragment : Fragment() {
                 value = getFeatureFlagUseCase(AppFeatures.PlansPageUpdate)
             }
             if (useNewPlansPageUI) {
-                NewUpgradeAccountView(
+                UpgradeAccountView(
                     state = uiState,
                     onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
-                    onButtonClicked = {
+                    onBuyClicked = {
                         billingViewModel.startPurchase(
                             upgradeAccountActivity,
                             upgradeAccountViewModel.getProductId(
@@ -109,7 +109,7 @@ class UpgradeAccountFragment : Fragment() {
                     onChoosingPlanType = upgradeAccountViewModel::onSelectingPlanType
                 )
             } else {
-                UpgradeAccountView(
+                LegacyUpgradeAccountView(
                     state = uiState,
                     onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
                     onPlanClicked = { onUpgradeClick(it) },

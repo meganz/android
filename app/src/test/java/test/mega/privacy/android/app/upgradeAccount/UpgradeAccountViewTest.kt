@@ -1,11 +1,14 @@
 package test.mega.privacy.android.app.upgradeAccount
 
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.hasAnyChild
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.R
@@ -14,25 +17,23 @@ import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
-import mega.privacy.android.app.upgradeAccount.view.BuyNewSubscriptionDialog
+import mega.privacy.android.app.upgradeAccount.view.UpgradeAccountView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import test.mega.privacy.android.app.onNodeWithText
-import java.text.DecimalFormat
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
 
 @RunWith(AndroidJUnit4::class)
 class UpgradeAccountViewTest {
     private val localisedPriceStringMapper = LocalisedPriceStringMapper()
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
-    private val subscriptionProIMonthly = LocalisedSubscription(
+
+    private val localisedSubscriptionProI = LocalisedSubscription(
         accountType = AccountType.PRO_I,
         storage = 2048,
         monthlyTransfer = 2048,
@@ -47,7 +48,7 @@ class UpgradeAccountViewTest {
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProIIMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProII = LocalisedSubscription(
         accountType = AccountType.PRO_II,
         storage = 8192,
         monthlyTransfer = 8192,
@@ -62,7 +63,7 @@ class UpgradeAccountViewTest {
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProIIIMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProIII = LocalisedSubscription(
         accountType = AccountType.PRO_III,
         storage = 16384,
         monthlyTransfer = 16384,
@@ -77,7 +78,7 @@ class UpgradeAccountViewTest {
         formattedSize = formattedSizeMapper,
     )
 
-    private val subscriptionProLiteMonthly = LocalisedSubscription(
+    private val localisedSubscriptionProLite = LocalisedSubscription(
         accountType = AccountType.PRO_LITE,
         storage = 400,
         monthlyTransfer = 1024,
@@ -93,221 +94,136 @@ class UpgradeAccountViewTest {
     )
 
     private val expectedLocalisedSubscriptionsList = listOf(
-        subscriptionProLiteMonthly,
-        subscriptionProIMonthly,
-        subscriptionProIIMonthly,
-        subscriptionProIIIMonthly
+        localisedSubscriptionProLite,
+        localisedSubscriptionProI,
+        localisedSubscriptionProII,
+        localisedSubscriptionProIII
     )
 
     @get:Rule
     var composeRule = createComposeRule()
 
     @Test
-    fun `test that comment about recurring subscription plan cancellation is shown`() {
+    fun `test that if monthly tab is selected the monthly button displays correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
             )
         }
+        composeRule.onNodeWithText("Monthly").performClick()
 
-        composeRule.onNodeWithText(R.string.upgrade_comment)
+        composeRule.onNode(hasTestTag("Monthly check"), useUnmergedTree = true).assertExists()
+        composeRule.onNode(hasTestTag("Yearly check"), useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
-    fun `test that current subscription is shown`() {
+    fun `test that if yearly tab is selected the yearly button displays correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+            )
+        }
+        composeRule.onNodeWithText("Yearly").performClick()
+
+        composeRule.onNode(hasTestTag("Monthly check"), useUnmergedTree = true).assertDoesNotExist()
+        composeRule.onNode(hasTestTag("Yearly check"), useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `test that current subscription label is shown correctly`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(AccountType.PRO_I, false),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
             )
         }
 
-        val text =
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.type_of_my_account,
-                "Free"
-            ).replace("[A]", "").replace("[/A]", "")
+        val text = "Current plan"
+        val testTag =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro1_account)
+        composeRule.onNode(hasTestTag(testTag), useUnmergedTree = true)
+            .assert(hasAnyChild(hasTestTag(text)))
+    }
+
+    @Test
+    fun `test that recommended label is shown correctly`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(AccountType.PRO_I, false),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+            )
+        }
+
+        val text = "Recommended"
+        val testTag =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro2_account)
+        composeRule.onNode(hasTestTag(testTag), useUnmergedTree = true)
+            .assert(hasAnyChild(hasTestTag(text)))
+    }
+
+    @Test
+    fun `test that buy button shows pre-selected plan correctly`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(AccountType.PRO_I, false),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+            )
+        }
+        val text = "Buy Pro II"
+
         composeRule.onNodeWithText(text).assertExists()
     }
 
     @Test
-    fun `test the list of subscription plans is shown correctly`() {
+    fun `test that buy button shows selected plan correctly if user taps on specific plan`() {
         composeRule.setContent {
             UpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
             )
         }
+        val text = "Buy Pro Lite"
+        val testTag =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.prolite_account)
+        composeRule.onNodeWithTag(testTag).performClick()
 
-        val expectedResults = listOf(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.prolite_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.type_month,
-                "€4.99"
-            ).replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(400)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(1024)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro1_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.type_month,
-                "€9.99"
-            ).replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(2048)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(2048)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro2_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.type_month,
-                "€19.99"
-            ).replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(8192)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(8192)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro3_account),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.type_month,
-                "€29.99"
-            ).replace("[A]", "").replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_storage_label,
-                getStorageTransferStringGBBased(16384)
-            ).replace("[A]", "")
-                .replace("[/A]", ""),
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                R.string.account_upgrade_transfer_quota_label,
-                getStorageTransferStringGBBased(16384)
-            ).replace("[A]", "")
-                .replace("[/A]", "")
-        )
-        expectedResults.forEach {
-            composeRule.onNodeWithText(it).assertExists()
-        }
-
+        composeRule.onNodeWithText(text).assertExists()
     }
 
     @Test
-    fun `test that top bar is shown correctly with a title`() {
+    fun `test that clicking buy button triggers onclick event`() {
+        val onBuyClicked = mock<() -> Unit>()
         composeRule.setContent {
             UpgradeAccountView(
                 getUpgradeAccountState(AccountType.FREE, false),
                 onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
+                onBuyClicked = onBuyClicked,
+                onTOSClicked = {},
             )
         }
-        composeRule.onNodeWithText(R.string.action_upgrade_account)
+        val text =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.prolite_account)
+        composeRule.onNodeWithText(text).performClick()
+
+        composeRule.onNodeWithTag("BUY_BUTTON_TAG").performClick()
+
+        verify(onBuyClicked).invoke()
     }
 
-    @Test
-    fun `test that billing warning is displayed when billing is not available`() {
-        composeRule.setContent {
-            UpgradeAccountView(
-                getUpgradeAccountState(AccountType.PRO_III, true),
-                onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
-            )
-        }
-
-        composeRule.onNodeWithText(R.string.upgrade_billing_warning)
-    }
-
-    @Test
-    fun `test that custom label is displayed if user has pro iii plan`() {
-        composeRule.setContent {
-            UpgradeAccountView(
-                getUpgradeAccountState(AccountType.PRO_III, true),
-                onBackPressed = {},
-                onPlanClicked = {},
-                onCustomLabelClicked = {},
-                hideBillingWarning = {},
-                onDialogPositiveButtonClicked = {},
-                onDialogDismissButtonClicked = {},
-            )
-        }
-
-        composeRule.onNodeWithText(R.string.label_custom_plan)
-    }
-
-    @Test
-    fun `test that clicking the positive dialog button calls the correct function`() {
-        val onDialogPositiveButtonClicked = mock<(Int) -> Unit>()
-
-        composeRule.setContent {
-            BuyNewSubscriptionDialog(
-                upgradeTypeInt = 2,
-                paymentMethod = PaymentMethod.GOOGLE_WALLET,
-                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
-                onDialogDismissButtonClicked = mock(),
-            )
-        }
-
-        composeRule.onNodeWithText(R.string.button_buy_new_subscription).performClick()
-
-        verify(onDialogPositiveButtonClicked).invoke(2)
-    }
-
-    @Test
-    fun `test that clicking the dismiss dialog button calls the correct function`() {
-        val onDialogDismissButtonClicked = mock<() -> Unit>()
-
-        composeRule.setContent {
-            BuyNewSubscriptionDialog(
-                upgradeTypeInt = 2,
-                paymentMethod = PaymentMethod.GOOGLE_WALLET,
-                onDialogPositiveButtonClicked = mock(),
-                onDialogDismissButtonClicked = onDialogDismissButtonClicked,
-            )
-        }
-
-        composeRule.onNodeWithText(R.string.general_dismiss).performClick()
-
-        verify(onDialogDismissButtonClicked).invoke()
-    }
 
     private fun getUpgradeAccountState(
         accountType: AccountType,
@@ -322,27 +238,4 @@ class UpgradeAccountViewTest {
                 currentPayment = null
             )
         )
-
-    private fun getStorageTransferStringGBBased(gbSize: Long): String {
-        val sizeString: String
-        val decf = DecimalFormat("###.##")
-
-        val TB = 1024
-
-        if (gbSize < TB) {
-            sizeString =
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                    R.string.label_file_size_giga_byte,
-                    decf.format(gbSize)
-                )
-        } else {
-            sizeString =
-                InstrumentationRegistry.getInstrumentation().targetContext.getString(
-                    R.string.label_file_size_tera_byte,
-                    decf.format(gbSize / TB)
-                )
-        }
-
-        return sizeString
-    }
 }
