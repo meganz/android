@@ -16,9 +16,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.decodeBase64
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
+import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -28,6 +32,8 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -39,11 +45,13 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -75,6 +83,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper,
+    private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper,
 ) : PhotosRepository {
     private val photosCache: MutableMap<NodeId, Photo> = mutableMapOf()
 
@@ -475,6 +485,77 @@ internal class DefaultPhotosRepository @Inject constructor(
                 getPhotoFromCache(it)
             }
         }
+
+    override suspend fun getTimelineFilterPreferences(): Map<String, String?>? =
+        withContext(ioDispatcher) {
+            getContentConsumptionPreferences()?.let { allPreferences ->
+                val allCurrentPreferences = allPreferences.getValueFor(
+                    TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value
+                )?.decodeBase64()
+                timelineFilterPreferencesJSONMapper(allCurrentPreferences)
+            }
+        }
+
+    override suspend fun setTimelineFilterPreferences(preferences: Map<String, String>): String? =
+        withContext(ioDispatcher) {
+            val latestPreferencesStringMap = getContentConsumptionPreferences()
+            val valueToPut = contentConsumptionMegaStringMapMapper(
+                latestPreferencesStringMap,
+                preferences,
+            )
+
+            suspendCancellableCoroutine { continuation ->
+                val listener =
+                    continuation.getRequestListener("setUserAttribute(MegaApiJava.USER_ATTR_CC_PREFS)") {
+                        it.megaStringMap.getValueFor(
+                            TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value
+                        )
+                    }
+
+                megaApiFacade.setUserAttribute(
+                    type = MegaApiJava.USER_ATTR_CC_PREFS,
+                    value = valueToPut,
+                    listener = listener
+                )
+
+                continuation.invokeOnCancellation {
+                    megaApiFacade.removeRequestListener(listener)
+                }
+            }
+        }
+
+    private suspend fun getContentConsumptionPreferences() = withContext(ioDispatcher) {
+        val request = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> {
+                            continuation.resumeWith(Result.success(request))
+                        }
+
+                        MegaError.API_ENOENT -> {
+                            continuation.resumeWith(Result.success(null))
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "getTimelineFilterPreferences")
+                        }
+                    }
+                }
+            )
+            megaApiFacade.getUserAttribute(
+                MegaApiJava.USER_ATTR_CC_PREFS,
+                listener
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiFacade.removeRequestListener(listener)
+            }
+        }
+        request?.let {
+            request.megaStringMap
+        }
+    }
 
     private suspend fun getPublicNode(nodeFileLink: String): MegaNode? =
         suspendCancellableCoroutine { continuation ->

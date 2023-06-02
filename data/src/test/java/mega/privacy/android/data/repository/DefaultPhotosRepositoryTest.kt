@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
+import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -10,9 +11,12 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
@@ -24,10 +28,15 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.PhotosRepository
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaStringMap
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -49,6 +58,13 @@ class DefaultPhotosRepositoryTest {
     private val imageMapper: ImageMapper = ::createImage
     private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = ::mapFileTypeInfo
+    private val timelineFilterPreferencesJSONMapper: TimelineFilterPreferencesJSONMapper = mock()
+    private val contentConsumptionMegaStringMapMapper: ContentConsumptionMegaStringMapMapper =
+        mock()
+
+    private val mockMegaStringMap = mock<MegaStringMap>()
+
+    private val success = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
     @Before
     fun setUp() {
@@ -122,6 +138,99 @@ class DefaultPhotosRepositoryTest {
         assertThat(actualPhoto?.fileTypeInfo == null)
     }
 
+    @Test
+    fun `test that getpreferences returns null if android settings doesnt exist`() = runTest {
+        val nullRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CC_PREFS)
+            on { megaStringMap }.thenReturn(null)
+        }
+        whenever(megaApiGateway.getUserAttribute(eq(MegaApiJava.USER_ATTR_CC_PREFS), any()))
+            .thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), nullRequest, success
+                )
+            }
+
+        underTest = createUnderTest(this)
+        assertThat(underTest.getTimelineFilterPreferences()).isNull()
+    }
+
+    @Test
+    fun `test that getpreferences returns the right preferences`() = runTest {
+        underTest = createUnderTest(this)
+
+        val expectedPrefStringMap = mock<MegaStringMap>()
+        expectedPrefStringMap["cc"] = "abc"
+
+        val expectedResult = timelineFilterPreferencesJSONMapper("abc")
+
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CC_PREFS)
+            on { megaStringMap }.thenReturn(expectedPrefStringMap)
+        }
+        whenever(megaApiGateway.getUserAttribute(eq(MegaApiJava.USER_ATTR_CC_PREFS), any()))
+            .thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, success
+                )
+            }
+
+        val actualPrefStringMap = underTest.getTimelineFilterPreferences()
+        assertThat(actualPrefStringMap).isEqualTo(expectedResult)
+    }
+
+    @Test
+    fun `test that setpreferences give the right value`() = runTest {
+        underTest = createUnderTest(this)
+
+        val expectedMegaStringMapValue = mapOf(Pair("abc", "def"))
+        val expectedPrefStringMap = mock<MegaStringMap>()
+        val valueToPut = mock<MegaStringMap>()
+        whenever(expectedPrefStringMap.size()).thenReturn(1)
+        whenever(expectedPrefStringMap.get("cc")).thenReturn(expectedMegaStringMapValue.toString())
+
+        val getRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CC_PREFS)
+            on { megaStringMap }.thenReturn(expectedPrefStringMap)
+        }
+        whenever(megaApiGateway.getUserAttribute(eq(MegaApiJava.USER_ATTR_CC_PREFS), any()))
+            .thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), getRequest, success
+                )
+            }
+
+        whenever(
+            contentConsumptionMegaStringMapMapper(
+                expectedPrefStringMap,
+                expectedMegaStringMapValue
+            )
+        ).thenReturn(valueToPut)
+
+        val request = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_CC_PREFS)
+            on { megaStringMap }.thenReturn(expectedPrefStringMap)
+        }
+        whenever(
+            megaApiGateway.setUserAttribute(
+                eq(MegaApiJava.USER_ATTR_CC_PREFS),
+                any<MegaStringMap>(),
+                any()
+            )
+        ).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+
+        assertThat(underTest.setTimelineFilterPreferences(expectedMegaStringMapValue))
+            .isEqualTo(expectedMegaStringMapValue.toString())
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultPhotosRepository(
         nodeRepository = nodeRepository,
         megaApiFacade = megaApiGateway,
@@ -133,7 +242,9 @@ class DefaultPhotosRepositoryTest {
         imageMapper = imageMapper,
         videoMapper = videoMapper,
         fileTypeInfoMapper = fileTypeInfoMapper,
-        megaChatApiGateway = megaChatApiGateway
+        megaChatApiGateway = megaChatApiGateway,
+        timelineFilterPreferencesJSONMapper = timelineFilterPreferencesJSONMapper,
+        contentConsumptionMegaStringMapMapper = contentConsumptionMegaStringMapMapper,
     )
 
     private fun createMegaNode(

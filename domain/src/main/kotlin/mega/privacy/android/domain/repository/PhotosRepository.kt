@@ -85,4 +85,14 @@ interface PhotosRepository {
      * @return photo
      */
     suspend fun getPhotoByPublicLink(link: String): Photo?
+
+    /**
+     * Get the preferences for Timeline Filter
+     */
+    suspend fun getTimelineFilterPreferences(): Map<String, String?>?
+
+    /**
+     * Set the preferences for Timeline Filter
+     */
+    suspend fun setTimelineFilterPreferences(preferences: Map<String, String>): String?
 }
