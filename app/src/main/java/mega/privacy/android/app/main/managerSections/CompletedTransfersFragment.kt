@@ -79,6 +79,7 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
                 }
                 is CompletedTransfersState.TransferRemovedUpdated -> {
                     adapter.removeItemData(transfersState.index, transfersState.newTransfers)
+                    setEmptyView(transfersState.newTransfers.size)
                 }
                 is CompletedTransfersState.ClearTransfersUpdated -> {
                     adapter.setCompletedTransfers(emptyList())
