@@ -14,8 +14,9 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
-import mega.privacy.android.data.mapper.TransferEventMapper
-import mega.privacy.android.data.mapper.TransferMapper
+import mega.privacy.android.data.mapper.transfer.TransferDataMapper
+import mega.privacy.android.data.mapper.transfer.TransferEventMapper
+import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -49,6 +50,7 @@ class DefaultTransfersRepositoryTest {
     private val localStorageGateway: MegaLocalStorageGateway = mock()
     private val workerManagerGateway = mock<WorkManagerGateway>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val transferDataMapper = mock<TransferDataMapper>()
 
     @Before
     fun setUp() {
@@ -62,6 +64,7 @@ class DefaultTransfersRepositoryTest {
             localStorageGateway = localStorageGateway,
             workerManagerGateway = workerManagerGateway,
             megaLocalRoomGateway = megaLocalRoomGateway,
+            transferDataMapper = transferDataMapper,
         )
     }
 

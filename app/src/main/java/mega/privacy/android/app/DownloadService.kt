@@ -77,6 +77,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -158,6 +159,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
+
+    @Inject
+    lateinit var getTransferDataUseCase: GetTransferDataUseCase
 
     private var errorCount = 0
     private var alreadyDownloaded = 0
@@ -392,23 +396,22 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         Timber.d("onHandleIntent")
         this.intent = intent
         if (intent.action != null && intent.action == Constants.ACTION_RESTART_SERVICE) {
-            val transferData = megaApi.getTransferData(null)
-            if (transferData == null) {
-                stopForeground()
-                return
-            }
-            val uploadsInProgress = transferData.numDownloads
-            for (i in 0 until uploadsInProgress) {
-                val transfer =
-                    megaApi.getTransferByTag(transferData.getDownloadTag(i)) ?: continue
-                if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
-                    transfersCount++
-                }
-            }
-            if (transfersCount > 0) {
-                updateProgressNotification()
-            } else {
-                stopForeground()
+            applicationScope.launch {
+                getTransferDataUseCase()?.let { transferData ->
+                    val uploadsInProgress = transferData.numDownloads
+                    for (i in 0 until uploadsInProgress) {
+                        val transfer =
+                            megaApi.getTransferByTag(transferData.downloadTags[i]) ?: continue
+                        if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
+                            transfersCount++
+                        }
+                    }
+                    if (transfersCount > 0) {
+                        updateProgressNotification()
+                    } else {
+                        stopForeground()
+                    }
+                } ?: stopForeground()
             }
             return
         }

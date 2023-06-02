@@ -22,8 +22,9 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
-import mega.privacy.android.data.mapper.TransferEventMapper
-import mega.privacy.android.data.mapper.TransferMapper
+import mega.privacy.android.data.mapper.transfer.TransferDataMapper
+import mega.privacy.android.data.mapper.transfer.TransferEventMapper
+import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -59,6 +60,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val transferDataMapper: TransferDataMapper,
 ) : TransfersRepository, TransferRepository {
 
     override suspend fun cancelTransfer(transfer: MegaTransfer) {
@@ -160,6 +162,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
         .flowOn(ioDispatcher)
         .cancellable()
+
+    override suspend fun getTransferData() = withContext(ioDispatcher) {
+        megaApiGateway.getTransferData()?.let { transferDataMapper(it) }
+    }
 
 
     override suspend fun cancelAllDownloadTransfers() = withContext(ioDispatcher) {

@@ -72,6 +72,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumberOfPendingUploadsUseCase
+import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
@@ -161,6 +162,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var checkUploadedQRCodeFileUseCase: CheckUploadedQRCodeFileUseCase
+
+    @Inject
+    lateinit var getTransferDataUseCase: GetTransferDataUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -383,48 +387,49 @@ internal class UploadService : LifecycleService() {
                     Constants.NOT_OVERQUOTA_STATE
 
                 Constants.ACTION_RESTART_SERVICE -> {
-                    val transferData = withContext(ioDispatcher) { megaApi.getTransferData(null) }
-                    if (transferData == null) {
-                        stopForeground()
-                        return
-                    }
-                    val uploadsInProgress = transferData.numUploads
-                    var i = 0
-                    while (i < uploadsInProgress) {
-                        val transfer = withContext(ioDispatcher) {
-                            megaApi.getTransferByTag(transferData.getUploadTag(i))
-                        }
-                        if (transfer == null || isCUOrChatTransfer(transfer)) {
-                            i++
-                            continue
-                        }
-                        if (!transfer.isFolderTransfer && transfer.appData == null) {
-                            mapProgressFileTransfers[transfer.tag] = transfer
-                        }
-                        i++
-                    }
-                    uploadCount = mapProgressFileTransfers.size
-                    if (uploadCount > 0) {
-                        isForeground = false
-                        stopForeground(STOP_FOREGROUND_REMOVE)
-                        notificationManager?.cancel(Constants.NOTIFICATION_UPLOAD)
+                    applicationScope.launch {
+                        getTransferDataUseCase()?.let { transferData ->
+                            val uploadsInProgress = transferData.numUploads
+                            var i = 0
+                            while (i < uploadsInProgress) {
+                                val transfer = withContext(ioDispatcher) {
+                                    megaApi.getTransferByTag(transferData.uploadTags[i])
+                                }
+                                if (transfer == null || isCUOrChatTransfer(transfer)) {
+                                    i++
+                                    continue
+                                }
+                                if (!transfer.isFolderTransfer && transfer.appData == null) {
+                                    mapProgressFileTransfers[transfer.tag] = transfer
+                                }
+                                i++
+                            }
+                            uploadCount = mapProgressFileTransfers.size
+                            checkUploads()
+                        } ?: stopForeground()
                     }
                 }
             }
-            if (uploadCount == 0) {
-                stopForeground()
-            } else {
-                updateProgressNotification()
-            }
+
+            checkUploads()
             return
         } ?: run {
             isOverQuota = Constants.NOT_OVERQUOTA_STATE
+
+            intent.getStringExtra(EXTRA_FILE_PATH)?.takeIf { it.isNotEmpty() }?.let { filePath ->
+                acquireLock()
+                doHandleIntent(intent, filePath)
+            } ?: run {
+                Timber.w("Error: File path is NULL or EMPTY")
+            }
         }
-        intent.getStringExtra(EXTRA_FILE_PATH)?.takeIf { it.isNotEmpty() }?.let { filePath ->
-            acquireLock()
-            doHandleIntent(intent, filePath)
-        } ?: run {
-            Timber.w("Error: File path is NULL or EMPTY")
+    }
+
+    private fun checkUploads() {
+        if (uploadCount == 0) {
+            stopForeground()
+        } else {
+            updateProgressNotification()
         }
     }
 

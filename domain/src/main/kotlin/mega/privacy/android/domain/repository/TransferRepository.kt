@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
@@ -237,7 +238,6 @@ interface TransferRepository {
      */
     suspend fun resetTotalUploads()
 
-
     /**
      * Start downloading a node to desired destination and returns a flow to expose download progress
      *
@@ -252,4 +252,11 @@ interface TransferRepository {
         appData: String?,
         shouldStartFirst: Boolean,
     ): Flow<Transfer>
+
+    /**
+     * Gets information about transfer queues.
+     *
+     * @return [TransferData]
+     */
+    suspend fun getTransferData(): TransferData?
 }

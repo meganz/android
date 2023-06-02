@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
+import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -128,6 +129,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
+
+    @Inject
+    lateinit var getTransferDataUseCase: GetTransferDataUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -326,37 +330,35 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         if (intent == null) return
 
         if (intent.action != null && intent.action == Constants.ACTION_RESTART_SERVICE) {
-            val transferData = megaApi.getTransferData(null)
-            if (transferData == null) {
-                stopForeground()
-                return
-            }
+            sharingScope.launch {
+                getTransferDataUseCase()?.let { transferData ->
+                    val uploadsInProgress = transferData.numUploads
+                    var voiceClipsInProgress = 0
 
-            val uploadsInProgress = transferData.numUploads
-            var voiceClipsInProgress = 0
+                    for (i in 0 until uploadsInProgress) {
+                        val transfer =
+                            megaApi.getTransferByTag(transferData.uploadTags[i]) ?: continue
+                        val data = transfer.appData
 
-            for (i in 0 until uploadsInProgress) {
-                val transfer = megaApi.getTransferByTag(transferData.getUploadTag(i)) ?: continue
-                val data = transfer.appData
+                        if (!TextUtil.isTextEmpty(data) && data.contains(Constants.APP_DATA_CHAT)) {
+                            mapProgressTransfers!![transfer.tag] = transfer
 
-                if (!TextUtil.isTextEmpty(data) && data.contains(Constants.APP_DATA_CHAT)) {
-                    mapProgressTransfers!![transfer.tag] = transfer
-
-                    if (transfer.isVoiceClipTransfer()) {
-                        voiceClipsInProgress++
+                            if (transfer.isVoiceClipTransfer()) {
+                                voiceClipsInProgress++
+                            }
+                        }
                     }
-                }
+
+                    totalUploads = mapProgressTransfers!!.size - voiceClipsInProgress
+                    transfersCount = totalUploads
+
+                    if (totalUploads > 0) {
+                        updateProgressNotification()
+                    } else {
+                        stopForeground()
+                    }
+                } ?: startForeground()
             }
-
-            totalUploads = mapProgressTransfers!!.size - voiceClipsInProgress
-            transfersCount = totalUploads
-
-            if (totalUploads > 0) {
-                updateProgressNotification()
-            } else {
-                stopForeground()
-            }
-
             return
         } else if (Constants.ACTION_CHECK_COMPRESSING_MESSAGE == intent.action) {
             checkCompressingMessage(intent)

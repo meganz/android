@@ -1,4 +1,4 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.transfer
 
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage

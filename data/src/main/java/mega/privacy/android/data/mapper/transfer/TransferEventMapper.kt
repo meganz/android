@@ -1,5 +1,6 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.transfer
 
+import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.QuotaExceededMegaException

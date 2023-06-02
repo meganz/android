@@ -1,4 +1,4 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.transfer.Transfer
