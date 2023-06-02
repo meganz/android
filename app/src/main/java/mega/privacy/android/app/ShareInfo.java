@@ -135,8 +135,8 @@ public class ShareInfo implements Serializable {
                 return processIntentMultiple(intent, context);
             }
         } else if (intent.getClipData() != null) {
-            if (Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
-                Timber.d("Multiple ACTION_GET_CONTENT");
+            if (Intent.ACTION_GET_CONTENT.equals(intent.getAction()) || Intent.ACTION_OPEN_DOCUMENT.equals(intent.getAction())) {
+                Timber.d("Multiple ACTION");
                 return processGetContentMultiple(intent, context);
             }
         }
