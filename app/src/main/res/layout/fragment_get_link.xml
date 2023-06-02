@@ -60,6 +60,27 @@
             android:layout_height="1dp"
             android:background="@color/grey_012_white_012" />
 
+        <LinearLayout
+            android:id="@+id/get_link_access"
+            android:orientation="vertical"
+            style="@style/GetLinkOptionsStyle">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cloud_drive_title_link_access"
+                android:textAppearance="?attr/textAppearanceSubtitle2"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cloud_drive_subtitle_link_access"
+                android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Secondary" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:background="@color/grey_012_white_012" />
+
         <RelativeLayout
             android:id="@+id/expiry_date_layout"
             style="@style/GetLinkOptionsStyle">
@@ -76,7 +97,7 @@
                     android:id="@+id/expiry_date_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/title_set_expiry_date"
+                    android:text="@string/general_expiry_date"
                     android:textAppearance="?attr/textAppearanceSubtitle2" />
 
                 <TextView
@@ -93,7 +114,7 @@
                 android:id="@+id/expiry_date_pro_only_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/subtitle_set_expiry_date"
+                android:text="@string/general_pro_only"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
@@ -121,7 +142,7 @@
                 android:id="@+id/password_protection_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/title_set_password_protection"
+                android:text="@string/general_set_password"
                 android:textAppearance="?attr/textAppearanceSubtitle2"
                 />
 
@@ -152,7 +173,7 @@
                 android:id="@+id/password_protection_pro_only_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/subtitle_set_expiry_date"
+                android:text="@string/general_pro_only"
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/password_protection_text"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
@@ -177,7 +198,7 @@
                 android:layout_marginBottom="10dp"
                 android:text="@string/action_reset"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor"
-               />
+                />
 
             <TextView
                 android:id="@+id/remove_password_button"
@@ -339,9 +360,6 @@
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_marginStart="8dp"
                 android:text="@string/button_copy_password" />
-
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>

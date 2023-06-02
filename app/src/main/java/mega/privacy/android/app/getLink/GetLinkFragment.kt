@@ -302,6 +302,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         } else {
             binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
         }
+        if (isPasswordSet) {
+            (requireActivity() as SnackbarShower).showSnackbar(getString(R.string.general_link_updated_copy_again))
+        }
     }
 
     /**

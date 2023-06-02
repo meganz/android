@@ -4810,4 +4810,16 @@
     <string name="dialog_taken_down_folder_description">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A]. You can dispute this takedown if you believe we’ve made a mistake.</string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Pro only</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Link access</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">Expiry date</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">Set password</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Link updated. Copy again</string>
 </resources>
