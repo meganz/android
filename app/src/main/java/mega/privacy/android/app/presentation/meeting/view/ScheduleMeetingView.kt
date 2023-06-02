@@ -364,8 +364,9 @@ private fun ActionButton(
                     style = MaterialTheme.typography.subtitle2,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Normal,
-                    text = stringResource(
-                        id = R.string.meetings_schedule_meeting_recurrence_monthly_description,
+                    text = pluralStringResource(
+                        R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
+                        state.startDate.dayOfMonth,
                         state.startDate.dayOfMonth
                     ),
                     color = MaterialTheme.colors.textColorSecondary
