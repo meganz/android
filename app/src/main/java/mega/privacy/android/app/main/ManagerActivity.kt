@@ -663,6 +663,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var joiningToChatLink = false
     private var linkJoinToChatLink: String? = null
     private var onAskingPermissionsFragment = false
+    private var initialPermissionsAlreadyAsked = false
     private lateinit var navHostView: View
     private var navController: NavController? = null
     private var mHomepageSearchable: HomepageSearchable? = null
@@ -1436,15 +1437,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return true
         }
         prefs = dbH.preferences
-        firstTimeAfterInstallation = if (prefs == null) {
-            true
-        } else {
-            if (prefs?.firstTime == null) {
-                true
-            } else {
-                prefs?.firstTime.toBoolean()
-            }
-        }
+        firstTimeAfterInstallation =
+            if (prefs == null || prefs?.firstTime == null) true
+            else prefs?.firstTime.toBoolean()
+
         return false
     }
 
@@ -2446,17 +2442,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * have not been shown.
      */
     private fun checkInitialScreens() {
-        if (checkBusinessStatus()) {
-            myAccountInfo.isBusinessAlertShown = true
-            return
-        }
-        if (firstTimeAfterInstallation || askPermissions) {
-            if (canVerifyPhoneNumber().not() || onAskingPermissionsFragment || newCreationAccount) {
-                drawerItem = DrawerItem.ASK_PERMISSIONS
-                askForAccess()
+        when {
+            checkBusinessStatus() -> {
+                myAccountInfo.isBusinessAlertShown = true
             }
-        } else if (requestNotificationsPermissionFirstLogin) {
-            askForNotificationsPermission()
+
+            firstTimeAfterInstallation || askPermissions || newCreationAccount -> {
+                if (!initialPermissionsAlreadyAsked && !onAskingPermissionsFragment) {
+                    drawerItem = DrawerItem.ASK_PERMISSIONS
+                    askForAccess()
+                }
+            }
+
+            requestNotificationsPermissionFirstLogin -> {
+                askForNotificationsPermission()
+            }
         }
     }
 
@@ -2696,6 +2696,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun destroyPermissionsFragment() {
+        initialPermissionsAlreadyAsked = true
         //In mobile, allow all orientation after permission screen
         if (!Util.isTablet(this)) {
             Timber.d("Mobile, all orientation")
