@@ -29,6 +29,7 @@ test {
 }
 
 dependencies {
+    lintChecks project(':lint')
     implementation lib.coroutines.core
     implementation lib.javax.inject
 
