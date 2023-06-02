@@ -1,12 +1,10 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
@@ -14,19 +12,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadSelectionQueryUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SaveSyncRecordsToDBUseCase
-import nz.mega.sdk.MegaNode
 import java.util.LinkedList
 import java.util.Queue
 import javax.inject.Inject
 
 /**
- * Default implementation of [ProcessMediaForUpload]
+ * Use case to collect and save photos and videos for camera upload
+ */
+/**
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
@@ -37,9 +30,8 @@ import javax.inject.Inject
  * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
  * @property getPendingUploadListUseCase [GetPendingUploadListUseCase]
  * @property saveSyncRecordsToDBUseCase [SaveSyncRecordsToDBUseCase]
- * @property cameraUploadRepository [CameraUploadSyncManagerWrapper]
  */
-class DefaultProcessMediaForUpload @Inject constructor(
+class ProcessMediaForUploadUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
@@ -49,12 +41,17 @@ class DefaultProcessMediaForUpload @Inject constructor(
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadListUseCase: GetPendingUploadListUseCase,
     private val saveSyncRecordsToDBUseCase: SaveSyncRecordsToDBUseCase,
-    private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
-) : ProcessMediaForUpload {
+) {
 
-    override suspend fun invoke(
-        primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+    /**
+     * Invoke
+     * @param primaryUploadNodeId [NodeId]
+     * @param secondaryUploadNodeId [NodeId]
+     * @param tempRoot [String]
+     */
+    suspend operator fun invoke(
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         tempRoot: String?,
     ) {
         val mediaStoreTypes = getMediaStoreFileTypesUseCase()
@@ -64,16 +61,16 @@ class DefaultProcessMediaForUpload @Inject constructor(
             list.add(
                 preparePrimaryPhotos(
                     types = mediaStoreTypes,
-                    primaryUploadNode = primaryUploadNode,
-                    secondaryUploadNode = secondaryUploadNode,
+                    primaryUploadNodeId = primaryUploadNodeId,
+                    secondaryUploadNodeId = secondaryUploadNodeId,
                     tempRoot = tempRoot,
                 )
             )
             list.add(
                 prepareSecondaryPhotos(
                     types = mediaStoreTypes,
-                    primaryUploadNode = primaryUploadNode,
-                    secondaryUploadNode = secondaryUploadNode,
+                    primaryUploadNodeId = primaryUploadNodeId,
+                    secondaryUploadNodeId = secondaryUploadNodeId,
                     tempRoot = tempRoot,
                     isSecondaryEnabled = secondaryEnabled,
                 )
@@ -81,30 +78,28 @@ class DefaultProcessMediaForUpload @Inject constructor(
             list.add(
                 preparePrimaryVideos(
                     types = mediaStoreTypes,
-                    primaryUploadNode = primaryUploadNode,
-                    secondaryUploadNode = secondaryUploadNode,
+                    primaryUploadNodeId = primaryUploadNodeId,
+                    secondaryUploadNodeId = secondaryUploadNodeId,
                     tempRoot = tempRoot,
                 )
             )
             list.add(
                 prepareSecondaryVideos(
                     types = mediaStoreTypes,
-                    primaryUploadNode = primaryUploadNode,
-                    secondaryUploadNode = secondaryUploadNode,
+                    primaryUploadNodeId = primaryUploadNodeId,
+                    secondaryUploadNodeId = secondaryUploadNodeId,
                     tempRoot = tempRoot,
                     isSecondaryEnabled = secondaryEnabled,
                 )
             )
             list.joinAll()
-            // Reset backup state as active.
-            cameraUploadSyncManagerWrapper.updatePrimaryFolderBackupState(BackupState.ACTIVE)
-            cameraUploadSyncManagerWrapper.updateSecondaryFolderBackupState(BackupState.ACTIVE)
         }
     }
 
     private fun CoroutineScope.preparePrimaryPhotos(
-        types: List<MediaStoreFileType>, primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+        types: List<MediaStoreFileType>,
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         tempRoot: String?,
     ) = launch {
         val primaryPhotos: Queue<CameraUploadMedia> = LinkedList()
@@ -127,16 +122,17 @@ class DefaultProcessMediaForUpload @Inject constructor(
         )
         saveSyncRecordsToDBUseCase(
             list = pendingUploadsList,
-            primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
-            secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
+            primaryUploadNodeId = primaryUploadNodeId,
+            secondaryUploadNodeId = secondaryUploadNodeId,
             rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_PHOTO)
     }
 
     private fun CoroutineScope.preparePrimaryVideos(
-        types: List<MediaStoreFileType>, primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+        types: List<MediaStoreFileType>,
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         tempRoot: String?,
     ) = launch {
         val primaryVideos: Queue<CameraUploadMedia> = LinkedList()
@@ -159,16 +155,17 @@ class DefaultProcessMediaForUpload @Inject constructor(
         )
         saveSyncRecordsToDBUseCase(
             list = pendingVideoUploadsList,
-            primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
-            secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
+            primaryUploadNodeId = primaryUploadNodeId,
+            secondaryUploadNodeId = secondaryUploadNodeId,
             rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_VIDEO)
     }
 
     private fun CoroutineScope.prepareSecondaryPhotos(
-        types: List<MediaStoreFileType>, primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+        types: List<MediaStoreFileType>,
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         tempRoot: String?, isSecondaryEnabled: Boolean,
     ) = launch {
         if (isSecondaryEnabled) {
@@ -192,8 +189,8 @@ class DefaultProcessMediaForUpload @Inject constructor(
             )
             saveSyncRecordsToDBUseCase(
                 list = pendingUploadsListSecondary,
-                primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
-                secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
+                primaryUploadNodeId = primaryUploadNodeId,
+                secondaryUploadNodeId = secondaryUploadNodeId,
                 rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_PHOTO)
@@ -201,8 +198,9 @@ class DefaultProcessMediaForUpload @Inject constructor(
     }
 
     private fun CoroutineScope.prepareSecondaryVideos(
-        types: List<MediaStoreFileType>, primaryUploadNode: MegaNode?,
-        secondaryUploadNode: MegaNode?,
+        types: List<MediaStoreFileType>,
+        primaryUploadNodeId: NodeId?,
+        secondaryUploadNodeId: NodeId?,
         tempRoot: String?, isSecondaryEnabled: Boolean,
     ) = launch {
         if (isSecondaryEnabled) {
@@ -227,8 +225,8 @@ class DefaultProcessMediaForUpload @Inject constructor(
             )
             saveSyncRecordsToDBUseCase(
                 list = pendingVideoUploadsListSecondary,
-                primaryUploadNodeId = primaryUploadNode?.let { NodeId(it.handle) },
-                secondaryUploadNodeId = secondaryUploadNode?.let { NodeId(it.handle) },
+                primaryUploadNodeId = primaryUploadNodeId,
+                secondaryUploadNodeId = secondaryUploadNodeId,
                 rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)

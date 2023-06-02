@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
@@ -157,9 +156,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsChargingRequired() = mock<IsChargingRequired>()
-
-    @Provides
-    fun provideProcessMediaForUpload() = mock<ProcessMediaForUpload>()
 
     @Provides
     fun provideSetPrimarySyncHandle() = mock<SetPrimarySyncHandle>()

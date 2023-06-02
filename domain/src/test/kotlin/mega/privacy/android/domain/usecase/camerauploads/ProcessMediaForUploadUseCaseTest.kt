@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.CancellationException
@@ -10,25 +10,14 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
-import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadSelectionQueryUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetMediaStoreFileTypesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPendingUploadListUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SaveSyncRecordsToDBUseCase
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.inOrder
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -41,8 +30,8 @@ import java.util.LinkedList
 import java.util.Queue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultProcessMediaForUploadTest {
-    private lateinit var underTest: ProcessMediaForUpload
+class ProcessMediaForUploadUseCaseTest {
+    private lateinit var underTest: ProcessMediaForUploadUseCase
 
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getSecondaryFolderPathUseCase = mock<GetSecondaryFolderPathUseCase>()
@@ -51,13 +40,12 @@ class DefaultProcessMediaForUploadTest {
     private val updateTimeStamp = mock<UpdateCameraUploadTimeStamp>()
     private val getPendingUploadListUseCase = mock<GetPendingUploadListUseCase>()
     private val saveSyncRecordsToDBUseCase = mock<SaveSyncRecordsToDBUseCase>()
-    private val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val getCameraUploadSelectionQueryUseCase = mock<GetCameraUploadSelectionQueryUseCase>()
 
     @Before
     fun setUp() {
-        underTest = DefaultProcessMediaForUpload(
+        underTest = ProcessMediaForUploadUseCase(
             cameraUploadRepository = cameraUploadRepository,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
@@ -67,7 +55,6 @@ class DefaultProcessMediaForUploadTest {
             updateTimeStamp = updateTimeStamp,
             getPendingUploadListUseCase = getPendingUploadListUseCase,
             saveSyncRecordsToDBUseCase = saveSyncRecordsToDBUseCase,
-            cameraUploadSyncManagerWrapper = cameraUploadSyncManagerWrapper
         )
         runBlocking {
             val queue: Queue<CameraUploadMedia> = LinkedList(
@@ -123,11 +110,8 @@ class DefaultProcessMediaForUploadTest {
             )
         )
         whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
-        val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
         underTest(null, null, null)
-        inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-        inOrder.verify(cameraUploadSyncManagerWrapper)
-            .updatePrimaryFolderBackupState(BackupState.ACTIVE)
+        verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
     }
 
     @Test
@@ -141,11 +125,8 @@ class DefaultProcessMediaForUploadTest {
             )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
             underTest(null, null, null)
-            val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
-            inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-            inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
-            inOrder.verify(cameraUploadSyncManagerWrapper)
-                .updateSecondaryFolderBackupState(BackupState.ACTIVE)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
         }
 
     @Test
@@ -214,7 +195,6 @@ class DefaultProcessMediaForUploadTest {
                     Truth.assertThat(e).isInstanceOf(CancellationException::class.java)
                 }
                 verifyNoInteractions(saveSyncRecordsToDBUseCase)
-                verifyNoInteractions(cameraUploadSyncManagerWrapper)
             }
             runCurrent()
             advanceTimeBy(3000)

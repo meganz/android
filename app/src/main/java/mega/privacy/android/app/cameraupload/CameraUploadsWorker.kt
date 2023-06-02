@@ -41,7 +41,6 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.main.ManagerActivity
@@ -98,7 +97,6 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
@@ -123,6 +121,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
@@ -130,6 +129,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -328,7 +328,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * ProcessMediaForUpload
      */
     @Inject
-    lateinit var processMediaForUpload: ProcessMediaForUpload
+    lateinit var processMediaForUploadUseCase: ProcessMediaForUploadUseCase
 
     /**
      * GetPrimarySyncHandle
@@ -1058,7 +1058,11 @@ class CameraUploadsWorker @AssistedInject constructor(
             null
         }
         totalUploaded = 0
-        processMediaForUpload(primaryUploadNode, secondaryUploadNode, tempRoot)
+        processMediaForUploadUseCase(
+            NodeId(primaryUploadNode.handle),
+            secondaryUploadNode?.let { NodeId(it.handle) },
+            tempRoot
+        )
         gatherSyncRecordsForUpload()
     }
 

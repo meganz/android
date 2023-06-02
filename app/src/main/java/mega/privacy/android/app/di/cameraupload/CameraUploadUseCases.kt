@@ -9,10 +9,8 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
-import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -432,12 +430,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsChargingRequired(isChargingRequired: DefaultIsChargingRequired): IsChargingRequired
-
-    /**
-     * Provide the [ProcessMediaForUpload] implementation
-     */
-    @Binds
-    abstract fun bindProcessMediaForUpload(processMediaForUpload: DefaultProcessMediaForUpload): ProcessMediaForUpload
 
     /**
      * Provide the [GetUploadFolderHandle] implementation
