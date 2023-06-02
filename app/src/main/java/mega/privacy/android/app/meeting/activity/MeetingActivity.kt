@@ -120,20 +120,24 @@ class MeetingActivity : BaseActivity() {
                     currentFragment.releaseVideoAndHideKeyboard()
                     removeRTCAudioManager()
                 }
+
                 is JoinMeetingFragment -> {
                     currentFragment.releaseVideoDeviceAndRemoveChatVideoListener()
                     removeRTCAudioManager()
                 }
+
                 is JoinMeetingAsGuestFragment -> {
                     currentFragment.releaseVideoAndHideKeyboard()
                     removeRTCAudioManager()
                 }
+
                 is InMeetingFragment -> {
                     // Prevent guest from quitting the call by pressing back
                     if (!isGuest) {
                         currentFragment.removeUI()
                     }
                 }
+
                 is MakeModeratorFragment -> {
                     currentFragment.cancel()
                 }
@@ -203,7 +207,27 @@ class MeetingActivity : BaseActivity() {
     }
 
     private fun initIntent() {
-        intent?.let { it ->
+        intent?.let {
+            if (it.action == CallNotificationIntentService.ANSWER) {
+                it.extras?.let { extra ->
+                    val chatIdIncomingCall = extra.getLong(
+                        Constants.CHAT_ID_OF_INCOMING_CALL,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+
+                    val answerIntent = Intent(this, CallNotificationIntentService::class.java)
+                    answerIntent.putExtra(
+                        Constants.CHAT_ID_OF_CURRENT_CALL,
+                        MEGACHAT_INVALID_HANDLE
+                    )
+                    answerIntent.putExtra(Constants.CHAT_ID_OF_INCOMING_CALL, chatIdIncomingCall)
+                    answerIntent.action = it.action
+                    startService(answerIntent)
+                    finish()
+                    return
+                }
+            }
+
             if (it.action == CallNotificationIntentService.START_SCHED_MEET) {
                 it.extras?.let { extra ->
                     val chatIdIncomingCall = extra.getLong(
@@ -287,6 +311,7 @@ class MeetingActivity : BaseActivity() {
             MEETING_ACTION_CREATE, MEETING_ACTION_JOIN, MEETING_ACTION_GUEST -> {
                 actionBar.setHomeAsUpIndicator(R.drawable.ic_close_white)
             }
+
             MEETING_ACTION_IN -> actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white)
         }
     }
