@@ -745,6 +745,12 @@ public class ChatActivity extends PasscodeActivity
     private ArrayList<MessageVoiceClip> messagesPlaying = new ArrayList<>();
     private ArrayList<RemovedMessage> removedMessages = new ArrayList<>();
 
+    /**
+     * Temporarily stores the voice clip message being played during a screen rotation
+     * so that it continues to play after the rotation is over.
+     */
+    private MessageVoiceClip currentMessagePlaying = null;
+
     private ConstraintLayout unreadMsgsLayout;
     private RelativeLayout unreadBadgeLayout;
     private ImageView unreadBadgeImage;
@@ -8608,17 +8614,16 @@ public class ChatActivity extends PasscodeActivity
             outState.putIntegerArrayList(SELECTED_ITEMS, selectedPositions);
         }
 
-        MessageVoiceClip messageVoiceClip = adapter.getVoiceClipPlaying();
-        if (messageVoiceClip != null) {
+        if (currentMessagePlaying != null) {
             outState.putBoolean(PLAYING, true);
-            outState.putLong(ID_VOICE_CLIP_PLAYING, messageVoiceClip.getIdMessage());
-            outState.putLong(MESSAGE_HANDLE_PLAYING, messageVoiceClip.getMessageHandle());
-            outState.putLong(USER_HANDLE_PLAYING, messageVoiceClip.getUserHandle());
-            outState.putInt(PROGRESS_PLAYING, messageVoiceClip.getProgress());
+            outState.putLong(ID_VOICE_CLIP_PLAYING, currentMessagePlaying.getIdMessage());
+            outState.putLong(MESSAGE_HANDLE_PLAYING, currentMessagePlaying.getMessageHandle());
+            outState.putLong(USER_HANDLE_PLAYING, currentMessagePlaying.getUserHandle());
+            outState.putInt(PROGRESS_PLAYING, currentMessagePlaying.getProgress());
         } else {
             outState.putBoolean(PLAYING, false);
-
         }
+
         outState.putBoolean("isLocationDialogShown", isLocationDialogShown);
         outState.putBoolean(OPENING_AND_JOINING_ACTION, openingAndJoining);
         outState.putBoolean(ERROR_REACTION_DIALOG, errorReactionsDialogIsShown);
@@ -8897,6 +8902,8 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onPause() {
         super.onPause();
+
+        currentMessagePlaying = adapter.getVoiceClipPlaying();
 
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();

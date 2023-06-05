@@ -7991,8 +7991,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 m.getMediaPlayer().setLooping(false);
                 m.getMediaPlayer().prepare();
                 m.setPaused(false);
-                m.setProgress(m.getMediaPlayer().getCurrentPosition());
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -8099,8 +8097,10 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    /* Get the voice clip that it is playing*/
-
+    /**
+     * Get the voice clip that it is playing
+     * @return The voice clip that it is playing
+     */
     public MessageVoiceClip getVoiceClipPlaying() {
         if (messagesPlaying == null || messagesPlaying.isEmpty()) return null;
         for (MessageVoiceClip m : messagesPlaying) {
