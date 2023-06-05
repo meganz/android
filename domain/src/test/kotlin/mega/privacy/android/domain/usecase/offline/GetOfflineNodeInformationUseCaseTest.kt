@@ -6,7 +6,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
+import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInInbox
@@ -25,9 +26,8 @@ import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetOfflinePathUseCaseTest {
+internal class GetOfflineNodeInformationUseCaseTest {
 
-    private val fileSystemRepository: FileSystemRepository = mock()
     private val nodeRepository: NodeRepository = mock()
     private val getParentNodeUseCase: GetParentNodeUseCase = mock()
     private val isNodeInInbox: IsNodeInInbox = mock()
@@ -35,19 +35,19 @@ class GetOfflinePathUseCaseTest {
     private val parent = mock<FolderNode>()
     private val grandParent = mock<FolderNode>()
 
-    private lateinit var underTest: GetOfflinePathUseCase
+    private lateinit var underTest: GetOfflineNodeInformationUseCase
 
     @BeforeAll
     fun setup() {
-        underTest = GetOfflinePathUseCase(
-            fileSystemRepository, nodeRepository, getParentNodeUseCase, isNodeInInbox
+        underTest = GetOfflineNodeInformationUseCase(
+            nodeRepository, getParentNodeUseCase, isNodeInInbox
         )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            fileSystemRepository, nodeRepository, getParentNodeUseCase, isNodeInInbox,
+            nodeRepository, getParentNodeUseCase, isNodeInInbox,
             node, parent, grandParent
         )
     }
@@ -61,28 +61,27 @@ class GetOfflinePathUseCaseTest {
         }
 
         @Test
-        fun `test that invoke return all nested folders in the correct order when node is a backup file`() =
+        fun `test that invoke returns the correct path and name when node is a backup file`() =
             runTest {
                 stubNodes()
                 stubFolderTree()
-                assertThat(underTest.invoke(node)).isEqualTo(
-                    OFFLINE_BACKUP_DIR + File.separator +
-                            GRAND_PARENT_NAME + File.separator +
-                            PARENT_NAME + File.separator +
-                            NODE_NAME
+                val actual = underTest.invoke(node)
+                assertThat(actual.path).isEqualTo(
+                    File.separator + PARENT_NAME + File.separator
                 )
+                assertThat(actual.name).isEqualTo(NODE_NAME)
             }
 
         @Test
-        fun `test that invoke return all nested folders in the correct order when node is a backup folder`() =
+        fun `test that invoke returns the correct path and name when node is a backup folder`() =
             runTest {
                 stubNodes()
                 stubFolderTree()
-                assertThat(underTest.invoke(parent)).isEqualTo(
-                    OFFLINE_BACKUP_DIR + File.separator +
-                            GRAND_PARENT_NAME + File.separator +
-                            PARENT_NAME
+                val actual = underTest.invoke(parent)
+                assertThat(actual.path).isEqualTo(
+                    File.separator
                 )
+                assertThat(actual.name).isEqualTo(PARENT_NAME)
             }
 
         @Test
@@ -91,7 +90,16 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(nodeRepository.getBackupFolderId()).thenReturn(parentId)
-                assertThat(underTest.invoke(node)).doesNotContain(GRAND_PARENT_NAME)
+                assertThat(underTest.invoke(node).path).doesNotContain(GRAND_PARENT_NAME)
+            }
+
+        @Test
+        fun `test that invoke returns an InboxOfflineNodeInformation when node is a backup file`() =
+            runTest {
+                stubNodes()
+                stubFolderTree()
+                val actual = underTest.invoke(node)
+                assertThat(actual).isInstanceOf(InboxOfflineNodeInformation::class.java)
             }
     }
 
@@ -105,28 +113,29 @@ class GetOfflinePathUseCaseTest {
         }
 
         @Test
-        fun `test that invoke return all nested folders in the correct order when node is a drive file`() =
+        fun `test that invoke returns correct path and name when node is a drive file`() =
             runTest {
                 stubNodes()
                 stubFolderTree()
-                assertThat(underTest.invoke(node)).isEqualTo(
-                    OFFLINE_DIR + File.separator +
+                val actual = underTest.invoke(node)
+                assertThat(actual.path).isEqualTo(
+                    File.separator +
                             GRAND_PARENT_NAME + File.separator +
-                            PARENT_NAME + File.separator +
-                            NODE_NAME
+                            PARENT_NAME + File.separator
                 )
+                assertThat(actual.name).isEqualTo(NODE_NAME)
             }
 
         @Test
-        fun `test that invoke return all nested folders in the correct order when node is a drive folder`() =
+        fun `test that invoke returns the correct path and name when node is a drive folder`() =
             runTest {
                 stubNodes()
                 stubFolderTree()
-                assertThat(underTest.invoke(parent)).isEqualTo(
-                    OFFLINE_DIR + File.separator +
-                            GRAND_PARENT_NAME + File.separator +
-                            PARENT_NAME
+                val actual = underTest.invoke(parent)
+                assertThat(actual.path).isEqualTo(
+                    File.separator + GRAND_PARENT_NAME + File.separator
                 )
+                assertThat(actual.name).isEqualTo(PARENT_NAME)
             }
 
         @Test
@@ -135,17 +144,29 @@ class GetOfflinePathUseCaseTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(nodeRepository.getRootNode()).thenReturn(grandParent)
-                assertThat(underTest.invoke(node)).doesNotContain(GRAND_PARENT_NAME)
+                assertThat(underTest.invoke(node).path).doesNotContain(GRAND_PARENT_NAME)
             }
 
-
         @Test
-        fun `test that invoke adds shared node id when the node is a shared node`() =
+        fun `test that invoke returns an IncomingShareOfflineNodeInformation with correct incomingHandle when node is a shared node`() =
             runTest {
                 stubNodes()
                 stubFolderTree()
                 whenever(grandParent.isIncomingShare).thenReturn(true)
-                assertThat(underTest.invoke(node)).startsWith(OFFLINE_DIR + File.separator + grandParent.id.longValue.toString())
+                val actual = underTest.invoke(node)
+                assertThat(actual).isInstanceOf(IncomingShareOfflineNodeInformation::class.java)
+                assertThat((actual as? IncomingShareOfflineNodeInformation)?.incomingHandle)
+                    .isEqualTo(grandParent.id.longValue.toString())
+            }
+
+        @Test
+        fun `test that invoke returns an OtherOfflineNodeInformation when node is not a shared node`() =
+            runTest {
+                stubNodes()
+                stubFolderTree()
+                whenever(node.isIncomingShare).thenReturn(true)
+                val actual = underTest.invoke(node)
+                assertThat(actual).isInstanceOf(IncomingShareOfflineNodeInformation::class.java)
             }
     }
 
@@ -168,13 +189,11 @@ class GetOfflinePathUseCaseTest {
 
     private suspend fun stubNotInBackup() {
         whenever(isNodeInInbox(any())).thenReturn(false)
-        whenever(fileSystemRepository.getOfflinePath()).thenReturn(OFFLINE_DIR)
         whenever(nodeRepository.getBackupFolderId()).thenReturn(invalidId)
     }
 
     private suspend fun stubInBackup() {
         whenever(isNodeInInbox(any())).thenReturn(true)
-        whenever(fileSystemRepository.getOfflineInboxPath()).thenReturn(OFFLINE_BACKUP_DIR)
         whenever(nodeRepository.getBackupFolderId()).thenReturn(grandParentId)
     }
 
@@ -186,8 +205,6 @@ class GetOfflinePathUseCaseTest {
         private const val NODE_NAME = "node.txt"
         private const val PARENT_NAME = "parent"
         private const val GRAND_PARENT_NAME = "grand parent"
-        private const val OFFLINE_DIR = "/MEGA Offline"
-        private const val OFFLINE_BACKUP_DIR = "/MEGA Offline/in"
     }
 
 }

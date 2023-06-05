@@ -283,7 +283,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     ) = withContext(ioDispatcher) {
         val parent = parentNodeId?.let { parentId ->
             megaLocalStorageGateway.getOfflineInformation(parentId.longValue)
-                ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy")
+                ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy. ParentId: ${parentId.longValue}")
         }
         megaLocalStorageGateway.saveOfflineInformation(
             offlineInformationMapper(offlineNodeInformation, parent?.id)
