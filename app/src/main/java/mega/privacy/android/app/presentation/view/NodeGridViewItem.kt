@@ -20,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
@@ -72,7 +74,7 @@ internal fun NodeGridViewItem(
                 )
                 .padding(start = 16.dp, end = 8.dp),
         ) {
-            val (menuImage, txtTitle, thumbImage) = createRefs()
+            val (menuImage, txtTitle, thumbImage, takenDownImage) = createRefs()
             Image(
                 painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                 contentDescription = "3 dots",
@@ -93,17 +95,29 @@ internal fun NodeGridViewItem(
                     .height(24.dp)
                     .width(24.dp)
                     .constrainAs(thumbImage) {
-                        start.linkTo(parent.start)
+                        end.linkTo(menuImage.start)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                     }
             )
+            Image(
+                modifier = Modifier.constrainAs(takenDownImage) {
+                    end.linkTo(menuImage.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    visibility = if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
+                }
+                    .height(16.dp)
+                    .width(16.dp),
+                painter = painterResource(id = R.drawable.ic_taken_down),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.red_800_red_400),
+                contentDescription = "Taken Down")
             MiddleEllipsisText(
                 text = nodeUIItem.name,
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(end = 8.dp)
                     .constrainAs(txtTitle) {
-                        end.linkTo(menuImage.start)
+                        end.linkTo(takenDownImage.start)
                         start.linkTo(thumbImage.end)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
@@ -153,7 +167,7 @@ internal fun NodeGridViewItem(
                     .padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp)
                     .fillMaxWidth()
             ) {
-                val (menuImage, txtTitle) = createRefs()
+                val (menuImage, txtTitle, takenDownImage) = createRefs()
                 Image(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
@@ -163,13 +177,27 @@ internal fun NodeGridViewItem(
                             end.linkTo(parent.end)
                         }
                 )
+                Image(
+                    modifier = Modifier.constrainAs(takenDownImage) {
+                        end.linkTo(menuImage.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        visibility =
+                            if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
+                    }
+                        .height(16.dp)
+                        .width(16.dp),
+                    painter = painterResource(id = R.drawable.ic_taken_down),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.red_800_red_400),
+                    contentDescription = "Taken Down")
                 MiddleEllipsisText(
                     text = nodeUIItem.name,
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
+                        .padding(end = 8.dp)
                         .constrainAs(txtTitle) {
-                            end.linkTo(menuImage.start)
                             start.linkTo(parent.start)
+                            end.linkTo(takenDownImage.start)
+                            width = Dimension.fillToConstraints
                         },
                     style = MaterialTheme.typography.subtitle1,
                     maxLines = 1,
