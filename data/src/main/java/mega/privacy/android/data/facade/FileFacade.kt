@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import android.content.Context
 import android.database.Cursor
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
@@ -238,6 +239,15 @@ class FileFacade @Inject constructor(
     override suspend fun deleteDirectory(path: String) = run {
         val directory = File(path)
         directory.deleteRecursively()
+    }
+
+    override fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>) {
+        MediaScannerConnection.scanFile(
+            context,
+            paths,
+            mimeTypes,
+            null
+        )
     }
 
     private companion object {

@@ -170,4 +170,9 @@ interface FileSystemRepository {
      * Returns the parent path of the file represented by path
      */
     suspend fun getParent(path: String): String
+
+    /**
+     * Update media store by scanning specified files with corresponding mime types.
+     */
+    fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>)
 }

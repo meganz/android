@@ -156,4 +156,12 @@ interface FileGateway {
      * @return [Boolean]
      */
     suspend fun deleteDirectory(path: String): Boolean
+
+    /**
+     * Scan media file to refresh media store
+     * @param paths Array of paths to be scanned.
+     * @param mimeTypes Optional array of MIME types for each path.
+     */
+    fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>)
+
 }

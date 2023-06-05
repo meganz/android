@@ -294,4 +294,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getParent(path: String): String = withContext(ioDispatcher) {
         File(path).parent ?: path
     }
+
+    override fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>) =
+        fileGateway.scanMediaFile(paths, mimeTypes)
+
 }
