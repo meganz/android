@@ -29,7 +29,7 @@ import javax.inject.Inject
  * @property megaApi        MegaApiAndroid instance to move nodes.
  * @property getNodeUseCase Required for getting MegaNodes.
  */
-class MoveNodeUseCase @Inject constructor(
+class LegacyMoveNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
 ) {

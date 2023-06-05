@@ -270,7 +270,7 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
@@ -419,7 +419,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var filePrepareUseCase: FilePrepareUseCase
 
     @Inject
-    lateinit var moveNodeUseCase: MoveNodeUseCase
+    lateinit var legacyMoveNodeUseCase: LegacyMoveNodeUseCase
 
     @Inject
     lateinit var removeNodeUseCase: RemoveNodeUseCase
@@ -5710,7 +5710,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun proceedWithRestoration(nodes: List<MegaNode>) {
-        moveNodeUseCase.restore(nodes, this)
+        legacyMoveNodeUseCase.restore(nodes, this)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -5829,7 +5829,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 builder.setMessage(resources.getString(R.string.confirmation_move_to_rubbish))
             }
             builder.setPositiveButton(R.string.general_move) { _: DialogInterface?, _: Int ->
-                moveNodeUseCase.moveToRubbishBin(handleList, this)
+                legacyMoveNodeUseCase.moveToRubbishBin(handleList, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
@@ -7531,7 +7531,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 nameCollisionActivityContract?.launch(collisions)
                             }
                             if (handlesWithoutCollision.isNotEmpty()) {
-                                moveNodeUseCase.move(handlesWithoutCollision, toHandle)
+                                legacyMoveNodeUseCase.move(handlesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe { moveResult: MoveRequestResult.GeneralMovement?, moveThrowable: Throwable? ->

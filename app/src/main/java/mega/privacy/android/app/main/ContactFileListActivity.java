@@ -109,7 +109,7 @@ import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;
-import mega.privacy.android.app.usecase.MoveNodeUseCase;
+import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -140,7 +140,7 @@ public class ContactFileListActivity extends PasscodeActivity
     @Inject
     FilePrepareUseCase filePrepareUseCase;
     @Inject
-    MoveNodeUseCase moveNodeUseCase;
+    LegacyMoveNodeUseCase legacyMoveNodeUseCase;
     @Inject
     GetNodeUseCase getNodeUseCase;
     @Inject
@@ -615,7 +615,7 @@ public class ContactFileListActivity extends PasscodeActivity
             return;
         }
 
-        composite.add(moveNodeUseCase.moveToRubbishBin(handleList, this)
+        composite.add(legacyMoveNodeUseCase.moveToRubbishBin(handleList, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -764,7 +764,7 @@ public class ContactFileListActivity extends PasscodeActivity
                             long[] handlesWithoutCollision = result.getSecond();
 
                             if (handlesWithoutCollision.length > 0) {
-                                composite.add(moveNodeUseCase.move(handlesWithoutCollision, toHandle)
+                                composite.add(legacyMoveNodeUseCase.move(handlesWithoutCollision, toHandle)
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((moveResult, moveThrowable) -> {

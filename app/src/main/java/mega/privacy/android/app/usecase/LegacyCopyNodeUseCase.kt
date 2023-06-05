@@ -30,14 +30,14 @@ import javax.inject.Inject
  * @property megaApi                MegaApiAndroid instance to copy nodes.
  * @property megaChatApi            MegaChatApiAndroid instance to get nodes from chats.
  * @property getNodeUseCase         Required for getting [MegaNode]s.
- * @property moveNodeUseCase        Required for moving MegaNodes to the Rubbish Bin.
+ * @property legacyMoveNodeUseCase  Required for moving MegaNodes to the Rubbish Bin.
  * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
  */
 class LegacyCopyNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
-    private val moveNodeUseCase: MoveNodeUseCase,
+    private val legacyMoveNodeUseCase: LegacyMoveNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
     private val copyNodeListByHandleUseCase: CopyNodeListByHandleUseCase,
@@ -146,7 +146,7 @@ class LegacyCopyNodeUseCase @Inject constructor(
             }
 
             if (!rename && node.isFile) {
-                moveNodeUseCase.moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
+                legacyMoveNodeUseCase.moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
                     .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
             }
 
