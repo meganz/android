@@ -16,6 +16,6 @@ class GetCopyLatestTargetPathUseCase @Inject constructor(
      */
     suspend operator fun invoke(): Long? {
         val path = accountRepository.getLatestTargetPathCopyPreference()
-        return path?.takeIf { isNodeInRubbishOrDeletedUseCase(it) }
+        return path?.takeIf { !isNodeInRubbishOrDeletedUseCase(it) }
     }
 }
