@@ -57,7 +57,15 @@ fun <T> Continuation<T>.failWithError(
     error: MegaChatError,
     methodName: String,
 ) {
-    resumeWith(Result.failure(MegaException(error.errorCode, error.errorString, methodName)))
+    resumeWith(
+        Result.failure(
+            MegaException(
+                errorCode = error.errorCode,
+                errorString = error.errorString,
+                methodName = methodName
+            )
+        )
+    )
 }
 
 /**

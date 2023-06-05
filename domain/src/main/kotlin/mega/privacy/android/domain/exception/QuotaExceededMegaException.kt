@@ -11,5 +11,5 @@ package mega.privacy.android.domain.exception
 class QuotaExceededMegaException(
     errorCode: Int,
     errorString: String? = null,
-    val value: Long = 0L,
-) : MegaException(errorCode, errorString)
+    value: Long = 0L,
+) : MegaException(errorCode, errorString, value)

@@ -22,17 +22,13 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -49,7 +45,6 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpty
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFile
@@ -62,8 +57,13 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
@@ -71,10 +71,13 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumberOfPendingUploadsUseCase
+import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -90,12 +93,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class UploadService : LifecycleService() {
-
-    /**
-     * Use case to get glboal transfer
-     */
-    @Inject
-    lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
 
     /**
      * Transfers Management
@@ -164,6 +161,15 @@ internal class UploadService : LifecycleService() {
     lateinit var checkUploadedQRCodeFileUseCase: CheckUploadedQRCodeFileUseCase
 
     @Inject
+    lateinit var monitorTransferEventsUseCase: MonitorTransferEventsUseCase
+
+    @Inject
+    lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
+
+    @Inject
+    lateinit var getTransferByTagUseCase: GetTransferByTagUseCase
+
+    @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
@@ -177,7 +183,7 @@ internal class UploadService : LifecycleService() {
         NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_UPLOAD_ID)
     }
     private var notificationManager: NotificationManager? = null
-    private val mapProgressFileTransfers: HashMap<Int, MegaTransfer> = HashMap()
+    private val mapProgressFileTransfers: HashMap<Int, Transfer> = HashMap()
     private var pendingToAddInQueue = 0
     private var completed = 0
     private var completedSuccessfully = 0
@@ -189,13 +195,12 @@ internal class UploadService : LifecycleService() {
     //PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-over quota
     private var isOverQuota = Constants.NOT_OVERQUOTA_STATE
 
-    private val rxSubscriptions = CompositeDisposable()
-
     // the flag to determine the rating dialog is showed for this upload action
     private var isRatingShowed = false
 
     private var monitorPausedTransfersJob: Job? = null
     private var monitorStopTransfersWorkJob: Job? = null
+    private var monitorTransferEventsJob: Job? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -238,54 +243,39 @@ internal class UploadService : LifecycleService() {
             }
         }
 
-        val subscription = getGlobalTransferUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ event: GetGlobalTransferUseCase.Result? ->
-                when (event) {
-                    is GetGlobalTransferUseCase.Result.OnTransferStart -> {
-                        val transfer = event.transfer
-                        doOnTransferStart(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
+        monitorTransferEventsJob = applicationScope.launch {
+            runCatching {
+                monitorTransferEventsUseCase()
+                    .filter {
+                        it.transfer.type == TransferType.TYPE_UPLOAD
+                                && !it.transfer.isCUUpload() && !it.transfer.isChatUpload()
                     }
+                    .conflate().collect { transferEvent ->
+                        when (transferEvent) {
+                            is TransferEvent.TransferFinishEvent -> doOnTransferFinish(
+                                transferEvent.transfer,
+                                transferEvent.error
+                            )
 
-                    is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
-                        val transfer = event.transfer
-                        doOnTransferUpdate(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
+                            is TransferEvent.TransferStartEvent -> doOnTransferStart(
+                                transferEvent.transfer
+                            )
+
+                            is TransferEvent.TransferTemporaryErrorEvent -> doOnTransferTemporaryError(
+                                transferEvent.transfer,
+                                transferEvent.error
+                            )
+
+                            is TransferEvent.TransferUpdateEvent -> doOnTransferUpdate(
+                                transferEvent.transfer
+                            )
+
+                            else -> {}
+                        }
                     }
+            }.onFailure { Timber.e(it) }
+        }
 
-                    is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
-                        val transfer = event.transfer
-                        val error = event.error
-                        doOnTransferFinish(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
-                        val transfer = event.transfer
-                        val error = event.error
-                        doOnTransferTemporaryError(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    else -> {}
-                }
-            }
-            ) { t: Throwable? -> Timber.e(t) }
-        rxSubscriptions.add(subscription)
         lifecycleScope.launch {
             intentFlow.collect { intent ->
                 onHandleIntent(intent)
@@ -368,9 +358,9 @@ internal class UploadService : LifecycleService() {
     override fun onDestroy() {
         Timber.d("onDestroy")
         releaseLocks()
-        rxSubscriptions.clear()
         monitorPausedTransfersJob?.cancel()
         monitorStopTransfersWorkJob?.cancel()
+        monitorTransferEventsJob?.cancel()
         super.onDestroy()
     }
 
@@ -389,21 +379,15 @@ internal class UploadService : LifecycleService() {
                 Constants.ACTION_RESTART_SERVICE -> {
                     applicationScope.launch {
                         getTransferDataUseCase()?.let { transferData ->
-                            val uploadsInProgress = transferData.numUploads
-                            var i = 0
-                            while (i < uploadsInProgress) {
-                                val transfer = withContext(ioDispatcher) {
-                                    megaApi.getTransferByTag(transferData.uploadTags[i])
-                                }
-                                if (transfer == null || isCUOrChatTransfer(transfer)) {
-                                    i++
-                                    continue
-                                }
-                                if (!transfer.isFolderTransfer && transfer.appData == null) {
+                            for (i in 0..transferData.numUploads) {
+                                getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
+                                    !transfer.isCUUpload() && !transfer.isChatUpload()
+                                            && transfer.appData.isEmpty() && !transfer.isFolderTransfer
+                                }?.let { transfer ->
                                     mapProgressFileTransfers[transfer.tag] = transfer
                                 }
-                                i++
                             }
+
                             uploadCount = mapProgressFileTransfers.size
                             checkUploads()
                         } ?: stopForeground()
@@ -588,7 +572,7 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun getTransferredByte(map: HashMap<Int, MegaTransfer>?): Long =
+    private fun getTransferredByte(map: HashMap<Int, Transfer>?): Long =
         map?.values?.sumOf { it.transferredBytes } ?: 0
 
     private fun sendUploadFinishBroadcast() = applicationScope.launch {
@@ -719,9 +703,7 @@ internal class UploadService : LifecycleService() {
     }
 
     private fun updateProgressNotification(pausedTransfers: Boolean = false) {
-        val transfers: Collection<MegaTransfer> = ArrayList(
-            mapProgressFileTransfers.values
-        )
+        val transfers: Collection<Transfer> = ArrayList(mapProgressFileTransfers.values)
         val up = getInProgressNotification(transfers)
         val total = up.total
         val inProgress = up.inProgress
@@ -781,14 +763,14 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun getInProgressNotification(transfers: Collection<MegaTransfer>): UploadProgress {
+    private fun getInProgressNotification(transfers: Collection<Transfer>): UploadProgress {
         Timber.d("getInProgressNotification")
         val progress = UploadProgress()
         var total: Long = 0
         var inProgress: Long = 0
 
         transfers.forEach { currTransfer ->
-            if (currTransfer.state == MegaTransfer.STATE_COMPLETED) {
+            if (currTransfer.state == TransferState.STATE_COMPLETED) {
                 total += currTransfer.totalBytes
                 inProgress += currTransfer.totalBytes
             } else {
@@ -801,355 +783,336 @@ internal class UploadService : LifecycleService() {
         return progress
     }
 
-    private fun doOnTransferStart(transfer: MegaTransfer?): Completable {
-        return Completable.fromCallable {
-            transfer?.let { t ->
-                Timber.d("Upload start: ${t.fileName}")
-                if (t.type == MegaTransfer.TYPE_UPLOAD) {
-                    if (isCUOrChatTransfer(t)) return@fromCallable null
-                    if (t.appData != null) {
-                        return@fromCallable null
-                    }
-                    pendingToAddInQueue--
-                    transfersManagement.checkScanningTransferOnStart(t)
-                    if (!t.isFolderTransfer) {
-                        uploadCount++
-                        mapProgressFileTransfers[t.tag] = t
-                        updateProgressNotification()
-                    }
-                }
-                null
-            }
+    private fun doOnTransferStart(transfer: Transfer) = with(transfer) {
+        Timber.d("Upload start: ${transfer.fileName}")
+
+        if (appData.isNotEmpty()) return
+
+        pendingToAddInQueue--
+        transfersManagement.checkScanningTransferOnStart(transfer)
+
+        if (!isFolderTransfer) {
+            uploadCount++
+            mapProgressFileTransfers[tag] = transfer
+            updateProgressNotification()
         }
     }
 
-    private fun doOnTransferFinish(transfer: MegaTransfer?, error: MegaError): Completable {
-        return Completable.fromCallable {
-            if (transfer == null) return@fromCallable null
-            Timber.d("Path: ${transfer.path}, Size: ${transfer.transferredBytes}")
-            if (isCUOrChatTransfer(transfer)) return@fromCallable null
-            if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-                sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+    private fun doOnTransferFinish(transfer: Transfer, error: MegaException) = with(transfer) {
+        Timber.d("Path: $localPath, Size: $transferredBytes")
+
+        if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+        }
+
+        transfersManagement.checkScanningTransferOnFinish(transfer)
+
+        if (!isFolderTransfer) {
+            val completedTransfer = AndroidCompletedTransfer(transfer, error, this@UploadService)
+            runBlocking {
+                addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
             }
-            if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-                transfersManagement.checkScanningTransferOnFinish(transfer)
-                if (!transfer.isFolderTransfer) {
-                    val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
-                    runBlocking {
-                        addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
-                    }
-                    val appData = transfer.appData
-                    if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_TXT_FILE)) {
-                        val message =
-                            getCreationOrEditorText(
-                                appData = appData,
-                                isSuccess = error.errorCode == MegaError.API_OK,
-                                context = this
-                            )
-                        sendBroadcast(
-                            Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
-                                .putExtra(SNACKBAR_TEXT, message)
-                        )
-                    }
-                    if (transfer.state == MegaTransfer.STATE_FAILED) {
-                        transfersManagement.setAreFailedTransfers(true)
-                    }
-                }
-                transfer.appData?.let {
-                    applicationScope.launch {
-                        if (getNumberOfPendingUploadsUseCase() == 0) {
-                            onQueueComplete(false)
-                        }
-                    }
-                    return@fromCallable null
-                }
-                if (!transfer.isFolderTransfer) {
-                    completed++
-                    mapProgressFileTransfers[transfer.tag] = transfer
-                }
-                if (canceled) {
-                    Timber.d("Upload canceled: transfer.fileName")
-                    releaseLocks()
-                    cancel()
-                    Timber.d("After cancel")
-                    deleteCacheFolderIfEmpty(
-                        applicationContext,
-                        CacheFolderManager.TEMPORARY_FOLDER
+            if (appData.isNotEmpty() && appData.contains(Constants.APP_DATA_TXT_FILE)) {
+                val message =
+                    getCreationOrEditorText(
+                        appData = appData,
+                        isSuccess = error.errorCode == MegaError.API_OK,
+                        context = this@UploadService
                     )
-                } else {
-                    if (error.errorCode == MegaError.API_OK) {
-                        if (!transfer.isFolderTransfer) {
-                            if (transfer.transferredBytes == 0L) {
-                                alreadyUploaded++
-                            } else {
-                                completedSuccessfully++
-                            }
+                sendBroadcast(
+                    Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
+                        .putExtra(SNACKBAR_TEXT, message)
+                )
+            }
+            if (state == TransferState.STATE_FAILED) {
+                transfersManagement.setAreFailedTransfers(true)
+            }
+        }
+        if (appData.isNotEmpty()) {
+            applicationScope.launch {
+                if (getNumberOfPendingUploadsUseCase() == 0) {
+                    onQueueComplete(false)
+                }
+            }
+            return
+        }
+
+        if (!isFolderTransfer) {
+            completed++
+            mapProgressFileTransfers[tag] = transfer
+        }
+
+        if (canceled) {
+            Timber.d("Upload canceled: transfer.fileName")
+            releaseLocks()
+            cancel()
+            Timber.d("After cancel")
+            deleteCacheFolderIfEmpty(
+                applicationContext,
+                CacheFolderManager.TEMPORARY_FOLDER
+            )
+        } else {
+            if (error.errorCode == MegaError.API_OK) {
+                if (!isFolderTransfer) {
+                    if (transferredBytes == 0L) {
+                        alreadyUploaded++
+                    } else {
+                        completedSuccessfully++
+                    }
+                }
+                if (FileUtil.isVideoFile(localPath)) {
+                    Timber.d("Is video!!!")
+                    val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
+                    val preview = File(
+                        previewDir,
+                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
+                    )
+                    val thumbDir = ThumbnailUtils.getThumbFolder(this@UploadService)
+                    val thumb = File(
+                        thumbDir,
+                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
+                    )
+                    megaApi.createThumbnail(localPath, thumb.absolutePath)
+                    megaApi.createPreview(localPath, preview.absolutePath)
+                    val node = megaApi.getNodeByHandle(nodeHandle)
+                    node?.let {
+                        val retriever = MediaMetadataRetriever()
+                        var location: String? = null
+                        try {
+                            retriever.setDataSource(localPath)
+                            location =
+                                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
+                        } catch (ex: Exception) {
+                            Timber.e(ex, "Exception is thrown")
                         }
-                        if (FileUtil.isVideoFile(transfer.path)) {
-                            Timber.d("Is video!!!")
-                            val previewDir = PreviewUtils.getPreviewFolder(this)
-                            val preview = File(
-                                previewDir,
-                                MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                            )
-                            val thumbDir = ThumbnailUtils.getThumbFolder(this)
-                            val thumb = File(
-                                thumbDir,
-                                MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                            )
-                            megaApi.createThumbnail(transfer.path, thumb.absolutePath)
-                            megaApi.createPreview(transfer.path, preview.absolutePath)
-                            val node = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            node?.let {
-                                val retriever = MediaMetadataRetriever()
-                                var location: String? = null
-                                try {
-                                    retriever.setDataSource(transfer.path)
-                                    location =
-                                        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION)
-                                } catch (ex: Exception) {
-                                    Timber.e(ex, "Exception is thrown")
-                                }
-                                location?.let {
-                                    Timber.d("Location: $location")
-                                    var secondTry = false
-                                    try {
-                                        val mid = location.length / 2 //get the middle of the String
-                                        val parts = arrayOf(
-                                            location.substring(0, mid),
-                                            location.substring(mid)
-                                        )
-                                        val lat = parts[0].toDouble()
-                                        val lon = parts[1].toDouble()
-                                        Timber.d("Lat: $lat") //first part
-                                        Timber.d("Long: $lon") //second part
-                                        megaApi.setNodeCoordinates(node, lat, lon, null)
-                                    } catch (e: Exception) {
-                                        secondTry = true
-                                        Timber.e(e, "Exception, second try to set GPS coordinates")
-                                    }
-                                    if (secondTry) {
-                                        try {
-                                            val lat = location.substring(0, 7).toDouble()
-                                            val lon = location.substring(8, 17).toDouble()
-                                            Timber.d("Lat: $lat") //first part
-                                            Timber.d("Long: $lon") //second part
-                                            megaApi.setNodeCoordinates(node, lat, lon, null)
-                                        } catch (e: Exception) {
-                                            Timber.e(
-                                                e,
-                                                "Exception again, no chance to set coordinates of video"
-                                            )
-                                        }
-                                    }
-                                } ?: run {
-                                    Timber.d("No location info")
-                                }
+                        location?.let {
+                            Timber.d("Location: $location")
+                            var secondTry = false
+                            try {
+                                val mid = location.length / 2 //get the middle of the String
+                                val parts = arrayOf(
+                                    location.substring(0, mid),
+                                    location.substring(mid)
+                                )
+                                val lat = parts[0].toDouble()
+                                val lon = parts[1].toDouble()
+                                Timber.d("Lat: $lat") //first part
+                                Timber.d("Long: $lon") //second part
+                                megaApi.setNodeCoordinates(node, lat, lon, null)
+                            } catch (e: Exception) {
+                                secondTry = true
+                                Timber.e(e, "Exception, second try to set GPS coordinates")
                             }
-                        } else if (typeForName(transfer.path).isImage) {
-                            Timber.d("Is image!!!")
-                            val previewDir = PreviewUtils.getPreviewFolder(this)
-                            val preview = File(
-                                previewDir,
-                                MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                            )
-                            val thumbDir = ThumbnailUtils.getThumbFolder(this)
-                            val thumb = File(
-                                thumbDir,
-                                MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                            )
-                            megaApi.createThumbnail(transfer.path, thumb.absolutePath)
-                            megaApi.createPreview(transfer.path, preview.absolutePath)
-                            megaApi.getNodeByHandle(transfer.nodeHandle)?.let { node ->
+                            if (secondTry) {
                                 try {
-                                    ExifInterface(transfer.path).latLong?.let { latLong ->
-                                        megaApi.setNodeCoordinates(
-                                            node,
-                                            latLong[0],
-                                            latLong[1],
-                                            null
-                                        )
-                                    }
+                                    val lat = location.substring(0, 7).toDouble()
+                                    val lon = location.substring(8, 17).toDouble()
+                                    Timber.d("Lat: $lat") //first part
+                                    Timber.d("Long: $lon") //second part
+                                    megaApi.setNodeCoordinates(node, lat, lon, null)
                                 } catch (e: Exception) {
-                                    Timber.w(e, "Couldn't read exif info: transfer.path")
-                                }
-                            }
-                        } else if (typeForName(transfer.path).isPdf) {
-                            Timber.d("Is pdf!!!")
-                            try {
-                                ThumbnailUtils.createThumbnailPdf(
-                                    this,
-                                    transfer.path,
-                                    megaApi,
-                                    transfer.nodeHandle
-                                )
-                            } catch (e: Exception) {
-                                Timber.w(e, "Pdf thumbnail could not be created")
-                            }
-                            val pageNumber = 0
-                            var out: FileOutputStream? = null
-                            try {
-                                val pdfiumCore = PdfiumCore(this)
-                                val pdfNode = megaApi.getNodeByHandle(transfer.nodeHandle)
-                                    ?: run {
-                                        Timber.e("pdf is NULL")
-                                        return@fromCallable null
-                                    }
-                                val previewDir = PreviewUtils.getPreviewFolder(this)
-                                val preview = File(
-                                    previewDir,
-                                    MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
-                                )
-                                val file = File(transfer.path)
-                                val pdfDocument = pdfiumCore.newDocument(
-                                    ParcelFileDescriptor.open(
-                                        file,
-                                        ParcelFileDescriptor.MODE_READ_ONLY
+                                    Timber.e(
+                                        e,
+                                        "Exception again, no chance to set coordinates of video"
                                     )
-                                )
-                                pdfiumCore.openPage(pdfDocument, pageNumber)
-                                val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
-                                val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
-                                val bmp =
-                                    Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-                                pdfiumCore.renderPageBitmap(
-                                    pdfDocument,
-                                    bmp,
-                                    pageNumber,
-                                    0,
-                                    0,
-                                    width,
-                                    height
-                                )
-                                val resizedBitmap =
-                                    PreviewUtils.resizeBitmapUpload(bmp, width, height)
-                                out = FileOutputStream(preview)
-                                val result = resizedBitmap.compress(
-                                    Bitmap.CompressFormat.JPEG,
-                                    100,
-                                    out
-                                ) // bmp is your Bitmap instance
-                                if (result) {
-                                    Timber.d("Compress OK!")
-                                    megaApi.setPreview(pdfNode, preview.absolutePath)
-                                } else {
-                                    Timber.w("Not Compress")
-                                }
-                                pdfiumCore.closeDocument(pdfDocument)
-                            } catch (e: Exception) {
-                                Timber.w(e, "Pdf preview could not be created")
-                            } finally {
-                                try {
-                                    out?.close()
-                                } catch (_: Exception) {
                                 }
                             }
-                        } else {
-                            Timber.d("NOT video, image or pdf!")
+                        } ?: run {
+                            Timber.d("No location info")
                         }
-                    } else {
-                        Timber.e(
-                            "Upload Error: ${transfer.fileName}_${error.errorCode}___${error.errorString}"
+                    }
+                } else if (typeForName(localPath).isImage) {
+                    Timber.d("Is image!!!")
+                    val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
+                    val preview = File(
+                        previewDir,
+                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
+                    )
+                    val thumbDir = ThumbnailUtils.getThumbFolder(this@UploadService)
+                    val thumb = File(
+                        thumbDir,
+                        MegaApiAndroid.handleToBase64(nodeHandle) + ".jpg"
+                    )
+                    megaApi.createThumbnail(localPath, thumb.absolutePath)
+                    megaApi.createPreview(localPath, preview.absolutePath)
+                    megaApi.getNodeByHandle(nodeHandle)?.let { node ->
+                        try {
+                            ExifInterface(localPath).latLong?.let { latLong ->
+                                megaApi.setNodeCoordinates(
+                                    node,
+                                    latLong[0],
+                                    latLong[1],
+                                    null
+                                )
+                            }
+                        } catch (e: Exception) {
+                            Timber.w(e, "Couldn't read exif info: transfer.path")
+                        }
+                    }
+                } else if (typeForName(localPath).isPdf) {
+                    Timber.d("Is pdf!!!")
+                    try {
+                        ThumbnailUtils.createThumbnailPdf(
+                            this@UploadService,
+                            localPath,
+                            megaApi,
+                            transfer.nodeHandle
                         )
-                        if (error.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota) {
-                            isOverQuota = Constants.OVERQUOTA_STORAGE_STATE
-                        } else if (error.errorCode == MegaError.API_EGOINGOVERQUOTA) {
-                            isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
-                        }
+                    } catch (e: Exception) {
+                        Timber.w(e, "Pdf thumbnail could not be created")
                     }
-
-                    applicationScope.launch {
-                        runCatching { checkUploadedQRCodeFileUseCase(transfer.fileName) }
-                            .onSuccess { Timber.d("File deleted $it: ${transfer.path}") }
-                            .onFailure { Timber.w("Exception checking uploaded QR code file.") }
-                    }
-
-                    if (error.errorCode == MegaError.API_OK) {
-                        // Get the uploaded file from cache root directory.
-                        getCacheFile(applicationContext, "", transfer.fileName)
-                            ?.takeIf { it.exists() }
-                            ?.let { uploadedFile ->
-                                Timber.d("Delete file!: ${uploadedFile.absolutePath}")
-                                uploadedFile.delete()
+                    val pageNumber = 0
+                    var out: FileOutputStream? = null
+                    try {
+                        val pdfiumCore = PdfiumCore(this@UploadService)
+                        val pdfNode = megaApi.getNodeByHandle(transfer.nodeHandle)
+                            ?: run {
+                                Timber.e("pdf is NULL")
+                                return
                             }
+                        val previewDir = PreviewUtils.getPreviewFolder(this@UploadService)
+                        val preview = File(
+                            previewDir,
+                            MegaApiAndroid.handleToBase64(transfer.nodeHandle) + ".jpg"
+                        )
+                        val file = File(localPath)
+                        val pdfDocument = pdfiumCore.newDocument(
+                            ParcelFileDescriptor.open(
+                                file,
+                                ParcelFileDescriptor.MODE_READ_ONLY
+                            )
+                        )
+                        pdfiumCore.openPage(pdfDocument, pageNumber)
+                        val width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNumber)
+                        val height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNumber)
+                        val bmp =
+                            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                        pdfiumCore.renderPageBitmap(
+                            pdfDocument,
+                            bmp,
+                            pageNumber,
+                            0,
+                            0,
+                            width,
+                            height
+                        )
+                        val resizedBitmap =
+                            PreviewUtils.resizeBitmapUpload(bmp, width, height)
+                        out = FileOutputStream(preview)
+                        val result = resizedBitmap.compress(
+                            Bitmap.CompressFormat.JPEG,
+                            100,
+                            out
+                        ) // bmp is your Bitmap instance
+                        if (result) {
+                            Timber.d("Compress OK!")
+                            megaApi.setPreview(pdfNode, preview.absolutePath)
+                        } else {
+                            Timber.w("Not Compress")
+                        }
+                        pdfiumCore.closeDocument(pdfDocument)
+                    } catch (e: Exception) {
+                        Timber.w(e, "Pdf preview could not be created")
+                    } finally {
+                        try {
+                            out?.close()
+                        } catch (_: Exception) {
+                        }
                     }
+                } else {
+                    Timber.d("NOT video, image or pdf!")
+                }
+            } else {
+                Timber.e(
+                    "Upload Error: ${fileName}_${error.errorCode}___${error.errorString}"
+                )
+                if (error.errorCode == MegaError.API_EOVERQUOTA && !isForeignOverQuota) {
+                    isOverQuota = Constants.OVERQUOTA_STORAGE_STATE
+                } else if (error.errorCode == MegaError.API_EGOINGOVERQUOTA) {
+                    isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
+                }
+            }
 
-                    Timber.d("IN Finish: ${transfer.fileName} path: ${transfer.path}")
-                    getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
-                        ?.takeIf { it.exists() && transfer.path != null }
-                        ?.let { tmpPic ->
-                            if (transfer.path.startsWith(tmpPic.absolutePath)) {
-                                File(transfer.path).delete()
-                            }
-                        }
-                        ?: run {
-                            Timber.e("transfer.getPath() is NULL or temporal folder unavailable")
-                        }
+            applicationScope.launch {
+                runCatching { checkUploadedQRCodeFileUseCase(fileName) }
+                    .onSuccess { Timber.d("File deleted $it: $localPath") }
+                    .onFailure { Timber.w("Exception checking uploaded QR code file.") }
+            }
 
-                    if (completed == uploadCount && pendingToAddInQueue == 0) {
-                        onQueueComplete(true)
+            if (error.errorCode == MegaError.API_OK) {
+                // Get the uploaded file from cache root directory.
+                getCacheFile(applicationContext, "", fileName)
+                    ?.takeIf { it.exists() }
+                    ?.let { uploadedFile ->
+                        Timber.d("Delete file!: ${uploadedFile.absolutePath}")
+                        uploadedFile.delete()
+                    }
+            }
+
+            Timber.d("IN Finish: $fileName path: $localPath")
+            getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+                ?.takeIf { it.exists() && localPath.isNotEmpty() }
+                ?.let { tmpPic ->
+                    if (localPath.startsWith(tmpPic.absolutePath)) {
+                        File(localPath).delete()
+                    }
+                }
+                ?: run {
+                    Timber.e("transfer.getPath() is NULL or temporal folder unavailable")
+                }
+
+            if (completed == uploadCount && pendingToAddInQueue == 0) {
+                onQueueComplete(true)
+            } else {
+                updateProgressNotification()
+            }
+        }
+    }
+
+    private fun doOnTransferUpdate(transfer: Transfer) = with(transfer) {
+        Timber.d("onTransferUpdate")
+
+        if (appData.isNotEmpty()) return
+
+        if (canceled) {
+            Timber.d("Transfer cancel: $fileName")
+            releaseLocks()
+            applicationScope.launch {
+                runCatching { cancelTransferByTagUseCase(tag) }
+                    .onFailure { Timber.w("Exception canceling transfer: $it") }
+            }
+            cancel()
+            Timber.d("After cancel")
+            return
+        }
+
+        transfersManagement.checkScanningTransferOnUpdate(transfer)
+
+        if (!isFolderTransfer) {
+            mapProgressFileTransfers[tag] = transfer
+            updateProgressNotification()
+        }
+    }
+
+    private fun doOnTransferTemporaryError(transfer: Transfer, e: MegaException) {
+        Timber.w("onTransferTemporaryError: ${e.errorString}__${e.errorCode}")
+
+        when (e.errorCode) {
+            MegaError.API_EOVERQUOTA, MegaError.API_EGOINGOVERQUOTA -> {
+                if (!transfer.isForeignOverQuota) {
+                    isOverQuota = if (e.errorCode == MegaError.API_EOVERQUOTA) {
+                        Constants.OVERQUOTA_STORAGE_STATE
                     } else {
+                        Constants.PRE_OVERQUOTA_STORAGE_STATE
+                    }
+                    if (e.value != 0L) {
+                        Timber.w("TRANSFER OVER QUOTA ERROR: ${e.errorCode}")
+                    } else {
+                        Timber.w("STORAGE OVER QUOTA ERROR: ${e.errorCode}")
                         updateProgressNotification()
                     }
                 }
             }
-            null
-        }
-    }
-
-    private fun doOnTransferUpdate(transfer: MegaTransfer?): Completable {
-        return Completable.fromCallable {
-            Timber.d("onTransferUpdate")
-            transfer
-                ?.takeIf { it.type == MegaTransfer.TYPE_UPLOAD }
-                ?.let { _transfer ->
-                    if (isCUOrChatTransfer(_transfer)) return@fromCallable null
-                    if (_transfer.appData != null) {
-                        return@fromCallable null
-                    }
-                    if (canceled) {
-                        Timber.d("Transfer cancel: ${_transfer.fileName}")
-                        releaseLocks()
-                        megaApi.cancelTransfer(_transfer)
-                        cancel()
-                        Timber.d("After cancel")
-                        return@fromCallable null
-                    }
-                    transfersManagement.checkScanningTransferOnUpdate(_transfer)
-                    if (!_transfer.isFolderTransfer) {
-                        mapProgressFileTransfers[_transfer.tag] = _transfer
-                        updateProgressNotification()
-                    }
-                }
-            null
-        }
-    }
-
-    private fun doOnTransferTemporaryError(transfer: MegaTransfer?, e: MegaError): Completable {
-        return Completable.fromCallable {
-            Timber.w("onTransferTemporaryError: ${e.errorString}__${e.errorCode}")
-            transfer
-                ?.takeIf { it.type == MegaTransfer.TYPE_UPLOAD }
-                ?.let { _transfer ->
-                    when (e.errorCode) {
-                        MegaError.API_EOVERQUOTA, MegaError.API_EGOINGOVERQUOTA -> {
-                            if (!_transfer.isForeignOverquota) {
-                                if (e.errorCode == MegaError.API_EOVERQUOTA) {
-                                    isOverQuota = Constants.OVERQUOTA_STORAGE_STATE
-                                } else if (e.errorCode == MegaError.API_EGOINGOVERQUOTA) {
-                                    isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
-                                }
-                                if (e.value != 0L) {
-                                    Timber.w("TRANSFER OVER QUOTA ERROR: ${e.errorCode}")
-                                } else {
-                                    Timber.w("STORAGE OVER QUOTA ERROR: ${e.errorCode}")
-                                    updateProgressNotification()
-                                }
-                            }
-                        }
-                    }
-                }
-            null
         }
     }
 
@@ -1248,19 +1211,6 @@ internal class UploadService : LifecycleService() {
         completedSuccessfully = 0
         alreadyUploaded = 0
         uploadCount = 0
-    }
-
-    /**
-     * Checks if a transfer is a CU or Chat transfer.
-     *
-     * @param transfer MegaTransfer to check
-     * @return True if the transfer is a CU or Chat transfer, false otherwise.
-     */
-    private fun isCUOrChatTransfer(transfer: MegaTransfer): Boolean {
-        val appData = transfer.appData
-        return (!TextUtil.isTextEmpty(appData)
-                && (appData.contains(Constants.APP_DATA_CU)
-                || appData.contains(Constants.APP_DATA_CHAT)))
     }
 
     internal class UploadProgress {

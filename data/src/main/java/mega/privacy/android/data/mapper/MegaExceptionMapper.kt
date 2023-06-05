@@ -9,4 +9,4 @@ import nz.mega.sdk.MegaError
 typealias MegaExceptionMapper = (@JvmSuppressWildcards MegaError) -> @JvmSuppressWildcards MegaException
 
 internal fun toMegaExceptionModel(error: MegaError) =
-    MegaException(error.errorCode, error.errorString)
+    MegaException(error.errorCode, error.errorString, error.value)
