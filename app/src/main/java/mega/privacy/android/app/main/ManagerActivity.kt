@@ -81,7 +81,6 @@ import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
-import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -102,8 +101,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -269,8 +268,8 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogS
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
@@ -343,6 +342,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
+import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaAccountDetails
@@ -4100,6 +4100,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @JvmOverloads
     fun selectDrawerItem(item: DrawerItem?) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
+        if (!this::drawerLayout.isInitialized) {
+            Timber.d("ManagerActivity doesn't call setContentView")
+            return
+        }
         drawerItem = item ?: drawerItem ?: DrawerItem.CLOUD_DRIVE
 
         // Homepage may hide the Appbar before
