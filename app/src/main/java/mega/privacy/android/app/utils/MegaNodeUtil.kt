@@ -188,14 +188,17 @@ object MegaNodeUtil {
             rootParent!!.handle == megaApi.rootNode?.handle -> {
                 return app.getString(R.string.section_cloud_drive) + path
             }
+
             rootParent.handle == megaApi.rubbishNode?.handle -> {
                 return app.getString(R.string.section_rubbish_bin) +
                         path?.replace("bin$SEPARATOR", "")
             }
+
             nodeFolder.isInShare -> {
                 return app.getString(R.string.title_incoming_shares_explorer) +
                         SEPARATOR + path?.substring(path.indexOf(":") + 1)
             }
+
             else -> ""
         }
     }
@@ -601,15 +604,28 @@ object MegaNodeUtil {
 
         val folderName = node?.name
         return when {
-            folderName?.contains(Regex("win|desktop", RegexOption.IGNORE_CASE)) == true -> R.drawable.pc_win
+            folderName?.contains(
+                Regex(
+                    "win|desktop",
+                    RegexOption.IGNORE_CASE
+                )
+            ) == true -> R.drawable.pc_win
+
             folderName?.contains(
                 Regex(
                     "linux|debian|ubuntu|centos",
                     RegexOption.IGNORE_CASE
                 )
             ) == true -> R.drawable.pc_linux
+
             folderName?.contains(Regex("mac", RegexOption.IGNORE_CASE)) == true -> R.drawable.pc_mac
-            folderName?.contains(Regex("ext|drive", RegexOption.IGNORE_CASE)) == true -> R.drawable.ex_drive
+            folderName?.contains(
+                Regex(
+                    "ext|drive",
+                    RegexOption.IGNORE_CASE
+                )
+            ) == true -> R.drawable.ex_drive
+
             else -> R.drawable.pc
         }
     }
@@ -1222,9 +1238,11 @@ object MegaNodeUtil {
                         && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR -> {
                     app.getString(R.string.section_saved_for_offline_new)
                 }
+
                 parentName == OfflineUtils.OFFLINE_DIR -> {
                     app.getString(R.string.section_saved_for_offline_new)
                 }
+
                 else -> {
                     app.getString(
                         R.string.location_label, parentName,
@@ -1255,9 +1273,11 @@ object MegaNodeUtil {
                         app.getString(R.string.tab_incoming_shares)
                     }
                 }
+
                 parent == null -> {
                     app.getString(R.string.tab_incoming_shares)
                 }
+
                 inCloudDrive -> {
                     if (topAncestor.handle == parent.handle) {
                         getTranslatedNameForParentNode(megaApi, topAncestor, app)
@@ -1268,6 +1288,7 @@ object MegaNodeUtil {
                         )
                     }
                 }
+
                 inBackups -> {
                     if (node.parentHandle == myBackupHandle) {
                         // If the Node's parent handle is the same with the My Backups handle,
@@ -1281,6 +1302,7 @@ object MegaNodeUtil {
                         )
                     }
                 }
+
                 else -> {
                     app.getString(
                         R.string.location_label, parent.name,
@@ -1376,6 +1398,7 @@ object MegaNodeUtil {
                     nodeHandle = autoPlayInfo.nodeHandle
                 )
             }
+
             mime.isPdf -> {
                 val pdfIntent = Intent(context, PdfViewerActivity::class.java)
                 pdfIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, autoPlayInfo.nodeHandle)
@@ -1395,6 +1418,7 @@ object MegaNodeUtil {
 
                 activityLauncher.launchActivity(pdfIntent)
             }
+
             mime.isVideoMimeType || mime.isAudio -> {
                 val mediaIntent: Intent
                 val internalIntent: Boolean
@@ -1445,6 +1469,7 @@ object MegaNodeUtil {
                     }
                 }
             }
+
             else -> {
                 launchActionView(
                     context,
@@ -1924,6 +1949,16 @@ object MegaNodeUtil {
         val children: List<MegaNode?>? = megaApi.getChildren(parent)
 
         children?.forEach {
+            val mime = MimeTypeList.typeForName(it?.name)
+            if (!mime.isSvgMimeType && (mime.isImage || mime.isVideoMimeType)) return true
+        }
+
+        return false
+    }
+
+    @JvmStatic
+    fun containsMediaFile(handles: List<MegaNode>): Boolean {
+        handles.forEach {
             val mime = MimeTypeList.typeForName(it?.name)
             if (!mime.isSvgMimeType && (mime.isImage || mime.isVideoMimeType)) return true
         }

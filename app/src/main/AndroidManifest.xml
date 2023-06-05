@@ -710,6 +710,10 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize|stateVisible" />
 
+        <activity
+            android:name="mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity"
+            android:windowSoftInputMode="adjustNothing"/>
+
     </application>
 
 </manifest>

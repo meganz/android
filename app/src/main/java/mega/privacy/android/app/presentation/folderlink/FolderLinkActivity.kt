@@ -36,6 +36,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -46,8 +47,10 @@ import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.databinding.ActivityFolderLinkBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForChildren
@@ -62,6 +65,8 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -81,6 +86,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -112,6 +118,11 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
      */
     @Inject
     lateinit var sortOrderIntMapper: SortOrderIntMapper
+
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
+
+    var showMDIcon: Boolean = false
 
     /**
      * Selected node
@@ -393,9 +404,11 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                         clearSelections()
                     }
                 }
+
                 R.id.cab_menu_select_all -> {
                     selectAll()
                 }
+
                 R.id.cab_menu_unselect_all -> {
                     clearSelections()
                     hideMultipleSelect()
@@ -469,6 +482,10 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
 
+        showMDIcon = runBlocking {
+            getFeatureFlagUseCase(AppFeatures.FolderLinkMD)
+        }
+
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityFolderLinkBinding.inflate(layoutInflater)
 
@@ -509,10 +526,12 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                     folderHandle = s[1]
                                     Timber.d("URL_handle: $folderHandle")
                                 }
+
                                 2 -> {
                                     folderKey = s[2]
                                     Timber.d("URL_key: $folderKey")
                                 }
+
                                 3 -> {
                                     folderSubHandle = s[3]
                                     Timber.d("URL_subhandle: $folderSubHandle")
@@ -665,24 +684,29 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             }
                             return@collect
                         }
+
                         it.isLoginComplete && !it.isNodesFetched -> {
                             megaApiFolder.fetchNodes(this@FolderLinkActivity)
                             // Get cookies settings after login.
                             getInstance().checkEnabledCookies()
                         }
+
                         it.collisions != null -> {
                             dismissAlertDialogIfExists(statusDialog)
                             nameCollisionActivityContract?.launch(it.collisions)
                             viewModel.resetLaunchCollisionActivity()
                         }
+
                         it.copyResultText != null || it.copyThrowable != null -> {
                             showCopyResult(it.copyResultText, it.copyThrowable)
                             viewModel.resetShowCopyResult()
                         }
+
                         it.isLoginComplete && it.isNodesFetched -> {}
                         it.askForDecryptionKeyDialog -> {
                             askForDecryptionKeyDialog()
                         }
+
                         else -> {
                             if (it.errorDialogTitle != -1 && it.errorDialogContent != -1) {
                                 Timber.w("Show error dialog")
@@ -696,6 +720,31 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     }
                 }
             }
+        }
+
+        LiveEventBus.get(EventConstants.EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
+            .observe(this) { showMediaDiscovery(true) }
+    }
+
+    /**
+     * Show Media discovery and launch [MediaDiscoveryFragment]
+     */
+    private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
+        clearSelections()
+        hideMultipleSelect()
+        lifecycleScope.launch {
+            val mediaHandle = if (folderSubHandle != null) {
+                MegaApiAndroid.base64ToHandle(folderSubHandle)
+            } else {
+                parentHandle
+            }
+
+            MediaDiscoveryActivity.startMDActivity(
+                context = this@FolderLinkActivity,
+                mediaHandle = mediaHandle,
+                folderName = supportActionBar?.title.toString(),
+                isOpenByMDIcon = isOpenByMDIcon
+            )
         }
     }
 
@@ -939,12 +988,14 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                 R.string.folder_link_unavaible_ToS_violation
                             )
                         }
+
                         MegaError.API_ETOOMANY -> {
                             showErrorDialog(
                                 R.string.general_error_folder_not_found,
                                 R.string.file_link_unavaible_delete_account
                             )
                         }
+
                         else -> {
                             showErrorDialog(
                                 R.string.general_error_word,

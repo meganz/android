@@ -236,7 +236,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (type == FOLDER_LINK_ADAPTER) {
                 binding.sortByLayout.setVisibility(View.GONE);
-                binding.enterMediaDiscovery.setVisibility(View.GONE);
+                setFolderLinkMediaDiscoveryVisibility(binding);
             } else {
                 binding.sortByLayout.setVisibility(View.VISIBLE);
                 setMediaDiscoveryVisibility(binding);
@@ -248,12 +248,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
+    private void setFolderLinkMediaDiscoveryVisibility(SortByHeaderBinding binding) {
+        boolean isInFolderLink = type == FOLDER_LINK_ADAPTER;
+        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(nodes);
+        boolean enableFolderLinkMD = ((FolderLinkActivity) context).getShowMDIcon();
+        binding.enterMediaDiscovery.setVisibility(enableFolderLinkMD && isInFolderLink && hasMediaFile ? View.VISIBLE : View.GONE);
+    }
+
     private void setMediaDiscoveryVisibility(SortByHeaderBinding binding) {
         long currentHandle = ((ManagerActivity) context).getParentHandleBrowser();
         boolean isInFileBrowser = type == FILE_BROWSER_ADAPTER;
-        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(currentHandle);
+        boolean hasMediaFile = MegaNodeUtil.containsMediaFile(nodes);
         boolean isNotRoot = currentHandle != megaApi.getRootNode().getHandle();
-
         binding.enterMediaDiscovery.setVisibility(isInFileBrowser && hasMediaFile && isNotRoot ? View.VISIBLE : View.GONE);
     }
 
