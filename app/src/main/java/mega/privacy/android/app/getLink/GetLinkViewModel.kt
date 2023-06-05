@@ -153,16 +153,21 @@ class GetLinkViewModel @Inject constructor(
     /**
      * Copies the link depending on the current configuration.
      *
+     * @param isFirstTime if link created for first time
      * @param action Copy action to perform.
      */
-    fun copyLink(action: (Pair<String, String>) -> Unit) {
+    fun copyLink(isFirstTime: Boolean = false, action: (Pair<String, String>) -> Unit) {
         action.invoke(
             Pair(
                 when {
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
                     !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
                     else -> node?.publicLink.orEmpty()
-                }, context.resources.getQuantityString(R.plurals.links_copied_clipboard, 1)
+                },
+                if (isFirstTime) context.getString(R.string.general_link_created_and_copied) else context.resources.getQuantityString(
+                    R.plurals.links_copied_clipboard,
+                    1
+                )
             )
         )
     }

@@ -4822,4 +4822,6 @@
     <string name="general_set_password">Set password</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Link updated. Copy again</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
 </resources>

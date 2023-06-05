@@ -214,7 +214,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun updateLink(text: String) {
         binding.linkText.text = text
-
+        viewModel.copyLink(isFirstTime = true) { copyInfo -> copyToClipboard(copyInfo) }
         val node = viewModel.getNode()
         val alpha = if (node?.isExported == true) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
 
