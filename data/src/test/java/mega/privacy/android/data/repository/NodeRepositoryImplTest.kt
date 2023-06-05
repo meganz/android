@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
@@ -49,6 +50,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -377,6 +379,79 @@ class NodeRepositoryImplTest {
             val actual = underTest.getVerifiedIncomingShares(any())
 
             assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that throw IllegalArgumentException when call moveNode and can not find node by handle`() =
+        runTest {
+            val node = NodeId(1L)
+            val destinationNode = NodeId(2L)
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
+            try {
+                underTest.moveNode(node, destinationNode, null)
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(IllegalArgumentException::class.java)
+            }
+        }
+
+    @Test
+    fun `test that move node success when call to SDK successfully`() = runTest {
+        val node = NodeId(1L)
+        val destinationNode = NodeId(2L)
+        val megaNode = mock<MegaNode>()
+        val destinationMegaNode = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+        whenever(megaApiGateway.getMegaNodeByHandle(destinationNode.longValue)).thenReturn(
+            destinationMegaNode
+        )
+        whenever(megaApiGateway.moveNode(any(), any(), anyOrNull(), any())).thenAnswer {
+            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock {
+                    on { nodeHandle }.thenReturn(node.longValue)
+                },
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+
+        assertThat(underTest.moveNode(node, destinationNode, null)).isEqualTo(node)
+    }
+
+    @Test
+    fun `test that move node throw ForeignNodeException when call to SDK returns API_EOVERQUOTA`() =
+        runTest {
+            val node = NodeId(1L)
+            val destinationNode = NodeId(2L)
+            val megaNode = mock<MegaNode>()
+            val destinationMegaNode = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.getMegaNodeByHandle(destinationNode.longValue)).thenReturn(
+                destinationMegaNode
+            )
+            whenever(megaApiGateway.moveNode(any(), any(), anyOrNull(), any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock {
+                        on { nodeHandle }.thenReturn(node.longValue)
+                    },
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_EOVERQUOTA
+                        )
+                    },
+                )
+            }
+            whenever(megaApiGateway.isForeignNode(destinationNode.longValue)).thenReturn(true)
+
+            try {
+                underTest.moveNode(node, destinationNode, null)
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ForeignNodeException::class.java)
+            }
         }
 
     private suspend fun mockFolderInfoResponse() {

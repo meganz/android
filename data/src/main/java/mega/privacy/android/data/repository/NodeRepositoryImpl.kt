@@ -12,6 +12,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
@@ -443,8 +445,12 @@ internal class NodeRepositoryImpl @Inject constructor(
         val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
         requireNotNull(node) { "Node to move with handle $nodeToMove not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("moveNode") { NodeId(it.nodeHandle) }
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    continuation.resumeWith(Result.success(request to error))
+                }
+            )
             megaApiGateway.moveNode(
                 nodeToMove = node,
                 newNodeParent = parent,
@@ -454,6 +460,13 @@ internal class NodeRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
             }
+        }
+        return@withContext when {
+            result.second.errorCode == MegaError.API_OK -> NodeId(result.first.nodeHandle)
+            result.second.errorCode == MegaError.API_EOVERQUOTA
+                    && megaApiGateway.isForeignNode(newNodeParent.longValue) -> throw ForeignNodeException()
+
+            else -> throw result.second.toException("moveNode")
         }
     }
 
