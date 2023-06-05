@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
@@ -39,7 +39,7 @@ internal class PaymentViewModel @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
-    private val isBillingAvailable: IsBillingAvailable,
+    private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val getActiveSubscription: GetActiveSubscription,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
@@ -77,7 +77,7 @@ internal class PaymentViewModel @Inject constructor(
             if (paymentMethod.flag == 0L) {
                 Timber.w("Not payment bit set received!!!")
             }
-            val isBillingAvailable = isBillingAvailable()
+            val isBillingAvailable = isBillingAvailableUseCase()
                     && ((paymentMethod.flag and (1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)) != 0L) // check bit enable
             _state.update {
                 it.copy(isPaymentMethodAvailable = isBillingAvailable)

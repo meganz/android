@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import org.junit.After
 
 import org.junit.Before
@@ -44,7 +44,7 @@ class UpgradeAccountViewModelTest {
     private val getYearlySubscriptionsUseCase = mock<GetYearlySubscriptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
     private val getCurrentPaymentUseCase = mock<GetCurrentPaymentUseCase>()
-    private val isBillingAvailable = mock<IsBillingAvailable>()
+    private val isBillingAvailableUseCase = mock<IsBillingAvailableUseCase>()
     private val localisedPriceStringMapper = mock<LocalisedPriceStringMapper>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
@@ -219,7 +219,7 @@ class UpgradeAccountViewModelTest {
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             getCurrentPaymentUseCase = getCurrentPaymentUseCase,
-            isBillingAvailable = isBillingAvailable,
+            isBillingAvailableUseCase = isBillingAvailableUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper
         )
     }

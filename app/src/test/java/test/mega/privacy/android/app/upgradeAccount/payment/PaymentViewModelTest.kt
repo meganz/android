@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
 import org.junit.After
 import org.junit.Before
@@ -38,7 +38,7 @@ internal class PaymentViewModelTest {
     private val getPaymentMethod: GetPaymentMethod = mock()
     private val getPricing: GetPricing = mock()
     private val getLocalPricingUseCase: GetLocalPricingUseCase = mock()
-    private val isBillingAvailable: IsBillingAvailable = mock()
+    private val isBillingAvailableUseCase: IsBillingAvailableUseCase = mock()
     private val getActiveSubscription: GetActiveSubscription = mock()
     private val context: Context = mock()
     private val savedStateHandle: SavedStateHandle = mock()
@@ -56,7 +56,7 @@ internal class PaymentViewModelTest {
             getPaymentMethod = getPaymentMethod,
             getPricing = getPricing,
             getLocalPricingUseCase = getLocalPricingUseCase,
-            isBillingAvailable = isBillingAvailable,
+            isBillingAvailableUseCase = isBillingAvailableUseCase,
             getActiveSubscription = getActiveSubscription,
             context = context,
             savedStateHandle = savedStateHandle
@@ -94,10 +94,10 @@ internal class PaymentViewModelTest {
     }
 
     @Test
-    fun `test that isPaymentMethodAvailable returns true when isBillingAvailable returns true and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-            whenever(isBillingAvailable()).thenReturn(true)
+            whenever(isBillingAvailableUseCase()).thenReturn(true)
             whenever(getPaymentMethod(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
             underTest.state.test {
@@ -107,10 +107,10 @@ internal class PaymentViewModelTest {
         }
 
     @Test
-    fun `test that isPaymentMethodAvailable returns false when isBillingAvailable returns false and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+    fun `test that isPaymentMethodAvailable returns false when isBillingAvailableUseCase returns false and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-            whenever(isBillingAvailable()).thenReturn(false)
+            whenever(isBillingAvailableUseCase()).thenReturn(false)
             whenever(getPaymentMethod(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
             underTest.state.drop(1).test {
@@ -123,7 +123,7 @@ internal class PaymentViewModelTest {
     @Test
     fun `test that an exception from getPaymentMethod is not propagated`() = runTest {
         whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-        whenever(isBillingAvailable()).thenReturn(true)
+        whenever(isBillingAvailableUseCase()).thenReturn(true)
         whenever(getPaymentMethod(false)).thenAnswer { throw MegaException(1, "Not available") }
         initViewModel()
         underTest.state.drop(1).test {
@@ -135,7 +135,7 @@ internal class PaymentViewModelTest {
     @Test
     fun `test that an exception from refresh pricing is not propagated`() = runTest {
         whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-        whenever(isBillingAvailable()).thenReturn(true)
+        whenever(isBillingAvailableUseCase()).thenReturn(true)
         whenever(getPricing(false)).thenAnswer { throw MegaException(1, "Not available") }
         initViewModel()
         underTest.state.drop(1).test {

@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEvent
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.domain.usecase.billing.QuerySkus
@@ -28,10 +27,6 @@ internal abstract class InternalBillingModule {
         @Provides
         fun provideMonitorBillingEvent(repository: BillingRepository) =
             MonitorBillingEvent(repository::monitorBillingEvent)
-
-        @Provides
-        fun provideIsBillingAvailable(repository: BillingRepository) =
-            IsBillingAvailable(repository::isBillingAvailable)
 
         @Provides
         fun provideGetActiveSubscription(repository: BillingRepository) =

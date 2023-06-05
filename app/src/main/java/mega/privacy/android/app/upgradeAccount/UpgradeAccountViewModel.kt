@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
+import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ import javax.inject.Inject
  * @param getYearlySubscriptionsUseCase use case to get the list of yearly subscriptions available in the app
  * @param getCurrentSubscriptionPlanUseCase use case to get the current subscribed plan
  * @param getCurrentPaymentUseCase use case to get the current payment option
- * @param isBillingAvailable use to check if billing is available
+ * @param isBillingAvailableUseCase use case to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
  *
  * @property state The current UI state
@@ -43,7 +43,7 @@ class UpgradeAccountViewModel @Inject constructor(
     private val getYearlySubscriptionsUseCase: GetYearlySubscriptionsUseCase,
     private val getCurrentSubscriptionPlanUseCase: GetCurrentSubscriptionPlanUseCase,
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
-    private val isBillingAvailable: IsBillingAvailable,
+    private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
@@ -130,7 +130,7 @@ class UpgradeAccountViewModel @Inject constructor(
         }
     }
 
-    fun isBillingAvailable(): Boolean = isBillingAvailable.invoke()
+    fun isBillingAvailable(): Boolean = isBillingAvailableUseCase.invoke()
 
     fun setBillingWarningVisibility(isVisible: Boolean) {
         _state.update { it.copy(showBillingWarning = isVisible) }
