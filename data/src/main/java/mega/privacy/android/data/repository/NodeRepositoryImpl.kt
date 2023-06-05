@@ -528,4 +528,21 @@ internal class NodeRepositoryImpl @Inject constructor(
                 ?.let { megaApiGateway.getMegaNodeByHandle(it.longValue) }
             megaApiGateway.getChildNode(parent, name)?.let { nodeMapper(it) }
         }
+
+    override suspend fun setOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) =
+        withContext(ioDispatcher) {
+            val node = megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+            requireNotNull(node) { "Node not found" }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setOriginalFingerprint") {}
+                megaApiGateway.setOriginalFingerprint(
+                    node = node,
+                    originalFingerprint = originalFingerprint,
+                    listener = listener
+                )
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }

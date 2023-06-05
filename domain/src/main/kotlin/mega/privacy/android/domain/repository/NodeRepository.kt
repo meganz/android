@@ -367,4 +367,15 @@ interface NodeRepository {
      * @return mega node or null if doesn't exist
      */
     suspend fun getChildNode(parentNodeId: NodeId?, name: String?): UnTypedNode?
+
+    /**
+     * Sets the original fingerprint of a [Node]
+     *
+     * @param nodeId the [NodeId] to attach the [originalFingerprint] to
+     * @param originalFingerprint the fingerprint of the file before modification
+     */
+    suspend fun setOriginalFingerprint(
+        nodeId: NodeId,
+        originalFingerprint: String,
+    )
 }

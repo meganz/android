@@ -11,7 +11,6 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -235,16 +234,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetVideoSyncRecordsByStatus(cameraUploadRepository: CameraUploadRepository): GetVideoSyncRecordsByStatus =
             GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it) }
-
-        /**
-         * Provide the [SetOriginalFingerprint] implementation
-         *
-         * @param megaNodeRepository [MegaNodeRepository]
-         * @return [SetOriginalFingerprint]
-         */
-        @Provides
-        fun provideSetOriginalFingerprint(megaNodeRepository: MegaNodeRepository): SetOriginalFingerprint =
-            SetOriginalFingerprint(megaNodeRepository::setOriginalFingerprint)
 
         /**
          * Provide the [GetParentMegaNode] implementation

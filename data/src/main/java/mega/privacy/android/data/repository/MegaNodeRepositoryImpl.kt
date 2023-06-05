@@ -196,22 +196,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)
     }
 
-    override suspend fun setOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("setOriginalFingerprint") {}
-                megaApiGateway.setOriginalFingerprint(
-                    node = node,
-                    originalFingerprint = originalFingerprint,
-                    listener = listener
-                )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-    }
-
     override suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))

@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
@@ -114,9 +113,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetNodeByFingerprint() = mock<GetNodeByFingerprintUseCase>()
-
-    @Provides
-    fun provideSetOriginalFingerprint() = mock<SetOriginalFingerprint>()
 
     @Provides
     fun provideGetParentMegaNode() = mock<GetParentMegaNode>()

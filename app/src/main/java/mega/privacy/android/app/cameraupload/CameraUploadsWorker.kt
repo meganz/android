@@ -41,7 +41,6 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -77,6 +76,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -123,6 +123,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathVali
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -443,7 +444,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Set Original Fingerprint
      */
     @Inject
-    lateinit var setOriginalFingerprint: SetOriginalFingerprint
+    lateinit var setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase
 
     /**
      * Start Upload
@@ -1696,7 +1697,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         isSecondary = record.isSecondary,
                     )
                     handleSetOriginalFingerprint(
-                        node = nonNullNode,
+                        nodeId = NodeId(nonNullNode.handle),
                         originalFingerprint = record.originFingerprint.orEmpty(),
                     )
                     record.latitude?.let { latitude ->
@@ -1760,15 +1761,15 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Sets the original fingerprint by calling [setOriginalFingerprint] and logs the result
+     * Sets the original fingerprint by calling [setOriginalFingerprintUseCase] and logs the result
      *
-     * @param node the [MegaNode] to attach the [originalFingerprint] to
+     * @param nodeId the [Node] to attach the [originalFingerprint] to
      * @param originalFingerprint the fingerprint of the file before modification
      */
-    private suspend fun handleSetOriginalFingerprint(node: MegaNode, originalFingerprint: String) {
+    private suspend fun handleSetOriginalFingerprint(nodeId: NodeId, originalFingerprint: String) {
         runCatching {
-            setOriginalFingerprint(
-                node = node,
+            setOriginalFingerprintUseCase(
+                nodeId = nodeId,
                 originalFingerprint = originalFingerprint,
             )
         }.onSuccess {
