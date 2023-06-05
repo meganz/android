@@ -22,8 +22,8 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetImageByNodePublicLinkUseCaseTest {
-    private lateinit var underTest: GetImageByNodePublicLinkUseCase
+class GetImageByNodeHandleUseCaseTest {
+    private lateinit var underTest: GetImageByNodeHandleUseCase
 
     private val addImageTypeUseCase = mock<AddImageTypeUseCase>()
     private val getImageUseCase = mock<GetImageUseCase>()
@@ -31,15 +31,16 @@ class GetImageByNodePublicLinkUseCaseTest {
     private val imageNode = mock<ImageNode>()
     private val typedImageNode = mock<TypedImageNode>()
 
-    private val nodeFileLink = "test"
+    private val nodeHandle = 1L
     private val fullSize = false
     private val highPriority = false
     private val resetDownloads: () -> Unit = {}
 
+
     @BeforeAll
     fun setUp() {
         underTest =
-            GetImageByNodePublicLinkUseCase(addImageTypeUseCase, getImageUseCase, imageRepository)
+            GetImageByNodeHandleUseCase(addImageTypeUseCase, getImageUseCase, imageRepository)
     }
 
     @BeforeEach
@@ -53,12 +54,10 @@ class GetImageByNodePublicLinkUseCaseTest {
     fun `test that image node is returned by image repository`() {
         runTest {
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
+                underTest.invoke(nodeHandle, fullSize, highPriority, resetDownloads)
+            whenever(imageRepository.getImageNodeByHandle(nodeHandle)).thenReturn(imageNode)
             result.test {
-                assertThat(imageRepository.getImageNodeForPublicLink(nodeFileLink)).isEqualTo(
-                    imageNode
-                )
+                assertThat(imageRepository.getImageNodeByHandle(nodeHandle)).isEqualTo(imageNode)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -67,10 +66,10 @@ class GetImageByNodePublicLinkUseCaseTest {
     @Test
     fun `test that typed image node is returned by addImageTypeUseCase`() {
         runTest {
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
+            whenever(imageRepository.getImageNodeByHandle(nodeHandle)).thenReturn(imageNode)
             whenever(addImageTypeUseCase.invoke(imageNode)).thenReturn(typedImageNode)
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
+                underTest.invoke(nodeHandle, fullSize, highPriority, resetDownloads)
             result.test {
                 assertThat(addImageTypeUseCase(imageNode)).isEqualTo(typedImageNode)
                 cancelAndIgnoreRemainingEvents()
@@ -85,7 +84,7 @@ class GetImageByNodePublicLinkUseCaseTest {
             val expectedPreviewUri = "previewMEGA/abc.jpg"
             val expectedFullSizeUri = "tempMEGA/test.jpg"
 
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
+            whenever(imageRepository.getImageNodeByHandle(nodeHandle)).thenReturn(imageNode)
             whenever(addImageTypeUseCase.invoke(imageNode)).thenReturn(typedImageNode)
             whenever(getImageUseCase(any(), any(), any(), any())).thenReturn(
                 flowOf(
@@ -97,7 +96,7 @@ class GetImageByNodePublicLinkUseCaseTest {
                 )
             )
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
+                underTest.invoke(nodeHandle, fullSize, highPriority, resetDownloads)
             result.test {
                 val actual = awaitItem()
                 assertThat(actual.thumbnailUri).isEqualTo(expectedThumbnailUri)

@@ -22,8 +22,8 @@ import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GetImageByNodePublicLinkUseCaseTest {
-    private lateinit var underTest: GetImageByNodePublicLinkUseCase
+class GetImageForChatMessageUseCaseTest {
+    private lateinit var underTest: GetImageForChatMessageUseCase
 
     private val addImageTypeUseCase = mock<AddImageTypeUseCase>()
     private val getImageUseCase = mock<GetImageUseCase>()
@@ -31,7 +31,8 @@ class GetImageByNodePublicLinkUseCaseTest {
     private val imageNode = mock<ImageNode>()
     private val typedImageNode = mock<TypedImageNode>()
 
-    private val nodeFileLink = "test"
+    private val chatRoomId = 1L
+    private val chatMessageId = 1L
     private val fullSize = false
     private val highPriority = false
     private val resetDownloads: () -> Unit = {}
@@ -39,7 +40,7 @@ class GetImageByNodePublicLinkUseCaseTest {
     @BeforeAll
     fun setUp() {
         underTest =
-            GetImageByNodePublicLinkUseCase(addImageTypeUseCase, getImageUseCase, imageRepository)
+            GetImageForChatMessageUseCase(addImageTypeUseCase, getImageUseCase, imageRepository)
     }
 
     @BeforeEach
@@ -53,12 +54,20 @@ class GetImageByNodePublicLinkUseCaseTest {
     fun `test that image node is returned by image repository`() {
         runTest {
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
-            result.test {
-                assertThat(imageRepository.getImageNodeForPublicLink(nodeFileLink)).isEqualTo(
-                    imageNode
+                underTest.invoke(chatRoomId, chatMessageId, fullSize, highPriority, resetDownloads)
+            whenever(
+                imageRepository.getImageNodeForChatMessage(
+                    chatRoomId,
+                    chatMessageId
                 )
+            ).thenReturn(imageNode)
+            result.test {
+                assertThat(
+                    imageRepository.getImageNodeForChatMessage(
+                        chatRoomId,
+                        chatMessageId
+                    )
+                ).isEqualTo(imageNode)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -67,10 +76,15 @@ class GetImageByNodePublicLinkUseCaseTest {
     @Test
     fun `test that typed image node is returned by addImageTypeUseCase`() {
         runTest {
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
+            whenever(
+                imageRepository.getImageNodeForChatMessage(
+                    chatRoomId,
+                    chatMessageId
+                )
+            ).thenReturn(imageNode)
             whenever(addImageTypeUseCase.invoke(imageNode)).thenReturn(typedImageNode)
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
+                underTest.invoke(chatRoomId, chatMessageId, fullSize, highPriority, resetDownloads)
             result.test {
                 assertThat(addImageTypeUseCase(imageNode)).isEqualTo(typedImageNode)
                 cancelAndIgnoreRemainingEvents()
@@ -85,7 +99,12 @@ class GetImageByNodePublicLinkUseCaseTest {
             val expectedPreviewUri = "previewMEGA/abc.jpg"
             val expectedFullSizeUri = "tempMEGA/test.jpg"
 
-            whenever(imageRepository.getImageNodeForPublicLink(nodeFileLink)).thenReturn(imageNode)
+            whenever(
+                imageRepository.getImageNodeForChatMessage(
+                    chatRoomId,
+                    chatMessageId
+                )
+            ).thenReturn(imageNode)
             whenever(addImageTypeUseCase.invoke(imageNode)).thenReturn(typedImageNode)
             whenever(getImageUseCase(any(), any(), any(), any())).thenReturn(
                 flowOf(
@@ -97,7 +116,7 @@ class GetImageByNodePublicLinkUseCaseTest {
                 )
             )
             val result =
-                underTest.invoke(nodeFileLink, fullSize, highPriority, resetDownloads)
+                underTest.invoke(chatRoomId, chatMessageId, fullSize, highPriority, resetDownloads)
             result.test {
                 val actual = awaitItem()
                 assertThat(actual.thumbnailUri).isEqualTo(expectedThumbnailUri)

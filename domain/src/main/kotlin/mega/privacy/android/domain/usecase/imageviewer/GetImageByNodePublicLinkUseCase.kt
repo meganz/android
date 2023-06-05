@@ -1,40 +1,38 @@
 package mega.privacy.android.domain.usecase.imageviewer
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.NetworkRepository
+import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import javax.inject.Inject
 
 /**
  * The use case to get Image Result given Node Public Link
  */
 class GetImageByNodePublicLinkUseCase @Inject constructor(
-    private val networkRepository: NetworkRepository,
+    private val addImageTypeUseCase: AddImageTypeUseCase,
+    private val getImageUseCase: GetImageUseCase,
     private val imageRepository: ImageRepository,
 ) {
     /**
-     * Get Image Result given Node Public Link
+     * Invoke
      *
-     * @param nodeFileLink      Public link to a file in MEGA
-     * @param fullSize          Flag to request full size image despite data/size requirements
-     * @param highPriority      Flag to request image with high priority
-     * @param resetDownloads    Callback to reset downloads
+     * @param nodeFileLink          Public link to a file in MEGA
+     * @param fullSize              Flag to request full size image despite data/size requirements
+     * @param highPriority          Flag to request image with high priority
+     * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         nodeFileLink: String,
         fullSize: Boolean,
         highPriority: Boolean,
         resetDownloads: () -> Unit,
-    ): Flow<ImageResult> {
-        return imageRepository.getImageByNodePublicLink(
-            nodeFileLink,
-            fullSize,
-            highPriority,
-            networkRepository.isMeteredConnection() ?: false,
-            resetDownloads
-        )
+    ): Flow<ImageResult> = flow {
+        val node = addImageTypeUseCase(imageRepository.getImageNodeForPublicLink(nodeFileLink))
+        emitAll(getImageUseCase(node, fullSize, highPriority, resetDownloads))
     }
 }

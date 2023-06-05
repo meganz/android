@@ -1,19 +1,21 @@
 package mega.privacy.android.domain.usecase.imageviewer
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.NetworkRepository
+import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
 import javax.inject.Inject
 
 /**
- * The use case class to get an ImageResult given a Node Chat Room Id and Chat Message Id.
+ * The use case to get an ImageResult given Chat Room Id and Chat Message Id.
  */
 class GetImageForChatMessageUseCase @Inject constructor(
-    private val networkRepository: NetworkRepository,
+    private val addImageTypeUseCase: AddImageTypeUseCase,
+    private val getImageUseCase: GetImageUseCase,
     private val imageRepository: ImageRepository,
 ) {
-
     /**
      * Get an ImageResult given a Node Chat Room Id and Chat Message Id.
      *
@@ -31,14 +33,13 @@ class GetImageForChatMessageUseCase @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         resetDownloads: () -> Unit,
-    ): Flow<ImageResult> {
-        return imageRepository.getImageForChatMessage(
-            chatRoomId,
-            chatMessageId,
-            fullSize,
-            highPriority,
-            networkRepository.isMeteredConnection() ?: false,
-            resetDownloads
+    ): Flow<ImageResult> = flow {
+        val node = addImageTypeUseCase(
+            imageRepository.getImageNodeForChatMessage(
+                chatRoomId,
+                chatMessageId
+            )
         )
+        emitAll(getImageUseCase(node, fullSize, highPriority, resetDownloads))
     }
 }

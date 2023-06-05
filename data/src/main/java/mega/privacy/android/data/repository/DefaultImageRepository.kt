@@ -3,10 +3,8 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import androidx.core.net.toFile
 import androidx.core.net.toUri
 import com.facebook.common.executors.CallerThreadExecutor
 import com.facebook.common.references.CloseableReference
@@ -20,10 +18,6 @@ import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -35,7 +29,6 @@ import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getScreenSize
 import mega.privacy.android.data.extensions.getThumbnailFileName
-import mega.privacy.android.data.extensions.isVideo
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
@@ -44,22 +37,15 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
-import mega.privacy.android.data.model.FullImageDownloadResult
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
-import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
-import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -227,62 +213,6 @@ internal class DefaultImageRepository @Inject constructor(
 
     private fun getThumbnailPath(thumbnailFolderPath: String, megaNode: MegaNode) =
         "$thumbnailFolderPath${File.separator}${megaNode.getThumbnailFileName()}"
-
-
-    override suspend fun getImageByNodeHandle(
-        nodeHandle: Long,
-        fullSize: Boolean,
-        highPriority: Boolean,
-        isMeteredConnection: Boolean,
-        resetDownloads: () -> Unit,
-    ): Flow<ImageResult> = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let {
-            if (!it.isFile) throw IllegalArgumentException("Node is not a file")
-            return@let getImageByNode(
-                it,
-                fullSize,
-                highPriority,
-                isMeteredConnection,
-                resetDownloads
-            )
-        } ?: throw IllegalArgumentException("Node is null")
-    }
-
-    override suspend fun getImageByNodePublicLink(
-        nodeFileLink: String,
-        fullSize: Boolean,
-        highPriority: Boolean,
-        isMeteredConnection: Boolean,
-        resetDownloads: () -> Unit,
-    ): Flow<ImageResult> = withContext(ioDispatcher) {
-        if (nodeFileLink.isBlank()) throw IllegalArgumentException("Invalid megaFileLink")
-        return@withContext getImageByNode(
-            getPublicNode(nodeFileLink),
-            fullSize,
-            highPriority,
-            isMeteredConnection,
-            resetDownloads
-        )
-    }
-
-    override suspend fun getImageForChatMessage(
-        chatRoomId: Long,
-        chatMessageId: Long,
-        fullSize: Boolean,
-        highPriority: Boolean,
-        isMeteredConnection: Boolean,
-        resetDownloads: () -> Unit,
-    ): Flow<ImageResult> = withContext(ioDispatcher) {
-        getChatNode(chatRoomId, chatMessageId)?.let {
-            return@let getImageByNode(
-                it,
-                fullSize,
-                highPriority,
-                isMeteredConnection,
-                resetDownloads
-            )
-        } ?: throw IllegalArgumentException("Node is null")
-    }
 
     private suspend fun getThumbnailFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
@@ -487,245 +417,6 @@ internal class DefaultImageRepository @Inject constructor(
             }
         }
 
-    private suspend fun getPublicNode(nodeFileLink: String): MegaNode =
-        suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    if (error.errorCode == MegaError.API_OK) {
-                        if (!request.flag) {
-                            continuation.resumeWith(Result.success(request.publicNode))
-                        } else {
-                            continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
-                        }
-                    } else {
-                        continuation.failWithException(error.toException("getPublicNode"))
-                    }
-                }
-            )
-            megaApiGateway.getPublicNode(nodeFileLink, listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-
-    private suspend fun getChatNode(chatId: Long, chatMessageId: Long) =
-        withContext(ioDispatcher) {
-            val chatMessage = megaChatApiGateway.getMessage(chatId, chatMessageId)
-                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, chatMessageId)
-
-            chatMessage?.let {
-                val node = chatMessage.megaNodeList.get(0)
-                val chatRoom = megaChatApiGateway.getChatRoom(chatId)
-
-                if (chatRoom?.isPreview == true) {
-                    megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken)
-                } else {
-                    node
-                }
-            }
-        }
-
-    private suspend fun getFullImageFromServer(
-        imageResult: ImageResult,
-        node: MegaNode,
-        fullFile: File,
-        highPriority: Boolean,
-        isValidNodeFile: Boolean,
-        resetDownloads: () -> Unit,
-    ): Flow<FullImageDownloadResult> = callbackFlow {
-        val listener = OptionalMegaTransferListenerInterface(
-            onTransferStart = { transfer ->
-                imageResult.transferTag = transfer.tag
-                imageResult.totalBytes = transfer.totalBytes
-                trySend(FullImageDownloadResult(imageResult))
-            },
-            onTransferFinish = { _: MegaTransfer, error: MegaError ->
-                imageResult.transferTag = null
-                when (error.errorCode) {
-                    MegaError.API_OK -> {
-                        imageResult.fullSizeUri =
-                            fullFile.toUri().toString()
-                        imageResult.isFullyLoaded = true
-                        trySend(FullImageDownloadResult(imageResult))
-                    }
-                    MegaError.API_EEXIST -> {
-                        if (isValidNodeFile) {
-                            imageResult.fullSizeUri =
-                                fullFile.toUri().toString()
-                            imageResult.isFullyLoaded = true
-                            trySend(FullImageDownloadResult(imageResult))
-                        } else {
-                            trySend(
-                                FullImageDownloadResult(
-                                    deleteFile = fullFile,
-                                    exception = ResourceAlreadyExistsMegaException(
-                                        error.errorCode,
-                                        error.errorString
-                                    )
-                                )
-                            )
-                        }
-                    }
-                    MegaError.API_ENOENT -> {
-                        imageResult.isFullyLoaded = true
-                        trySend(FullImageDownloadResult(imageResult = imageResult))
-                    }
-                    else -> {
-                        trySend(
-                            FullImageDownloadResult(
-                                exception = MegaException(
-                                    error.errorCode,
-                                    error.errorString
-                                )
-                            )
-                        )
-                    }
-                }
-                resetDownloads()
-            },
-            onTransferTemporaryError = { _, error ->
-                if (error.errorCode == MegaError.API_EOVERQUOTA) {
-                    imageResult.isFullyLoaded = true
-                    trySend(
-                        FullImageDownloadResult(
-                            imageResult = imageResult,
-                            exception = QuotaExceededMegaException(
-                                error.errorCode,
-                                error.errorString
-                            )
-                        )
-                    )
-                }
-            },
-            onTransferUpdate = {
-                imageResult.transferredBytes = it.transferredBytes
-                trySend(FullImageDownloadResult(imageResult = imageResult))
-            }
-        )
-
-        megaApiGateway.getFullImage(
-            node,
-            fullFile,
-            highPriority, listener
-        )
-
-        awaitClose {
-            megaApiGateway.removeTransferListener(listener)
-        }
-    }
-
-    private suspend fun getImageByNode(
-        node: MegaNode,
-        fullSize: Boolean,
-        highPriority: Boolean,
-        isMeteredConnection: Boolean,
-        resetDownloads: () -> Unit,
-    ): Flow<ImageResult> = flow {
-        val fullSizeRequired =
-            isFullSizeRequired(
-                node,
-                fullSize,
-                fileManagementPreferencesGateway.isMobileDataAllowed(),
-                isMeteredConnection
-            )
-
-        val thumbnailFile = if (node.hasThumbnail()) getThumbnailFile(node) else null
-
-        val previewFile =
-            if (node.hasPreview() || node.isVideo()) getPreviewFile(node) else null
-
-        getFullFile(node)?.let { fullFile ->
-            val isValidNodeFile = megaApiGateway.checkValidNodeFile(node, fullFile)
-            if (!isValidNodeFile) {
-                fileGateway.deleteFile(fullFile)
-            }
-
-            val imageResult = ImageResult(
-                isVideo = node.isVideo(),
-                thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri()?.toString(),
-                previewUri = previewFile?.takeIf { it.exists() }?.toUri()?.toString(),
-                fullSizeUri = fullFile.takeIf { it.exists() }?.toUri()?.toString(),
-            )
-
-            if (imageResult.isVideo && imageResult.fullSizeUri != null && previewFile == null) {
-                imageResult.previewUri = getVideoThumbnail(
-                    node.getThumbnailFileName(),
-                    fullFile.toUri()
-                )
-            }
-
-            if ((!fullSizeRequired && !imageResult.previewUri.isNullOrBlank()) || isValidNodeFile) {
-                imageResult.isFullyLoaded = true
-                emit(imageResult)
-            } else {
-                emit(imageResult)
-                if (imageResult.thumbnailUri == null) {
-                    runCatching {
-                        getThumbnailFromServer(node.handle)
-                    }.onSuccess {
-                        imageResult.thumbnailUri = it?.toUri().toString()
-                        emit(imageResult)
-                    }.onFailure {
-                        Timber.w(it)
-                    }
-                }
-
-                if (imageResult.previewUri == null) {
-                    runCatching {
-                        getPreviewFromServer(node.handle)
-                    }.onSuccess {
-                        imageResult.previewUri = it?.toUri().toString()
-                        if (!fullSizeRequired) {
-                            imageResult.isFullyLoaded = true
-                            emit(imageResult)
-                        } else {
-                            emit(imageResult)
-                            if (imageResult.fullSizeUri == null) {
-                                getFullImageFromServer(
-                                    imageResult,
-                                    node,
-                                    fullFile,
-                                    highPriority,
-                                    isValidNodeFile,
-                                    resetDownloads
-                                ).collect { result ->
-                                    result.imageResult?.let { downloadImageResult ->
-                                        emit(downloadImageResult)
-                                    }
-                                    result.deleteFile?.let { file ->
-                                        fileGateway.deleteFile(file)
-                                    }
-                                    result.exception?.let { exception ->
-                                        throw exception
-                                    }
-                                }
-                            }
-                        }
-                    }.onFailure { exception ->
-                        if (!fullSizeRequired) {
-                            throw exception
-                        } else {
-                            Timber.w(exception)
-                        }
-                    }
-                }
-            }
-        } ?: throw IllegalArgumentException("Full image file is null")
-    }
-
-
-    private fun isFullSizeRequired(
-        node: MegaNode,
-        fullSize: Boolean,
-        isMobileDataAllowed: Boolean,
-        isMeteredConnection: Boolean,
-    ) = when {
-        node.isTakenDown || node.isVideo() -> false
-        node.size <= SIZE_1_MB -> true
-        node.size in SIZE_1_MB..SIZE_50_MB -> fullSize || isMobileDataAllowed || !isMeteredConnection
-        else -> false
-    }
-
     private suspend fun getPreviewFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
 
@@ -769,45 +460,8 @@ internal class DefaultImageRepository @Inject constructor(
             }
         }
 
-    @Suppress("deprecation")
-    suspend fun getVideoThumbnail(fileName: String, videoUri: Uri): String? =
-        withContext(ioDispatcher) {
-            val videoFile = videoUri.toFile().takeIf { it.exists() }
-            videoFile?.let { getPreviewFile(fileName) }?.let { previewFile ->
-                if (previewFile.exists()) return@withContext previewFile.toUri().toString()
-
-                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ThumbnailUtils.createVideoThumbnail(
-                        videoFile,
-                        context.getScreenSize(),
-                        null
-                    )
-                } else {
-                    ThumbnailUtils.createVideoThumbnail(
-                        videoFile.path,
-                        MediaStore.Images.Thumbnails.FULL_SCREEN_KIND
-                    )
-                }
-
-                bitmap?.let {
-                    BufferedOutputStream(FileOutputStream(previewFile)).apply {
-                        this.use {
-                            bitmap.compress(
-                                Bitmap.CompressFormat.JPEG,
-                                BITMAP_COMPRESS_QUALITY,
-                                it,
-                            )
-                        }
-                    }
-                    bitmap.recycle()
-                    return@withContext previewFile.toUri().toString()
-                }
-            }
-        }
-
     companion object {
         private const val SIZE_1_MB = 1024 * 1024 * 1L
-        private const val SIZE_50_MB = SIZE_1_MB * 50L
         private const val BITMAP_COMPRESS_QUALITY = 75
     }
 
