@@ -30,8 +30,12 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.extensions.toTransferStage
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferStage
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
@@ -439,6 +443,31 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
+     * If the transfer is a file, removes it from scanningTransfers because is already processed.
+     * It the transfer is a folder, updates its scanningTransferData.
+     *
+     * @param transfer  Transfer to check.
+     */
+    @Synchronized
+    fun checkScanningTransferOnStart(transfer: Transfer) {
+        Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
+        for (data in scanningTransfers) {
+            if (data.isTheSameTransfer(transfer)) {
+                data.apply {
+                    if (!isFolder || transfer.state == TransferState.STATE_COMPLETED) {
+                        removeProcessedScanningTransfer()
+                    } else {
+                        transferTag = transfer.tag
+                        transferStage = transfer.stage.toTransferStage()
+                    }
+                }
+
+                break
+            }
+        }
+    }
+
+    /**
      * If the transfer is a folder removes it from scanningTransfers if already processed,
      * or updates its stage if not.
      * If the folder transfer is already processed means its stage is >= STAGE_TRANSFERRING_FILES.
@@ -461,12 +490,51 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
+     * If the transfer is a folder removes it from scanningTransfers if already processed,
+     * or updates its stage if not.
+     * If the folder transfer is already processed means its stage is >= STAGE_TRANSFERRING_FILES.
+     *
+     * @param transfer  Transfer to check.
+     */
+    @Synchronized
+    fun checkScanningTransferOnUpdate(transfer: Transfer) {
+        for (data in scanningTransfers) {
+            if (data.isTheSameTransfer(transfer)) {
+                if (transfer.stage == TransferStage.STAGE_TRANSFERRING_FILES
+                    || transfer.state == TransferState.STATE_COMPLETED
+                ) {
+                    data.removeProcessedScanningTransfer()
+                } else {
+                    data.transferStage = transfer.stage.toTransferStage()
+                }
+
+                break
+            }
+        }
+    }
+
+    /**
      * If the transfer is a folder removes it from scanningTransfers as is already processed.
      *
      * @param transfer  Transfer to check.
      */
     @Synchronized
     fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
+        for (data in scanningTransfers) {
+            if (data.isTheSameTransfer(transfer)) {
+                data.removeProcessedScanningTransfer()
+                break
+            }
+        }
+    }
+
+    /**
+     * If the transfer is a folder removes it from scanningTransfers as is already processed.
+     *
+     * @param transfer  Transfer to check.
+     */
+    @Synchronized
+    fun checkScanningTransferOnFinish(transfer: Transfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
                 data.removeProcessedScanningTransfer()
