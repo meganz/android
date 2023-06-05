@@ -16,6 +16,6 @@ class GetMoveLatestTargetPathUseCase @Inject constructor(
      */
     suspend operator fun invoke(): Long? {
         val path = accountRepository.getLatestTargetPathMovePreference()
-        return path?.takeIf { isNodeInRubbishOrDeletedUseCase(it) }
+        return path?.takeIf { !isNodeInRubbishOrDeletedUseCase(it) }
     }
 }
