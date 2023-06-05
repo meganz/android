@@ -1,94 +1,86 @@
 package mega.privacy.android.app.usecase
 
 import android.content.Context
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.rx3.rxSingle
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.usecase.exception.SuccessMegaException
 import mega.privacy.android.app.usecase.exception.toMegaException
-import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import nz.mega.sdk.MegaApiAndroid
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError.API_EOVERQUOTA
-import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
  * Use case for moving MegaNodes.
  *
- * @property megaApi        MegaApiAndroid instance to move nodes.
- * @property getNodeUseCase Required for getting MegaNodes.
+ * @property megaApiGateway        MegaApiAndroid instance to move nodes.
  */
 class LegacyMoveNodeUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val getNodeUseCase: GetNodeUseCase,
+    private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
+    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val accountRepository: AccountRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
-     * Moves a node to the Rubbish Bin.
+     * Moves node from one location to another
      *
-     * @param handle        The identifier of the MegaNode to move.
-     * @return Completable.
+     * @param node the node to be moved
+     * @param parentNode parent location to which the nod should be moved to
+     * @param newName if we should give a new name to the node at parentNode location
      */
-    @Deprecated(
-        message = "This RXJava version has been deprecated in favour of MoveNodeToRubbishByHandle use case",
-        replaceWith = ReplaceWith("MoveNodeToRubbishByHandle"),
-        level = DeprecationLevel.WARNING
-    )
-    fun moveToRubbishBin(handle: Long): Completable =
-        Completable.fromCallable {
-            move(getNodeUseCase.get(handle).blockingGetOrNull(), megaApi.rubbishNode)
-                .blockingAwait()
-        }
-
-    /**
-     * Moves a node to other location.
-     *
-     * @param node          The MegaNoe to move.
-     * @param parentNode    The parent MegaNode where the node has to be moved.
-     * @param newName       New name for the moved node. Null if it wants to keep the original one.
-     * @return Completable.
-     */
-    private fun move(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
-        Completable.create { emitter ->
-            if (node == null) {
-                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                return@create
-            }
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                when {
-                    emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
-                    error.errorCode == API_OK -> emitter.onComplete()
-                    error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(parentNode.handle) ->
-                        emitter.onError(ForeignNodeException())
-
-                    else -> emitter.onError(error.toMegaException())
+    suspend fun moveAsync(
+        node: MegaNode?,
+        parentNode: MegaNode?,
+        newName: String? = null,
+    ): Boolean {
+        node ?: throw MegaNodeException.NodeDoesNotExistsException()
+        parentNode ?: throw MegaNodeException.ParentDoesNotExistException()
+        val exception = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    continuation.resumeWith(Result.success(error.toMegaException()))
                 }
-            })
-
-            if (newName != null) {
-                megaApi.moveNode(node, parentNode, newName, listener)
-            } else {
-                megaApi.moveNode(node, parentNode, listener)
+            )
+            megaApiGateway.moveNode(
+                nodeToMove = node,
+                newNodeParent = parentNode,
+                newNodeName = newName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+        return when (exception) {
+            is SuccessMegaException -> true
+            is QuotaExceededMegaException -> {
+                val isForeignNode = megaApiGateway.isForeignNode(parentNode.handle)
+                if (isForeignNode) {
+                    throw ForeignNodeException()
+                } else {
+                    throw exception
+                }
             }
 
+            else -> throw exception
         }
+    }
 
     /**
      * Moves a node to other location after resolving a name collision.
@@ -100,59 +92,43 @@ class LegacyMoveNodeUseCase @Inject constructor(
     fun move(
         collisionResult: NameCollisionResult,
         rename: Boolean,
-    ): Single<MoveRequestResult.GeneralMovement> =
-        Single.create { emitter ->
-            val node = getNodeUseCase
-                .get((collisionResult.nameCollision as NameCollision.Movement).nodeHandle)
-                .blockingGetOrNull()
+    ): Single<MoveRequestResult.GeneralMovement> = rxSingle(ioDispatcher) {
+        moveAsync(collisionResult, rename)
+    }
 
-            if (node == null) {
-                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                return@create
-            }
+    /**
+     * Moves a node to other location after resolving a name collision.
+     *
+     * @param collisionResult   The result of the name collision.
+     * @param rename            True if should rename the node, false otherwise.
+     * @return Single with the movement result.
+     * */
+    suspend fun moveAsync(
+        collisionResult: NameCollisionResult,
+        rename: Boolean,
+    ): MoveRequestResult.GeneralMovement {
+        val node =
+            getMegaNode((collisionResult.nameCollision as NameCollision.Movement).nodeHandle)
+                ?: throw MegaNodeException.NodeDoesNotExistsException()
 
-            val parentNode = getNodeUseCase
-                .get(collisionResult.nameCollision.parentHandle).blockingGetOrNull()
+        val parentNode = getMegaNode(collisionResult.nameCollision.parentHandle)
+            ?: throw MegaNodeException.ParentDoesNotExistException()
 
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            if (!rename && node.isFile) {
-                moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
-                    .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
-            }
-
-            if (emitter.isDisposed) return@create
-
-            move(node, parentNode, if (rename) collisionResult.renameName else null)
-                .blockingSubscribeBy(
-                    onError = { error ->
-                        when {
-                            emitter.isDisposed -> return@blockingSubscribeBy
-                            error.shouldEmmitError() -> emitter.onError(error)
-                            else -> emitter.onSuccess(
-                                MoveRequestResult.GeneralMovement(
-                                    count = 1,
-                                    errorCount = 1
-                                )
-                            )
-                        }
-                    },
-                    onComplete = {
-                        when {
-                            emitter.isDisposed -> return@blockingSubscribeBy
-                            else -> emitter.onSuccess(
-                                MoveRequestResult.GeneralMovement(
-                                    count = 1,
-                                    errorCount = 0
-                                )
-                            )
-                        }
-                    }
-                )
+        if (!rename && node.isFile) {
+            moveNodeToRubbishByHandle(NodeId(collisionResult.nameCollision.collisionHandle))
         }
+        val newName = if (rename) collisionResult.renameName else null
+        return try {
+            moveAsync(node, parentNode, newName)
+            MoveRequestResult.GeneralMovement(count = 1, errorCount = 0)
+        } catch (e: Exception) {
+            if (e.shouldEmmitError()) {
+                throw e
+            } else {
+                MoveRequestResult.GeneralMovement(count = 1, errorCount = 1)
+            }
+        }
+    }
 
     /**
      * Moves a list of nodes to other location after resolving name collisions.
@@ -164,31 +140,24 @@ class LegacyMoveNodeUseCase @Inject constructor(
     fun move(
         collisions: List<NameCollisionResult>,
         rename: Boolean,
-    ): Single<MoveRequestResult.GeneralMovement> =
-        Single.create { emitter ->
-            var errorCount = 0
-
-            for (collision in collisions) {
-                if (emitter.isDisposed) break
-
-                move(collision, rename).blockingSubscribeBy(onError = { error ->
-                    when {
-                        error.shouldEmmitError() -> emitter.onError(error)
-                        else -> errorCount++
-                    }
-                })
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    MoveRequestResult.GeneralMovement(
-                        count = collisions.size,
-                        errorCount = errorCount
-                    )
-                )
+    ): Single<MoveRequestResult.GeneralMovement> = rxSingle(ioDispatcher) {
+        var errorCount = 0
+        for (collision in collisions) {
+            runCatching {
+                moveAsync(collision, rename)
+            }.onFailure {
+                if (it.shouldEmmitError()) {
+                    throw it
+                } else {
+                    errorCount++
+                }
             }
         }
+        MoveRequestResult.GeneralMovement(
+            count = collisions.size,
+            errorCount = errorCount
+        )
+    }
 
     /**
      * Moves nodes to a new location.
@@ -198,48 +167,41 @@ class LegacyMoveNodeUseCase @Inject constructor(
      * @return The movement.
      */
     fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult.GeneralMovement> =
-        Single.create { emitter ->
-            val parentNode = getNodeUseCase.get(newParentHandle).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
+        rxSingle(ioDispatcher) {
+            val parentNode = getMegaNode(newParentHandle)
+                ?: throw MegaNodeException.ParentDoesNotExistException()
 
             var errorCount = 0
             val oldParentHandle = if (handles.size == 1) {
-                getNodeUseCase.get(handles.first()).blockingGetOrNull()?.parentHandle
+                getMegaNode(handles.first())?.parentHandle
             } else {
                 INVALID_HANDLE
             }
 
             for (handle in handles) {
-                if (emitter.isDisposed) break
-
-                val node = getNodeUseCase.get(handle).blockingGetOrNull()
-
+                val node = getMegaNode(handle)
                 if (node == null) {
                     errorCount++
                 } else {
-                    move(node, parentNode).blockingSubscribeBy(onError = { error ->
-                        when {
-                            error.shouldEmmitError() -> emitter.onError(error)
-                            else -> errorCount++
+                    runCatching {
+                        moveAsync(node = node, parentNode = parentNode)
+                    }.onFailure {
+                        if (it.shouldEmmitError()) {
+                            throw it
+                        } else {
+                            errorCount++
                         }
-                    })
+                    }
                 }
             }
 
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    MoveRequestResult.GeneralMovement(
-                        count = handles.size,
-                        errorCount = errorCount,
-                        oldParentHandle = oldParentHandle
-                    ).also { resetAccountDetailsIfNeeded(it) })
-            }
+            MoveRequestResult.GeneralMovement(
+                count = handles.size,
+                errorCount = errorCount,
+                oldParentHandle = oldParentHandle
+            ).also { resetAccountDetailsIfNeeded(it) }
         }
+
 
     /**
      * Moves nodes to the Rubbish Bin.
@@ -250,40 +212,35 @@ class LegacyMoveNodeUseCase @Inject constructor(
     fun moveToRubbishBin(
         handles: List<Long>,
         context: Context,
-    ): Single<MoveRequestResult.RubbishMovement> =
-        Single.create { emitter ->
-            var errorCount = 0
-            val rubbishNode = megaApi.rubbishNode
-            val oldParentHandle = if (handles.size == 1) {
-                getNodeUseCase.get(handles.first()).blockingGetOrNull()?.parentHandle
-            } else {
-                INVALID_HANDLE
-            }
-
-            handles.forEach { handle ->
-                val node = getNodeUseCase.get(handle).blockingGetOrNull()
-
-                if (node == null) {
-                    errorCount++
-                } else {
-                    move(node, rubbishNode).blockingSubscribeBy(
-                        onError = { errorCount++ },
-                        onComplete = { megaApi.disableExport(node) }
-                    )
-                }
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    MoveRequestResult.RubbishMovement(
-                        count = handles.size,
-                        errorCount = errorCount,
-                        oldParentHandle = oldParentHandle,
-                        context = context
-                    ).also { resetAccountDetailsIfNeeded(it) })
-            }
+    ) = rxSingle(ioDispatcher) {
+        var errorCount = 0
+        val rubbishNode = megaApiGateway.getRubbishBinNode()
+        val oldParentHandle = if (handles.size == 1) {
+            getMegaNode(handles.first())?.parentHandle
+        } else {
+            INVALID_HANDLE
         }
+        handles.forEach { handle ->
+            val node = getMegaNode(handle = handle)
+            node?.let {
+                runCatching {
+                    moveAsync(node = node, parentNode = rubbishNode)
+                }.onSuccess {
+                    megaApiGateway.stopSharingNode(node)
+                }.onFailure {
+                    errorCount++
+                }
+            } ?: run { errorCount++ }
+        }
+
+        MoveRequestResult.RubbishMovement(
+            count = handles.size,
+            errorCount = errorCount,
+            oldParentHandle = oldParentHandle,
+            context = context
+        )
+
+    }
 
     /**
      * Moves nodes from the Rubbish Bin to their original parent if it still exists.
@@ -292,43 +249,36 @@ class LegacyMoveNodeUseCase @Inject constructor(
      * @return The restoration result.
      */
     fun restore(nodes: List<MegaNode>, context: Context): Single<MoveRequestResult.Restoration> =
-        Single.create { emitter ->
+        rxSingle(ioDispatcher) {
             var errorCount = 0
-            val destination: MegaNode? = if (nodes.size == 1) {
-                getNodeUseCase.get(nodes.first().restoreHandle).blockingGetOrNull()
-            } else {
-                null
-            }
-
+            val destination = if (nodes.size == 1) {
+                getMegaNode(nodes.first().restoreHandle)
+            } else null
             var throwForeign = false
-
             nodes.forEach { node ->
-                val parent = getNodeUseCase.get(node.restoreHandle).blockingGetOrNull()
-
-                if (parent == null || megaApi.isInRubbish(parent)) {
+                val parent = getMegaNode(node.restoreHandle)
+                if (parent == null || megaApiGateway.isInRubbish(parent)) {
                     errorCount++
                 } else {
-                    move(node, parent).blockingSubscribeBy(onError = { error ->
+                    runCatching {
+                        moveAsync(node = node, parentNode = parent)
+                    }.onFailure {
                         errorCount++
-
-                        if (error is ForeignNodeException) {
+                        if (it is ForeignNodeException) {
                             throwForeign = true
                         }
-                    })
+                    }
                 }
             }
-
-            when {
-                emitter.isDisposed -> return@create
-                throwForeign -> emitter.onError(ForeignNodeException())
-                else -> emitter.onSuccess(
-                    MoveRequestResult.Restoration(
-                        count = nodes.size,
-                        errorCount = errorCount,
-                        destination = destination,
-                        context = context,
-                    ).also { resetAccountDetailsIfNeeded(it) })
+            if (throwForeign) {
+                throw ForeignNodeException()
             }
+            MoveRequestResult.Restoration(
+                count = nodes.size,
+                errorCount = errorCount,
+                destination = destination,
+                context = context,
+            ).also { resetAccountDetailsIfNeeded(it) }
         }
 
     /**
@@ -345,9 +295,17 @@ class LegacyMoveNodeUseCase @Inject constructor(
     /**
      * Resets the account details timestamp if some request finished with success.
      */
-    private fun resetAccountDetailsIfNeeded(request: MoveRequestResult) {
-        if (request.successCount > 0) {
-            DBUtil.resetAccountDetailsTimeStamp()
+    private suspend fun resetAccountDetailsIfNeeded(request: MoveRequestResult) =
+        withContext(ioDispatcher) {
+            if (request.successCount > 0) {
+                accountRepository.resetAccountDetailsTimeStamp()
+            }
         }
+
+    private suspend fun getMegaNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)
+            ?: megaApiFolderGateway.getMegaNodeByHandle(handle)
+                ?.let { megaApiFolderGateway.authorizeNode(it) }
     }
+
 }

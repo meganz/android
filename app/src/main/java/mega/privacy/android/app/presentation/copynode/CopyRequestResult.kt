@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.copynode
 
-import mega.privacy.android.app.utils.DBUtil
-
 /**
  * Data class containing all the info related to a copy request.
  *
@@ -10,7 +8,7 @@ import mega.privacy.android.app.utils.DBUtil
  */
 data class CopyRequestResult(
     val count: Int,
-    val errorCount: Int
+    val errorCount: Int,
 ) {
     /**
      * Count of success copy request

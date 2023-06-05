@@ -1,46 +1,51 @@
 package mega.privacy.android.app.usecase
 
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.rx3.rxCompletable
 import kotlinx.coroutines.rx3.rxSingle
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.usecase.exception.SuccessMegaException
 import mega.privacy.android.app.usecase.exception.toMegaException
-import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.data.qualifier.MegaApi
-import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaError.API_EOVERQUOTA
-import nz.mega.sdk.MegaError.API_OK
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
  * Use case for copying MegaNodes.
  *
- * @property megaApi                MegaApiAndroid instance to copy nodes.
- * @property megaChatApi            MegaChatApiAndroid instance to get nodes from chats.
- * @property getNodeUseCase         Required for getting [MegaNode]s.
- * @property legacyMoveNodeUseCase  Required for moving MegaNodes to the Rubbish Bin.
- * @property getChatMessageUseCase  Required for getting chat [MegaNode]s.
+ * @property megaApiGateway             MegaApiGateway instance to copy nodes.
+ * @property getChatMessageUseCase      Required for getting chat [MegaNode]s.
+ * @property copyNodeListUseCase        copy list of mega nodes
+ * @property copyNodeListByHandleUseCase
+ * @property moveNodeToRubbishByHandle
+ * @property ioDispatcher
  */
 class LegacyCopyNodeUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid,
-    private val megaChatApi: MegaChatApiAndroid,
-    private val getNodeUseCase: GetNodeUseCase,
-    private val legacyMoveNodeUseCase: LegacyMoveNodeUseCase,
+    private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val copyNodeListUseCase: CopyNodeListUseCase,
     private val copyNodeListByHandleUseCase: CopyNodeListByHandleUseCase,
+    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val accountRepository: AccountRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -50,10 +55,9 @@ class LegacyCopyNodeUseCase @Inject constructor(
      * @param parentHandle  The parent MegaNode where the node has to be copied.
      * @return Completable.
      */
-    fun copy(node: MegaNode?, parentHandle: Long): Completable =
-        Completable.fromCallable {
-            copy(node, getNodeUseCase.get(parentHandle).blockingGetOrNull()).blockingAwait()
-        }
+    fun copy(node: MegaNode?, parentHandle: Long) = rxCompletable(ioDispatcher) {
+        copyAsync(node, getMegaNode(parentHandle))
+    }
 
     /**
      * Copies a node.
@@ -63,36 +67,56 @@ class LegacyCopyNodeUseCase @Inject constructor(
      * @param newName       New name for the copied node. Null if it wants to keep the original one.
      * @return Completable.
      */
-    fun copy(node: MegaNode?, parentNode: MegaNode?, newName: String? = null): Completable =
-        Completable.create { emitter ->
-            if (node == null) {
-                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                return@create
-            }
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            val listener = OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
-                when {
-                    emitter.isDisposed -> return@OptionalMegaRequestListenerInterface
-                    error.errorCode == API_OK -> emitter.onComplete()
-                    error.errorCode == API_EOVERQUOTA && megaApi.isForeignNode(parentNode.handle) ->
-                        emitter.onError(ForeignNodeException())
-
-                    else -> emitter.onError(error.toMegaException())
-                }
-            })
-
-            if (newName != null) {
-                megaApi.copyNode(node, parentNode, newName, listener)
-            } else {
-                megaApi.copyNode(node, parentNode, listener)
-            }
-
+    fun copy(node: MegaNode?, parentNode: MegaNode?, newName: String? = null) =
+        rxCompletable(ioDispatcher) {
+            copyAsync(node, parentNode, newName)
         }
+
+
+    /**
+     * Copies a node.
+     *
+     * @param node          The MegaNoe to copy.
+     * @param parentNode    The parent MegaNode where the node has to be copied.
+     * @param newName       New name for the copied node. Null if it wants to keep the original one.
+     * @return CopyRequestResult.
+     */
+    suspend fun copyAsync(
+        node: MegaNode?,
+        parentNode: MegaNode?,
+        newName: String? = null,
+    ): Boolean {
+        node ?: throw MegaNodeException.NodeDoesNotExistsException()
+        parentNode ?: throw MegaNodeException.ParentDoesNotExistException()
+
+        val response = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    continuation.resumeWith(Result.success(error.toMegaException()))
+                }
+            )
+            megaApiGateway.copyNode(
+                nodeToCopy = node,
+                newNodeParent = parentNode,
+                newNodeName = newName,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+        return when (response) {
+            is SuccessMegaException -> true
+            is QuotaExceededMegaException -> {
+                val isForeignNode = megaApiGateway.isForeignNode(parentNode.handle)
+                if (isForeignNode) {
+                    throw ForeignNodeException()
+                } else {
+                    throw response
+                }
+            }
+
+            else -> throw response
+        }
+    }
 
     /**
      * Copies a node after resolving a name collision.
@@ -104,81 +128,70 @@ class LegacyCopyNodeUseCase @Inject constructor(
     fun copy(
         collisionResult: NameCollisionResult,
         rename: Boolean,
-    ): Single<CopyRequestResult> =
-        Single.create { emitter ->
-            val node = if (collisionResult.nameCollision is NameCollision.Import) {
-                val collision = collisionResult.nameCollision
-                val nodes =
-                    getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
-                        .blockingGetOrNull()
+    ): Single<CopyRequestResult> = rxSingle(ioDispatcher) {
+        copyAsync(collisionResult, rename)
+    }
 
-                if (nodes == null) {
-                    null
-                } else {
-                    var nodeCollision: MegaNode? = null
-
-                    for (node in nodes) {
-                        if (node.handle == collision.nodeHandle) {
-                            nodeCollision = node
-                            break
-                        }
-                    }
-
-                    nodeCollision
-                }
-            } else {
-                getNodeUseCase
-                    .get((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
+    /**
+     * Copies a node after resolving a name collision.
+     *
+     * @param collisionResult   The result of the name collision.
+     * @param rename            True if should rename the node, false otherwise.
+     * @return copy result.
+     */
+    suspend fun copyAsync(
+        collisionResult: NameCollisionResult,
+        rename: Boolean,
+    ): CopyRequestResult {
+        val node = if (collisionResult.nameCollision is NameCollision.Import) {
+            val collision = collisionResult.nameCollision
+            val nodes =
+                getChatMessageUseCase.getChatNodes(collision.chatId, collision.messageId)
                     .blockingGetOrNull()
-            }
 
-            if (node == null) {
-                emitter.onError(MegaNodeException.NodeDoesNotExistsException())
-                return@create
-            }
+            nodes?.let {
+                var nodeCollision: MegaNode? = null
 
-            val parentNode = getNodeUseCase
-                .get(collisionResult.nameCollision.parentHandle ?: -1).blockingGetOrNull()
-
-            if (parentNode == null) {
-                emitter.onError(MegaNodeException.ParentDoesNotExistException())
-                return@create
-            }
-
-            if (!rename && node.isFile) {
-                legacyMoveNodeUseCase.moveToRubbishBin(collisionResult.nameCollision.collisionHandle)
-                    .blockingSubscribeBy(onError = { error -> emitter.onError(error) })
-            }
-
-            if (emitter.isDisposed) return@create
-
-            copy(node, parentNode, if (rename) collisionResult.renameName else null)
-                .blockingSubscribeBy(
-                    onError = { error ->
-                        when {
-                            emitter.isDisposed -> return@blockingSubscribeBy
-                            error.shouldEmmitError() -> emitter.onError(error)
-                            else -> emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 1
-                                )
-                            )
-                        }
-                    },
-                    onComplete = {
-                        when {
-                            emitter.isDisposed -> return@blockingSubscribeBy
-                            else -> emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 0
-                                ).also { resetAccountDetailsIfNeeded(it) }
-                            )
-                        }
+                for (node in nodes) {
+                    if (node.handle == collision.nodeHandle) {
+                        nodeCollision = node
+                        break
                     }
-                )
+                }
+
+                nodeCollision
+            }
+        } else {
+            getMegaNode((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
+        } ?: throw MegaNodeException.NodeDoesNotExistsException()
+
+
+        val parentNode = getMegaNode(collisionResult.nameCollision.parentHandle ?: -1)
+            ?: throw MegaNodeException.ParentDoesNotExistException()
+
+        if (!rename && node.isFile) {
+            moveNodeToRubbishByHandle(NodeId(collisionResult.nameCollision.collisionHandle))
         }
+
+        val newName = if (rename) collisionResult.renameName else null
+        return try {
+            copyAsync(node, parentNode, newName)
+            CopyRequestResult(count = 1, errorCount = 0)
+        } catch (exception: Exception) {
+            if (exception.shouldEmmitError()) {
+                throw exception
+            } else {
+                CopyRequestResult(count = 1, errorCount = 1)
+            }
+        }
+    }
+
+    private suspend fun getMegaNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)
+            ?: megaApiFolderGateway.getMegaNodeByHandle(handle)
+                ?.let { megaApiFolderGateway.authorizeNode(it) }
+    }
+
 
     /**
      * Copies a list of nodes after resolving name collisions.
@@ -190,31 +203,24 @@ class LegacyCopyNodeUseCase @Inject constructor(
     fun copy(
         collisions: List<NameCollisionResult>,
         rename: Boolean,
-    ): Single<CopyRequestResult> =
-        Single.create { emitter ->
-            var errorCount = 0
-
-            for (collision in collisions) {
-                if (emitter.isDisposed) break
-
-                copy(collision, rename).blockingSubscribeBy(onError = { error ->
-                    when {
-                        error.shouldEmmitError() -> emitter.onError(error)
-                        else -> errorCount++
-                    }
-                })
-            }
-
-            when {
-                emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        count = collisions.size,
-                        errorCount = errorCount
-                    ).also { resetAccountDetailsIfNeeded(it) }
-                )
+    ): Single<CopyRequestResult> = rxSingle(ioDispatcher) {
+        var errorCount = 0
+        for (collision in collisions) {
+            runCatching {
+                copyAsync(collision, rename)
+            }.onFailure {
+                if (it.shouldEmmitError()) {
+                    throw it
+                } else {
+                    errorCount++
+                }
             }
         }
+        CopyRequestResult(
+            count = collisions.size,
+            errorCount = errorCount
+        ).also { resetAccountDetailsIfNeeded(it) }
+    }
 
     /**
      * Copies nodes.
@@ -247,9 +253,13 @@ class LegacyCopyNodeUseCase @Inject constructor(
             else -> false
         }
 
-    private fun resetAccountDetailsIfNeeded(result: CopyRequestResult) {
-        if (result.successCount > 0) {
-            DBUtil.resetAccountDetailsTimeStamp()
+    /**
+     * Resets the account details timestamp if some request finished with success.
+     */
+    private suspend fun resetAccountDetailsIfNeeded(request: CopyRequestResult) =
+        withContext(ioDispatcher) {
+            if (request.successCount > 0) {
+                accountRepository.resetAccountDetailsTimeStamp()
+            }
         }
-    }
 }
