@@ -348,6 +348,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getOfflineInformation(nodeHandle: Long) =
         dbHandler.getOfflineInformation(nodeHandle)
 
+    override suspend fun saveOfflineInformation(offlineInformation: OfflineInformation) {
+        dbHandler.saveOfflineInformation(offlineInformation)
+    }
+
     override suspend fun saveMyFirstName(firstName: String) =
         dbHandler.saveMyFirstName(firstName)
 

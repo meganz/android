@@ -1,26 +1,29 @@
 package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.data.model.node.OfflineInformation.Companion.FILE
+import mega.privacy.android.data.model.node.OfflineInformation.Companion.FOLDER
 import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import org.junit.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
-@OptIn(ExperimentalCoroutinesApi::class)
-class OfflineNodeInformationMapperTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+internal class OfflineNodeInformationMapperTest {
 
     private val expectedPath = "path"
     private val expectedName = "name"
     private val expectedHandle = "handle"
     private val expectedIncomingHandle = "incomingHandle"
 
-    @Test
-    fun `test that incoming offline node contains correct values`() = runTest {
+    @ParameterizedTest(name = "folder node: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that incoming offline node contains correct values`(isFolderNode: Boolean) {
         val origin = OfflineInformation.INCOMING
-        val input = getInput(origin)
+        val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             IncomingShareOfflineNodeInformation(
@@ -28,46 +31,51 @@ class OfflineNodeInformationMapperTest {
                 name = expectedName,
                 handle = expectedHandle,
                 incomingHandle = expectedIncomingHandle,
+                isFolder = isFolderNode,
             )
         )
     }
 
-    @Test
-    fun `test that inbox offline node is the correct type and contains correct values`() = runTest {
+    @ParameterizedTest(name = "folder node: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that inbox offline node is the correct type and contains correct values`(isFolderNode: Boolean) {
         val origin = OfflineInformation.INBOX
-        val input = getInput(origin)
+        val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             InboxOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
                 handle = expectedHandle,
+                isFolder = isFolderNode,
             )
         )
     }
 
 
-    @Test
-    fun `test that a node with source OTHER returns the correct information`() {
+    @ParameterizedTest(name = "folder node: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that a node with source OTHER returns the correct information`(isFolderNode: Boolean) {
         val origin = OfflineInformation.OTHER
-        val input = getInput(origin)
+        val input = getInput(origin, isFolderNode)
 
         assertThat(toOfflineNodeInformation(input)).isEqualTo(
             OtherOfflineNodeInformation(
                 path = expectedPath,
                 name = expectedName,
                 handle = expectedHandle,
+                isFolder = isFolderNode,
             )
         )
     }
 
-    private fun getInput(origin: Int) = OfflineInformation(
+    private fun getInput(origin: Int, isFolderNode: Boolean) = OfflineInformation(
         id = 1,
         handle = "handle",
         path = expectedPath,
         name = expectedName,
         parentId = 1,
-        type = null,
+        type = if (isFolderNode) FOLDER else FILE,
         origin = origin,
         handleIncoming = expectedIncomingHandle
     )

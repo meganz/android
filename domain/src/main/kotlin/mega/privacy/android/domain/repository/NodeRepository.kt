@@ -158,6 +158,19 @@ interface NodeRepository {
     suspend fun getOfflineNodeInformation(nodeId: NodeId): OfflineNodeInformation?
 
     /**
+     * Save offline node information.
+     * All ancestors must have been previously saved in order to have a consistent hierarchy,
+     * if not an [IllegalArgumentException] will be thrown
+     *
+     * @param offlineNodeInformation [OfflineNodeInformation]
+     * @param parentNodeId the [NodeId] of the node's parent
+     */
+    suspend fun saveOfflineNodeInformation(
+        offlineNodeInformation: OfflineNodeInformation,
+        parentNodeId: NodeId?,
+    )
+
+    /**
      * Convert Base 64 string to handle
      */
     suspend fun convertBase64ToHandle(base64: String): Long

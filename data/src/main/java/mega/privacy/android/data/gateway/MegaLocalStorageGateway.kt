@@ -602,6 +602,13 @@ interface MegaLocalStorageGateway {
     suspend fun getOfflineInformation(nodeHandle: Long): OfflineInformation?
 
     /**
+     * Save offline information
+     *
+     * @param offlineInformation [OfflineInformation]
+     */
+    suspend fun saveOfflineInformation(offlineInformation: OfflineInformation)
+
+    /**
      * Save first name
      * @param firstName first name
      */

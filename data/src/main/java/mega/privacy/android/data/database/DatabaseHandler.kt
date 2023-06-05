@@ -377,6 +377,14 @@ interface DatabaseHandler {
     suspend fun getOfflineInformation(handle: Long): OfflineInformation?
 
     /**
+     * Save offline information
+     *
+     * @param offlineInformation [OfflineInformation]
+     * @return the id of the inserted row
+     */
+    suspend fun saveOfflineInformation(offlineInformation: OfflineInformation): Long
+
+    /**
      * Get list of [OfflineInformation]
      *
      * @param nodePath

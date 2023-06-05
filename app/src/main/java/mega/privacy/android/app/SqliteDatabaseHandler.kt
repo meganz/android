@@ -4728,6 +4728,18 @@ class SqliteDatabaseHandler @Inject constructor(
         return null
     }
 
+    override suspend fun saveOfflineInformation(offlineInformation: OfflineInformation): Long {
+        val values = ContentValues()
+        values.put(KEY_OFF_HANDLE, encrypt(offlineInformation.handle))
+        values.put(KEY_OFF_PATH, encrypt(offlineInformation.path))
+        values.put(KEY_OFF_NAME, encrypt(offlineInformation.name))
+        values.put(KEY_OFF_PARENT, offlineInformation.parentId)
+        values.put(KEY_OFF_TYPE, encrypt(offlineInformation.type))
+        values.put(KEY_OFF_INCOMING, offlineInformation.origin)
+        values.put(KEY_OFF_HANDLE_INCOMING, encrypt(offlineInformation.handleIncoming))
+        return db.insert(TABLE_OFFLINE, null, values)
+    }
+
     override suspend fun getOfflineInformationList(
         nodePath: String,
         searchQuery: String?,

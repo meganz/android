@@ -15,16 +15,21 @@ internal fun toOfflineNodeInformation(offline: OfflineInformation): OfflineNodeI
             name = offline.name,
             handle = offline.handle,
             incomingHandle = offline.handleIncoming,
+            isFolder = offline.isFolder,
         )
+
         OfflineInformation.INBOX -> InboxOfflineNodeInformation(
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
+            isFolder = offline.isFolder,
         )
+
         else -> OtherOfflineNodeInformation(
             path = offline.path,
             name = offline.name,
             handle = offline.handle,
+            isFolder = offline.isFolder,
         )
     }
 }

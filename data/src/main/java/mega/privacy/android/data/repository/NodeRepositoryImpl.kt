@@ -25,6 +25,7 @@ import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -70,6 +71,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property offlineNodeInformationMapper
+ * @property offlineInformationMapper
  * @property fileGateway
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
@@ -88,6 +90,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
+    private val offlineInformationMapper: OfflineInformationMapper,
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
@@ -273,6 +276,19 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalStorageGateway.getOfflineInformation(nodeId.longValue)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    override suspend fun saveOfflineNodeInformation(
+        offlineNodeInformation: OfflineNodeInformation,
+        parentNodeId: NodeId?,
+    ) = withContext(ioDispatcher) {
+        val parent = parentNodeId?.let { parentId ->
+            megaLocalStorageGateway.getOfflineInformation(parentId.longValue)
+                ?: throw IllegalArgumentException("Parent offline information must have been previously saved in order to have a consistent hierarchy")
+        }
+        megaLocalStorageGateway.saveOfflineInformation(
+            offlineInformationMapper(offlineNodeInformation, parent?.id)
+        )
+    }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {
         megaApiGateway.base64ToHandle(base64)

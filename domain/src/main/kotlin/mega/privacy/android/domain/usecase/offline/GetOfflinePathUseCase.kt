@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.offline
 
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
@@ -46,7 +47,8 @@ class GetOfflinePathUseCase @Inject constructor(
      * - adds root id in case of an incoming shared node
      */
     private suspend fun folderArrayForOfflinePath(node: Node): Array<String> {
-        val backupRootNodeId = nodeRepository.getBackupFolderId()
+        val backupRootNodeId =
+            runCatching { nodeRepository.getBackupFolderId() }.getOrNull() ?: NodeId(-1L)
         val driveRootNode = nodeRepository.getRootNode()
         val nodes = nestedParentFolders(node)
         val names = nodes.map { it.name }

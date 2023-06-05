@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
+import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
@@ -25,12 +26,14 @@ import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
+import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
@@ -46,6 +49,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -77,6 +81,7 @@ class NodeRepositoryImplTest {
     private val cacheFolderGateway: CacheFolderGateway = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
+    private val offlineInformationMapper: OfflineInformationMapper = mock()
     private val fileGateway: FileGateway = mock()
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val streamingGateway: StreamingGateway = mock()
@@ -112,6 +117,7 @@ class NodeRepositoryImplTest {
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             offlineNodeInformationMapper = offlineNodeInformationMapper,
+            offlineInformationMapper = offlineInformationMapper,
             fileGateway = fileGateway,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             streamingGateway = streamingGateway,
@@ -379,6 +385,39 @@ class NodeRepositoryImplTest {
             val actual = underTest.getVerifiedIncomingShares(any())
 
             assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that saveOfflineNodeInformation calls api gateway saveOfflineNodeInformation with the mapped data and correct parent id`() =
+        runTest {
+            val parenId = 1
+            val parenNodeId = NodeId(2L)
+            val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
+            val mapped = mock<OfflineInformation>()
+            val offlineParentInformation = mock<OfflineInformation> {
+                on { id }.thenReturn(parenId)
+            }
+            whenever(megaLocalStorageGateway.getOfflineInformation(parenNodeId.longValue))
+                .thenReturn(offlineParentInformation)
+            whenever(offlineInformationMapper(offlineNodeInformation, parenId)).thenReturn(mapped)
+
+            underTest.saveOfflineNodeInformation(offlineNodeInformation, parenNodeId)
+
+            verify(megaLocalStorageGateway).saveOfflineInformation(mapped)
+        }
+
+    @Test
+    fun `test that saveOfflineNodeInformation throws an exception if parent offline information is not found`() =
+        runTest {
+            val parenNodeId = NodeId(2L)
+            val offlineNodeInformation = mock<OtherOfflineNodeInformation>()
+
+            whenever(megaLocalStorageGateway.getOfflineInformation(parenNodeId.longValue))
+                .thenReturn(null)
+
+            assertThrows<IllegalArgumentException> {
+                underTest.saveOfflineNodeInformation(offlineNodeInformation, parenNodeId)
+            }
         }
 
     @Test

@@ -18,6 +18,11 @@ sealed interface OfflineNodeInformation {
      * Handle
      */
     val handle: String
+
+    /**
+     * Is folder
+     */
+    val isFolder: Boolean
 }
 
 /**
@@ -30,6 +35,7 @@ data class OtherOfflineNodeInformation(
     override val path: String,
     override val name: String,
     override val handle: String,
+    override val isFolder: Boolean,
 ) : OfflineNodeInformation
 
 /**
@@ -42,6 +48,7 @@ data class InboxOfflineNodeInformation(
     override val path: String,
     override val name: String,
     override val handle: String,
+    override val isFolder: Boolean,
 ) : OfflineNodeInformation
 
 /**
@@ -55,5 +62,6 @@ data class IncomingShareOfflineNodeInformation(
     override val path: String,
     override val name: String,
     override val handle: String,
+    override val isFolder: Boolean,
     val incomingHandle: String,
 ) : OfflineNodeInformation
