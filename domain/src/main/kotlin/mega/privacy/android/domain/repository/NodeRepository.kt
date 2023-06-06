@@ -391,4 +391,11 @@ interface NodeRepository {
         nodeId: NodeId,
         originalFingerprint: String,
     )
+
+    /**
+     * Get node by handle
+     *
+     * @param handle
+     */
+    suspend fun getNodeByHandle(handle: Long): UnTypedNode?
 }

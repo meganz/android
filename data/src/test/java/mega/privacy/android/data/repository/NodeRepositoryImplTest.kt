@@ -493,6 +493,14 @@ class NodeRepositoryImplTest {
             }
         }
 
+    @Test
+    fun `test that getNodesByHandle invokes correct function`() = runTest {
+        val handle = 1L
+        val megaNode = mockMegaNodeForConversion()
+        whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
+        assertThat(underTest.getNodeByHandle(handle)?.base64Id).isEqualTo("base64Handle")
+    }
+
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()
         whenever(folderNode.id).thenReturn(nodeId)

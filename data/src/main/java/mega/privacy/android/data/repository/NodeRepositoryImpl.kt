@@ -561,4 +561,9 @@ internal class NodeRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getNodeByHandle(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)
+            ?.let { nodeMapper(it) }
+    }
 }
