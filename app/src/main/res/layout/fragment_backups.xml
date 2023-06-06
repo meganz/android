@@ -5,62 +5,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/inbox_list_recycler_view"
+    <mega.privacy.android.app.components.NewGridRecyclerView
+        android:id="@+id/backups_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:choiceMode="multipleChoice"
+        android:columnWidth="@dimen/grid_node_item_width"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
 
     <ImageView
-        android:id="@+id/empty_list_folder_image_view"
+        android:id="@+id/backups_no_items_image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        app:layout_constraintBottom_toTopOf="@+id/empty_list_folder_title_text_view"
+        android:contentDescription="@null"
+        app:layout_constraintBottom_toTopOf="@+id/backups_no_items_title_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:src="@drawable/ic_zero_portrait_empty_folder" />
 
     <TextView
-        android:id="@+id/empty_list_folder_title_text_view"
+        android:id="@+id/backups_no_items_title_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="40dp"
         android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant.AllCaps"
-        app:layout_constraintBottom_toTopOf="@+id/empty_list_folder_description_text_view"
+        app:layout_constraintBottom_toTopOf="@+id/backups_no_items_description_text_view"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/empty_list_folder_image_view"
-        tools:text="No items in your BACKUPS" />
+        app:layout_constraintTop_toBottomOf="@+id/backups_no_items_image_view"
+        tools:text="@string/backups_empty_state_title" />
 
     <TextView
-        android:id="@+id/empty_list_folder_description_text_view"
+        android:id="@+id/backups_no_items_description_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="40dp"
         android:layout_marginTop="20dp"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/empty_list_folder_title_text_view"
+        app:layout_constraintTop_toBottomOf="@+id/backups_no_items_title_text_view"
         tools:text="@string/backups_empty_state_body" />
 
     <androidx.constraintlayout.widget.Group
-        android:id="@+id/empty_list_folder_content_group"
+        android:id="@+id/backups_no_items_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="empty_list_folder_image_view,empty_list_folder_title_text_view,empty_list_folder_description_text_view" />
+        app:constraint_referenced_ids="backups_no_items_image_view,backups_no_items_title_text_view,backups_no_items_description_text_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

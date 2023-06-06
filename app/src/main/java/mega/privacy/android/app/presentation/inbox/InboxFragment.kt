@@ -8,18 +8,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.Spanned
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.constraintlayout.widget.Group
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -28,7 +25,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -43,6 +39,7 @@ import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
+import mega.privacy.android.app.databinding.FragmentBackupsBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
@@ -63,7 +60,9 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -86,46 +85,25 @@ class InboxFragment : RotatableFragment() {
     lateinit var megaApi: MegaApiAndroid
 
     /**
-     * [Boolean] value referenced from [ManagerActivity]
-     *
-     * If "true", the contents are displayed in a List View-like manner
-     * If "false", the contents are displayed in a Grid View-like manner
-     */
-    private val isList: Boolean
-        get() = (requireActivity() as ManagerActivity).isList
-
-    /**
      * Retrieves the UI state from [InboxViewModel]
      *
      * @return the UI State
      */
     private fun state() = viewModel.state.value
 
-    private var recyclerView: RecyclerView? = null
-    private var linearLayoutManager: LinearLayoutManager? = null
-    private var gridLayoutManager: CustomizedGridLayoutManager? = null
-    private var emptyFolderImageView: ImageView? = null
-    private var emptyFolderTitleTextView: TextView? = null
-    private var emptyFolderDescriptionTextView: TextView? = null
-    private var emptyFolderContentGroup: Group? = null
+    // UI Elements
+    private var _binding: FragmentBackupsBinding? = null
+    private val binding get() = _binding!!
+    private val itemDecoration: PositionDividerItemDecoration by lazy(LazyThreadSafetyMode.NONE) {
+        PositionDividerItemDecoration(requireContext(), displayMetrics())
+    }
 
-    private var adapter: MegaNodeAdapter? = null
+    private var megaNodeAdapter: MegaNodeAdapter? = null
     private var lastPositionStack: Stack<Int>? = null
     private var actionMode: ActionMode? = null
 
     private val viewModel by activityViewModels<InboxViewModel>()
     private val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
-
-    companion object {
-        /**
-         * Creates a new instance of [InboxFragment]
-         */
-        @JvmStatic
-        fun newInstance(): InboxFragment {
-            Timber.d("newInstance()")
-            return InboxFragment()
-        }
-    }
 
     /**
      * onCreate Implementation
@@ -139,123 +117,21 @@ class InboxFragment : RotatableFragment() {
     /**
      * onCreateView Implementation
      */
-    @Suppress("DEPRECATION")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
         Timber.d("onCreateView()")
 
-        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-            EventObserver { showSortByPanel() }
-        )
-        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
-            viewModel.refreshInboxNodes()
-        })
+        _binding = FragmentBackupsBinding.inflate(inflater, container, false)
 
-        val display = requireActivity().windowManager.defaultDisplay
-        val outMetrics = DisplayMetrics()
-        display.getMetrics(outMetrics)
+        setupToolbar()
+        setupAdapter()
+        setupRecyclerView()
+        switchViewType()
 
-        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
-        (requireActivity() as ManagerActivity).setToolbarTitle()
-        return if (isList) {
-            Timber.d("InboxFragment is on a ListView")
-            val v = inflater.inflate(R.layout.fragment_inbox_list, container, false)
-
-            recyclerView = v.findViewById(R.id.inbox_list_recycler_view)
-            linearLayoutManager = LinearLayoutManager(requireActivity())
-
-            // Add bottom padding for recyclerView like in other fragments.
-            recyclerView?.let {
-                it.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics))
-                it.clipToPadding = false
-                it.layoutManager = linearLayoutManager
-                it.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-                it.addItemDecoration(
-                    PositionDividerItemDecoration(
-                        requireContext(),
-                        resources.displayMetrics
-                    )
-                )
-                it.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        checkScroll()
-                    }
-                })
-            }
-
-            emptyFolderImageView = v.findViewById(R.id.empty_list_folder_image_view)
-            emptyFolderContentGroup = v.findViewById(R.id.empty_list_folder_content_group)
-            emptyFolderTitleTextView = v.findViewById(R.id.empty_list_folder_title_text_view)
-            emptyFolderDescriptionTextView =
-                v.findViewById(R.id.empty_list_folder_description_text_view)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(
-                    requireActivity(),
-                    this,
-                    emptyList(),
-                    state().inboxHandle,
-                    recyclerView,
-                    Constants.INBOX_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_LIST,
-                    sortByHeaderViewModel
-                )
-            } else {
-                adapter?.parentHandle = state().inboxHandle
-                adapter?.setListFragment(recyclerView)
-                adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-            }
-            adapter?.isMultipleSelect = false
-            recyclerView?.adapter = adapter
-            v
-        } else {
-            Timber.d("InboxFragment is on a GridView")
-            val v = inflater.inflate(R.layout.fragment_inbox_grid, container, false)
-
-            recyclerView = v.findViewById(R.id.inbox_grid_recycler_view)
-            recyclerView?.let {
-                it.setHasFixedSize(true)
-                it.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        checkScroll()
-                    }
-                })
-                it.itemAnimator = DefaultItemAnimator()
-            }
-
-            gridLayoutManager = recyclerView?.layoutManager as CustomizedGridLayoutManager?
-            emptyFolderImageView = v.findViewById(R.id.empty_grid_folder_image_view)
-            emptyFolderContentGroup = v.findViewById(R.id.empty_grid_folder_content_group)
-            emptyFolderTitleTextView = v.findViewById(R.id.empty_grid_folder_text_view)
-            if (adapter == null) {
-                adapter = MegaNodeAdapter(
-                    requireActivity(),
-                    this,
-                    emptyList(),
-                    state().inboxHandle,
-                    recyclerView,
-                    Constants.INBOX_ADAPTER,
-                    MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                    sortByHeaderViewModel
-                )
-            } else {
-                adapter?.let {
-                    it.parentHandle = state().inboxHandle
-                    it.setListFragment(recyclerView)
-                    it.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-                }
-            }
-
-            gridLayoutManager?.let {
-                it.spanSizeLookup = adapter?.getSpanSizeLookup(it.spanCount)
-            }
-            recyclerView?.adapter = adapter
-            v
-        }
+        return binding.root
     }
 
     /**
@@ -263,21 +139,33 @@ class InboxFragment : RotatableFragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeDragSupportEvents(viewLifecycleOwner, recyclerView, Constants.VIEWER_FROM_INBOX)
+        observeDragSupportEvents(
+            lifecycleOwner = viewLifecycleOwner,
+            rv = binding.backupsRecyclerView,
+            viewerFrom = Constants.VIEWER_FROM_INBOX,
+        )
         observeUiState()
+    }
+
+    /**
+     * onDestroyView implementation
+     */
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     /**
      * getAdapter implementation
      */
-    override fun getAdapter(): RotatableAdapter? = adapter
+    override fun getAdapter(): RotatableAdapter? = megaNodeAdapter
 
     /**
      * activateActionMode implementation
      */
     override fun activateActionMode() {
         Timber.d("activateActionMode()")
-        adapter?.let {
+        megaNodeAdapter?.let {
             if (!it.isMultipleSelect) {
                 it.isMultipleSelect = true
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
@@ -291,7 +179,7 @@ class InboxFragment : RotatableFragment() {
      * multipleItemClick implementation
      */
     override fun multipleItemClick(position: Int) {
-        adapter?.toggleSelection(position)
+        megaNodeAdapter?.toggleSelection(position)
     }
 
     /**
@@ -307,7 +195,7 @@ class InboxFragment : RotatableFragment() {
             return
         }
 
-        val documents = adapter?.selectedNodes ?: emptyList()
+        val documents = megaNodeAdapter?.selectedNodes ?: emptyList()
         val files = documents.filter { it.isFile }.size
         val folders = documents.filter { it.isFolder }.size
         val sum = files + folders
@@ -332,9 +220,12 @@ class InboxFragment : RotatableFragment() {
         }
     }
 
+    /**
+     * The Action Bar Callback
+     */
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            val selectedNodes = adapter?.selectedNodes ?: emptyList()
+            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
             when (item.itemId) {
                 R.id.cab_menu_download -> {
                     (requireActivity() as ManagerActivity).saveNodesToDevice(
@@ -391,12 +282,12 @@ class InboxFragment : RotatableFragment() {
         override fun onDestroyActionMode(arg0: ActionMode) {
             Timber.d("onDestroyActionMode()")
             clearSelections()
-            adapter?.isMultipleSelect = false
+            megaNodeAdapter?.isMultipleSelect = false
             checkScroll()
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            val selectedNodes = adapter?.selectedNodes ?: emptyList()
+            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
             val areAllNotTakenDown = selectedNodes.areAllNotTakenDown()
             var showDownload = false
             var showCopy = false
@@ -428,15 +319,64 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
+     * Establishes the Toolbar
+     */
+    private fun setupToolbar() {
+        (requireActivity() as? ManagerActivity)?.run {
+            this.setToolbarTitle()
+            this.invalidateOptionsMenu()
+        }
+    }
+
+    /**
+     * Establishes the [MegaNodeAdapter]
+     */
+    private fun setupAdapter() {
+        megaNodeAdapter = MegaNodeAdapter(
+            requireActivity(),
+            this,
+            emptyList(),
+            state().inboxHandle,
+            binding.backupsRecyclerView,
+            Constants.INBOX_ADAPTER,
+            if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+            sortByHeaderViewModel,
+        )
+        megaNodeAdapter?.isMultipleSelect = false
+    }
+
+    /**
+     * Establishes the [NewGridRecyclerView]
+     */
+    private fun setupRecyclerView() {
+        binding.backupsRecyclerView.let {
+            it.itemAnimator = DefaultItemAnimator()
+            it.setPadding(0, 0, 0, Util.scaleHeightPx(85, displayMetrics()))
+            it.clipToPadding = false
+            it.setHasFixedSize(true)
+            it.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    checkScroll()
+                }
+            })
+            it.adapter = megaNodeAdapter
+        }
+    }
+
+    /**
      * Observes changes to the UI State from [InboxViewModel]
      */
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
-                    // Instruct the Adapter to update the list of Nodes being displayed
                     Timber.d("Node Count from ViewModel is ${it.nodes.size}")
-                    setNodes(it.nodes)
+                    handleViewType(
+                        megaNodeAdapter?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                    )
+                    setNodes(it.nodes.toMutableList())
+                    setContent()
 
                     // Whenever a Node Update occurs, instruct the Fragment to hide the Multiple
                     // Item selection and instruct the ViewModel that it has been handled
@@ -469,41 +409,82 @@ class InboxFragment : RotatableFragment() {
                 viewModel.markHandledPendingRefresh()
             }
         }
+
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+            EventObserver { showSortByPanel() }
+        )
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            viewModel.refreshInboxNodes()
+        })
     }
 
     /**
-     * Invalidates [recyclerView]
+     * Updates the View Type of this Fragment
+     *
+     * Changing the View Type will cause the scroll position to be lost. To avoid that, only
+     * refresh the contents when the new View Type is different from the original View Type
+     *
+     * @param viewType The new View Type received from [InboxViewModel]
+     */
+    private fun handleViewType(viewType: Int) {
+        if (viewType != state().currentViewType.id) {
+            switchViewType()
+        }
+    }
+
+    /**
+     * Switches how items in the [MegaNodeAdapter] are being displayed, based on the current
+     * [ViewType] in [InboxViewModel]
+     */
+    private fun switchViewType() = binding.backupsRecyclerView.run {
+        when (state().currentViewType) {
+            ViewType.LIST -> {
+                switchToLinear()
+                if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+                megaNodeAdapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+            }
+
+            ViewType.GRID -> {
+                switchBackToGrid()
+                removeItemDecoration(itemDecoration)
+                (layoutManager as CustomizedGridLayoutManager).apply {
+                    spanSizeLookup = megaNodeAdapter?.getSpanSizeLookup(spanCount)
+                }
+                megaNodeAdapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+            }
+        }
+    }
+
+    /**
+     * Invalidates the [NewGridRecyclerView]
      *
      * This function is used by [ManagerActivity.refreshInboxList]
      */
-    fun invalidateRecyclerView() = recyclerView?.invalidate()
+    fun invalidateRecyclerView() = binding.backupsRecyclerView.invalidate()
 
     /**
      * Selects all items from [MegaNodeAdapter]
      *
      * This function is also used by [ManagerActivity.onOptionsItemSelected]
      */
-    fun selectAll() {
-        adapter?.let {
-            if (it.isMultipleSelect) {
-                it.selectAll()
-            } else {
-                it.isMultipleSelect = true
-                it.selectAll()
-                actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                    ActionBarCallBack()
-                )
-            }
-            updateActionModeTitle()
+    fun selectAll() = megaNodeAdapter?.let {
+        if (it.isMultipleSelect) {
+            it.selectAll()
+        } else {
+            it.isMultipleSelect = true
+            it.selectAll()
+            actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
+                ActionBarCallBack()
+            )
         }
+        updateActionModeTitle()
     }
 
     /**
      * Shows the Sort by panel
      */
-    private fun showSortByPanel() {
+    private fun showSortByPanel() =
         (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
-    }
 
     /**
      * Checks the Scrolling Behavior
@@ -511,13 +492,12 @@ class InboxFragment : RotatableFragment() {
      * This function is also used by [ManagerActivity.checkScrollElevation]
      */
     fun checkScroll() {
-        recyclerView?.let {
-            if ((it.canScrollVertically(-1) && it.isVisible) ||
-                adapter?.isMultipleSelect == true
-            ) {
-                (requireActivity() as ManagerActivity).changeAppBarElevation(true)
-            } else {
-                (requireActivity() as ManagerActivity).changeAppBarElevation(false)
+        // Check if the Fragment is added to its Activity before changing the App Bar Elevation
+        if (isAdded) {
+            binding.backupsRecyclerView.let {
+                val hasElevation = (it.canScrollVertically(-1) && it.isVisible) ||
+                        megaNodeAdapter?.isMultipleSelect == true
+                (requireActivity() as ManagerActivity).changeAppBarElevation(hasElevation)
             }
         }
     }
@@ -538,10 +518,10 @@ class InboxFragment : RotatableFragment() {
             )
             putThumbnailLocation(
                 launchIntent = intent,
-                rv = recyclerView,
+                rv = binding.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
-                thumbnailGetter = adapter
+                thumbnailGetter = megaNodeAdapter
             )
             startActivity(intent)
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
@@ -583,13 +563,16 @@ class InboxFragment : RotatableFragment() {
             )
             putThumbnailLocation(
                 launchIntent = mediaIntent,
-                rv = recyclerView,
+                rv = binding.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
-                thumbnailGetter = adapter
+                thumbnailGetter = megaNodeAdapter
             )
 
-            mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_PLACEHOLDER, adapter?.placeholderCount)
+            mediaIntent.putExtra(
+                Constants.INTENT_EXTRA_KEY_PLACEHOLDER,
+                megaNodeAdapter?.placeholderCount
+            )
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.INBOX_ADAPTER)
@@ -642,14 +625,17 @@ class InboxFragment : RotatableFragment() {
                     startActivity(mediaIntent)
                 } else {
                     (requireActivity() as ManagerActivity).showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.intent_not_available),
-                        -1
+                        type = Constants.SNACKBAR_TYPE,
+                        content = getString(R.string.intent_not_available),
+                        chatId = -1,
                     )
-                    adapter?.notifyDataSetChanged()
+                    megaNodeAdapter?.notifyDataSetChanged()
                     (requireActivity() as ManagerActivity).saveNodesToDevice(
-                        listOf(node),
-                        true, false, false, false
+                        nodes = listOf(node),
+                        highPriority = true,
+                        isFolderLink = false,
+                        fromMediaViewer = false,
+                        fromChat = false,
                     )
                 }
             }
@@ -703,10 +689,10 @@ class InboxFragment : RotatableFragment() {
             pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
             putThumbnailLocation(
                 launchIntent = pdfIntent,
-                rv = recyclerView,
+                rv = binding.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
-                thumbnailGetter = adapter,
+                thumbnailGetter = megaNodeAdapter,
             )
             if (MegaApiUtils.isIntentAvailable(requireActivity(), pdfIntent)) {
                 startActivity(pdfIntent)
@@ -717,8 +703,11 @@ class InboxFragment : RotatableFragment() {
                     Toast.LENGTH_LONG
                 ).show()
                 (requireActivity() as ManagerActivity).saveNodesToDevice(
-                    listOf(node),
-                    true, false, false, false
+                    nodes = listOf(node),
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    fromChat = false,
                 )
             }
             (requireActivity() as ManagerActivity).overridePendingTransition(0, 0)
@@ -727,7 +716,7 @@ class InboxFragment : RotatableFragment() {
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
             manageTextFileIntent(requireContext(), node, Constants.INBOX_ADAPTER)
         } else {
-            adapter?.notifyDataSetChanged()
+            megaNodeAdapter?.notifyDataSetChanged()
             onNodeTapped(
                 context = requireActivity(),
                 node = node,
@@ -748,13 +737,13 @@ class InboxFragment : RotatableFragment() {
     fun onNodeSelected(nodePosition: Int) {
         Timber.d("itemClick()")
         // Perform the following actions when Multi Select is enabled
-        if (adapter?.isMultipleSelect == true) {
+        if (megaNodeAdapter?.isMultipleSelect == true) {
             Timber.d("Multi Select is Enabled")
-            adapter?.toggleSelection(nodePosition)
-            val selectedNodes = adapter?.selectedNodes ?: emptyList()
+            megaNodeAdapter?.toggleSelection(nodePosition)
+            val selectedNodes = megaNodeAdapter?.selectedNodes ?: emptyList()
             if (selectedNodes.isNotEmpty()) updateActionModeTitle()
         } else {
-            adapter?.getItem(nodePosition)?.let { selectedNode ->
+            megaNodeAdapter?.getItem(nodePosition)?.let { selectedNode ->
                 // When the selected Node is a Folder, perform the following actions
                 if (selectedNode.isFolder) {
                     // Update the last position stack
@@ -772,7 +761,7 @@ class InboxFragment : RotatableFragment() {
                     }
 
                     // Update the RecyclerView scrolling behavior
-                    recyclerView?.scrollToPosition(0)
+                    binding.backupsRecyclerView.scrollToPosition(0)
                     checkScroll()
                 } else {
                     // For non-Folder typed Nodes, simply open the file
@@ -787,21 +776,11 @@ class InboxFragment : RotatableFragment() {
      * to add one level in the Node navigation hierarchy
      */
     private fun pushLastPositionStack() {
-        var lastFirstVisiblePosition: Int
-        if (isList) {
-            lastFirstVisiblePosition =
-                linearLayoutManager?.findFirstCompletelyVisibleItemPosition()
-                    ?: RecyclerView.NO_POSITION
-        } else {
-            lastFirstVisiblePosition =
-                (recyclerView as NewGridRecyclerView?)?.findFirstCompletelyVisibleItemPosition()
-                    ?: RecyclerView.NO_POSITION
-            if (lastFirstVisiblePosition == -1) {
-                Timber.d("Completely -1 then find just visible position")
-                lastFirstVisiblePosition =
-                    (recyclerView as NewGridRecyclerView?)?.findFirstVisibleItemPosition()
-                        ?: RecyclerView.NO_POSITION
-            }
+        var lastFirstVisiblePosition =
+            binding.backupsRecyclerView.findFirstCompletelyVisibleItemPosition()
+        if (state().currentViewType == ViewType.GRID && lastFirstVisiblePosition == -1) {
+            Timber.d("Completely -1 then find just visible position")
+            lastFirstVisiblePosition = binding.backupsRecyclerView.findFirstVisibleItemPosition()
         }
         Timber.d("Push to stack %d position", lastFirstVisiblePosition)
         lastPositionStack?.push(lastFirstVisiblePosition)
@@ -810,9 +789,8 @@ class InboxFragment : RotatableFragment() {
     /**
      * Clear all selected items
      */
-    private fun clearSelections() {
-        adapter?.let { if (it.isMultipleSelect) it.clearSelections() }
-    }
+    private fun clearSelections() =
+        megaNodeAdapter?.let { if (it.isMultipleSelect) it.clearSelections() }
 
     /**
      * Hides the Multiple Selection option
@@ -821,7 +799,7 @@ class InboxFragment : RotatableFragment() {
      */
     fun hideMultipleSelect() {
         Timber.d("hideMultipleSelect()")
-        adapter?.let { it.isMultipleSelect = false }
+        megaNodeAdapter?.let { it.isMultipleSelect = false }
         actionMode?.finish()
     }
 
@@ -832,7 +810,7 @@ class InboxFragment : RotatableFragment() {
         Timber.d("onBackPressed()")
 
         with(requireActivity() as ManagerActivity) {
-            if (adapter == null) {
+            if (megaNodeAdapter == null) {
                 // Call the method from ManagerActivity to move back to the previous Drawer Item
                 exitInboxScreen()
             } else if (comesFromNotifications && comesFromNotificationHandle == state().inboxHandle) {
@@ -879,26 +857,19 @@ class InboxFragment : RotatableFragment() {
 
         Timber.d("Scroll to position $lastVisiblePosition")
         if (lastVisiblePosition >= 0) {
-            if (isList) {
-                linearLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-            } else {
-                gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
-            }
+            binding.backupsRecyclerView.scrollToPosition(lastVisiblePosition)
         }
     }
 
     /**
      * Sets the list of Nodes to [MegaNodeAdapter]
      *
-     * @param nodes The list of Nodes to display
+     * @param nodes The list of Nodes to display. A [MutableList] is needed as
+     * [MegaNodeAdapter.setNodes] is written in Java
      */
-    private fun setNodes(nodes: List<MegaNode>) {
+    private fun setNodes(nodes: MutableList<MegaNode>) {
         Timber.d("Call setNodes() with Node Size ${nodes.size}")
-        adapter?.let {
-            // The list must be converted into a MutableList, as MegaNodeAdapter is written in Java
-            it.setNodes(nodes.toMutableList())
-            setContent()
-        }
+        megaNodeAdapter?.setNodes(nodes)
     }
 
     /**
@@ -908,7 +879,7 @@ class InboxFragment : RotatableFragment() {
      *
      * @return the total number or Nodes, or 0 if [MegaNodeAdapter] is null
      */
-    fun getNodeCount(): Int = adapter?.itemCount ?: 0
+    fun getNodeCount(): Int = megaNodeAdapter?.itemCount ?: 0
 
     /**
      * Sets all content of the feature.
@@ -918,38 +889,40 @@ class InboxFragment : RotatableFragment() {
      */
     private fun setContent() {
         Timber.d("setContent()")
-        if (getNodeCount() == 0) {
-            recyclerView?.visibility = View.GONE
-            emptyFolderContentGroup?.visibility = View.VISIBLE
-            if (viewModel.isCurrentlyOnBackupFolderLevel()) {
-                setEmptyFolderTextContent(
-                    getString(R.string.backups_empty_state_title),
-                    getString(R.string.backups_empty_state_body)
-                )
-                emptyFolderImageView?.setImageResource(
-                    if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        R.drawable.ic_zero_landscape_empty_folder
-                    } else {
-                        R.drawable.ic_zero_portrait_empty_folder
-                    }
-                )
-            } else {
-                setEmptyFolderTextContent(
-                    getString(R.string.file_browser_empty_folder_new),
-                    ""
-                )
-                emptyFolderImageView?.setImageResource(
-                    if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        R.drawable.empty_folder_landscape
-                    } else {
-                        R.drawable.empty_folder_portrait
-                    }
-                )
+        with(binding) {
+            if (getNodeCount() == 0) {
+                backupsRecyclerView.visibility = View.GONE
+                backupsNoItemsGroup.visibility = View.VISIBLE
+                if (viewModel.isCurrentlyOnBackupFolderLevel()) {
+                    setEmptyFolderTextContent(
+                        title = getString(R.string.backups_empty_state_title),
+                        description = getString(R.string.backups_empty_state_body)
+                    )
+                    backupsNoItemsImageView.setImageResource(
+                        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            R.drawable.ic_zero_landscape_empty_folder
+                        } else {
+                            R.drawable.ic_zero_portrait_empty_folder
+                        }
+                    )
+                } else {
+                    setEmptyFolderTextContent(
+                        title = getString(R.string.file_browser_empty_folder_new),
+                        description = "",
+                    )
+                    backupsNoItemsImageView.setImageResource(
+                        if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            R.drawable.empty_folder_landscape
+                        } else {
+                            R.drawable.empty_folder_portrait
+                        }
+                    )
 
+                }
+            } else {
+                backupsRecyclerView.visibility = View.VISIBLE
+                backupsNoItemsGroup.visibility = View.GONE
             }
-        } else {
-            recyclerView?.visibility = View.VISIBLE
-            emptyFolderContentGroup?.visibility = View.GONE
         }
     }
 
@@ -962,8 +935,10 @@ class InboxFragment : RotatableFragment() {
      * @param description Empty folder description
      */
     private fun setEmptyFolderTextContent(title: String, description: String) {
-        emptyFolderTitleTextView?.text = formatEmptyFolderTitleString(title)
-        emptyFolderDescriptionTextView?.text = description
+        with(binding) {
+            backupsNoItemsTitleTextView.text = formatEmptyFolderTitleString(title)
+            backupsNoItemsDescriptionTextView.text = description
+        }
     }
 
     /**
@@ -991,5 +966,15 @@ class InboxFragment : RotatableFragment() {
         }
 
         return HtmlCompat.fromHtml(textToFormat, HtmlCompat.FROM_HTML_MODE_LEGACY)
+    }
+
+    companion object {
+        /**
+         * Creates a new instance of [InboxFragment]
+         */
+        fun newInstance(): InboxFragment {
+            Timber.d("newInstance()")
+            return InboxFragment()
+        }
     }
 }

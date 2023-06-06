@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -26,12 +28,14 @@ import javax.inject.Inject
 /**
  * [ViewModel] class associated to InboxFragment
  *
- * @property getChildrenNode Get Children Node
- * @property getCloudSortOrder Get Cloud Sort Order
- * @property getNodeByHandle Get Node By Handle
- * @property getParentNodeHandle Get Parent Node Handle
- * @property monitorBackupFolder Monitor Backup Folder
- * @property monitorNodeUpdates Monitor Global Node Updates
+ * @property getChildrenNode [GetChildrenNode]
+ * @property getCloudSortOrder [GetCloudSortOrder]
+ * @property getNodeByHandle [GetNodeByHandle]
+ * @property getParentNodeHandle [GetParentNodeHandle]
+ * @property monitorBackupFolder [MonitorBackupFolder]
+ * @property monitorNodeUpdates [MonitorNodeUpdates]
+ * @property monitorViewType [MonitorViewType]
+ * @property setViewType [SetViewType]
  */
 @HiltViewModel
 class InboxViewModel @Inject constructor(
@@ -41,6 +45,8 @@ class InboxViewModel @Inject constructor(
     private val getParentNodeHandle: GetParentNodeHandle,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val monitorNodeUpdates: MonitorNodeUpdates,
+    private val monitorViewType: MonitorViewType,
+    private val setViewType: SetViewType,
 ) : ViewModel() {
 
     /**
@@ -64,6 +70,7 @@ class InboxViewModel @Inject constructor(
     init {
         observeNodeUpdates()
         observeMyBackupsFolderUpdates()
+        observeViewType()
     }
 
     /**
@@ -91,6 +98,15 @@ class InboxViewModel @Inject constructor(
                 Timber.d("The My Backups Folder Handle is: ${newMyBackupsFolder.longValue}")
                 onMyBackupsFolderUpdateReceived(newMyBackupsFolder)
             }
+    }
+
+    /**
+     * Uses [monitorViewType] to observe any View Type updates
+     */
+    private fun observeViewType() = viewModelScope.launch {
+        monitorViewType().collect { viewType ->
+            _state.update { it.copy(currentViewType = viewType) }
+        }
     }
 
     /**
@@ -157,7 +173,7 @@ class InboxViewModel @Inject constructor(
      * @return a List of Inbox Nodes
      */
     private suspend fun refreshNodes(nodeHandle: Long = _state.value.inboxHandle): List<MegaNode> =
-        if (isValidNodeHandle(nodeHandle)) {
+        if (nodeHandle != -1L) {
             getNodeByHandle(nodeHandle)?.let { parentNode ->
                 getChildrenNode(
                     parent = parentNode,
@@ -167,15 +183,6 @@ class InboxViewModel @Inject constructor(
         } else {
             emptyList()
         }
-
-    /**
-     * Checks whether the Node Handle is valid or not
-     *
-     * @param nodeHandle The Node Handle
-     * @return true if the Node Handle satisfies either condition, and false if otherwise
-     */
-    private fun isValidNodeHandle(nodeHandle: Long): Boolean =
-        nodeHandle != -1L || nodeHandle != MegaApiJava.INVALID_HANDLE
 
     /**
      * Handles the Back Press Behavior from Inbox after checking certain conditions
@@ -284,7 +291,6 @@ class InboxViewModel @Inject constructor(
 
     /**
      * Mark handled pending refresh
-     *
      */
     fun markHandledPendingRefresh() {
         _state.update { it.copy(isPendingRefresh = false) }
