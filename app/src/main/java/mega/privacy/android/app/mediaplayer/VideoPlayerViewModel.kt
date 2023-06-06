@@ -104,12 +104,6 @@ class VideoPlayerViewModel @Inject constructor(
         false
     )
 
-    private val _videoPlayerPausedForPlaylist = savedStateHandle.getStateFlow(
-        viewModelScope,
-        videoPlayerPausedForPlaylistKey,
-        false
-    )
-
     private val _currentSubtitleFileInfo: MutableStateFlow<SubtitleFileInfo?> =
         savedStateHandle.getStateFlow(
             viewModelScope,
@@ -124,7 +118,6 @@ class VideoPlayerViewModel @Inject constructor(
                 _isSubtitleDialogShown,
                 _isAddSubtitle,
                 _currentSubtitleFileInfo,
-                _videoPlayerPausedForPlaylist,
                 ::mapToSubtitleDisplayState
             ).collectLatest { newState ->
                 _state.update {
@@ -139,13 +132,11 @@ class VideoPlayerViewModel @Inject constructor(
         subtitleDialogShown: Boolean,
         isAddSubtitle: Boolean,
         subtitleFileInfo: SubtitleFileInfo?,
-        videoPlayerPausedForPlaylistState: Boolean,
     ) = SubtitleDisplayState(
         isSubtitleShown = subtitleShown,
         isSubtitleDialogShown = subtitleDialogShown,
         isAddSubtitle = isAddSubtitle,
         subtitleFileInfo = subtitleFileInfo,
-        videoPlayerPausedForPlaylistState = videoPlayerPausedForPlaylistState
     )
 
     /**
@@ -178,15 +169,6 @@ class VideoPlayerViewModel @Inject constructor(
             }
             currentMediaPlayerMediaId = mediaId
         }
-    }
-
-    /**
-     * Update whether video player paused for playlist
-     *
-     * @param isPaused true is paused, otherwise is false
-     */
-    fun updateVideoPlayerPausedForPlaylist(isPaused: Boolean) {
-        _videoPlayerPausedForPlaylist.update { isPaused }
     }
 
     /**

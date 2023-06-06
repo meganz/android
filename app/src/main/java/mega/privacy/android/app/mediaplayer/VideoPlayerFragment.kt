@@ -178,7 +178,6 @@ class VideoPlayerFragment : Fragment() {
         viewModel.updateAddSubtitleState()
         if (serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
-            viewModel.updateVideoPlayerPausedForPlaylist(true)
         }
     }
 
@@ -380,11 +379,6 @@ class VideoPlayerFragment : Fragment() {
 
             serviceGateway?.run {
                 setupPlayerView(this, viewHolder.binding.playerView)
-
-                if (viewModel.state.value.videoPlayerPausedForPlaylistState) {
-                    setPlayWhenReady(true)
-                    viewModel.updateVideoPlayerPausedForPlaylist(false)
-                }
             }
 
             initRepeatToggleButtonForVideo(viewHolder)
