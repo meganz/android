@@ -4,11 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
@@ -18,6 +19,8 @@ import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumI
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
+import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -26,7 +29,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlbumScreenWrapperActivity : AppCompatActivity() {
+class AlbumScreenWrapperActivity : BaseActivity() {
     private enum class AlbumScreen {
         AlbumPhotosSelectionScreen,
         AlbumCoverSelectionScreen,
@@ -50,6 +53,10 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            nodeSaver.restoreState(savedInstanceState)
+        }
+
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
@@ -138,6 +145,28 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                     }
                     AlbumScreen.AlbumImportScreen -> {
                         AlbumImportScreen(
+                            onShareLink = { link ->
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, link)
+                                }
+                                val shareIntent = Intent.createChooser(
+                                    intent,
+                                    getString(R.string.general_share)
+                                )
+                                startActivity(shareIntent)
+                            },
+                            onPreviewPhoto = {},
+                            onSaveToDevice = { nodes ->
+                                checkNotificationsPermission(this)
+                                nodeSaver.saveNodes(
+                                    nodes = nodes,
+                                    highPriority = false,
+                                    isFolderLink = false,
+                                    fromMediaViewer = false,
+                                    needSerialize = true,
+                                )
+                            },
                             onBack = ::finish,
                         )
                     }
@@ -146,6 +175,46 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
             }
         }
     }
+
+    /**
+     * Start: Download node block
+     */
+
+    private val nodeSaver = NodeSaver(
+        activityLauncher = this,
+        permissionRequester = this,
+        snackbarShower = this,
+        confirmDialogShower = AlertsAndWarnings.showSaveToDeviceConfirmDialog(this),
+    )
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        nodeSaver.saveState(outState)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        intent ?: return
+        nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        nodeSaver.handleRequestPermissionsResult(requestCode)
+    }
+
+    override fun onDestroy() {
+        nodeSaver.destroy()
+        super.onDestroy()
+    }
+
+    /**
+     * End
+     */
 
     companion object {
         private const val ALBUM_SCREEN: String = "album_screen"

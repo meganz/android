@@ -95,7 +95,7 @@ internal fun toVideo(
     fileTypeInfo = fileTypeInfo as VideoFileTypeInfo
 )
 
-internal class PhotoMapper @Inject constructor(
+class PhotoMapper @Inject constructor(
     private val imageMapper: ImageMapper,
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,

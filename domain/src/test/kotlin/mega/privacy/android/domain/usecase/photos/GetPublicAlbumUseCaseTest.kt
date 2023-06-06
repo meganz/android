@@ -49,6 +49,6 @@ class GetPublicAlbumUseCaseTest {
 
         // then
         assertThat(albumPhotos.first).isNotNull()
-        assertThat(albumPhotos.second).isEqualTo(photos)
+        assertThat(albumPhotos.second).isEqualTo(albumPhotoIds)
     }
 }

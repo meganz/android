@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.set.UserSet
 
 typealias UserSetPhotoIds = Pair<UserSet, List<AlbumPhotoId>>
 
-typealias AlbumPhotos = Pair<Album.UserAlbum, List<Photo>>
+typealias AlbumPhotoIds = Pair<Album.UserAlbum, List<AlbumPhotoId>>
 
 typealias AlbumIdLink = Pair<AlbumId, AlbumLink>
 
