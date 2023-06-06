@@ -253,29 +253,41 @@ fun MyAccountHomeView(
             )
 
             if (shouldShowPaymentInfo(uiState)) {
-                when {
-                    uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not() -> {
-                        ExpiredOrGraceBusinessInfo(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            businessStatus = uiState.businessStatus,
-                            backgroundColor = uiState.accountType.toAccountAttributes().background
-                        )
-                    }
+                val isExpiredOrGracePeriod =
+                    uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not()
+                val isPaymentAlertVisible =
+                    (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not()
+                val isSubscriptionRenewableOrExpired =
+                    uiState.hasRenewableSubscription || uiState.hasExpireAbleSubscription
 
-                    (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not() -> {
-                        PaymentAlertSection(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            renewTime = uiState.subscriptionRenewTime,
-                            expirationTime = uiState.proExpirationTime,
-                            hasRenewableSubscription = uiState.hasRenewableSubscription,
-                            hasExpiringSubscription = uiState.hasExpireAbleSubscription,
-                            backgroundColor = uiState.accountType.toAccountAttributes().background
-                        )
-                    }
+                AnimatedVisibility(
+                    visible = isExpiredOrGracePeriod,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    ExpiredOrGraceBusinessInfo(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        businessStatus = uiState.businessStatus,
+                        backgroundColor = uiState.accountType.toAccountAttributes().background
+                    )
+                }
+
+                AnimatedVisibility(
+                    visible = isPaymentAlertVisible && isSubscriptionRenewableOrExpired,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    PaymentAlertSection(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        renewTime = uiState.subscriptionRenewTime,
+                        expirationTime = uiState.proExpirationTime,
+                        hasRenewableSubscription = uiState.hasRenewableSubscription,
+                        backgroundColor = uiState.accountType.toAccountAttributes().background
+                    )
                 }
             }
 
@@ -505,32 +517,26 @@ internal fun ExpiredOrGraceBusinessInfo(
     businessStatus: BusinessAccountStatus?,
     backgroundColor: Color,
 ) {
-    AnimatedVisibility(
-        visible = true,
-        enter = expandVertically(),
-        exit = shrinkVertically()
+    Box(
+        modifier = modifier
+            .testTag(EXPIRED_BUSINESS_BANNER)
+            .padding(horizontal = 22.dp)
+            .background(backgroundColor)
     ) {
-        Box(
-            modifier = modifier
-                .testTag(EXPIRED_BUSINESS_BANNER)
-                .padding(horizontal = 22.dp)
-                .background(backgroundColor)
-        ) {
-            val businessExpiryText =
-                if (businessStatus == BusinessAccountStatus.Expired) R.string.payment_overdue_label else R.string.payment_required_label
-            val businessTextColor =
-                if (businessStatus == BusinessAccountStatus.Expired) red_400 else amber_400
+        val businessExpiryText =
+            if (businessStatus == BusinessAccountStatus.Expired) R.string.payment_overdue_label else R.string.payment_required_label
+        val businessTextColor =
+            if (businessStatus == BusinessAccountStatus.Expired) red_400 else amber_400
 
-            Text(
-                modifier = Modifier
-                    .testTag(EXPIRED_BUSINESS_BANNER_TEXT)
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, bottom = 10.dp),
-                text = stringResource(id = businessExpiryText),
-                style = MaterialTheme.typography.body2,
-                color = businessTextColor
-            )
-        }
+        Text(
+            modifier = Modifier
+                .testTag(EXPIRED_BUSINESS_BANNER_TEXT)
+                .fillMaxWidth()
+                .padding(start = 12.dp, bottom = 10.dp),
+            text = stringResource(id = businessExpiryText),
+            style = MaterialTheme.typography.body2,
+            color = businessTextColor
+        )
     }
 }
 
@@ -540,45 +546,38 @@ private fun PaymentAlertSection(
     renewTime: Long,
     expirationTime: Long,
     hasRenewableSubscription: Boolean,
-    hasExpiringSubscription: Boolean,
     backgroundColor: Color,
 ) {
-    AnimatedVisibility(
-        visible = hasRenewableSubscription || hasExpiringSubscription,
-        enter = expandVertically(),
-        exit = shrinkVertically()
+    Box(
+        modifier = modifier
+            .testTag(PAYMENT_ALERT_INFO)
+            .padding(horizontal = 22.dp)
+            .background(backgroundColor)
     ) {
-        Box(
-            modifier = modifier
-                .testTag(PAYMENT_ALERT_INFO)
-                .padding(horizontal = 22.dp)
-                .background(backgroundColor)
-        ) {
-            MegaSpannedText(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, bottom = 10.dp),
-                value = stringResource(
-                    if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
-                    TimeUtils.formatDate(
-                        if (hasRenewableSubscription) renewTime else expirationTime,
-                        TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                        LocalContext.current
-                    )
+        MegaSpannedText(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, bottom = 10.dp),
+            value = stringResource(
+                if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
+                TimeUtils.formatDate(
+                    if (hasRenewableSubscription) renewTime else expirationTime,
+                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    LocalContext.current
+                )
+            ),
+            baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.white_alpha_087_grey_alpha_087),
+            styles = hashMapOf(
+                SpanIndicator('A') to SpanStyle(
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal
                 ),
-                baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.white_alpha_087_grey_alpha_087),
-                styles = hashMapOf(
-                    SpanIndicator('A') to SpanStyle(
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal
-                    ),
-                    SpanIndicator('B') to SpanStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                SpanIndicator('B') to SpanStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             )
-        }
+        )
     }
 }
 
