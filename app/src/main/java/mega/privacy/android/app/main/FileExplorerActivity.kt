@@ -606,8 +606,6 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
-
-        checkNotificationsPermission(this)
     }
 
     private fun setupObservers() {
