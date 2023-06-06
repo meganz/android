@@ -446,6 +446,72 @@ class MyAccountHomeViewTest {
             .assert(hasText(fromId(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)))
     }
 
+    @Test
+    fun `test that expire or grace alert should not be shown when due is more than 7 days`() {
+        val eightDaysInSeconds = 691200
+        val dueDateInSeconds = (System.currentTimeMillis() / 1000) + eightDaysInSeconds
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = false,
+                hasRenewableSubscription = true,
+                subscriptionRenewTime = dueDateInSeconds
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that expire or grace alert should be shown when due is less than 7 days`() {
+        val fiveDaysInSeconds = 432000
+        val dueDateInSeconds = (System.currentTimeMillis() / 1000) + fiveDaysInSeconds
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isMasterBusinessAccount = true,
+                isBusinessStatusActive = false,
+                hasRenewableSubscription = true,
+                subscriptionRenewTime = dueDateInSeconds
+            )
+        )
+
+        composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that payment alert should not be shown when due is more than 7 days`() {
+        val eightDaysInSeconds = 691200
+        val dueDateInSeconds = (System.currentTimeMillis() / 1000) + eightDaysInSeconds
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isBusinessAccount = false,
+                hasRenewableSubscription = true,
+                subscriptionRenewTime = dueDateInSeconds
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that payment alert should be shown when due is less than 7 days`() {
+        val fiveDaysInSeconds = 432000
+        val dueDateInSeconds = (System.currentTimeMillis() / 1000) + fiveDaysInSeconds
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isBusinessAccount = false,
+                hasRenewableSubscription = true,
+                subscriptionRenewTime = dueDateInSeconds
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertIsDisplayed()
+    }
+
     private fun verifyAccountTypeSectionColor(
         accountType: AccountType,
         color: Color,
