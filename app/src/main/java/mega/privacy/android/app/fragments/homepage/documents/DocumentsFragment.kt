@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -177,9 +176,9 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
             }
         }
 
-        lifecycleScope.launch {
-            itemOperationViewModel.openDisputeNodeEvent.collectLatest {
-                it.node?.let { node ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            itemOperationViewModel.openDisputeNodeEvent.collect {
+                it.getContentIfNotHandled()?.node?.let { node ->
                     megaNodeUtilWrapper.showTakenDownDialog(
                         isFolder = node.isFolder,
                         context = requireContext(),
@@ -187,6 +186,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 }
             }
         }
+
     }
 
     /**

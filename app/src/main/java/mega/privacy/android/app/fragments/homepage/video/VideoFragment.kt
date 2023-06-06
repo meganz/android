@@ -17,7 +17,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Constants.VIDEO_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIEWER_FROM_VIDEOS
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
+import mega.privacy.android.app.utils.NodeTakenDownDialogListener
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
@@ -501,8 +502,8 @@ class VideoFragment : Fragment(), HomepageSearchable {
         })
 
         lifecycleScope.launch {
-            itemOperationViewModel.openDisputeNodeEvent.collectLatest {
-                it.node?.let { node ->
+            itemOperationViewModel.openDisputeNodeEvent.collect {
+                it.getContentIfNotHandled()?.node?.let { node ->
                     megaNodeUtilWrapper.showTakenDownDialog(
                         isFolder = node.isFolder,
                         context = requireContext(),
