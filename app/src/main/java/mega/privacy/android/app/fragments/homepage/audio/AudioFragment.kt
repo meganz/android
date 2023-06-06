@@ -17,7 +17,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -164,8 +163,8 @@ class AudioFragment : Fragment(), HomepageSearchable {
         }
 
         lifecycleScope.launch {
-            itemOperationViewModel.openDisputeNodeEvent.collectLatest {
-                it.node?.let { node ->
+            itemOperationViewModel.openDisputeNodeEvent.collect {
+                it.getContentIfNotHandled()?.node?.let { node ->
                     megaNodeUtilWrapper.showTakenDownDialog(
                         isFolder = node.isFolder,
                         context = requireContext(),
