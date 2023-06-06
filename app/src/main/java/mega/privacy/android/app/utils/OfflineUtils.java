@@ -56,11 +56,11 @@ import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.domain.entity.StorageState;
+import mega.privacy.android.domain.entity.transfer.Transfer;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaTransfer;
 import timber.log.Timber;
 
 public class OfflineUtils {
@@ -410,7 +410,7 @@ public class OfflineUtils {
         insertDB(context, megaApi, dbH, nodesToDB, path.contains(OFFLINE_INBOX_DIR));
     }
 
-    public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, MegaTransfer transfer) {
+    public static void saveOfflineChatFile(LegacyDatabaseHandler dbH, Transfer transfer) {
         Timber.d("saveOfflineChatFile: %d %s", transfer.getNodeHandle(), transfer.getFileName());
 
         MegaOffline mOffInsert = new MegaOffline(Long.toString(transfer.getNodeHandle()), "/", transfer.getFileName(), -1, DB_FILE, 0, "-1");

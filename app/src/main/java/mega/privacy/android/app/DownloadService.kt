@@ -19,8 +19,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -28,8 +26,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -66,8 +66,13 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
@@ -77,9 +82,11 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -163,6 +170,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
 
+    @Inject
+    lateinit var monitorTransferEventsUseCase: MonitorTransferEventsUseCase
+
+    @Inject
+    lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
+
     private var errorCount = 0
     private var alreadyDownloaded = 0
     private var isForeground = false
@@ -203,6 +216,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     private var monitorPausedTransfersJob: Job? = null
     private var monitorStopTransfersWorkJob: Job? = null
+    private var monitorTransferEventsJob: Job? = null
 
     @SuppressLint("NewApi")
     override fun onCreate() {
@@ -221,7 +235,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         initialiseWifiLock()
         initialiseWakeLock()
         setReceivers()
-        setRxSubscription()
     }
 
     private fun initialiseWifiLock() {
@@ -255,57 +268,40 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 if (megaApi.numPendingDownloads == 0) stopForeground()
             }
         }
-    }
 
-    private fun setRxSubscription() {
-        getGlobalTransferUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ event: GetGlobalTransferUseCase.Result? ->
-                when (event) {
-                    is GetGlobalTransferUseCase.Result.OnTransferStart -> {
-                        val transfer = event.transfer
-                        doOnTransferStart(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
-                        val transfer = event.transfer
-                        doOnTransferUpdate(transfer)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
-                        val transfer = event.transfer
-                        val error = event.error
-                        doOnTransferFinish(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
-                        val transfer = event.transfer
-                        val error = event.error
-                        doOnTransferTemporaryError(transfer, error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({}) { t: Throwable? -> Timber.e(t) }
-                            .addTo(rxSubscriptions)
-                    }
-
-                    is GetGlobalTransferUseCase.Result.OnTransferData -> {}
-                    null -> {}
+        monitorTransferEventsJob = applicationScope.launch {
+            monitorTransferEventsUseCase()
+                .filter {
+                    it.transfer.type == TransferType.TYPE_DOWNLOAD
                 }
-            }) { t: Throwable? -> Timber.e(t) }
-            .addTo(rxSubscriptions)
+                .catch {
+                    Timber.e(it)
+                }
+                .collect { transferEvent ->
+                    when (transferEvent) {
+                        is TransferEvent.TransferStartEvent -> {
+                            doOnTransferStart(transferEvent.transfer)
+                        }
+
+                        is TransferEvent.TransferUpdateEvent -> {
+                            doOnTransferUpdate(transferEvent.transfer)
+                        }
+
+                        is TransferEvent.TransferFinishEvent -> {
+                            doOnTransferFinish(transferEvent.transfer, transferEvent.error)
+                        }
+
+                        is TransferEvent.TransferTemporaryErrorEvent -> {
+                            doOnTransferTemporaryError(
+                                transferEvent.transfer,
+                                transferEvent.error
+                            )
+                        }
+
+                        else -> {}
+                    }
+                }
+        }
     }
 
     private fun startForeground() {
@@ -358,6 +354,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         stopForeground()
         monitorPausedTransfersJob?.cancel()
         monitorStopTransfersWorkJob?.cancel()
+        monitorTransferEventsJob?.cancel()
         super.onDestroy()
     }
 
@@ -1286,194 +1283,188 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         return null
     }
 
-    private fun doOnTransferStart(transfer: MegaTransfer?): Completable {
-        return Completable.fromCallable {
-            Timber.d(
-                "Download start: %d, totalDownloads: %d",
-                transfer?.nodeHandle,
-                megaApi.totalDownloads
+    private fun doOnTransferStart(transfer: Transfer) {
+        Timber.d(
+            "Download start: %d, totalDownloads: %d",
+            transfer.nodeHandle,
+            megaApi.totalDownloads
+        )
+        if (transfer?.isStreamingTransfer == true || transfer?.isVoiceClip() == true) return
+        if (transfer.isBackgroundTransfer()) {
+            backgroundTransfers.add(transfer.tag)
+            return
+        }
+        val appData = transfer.appData
+        if (appData.contains(Constants.APP_DATA_SD_CARD)) {
+            dbH.addSDTransfer(
+                SDTransfer(
+                    transfer.tag,
+                    transfer.fileName,
+                    Util.getSizeString(transfer.totalBytes, this),
+                    java.lang.Long.toString(transfer.nodeHandle),
+                    transfer.localPath,
+                    appData
+                )
             )
-            if (transfer?.isStreamingTransfer == true || transfer?.isVoiceClipTransfer() == true) return@fromCallable null
-            if (transfer?.isBackgroundTransfer() == true) {
-                backgroundTransfers.add(transfer.tag)
-                return@fromCallable null
-            }
-            if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
-                val appData = transfer.appData
-                if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_SD_CARD)) {
-                    dbH.addSDTransfer(
-                        SDTransfer(
-                            transfer.tag,
-                            transfer.fileName,
-                            Util.getSizeString(transfer.totalBytes, this),
-                            java.lang.Long.toString(transfer.nodeHandle),
-                            transfer.path,
-                            appData
+        }
+        transfersManagement.checkScanningTransferOnStart(transfer)
+        transfersCount++
+        updateProgressNotification()
+    }
+
+    private fun doOnTransferFinish(transfer: Transfer, error: MegaException) {
+        Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.type)
+        if (transfer?.isStreamingTransfer == true) {
+            return
+        }
+        if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+            sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
+        }
+        transfersManagement.checkScanningTransferOnFinish(transfer)
+        val isVoiceClip = transfer.isVoiceClip()
+        val isBackgroundTransfer = transfer.isBackgroundTransfer()
+        if (!isVoiceClip && !isBackgroundTransfer) transfersCount--
+        val path = transfer.localPath
+        val targetPath = SDCardUtils.getSDCardTargetPath(transfer.appData)
+        if (!transfer.isFolderTransfer) {
+            if (!isVoiceClip && !isBackgroundTransfer) {
+                val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
+                if (!TextUtil.isTextEmpty(targetPath)) {
+                    completedTransfer.path = targetPath
+                }
+                runBlocking {
+                    addCompletedTransferUseCase(
+                        legacyCompletedTransferMapper(
+                            completedTransfer
                         )
                     )
                 }
-                transfersManagement.checkScanningTransferOnStart(transfer)
-                transfersCount++
+            }
+            if (transfer.state == TransferState.STATE_FAILED) {
+                transfersManagement.setAreFailedTransfers(true)
+            }
+            if (!isVoiceClip && !isBackgroundTransfer) {
                 updateProgressNotification()
             }
-            null
         }
-    }
+        if (canceled) {
+            releaseLocks()
+            Timber.d("Download canceled: %s", transfer.nodeHandle)
+            if (isVoiceClip) {
+                resultTransfersVoiceClip(
+                    transfer.nodeHandle,
+                    Constants.ERROR_VOICE_CLIP_TRANSFER
+                )
+                val localFile = buildVoiceClipFile(this, transfer.fileName)
+                if (FileUtil.isFileAvailable(localFile)) {
+                    Timber.d("Delete own voiceclip : exists")
+                    localFile?.delete()
+                }
+            } else {
+                val file = File(transfer.localPath)
+                file.delete()
+            }
+            cancel()
+        } else {
+            if (error.errorCode == MegaError.API_OK) {
+                Timber.d("Download OK - Node handle: %s", transfer.nodeHandle)
+                if (isVoiceClip) {
+                    resultTransfersVoiceClip(
+                        transfer.nodeHandle,
+                        Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER
+                    )
+                }
 
-    private fun doOnTransferFinish(transfer: MegaTransfer?, error: MegaError): Completable {
-        return Completable.fromCallable {
-            Timber.d("Node handle: " + transfer?.nodeHandle + ", Type = " + transfer?.type)
-            if (transfer?.isStreamingTransfer == true) {
-                return@fromCallable null
-            }
-            if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
-                sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
-            }
-            if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
-                transfersManagement.checkScanningTransferOnFinish(transfer)
-                val isVoiceClip = transfer.isVoiceClipTransfer()
-                val isBackgroundTransfer = transfer.isBackgroundTransfer()
-                if (!isVoiceClip && !isBackgroundTransfer) transfersCount--
-                val path = transfer.path
-                val targetPath = SDCardUtils.getSDCardTargetPath(transfer.appData)
-                if (!transfer.isFolderTransfer) {
-                    if (!isVoiceClip && !isBackgroundTransfer) {
-                        val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
-                        if (!TextUtil.isTextEmpty(targetPath)) {
-                            completedTransfer.path = targetPath
-                        }
-                        runBlocking {
-                            addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
-                        }
-                    }
-                    if (transfer.state == MegaTransfer.STATE_FAILED) {
-                        transfersManagement.setAreFailedTransfers(true)
-                    }
-                    if (!isVoiceClip && !isBackgroundTransfer) {
-                        updateProgressNotification()
+                //need to move downloaded file to a location on sd card.
+                if (targetPath != null) {
+                    val source = File(path)
+                    try {
+                        val sdCardOperator = SDCardOperator(this)
+                        sdCardOperator.moveDownloadedFileToDestinationPath(
+                            source,
+                            targetPath,
+                            SDCardUtils.getSDCardTargetUri(transfer.appData),
+                            transfer.tag
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "Error moving file to the sd card path.")
                     }
                 }
-                if (canceled) {
-                    releaseLocks()
-                    Timber.d("Download canceled: %s", transfer.nodeHandle)
-                    if (isVoiceClip) {
-                        resultTransfersVoiceClip(
-                            transfer.nodeHandle,
-                            Constants.ERROR_VOICE_CLIP_TRANSFER
-                        )
-                        val localFile = buildVoiceClipFile(this, transfer.fileName)
-                        if (FileUtil.isFileAvailable(localFile)) {
-                            Timber.d("Delete own voiceclip : exists")
-                            localFile?.delete()
+                //To update thumbnails for videos
+                if (FileUtil.isVideoFile(transfer.localPath)) {
+                    Timber.d("Is video!")
+                    val videoNode = megaApi.getNodeByHandle(transfer.nodeHandle)
+                    if (videoNode != null) {
+                        if (!videoNode.hasThumbnail()) {
+                            Timber.d("The video has not thumb")
+                            ThumbnailUtils.createThumbnailVideo(
+                                this,
+                                path,
+                                megaApi,
+                                transfer.nodeHandle
+                            )
                         }
                     } else {
-                        val file = File(transfer.path)
+                        Timber.w("videoNode is NULL")
+                    }
+                } else {
+                    Timber.d("NOT video!")
+                }
+                if (!TextUtil.isTextEmpty(path)) {
+                    FileUtil.sendBroadcastToUpdateGallery(this, File(path))
+                }
+                storeToAdvancedDevices[transfer.nodeHandle]?.let { transfersUri ->
+                    Timber.d("Now copy the file to the SD Card")
+                    openFile = false
+                    val node = megaApi.getNodeByHandle(transfer.nodeHandle)
+                    alterDocument(transfersUri, node?.name)
+                }
+                if (!TextUtil.isTextEmpty(path) && path.contains(OfflineUtils.OFFLINE_DIR)) {
+                    Timber.d("It is Offline file")
+                    offlineNode = megaApi.getNodeByHandle(transfer.nodeHandle)
+                    if (offlineNode != null) {
+                        OfflineUtils.saveOffline(
+                            this,
+                            megaApi,
+                            dbH,
+                            offlineNode,
+                            transfer.localPath
+                        )
+                    } else {
+                        OfflineUtils.saveOfflineChatFile(dbH, transfer)
+                    }
+                    refreshOfflineFragment()
+                    refreshSettingsFragment()
+                }
+            } else {
+                Timber.e("Download ERROR: %s", transfer.nodeHandle)
+                if (isVoiceClip) {
+                    resultTransfersVoiceClip(
+                        transfer.nodeHandle,
+                        Constants.ERROR_VOICE_CLIP_TRANSFER
+                    )
+                    val localFile = buildVoiceClipFile(this, transfer.fileName)
+                    if (FileUtil.isFileAvailable(localFile)) {
+                        Timber.d("Delete own voice clip : exists")
+                        localFile?.delete()
+                    }
+                } else {
+                    if (error.errorCode == MegaError.API_EBLOCKED) {
+                        errorEBlocked++
+                    }
+                    if (!transfer.isFolderTransfer) {
+                        errorCount++
+                    }
+                    if (!TextUtil.isTextEmpty(transfer.localPath)) {
+                        val file = File(transfer.localPath)
                         file.delete()
                     }
-                    cancel()
-                } else {
-                    if (error.errorCode == MegaError.API_OK) {
-                        Timber.d("Download OK - Node handle: %s", transfer.nodeHandle)
-                        if (isVoiceClip) {
-                            resultTransfersVoiceClip(
-                                transfer.nodeHandle,
-                                Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER
-                            )
-                        }
-
-                        //need to move downloaded file to a location on sd card.
-                        if (targetPath != null) {
-                            val source = File(path)
-                            try {
-                                val sdCardOperator = SDCardOperator(this)
-                                sdCardOperator.moveDownloadedFileToDestinationPath(
-                                    source,
-                                    targetPath,
-                                    SDCardUtils.getSDCardTargetUri(transfer.appData),
-                                    transfer.tag
-                                )
-                            } catch (e: Exception) {
-                                Timber.e(e, "Error moving file to the sd card path.")
-                            }
-                        }
-                        //To update thumbnails for videos
-                        if (FileUtil.isVideoFile(transfer.path)) {
-                            Timber.d("Is video!")
-                            val videoNode = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            if (videoNode != null) {
-                                if (!videoNode.hasThumbnail()) {
-                                    Timber.d("The video has not thumb")
-                                    ThumbnailUtils.createThumbnailVideo(
-                                        this,
-                                        path,
-                                        megaApi,
-                                        transfer.nodeHandle
-                                    )
-                                }
-                            } else {
-                                Timber.w("videoNode is NULL")
-                            }
-                        } else {
-                            Timber.d("NOT video!")
-                        }
-                        if (!TextUtil.isTextEmpty(path)) {
-                            FileUtil.sendBroadcastToUpdateGallery(this, File(path))
-                        }
-                        storeToAdvancedDevices[transfer.nodeHandle]?.let { transfersUri ->
-                            Timber.d("Now copy the file to the SD Card")
-                            openFile = false
-                            val node = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            alterDocument(transfersUri, node?.name)
-                        }
-                        if (!TextUtil.isTextEmpty(path) && path.contains(OfflineUtils.OFFLINE_DIR)) {
-                            Timber.d("It is Offline file")
-                            offlineNode = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            if (offlineNode != null) {
-                                OfflineUtils.saveOffline(
-                                    this,
-                                    megaApi,
-                                    dbH,
-                                    offlineNode,
-                                    transfer.path
-                                )
-                            } else {
-                                OfflineUtils.saveOfflineChatFile(dbH, transfer)
-                            }
-                            refreshOfflineFragment()
-                            refreshSettingsFragment()
-                        }
-                    } else {
-                        Timber.e("Download ERROR: %s", transfer.nodeHandle)
-                        if (isVoiceClip) {
-                            resultTransfersVoiceClip(
-                                transfer.nodeHandle,
-                                Constants.ERROR_VOICE_CLIP_TRANSFER
-                            )
-                            val localFile = buildVoiceClipFile(this, transfer.fileName)
-                            if (FileUtil.isFileAvailable(localFile)) {
-                                Timber.d("Delete own voice clip : exists")
-                                localFile?.delete()
-                            }
-                        } else {
-                            if (error.errorCode == MegaError.API_EBLOCKED) {
-                                errorEBlocked++
-                            }
-                            if (!transfer.isFolderTransfer) {
-                                errorCount++
-                            }
-                            if (!TextUtil.isTextEmpty(transfer.path)) {
-                                val file = File(transfer.path)
-                                file.delete()
-                            }
-                        }
-                    }
-                }
-                if (isVoiceClip || isBackgroundTransfer) return@fromCallable null
-                if (megaApi.getNumPendingDownloadsNonBackground() == 0 && transfersCount == 0) {
-                    onQueueComplete(transfer.nodeHandle)
                 }
             }
-            null
+        }
+        if (isVoiceClip || isBackgroundTransfer) return
+        if (megaApi.getNumPendingDownloadsNonBackground() == 0 && transfersCount == 0) {
+            onQueueComplete(transfer.nodeHandle)
         }
     }
 
@@ -1517,53 +1508,45 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
-    private fun doOnTransferUpdate(transfer: MegaTransfer?): Completable {
-        return Completable.fromCallable {
-            if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
-                if (canceled) {
-                    Timber.d("Transfer cancel: %s", transfer.nodeHandle)
-                    releaseLocks()
-                    megaApi.cancelTransfer(transfer)
-                    cancel()
-                    return@fromCallable null
-                }
-                if (transfer.isStreamingTransfer || transfer.isVoiceClipTransfer()) return@fromCallable null
-                if (transfer.isBackgroundTransfer()) {
-                    backgroundTransfers.add(transfer.tag)
-                    return@fromCallable null
-                }
-                transfersManagement.checkScanningTransferOnUpdate(transfer)
-                if (!transfer.isFolderTransfer) {
-                    updateProgressNotification()
-                }
-                if (!transfersManagement.isOnTransferOverQuota() && transfersManagement.hasNotToBeShowDueToTransferOverQuota()) {
-                    transfersManagement.setHasNotToBeShowDueToTransferOverQuota(false)
-                }
+    private fun doOnTransferUpdate(transfer: Transfer) {
+        if (canceled) {
+            Timber.d("Transfer cancel: %s", transfer.nodeHandle)
+            releaseLocks()
+            applicationScope.launch {
+                runCatching { cancelTransferByTagUseCase(transfer.tag) }
+                    .onFailure { Timber.w("Exception canceling transfer: $it") }
             }
-            null
+            cancel()
+            return
+        }
+        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return
+        if (transfer.isBackgroundTransfer()) {
+            backgroundTransfers.add(transfer.tag)
+            return
+        }
+        transfersManagement.checkScanningTransferOnUpdate(transfer)
+        if (!transfer.isFolderTransfer) {
+            updateProgressNotification()
+        }
+        if (!transfersManagement.isOnTransferOverQuota() && transfersManagement.hasNotToBeShowDueToTransferOverQuota()) {
+            transfersManagement.setHasNotToBeShowDueToTransferOverQuota(false)
         }
     }
 
-    private fun doOnTransferTemporaryError(transfer: MegaTransfer?, e: MegaError): Completable {
-        return Completable.fromCallable {
-            Timber.w(
-                """Download Temporary Error - Node Handle: ${transfer?.nodeHandle}
-Error: ${e.errorCode} ${e.errorString}"""
-            )
-            if (transfer?.isStreamingTransfer == true || transfer?.isBackgroundTransfer() == true) {
-                return@fromCallable null
+    private fun doOnTransferTemporaryError(transfer: Transfer, e: MegaException) {
+        Timber.w(
+            "Download Temporary Error - Node Handle: ${transfer.nodeHandle} Error: ${e.errorCode} ${e.errorString}"
+        )
+        if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
+            return
+        }
+        if (e.errorCode == MegaError.API_EOVERQUOTA) {
+            if (e.value != 0L) {
+                Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.errorCode)
+                checkTransferOverQuota(true)
+                downloadedBytesToOverQuota = megaApi.totalDownloadedBytes
+                isOverQuota = true
             }
-            if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
-                if (e.errorCode == MegaError.API_EOVERQUOTA) {
-                    if (e.value != 0L) {
-                        Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.errorCode)
-                        checkTransferOverQuota(true)
-                        downloadedBytesToOverQuota = megaApi.totalDownloadedBytes
-                        isOverQuota = true
-                    }
-                }
-            }
-            null
         }
     }
 
