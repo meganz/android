@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="3dp"
-            android:text="@string/upload_to_audio"
+            android:text="@string/calls_answer_audio_button"
             android:textAppearance="@style/TextAppearance.Mega.Caption.Variant5"
             app:layout_constraintEnd_toEndOf="@id/answer_audio_fab"
             app:layout_constraintHorizontal_bias="0.5"
