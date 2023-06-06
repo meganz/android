@@ -143,13 +143,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
                 refreshMenuOptionsVisibility()
 
-                collectFlow(service.serviceGateway.metadataUpdate()) { metadata ->
-                    binding.toolbar.title =
-                        if (configuration.orientation == ORIENTATION_LANDSCAPE) {
-                            metadata.title ?: metadata.nodeName
-                        } else {
-                            ""
-                        }
+                collectFlow(service.serviceGateway.metadataUpdate()) {
                     dragToExit.nodeChanged(
                         service.playerServiceViewModelGateway.getCurrentPlayingHandle()
                     )

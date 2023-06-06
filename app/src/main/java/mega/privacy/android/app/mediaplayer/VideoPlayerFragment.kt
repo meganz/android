@@ -203,6 +203,13 @@ class VideoPlayerFragment : Fragment() {
             serviceGateway?.let { gateway ->
                 collectFlow(gateway.metadataUpdate()) { metadata ->
                     playerViewHolder?.displayMetadata(metadata)
+                    (activity as? VideoPlayerActivity)?.setToolbarTitle(
+                        if (context?.configuration?.orientation == ORIENTATION_LANDSCAPE) {
+                            metadata.title ?: metadata.nodeName
+                        } else {
+                            ""
+                        }
+                    )
                 }
 
                 collectFlow(gateway.playbackPositionStateUpdate()) { state ->
