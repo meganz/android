@@ -4,9 +4,9 @@ import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -64,12 +64,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
-import com.google.android.material.textview.MaterialTextView
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
@@ -83,8 +81,6 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_TOP_PADDING
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ADD_PHONE_NUMBER
-import mega.privacy.android.app.presentation.myaccount.view.Constants.ANIMATION_DELAY
-import mega.privacy.android.app.presentation.myaccount.view.Constants.ANIMATION_DURATION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR_SIZE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CLICKS_TO_CHANGE_API_SERVER
@@ -99,7 +95,7 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TEXT_AVATAR
-import mega.privacy.android.app.presentation.myaccount.view.Constants.TIME_TO_SHOW_PAYMENT_INFO
+import mega.privacy.android.app.presentation.myaccount.view.Constants.TIME_TO_SHOW_PAYMENT_INFO_IN_SECONDS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.TOOLBAR_HEIGHT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER
@@ -109,15 +105,14 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STOR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_IMAGE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_PROGRESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.controls.MegaSpannedText
+import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.amber_400
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.body2medium
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.grey_020_black
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
@@ -126,6 +121,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+import mega.privacy.android.core.ui.theme.extensions.white_alpha_087_grey_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.core.ui.theme.extensions.white_grey_800
 import mega.privacy.android.core.ui.theme.red_400
@@ -138,9 +134,8 @@ import java.io.File
 internal object Constants {
     const val AVATAR_SIZE = 60
     const val CLICKS_TO_CHANGE_API_SERVER = 5
-    const val TIME_TO_SHOW_PAYMENT_INFO = 604800
-    const val ANIMATION_DURATION = 200
-    const val ANIMATION_DELAY = 500
+    const val TIME_TO_SHOW_PAYMENT_INFO_IN_SECONDS = 604800
+    const val ANIMATION_DURATION = 1000
     val TOOLBAR_HEIGHT = 56.dp
     val HEADER_TOP_PADDING = 24.dp
     val ACCOUNT_TYPE_TOP_PADDING = 48.dp
@@ -257,27 +252,30 @@ fun MyAccountHomeView(
                 }
             )
 
-            when {
-                uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not() -> {
-                    ExpiredOrGraceBusinessInfo(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        businessStatus = uiState.businessStatus,
-                    )
-                }
+            if (shouldShowPaymentInfo(uiState)) {
+                when {
+                    uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive.not() -> {
+                        ExpiredOrGraceBusinessInfo(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            businessStatus = uiState.businessStatus,
+                            backgroundColor = uiState.accountType.toAccountAttributes().background
+                        )
+                    }
 
-                (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not() -> {
-                    PaymentAlertSection(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        renewTime = uiState.subscriptionRenewTime,
-                        expirationTime = uiState.proExpirationTime,
-                        hasRenewableSubscription = uiState.hasRenewableSubscription,
-                        hasExpiringSubscription = uiState.hasExpireAbleSubscription,
-                        withAnimation = shouldExpandPaymentInfo(uiState)
-                    )
+                    (uiState.isMasterBusinessAccount && uiState.isBusinessStatusActive) || uiState.isBusinessAccount.not() -> {
+                        PaymentAlertSection(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            renewTime = uiState.subscriptionRenewTime,
+                            expirationTime = uiState.proExpirationTime,
+                            hasRenewableSubscription = uiState.hasRenewableSubscription,
+                            hasExpiringSubscription = uiState.hasExpireAbleSubscription,
+                            backgroundColor = uiState.accountType.toAccountAttributes().background
+                        )
+                    }
                 }
             }
 
@@ -505,33 +503,34 @@ internal fun AccountTypeSection(
 internal fun ExpiredOrGraceBusinessInfo(
     modifier: Modifier = Modifier,
     businessStatus: BusinessAccountStatus?,
+    backgroundColor: Color,
 ) {
-    Box(
-        modifier = modifier
-            .testTag(EXPIRED_BUSINESS_BANNER)
-            .padding(horizontal = 22.dp)
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = ANIMATION_DURATION,
-                    delayMillis = ANIMATION_DELAY,
-                    easing = LinearOutSlowInEasing
-                )
-            )
+    AnimatedVisibility(
+        visible = true,
+        enter = expandVertically(),
+        exit = shrinkVertically()
     ) {
-        val businessExpiryText =
-            if (businessStatus == BusinessAccountStatus.Expired) R.string.payment_overdue_label else R.string.payment_required_label
-        val businessTextColor =
-            if (businessStatus == BusinessAccountStatus.Expired) red_400 else amber_400
+        Box(
+            modifier = modifier
+                .testTag(EXPIRED_BUSINESS_BANNER)
+                .padding(horizontal = 22.dp)
+                .background(backgroundColor)
+        ) {
+            val businessExpiryText =
+                if (businessStatus == BusinessAccountStatus.Expired) R.string.payment_overdue_label else R.string.payment_required_label
+            val businessTextColor =
+                if (businessStatus == BusinessAccountStatus.Expired) red_400 else amber_400
 
-        Text(
-            modifier = Modifier
-                .testTag(EXPIRED_BUSINESS_BANNER_TEXT)
-                .fillMaxWidth()
-                .padding(start = 12.dp, bottom = 10.dp),
-            text = stringResource(id = businessExpiryText),
-            style = MaterialTheme.typography.body2,
-            color = businessTextColor
-        )
+            Text(
+                modifier = Modifier
+                    .testTag(EXPIRED_BUSINESS_BANNER_TEXT)
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, bottom = 10.dp),
+                text = stringResource(id = businessExpiryText),
+                style = MaterialTheme.typography.body2,
+                color = businessTextColor
+            )
+        }
     }
 }
 
@@ -542,49 +541,42 @@ private fun PaymentAlertSection(
     expirationTime: Long,
     hasRenewableSubscription: Boolean,
     hasExpiringSubscription: Boolean,
-    withAnimation: Boolean,
+    backgroundColor: Color,
 ) {
-    if (hasRenewableSubscription || hasExpiringSubscription) {
+    AnimatedVisibility(
+        visible = hasRenewableSubscription || hasExpiringSubscription,
+        enter = expandVertically(),
+        exit = shrinkVertically()
+    ) {
         Box(
             modifier = modifier
                 .testTag(PAYMENT_ALERT_INFO)
                 .padding(horizontal = 22.dp)
-                .conditional(withAnimation) {
-                    animateContentSize(
-                        animationSpec = tween(
-                            durationMillis = ANIMATION_DURATION,
-                            delayMillis = ANIMATION_DELAY,
-                            easing = LinearOutSlowInEasing
-                        )
-                    )
-                }
+                .background(backgroundColor)
         ) {
-            val renewText = stringResource(
-                if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
-                TimeUtils.formatDate(
-                    if (hasRenewableSubscription) renewTime else expirationTime,
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
-                    LocalContext.current
-                )
-            ).replace("[A]", "<font face='sans-serif'>")
-                .replace("[/A]", "</font>")
-                .replace("[B]", "<big><font face='sans-serif-medium'>")
-                .replace("[/B]", "</font></big>")
-                .toSpannedHtmlText()
-
-            AndroidView(
+            MegaSpannedText(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 12.dp, bottom = 10.dp),
-                factory = {
-                    MaterialTextView(it)
-                },
-                update = {
-                    it.text = renewText
-                    it.setTextStyle(
-                        textAppearance = R.style.TextAppearance_Mega_Subtitle2_Normal_Grey54White54,
+                value = stringResource(
+                    if (hasRenewableSubscription) R.string.account_info_renews_on else R.string.account_info_expires_on,
+                    TimeUtils.formatDate(
+                        if (hasRenewableSubscription) renewTime else expirationTime,
+                        TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                        LocalContext.current
                     )
-                }
+                ),
+                baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.white_alpha_087_grey_alpha_087),
+                styles = hashMapOf(
+                    SpanIndicator('A') to SpanStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
+                    SpanIndicator('B') to SpanStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                )
             )
         }
     }
@@ -999,12 +991,12 @@ private fun AccountInfoListItem(
 @Composable
 private fun formatSize(size: Long): String = Util.getSizeString(size, LocalContext.current)
 
-private fun shouldExpandPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
+private fun shouldShowPaymentInfo(uiState: MyAccountHomeUIState): Boolean {
     val timeToCheck =
         if (uiState.hasRenewableSubscription) uiState.subscriptionRenewTime else uiState.proExpirationTime
     val currentTime = System.currentTimeMillis() / 1000
 
-    return timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
+    return timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO_IN_SECONDS
 }
 
 @Preview
