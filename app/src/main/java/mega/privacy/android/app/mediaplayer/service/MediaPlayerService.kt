@@ -108,7 +108,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
-        if (needPlayWhenReceiveResumeCommand) {
+        if (needPlayWhenReceiveResumeCommand || !mediaPlayerGateway.getPlayWhenReady()) {
             setPlayWhenReady(true)
             needPlayWhenReceiveResumeCommand = false
         }
