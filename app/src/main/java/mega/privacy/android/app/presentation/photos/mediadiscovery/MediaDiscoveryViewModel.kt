@@ -10,11 +10,18 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
+import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -28,6 +35,7 @@ import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.usecase.CopyNodeListUseCase
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
 import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
@@ -44,7 +52,9 @@ import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
+import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import java.io.File
 import javax.inject.Inject
@@ -64,8 +74,12 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
-
-    ) : ViewModel() {
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val authorizeNode: AuthorizeNode,
+    private val copyNodeListUseCase: CopyNodeListUseCase,
+    private val copyRequestMessageMapper: CopyRequestMessageMapper,
+) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
     val state = _state.asStateFlow()
@@ -73,9 +87,29 @@ class MediaDiscoveryViewModel @Inject constructor(
     private var fetchPhotosJob: Job? = null
 
     init {
+        checkConnectivity()
         checkMDSetting()
         loadSortRule()
         fetchPhotos()
+    }
+
+    /**
+     * Is connected
+     */
+    val isConnected: Boolean
+        get() = _state.value.isConnectedToNetwork
+
+    private fun checkConnectivity() {
+        viewModelScope.launch {
+            flow {
+                emitAll(monitorConnectivityUseCase())
+            }.collectLatest { isConnected ->
+                _state.update {
+                    it.copy(isConnectedToNetwork = isConnected)
+                }
+            }
+        }
+
     }
 
     private fun checkMDSetting() {
@@ -247,6 +281,17 @@ class MediaDiscoveryViewModel @Inject constructor(
             photo.id
         }
 
+    suspend fun getAllPhotoNodes() =
+        getNodeListByIds(getAllPhotoIds())
+
+    suspend fun getNodes() =
+        if (_state.value.selectedPhotoIds.isNotEmpty()) {
+            getSelectedNodes()
+        } else {
+            getAllPhotoNodes()
+        }
+
+
     suspend fun getSelectedNodes() =
         getNodeListByIds(_state.value.selectedPhotoIds.toList())
 
@@ -410,4 +455,55 @@ class MediaDiscoveryViewModel @Inject constructor(
                 }
             }
         }
+
+    suspend fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) {
+        runCatching {
+            checkNameCollisionUseCase.checkNodeListAsync(
+                nodes = nodes,
+                parentHandle = toHandle,
+                type = NameCollisionType.COPY
+            )
+        }.map { result: Pair<ArrayList<NameCollision>, List<MegaNode>> ->
+            if (result.first.isNotEmpty()) {
+                _state.update {
+                    it.copy(collisions = result.first)
+                }
+            }
+            copyNodeListUseCase(result.second, toHandle)
+        }.onSuccess { copyRequestResult ->
+            _state.update {
+                it.copy(
+                    copyResultText = copyRequestMessageMapper(
+                        copyRequestResult
+                    )
+                )
+            }
+        }.onFailure { throwable ->
+            _state.update {
+                it.copy(
+                    copyThrowable = throwable
+                )
+            }
+        }
+    }
+
+    /**
+     * Reset values once show copy result is processed
+     */
+    fun resetShowCopyResult() {
+        _state.update {
+            it.copy(copyResultText = null, copyThrowable = null)
+        }
+    }
+
+    /**
+     * Reset values once collision activity is launched
+     */
+    fun resetLaunchCollisionActivity() {
+        _state.update {
+            it.copy(collisions = null)
+        }
+    }
+
+    suspend fun authorizeNodeById(id: Long): MegaNode? = authorizeNode(id)
 }

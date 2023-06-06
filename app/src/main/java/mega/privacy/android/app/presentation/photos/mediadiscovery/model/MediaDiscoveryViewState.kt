@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery.model
 
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
@@ -27,6 +28,10 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property shouldBack handle empty state, when no photos then back to file list page, eg, delete.
  * @property showSortByDialog
  * @property showFilterDialog
+ * @property collisions
+ * @property copyThrowable
+ * @property copyResultText
+ * @property isConnectedToNetwork
  */
 data class MediaDiscoveryViewState(
     val sourcePhotos: List<Photo> = emptyList(),
@@ -45,4 +50,8 @@ data class MediaDiscoveryViewState(
     val shouldBack: Boolean = false,
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
+    val collisions: ArrayList<NameCollision>? = null,
+    val copyThrowable: Throwable? = null,
+    val copyResultText: String? = null,
+    val isConnectedToNetwork: Boolean = true,
 )

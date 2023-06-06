@@ -18,7 +18,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,9 +45,8 @@ import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.domain.entity.photos.Photo
 
 
@@ -62,11 +60,11 @@ fun MediaDiscoveryScreen(
     onBackClicked: () -> Unit,
     onPhotoClicked: (Photo) -> Unit,
     onPhotoLongPressed: (Photo) -> Unit,
+    onImportClicked: () -> Unit,
+    onSaveToDeviceClicked: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
-    val isLight = MaterialTheme.colors.isLight
     val lazyGridState = rememberLazyGridState()
-    val coroutineScope = rememberCoroutineScope()
 
     var showSortByDialog by rememberSaveable { mutableStateOf(false) }
     var showFilterDialog by rememberSaveable { mutableStateOf(false) }
@@ -98,10 +96,10 @@ fun MediaDiscoveryScreen(
         topBar = {
             MDHeader(
                 screenTitle = screenTitle,
+                currentZoomLevel = uiState.currentZoomLevel,
                 selectedTimeBarTab = uiState.selectedTimeBarTab,
                 numSelectedPhotos = uiState.selectedPhotoIds.size,
                 showMoreMenu = showMoreMenu,
-                showSelectAllMenu = false,
                 onBackClicked = {
                     if (uiState.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -110,9 +108,11 @@ fun MediaDiscoveryScreen(
                     }
                 },
                 onImportClicked = {
+                    onImportClicked()
                     showMoreMenu = false
                 },
                 onSaveToDeviceClicked = {
+                    onSaveToDeviceClicked()
                     showMoreMenu = false
                 },
                 onSortByClicked = {
@@ -172,10 +172,10 @@ fun MediaDiscoveryScreen(
 @Composable
 private fun MDHeader(
     screenTitle: String? = null,
+    currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     selectedTimeBarTab: TimeBarTab,
     numSelectedPhotos: Int,
     showMoreMenu: Boolean,
-    showSelectAllMenu: Boolean,
     onBackClicked: () -> Unit,
     onImportClicked: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
@@ -188,7 +188,6 @@ private fun MDHeader(
     onSelectAllClicked: () -> Unit,
     onClearSelectionClicked: () -> Unit,
 ) {
-    val isLight = MaterialTheme.colors.isLight
 
     TopAppBar(
         title = {
@@ -196,7 +195,7 @@ private fun MDHeader(
                 if (numSelectedPhotos > 0) {
                     Text(
                         text = "$numSelectedPhotos",
-                        color = teal_300,
+                        color = tealIconTint(),
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.subtitle1,
                     )
@@ -216,9 +215,9 @@ private fun MDHeader(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_arrow_back_white),
                     contentDescription = null,
-                    tint = teal_300.takeIf {
+                    tint = tealIconTint().takeIf {
                         numSelectedPhotos > 0
-                    } ?: (black.takeIf { isLight } ?: white),
+                    } ?: blackWhiteIconTint(),
                 )
             }
         },
@@ -229,7 +228,13 @@ private fun MDHeader(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_zoom_out),
                             contentDescription = null,
-                            tint = black.takeIf { isLight } ?: white,
+                            tint = blackWhiteIconTint().takeIf {
+                                isZoomOutValid(
+                                    currentZoomLevel
+                                )
+                            } ?: blackWhiteIconTint().copy(
+                                alpha = 0.5f
+                            )
                         )
                     }
 
@@ -237,7 +242,13 @@ private fun MDHeader(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_zoom_in),
                             contentDescription = null,
-                            tint = black.takeIf { isLight } ?: white,
+                            tint = blackWhiteIconTint().takeIf {
+                                isZoomInValid(
+                                    currentZoomLevel
+                                )
+                            } ?: blackWhiteIconTint().copy(
+                                alpha = 0.5f
+                            )
                         )
                     }
                 } else {
@@ -245,7 +256,7 @@ private fun MDHeader(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_download_white),
                             contentDescription = null,
-                            tint = teal_300,
+                            tint = tealIconTint(),
                         )
                     }
 
@@ -253,7 +264,7 @@ private fun MDHeader(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_import_to_cloud_white),
                             contentDescription = null,
-                            tint = teal_300,
+                            tint = tealIconTint(),
                         )
                     }
                 }
@@ -262,21 +273,18 @@ private fun MDHeader(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_dots_vertical_white),
                         contentDescription = null,
-                        tint = teal_300.takeIf {
+                        tint = tealIconTint().takeIf {
                             numSelectedPhotos > 0
-                        } ?: (black.takeIf { isLight } ?: white),
+                        } ?: blackWhiteIconTint(),
                     )
                 }
             }
 
-
             DropdownMenu(expanded = showMoreMenu, onDismissRequest = onMoreDismissed) {
 
                 if (numSelectedPhotos > 0) {
-                    if (showSelectAllMenu) {
-                        DropdownMenuItem(onClick = onSelectAllClicked) {
-                            Text(text = stringResource(id = R.string.action_select_all))
-                        }
+                    DropdownMenuItem(onClick = onSelectAllClicked) {
+                        Text(text = stringResource(id = R.string.action_select_all))
                     }
                     DropdownMenuItem(onClick = onClearSelectionClicked) {
                         Text(text = stringResource(id = R.string.action_unselect_all))
@@ -300,6 +308,22 @@ private fun MDHeader(
         elevation = 0.dp,
     )
 }
+
+@Composable
+private fun tealIconTint() = MaterialTheme.colors.teal_300_teal_200
+
+@Composable
+private fun blackWhiteIconTint() = MaterialTheme.colors.black_white
+
+@Composable
+private fun isZoomInValid(currentZoomLevel: ZoomLevel) =
+    currentZoomLevel != ZoomLevel.values()
+        .first()
+
+@Composable
+private fun isZoomOutValid(currentZoomLevel: ZoomLevel) =
+    currentZoomLevel != ZoomLevel.values()
+        .last()
 
 @Composable
 private fun MediaDiscoveryContent(
