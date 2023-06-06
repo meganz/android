@@ -55,7 +55,7 @@ ext {
     buildToolsVerion = '33.0.1'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20230601.013830-rel'
+    megaSdkVersion = '20230606.094618-rel'
 
     //JDK and Java Version
     jdk = "17"
