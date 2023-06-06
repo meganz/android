@@ -398,6 +398,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             state.flowWithLifecycle(
                 viewLifecycleOwner.lifecycle, Lifecycle.State.RESUMED
             ).onEach { state ->
+                rotatableFragmentViewType = state.viewType
                 switchListGridView(state.viewType)
             }.launchIn(viewLifecycleOwner.lifecycleScope)
         }
@@ -872,7 +873,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      *
      * @param nodes search nodes
      */
-    fun setSearchNodes(nodes: List<MegaNode>) {
+    private fun setSearchNodes(nodes: List<MegaNode>) {
         searchNodes.clear()
         searchNodes.addAll(nodes)
         (requireActivity() as FileExplorerActivity).shouldRestartSearch = true

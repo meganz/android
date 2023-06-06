@@ -1,16 +1,11 @@
 package mega.privacy.android.app.main.managerSections;
 
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
-
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
 import java.util.ArrayList;
-
-import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
+import mega.privacy.android.domain.entity.preference.ViewType;
 import timber.log.Timber;
 
 public abstract class RotatableFragment extends Fragment {
@@ -42,6 +37,11 @@ public abstract class RotatableFragment extends Fragment {
 
     private boolean waitingForSearchedNodes;
 
+    private ViewType rotatableFragmentViewType = ViewType.LIST;
+
+    /**
+     * Redo the selection after rotation
+     */
     protected void reDoTheSelectionAfterRotation() {
         Timber.d("Reselect items");
         setWaitingForSearchedNodes(false);
@@ -62,6 +62,9 @@ public abstract class RotatableFragment extends Fragment {
         updateActionModeTitle();
     }
 
+    /**
+     * Reselect unhandled item
+     */
     protected void reSelectUnhandledItem() {
         if (unHandledItem == -1) {
             return;
@@ -75,6 +78,8 @@ public abstract class RotatableFragment extends Fragment {
     }
 
     /**
+     * Transfer position
+     *
      * @param originalPosition original position before rotation
      * @param adapter          the adapter where rotation happens
      * @return the list position after rotation of adapter
@@ -84,7 +89,7 @@ public abstract class RotatableFragment extends Fragment {
 
         int folderCount = adapter.getFolderCount();
 
-        if (isList() || folderCount == 0 || originalPosition < folderCount) {
+        if (getRotatableFragmentViewType() == ViewType.LIST || folderCount == 0 || originalPosition < folderCount) {
             position = originalPosition;
         } else if (isScreenInPortrait(getContext())) {
             position = originalPosition - (lastPlaceHolderCount - adapter.getPlaceholderCount());
@@ -92,16 +97,6 @@ public abstract class RotatableFragment extends Fragment {
             position = originalPosition + (adapter.getPlaceholderCount() - lastPlaceHolderCount);
         }
         return position;
-    }
-
-    private boolean isList() {
-        if (getActivity() instanceof ManagerActivity) {
-            return ((ManagerActivity) getActivity()).isList();
-        } else if (getActivity() instanceof FileExplorerActivity) {
-            return ((FileExplorerActivity) getActivity()).isList();
-        }
-
-        return false;
     }
 
     @Override
@@ -146,6 +141,12 @@ public abstract class RotatableFragment extends Fragment {
 
     public void setWaitingForSearchedNodes(boolean waitingForSearchedNodes) {
         this.waitingForSearchedNodes = waitingForSearchedNodes;
+    }
+
+    public ViewType getRotatableFragmentViewType() { return rotatableFragmentViewType;}
+
+    public void setRotatableFragmentViewType(ViewType rotatableFragmentViewType) {
+        this.rotatableFragmentViewType = rotatableFragmentViewType;
     }
 
     protected void resetSelectedItems() {

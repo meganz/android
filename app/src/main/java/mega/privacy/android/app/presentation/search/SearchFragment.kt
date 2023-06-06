@@ -226,6 +226,7 @@ class SearchFragment : RotatableFragment() {
         )
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            rotatableFragmentViewType = state.viewType
             handleViewType(state.viewType)
         }
     }

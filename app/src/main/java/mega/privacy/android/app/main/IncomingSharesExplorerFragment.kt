@@ -345,6 +345,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             EventObserver { showSortByPanel() }
         )
         collectFlow(sortByHeaderViewModel.state) { state ->
+            rotatableFragmentViewType = state.viewType
             switchListGridView(state.viewType)
         }
         super.onViewCreated(view, savedInstanceState)
