@@ -2,8 +2,8 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 
 /**
@@ -39,7 +39,7 @@ interface TransfersRepository {
      */
     fun startUpload(
         localPath: String,
-        parentNode: MegaNode,
+        parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
         appData: String?,

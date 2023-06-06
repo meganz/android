@@ -40,7 +40,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelTransfer
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -78,6 +77,7 @@ import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
@@ -92,6 +92,7 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
@@ -314,10 +315,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var isChargingRequired: IsChargingRequired
 
     /**
-     * GetNodeByHandle
+     * [GetNodeByIdUseCase]
      */
     @Inject
-    lateinit var getNodeByHandle: GetNodeByHandle
+    lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
 
     /**
      * GetChildrenNode
@@ -759,7 +760,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     /**
      * Cancels a pending [MegaTransfer] through [CancelTransfer],
-     * and call [ResetTotalUploads] after every cancellation to reset the total uploads if
+     * and call [resetTotalUploadsUseCase] after every cancellation to reset the total uploads if
      * there are no more pending uploads
      *
      * @param transfer the [MegaTransfer] to be cancelled
@@ -775,7 +776,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     /**
      * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfersUseCase],
-     * and call [ResetTotalUploads] afterwards
+     * and call [resetTotalUploadsUseCase] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
         runCatching { cancelAllUploadTransfersUseCase() }
@@ -1046,7 +1047,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
-        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandleUseCase())
+        val primaryUploadNode = getNodeByIdUseCase(NodeId(getPrimarySyncHandleUseCase()))
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
             endService(aborted = true)
@@ -1054,14 +1055,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
         val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
             Timber.d("Secondary Upload is ENABLED")
-            getNodeByHandle(getSecondarySyncHandleUseCase())
+            getNodeByIdUseCase(NodeId(getSecondarySyncHandleUseCase()))
         } else {
             null
         }
         totalUploaded = 0
         processMediaForUploadUseCase(
-            NodeId(primaryUploadNode.handle),
-            secondaryUploadNode?.let { NodeId(it.handle) },
+            primaryUploadNode.id,
+            secondaryUploadNode?.id,
             tempRoot
         )
         gatherSyncRecordsForUpload()
@@ -1111,8 +1112,8 @@ class CameraUploadsWorker @AssistedInject constructor(
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
         }
-        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandleUseCase())
-        val secondaryUploadNode = getNodeByHandle(getSecondarySyncHandleUseCase())
+        val primaryUploadNode = getNodeByIdUseCase(NodeId(getPrimarySyncHandleUseCase()))
+        val secondaryUploadNode = getNodeByIdUseCase(NodeId(getSecondarySyncHandleUseCase()))
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
@@ -1181,7 +1182,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             if (file.isCopyOnly) {
                 Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
                 file.nodeHandle?.let { nodeHandle ->
-                    getNodeByHandle(nodeHandle)?.let { nodeToCopy ->
+                    getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
                         totalToUpload++
                         copyFileAsyncList.add(async {
                             handleCopyNode(
@@ -1214,7 +1215,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             uploadFileAsyncList.add(async {
                                 startUpload(
                                     localPath = nonNullFilePath,
-                                    parentNode = parent,
+                                    parentNodeId = parent.id,
                                     fileName = file.fileName,
                                     modificationTime = lastModified / 1000,
                                     appData = Constants.APP_DATA_CU,
@@ -1330,27 +1331,29 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
      */
     private suspend fun handleCopyNode(
-        nodeToCopy: MegaNode,
-        newNodeParent: MegaNode,
+        nodeToCopy: Node,
+        newNodeParent: Node,
         newNodeName: String,
     ) {
         runCatching {
             copyNodeUseCase(
-                nodeToCopy = NodeId(nodeToCopy.handle),
-                newNodeParent = NodeId(newNodeParent.handle),
+                nodeToCopy = nodeToCopy.id,
+                newNodeParent = newNodeParent.id,
                 newNodeName = newNodeName,
             )
         }.onSuccess { nodeId ->
             Timber.d("Copy node successful")
-            getNodeByHandle(nodeId.longValue)?.let { retrievedNode ->
+            (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
                 val fingerprint = retrievedNode.fingerprint
-                val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandleUseCase()
+                val isSecondary = retrievedNode.parentId == NodeId(getSecondarySyncHandleUseCase())
                 // Delete the Camera Upload sync record by fingerprint
-                deleteSyncRecordByFingerprint(
-                    originalPrint = fingerprint,
-                    newPrint = fingerprint,
-                    isSecondary = isSecondary,
-                )
+                fingerprint?.let {
+                    deleteSyncRecordByFingerprint(
+                        originalPrint = fingerprint,
+                        newPrint = fingerprint,
+                        isSecondary = isSecondary,
+                    )
+                }
                 // Update information when the file is copied to the target node
                 onUploadSuccess(
                     node = retrievedNode,
@@ -1365,9 +1368,9 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     }
 
-    private suspend fun checkExistBySize(parent: MegaNode, size: Long): FileNode? {
+    private suspend fun checkExistBySize(parent: Node, size: Long): FileNode? {
         val nodeList =
-            getTypedChildrenNodeUseCase(NodeId(parent.handle), SortOrder.ORDER_ALPHABETICAL_ASC)
+            getTypedChildrenNodeUseCase(parent.id, SortOrder.ORDER_ALPHABETICAL_ASC)
         for (node in nodeList) {
             if (node is FileNode && node.size == size) {
                 return node
@@ -1499,7 +1502,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun getSecondaryFolderHandle(): Long {
         // get Secondary folder handle of user
         val secondarySyncHandle = getSecondarySyncHandleUseCase()
-        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByHandle(secondarySyncHandle) == null) {
+        if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByIdUseCase(
+                NodeId(secondarySyncHandle)
+            ) == null
+        ) {
             // if it's invalid or deleted then return the default value
             return getDefaultNodeHandleUseCase(context.getString(R.string.section_secondary_media_uploads))
         }
@@ -1687,8 +1693,8 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("Image Sync API_OK")
-            val node = getNodeByHandle(transfer.nodeHandle)
-            val isSecondary = node?.parentHandle == getSecondarySyncHandleUseCase()
+            val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
+            val isSecondary = node?.parentId == NodeId(getSecondarySyncHandleUseCase())
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { nonNullNode ->
@@ -1697,13 +1703,13 @@ class CameraUploadsWorker @AssistedInject constructor(
                         isSecondary = record.isSecondary,
                     )
                     handleSetOriginalFingerprint(
-                        nodeId = NodeId(nonNullNode.handle),
+                        nodeId = nonNullNode.id,
                         originalFingerprint = record.originFingerprint.orEmpty(),
                     )
                     record.latitude?.let { latitude ->
                         record.longitude?.let { longitude ->
                             setCoordinatesUseCase(
-                                nodeId = NodeId(nonNullNode.handle),
+                                nodeId = nonNullNode.id,
                                 latitude = latitude.toDouble(),
                                 longitude = longitude.toDouble(),
                             )
@@ -1805,7 +1811,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun startVideoCompression() = coroutineScope {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
-            @Suppress("DEPRECATION")
             resetTotalUploadsUseCase()
             totalUploaded = 0
             totalToUpload = 0

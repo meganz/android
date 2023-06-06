@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
@@ -702,17 +703,17 @@ object CameraUploadSyncManager {
      * @param node The uploaded/copied node.
      * @param isSecondary Whether it is a MU backup.
      */
-    fun onUploadSuccess(node: MegaNode, isSecondary: Boolean) {
+    fun onUploadSuccess(node: TypedFileNode, isSecondary: Boolean) {
         if (isSecondary) {
             muPendingUploads--
             muUploadedBytes += node.size
             muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            muLastUploadedHandle = node.handle
+            muLastUploadedHandle = node.id.longValue
         } else {
             cuPendingUploads--
             cuUploadedBytes += node.size
             cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            cuLastUploadedHandle = node.handle
+            cuLastUploadedHandle = node.id.longValue
         }
     }
 

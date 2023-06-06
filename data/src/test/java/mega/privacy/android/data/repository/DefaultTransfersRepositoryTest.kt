@@ -18,6 +18,7 @@ import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.exception.MegaException
@@ -83,7 +84,7 @@ class DefaultTransfersRepositoryTest {
     private fun startUploadFlow() =
         underTest.startUpload(
             localPath = "test local path",
-            parentNode = mock(),
+            parentNodeId = NodeId(1L),
             fileName = "test filename",
             modificationTime = 123456789L,
             appData = null,
@@ -100,6 +101,7 @@ class DefaultTransfersRepositoryTest {
                 transfer = mock(),
             )
         }
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
         startUploadFlow().test {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferStart::class.java)
         }
@@ -114,6 +116,7 @@ class DefaultTransfersRepositoryTest {
                 error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
             )
         }
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
         startUploadFlow().test {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferFinish::class.java)
             awaitComplete()
@@ -131,6 +134,7 @@ class DefaultTransfersRepositoryTest {
                     transfer = mock(),
                 )
             }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
             startUploadFlow().test {
                 assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferUpdate::class.java)
             }
@@ -146,6 +150,7 @@ class DefaultTransfersRepositoryTest {
                     error = mock { on { errorCode }.thenReturn(MegaError.API_OK + 1) },
                 )
             }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
             startUploadFlow().test {
                 assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferTemporaryError::class.java)
             }
@@ -160,6 +165,7 @@ class DefaultTransfersRepositoryTest {
                 buffer = byteArrayOf(),
             )
         }
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
         startUploadFlow().test {
             assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferData::class.java)
         }

@@ -80,7 +80,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun startUpload(
         localPath: String,
-        parentNode: MegaNode,
+        parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
         appData: String?,
@@ -88,6 +88,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         shouldStartFirst: Boolean,
         cancelToken: MegaCancelToken?,
     ): Flow<GlobalTransfer> = callbackFlow {
+        val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
+        requireNotNull(parentNode)
         val listener = uploadListener(channel)
 
         megaApiGateway.startUpload(

@@ -2,8 +2,8 @@ package mega.privacy.android.app.domain.usecase
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaNode
 
 /**
  * Use Case to upload a file or folder
@@ -14,7 +14,7 @@ fun interface StartUpload {
      * Invokes the Use Case to upload a file or folder
      *
      * @param localPath The local path of the file or folder
-     * @param parentNode The parent node for the file or folder
+     * @param parentNodeId The parent node for the file or folder
      * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
      * if there are no changes
      * @param modificationTime The custom modification time for the file or folder, denoted in
@@ -31,7 +31,7 @@ fun interface StartUpload {
      */
     suspend operator fun invoke(
         localPath: String,
-        parentNode: MegaNode,
+        parentNodeId: NodeId,
         fileName: String?,
         modificationTime: Long,
         appData: String?,
