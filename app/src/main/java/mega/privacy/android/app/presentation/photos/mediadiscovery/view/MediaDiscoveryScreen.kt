@@ -100,6 +100,7 @@ fun MediaDiscoveryScreen(
                 selectedTimeBarTab = uiState.selectedTimeBarTab,
                 numSelectedPhotos = uiState.selectedPhotoIds.size,
                 showMoreMenu = showMoreMenu,
+                showImportMenu = uiState.hasDbCredentials,
                 onBackClicked = {
                     if (uiState.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -176,6 +177,7 @@ private fun MDHeader(
     selectedTimeBarTab: TimeBarTab,
     numSelectedPhotos: Int,
     showMoreMenu: Boolean,
+    showImportMenu: Boolean,
     onBackClicked: () -> Unit,
     onImportClicked: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
@@ -260,12 +262,14 @@ private fun MDHeader(
                         )
                     }
 
-                    IconButton(onClick = onImportClicked) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_import_to_cloud_white),
-                            contentDescription = null,
-                            tint = tealIconTint(),
-                        )
+                    if (showImportMenu) {
+                        IconButton(onClick = onImportClicked) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_import_to_cloud_white),
+                                contentDescription = null,
+                                tint = tealIconTint(),
+                            )
+                        }
                     }
                 }
 
@@ -290,8 +294,10 @@ private fun MDHeader(
                         Text(text = stringResource(id = R.string.action_unselect_all))
                     }
                 } else {
-                    DropdownMenuItem(onClick = onImportClicked) {
-                        Text(text = stringResource(id = R.string.general_import))
+                    if (showImportMenu) {
+                        DropdownMenuItem(onClick = onImportClicked) {
+                            Text(text = stringResource(id = R.string.general_import))
+                        }
                     }
                     DropdownMenuItem(onClick = onSaveToDeviceClicked) {
                         Text(text = stringResource(id = R.string.general_save_to_device))

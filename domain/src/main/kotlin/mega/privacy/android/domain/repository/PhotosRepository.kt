@@ -55,7 +55,21 @@ interface PhotosRepository {
      * @param folderId
      * @param recursive True search Photo from sub folders, false only search current folder
      */
-    suspend fun getPhotosByFolderId(folderId: NodeId, recursive: Boolean): List<Photo>
+    suspend fun getPhotosByFolderId(
+        folderId: NodeId,
+        recursive: Boolean,
+    ): List<Photo>
+
+    /**
+     * Get Photos from a folder
+     *
+     * @param folderId
+     * @param recursive True search Photo from sub folders, false only search current folder
+     */
+    suspend fun getPhotosByFolderIdInFolderLink(
+        folderId: NodeId,
+        recursive: Boolean,
+    ): List<Photo>
 
     /**
      * Get Photos By a list of id

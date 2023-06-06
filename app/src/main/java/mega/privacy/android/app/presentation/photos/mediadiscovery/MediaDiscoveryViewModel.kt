@@ -10,14 +10,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -45,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdInFolderLinkUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -64,6 +65,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val savedStateHandle: SavedStateHandle,
     private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
+    private val getPhotosByFolderIdInFolderLinkUseCase: GetPhotosByFolderIdInFolderLinkUseCase,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
@@ -79,14 +81,19 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val authorizeNode: AuthorizeNode,
     private val copyNodeListUseCase: CopyNodeListUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
+    private val hasCredentials: HasCredentials,
+    private val getPublicNodeListByIds: GetPublicNodeListByIds,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
     val state = _state.asStateFlow()
 
     private var fetchPhotosJob: Job? = null
+    private var fromFolderLink: Boolean? = null
 
     init {
+        fromFolderLink =
+            savedStateHandle.get<Boolean>(MediaDiscoveryActivity.INTENT_KEY_FROM_FOLDER_LINK)
         checkConnectivity()
         checkMDSetting()
         loadSortRule()
@@ -101,15 +108,13 @@ class MediaDiscoveryViewModel @Inject constructor(
 
     private fun checkConnectivity() {
         viewModelScope.launch {
-            flow {
-                emitAll(monitorConnectivityUseCase())
-            }.collectLatest { isConnected ->
-                _state.update {
-                    it.copy(isConnectedToNetwork = isConnected)
+            monitorConnectivityUseCase()
+                .collectLatest { isConnected ->
+                    _state.update {
+                        it.copy(isConnectedToNetwork = isConnected)
+                    }
                 }
-            }
         }
-
     }
 
     private fun checkMDSetting() {
@@ -147,15 +152,31 @@ class MediaDiscoveryViewModel @Inject constructor(
         fetchPhotosJob?.cancel()
 
         val currentFolderId = savedStateHandle.get<Long>(INTENT_KEY_CURRENT_FOLDER_ID)
+
         fetchPhotosJob = currentFolderId?.let {
             viewModelScope.launch {
-                getPhotosByFolderIdUseCase(folderId = NodeId(it), recursive = true)
-                    .collectLatest { sourcePhotos ->
+                if (fromFolderLink == true) {
+                    getPhotosByFolderIdInFolderLinkUseCase(
+                        folderId = NodeId(it),
+                        recursive = true
+                    ).collectLatest { sourcePhotos ->
                         handlePhotoItems(
                             sortedPhotos = sortAndFilterPhotos(sourcePhotos),
                             sourcePhotos = sourcePhotos
                         )
                     }
+                } else {
+                    getPhotosByFolderIdUseCase(
+                        folderId = NodeId(it),
+                        recursive = true
+                    ).collectLatest { sourcePhotos ->
+                        handlePhotoItems(
+                            sortedPhotos = sortAndFilterPhotos(sourcePhotos),
+                            sourcePhotos = sourcePhotos
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -281,8 +302,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             photo.id
         }
 
-    suspend fun getAllPhotoNodes() =
-        getNodeListByIds(getAllPhotoIds())
+    suspend fun getAllPhotoNodes() = getNodesByIds(getAllPhotoIds())
 
     suspend fun getNodes() =
         if (_state.value.selectedPhotoIds.isNotEmpty()) {
@@ -292,8 +312,15 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
 
 
-    suspend fun getSelectedNodes() =
-        getNodeListByIds(_state.value.selectedPhotoIds.toList())
+    suspend fun getSelectedNodes() = getNodesByIds(_state.value.selectedPhotoIds.toList())
+
+    private suspend fun getNodesByIds(ids: List<Long>) =
+        if (fromFolderLink == true) {
+            getPublicNodeListByIds(ids)
+        } else {
+            getNodeListByIds(ids)
+        }
+
 
     fun setCurrentSort(sort: Sort) {
         _state.update {
@@ -506,4 +533,18 @@ class MediaDiscoveryViewModel @Inject constructor(
     }
 
     suspend fun authorizeNodeById(id: Long): MegaNode? = authorizeNode(id)
+
+    /**
+     * Check if login is required
+     */
+    fun checkLoginRequired() {
+        viewModelScope.launch {
+            val hasCredentials = hasCredentials()
+            _state.update {
+                it.copy(
+                    hasDbCredentials = hasCredentials
+                )
+            }
+        }
+    }
 }

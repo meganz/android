@@ -113,6 +113,13 @@ interface MegaNodeRepository {
     suspend fun getNodeByHandle(handle: Long): MegaNode?
 
     /**
+     * Get the node corresponding to a handle
+     *
+     * @param handle
+     */
+    suspend fun getPublicNodeByHandle(handle: Long): MegaNode?
+
+    /**
      * Get the MegaNode by path
      *
      * @param path

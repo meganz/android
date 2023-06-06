@@ -78,7 +78,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
         }
-
+        checkLoginStatus()
         setContent {
             val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
@@ -97,6 +97,10 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
 
         setupFlow()
         setupLauncher()
+    }
+
+    private fun checkLoginStatus() {
+        mediaDiscoveryViewModel.checkLoginRequired()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -390,12 +394,14 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             val intent = Intent(context, MediaDiscoveryActivity::class.java).apply {
                 putExtra(INTENT_KEY_CURRENT_FOLDER_ID, mediaHandle)
                 putExtra(INTENT_KEY_CURRENT_FOLDER_NAME, folderName)
+                putExtra(INTENT_KEY_FROM_FOLDER_LINK, true)
                 putExtra(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON, isOpenByMDIcon)
             }
             context.startActivity(intent)
         }
 
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
+        internal const val INTENT_KEY_FROM_FOLDER_LINK = "FROM_FOLDER_LINK"
         internal const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
         private const val INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON =
             "OPEN_MEDIA_DISCOVERY_BY_MD_ICON"

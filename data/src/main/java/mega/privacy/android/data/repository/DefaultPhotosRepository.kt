@@ -26,6 +26,7 @@ import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -74,6 +75,7 @@ import kotlin.coroutines.resumeWithException
 internal class DefaultPhotosRepository @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
+    private val megaApiFolder: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -227,7 +229,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_PHOTO,
+                        type = MegaApiAndroid.FILE_TYPE_PHOTO
                     )
                     mapPhotoNodesToImages(imageNodes)
                 }
@@ -238,7 +240,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                         cancelToken = token,
                         recursive = recursive,
                         order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
-                        type = MegaApiAndroid.FILE_TYPE_VIDEO,
+                        type = MegaApiAndroid.FILE_TYPE_VIDEO
                     )
                     mapPhotoNodesToVideos(videoNodes)
                 }
@@ -254,6 +256,47 @@ internal class DefaultPhotosRepository @Inject constructor(
             } ?: emptyList()
         }
 
+    override suspend fun getPhotosByFolderIdInFolderLink(
+        folderId: NodeId,
+        recursive: Boolean,
+    ): List<Photo> =
+        withContext(ioDispatcher) {
+            val parent = megaApiFolder.getMegaNodeByHandle(folderId.longValue)
+            parent?.let { parentNode ->
+                val token = MegaCancelToken.createInstance()
+                val images = async {
+                    val imageNodes = megaApiFolder.searchByType(
+                        parentNode = parentNode,
+                        searchString = "",
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_PHOTO
+                    )
+                    mapPhotoNodesToImages(imageNodes)
+                }
+                val videos = async {
+                    val videoNodes = megaApiFolder.searchByType(
+                        parentNode = parentNode,
+                        searchString = "",
+                        cancelToken = token,
+                        recursive = recursive,
+                        order = MegaApiAndroid.ORDER_MODIFICATION_DESC,
+                        type = MegaApiAndroid.FILE_TYPE_VIDEO
+                    )
+                    mapPhotoNodesToVideos(videoNodes)
+                }
+                val photos = images.await() + videos.await()
+                suspendCancellableCoroutine { continuation ->
+                    continuation.resumeWith(Result.success(photos))
+                    continuation.invokeOnCancellation {
+                        token.cancel()
+                    }
+                }
+                token.cancel()
+                photos
+            } ?: emptyList()
+        }
 
     override suspend fun getPhotosByIds(ids: List<NodeId>): List<Photo> =
         withContext(ioDispatcher) {

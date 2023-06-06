@@ -3,6 +3,7 @@ package mega.privacy.android.data.facade
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 import javax.inject.Inject
@@ -79,4 +80,21 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override suspend fun getParentNode(node: MegaNode): MegaNode? =
         megaApiFolder.getParentNode(node)
+
+    override suspend fun searchByType(
+        parentNode: MegaNode,
+        searchString: String,
+        cancelToken: MegaCancelToken,
+        recursive: Boolean,
+        order: Int,
+        type: Int,
+    ): List<MegaNode> =
+        megaApiFolder.searchByType(
+            parentNode,
+            searchString,
+            cancelToken,
+            recursive,
+            order,
+            type
+        )
 }

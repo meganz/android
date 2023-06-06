@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -9,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -47,6 +47,7 @@ class DefaultPhotosRepositoryTest {
 
     private val nodeRepository = mock<NodeRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val cacheFolderFacade = mock<CacheFolderGateway> {
         on { getCacheFolder(any()) }.thenReturn(null)
@@ -234,6 +235,7 @@ class DefaultPhotosRepositoryTest {
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultPhotosRepository(
         nodeRepository = nodeRepository,
         megaApiFacade = megaApiGateway,
+        megaApiFolder = megaApiFolder,
         appScope = coroutineScope,
         ioDispatcher = UnconfinedTestDispatcher(),
         cacheFolderFacade = cacheFolderFacade,

@@ -1,5 +1,6 @@
 package mega.privacy.android.data.gateway.api
 
+import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequestListenerInterface
 
@@ -154,4 +155,31 @@ interface MegaApiFolderGateway {
      * @return the parent node of the node, null if node doesn't exist
      */
     suspend fun getParentNode(node: MegaNode): MegaNode?
+
+    /**
+     *
+     * Allow to search nodes with the following options:
+     * - Search given a parent node of the tree to explore
+     * - Search recursively
+     * - Containing a search string in their name
+     * - Filter by the type of the node
+     * - Order the returned list
+     *
+     * @param parentNode parentNode
+     * @param searchString containing a search string in their name
+     * @param cancelToken use for cancel search
+     * @param recursive is search recursively
+     * @param order
+     * @param type type of nodes requested in the search
+     *
+     * @return List of nodes that match with the search parameters
+     */
+    suspend fun searchByType(
+        parentNode: MegaNode,
+        searchString: String,
+        cancelToken: MegaCancelToken,
+        recursive: Boolean,
+        order: Int,
+        type: Int,
+    ): List<MegaNode>
 }

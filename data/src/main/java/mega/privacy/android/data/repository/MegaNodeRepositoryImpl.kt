@@ -196,6 +196,11 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)
     }
 
+    override suspend fun getPublicNodeByHandle(handle: Long): MegaNode? =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(handle)
+        }
+
     override suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode> =
         withContext(ioDispatcher) {
             megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))
