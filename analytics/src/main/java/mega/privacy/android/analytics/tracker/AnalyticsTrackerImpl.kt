@@ -11,10 +11,10 @@ import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
-import mega.privacy.android.domain.entity.analytics.DialogDisplayedEventIdentifier
-import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
-import mega.privacy.android.domain.entity.analytics.TabSelectedEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.TabSelectedEventIdentifier
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.analytics.GetViewIdUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackEventUseCase

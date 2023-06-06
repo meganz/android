@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.analytics
 
 import com.google.common.truth.Truth
+import mega.privacy.android.domain.entity.analytics.identifier.TabSelectedEventIdentifier
 import org.junit.jupiter.api.Test
 
 internal class TabSelectedEventTest {

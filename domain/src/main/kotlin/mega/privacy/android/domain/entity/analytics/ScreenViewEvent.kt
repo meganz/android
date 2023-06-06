@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.analytics
 
+import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
+
 /**
  * Screen view event
  *

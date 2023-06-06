@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.analytics
 
 import mega.privacy.android.domain.entity.analytics.ScreenViewEvent
-import mega.privacy.android.domain.entity.analytics.ScreenViewEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
 import javax.inject.Inject
 
 /**

@@ -1,16 +1,15 @@
-package mega.privacy.android.domain.entity.analytics
+package mega.privacy.android.domain.entity.analytics.identifier
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-internal class TabSelectedEventIdentifierTest {
-
+internal class DialogDisplayedEventIdentifierTest {
     @Test
     internal fun `test that an exception is thrown if the identifier is negative`() {
         assertThrows<IllegalArgumentException> {
-            TabSelectedEventIdentifier(
+            DialogDisplayedEventIdentifier(
                 screenName = "",
-                tabName = "",
+                dialogName = "",
                 uniqueIdentifier = -1
             )
         }
@@ -19,9 +18,9 @@ internal class TabSelectedEventIdentifierTest {
     @Test
     internal fun `test that an exception is thrown if the identifier greater than 999`() {
         assertThrows<IllegalArgumentException> {
-            TabSelectedEventIdentifier(
+            DialogDisplayedEventIdentifier(
                 screenName = "",
-                tabName = "",
+                dialogName = "",
                 uniqueIdentifier = 999 + 1
             )
         }

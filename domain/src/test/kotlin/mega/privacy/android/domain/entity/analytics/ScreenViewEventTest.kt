@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.analytics
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
 import org.junit.jupiter.api.Test
 
 internal class ScreenViewEventTest {

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.entity.analytics
+package mega.privacy.android.domain.entity.analytics.identifier
 
 /**
  * Tab selected event identifier
