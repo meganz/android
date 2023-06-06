@@ -78,7 +78,7 @@ import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.BroadcastRefreshSessionUseCase
@@ -128,7 +128,7 @@ import javax.inject.Inject
  * @property getAccountDetailsUseCase
  * @property getExtendedAccountDetail
  * @property getNumberOfSubscription
- * @property getPaymentMethod
+ * @property getPaymentMethodUseCase
  * @property getCurrentUserFullName
  * @property monitorUserUpdates
  * @property changeEmail
@@ -161,7 +161,7 @@ class MyAccountViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,
-    private val getPaymentMethod: GetPaymentMethod,
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val changeEmail: ChangeEmail,
@@ -1177,7 +1177,7 @@ class MyAccountViewModel @Inject constructor(
                     purchases = false,
                     transactions = false
                 )
-                getPaymentMethod(false)
+                getPaymentMethodUseCase(false)
 
                 _state.update {
                     it.copy(

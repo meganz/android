@@ -11,7 +11,6 @@ import mega.privacy.android.domain.usecase.DefaultIsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
 import mega.privacy.android.domain.usecase.IsExtendedAccountDetailStale
@@ -50,10 +49,6 @@ internal abstract class InternalSharedUseCaseModule {
 
 
     companion object {
-
-        @Provides
-        fun provideGetPaymentMethod(repository: BillingRepository) =
-            GetPaymentMethod(repository::getPaymentMethod)
 
         @Provides
         fun provideGetPricing(repository: BillingRepository) = GetPricing(repository::getPricing)

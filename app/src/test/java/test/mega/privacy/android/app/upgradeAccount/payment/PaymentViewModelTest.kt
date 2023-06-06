@@ -18,7 +18,7 @@ import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
@@ -35,7 +35,7 @@ import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class PaymentViewModelTest {
-    private val getPaymentMethod: GetPaymentMethod = mock()
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase = mock()
     private val getPricing: GetPricing = mock()
     private val getLocalPricingUseCase: GetLocalPricingUseCase = mock()
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase = mock()
@@ -53,7 +53,7 @@ internal class PaymentViewModelTest {
 
     private fun initViewModel() {
         underTest = PaymentViewModel(
-            getPaymentMethod = getPaymentMethod,
+            getPaymentMethodUseCase = getPaymentMethodUseCase,
             getPricing = getPricing,
             getLocalPricingUseCase = getLocalPricingUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
@@ -94,11 +94,11 @@ internal class PaymentViewModelTest {
     }
 
     @Test
-    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
             whenever(isBillingAvailableUseCase()).thenReturn(true)
-            whenever(getPaymentMethod(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
+            whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
             underTest.state.test {
                 val state = awaitItem()
@@ -107,11 +107,11 @@ internal class PaymentViewModelTest {
         }
 
     @Test
-    fun `test that isPaymentMethodAvailable returns false when isBillingAvailableUseCase returns false and getPaymentMethod contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+    fun `test that isPaymentMethodAvailable returns false when isBillingAvailableUseCase returns false and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
         runTest {
             whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
             whenever(isBillingAvailableUseCase()).thenReturn(false)
-            whenever(getPaymentMethod(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
+            whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
             underTest.state.drop(1).test {
                 val state = awaitItem()
@@ -124,7 +124,12 @@ internal class PaymentViewModelTest {
     fun `test that an exception from getPaymentMethod is not propagated`() = runTest {
         whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
         whenever(isBillingAvailableUseCase()).thenReturn(true)
-        whenever(getPaymentMethod(false)).thenAnswer { throw MegaException(1, "Not available") }
+        whenever(getPaymentMethodUseCase(false)).thenAnswer {
+            throw MegaException(
+                1,
+                "Not available"
+            )
+        }
         initViewModel()
         underTest.state.drop(1).test {
             val state = awaitItem()

@@ -46,7 +46,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
@@ -81,7 +81,7 @@ class GlobalListener @Inject constructor(
     private val storageStateMapper: StorageStateMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val getPaymentMethod: GetPaymentMethod,
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
@@ -169,7 +169,7 @@ class GlobalListener @Inject constructor(
 
         applicationScope.launch {
             runCatching { broadcastAccountUpdateUseCase() }.onFailure { Timber.e(it) }
-            runCatching { getPaymentMethod(true) }.onFailure { Timber.e(it) }
+            runCatching { getPaymentMethodUseCase(true) }.onFailure { Timber.e(it) }
             runCatching { getPricing(true) }.onFailure { Timber.e(it) }
             runCatching { dbH.resetExtendedAccountDetailsTimestamp() }.onFailure { Timber.e(it) }
             runCatching { getAccountDetailsUseCase(forceRefresh = true) }.onFailure { Timber.e(it) }

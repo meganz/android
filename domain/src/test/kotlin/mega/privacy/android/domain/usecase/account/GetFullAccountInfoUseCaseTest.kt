@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +24,7 @@ class GetFullAccountInfoUseCaseTest {
     private val getPricing: GetPricing = mock()
     private val getNumberOfSubscription: GetNumberOfSubscription = mock()
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
-    private val getPaymentMethod: GetPaymentMethod = mock()
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase = mock()
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase = mock()
 
     @Before
@@ -34,7 +34,7 @@ class GetFullAccountInfoUseCaseTest {
             getPricing = getPricing,
             getNumberOfSubscription = getNumberOfSubscription,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
-            getPaymentMethod = getPaymentMethod,
+            getPaymentMethodUseCase = getPaymentMethodUseCase,
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
         )
     }
@@ -45,7 +45,7 @@ class GetFullAccountInfoUseCaseTest {
             val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Unknown)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
-            verify(getPaymentMethod).invoke(true)
+            verify(getPaymentMethodUseCase).invoke(true)
             verify(getAccountDetailsUseCase).invoke(true)
             verifyNoMoreInteractions(getSpecificAccountDetailUseCase)
             verify(getPricing).invoke(true)
@@ -59,7 +59,7 @@ class GetFullAccountInfoUseCaseTest {
             val event = StorageStateEvent(0L, "", 0L, "", EventType.Storage, StorageState.Green)
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
-            verify(getPaymentMethod).invoke(true)
+            verify(getPaymentMethodUseCase).invoke(true)
             verify(getSpecificAccountDetailUseCase).invoke(
                 storage = false,
                 transfer = true,

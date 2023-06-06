@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.account
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import javax.inject.Inject
 
@@ -15,14 +15,14 @@ class GetFullAccountInfoUseCase @Inject constructor(
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val getPaymentMethod: GetPaymentMethod,
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
 ) {
     /**
      * Invoke.
      */
     suspend operator fun invoke() {
-        getPaymentMethod(true)
+        getPaymentMethodUseCase(true)
         if (monitorStorageStateEventUseCase().value.storageState == StorageState.Unknown) {
             getAccountDetailsUseCase(true)
         } else {
