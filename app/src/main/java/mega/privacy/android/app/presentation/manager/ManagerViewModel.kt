@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +41,6 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
@@ -72,7 +70,6 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaNode
@@ -90,7 +87,6 @@ import javax.inject.Inject
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
- * @property monitorViewType
  * @property getPrimarySyncHandleUseCase
  * @property getSecondarySyncHandleUseCase
  * @property checkCameraUpload
@@ -129,7 +125,6 @@ class ManagerViewModel @Inject constructor(
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
-    private val monitorViewType: MonitorViewType,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val checkCameraUpload: CheckCameraUpload,
@@ -380,12 +375,6 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onContactRequestsUpdate") }
             .map { Event(it) }
             .asLiveData()
-
-    /**
-     * Flow that monitors the View Type
-     */
-    val onViewTypeChanged: Flow<ViewType>
-        get() = monitorViewType()
 
     /**
      * Set a flag to know if the current navigation level is the first one

@@ -334,7 +334,6 @@ import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -579,7 +578,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         private set
     var megaContacts = true
     private var homepageScreen = HomepageScreen.HOMEPAGE
-    var isList = true
     var pathNavigationOffline: String? = null
 
     // Fragments
@@ -2320,12 +2318,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         this.collectFlow(
-            viewModel.onViewTypeChanged,
-            Lifecycle.State.STARTED
-        ) { viewType: ViewType ->
-            updateViewType(viewType)
-        }
-        this.collectFlow(
             viewModel.monitorConnectivityEvent,
             Lifecycle.State.STARTED
         ) { isConnected: Boolean ->
@@ -2419,16 +2411,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     ?.let { sharedItemsView.removeViewAt(it) }
             }
         }
-    }
-
-    /**
-     * Updates the View Type
-     *
-     * @param viewType The new View Type
-     */
-    private fun updateViewType(viewType: ViewType) {
-        Timber.d("The updated View Type is %s", viewType.name)
-        isList = viewType === ViewType.LIST
     }
 
     /**
