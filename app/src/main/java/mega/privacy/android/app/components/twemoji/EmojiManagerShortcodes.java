@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 public final class EmojiManagerShortcodes {
     private static final String EMOJI_SHORTCODES = "emojisshortcodes/emoji.json";
     static List<EmojiShortcodes> emojiData;
@@ -24,15 +26,15 @@ public final class EmojiManagerShortcodes {
                 reader = new BufferedReader(new InputStreamReader(context.getAssets().open(EMOJI_SHORTCODES)));
                 emojiData = gson.fromJson(reader, new TypeToken<ArrayList<EmojiShortcodes>>() {
                 }.getType());
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException | NullPointerException e) {
+                Timber.e(e);
             } finally {
                 try {
-                    if(reader != null) {
+                    if (reader != null) {
                         reader.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Timber.e(e);
                 }
             }
         }
