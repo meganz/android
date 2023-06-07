@@ -17,7 +17,7 @@ class GetNextDefaultAlbumNameUseCase @Inject constructor() {
     operator fun invoke(defaultName: String, currentNames: List<String>): String {
         val firstMissingIndex = currentNames.mapNotNull {
             getDefaultIndex(it, defaultName)
-        }.sorted()
+        }.sorted().distinct()
             .mapIndexed { index, i -> index to i }
             .lastOrNull { it.first == it.second }
             ?.first?.plus(1)

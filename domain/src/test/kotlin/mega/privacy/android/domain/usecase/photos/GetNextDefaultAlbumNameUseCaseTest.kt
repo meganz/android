@@ -51,8 +51,21 @@ internal class GetNextDefaultAlbumNameUseCaseTest {
     @Test
     internal fun `test that missing count is returned`() {
         val default = "default"
-        val actual = underTest(default, listOf(default, "$default (1)", "$default (2)", "$default (4)"))
+        val actual =
+            underTest(default, listOf(default, "$default (1)", "$default (2)", "$default (4)"))
 
         assertThat(actual).isEqualTo("$default (3)")
+    }
+
+    @Test
+    internal fun `test that if there is a duplicate count it does not count`() {
+        val default = "default"
+        val actual = underTest(
+            default,
+            listOf(default, default, "$default (1)", "$default (1)", "$default (2)", "$default (2)")
+        )
+
+        assertThat(actual).isEqualTo("$default (3)")
+
     }
 }
