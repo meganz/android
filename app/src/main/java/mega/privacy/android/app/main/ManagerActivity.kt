@@ -215,6 +215,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.manager.outgoingSharesState
 import mega.privacy.android.app.presentation.manager.rubbishBinState
+import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
 import mega.privacy.android.app.presentation.meeting.ScheduleMeetingActivity
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
@@ -334,6 +335,7 @@ import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -465,6 +467,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var restoreNodeResultMapper: RestoreNodeResultMapper
 
     private val subscriptions = CompositeDisposable()
 
@@ -2261,6 +2266,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.cancelTransfersResult != null) {
                 handleAllTransfersCanceled(managerState.cancelTransfersResult)
             }
+            if (managerState.restoreNodeResult != null) {
+                handleRestoreNodeResult(managerState.restoreNodeResult)
+                viewModel.markHandleRestoreNodeResult()
+            }
             if (managerState.shouldAlertUserAboutSecurityUpgrade) {
                 SecurityUpgradeDialogFragment.newInstance()
                     .show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
@@ -2378,6 +2387,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         collectFlow(targetFlow = viewModel.monitorOfflineNodeAvailabilityEvent) {
             refreshCloudOrder()
+        }
+    }
+
+    private fun handleRestoreNodeResult(result: Result<RestoreNodeResult>) {
+        if (result.isSuccess) {
+            val restoreNodeResult = result.getOrThrow()
+            showRestorationOrRemovalResult(restoreNodeResultMapper(restoreNodeResult))
+        } else {
+            val exception = result.exceptionOrNull()
+            Timber.e(exception)
+            if (exception is ForeignNodeException) {
+                launchForeignNodeError()
+            }
         }
     }
 
@@ -5692,37 +5714,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun proceedWithRestoration(nodes: List<MegaNode>) {
-        legacyMoveNodeUseCase.restore(nodes, this)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result: MoveRequestResult.Restoration ->
-                    val notValidView =
-                        result.isSingleAction && result.isSuccess && this@ManagerActivity.rubbishBinState().rubbishBinHandle == nodes[0].handle
-                    showRestorationOrRemovalResult(notValidView, result.getResultText())
-                },
-                { throwable: Throwable ->
-                    if (throwable is ForeignNodeException) {
-                        launchForeignNodeError()
-                    }
-                    Timber.e(throwable)
-                }
-            )
-            .addTo(composite)
+        viewModel.restoreNodes(nodes)
     }
 
     /**
      * Shows the final result of a restoration or removal from Rubbish Bin section.
      *
-     * @param notValidView True if should update the view, false otherwise.
      * @param message      Text message to show as the request result.
      */
-    private fun showRestorationOrRemovalResult(notValidView: Boolean, message: String) {
-        if (notValidView) {
-            rubbishBinViewModel.setRubbishBinHandle(MegaApiJava.INVALID_HANDLE)
-            setToolbarTitle()
-        }
-        dismissAlertDialogIfExists(statusDialog)
+    private fun showRestorationOrRemovalResult(message: String) {
         showSnackbar(Constants.SNACKBAR_TYPE, message, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
     }
 
@@ -5835,10 +5835,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         { result: RemoveRequestResult ->
-                            val notValidView = (result.count == 1
-                                    && result.errorCount == 0) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
                             showRestorationOrRemovalResult(
-                                notValidView,
                                 result.getResultText(context = this@ManagerActivity)
                             )
                         },

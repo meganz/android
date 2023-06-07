@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -158,6 +159,7 @@ class ManagerViewModel @Inject constructor(
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
+    private val restoreNodesUseCase: RestoreNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -680,6 +682,29 @@ class ManagerViewModel @Inject constructor(
      */
     fun onChatArchivedEventConsumed() =
         _state.update { it.copy(titleChatArchivedEvent = null) }
+
+
+    /**
+     * Restore nodes
+     *
+     * @param nodes
+     */
+    fun restoreNodes(nodes: List<MegaNode>) {
+        viewModelScope.launch {
+            val result = runCatching {
+                restoreNodesUseCase(nodes.associate { it.handle to it.restoreHandle })
+            }
+            _state.update { it.copy(restoreNodeResult = result) }
+        }
+    }
+
+    /**
+     * Mark handle restore node result
+     *
+     */
+    fun markHandleRestoreNodeResult() {
+        _state.update { it.copy(restoreNodeResult = null) }
+    }
 
     internal companion object {
         internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"

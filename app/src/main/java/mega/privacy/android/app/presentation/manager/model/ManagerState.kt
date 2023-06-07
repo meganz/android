@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.manager.model
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.node.RestoreNodeResult
 
 
 /**
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.Feature
  * @property isPushNotificationSettingsUpdatedEvent
  * @property titleChatArchivedEvent
  * @property cancelTransfersResult
+ * @property restoreNodeResult
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -42,4 +44,5 @@ data class ManagerState(
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
     val titleChatArchivedEvent: String? = null,
     val cancelTransfersResult: Result<Unit>? = null,
+    val restoreNodeResult: Result<RestoreNodeResult>? = null,
 )

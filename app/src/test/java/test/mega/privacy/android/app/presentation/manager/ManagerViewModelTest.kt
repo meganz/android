@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -42,6 +43,7 @@ import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -71,6 +74,7 @@ import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import org.junit.After
 import org.junit.Before
@@ -211,6 +215,7 @@ class ManagerViewModelTest {
 
     private val getPricing = mock<GetPricing>()
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
+    private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -261,7 +266,8 @@ class ManagerViewModelTest {
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
-            monitorChatArchivedUseCase = monitorChatArchivedUseCase
+            monitorChatArchivedUseCase = monitorChatArchivedUseCase,
+            restoreNodesUseCase = restoreNodesUseCase
         )
     }
 
@@ -691,4 +697,44 @@ class ManagerViewModelTest {
                 assertThat(updatedState.titleChatArchivedEvent).isNull()
             }
         }
+
+    @Test
+    fun `test that restoreNodeResult updated when calling restoreNodes successfully`() = runTest {
+        testScheduler.advanceUntilIdle()
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(1L)
+            on { restoreHandle }.thenReturn(100L)
+        }
+        val result = mock<SingleNodeRestoreResult>()
+        whenever(restoreNodesUseCase(mapOf(node.handle to node.restoreHandle))).thenReturn(result)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.restoreNodeResult).isNull()
+            underTest.restoreNodes(listOf(node))
+            val updatedState = awaitItem()
+            assertThat(updatedState.restoreNodeResult).isNotNull()
+            assertThat(updatedState.restoreNodeResult?.isSuccess).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that restoreNodeResult updated when calling restoreNodes failed`() = runTest {
+        testScheduler.advanceUntilIdle()
+        val node = mock<MegaNode> {
+            on { handle }.thenReturn(1L)
+            on { restoreHandle }.thenReturn(100L)
+        }
+        whenever(restoreNodesUseCase(mapOf(node.handle to node.restoreHandle)))
+            .thenThrow(ForeignNodeException::class.java)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.restoreNodeResult).isNull()
+            underTest.restoreNodes(listOf(node))
+            val updatedState = awaitItem()
+            assertThat(updatedState.restoreNodeResult).isNotNull()
+            assertThat(updatedState.restoreNodeResult?.isFailure).isTrue()
+        }
+    }
 }
