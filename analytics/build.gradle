@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'de.mannodermaus.android-junit5'
 }
 
 android {
@@ -73,7 +74,8 @@ dependencies {
     testImplementation(testlib.bundles.junit5.api)
     testRuntimeOnly testlib.junit.jupiter.engine
     testImplementation testlib.junit.test.ktx
-    androidTestImplementation testlib.junit.test.ktx
+
+    testImplementation testlib.bundles.unit.test
 
     testImplementation testlib.compose.junit
     testImplementation testlib.mockito

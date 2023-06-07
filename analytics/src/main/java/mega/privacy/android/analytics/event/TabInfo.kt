@@ -13,9 +13,4 @@ interface TabInfo : AnalyticsInfo {
      * Name
      */
     val name: String
-
-    /**
-     * Unique identifier
-     */
-    override val uniqueIdentifier: Int
 }

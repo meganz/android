@@ -19,9 +19,4 @@ interface ButtonInfo : AnalyticsInfo {
      * Dialog
      */
     val dialog: DialogInfo?
-
-    /**
-     * Unique identifier
-     */
-    override val uniqueIdentifier: Int
 }

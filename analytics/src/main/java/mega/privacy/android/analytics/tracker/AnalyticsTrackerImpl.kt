@@ -8,14 +8,17 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
+import mega.privacy.android.analytics.event.NavigationInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ButtonPressedEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
+import mega.privacy.android.domain.entity.analytics.NavigationEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.identifier.ButtonPressedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.NavigationEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.TabSelectedEventIdentifier
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -114,6 +117,18 @@ class AnalyticsTrackerImpl @Inject constructor(
                 dialogName = button.dialog?.name,
             )
             trackEventUseCase(ButtonPressedEvent(identifier, currentViewId))
+        }
+    }
+
+    override fun trackNavigation(navigation: NavigationInfo) {
+        appScope.launch {
+            val identifier = NavigationEventIdentifier(
+                uniqueIdentifier = navigation.uniqueIdentifier,
+                navigationElementType = navigation.source.name.lowercase(),
+                destination = navigation.destination
+            )
+
+            trackEventUseCase(NavigationEvent(identifier, currentViewId))
         }
     }
 

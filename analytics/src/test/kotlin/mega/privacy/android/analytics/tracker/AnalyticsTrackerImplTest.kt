@@ -5,11 +5,14 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
+import mega.privacy.android.analytics.event.navigation.NavigationEventSource
 import mega.privacy.android.domain.usecase.analytics.GetViewIdUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackEventUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackScreenViewUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
@@ -211,5 +214,49 @@ internal class AnalyticsTrackerImplTest {
         })
 
         verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == expectedViewId }) }
+    }
+
+    @Test
+    internal fun `test that track navigation uses null view id if it does not exist`() {
+        underTest.trackNavigation(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { source }.thenReturn(NavigationEventSource.Other)
+            on { destination }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == null }) }
+    }
+
+    @Test
+    internal fun `test that track navigation uses existing view id if it exists`() {
+        val expectedViewId = "viewId"
+        trackScreenViewUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(expectedViewId)
+        }
+        val screen = mock<ScreenInfo> {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(12)
+        }
+        underTest.trackScreenView(screen)
+
+        underTest.trackNavigation(mock {
+            on { uniqueIdentifier }.thenReturn(2)
+            on { source }.thenReturn(NavigationEventSource.Other)
+            on { destination }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == expectedViewId }) }
+    }
+
+    @ParameterizedTest(name = "Source {0} passed to event use case")
+    @EnumSource()
+    internal fun `test that navigation source items are passed`(enumSource: NavigationEventSource) {
+        underTest.trackNavigation(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { source }.thenReturn(enumSource)
+            on { destination }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { data().containsValue(enumSource.name.lowercase()) }) }
     }
 }
