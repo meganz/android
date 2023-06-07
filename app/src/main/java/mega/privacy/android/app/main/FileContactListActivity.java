@@ -718,7 +718,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         dialogBuilder.setSingleChoiceItems(items, selectedShare.getAccess(), (dialog, item) -> {
             statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
             permissionsDialog.dismiss();
-            contactController.changePermission(selectedShare.getUser(), item, node, new ShareListener(getApplicationContext(), CHANGE_PERMISSIONS_LISTENER, 1));
+            contactController.changePermission(selectedShare.getUser(), item, node, new ShareListener(this, CHANGE_PERMISSIONS_LISTENER, 1));
         });
         permissionsDialog = dialogBuilder.create();
         permissionsDialog.show();
