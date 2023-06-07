@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
-import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
@@ -167,9 +166,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()
-
-    @Provides
-    fun provideGetUploadFolderHandle() = mock<GetUploadFolderHandle>()
 
     @Provides
     fun provideResetCameraUploadTimeStamps() = mock<ResetCameraUploadTimeStamps>()

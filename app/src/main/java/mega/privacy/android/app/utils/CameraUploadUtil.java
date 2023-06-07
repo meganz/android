@@ -6,7 +6,7 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.domain.usecase.GetUploadFolderHandle;
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase;
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled;
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled;
 
@@ -16,7 +16,7 @@ public class CameraUploadUtil {
     private static final DatabaseHandler dbH = app.getDbH();
 
     /**
-     * @see GetUploadFolderHandle
+     * @see GetUploadFolderHandleUseCase
      * @deprecated Replace all calls with use case
      */
     public static long getPrimaryFolderHandle() {
@@ -24,7 +24,7 @@ public class CameraUploadUtil {
     }
 
     /**
-     * @see GetUploadFolderHandle
+     * @see GetUploadFolderHandleUseCase
      * @deprecated Replace all calls with use case
      */
     public static long getSecondaryFolderHandle() {

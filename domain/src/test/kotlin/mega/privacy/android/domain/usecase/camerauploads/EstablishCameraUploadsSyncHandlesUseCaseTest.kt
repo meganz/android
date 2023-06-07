@@ -2,11 +2,12 @@ package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
+import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -77,14 +78,14 @@ class EstablishCameraUploadsSyncHandlesUseCaseTest {
         if (!primaryHandleDeleted) {
             verify(resetCameraUploadTimelines).invoke(
                 handleInAttribute = testPair.first,
-                isSecondary = false,
+                CameraUploadFolderType.Primary
             )
             verify(setPrimarySyncHandle).invoke(testPair.first)
         }
         if (!secondaryHandleDeleted) {
             verify(resetCameraUploadTimelines).invoke(
                 handleInAttribute = testPair.second,
-                isSecondary = true,
+                CameraUploadFolderType.Secondary
             )
             verify(setSecondarySyncHandle).invoke(testPair.second)
         }

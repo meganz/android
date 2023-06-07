@@ -41,7 +41,6 @@ import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
-import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
 import mega.privacy.android.domain.usecase.DefaultRenamePrimaryFolder
@@ -71,7 +70,6 @@ import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
-import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
@@ -419,12 +417,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsChargingRequired(isChargingRequired: DefaultIsChargingRequired): IsChargingRequired
-
-    /**
-     * Provide the [GetUploadFolderHandle] implementation
-     */
-    @Binds
-    abstract fun bindGetUploadFolderHandle(getUploadFolderHandle: DefaultGetUploadFolderHandle): GetUploadFolderHandle
 
     /**
      * Provide the [ResetCameraUploadTimeStamps] implementation

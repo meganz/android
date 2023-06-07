@@ -3,12 +3,13 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -24,7 +25,7 @@ class DefaultResetCameraUploadTimelinesTest {
             getInvalidHandle()
         }.thenReturn(invalidHandle)
     }
-    private val getUploadFolderHandle = mock<GetUploadFolderHandle>()
+    private val getUploadFolderHandleUseCase = mock<GetUploadFolderHandleUseCase>()
     private val resetPrimaryTimeline = mock<ResetPrimaryTimeline>()
     private val resetSecondaryTimeline = mock<ResetSecondaryTimeline>()
 
@@ -32,7 +33,7 @@ class DefaultResetCameraUploadTimelinesTest {
     fun setup() {
         underTest = DefaultResetCameraUploadTimelines(
             cameraUploadRepository = cameraUploadRepository,
-            getUploadFolderHandle = getUploadFolderHandle,
+            getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
             resetPrimaryTimeline = resetPrimaryTimeline,
             resetSecondaryTimeline = resetSecondaryTimeline
         )
@@ -41,7 +42,7 @@ class DefaultResetCameraUploadTimelinesTest {
     @Test
     fun `test that reset camera upload timelines does not update anything if handle is invalid and returns false`() =
         runTest {
-            val result = underTest(invalidHandle, false)
+            val result = underTest(invalidHandle, CameraUploadFolderType.Primary)
             assertThat(result).isFalse()
         }
 
@@ -49,8 +50,8 @@ class DefaultResetCameraUploadTimelinesTest {
     fun `test that reset camera upload timelines does not update if primary folder handle already exists and returns false`() =
         runTest {
             val existingHandle = 69L
-            whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
-            val result = underTest(existingHandle, false)
+            whenever(getUploadFolderHandleUseCase(any())).thenReturn(existingHandle)
+            val result = underTest(existingHandle, CameraUploadFolderType.Primary)
             verifyNoInteractions(resetPrimaryTimeline)
             assertThat(result).isFalse()
         }
@@ -59,8 +60,8 @@ class DefaultResetCameraUploadTimelinesTest {
     fun `test that reset camera upload timelines does not update if secondary folder handle already exists and returns false`() =
         runTest {
             val existingHandle = 69L
-            whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
-            val result = underTest(existingHandle, true)
+            whenever(getUploadFolderHandleUseCase(any())).thenReturn(existingHandle)
+            val result = underTest(existingHandle, CameraUploadFolderType.Secondary)
             verifyNoInteractions(resetSecondaryTimeline)
             assertThat(result).isFalse()
         }
@@ -69,9 +70,9 @@ class DefaultResetCameraUploadTimelinesTest {
     fun `test that reset camera upload timelines updates if primary folder handle does not exist and returns true`() =
         runTest {
             val existingHandle = 69L
-            whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
-            val result = underTest(1337L, false)
-            verify(resetPrimaryTimeline, times(1)).invoke()
+            whenever(getUploadFolderHandleUseCase(any())).thenReturn(existingHandle)
+            val result = underTest(1337L, CameraUploadFolderType.Primary)
+            verify(resetPrimaryTimeline).invoke()
             assertThat(result).isTrue()
         }
 
@@ -79,9 +80,9 @@ class DefaultResetCameraUploadTimelinesTest {
     fun `test that reset camera upload timelines updates if secondary folder handle does not exist and returns true`() =
         runTest {
             val existingHandle = 69L
-            whenever(getUploadFolderHandle(any())).thenReturn(existingHandle)
-            val result = underTest(1337L, true)
-            verify(resetSecondaryTimeline, times(1)).invoke()
+            whenever(getUploadFolderHandleUseCase(any())).thenReturn(existingHandle)
+            val result = underTest(1337L, CameraUploadFolderType.Secondary)
+            verify(resetSecondaryTimeline).invoke()
             assertThat(result).isTrue()
         }
 }

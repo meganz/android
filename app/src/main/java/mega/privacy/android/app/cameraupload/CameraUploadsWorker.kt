@@ -73,6 +73,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
@@ -116,8 +117,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemp
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
@@ -333,16 +333,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var processMediaForUploadUseCase: ProcessMediaForUploadUseCase
 
     /**
-     * GetPrimarySyncHandle
+     * [GetUploadFolderHandleUseCase]
      */
     @Inject
-    lateinit var getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase
-
-    /**
-     * GetSecondarySyncHandle
-     */
-    @Inject
-    lateinit var getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase
+    lateinit var getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase
 
     /**
      * SetPrimarySyncHandle
@@ -969,7 +963,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return true if the Primary Folder handle is a valid handle, and false if otherwise
      */
     private suspend fun isPrimaryFolderEstablished(): Boolean {
-        val primarySyncHandle = getPrimarySyncHandleUseCase()
+        val primarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)
         if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
@@ -1047,7 +1041,8 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
-        val primaryUploadNode = getNodeByIdUseCase(NodeId(getPrimarySyncHandleUseCase()))
+        val primaryUploadNode =
+            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
             endService(aborted = true)
@@ -1055,7 +1050,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
         val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
             Timber.d("Secondary Upload is ENABLED")
-            getNodeByIdUseCase(NodeId(getSecondarySyncHandleUseCase()))
+            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
         } else {
             null
         }
@@ -1112,8 +1107,10 @@ class CameraUploadsWorker @AssistedInject constructor(
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
         }
-        val primaryUploadNode = getNodeByIdUseCase(NodeId(getPrimarySyncHandleUseCase()))
-        val secondaryUploadNode = getNodeByIdUseCase(NodeId(getSecondarySyncHandleUseCase()))
+        val primaryUploadNode =
+            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
+        val secondaryUploadNode =
+            getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
@@ -1345,7 +1342,9 @@ class CameraUploadsWorker @AssistedInject constructor(
             Timber.d("Copy node successful")
             (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
                 val fingerprint = retrievedNode.fingerprint
-                val isSecondary = retrievedNode.parentId == NodeId(getSecondarySyncHandleUseCase())
+                val isSecondary = retrievedNode.parentId == NodeId(
+                    getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
+                )
                 // Delete the Camera Upload sync record by fingerprint
                 fingerprint?.let {
                     deleteSyncRecordByFingerprint(
@@ -1501,7 +1500,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun getSecondaryFolderHandle(): Long {
         // get Secondary folder handle of user
-        val secondarySyncHandle = getSecondarySyncHandleUseCase()
+        val secondarySyncHandle = getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByIdUseCase(
                 NodeId(secondarySyncHandle)
             ) == null
@@ -1694,7 +1693,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("Image Sync API_OK")
             val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
-            val isSecondary = node?.parentId == NodeId(getSecondarySyncHandleUseCase())
+            val isSecondary =
+                node?.parentId == NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { nonNullNode ->

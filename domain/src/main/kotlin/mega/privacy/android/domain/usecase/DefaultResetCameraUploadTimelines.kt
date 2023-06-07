@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import javax.inject.Inject
 
 /**
@@ -9,22 +11,30 @@ import javax.inject.Inject
  */
 class DefaultResetCameraUploadTimelines @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val getUploadFolderHandle: GetUploadFolderHandle,
+    private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
     private val resetPrimaryTimeline: ResetPrimaryTimeline,
     private val resetSecondaryTimeline: ResetSecondaryTimeline,
 ) : ResetCameraUploadTimelines {
 
-    override suspend fun invoke(handleInAttribute: Long, isSecondary: Boolean): Boolean {
+    override suspend fun invoke(
+        handleInAttribute: Long,
+        cameraUploadFolderType: CameraUploadFolderType,
+    ): Boolean {
         if (handleInAttribute == cameraUploadRepository.getInvalidHandle()) {
             return false
         }
+        if (handleInAttribute != getUploadFolderHandleUseCase(cameraUploadFolderType)) {
+            return when (cameraUploadFolderType) {
+                CameraUploadFolderType.Primary -> {
+                    resetPrimaryTimeline()
+                    true
+                }
 
-        if (!isSecondary && handleInAttribute != getUploadFolderHandle(true)) {
-            resetPrimaryTimeline()
-            return true
-        } else if (isSecondary && handleInAttribute != getUploadFolderHandle(false)) {
-            resetSecondaryTimeline()
-            return true
+                CameraUploadFolderType.Secondary -> {
+                    resetSecondaryTimeline()
+                    true
+                }
+            }
         }
         return false
     }
