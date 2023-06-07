@@ -83,6 +83,17 @@ internal class EventIdentifierTest {
             },
             NavigationEventIdentifier::class.simpleName
         ),
+        Arguments.of(
+            { id: Int ->
+                MenuItemEventIdentifier(
+                    menuItem = "",
+                    uniqueIdentifier = id,
+                    screenName = "",
+                    menuType = "",
+                )
+            },
+            MenuItemEventIdentifier::class.simpleName
+        ),
     )
 
 }
