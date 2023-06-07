@@ -56,7 +56,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -65,6 +64,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
@@ -77,6 +77,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
+import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
@@ -172,6 +174,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @Inject
     lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
 
+    @Inject
+    lateinit var isOfflineTransferUseCase: IsOfflineTransferUseCase
+
+    @Inject
+    lateinit var saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase
+
     private var errorCount = 0
     private var alreadyDownloaded = 0
     private var isForeground = false
@@ -193,7 +201,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private val storeToAdvancedDevices: MutableMap<Long, Uri> = mutableMapOf()
     private val fromMediaViewers: MutableMap<Long, Boolean> = mutableMapOf()
     private lateinit var mNotificationManager: NotificationManager
-    private var offlineNode: MegaNode? = null
     private var isLoggingIn = false
     private var lastUpdated: Long = 0
     private var intent: Intent? = null
@@ -480,10 +487,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     Timber.d("Delete the old version")
                     currentFile?.delete()
                 }
-            }
-            if (currentDir?.absolutePath?.contains(OfflineUtils.OFFLINE_DIR) == true) {
-                //			Save for offline: do not open when finishes
-                openFile = false
             }
             if (isFolderLink) {
                 currentDocument = megaApiFolder.authorizeNode(currentDocument)
@@ -1285,7 +1288,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             transfer.nodeHandle,
             megaApi.totalDownloads
         )
-        if (transfer?.isStreamingTransfer == true || transfer?.isVoiceClip() == true) return
+        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return
         if (transfer.isBackgroundTransfer()) {
             backgroundTransfers.add(transfer.tag)
             return
@@ -1308,9 +1311,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         updateProgressNotification()
     }
 
-    private fun doOnTransferFinish(transfer: Transfer, error: MegaException) {
+    private suspend fun doOnTransferFinish(transfer: Transfer, error: MegaException) {
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.type)
-        if (transfer?.isStreamingTransfer == true) {
+        if (transfer.isStreamingTransfer) {
             return
         }
         if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
@@ -1415,20 +1418,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     val node = megaApi.getNodeByHandle(transfer.nodeHandle)
                     alterDocument(transfersUri, node?.name)
                 }
-                if (!TextUtil.isTextEmpty(path) && path.contains(OfflineUtils.OFFLINE_DIR)) {
+                if (isOfflineTransferUseCase(transfer)) {
                     Timber.d("It is Offline file")
-                    offlineNode = megaApi.getNodeByHandle(transfer.nodeHandle)
-                    if (offlineNode != null) {
-                        OfflineUtils.saveOffline(
-                            this,
-                            megaApi,
-                            dbH,
-                            offlineNode,
-                            transfer.localPath
-                        )
-                    } else {
-                        OfflineUtils.saveOfflineChatFile(dbH, transfer)
-                    }
+                    saveOfflineNodeInformationUseCase(NodeId(transfer.nodeHandle))
+                    openFile = false
                     refreshOfflineFragment()
                     refreshSettingsFragment()
                 }
@@ -1504,14 +1497,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
-    private fun doOnTransferUpdate(transfer: Transfer) {
+    private suspend fun doOnTransferUpdate(transfer: Transfer) {
         if (canceled) {
             Timber.d("Transfer cancel: %s", transfer.nodeHandle)
             releaseLocks()
-            applicationScope.launch {
-                runCatching { cancelTransferByTagUseCase(transfer.tag) }
-                    .onFailure { Timber.w("Exception canceling transfer: $it") }
-            }
+            runCatching { cancelTransferByTagUseCase(transfer.tag) }
+                .onFailure { Timber.w("Exception canceling transfer: $it") }
             cancel()
             return
         }

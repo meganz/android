@@ -93,7 +93,34 @@ internal class SaveOfflineNodeInformationUseCaseTest {
         underTest(parentId)
         verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, parentId)
         verify(nodeRepository).saveOfflineNodeInformation(parentOfflineInformation, null)
+    }
 
+    @Test
+    fun `test that node is saved without parent when the parent is drive root node`() = runTest {
+        stubDriveNodeWithParent()
+        stubNodeOfflineInfo()
+        stubParentOfflineInfo()
+
+        whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+        whenever(nodeRepository.getRootNode()).thenReturn(parent)
+
+        underTest(nodeId)
+        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
+        verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
+    }
+
+    @Test
+    fun `test that node is saved without parent when the node is backup root node`() = runTest {
+        stubDriveNodeWithParent()
+        stubNodeOfflineInfo()
+        stubParentOfflineInfo()
+
+        whenever(nodeRepository.getOfflineNodeInformation(nodeId)).thenReturn(null)
+        whenever(nodeRepository.getBackupFolderId()).thenReturn(nodeId)
+
+        underTest(nodeId)
+        verify(nodeRepository).saveOfflineNodeInformation(nodeOfflineInformation, null)
+        verify(nodeRepository, times(0)).saveOfflineNodeInformation(parentOfflineInformation, null)
     }
 
     private fun stubDriveNodeWithoutParent() = runTest {

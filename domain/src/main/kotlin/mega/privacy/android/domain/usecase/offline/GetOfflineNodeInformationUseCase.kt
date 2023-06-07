@@ -20,6 +20,7 @@ import javax.inject.Inject
  *  - sub-folder in drive:      /data/user/0/mega.privacy.android.app/files/MEGA Offline/folder1/folder2
  *  - file in backup:           /data/user/0/mega.privacy.android.app/files/MEGA Offline/in/Backups/MacBook Pro/My backup/Screenshot.png
  *  - file in incoming shared:  /data/user/0/mega.privacy.android.app/files/MEGA Offline/229921431902040/shared with friends/notes/hola.txt
+ *  - file in chats folder:     /data/user/0/mega.privacy.android.app/files/MEGA Offline/My chat files/picture.png
 
  * @see [IsAvailableOfflineUseCase] to know if the node is available offline or not
  */
