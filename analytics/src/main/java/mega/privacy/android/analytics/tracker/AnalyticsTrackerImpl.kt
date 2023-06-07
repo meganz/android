@@ -6,12 +6,15 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
+import mega.privacy.android.domain.entity.analytics.ButtonPressedEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
+import mega.privacy.android.domain.entity.analytics.identifier.ButtonPressedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.TabSelectedEventIdentifier
@@ -100,6 +103,18 @@ class AnalyticsTrackerImpl @Inject constructor(
 
     override fun trackDialogDisplayed(dialog: DialogInfo) {
         trackDialog(dialog)
+    }
+
+    override fun trackButtonPress(button: ButtonInfo) {
+        appScope.launch {
+            val identifier = ButtonPressedEventIdentifier(
+                buttonName = button.name,
+                uniqueIdentifier = button.uniqueIdentifier,
+                screenName = button.screen?.name,
+                dialogName = button.dialog?.name,
+            )
+            trackEventUseCase(ButtonPressedEvent(identifier, currentViewId))
+        }
     }
 
     override fun trackDialogDisplayed(dialog: DialogInfo, screen: ScreenInfo) {

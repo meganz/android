@@ -1,5 +1,6 @@
 package mega.privacy.android.analytics.tracker
 
+import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
@@ -36,4 +37,11 @@ interface AnalyticsTracker {
      * @param dialog
      */
     fun trackDialogDisplayed(dialog: DialogInfo)
+
+    /**
+     * Track button press
+     *
+     * @param button
+     */
+    fun trackButtonPress(button: ButtonInfo)
 }

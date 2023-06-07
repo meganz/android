@@ -69,6 +69,9 @@ dependencies {
 
     // Testing
     testImplementation testlib.junit
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly testlib.junit.jupiter.engine
     testImplementation testlib.junit.test.ktx
     androidTestImplementation testlib.junit.test.ktx
 
