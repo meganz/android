@@ -185,6 +185,14 @@ class TextEditorViewModel @Inject constructor(
     fun getNodeAccess(): Int = megaApi.getAccess(getNode())
 
     fun updateNode() {
+        if (textEditorData.value?.adapterType in listOf(
+                FOLDER_LINK_ADAPTER,
+                FILE_LINK_ADAPTER,
+                OFFLINE_ADAPTER,
+                ZIP_ADAPTER,
+                FROM_CHAT
+            )
+        ) return
         val node = textEditorData.value?.node ?: return
 
         textEditorData.value?.node = megaApi.getNodeByHandle(node.handle)
@@ -874,7 +882,7 @@ class TextEditorViewModel @Inject constructor(
             showConfirmRemoveLinkDialog(context) {
                 megaApi.disableExport(
                     getNode(),
-                    ExportListener(context) { runDelay(100L) { updateNode() } })
+                    ExportListener(context) { runDelay(500L) { updateNode() } })
             }
         } else {
             showGetLinkActivity(context as Activity, getNode()!!.handle)

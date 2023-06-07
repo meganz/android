@@ -158,7 +158,6 @@ class PdfViewerViewModel @Inject constructor(
                 newParentHandle = newParentHandle,
                 type = NameCollisionType.MOVE
             ) {
-                Timber.d("SMP move node Imager view model")
                 viewModelScope.launch {
                     runCatching {
                         moveNodeUseCase(
@@ -166,7 +165,6 @@ class PdfViewerViewModel @Inject constructor(
                             newNodeParent = NodeId(newParentHandle),
                         )
                     }.onSuccess {
-                        Timber.d("SMP move node Imager view model success")
                         _state.update {
                             it.copy(
                                 snackBarMessage = R.string.context_correctly_moved,
@@ -174,7 +172,6 @@ class PdfViewerViewModel @Inject constructor(
                             )
                         }
                     }.onFailure { error ->
-                        Timber.d("SMP move node Imager view model failure")
                         _state.update {
                             it.copy(nodeMoveError = error)
                         }
