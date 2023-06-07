@@ -23,7 +23,12 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
             }
         }
         composable(route = syncNewFolderRoute) {
-            SyncNewFolderScreenRoute(hiltViewModel())
+            SyncNewFolderScreenRoute(
+                hiltViewModel()
+            ) {
+                // Use the navController to navigate to the next screen
+                // At this stage, the next screen is not created yet
+            }
         }
     }
 }

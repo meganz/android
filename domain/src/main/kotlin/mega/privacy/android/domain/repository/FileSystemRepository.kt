@@ -175,4 +175,9 @@ interface FileSystemRepository {
      * Update media store by scanning specified files with corresponding mime types.
      */
     fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>)
+
+    /**
+     * Returns an external storage path based on content Uri
+     */
+    suspend fun getExternalPathByContentUri(uri: String): String?
 }

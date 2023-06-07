@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id 'de.mannodermaus.android-junit5'
 }
 
 apply from: "$project.rootDir/tools/util.gradle"
@@ -35,6 +36,7 @@ android {
     testOptions {
         unitTests{
             includeAndroidResources = true
+            returnDefaultValues = true
         }
     }
 
@@ -94,4 +96,7 @@ dependencies {
     testImplementation testlib.mockito
     testImplementation testlib.mockito.kotlin
     testImplementation testlib.mockito.android
+    testRuntimeOnly testlib.junit.jupiter.engine
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
 }

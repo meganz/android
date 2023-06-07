@@ -164,4 +164,16 @@ interface FileGateway {
      */
     fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>)
 
+
+    /**
+     * Takes a content Uri and creates an external storage path from it
+     *
+     * e.g. the following Uri:
+     * "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
+     * will be converted to
+     * "/storage/emulated/0/Sync/someFolder"
+     *
+     * @param uri The content Uri to be converted
+     */
+    suspend fun getExternalPathByContentUri(contentUri: String): String?
 }

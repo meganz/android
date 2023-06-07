@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.ui.newfolderpair
 import android.net.Uri
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 
-sealed interface SyncNewFolderAction {
+internal sealed interface SyncNewFolderAction {
 
     /**
      * @param remoteFolder - selected remote folder
@@ -19,9 +19,4 @@ sealed interface SyncNewFolderAction {
      * @param name - new name of the folder pair
      */
     data class FolderNameChanged(val name: String) : SyncNewFolderAction
-
-    /**
-     * Sync button clicked
-     */
-    object SyncClicked : SyncNewFolderAction
 }

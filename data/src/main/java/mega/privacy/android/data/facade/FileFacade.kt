@@ -13,6 +13,7 @@ import android.provider.MediaStore.MediaColumns.DISPLAY_NAME
 import android.provider.MediaStore.MediaColumns.SIZE
 import android.provider.MediaStore.VOLUME_EXTERNAL
 import android.provider.MediaStore.VOLUME_INTERNAL
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -248,6 +249,18 @@ class FileFacade @Inject constructor(
             mimeTypes,
             null
         )
+    }
+
+    override suspend fun getExternalPathByContentUri(contentUri: String): String? = run {
+        contentUri
+            .toUri()
+            .lastPathSegment
+            ?.split(":")
+            ?.lastOrNull()
+            ?.let {
+                Environment.getExternalStorageDirectory().path +
+                        "/" + it
+            }
     }
 
     private companion object {

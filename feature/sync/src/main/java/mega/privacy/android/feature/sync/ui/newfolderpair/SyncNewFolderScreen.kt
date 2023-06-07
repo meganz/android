@@ -54,7 +54,7 @@ internal fun SyncNewFolderScreen(
             Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             val buttonEnabled =
-                folderPairName.isNotBlank() && selectedMegaFolder != null
+                selectedLocalFolder.isNotBlank() && selectedMegaFolder != null
 
             RaisedDefaultMegaButton(
                 modifier = Modifier

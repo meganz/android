@@ -298,4 +298,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override fun scanMediaFile(paths: Array<String>, mimeTypes: Array<String>) =
         fileGateway.scanMediaFile(paths, mimeTypes)
 
+
+    override suspend fun getExternalPathByContentUri(uri: String): String? =
+        withContext(ioDispatcher) {
+            fileGateway.getExternalPathByContentUri(uri)
+        }
 }

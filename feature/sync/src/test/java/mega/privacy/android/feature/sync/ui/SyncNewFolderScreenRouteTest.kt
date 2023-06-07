@@ -4,8 +4,10 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.flow.StateFlow
+import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
@@ -14,6 +16,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 
@@ -32,7 +35,10 @@ class SyncNewFolderScreenRouteTest {
         whenever(state.value).thenReturn(SyncNewFolderState())
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
-            SyncNewFolderScreenRoute(viewModel)
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+            )
         }
 
         composeTestRule.onNodeWithText("Device folder")
@@ -53,7 +59,10 @@ class SyncNewFolderScreenRouteTest {
         whenever(state.value).thenReturn(SyncNewFolderState(folderPairName = folderPairName))
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
-            SyncNewFolderScreenRoute(viewModel)
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+            )
         }
 
         composeTestRule.onNodeWithText(folderPairName)
@@ -66,7 +75,10 @@ class SyncNewFolderScreenRouteTest {
         whenever(state.value).thenReturn(SyncNewFolderState(selectedLocalFolder = localFolderName))
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
-            SyncNewFolderScreenRoute(viewModel)
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+            )
         }
 
         composeTestRule.onNodeWithText(localFolderName)
@@ -86,10 +98,32 @@ class SyncNewFolderScreenRouteTest {
         )
         whenever(viewModel.state).thenReturn(state)
         composeTestRule.setContent {
-            SyncNewFolderScreenRoute(viewModel)
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+            )
         }
 
         composeTestRule.onNodeWithText(megaFolderName)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that sync button is not clickable when local folder or mega folder are not filled`() {
+        val emptyState = SyncNewFolderState()
+        val openNextScreenCallback = mock<(SyncNewFolderState) -> Unit>()
+        whenever(state.value).thenReturn(emptyState)
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = openNextScreenCallback,
+            )
+        }
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.sync_button_label))
+            .performClick()
+
+        verifyNoInteractions(openNextScreenCallback)
     }
 }
