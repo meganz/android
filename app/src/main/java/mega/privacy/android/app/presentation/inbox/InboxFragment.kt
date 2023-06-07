@@ -92,8 +92,7 @@ class InboxFragment : RotatableFragment() {
     private fun state() = viewModel.state.value
 
     // UI Elements
-    private var _binding: FragmentBackupsBinding? = null
-    private val binding get() = _binding!!
+    private var binding: FragmentBackupsBinding? = null
     private val itemDecoration: PositionDividerItemDecoration by lazy(LazyThreadSafetyMode.NONE) {
         PositionDividerItemDecoration(requireContext(), displayMetrics())
     }
@@ -124,7 +123,8 @@ class InboxFragment : RotatableFragment() {
     ): View {
         Timber.d("onCreateView()")
 
-        _binding = FragmentBackupsBinding.inflate(inflater, container, false)
+        val binding = FragmentBackupsBinding.inflate(inflater, container, false)
+        this.binding = binding
 
         setupToolbar()
         setupAdapter()
@@ -141,7 +141,7 @@ class InboxFragment : RotatableFragment() {
         super.onViewCreated(view, savedInstanceState)
         observeDragSupportEvents(
             lifecycleOwner = viewLifecycleOwner,
-            rv = binding.backupsRecyclerView,
+            rv = binding?.backupsRecyclerView,
             viewerFrom = Constants.VIEWER_FROM_INBOX,
         )
         observeUiState()
@@ -152,7 +152,7 @@ class InboxFragment : RotatableFragment() {
      */
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 
     /**
@@ -337,7 +337,7 @@ class InboxFragment : RotatableFragment() {
             this,
             emptyList(),
             state().inboxHandle,
-            binding.backupsRecyclerView,
+            binding?.backupsRecyclerView,
             Constants.INBOX_ADAPTER,
             if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
             sortByHeaderViewModel,
@@ -349,7 +349,7 @@ class InboxFragment : RotatableFragment() {
      * Establishes the [NewGridRecyclerView]
      */
     private fun setupRecyclerView() {
-        binding.backupsRecyclerView.let {
+        binding?.backupsRecyclerView?.let {
             it.itemAnimator = DefaultItemAnimator()
             it.setPadding(0, 0, 0, Util.scaleHeightPx(85, displayMetrics()))
             it.clipToPadding = false
@@ -436,7 +436,7 @@ class InboxFragment : RotatableFragment() {
      * Switches how items in the [MegaNodeAdapter] are being displayed, based on the current
      * [ViewType] in [InboxViewModel]
      */
-    private fun switchViewType() = binding.backupsRecyclerView.run {
+    private fun switchViewType() = binding?.backupsRecyclerView?.run {
         when (state().currentViewType) {
             ViewType.LIST -> {
                 switchToLinear()
@@ -460,7 +460,7 @@ class InboxFragment : RotatableFragment() {
      *
      * This function is used by [ManagerActivity.refreshInboxList]
      */
-    fun invalidateRecyclerView() = binding.backupsRecyclerView.invalidate()
+    fun invalidateRecyclerView() = binding?.backupsRecyclerView?.invalidate()
 
     /**
      * Selects all items from [MegaNodeAdapter]
@@ -494,7 +494,7 @@ class InboxFragment : RotatableFragment() {
     fun checkScroll() {
         // Check if the Fragment is added to its Activity before changing the App Bar Elevation
         if (isAdded) {
-            binding.backupsRecyclerView.let {
+            binding?.backupsRecyclerView?.let {
                 val hasElevation = (it.canScrollVertically(-1) && it.isVisible) ||
                         megaNodeAdapter?.isMultipleSelect == true
                 (requireActivity() as ManagerActivity).changeAppBarElevation(hasElevation)
@@ -518,7 +518,7 @@ class InboxFragment : RotatableFragment() {
             )
             putThumbnailLocation(
                 launchIntent = intent,
-                rv = binding.backupsRecyclerView,
+                rv = binding?.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
                 thumbnailGetter = megaNodeAdapter
@@ -563,7 +563,7 @@ class InboxFragment : RotatableFragment() {
             )
             putThumbnailLocation(
                 launchIntent = mediaIntent,
-                rv = binding.backupsRecyclerView,
+                rv = binding?.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
                 thumbnailGetter = megaNodeAdapter
@@ -689,7 +689,7 @@ class InboxFragment : RotatableFragment() {
             pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
             putThumbnailLocation(
                 launchIntent = pdfIntent,
-                rv = binding.backupsRecyclerView,
+                rv = binding?.backupsRecyclerView,
                 position = position,
                 viewerFrom = Constants.VIEWER_FROM_INBOX,
                 thumbnailGetter = megaNodeAdapter,
@@ -761,7 +761,7 @@ class InboxFragment : RotatableFragment() {
                     }
 
                     // Update the RecyclerView scrolling behavior
-                    binding.backupsRecyclerView.scrollToPosition(0)
+                    binding?.backupsRecyclerView?.scrollToPosition(0)
                     checkScroll()
                 } else {
                     // For non-Folder typed Nodes, simply open the file
@@ -777,10 +777,12 @@ class InboxFragment : RotatableFragment() {
      */
     private fun pushLastPositionStack() {
         var lastFirstVisiblePosition =
-            binding.backupsRecyclerView.findFirstCompletelyVisibleItemPosition()
+            binding?.backupsRecyclerView?.findFirstCompletelyVisibleItemPosition()
+                ?: RecyclerView.NO_POSITION
         if (state().currentViewType == ViewType.GRID && lastFirstVisiblePosition == -1) {
             Timber.d("Completely -1 then find just visible position")
-            lastFirstVisiblePosition = binding.backupsRecyclerView.findFirstVisibleItemPosition()
+            lastFirstVisiblePosition = binding?.backupsRecyclerView?.findFirstVisibleItemPosition()
+                ?: RecyclerView.NO_POSITION
         }
         Timber.d("Push to stack %d position", lastFirstVisiblePosition)
         lastPositionStack?.push(lastFirstVisiblePosition)
@@ -857,7 +859,7 @@ class InboxFragment : RotatableFragment() {
 
         Timber.d("Scroll to position $lastVisiblePosition")
         if (lastVisiblePosition >= 0) {
-            binding.backupsRecyclerView.scrollToPosition(lastVisiblePosition)
+            binding?.backupsRecyclerView?.scrollToPosition(lastVisiblePosition)
         }
     }
 
@@ -889,7 +891,7 @@ class InboxFragment : RotatableFragment() {
      */
     private fun setContent() {
         Timber.d("setContent()")
-        with(binding) {
+        binding?.run {
             if (getNodeCount() == 0) {
                 backupsRecyclerView.visibility = View.GONE
                 backupsNoItemsGroup.visibility = View.VISIBLE
@@ -935,7 +937,7 @@ class InboxFragment : RotatableFragment() {
      * @param description Empty folder description
      */
     private fun setEmptyFolderTextContent(title: String, description: String) {
-        with(binding) {
+        binding?.run {
             backupsNoItemsTitleTextView.text = formatEmptyFolderTitleString(title)
             backupsNoItemsDescriptionTextView.text = description
         }
