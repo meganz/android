@@ -3,14 +3,12 @@ package mega.privacy.android.app.presentation.movenode
 import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult.GeneralMovement
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult.Restoration
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult.RubbishMovement
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaNode
 
 /**
  * Sealed class containing all the info related to a movement request.
- * The class can be a [GeneralMovement], [RubbishMovement] or [Restoration]
+ * The class can be a [GeneralMovement], [RubbishMovement]
  *
  * @property count              Number of requests.
  * @property errorCount         Number of requests which finished with an error.
@@ -119,80 +117,6 @@ sealed class MoveRequestResult(
                     ).append(". ").append(
                         context.resources.getQuantityString(
                             R.plurals.number_incorrectly_moved_to_rubbish,
-                            errorCount,
-                            errorCount
-                        )
-                    ).toString()
-                }
-            }
-    }
-
-    /**
-     * Result of a movement from the Rubbish Bin to the original location.
-     */
-    class Restoration(
-        count: Int,
-        errorCount: Int,
-        val destination: MegaNode?,
-        private val context: Context,
-    ) : MoveRequestResult(
-        count = count,
-        errorCount = errorCount
-    ) {
-        override fun getResultText(): String =
-            when {
-                count == 1 && isSuccess -> {
-
-                    if (destination != null) {
-                        context.getString(
-                            R.string.context_correctly_node_restored,
-                            destination.name
-                        )
-                    } else {
-                        context.getString(R.string.context_correctly_moved)
-                    }
-                }
-                count == 1 -> {
-                    context.getString(R.string.context_no_restored)
-                }
-                isSuccess -> {
-                    context.resources.getQuantityString(
-                        R.plurals.number_correctly_restored_from_rubbish,
-                        count,
-                        count
-                    )
-                }
-                count == errorCount -> {
-                    context.resources.getQuantityString(
-                        R.plurals.number_incorrectly_restored_from_rubbish,
-                        errorCount,
-                        errorCount
-                    )
-                }
-                errorCount == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
-                        successCount,
-                        successCount
-                    )
-                }
-                successCount == 1 -> {
-                    context.resources.getQuantityString(
-                        R.plurals.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
-                        errorCount,
-                        errorCount
-                    )
-                }
-                else -> {
-                    StringBuilder().append(
-                        context.resources.getQuantityString(
-                            R.plurals.number_correctly_restored_from_rubbish,
-                            successCount,
-                            successCount
-                        )
-                    ).append(". ").append(
-                        context.resources.getQuantityString(
-                            R.plurals.number_incorrectly_restored_from_rubbish,
                             errorCount,
                             errorCount
                         )

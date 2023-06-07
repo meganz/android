@@ -243,45 +243,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
     }
 
     /**
-     * Moves nodes from the Rubbish Bin to their original parent if it still exists.
-     *
-     * @param nodes List of MegaNode to restore.
-     * @return The restoration result.
-     */
-    fun restore(nodes: List<MegaNode>, context: Context): Single<MoveRequestResult.Restoration> =
-        rxSingle(ioDispatcher) {
-            var errorCount = 0
-            val destination = if (nodes.size == 1) {
-                getMegaNode(nodes.first().restoreHandle)
-            } else null
-            var throwForeign = false
-            nodes.forEach { node ->
-                val parent = getMegaNode(node.restoreHandle)
-                if (parent == null || megaApiGateway.isInRubbish(parent)) {
-                    errorCount++
-                } else {
-                    runCatching {
-                        moveAsync(node = node, parentNode = parent)
-                    }.onFailure {
-                        errorCount++
-                        if (it is ForeignNodeException) {
-                            throwForeign = true
-                        }
-                    }
-                }
-            }
-            if (throwForeign) {
-                throw ForeignNodeException()
-            }
-            MoveRequestResult.Restoration(
-                count = nodes.size,
-                errorCount = errorCount,
-                destination = destination,
-                context = context,
-            ).also { resetAccountDetailsIfNeeded(it) }
-        }
-
-    /**
      * Checks if the error of the request is over quota, pre over quota or foreign node.
      *
      * @return True if the error is one of those specified above, false otherwise.

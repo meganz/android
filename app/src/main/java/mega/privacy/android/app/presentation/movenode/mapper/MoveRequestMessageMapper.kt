@@ -51,7 +51,6 @@ class MoveRequestMessageMapper @Inject constructor(
                     }
                 }
             }
-            is MoveRequestResult.Restoration -> TODO()
             is MoveRequestResult.RubbishMovement -> TODO()
         }
 }
