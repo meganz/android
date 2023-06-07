@@ -53,14 +53,14 @@
         <FrameLayout
             android:id="@+id/header_layout"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="50dp"
             android:background="@{highlight ? (isAudio ? @color/grey_020_grey_800 : @color/grey_800) : (isAudio ? @color/white_dark_grey : @color/dark_grey) }"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
+                android:layout_gravity="bottom"
                 android:layout_marginStart="72dp"
                 android:text="@{name}"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.AccentColor"
