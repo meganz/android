@@ -162,7 +162,7 @@ void checkoutMegaChatSdkByTag(String megaChatTag) {
 }
 
 /**
- * Read the prebuilt SDK version from project build.gradle
+ * Read the prebuilt SDK version from project build.gradle.kts
  * @return version of prebuilt SDK
  */
 String readPrebuiltSdkVersion() {
@@ -176,7 +176,7 @@ String readPrebuiltSdkVersion() {
  *
  * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
  * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
- * project build.gradle file.
+ * project build.gradle.kts file.
  * @return property value
  */
 def queryPrebuiltSdkProperty(String property, String version) {
@@ -371,7 +371,7 @@ SDK version: ${readPrebuiltSdkVersion()}
 }
 
 /**
- * read the version name from source code(build.gradle)
+ * read the version name from source code(build.gradle.kts)
  * read the version code from environment variable
  *
  * @return a tuple of version code and version name

@@ -10,7 +10,7 @@ apply from: "$project.rootDir/tools/sdk.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVerion
+    buildToolsVersion rootProject.buildToolsVersion
 
     buildFeatures {
         compose true
@@ -44,7 +44,7 @@ android {
 
     kotlinOptions {
         jvmTarget = rootProject.jdk
-        suppressWarnings = shouldSuppressWarnings()
+        suppressWarnings = rootProject.shouldSuppressWarnings
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 

@@ -24,7 +24,7 @@ dependencies {
 compileKotlin {
     kotlinOptions {
         jvmTarget = rootProject.jdk
-        suppressWarnings = shouldSuppressWarnings()
+        suppressWarnings = rootProject.shouldSuppressWarnings
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 

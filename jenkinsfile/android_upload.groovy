@@ -854,11 +854,11 @@ private void checkSDKVersion() {
 }
 
 /**
- * read version name and version code from build.gradle
+ * read version name and version code from build.gradle.kts
  * @return version name plus version code. Example: "6.6(433)"
  */
 private String readAppVersion() {
-    String versionName = sh(script: "grep appVersion build.gradle | awk -F= '{print \$2}'", returnStdout: true).trim().replaceAll("\"", "")
+    String versionName = sh(script: "grep appVersion build.gradle.kts | awk -F'\"' '{print \$4}'", returnStdout: true).trim().replaceAll("\"", "")
     String versionCode = env.APK_VERSION_CODE_FOR_CD
     return versionName + "(" + versionCode + ")"
 }

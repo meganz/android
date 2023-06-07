@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVerion
+    buildToolsVersion rootProject.buildToolsVersion
 
     buildFeatures {
         compose = true
