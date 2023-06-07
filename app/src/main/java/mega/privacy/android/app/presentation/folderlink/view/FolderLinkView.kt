@@ -59,7 +59,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
@@ -71,6 +70,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -118,16 +118,15 @@ internal fun FolderLinkView(
     state: FolderLinkState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
-    stringUtilWrapper: StringUtilWrapper,
-    onMoreOptionClick: (NodeUIItem?) -> Unit,
-    onItemClicked: (NodeUIItem) -> Unit,
-    onLongClick: (NodeUIItem) -> Unit,
+    onMoreOptionClick: (NodeUIItem<TypedNode>?) -> Unit,
+    onItemClicked: (NodeUIItem<TypedNode>) -> Unit,
+    onLongClick: (NodeUIItem<TypedNode>) -> Unit,
     onChangeViewTypeClick: () -> Unit,
     onSortOrderClick: () -> Unit,
     onSelectAllActionClicked: () -> Unit,
     onClearAllActionClicked: () -> Unit,
-    onSaveToDeviceClicked: (NodeUIItem?) -> Unit,
-    onImportClicked: (NodeUIItem?) -> Unit,
+    onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onOpenFile: (Intent) -> Unit,
     onResetOpenFile: () -> Unit,
     onDownloadNode: (List<MegaNode>) -> Unit,
@@ -140,7 +139,7 @@ internal fun FolderLinkView(
     emptyViewString: String,
     thumbnailViewModel: ThumbnailViewModel,
     onLinkClicked: (String) -> Unit,
-    onDisputeTakeDownClicked: (String) -> Unit
+    onDisputeTakeDownClicked: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -244,12 +243,11 @@ internal fun FolderLinkView(
             )
         } else {
             Column {
-                NodesView(
+                NodesView<TypedNode>(
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 8.dp),
                     nodeUIItems = state.nodesList,
-                    stringUtilWrapper = stringUtilWrapper,
                     onMenuClick = { onMoreOptionClick(it) },
                     onItemClicked = onItemClicked,
                     onLongClick = onLongClick,
@@ -260,7 +258,7 @@ internal fun FolderLinkView(
                     showSortOrder = false,
                     listState = listState,
                     gridState = gridState,
-                    thumbnailViewModel = thumbnailViewModel,
+                    getThumbnail = thumbnailViewModel::getThumbnail,
                     onLinkClicked = onLinkClicked,
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked
                 )
@@ -293,7 +291,7 @@ internal fun FolderLinkTopAppBar(
     elevation: Boolean,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
-    onMoreClicked: () -> Unit
+    onMoreClicked: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -344,7 +342,7 @@ internal fun FolderLinkSelectedTopAppBar(
     onBackPressed: () -> Unit,
     onSelectAllClicked: () -> Unit,
     onClearAllClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit
+    onSaveToDeviceClicked: () -> Unit,
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -393,19 +391,23 @@ internal fun FolderLinkSelectedTopAppBar(
 internal fun ImportDownloadView(
     modifier: Modifier,
     hasDbCredentials: Boolean,
-    onImportClicked: (NodeUIItem?) -> Unit,
-    onSaveToDeviceClicked: () -> Unit
+    onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    onSaveToDeviceClicked: () -> Unit,
 ) {
     Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
         if (hasDbCredentials) {
             TextMegaButton(
-                modifier = Modifier.padding(end = 16.dp).testTag(IMPORT_BUTTON_TAG),
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .testTag(IMPORT_BUTTON_TAG),
                 textId = R.string.add_to_cloud,
                 onClick = { onImportClicked(null) }
             )
         }
         TextMegaButton(
-            modifier = Modifier.padding(end = 16.dp).testTag(SAVE_BUTTON_TAG),
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .testTag(SAVE_BUTTON_TAG),
             textId = R.string.general_save_to_device,
             onClick = onSaveToDeviceClicked
         )
@@ -416,7 +418,7 @@ internal fun ImportDownloadView(
 internal fun EmptyFolderLinkView(
     modifier: Modifier,
     emptyViewString: String,
-    isNodesFetched: Boolean
+    isNodesFetched: Boolean,
 ) {
     val orientation = LocalConfiguration.current.orientation
     val imageResource = if (orientation == Configuration.ORIENTATION_LANDSCAPE)

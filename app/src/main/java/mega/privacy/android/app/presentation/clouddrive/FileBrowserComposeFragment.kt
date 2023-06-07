@@ -44,7 +44,6 @@ import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeVie
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
@@ -57,6 +56,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
@@ -79,11 +79,6 @@ class FileBrowserComposeFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
-    /**
-     * String formatter for file desc
-     */
-    @Inject
-    lateinit var stringUtilWrapper: StringUtilWrapper
 
     /**
      * Application Theme Mode
@@ -134,7 +129,6 @@ class FileBrowserComposeFragment : Fragment() {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     FileBrowserComposeView(
                         uiState = uiState,
-                        stringUtilWrapper = stringUtilWrapper,
                         emptyState = getEmptyFolderDrawable(uiState.isFileBrowserEmpty),
                         onItemClick = fileBrowserViewModel::onItemClicked,
                         onLongClick = {
@@ -302,7 +296,7 @@ class FileBrowserComposeFragment : Fragment() {
     /**
      * Shows Options menu for item clicked
      */
-    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem) {
+    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
     }
 

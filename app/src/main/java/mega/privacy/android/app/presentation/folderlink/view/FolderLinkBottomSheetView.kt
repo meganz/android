@@ -33,24 +33,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.view.getFolderInfo
-import mega.privacy.android.app.presentation.view.getUnitString
+import mega.privacy.android.app.presentation.view.extension.fileSize
+import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun FolderLinkBottomSheetView(
     modalSheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
-    nodeUIItem: NodeUIItem?,
+    nodeUIItem: NodeUIItem<TypedNode>?,
     showImport: Boolean,
-    onImportClicked: (NodeUIItem?) -> Unit,
-    onSaveToDeviceClicked: (NodeUIItem?) -> Unit,
+    onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
 ) {
     ModalBottomSheetLayout(
         sheetState = modalSheetState,
@@ -73,10 +74,10 @@ internal fun FolderLinkBottomSheetView(
 private fun BottomSheetContent(
     modalSheetState: ModalBottomSheetState,
     coroutineScope: CoroutineScope,
-    nodeUIItem: NodeUIItem?,
+    nodeUIItem: NodeUIItem<TypedNode>?,
     showImport: Boolean,
-    onImportClicked: (NodeUIItem?) -> Unit,
-    onSaveToDeviceClicked: (NodeUIItem?) -> Unit
+    onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -90,13 +91,10 @@ private fun BottomSheetContent(
 
         val infoText = nodeUIItem?.let {
             if (it.node is FolderNode) {
-                getFolderInfo(
-                    it.node.childFolderCount,
-                    it.node.childFileCount,
-                )
+                it.node.folderInfo()
             } else {
                 val fileItem = it.node as FileNode
-                getUnitString(unit = fileItem.size, isSpeed = false)
+                fileItem.fileSize()
             }
         } ?: ""
 

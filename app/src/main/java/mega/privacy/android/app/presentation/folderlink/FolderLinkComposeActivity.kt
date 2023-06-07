@@ -33,7 +33,6 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -48,7 +47,6 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * FolderLinkActivity with compose view
@@ -58,12 +56,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
-
-    /**
-     * String formatter for file desc
-     */
-    @Inject
-    lateinit var stringUtilWrapper: StringUtilWrapper
 
     private val viewModel: FolderLinkViewModel by viewModels()
     private val thumbnailViewModel: ThumbnailViewModel by viewModels()
@@ -154,7 +146,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 state = uiState,
                 onBackPressed = viewModel::handleBackPress,
                 onShareClicked = ::onShareClicked,
-                stringUtilWrapper = stringUtilWrapper,
                 onMoreOptionClick = viewModel::handleMoreOptionClick,
                 onItemClicked = { viewModel.onItemClick(it, this) },
                 onLongClick = viewModel::onItemLongClick,
@@ -216,6 +207,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                         it.finishActivity -> {
                             finish()
                         }
+
                         it.isInitialState -> {
                             it.shouldLogin?.let { showLogin ->
                                 if (showLogin) {
@@ -226,25 +218,30 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                             }
                             return@collect
                         }
+
                         it.isLoginComplete && !it.isNodesFetched -> {
                             it.folderSubHandle?.let { handle -> viewModel.fetchNodes(handle) }
                             // Get cookies settings after login.
                             MegaApplication.getInstance().checkEnabledCookies()
                         }
+
                         it.collisions != null -> {
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
                             nameCollisionActivityContract?.launch(it.collisions)
                             viewModel.resetLaunchCollisionActivity()
                             viewModel.clearAllSelection()
                         }
+
                         it.copyResultText != null || it.copyThrowable != null -> {
                             showCopyResult(it.copyResultText, it.copyThrowable)
                             viewModel.resetShowCopyResult()
                         }
+
                         it.isLoginComplete && it.isNodesFetched -> {}
                         it.askForDecryptionKeyDialog -> {
                             askForDecryptionKeyDialog()
                         }
+
                         else -> {
                             if (it.errorDialogTitle != -1 && it.errorDialogContent != -1) {
                                 Timber.w("Show error dialog")

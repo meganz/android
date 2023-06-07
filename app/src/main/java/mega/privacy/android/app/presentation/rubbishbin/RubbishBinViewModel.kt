@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.DefaultGetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -61,7 +60,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
     private val getRubbishBinFolder: GetRubbishBinFolder,
-    private val getNodeByHandle: GetNodeByHandle
+    private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
     /**
@@ -138,12 +137,12 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem> {
+    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
         val existingNodeList = _state.value.nodeList
         return nodeList.mapIndexed { index, it ->
             val isSelected =
                 state.value.selectedNodeHandles.contains(it.id.longValue)
-            NodeUIItem(
+            NodeUIItem<TypedNode>(
                 node = it,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
@@ -207,7 +206,7 @@ class RubbishBinViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onItemClicked(nodeUIItem: NodeUIItem) {
+    fun onItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
         val index =
             _state.value.nodeList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         if (_state.value.isInSelection) {
@@ -233,7 +232,7 @@ class RubbishBinViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onLongItemClicked(nodeUIItem: NodeUIItem) {
+    fun onLongItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
         nodeUIItem.isSelected = true
         val index =
             _state.value.nodeList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
@@ -256,7 +255,7 @@ class RubbishBinViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem] to be updated
      * @param index Index of [NodeUIItem] in [state]
      */
-    private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem, index: Int) {
+    private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem<TypedNode>, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
         var totalSelectedFileNode = _state.value.selectedFileNodes
         var totalSelectedFolderNode = _state.value.selectedFolderNodes
@@ -315,7 +314,7 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * Returns list of all selected Nodes
      */
-    private fun selectAllNodesUiList(): List<NodeUIItem> {
+    private fun selectAllNodesUiList(): List<NodeUIItem<TypedNode>> {
         return _state.value.nodeList.map {
             it.copy(isSelected = true)
         }
@@ -350,7 +349,7 @@ class RubbishBinViewModel @Inject constructor(
     /**
      * Clear the selections of items from NodesUiList
      */
-    private fun clearNodeUiItemList(): List<NodeUIItem> {
+    private fun clearNodeUiItemList(): List<NodeUIItem<TypedNode>> {
         return _state.value.nodeList.map {
             it.copy(isSelected = false)
         }

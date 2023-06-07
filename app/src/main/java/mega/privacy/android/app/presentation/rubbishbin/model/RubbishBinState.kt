@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.rubbishbin.model
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -26,7 +27,7 @@ import nz.mega.sdk.MegaNode
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
     val parentHandle: Long? = null,
-    val nodeList: List<NodeUIItem> = emptyList(),
+    val nodeList: List<NodeUIItem<TypedNode>> = emptyList(),
     val selectedFileNodes: Int = 0,
     val selectedFolderNodes: Int = 0,
     val isInSelection: Boolean = false,

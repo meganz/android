@@ -35,7 +35,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.rubbishbin.model.RestoreType
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
@@ -44,6 +43,7 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
@@ -62,12 +62,6 @@ class RubbishBinComposeFragment : Fragment() {
         @JvmStatic
         fun newInstance() = RubbishBinComposeFragment()
     }
-
-    /**
-     * String formatter for file desc
-     */
-    @Inject
-    lateinit var stringUtilWrapper: StringUtilWrapper
 
     /**
      * Application Theme Mode
@@ -98,7 +92,6 @@ class RubbishBinComposeFragment : Fragment() {
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
                     RubbishBinComposeView(
                         uiState = uiState,
-                        stringUtilWrapper = stringUtilWrapper,
                         onMenuClick = ::showOptionsMenuForItem,
                         onItemClicked = viewModel::onItemClicked,
                         onLongClick = {
@@ -108,12 +101,12 @@ class RubbishBinComposeFragment : Fragment() {
                                     ActionBarCallback()
                                 )
                         },
+                        onSortOrderClick = { showSortByPanel() },
+                        onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         sortOrder = getString(
                             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                 ?: R.string.sortby_name
                         ),
-                        onSortOrderClick = { showSortByPanel() },
-                        onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                         emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
                         thumbnailViewModel = thumbnailViewModel,
                         onLinkClicked = ::navigateToLink,
@@ -151,6 +144,7 @@ class RubbishBinComposeFragment : Fragment() {
                 RestoreType.MOVE -> {
                     NodeController(requireActivity()).chooseLocationToMoveNodes(selectedNodeHandles)
                 }
+
                 RestoreType.RESTORE -> {
                     selectedNodes?.let {
                         ((requireActivity()) as ManagerActivity).restoreFromRubbish(it)
@@ -267,11 +261,13 @@ class RubbishBinComposeFragment : Fragment() {
                 R.id.cab_menu_restore_from_rubbish -> {
                     viewModel.onRestoreClicked()
                 }
+
                 R.id.cab_menu_delete -> {
                     val documents = viewModel.state.value.selectedNodeHandles
                     ((requireActivity()) as ManagerActivity).askConfirmationMoveToRubbish(documents)
                     actionMode?.finish()
                 }
+
                 R.id.cab_menu_select_all -> viewModel.selectAllNodes()
                 R.id.cab_menu_clear_selection -> {
                     viewModel.clearAllSelectedNodes()
@@ -318,7 +314,7 @@ class RubbishBinComposeFragment : Fragment() {
     /**
      * Shows Options menu for item clicked
      */
-    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem) {
+    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem<TypedNode>) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
     }
 
@@ -329,6 +325,7 @@ class RubbishBinComposeFragment : Fragment() {
                     actionMode?.finish()
                     0.toString()
                 }
+
                 fileCount == 0 -> folderCount.toString()
                 folderCount == 0 -> fileCount.toString()
                 else -> (fileCount + folderCount).toString()

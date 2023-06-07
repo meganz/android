@@ -12,16 +12,15 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 
 /**
  * Composable view for FileBrowser
  * @param uiState
- * @param stringUtilWrapper
  * @param emptyState
  * @param onItemClick
  * @param onLongClick
@@ -36,26 +35,24 @@ import mega.privacy.android.domain.entity.preference.ViewType
 @Composable
 fun FileBrowserComposeView(
     uiState: FileBrowserState,
-    stringUtilWrapper: StringUtilWrapper,
     emptyState: Pair<Int, Int>,
-    onItemClick: (NodeUIItem) -> Unit,
-    onLongClick: (NodeUIItem) -> Unit,
-    onMenuClick: (NodeUIItem) -> Unit,
+    onItemClick: (NodeUIItem<TypedNode>) -> Unit,
+    onLongClick: (NodeUIItem<TypedNode>) -> Unit,
+    onMenuClick: (NodeUIItem<TypedNode>) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     thumbnailViewModel: ThumbnailViewModel,
     onLinkClicked: (String) -> Unit,
-    onDisputeTakeDownClicked: (String) -> Unit
+    onDisputeTakeDownClicked: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     if (uiState.nodesList.isNotEmpty()) {
-        NodesView(
+        NodesView<TypedNode>(
             modifier = Modifier
                 .padding(horizontal = 8.dp),
             nodeUIItems = uiState.nodesList,
-            stringUtilWrapper = stringUtilWrapper,
             onMenuClick = onMenuClick,
             onItemClicked = onItemClick,
             onLongClick = onLongClick,
@@ -63,7 +60,7 @@ fun FileBrowserComposeView(
             isListView = uiState.currentViewType == ViewType.LIST,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
-            thumbnailViewModel = thumbnailViewModel,
+            getThumbnail = thumbnailViewModel::getThumbnail,
             listState = listState,
             gridState = gridState,
             onLinkClicked = onLinkClicked,

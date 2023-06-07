@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -55,7 +56,7 @@ data class FolderLinkState(
     val copyResultText: String? = null,
     val shouldLogin: Boolean? = null,
     val hasDbCredentials: Boolean = false,
-    val nodesList: List<NodeUIItem> = listOf(),
+    val nodesList: List<NodeUIItem<TypedNode>> = listOf(),
     val rootNode: TypedFolderNode? = null,
     val parentNode: TypedFolderNode? = null,
     val currentViewType: ViewType = ViewType.LIST,
@@ -64,11 +65,11 @@ data class FolderLinkState(
     val finishActivity: Boolean = false,
     val openFile: StateEventWithContent<Intent> = consumed(),
     val downloadNodes: StateEventWithContent<List<MegaNode>> = consumed(),
-    val importNode: NodeUIItem? = null,
+    val importNode: NodeUIItem<TypedNode>? = null,
     val selectImportLocation: StateEvent = consumed,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val openMoreOption: StateEvent = consumed,
-    val moreOptionNode: NodeUIItem? = null,
+    val moreOptionNode: NodeUIItem<TypedNode>? = null,
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

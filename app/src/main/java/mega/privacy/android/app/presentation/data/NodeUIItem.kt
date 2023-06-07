@@ -9,8 +9,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param isSelected Node is selected
  * @param isInvisible Node is invisible
  */
-data class NodeUIItem(
-    val node: TypedNode,
+data class NodeUIItem<T : TypedNode>(
+    val node: T,
     var isSelected: Boolean,
-    val isInvisible: Boolean
+    val isInvisible: Boolean,
 ) : Node by node

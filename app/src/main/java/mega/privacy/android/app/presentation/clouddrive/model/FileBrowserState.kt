@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -39,7 +40,7 @@ data class FileBrowserState(
     val parentHandle: Long? = null,
     val mediaHandle: Long = -1L,
     val isPendingRefresh: Boolean = false,
-    val nodesList: List<NodeUIItem> = emptyList(),
+    val nodesList: List<NodeUIItem<TypedNode>> = emptyList(),
     val isInSelection: Boolean = false,
     val itemIndex: Int = -1,
     val currentFileNode: FileNode? = null,

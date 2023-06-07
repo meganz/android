@@ -22,13 +22,14 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.HasCredentials
@@ -296,7 +297,7 @@ class FolderLinkViewModelTest {
         val childNode = mock<TypedFolderNode>()
         val childrenNodes = listOf(childNode)
         val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
-        val nodeUIItem = NodeUIItem(childNode, isSelected = false, isInvisible = false)
+        val nodeUIItem = NodeUIItem<TypedNode>(childNode, isSelected = false, isInvisible = false)
 
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
 
@@ -434,7 +435,8 @@ class FolderLinkViewModelTest {
         val rootNode = mock<TypedFolderNode>()
         val childNode = mock<TypedFileNode>()
         val childrenNodes = listOf(childNode)
-        val node = NodeUIItem(mock<TypedFolderNode>(), isSelected = false, isInvisible = false)
+        val node =
+            NodeUIItem<TypedNode>(mock<TypedFolderNode>(), isSelected = false, isInvisible = false)
         val fetchFolderNodeResult =
             FetchFolderNodesResult(rootNode, mock(), childrenNodes)
 

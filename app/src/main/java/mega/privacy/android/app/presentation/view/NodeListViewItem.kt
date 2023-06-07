@@ -23,31 +23,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
+import mega.privacy.android.app.presentation.view.extension.fileSize
+import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.app.presentation.view.extension.formattedModifiedDate
+import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
-import java.text.DecimalFormat
 
 /**
  * List view item for file/folder info
  * @param modifier [Modifier]
  * @param nodeUIItem [NodeUIItem]
- * @param stringUtilWrapper [StringUtilWrapper] to format Info
  * @param onLongClick onLongItemClick
  * @param onItemClicked itemClick
  * @param onMenuClick three dots click
@@ -55,14 +55,13 @@ import java.text.DecimalFormat
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun NodeListViewItem(
+internal fun <T : TypedNode> NodeListViewItem(
     modifier: Modifier,
-    nodeUIItem: NodeUIItem,
-    stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: (NodeUIItem) -> Unit,
-    onItemClicked: (NodeUIItem) -> Unit,
-    onLongClick: (NodeUIItem) -> Unit,
-    imageState: State<File?>
+    nodeUIItem: NodeUIItem<T>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    imageState: State<File?>,
 ) {
     Column(
         modifier = modifier
@@ -95,12 +94,12 @@ internal fun NodeListViewItem(
                     Image(
                         modifier = thumbNailModifier
                             .testTag(FOLDER_TEST_TAG),
-                        painter = getPainter(nodeUIItem = nodeUIItem.node),
+                        painter = nodeUIItem.node.getPainter(),
                         contentDescription = "Folder Thumbnail"
                     )
                 } else if (nodeUIItem.node is FileNode) {
                     imageState.value
-                    ThumbnailView(
+                    ThumbnailView<T>(
                         modifier = thumbNailModifier
                             .testTag(FILE_TEST_TAG),
                         imageFile = imageState.value,
@@ -180,22 +179,14 @@ internal fun NodeListViewItem(
                 }
                 Text(
                     text = if (nodeUIItem.node is FolderNode) {
-                        getFolderInfo(
-                            nodeUIItem.node.childFolderCount,
-                            nodeUIItem.node.childFileCount,
-                        )
+                        nodeUIItem.node.folderInfo()
                     } else {
                         val fileItem = nodeUIItem.node as FileNode
-                        "${
-                            getUnitString(
-                                unit = fileItem.size,
-                                isSpeed = false
-                            )
-                        } · ${
-                            stringUtilWrapper.formatLongDateTime(
-                                fileItem.modificationTime
-                            )
-                        }"
+                        val current = Locale.current
+                        val javaLocale = java.util.Locale(
+                            current.language, current.region
+                        )
+                        "${fileItem.fileSize()} · ${fileItem.formattedModifiedDate(javaLocale)}"
                     },
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.textColorSecondary,
@@ -216,69 +207,37 @@ internal fun NodeListViewItem(
     }
 }
 
-@Composable
-fun getFolderInfo(numFolders: Int, numFiles: Int): String {
-    return if (numFolders == 0 && numFiles == 0) {
-        stringResource(R.string.file_browser_empty_folder)
-    } else if (numFolders == 0 && numFiles > 0) {
-        pluralStringResource(R.plurals.num_files_with_parameter, numFiles, numFiles)
-    } else if (numFiles == 0 && numFolders > 0) {
-        pluralStringResource(
-            R.plurals.num_folders_with_parameter,
-            numFolders,
-            numFolders
-        )
-    } else {
-        pluralStringResource(
-            R.plurals.num_folders_num_files,
-            numFolders,
-            numFolders
-        ) + pluralStringResource(
-            R.plurals.num_folders_num_files_2,
-            numFiles,
-            numFiles
-        )
-    }
-}
+/**
+ * Test tag for info text
+ */
+const val INFO_TEXT_TEST_TAG = "Info Text"
 
-@Composable
-fun getUnitString(unit: Long, isSpeed: Boolean): String? {
-    val df = DecimalFormat("#.##")
-    val KB = 1024f
-    val MB = KB * 1024
-    val GB = MB * 1024
-    val TB = GB * 1024
-    val PB = TB * 1024
-    val EB = PB * 1024
-    return if (unit < KB) {
-        stringResource(
-            if (isSpeed) R.string.label_file_speed_byte else R.string.label_file_size_byte,
-            unit.toString()
-        )
-    } else if (unit < MB) {
-        stringResource(
-            if (isSpeed) R.string.label_file_speed_kilo_byte else R.string.label_file_size_kilo_byte,
-            df.format((unit / KB).toDouble())
-        )
-    } else if (unit < GB) {
-        stringResource(
-            if (isSpeed) R.string.label_file_speed_mega_byte else R.string.label_file_size_mega_byte,
-            df.format((unit / MB).toDouble())
-        )
-    } else if (unit < TB) {
-        stringResource(
-            if (isSpeed) R.string.label_file_speed_giga_byte else R.string.label_file_size_giga_byte,
-            df.format((unit / GB).toDouble())
-        )
-    } else if (unit < PB) {
-        stringResource(
-            if (isSpeed) R.string.label_file_speed_tera_byte else R.string.label_file_size_tera_byte,
-            df.format((unit / TB).toDouble())
-        )
-    } else if (unit < EB) {
-        stringResource(R.string.label_file_size_peta_byte, df.format((unit / PB).toDouble()))
-    } else {
-        stringResource(R.string.label_file_size_exa_byte, df.format((unit / EB).toDouble()))
-    }
-}
+/**
+ * Text tag for selected item
+ */
+const val SELECTED_TEST_TAG = "Selected Tag"
 
+/**
+ * Test tag for folder item
+ */
+const val FOLDER_TEST_TAG = "Folder Tag"
+
+/**
+ * Test tag for file item
+ */
+const val FILE_TEST_TAG = "File Tag"
+
+/**
+ * Test tag for favorite item
+ */
+const val FAVORITE_TEST_TAG = "favorite Tag"
+
+/**
+ * Test tag for exported item
+ */
+const val EXPORTED_TEST_TAG = "exported Tag"
+
+/**
+ * Test tag for taken item
+ */
+const val TAKEN_TEST_TAG = "taken Tag"

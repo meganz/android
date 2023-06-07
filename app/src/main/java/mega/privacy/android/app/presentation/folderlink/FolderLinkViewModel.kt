@@ -34,13 +34,14 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
@@ -142,6 +143,7 @@ class FolderLinkViewModel @Inject constructor(
                 FolderLoginStatus.SUCCESS -> {
                     _state.update { it.copy(isInitialState = false, isLoginComplete = true) }
                 }
+
                 FolderLoginStatus.API_INCOMPLETE -> {
                     _state.update {
                         it.copy(
@@ -151,6 +153,7 @@ class FolderLinkViewModel @Inject constructor(
                         )
                     }
                 }
+
                 FolderLoginStatus.INCORRECT_KEY -> {
                     _state.update {
                         it.copy(
@@ -163,6 +166,7 @@ class FolderLinkViewModel @Inject constructor(
                         )
                     }
                 }
+
                 FolderLoginStatus.ERROR -> {
                     _state.update {
                         it.copy(
@@ -337,7 +341,11 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isNodesFetched = true,
                             nodesList = result.childrenNodes.map { typedNode ->
-                                NodeUIItem(typedNode, isSelected = false, isInvisible = false)
+                                NodeUIItem<TypedNode>(
+                                    typedNode,
+                                    isSelected = false,
+                                    isInvisible = false
+                                )
                             },
                             rootNode = result.rootNode,
                             parentNode = result.parentNode,
@@ -371,10 +379,10 @@ class FolderLinkViewModel @Inject constructor(
      *
      * @param nodeUIItem    Item that is long clicked
      */
-    fun onItemLongClick(nodeUIItem: NodeUIItem) {
+    fun onItemLongClick(nodeUIItem: NodeUIItem<TypedNode>) {
         val list = _state.value.nodesList
         val index = list.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
-        val newNode = NodeUIItem(nodeUIItem.node, !nodeUIItem.isSelected, false)
+        val newNode = NodeUIItem<TypedNode>(nodeUIItem.node, !nodeUIItem.isSelected, false)
         val newNodesList = list.updateItemAt(index = index, item = newNode)
 
         val selectedNodeCount = newNodesList.count { it.isSelected }
@@ -387,7 +395,8 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Get all the selected nodes
      */
-    fun getSelectedNodes(): List<NodeUIItem> = _state.value.nodesList.filter { it.isSelected }
+    fun getSelectedNodes(): List<NodeUIItem<TypedNode>> =
+        _state.value.nodesList.filter { it.isSelected }
 
     /**
      * Handle select all clicked
@@ -441,7 +450,7 @@ class FolderLinkViewModel @Inject constructor(
                                 _state.update {
                                     it.copy(
                                         nodesList = children.map { typedNode ->
-                                            NodeUIItem(
+                                            NodeUIItem<TypedNode>(
                                                 typedNode,
                                                 isSelected = false,
                                                 isInvisible = false
@@ -489,9 +498,11 @@ class FolderLinkViewModel @Inject constructor(
                         1 -> {
                             Timber.d("URL_handle: ${s[1]}")
                         }
+
                         2 -> {
                             Timber.d("URL_key: ${s[2]}")
                         }
+
                         3 -> {
                             folderSubHandle = s[3]
                             Timber.d("URL_subhandle: $folderSubHandle")
@@ -509,7 +520,7 @@ class FolderLinkViewModel @Inject constructor(
      * @param nodeUIItem    Item that is clicked
      * @param activity      Activity
      */
-    fun onItemClick(nodeUIItem: NodeUIItem, activity: Activity) {
+    fun onItemClick(nodeUIItem: NodeUIItem<TypedNode>, activity: Activity) {
         viewModelScope.launch {
             if (isMultipleNodeSelected()) {
                 onItemLongClick(nodeUIItem)
@@ -538,7 +549,7 @@ class FolderLinkViewModel @Inject constructor(
      *
      * @param nodeUIItem    Folder node to navigate to
      */
-    private fun openFolder(nodeUIItem: NodeUIItem) {
+    private fun openFolder(nodeUIItem: NodeUIItem<TypedNode>) {
         viewModelScope.launch {
             val children = getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null)
             _state.update {
@@ -546,7 +557,7 @@ class FolderLinkViewModel @Inject constructor(
                     parentNode = addNodeType(nodeUIItem.node as FolderNode) as TypedFolderNode,
                     title = nodeUIItem.name,
                     nodesList = children.map { childNode ->
-                        NodeUIItem(childNode, isSelected = false, isInvisible = false)
+                        NodeUIItem<TypedNode>(childNode, isSelected = false, isInvisible = false)
                     }
                 )
             }
@@ -568,7 +579,7 @@ class FolderLinkViewModel @Inject constructor(
      *
      * @param node  Node for which import is clicked
      */
-    fun handleImportClick(node: NodeUIItem?) {
+    fun handleImportClick(node: NodeUIItem<TypedNode>?) {
         state.value.rootNode?.let {
             _state.update { it.copy(importNode = node, selectImportLocation = triggered) }
         }
@@ -618,7 +629,7 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Handle Save to device button click
      */
-    fun handleSaveToDevice(nodeUIItem: NodeUIItem?) {
+    fun handleSaveToDevice(nodeUIItem: NodeUIItem<TypedNode>?) {
         viewModelScope.launch {
             if (isMultipleNodeSelected()) {
                 val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
@@ -675,9 +686,9 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Handle more options/ 3 dots clicked
      */
-    fun handleMoreOptionClick(nodeUIItem: NodeUIItem?) {
+    fun handleMoreOptionClick(nodeUIItem: NodeUIItem<TypedNode>?) {
         val moreOptionNode = nodeUIItem ?: state.value.parentNode?.let {
-            NodeUIItem(
+            NodeUIItem<TypedNode>(
                 it,
                 isSelected = false,
                 isInvisible = false

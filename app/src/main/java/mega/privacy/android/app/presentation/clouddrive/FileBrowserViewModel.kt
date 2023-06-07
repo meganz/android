@@ -246,11 +246,11 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * This will map list of [Node] to [NodeUIItem]
      */
-    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem> {
+    private fun getNodeUiItems(nodeList: List<TypedNode>): List<NodeUIItem<TypedNode>> {
         val existingNodeList = state.value.nodesList
         return nodeList.mapIndexed { index, node ->
             val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
-            NodeUIItem(
+            NodeUIItem<TypedNode>(
                 node = node,
                 isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
@@ -343,7 +343,7 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * Returns list of all selected Nodes
      */
-    private fun selectAllNodesUiList(): List<NodeUIItem> {
+    private fun selectAllNodesUiList(): List<NodeUIItem<TypedNode>> {
         return _state.value.nodesList.map {
             it.copy(isSelected = true)
         }
@@ -370,7 +370,7 @@ class FileBrowserViewModel @Inject constructor(
     /**
      * Clear the selections of items from NodesUiList
      */
-    private fun clearNodeUiItemList(): List<NodeUIItem> {
+    private fun clearNodeUiItemList(): List<NodeUIItem<TypedNode>> {
         return _state.value.nodesList.map {
             it.copy(isSelected = false)
         }
@@ -390,7 +390,7 @@ class FileBrowserViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onItemClicked(nodeUIItem: NodeUIItem) {
+    fun onItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
         val index =
             _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         if (_state.value.isInSelection) {
@@ -415,7 +415,7 @@ class FileBrowserViewModel @Inject constructor(
      *
      * @param nodeUIItem [NodeUIItem]
      */
-    fun onLongItemClicked(nodeUIItem: NodeUIItem) {
+    fun onLongItemClicked(nodeUIItem: NodeUIItem<TypedNode>) {
         nodeUIItem.isSelected = true
         val index =
             _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
@@ -438,7 +438,7 @@ class FileBrowserViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem] to be updated
      * @param index Index of [NodeUIItem] in [state]
      */
-    private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem, index: Int) {
+    private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem<TypedNode>, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
         val selectedNodeHandle = state.value.selectedNodeHandles.toMutableList()
         val pair = if (nodeUIItem.isSelected) {
@@ -465,7 +465,7 @@ class FileBrowserViewModel @Inject constructor(
      * @param nodeUIItem
      * @return Pair of count of Selected File Node and Selected Folder Node
      */
-    private fun selectNode(nodeUIItem: NodeUIItem): Pair<Int, Int> {
+    private fun selectNode(nodeUIItem: NodeUIItem<TypedNode>): Pair<Int, Int> {
         var totalSelectedFileNode = state.value.selectedFileNodes
         var totalSelectedFolderNode = state.value.selectedFolderNodes
         if (nodeUIItem.node is FolderNode) {
@@ -481,7 +481,7 @@ class FileBrowserViewModel @Inject constructor(
      * @param nodeUIItem
      * @return Pair of count of Selected File Node and Selected Folder Node
      */
-    private fun unSelectNode(nodeUIItem: NodeUIItem): Pair<Int, Int> {
+    private fun unSelectNode(nodeUIItem: NodeUIItem<TypedNode>): Pair<Int, Int> {
         var totalSelectedFileNode = state.value.selectedFileNodes
         var totalSelectedFolderNode = state.value.selectedFolderNodes
         if (nodeUIItem.node is FolderNode) {

@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTT
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +40,6 @@ class FolderLinkViewTest {
                 state = uiState,
                 onBackPressed = { },
                 onShareClicked = { },
-                stringUtilWrapper = mock(),
                 onMoreOptionClick = { },
                 onItemClicked = { },
                 onLongClick = { },
@@ -56,8 +56,8 @@ class FolderLinkViewTest {
                 onSelectImportLocation = { },
                 onResetSelectImportLocation = { },
                 onResetSnackbarMessage = { },
-                onResetOpenMoreOption = { },
                 onResetMoreOptionNode = { },
+                onResetOpenMoreOption = { },
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
                 thumbnailViewModel = mock(),
                 onLinkClicked = {},
@@ -109,7 +109,13 @@ class FolderLinkViewTest {
         setComposeContent(
             FolderLinkState(
                 isNodesFetched = true,
-                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false))
+                nodesList = listOf(
+                    NodeUIItem<TypedNode>(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                )
             )
         )
         composeTestRule.onNodeWithText(nodeName).assertIsDisplayed()
@@ -123,7 +129,13 @@ class FolderLinkViewTest {
         setComposeContent(
             FolderLinkState(
                 isNodesFetched = true,
-                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                nodesList = listOf(
+                    NodeUIItem<TypedNode>(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                ),
                 hasDbCredentials = true
             )
         )
@@ -139,7 +151,13 @@ class FolderLinkViewTest {
         setComposeContent(
             FolderLinkState(
                 isNodesFetched = true,
-                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                nodesList = listOf(
+                    NodeUIItem<TypedNode>(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                ),
                 snackbarMessageContent = triggered("Test")
             )
         )
@@ -154,7 +172,13 @@ class FolderLinkViewTest {
         setComposeContent(
             FolderLinkState(
                 isNodesFetched = true,
-                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                nodesList = listOf(
+                    NodeUIItem<TypedNode>(
+                        node,
+                        isSelected = false,
+                        isInvisible = false
+                    )
+                ),
                 hasDbCredentials = true,
                 openMoreOption = triggered
             )

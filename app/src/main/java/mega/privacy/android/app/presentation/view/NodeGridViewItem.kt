@@ -31,11 +31,13 @@ import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
+import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 
 /**
@@ -49,13 +51,13 @@ import java.io.File
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun NodeGridViewItem(
+internal fun <T : TypedNode> NodeGridViewItem(
     modifier: Modifier,
-    nodeUIItem: NodeUIItem,
-    onMenuClick: (NodeUIItem) -> Unit,
-    onItemClicked: (NodeUIItem) -> Unit,
-    onLongClick: (NodeUIItem) -> Unit,
-    imageState: State<File?>
+    nodeUIItem: NodeUIItem<T>,
+    onMenuClick: (NodeUIItem<T>) -> Unit,
+    onItemClicked: (NodeUIItem<T>) -> Unit,
+    onLongClick: (NodeUIItem<T>) -> Unit,
+    imageState: State<File?>,
 ) {
     if (nodeUIItem.node is FolderNode) {
         ConstraintLayout(
@@ -87,9 +89,7 @@ internal fun NodeGridViewItem(
                     }
             )
             Image(
-                painter = if (nodeUIItem.isSelected) painterResource(id = R.drawable.ic_select_folder) else getPainter(
-                    nodeUIItem = nodeUIItem.node
-                ),
+                painter = if (nodeUIItem.isSelected) painterResource(id = R.drawable.ic_select_folder) else nodeUIItem.node.getPainter(),
                 contentDescription = "Folder",
                 modifier = Modifier
                     .height(24.dp)
@@ -144,7 +144,7 @@ internal fun NodeGridViewItem(
                 )
         ) {
             Box(contentAlignment = Alignment.TopStart) {
-                ThumbnailView(
+                ThumbnailView<T>(
                     modifier = Modifier
                         .height(172.dp)
                         .fillMaxSize()

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -164,7 +165,7 @@ class RubbishBinViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
@@ -192,14 +193,14 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
@@ -227,14 +228,14 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onLongItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     nodesListItem1,
                     isSelected = true,
                     isInvisible = false
                 )
             )
             underTest.onItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     nodesListItem2,
                     isSelected = false,
                     isInvisible = false
@@ -314,7 +315,7 @@ class RubbishBinViewModelTest {
 
             underTest.refreshNodes()
             underTest.onItemClicked(
-                NodeUIItem(
+                NodeUIItem<TypedNode>(
                     node = nodesListItem2,
                     isSelected = false,
                     isInvisible = false

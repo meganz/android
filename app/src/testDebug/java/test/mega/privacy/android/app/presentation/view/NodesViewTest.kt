@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
 import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,13 +45,12 @@ class NodesViewTest {
             NodesView(
                 modifier = Modifier,
                 nodeUIItems = listOf(
-                    NodeUIItem(
+                    NodeUIItem<TypedNode>(
                         node = node,
                         isSelected = true,
                         isInvisible = false
                     )
                 ),
-                stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
@@ -58,7 +58,7 @@ class NodesViewTest {
                 onChangeViewTypeClick = {},
                 isListView = false,
                 sortOrder = "Any Name",
-                thumbnailViewModel = mock(),
+                getThumbnail = mock(),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {}
             )
@@ -81,13 +81,12 @@ class NodesViewTest {
             NodesView(
                 modifier = Modifier,
                 nodeUIItems = listOf(
-                    NodeUIItem(
+                    NodeUIItem<TypedNode>(
                         node = node,
                         isSelected = true,
                         isInvisible = false
                     )
                 ),
-                stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
@@ -95,7 +94,7 @@ class NodesViewTest {
                 onChangeViewTypeClick = {},
                 isListView = false,
                 sortOrder = "Any Name",
-                thumbnailViewModel = mock(),
+                getThumbnail = mock(),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {}
             )
@@ -119,13 +118,12 @@ class NodesViewTest {
             NodesView(
                 modifier = Modifier,
                 nodeUIItems = listOf(
-                    NodeUIItem(
+                    NodeUIItem<TypedNode>(
                         node = node,
                         isSelected = true,
                         isInvisible = false
                     )
                 ),
-                stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
@@ -133,7 +131,7 @@ class NodesViewTest {
                 onChangeViewTypeClick = {},
                 isListView = false,
                 sortOrder = "Any Name",
-                thumbnailViewModel = mock(),
+                getThumbnail = mock(),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {}
             )
@@ -160,13 +158,12 @@ class NodesViewTest {
                 NodesView(
                     modifier = Modifier,
                     nodeUIItems = listOf(
-                        NodeUIItem(
+                        NodeUIItem<TypedNode>(
                             node = node,
                             isSelected = false,
                             isInvisible = false
                         )
                     ),
-                    stringUtilWrapper = stringUtilWrapper,
                     onItemClicked = {},
                     onMenuClick = {},
                     onLongClick = {},
@@ -174,7 +171,7 @@ class NodesViewTest {
                     onChangeViewTypeClick = {},
                     isListView = false,
                     sortOrder = "Any Name",
-                    thumbnailViewModel = mock(),
+                    getThumbnail = mock(),
                     onLinkClicked = {},
                     onDisputeTakeDownClicked = {}
                 )
@@ -197,13 +194,12 @@ class NodesViewTest {
             NodesView(
                 modifier = Modifier,
                 nodeUIItems = listOf(
-                    NodeUIItem(
+                    NodeUIItem<TypedNode>(
                         node = node,
                         isSelected = true,
                         isInvisible = false
                     )
                 ),
-                stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
@@ -211,7 +207,7 @@ class NodesViewTest {
                 onChangeViewTypeClick = {},
                 isListView = true,
                 sortOrder = "Any Name",
-                thumbnailViewModel = mock(),
+                getThumbnail = mock(),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {}
             )

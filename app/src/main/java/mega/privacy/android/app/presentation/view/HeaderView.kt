@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -16,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -38,11 +37,12 @@ fun HeaderViewItem(
     sortOrder: String,
     isListView: Boolean,
     showSortOrder: Boolean,
+    showChangeViewType: Boolean,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp)
+            .padding(start = 8.dp, end = 8.dp),
     ) {
         if (showSortOrder) {
             Row(
@@ -65,18 +65,20 @@ fun HeaderViewItem(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Column(
-            modifier = Modifier.clickable {
-                onChangeViewTypeClick()
+        if (showChangeViewType) {
+            Column(
+                modifier = Modifier.clickable {
+                    onChangeViewTypeClick()
+                }
+            ) {
+                Image(
+                    painter = if (isListView) painterResource(id = R.drawable.ic_grid_view_new) else painterResource(
+                        id = R.drawable.ic_list_view_new
+                    ),
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
+                    contentDescription = "DropDown arrow"
+                )
             }
-        ) {
-            Image(
-                painter = if (isListView) painterResource(id = R.drawable.ic_grid_view_new) else painterResource(
-                    id = R.drawable.ic_list_view_new
-                ),
-                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
-                contentDescription = "DropDown arrow"
-            )
         }
     }
 }
@@ -84,8 +86,7 @@ fun HeaderViewItem(
 /**
  * PreviewHeaderView
  */
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "PreviewHeaderView")
+@CombinedThemePreviews
 @Composable
 fun PreviewHeaderView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -95,7 +96,40 @@ fun PreviewHeaderView() {
             onSortOrderClick = {},
             isListView = true,
             sortOrder = "Name",
-            showSortOrder = true
+            showSortOrder = true,
+            showChangeViewType = true,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+fun PreviewHeaderViewNoSortOrder() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        HeaderViewItem(
+            modifier = Modifier,
+            onChangeViewTypeClick = {},
+            onSortOrderClick = {},
+            isListView = true,
+            sortOrder = "Name",
+            showSortOrder = false,
+            showChangeViewType = true,
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+fun PreviewHeaderViewNoViewType() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        HeaderViewItem(
+            modifier = Modifier,
+            onChangeViewTypeClick = {},
+            onSortOrderClick = {},
+            isListView = true,
+            sortOrder = "Name",
+            showSortOrder = true,
+            showChangeViewType = false,
         )
     }
 }
