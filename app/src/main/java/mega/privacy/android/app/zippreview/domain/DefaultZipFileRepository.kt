@@ -4,8 +4,10 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
-import java.io.*
-import java.lang.Exception
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.nio.charset.Charset
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -34,7 +36,18 @@ class DefaultZipFileRepository @Inject constructor(@IoDispatcher private val ioD
      */
     private fun unzip(zipFullPath: String, unzipRootPath: String): Boolean {
         try {
-            val zipFile = ZipFile(zipFullPath)
+            val zipFile = try {
+                // Construct ZipFile with UTF-8
+                val zipFile = ZipFile(zipFullPath)
+                // Try reading the Zip File with UTF-8 Charset
+                zipFile.entries().toList()
+                zipFile
+            } catch (e: Exception) {
+                // Throws IllegalArgumentException (thrown when malformed) / ZipException (thrown when unsupported format)
+                // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for Most Windows Zip Software)
+                // i.e: 7-Zip, PeaZip, Winrar, Winzip
+                ZipFile(zipFullPath, Charset.forName("Cp437"))
+            }
             val zipEntries = zipFile.entries()
             zipEntries.toList().forEach {
                 val zipDestination = File(unzipRootPath + it.name)

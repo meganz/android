@@ -159,8 +159,10 @@ class ZipBrowserViewModel @Inject constructor(
                 // Try reading the Zip File with UTF-8 Charset
                 zipFile.entries().toList()
                 zipFile
-            } catch (e: IllegalArgumentException) {
-                // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for 7-ZIP)
+            } catch (e: Exception) {
+                // Throws IllegalArgumentException (thrown when malformed) / ZipException (thrown when unsupported format)
+                // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for Most Windows Zip Software)
+                // i.e: 7-Zip, PeaZip, Winrar, Winzip
                 ZipFile(zipFullPath, Charset.forName("Cp437"))
             }
             rootFolderPath = unzipRootPath.split("/").last()

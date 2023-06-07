@@ -58,7 +58,7 @@ import mega.privacy.android.app.zippreview.viewmodel.ZipBrowserViewModel
 import mega.privacy.android.domain.entity.SortOrder
 import timber.log.Timber
 import java.io.File
-import java.util.zip.ZipException
+import java.nio.charset.Charset
 import java.util.zip.ZipFile
 import javax.inject.Inject
 
@@ -520,14 +520,25 @@ class ZipBrowserActivity : PasscodeActivity() {
             hiltEntryPoint.crashReporter()
                 .log("Path of ZipFile(zipFileFormatCheck) is $zipFilePath")
             var zipFile: ZipFile? = null
-            try {
-                zipFile = ZipFile(zipFilePath)
-            } catch (exception: ZipException) {
-
-                zipFile?.close()
-                return false
+            zipFile = try {
+                val file = ZipFile(zipFilePath)
+                // Try reading the Zip File with UTF-8 Charset
+                file.entries().toList()
+                file
+            } catch (exception: Exception) {
+                // Throws IllegalArgumentException (thrown when malformed) / ZipException (thrown when unsupported format)
+                // Fallback if zip cannot be read with UTF-8 Charset, then switch to CP-437 (Default for Most Windows Zip Software)
+                // i.e: 7-Zip, PeaZip, Winrar, Winzip
+                try {
+                    val fallback = ZipFile(zipFilePath, Charset.forName("Cp437"))
+                    fallback.entries().toList()
+                    fallback
+                } catch (e: Exception) {
+                    zipFile?.close()
+                    return false
+                }
             }
-            zipFile.close()
+            zipFile?.close()
             return true
         }
     }
