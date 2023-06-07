@@ -123,6 +123,8 @@ class GetSeveralLinksFragment : Fragment() {
             )
         }
 
+        copyLinks(viewModel.getLinksString())
+
         binding.copyButton.apply {
             isEnabled = false
             setOnClickListener { copyLinks(viewModel.getLinksString()) }

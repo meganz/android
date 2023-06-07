@@ -180,10 +180,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.passwordProtectionProOnlyText.isVisible = true
         }
 
-        if (node?.isExported == false) {
-            viewModel.export()
-        }
-
         binding.scrollViewGetLink.postDelayed(::checkScroll, POST_CHECK_SCROLL)
     }
 
