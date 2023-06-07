@@ -40,10 +40,10 @@
 
         <Button
             android:id="@+id/copy_button"
-            style="@style/Widget.Mega.Button.OutlinedButton"
+            style="@style/Widget.Mega.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
             android:layout_marginEnd="72dp"
             android:layout_marginBottom="12dp"

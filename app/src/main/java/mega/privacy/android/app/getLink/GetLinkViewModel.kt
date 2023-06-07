@@ -132,6 +132,7 @@ class GetLinkViewModel @Inject constructor(
                 onError = Timber::w
             )
             .addTo(composite)
+
     }
 
     /**
@@ -258,10 +259,10 @@ class GetLinkViewModel @Inject constructor(
             val link = node?.publicLink
             linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
             key = LinksUtil.getKeyLink(link)
+            updateLink()
+        } else {
+            export()
         }
-
-        updateLink()
-
         expiryDate.value = if ((node?.expirationTime ?: 0) > 0) getExpiredDateText() else ""
     }
 
