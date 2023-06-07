@@ -16,14 +16,14 @@ import mega.privacy.android.core.ui.theme.red_600
  *  @param textValue                  Int     string Int
  *  @param colorValue                 Color   color value for Light Theme
  *  @param colorValueDark             Color   color value for Dark Theme
- *  @param textBuyAccountTypeValue    String   String for Buy button
+ *  @param textBuyAccountTypeValue    Int     string Int for Buy button
  */
 enum class UIAccountType(
     val iconValue: Int,
     val textValue: Int,
     val colorValue: Color,
     val colorValueDark: Color,
-    val textBuyAccountTypeValue: String,
+    val textBuyAccountTypeValue: Int,
 ) {
     /**
      * FREE
@@ -33,7 +33,7 @@ enum class UIAccountType(
         R.string.free_account,
         green_500,
         green_200,
-        "",
+        0,
     ),
 
     /**
@@ -44,7 +44,7 @@ enum class UIAccountType(
         R.string.prolite_account,
         orange_500,
         orange_300,
-        "Buy Pro Lite",
+        R.string.account_upgrade_account_buy_button_title_pro_lite,
     ),
 
     /**
@@ -55,7 +55,7 @@ enum class UIAccountType(
         R.string.pro1_account,
         red_600,
         red_300,
-        "Buy Pro I",
+        R.string.account_upgrade_account_buy_button_title_pro_i,
     ),
 
     /**
@@ -66,7 +66,7 @@ enum class UIAccountType(
         R.string.pro2_account,
         red_600,
         red_300,
-        "Buy Pro II",
+        R.string.account_upgrade_account_buy_button_title_pro_ii,
     ),
 
     /**
@@ -77,7 +77,7 @@ enum class UIAccountType(
         R.string.pro3_account,
         red_600,
         red_300,
-        "Buy Pro III",
+        R.string.account_upgrade_account_buy_button_title_pro_iii,
     );
 
     companion object {

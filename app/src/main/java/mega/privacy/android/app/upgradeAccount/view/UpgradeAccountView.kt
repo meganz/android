@@ -38,8 +38,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -104,7 +107,7 @@ fun UpgradeAccountView(
                     content = {
                         val uiAccountType = mapUIAccountType(chosenPlan)
                         Text(
-                            text = uiAccountType.textBuyAccountTypeValue,
+                            text = stringResource(id = uiAccountType.textBuyAccountTypeValue),
                             style = MaterialTheme.typography.button,
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Medium,
@@ -132,7 +135,7 @@ fun UpgradeAccountView(
                 .verticalScroll(state = scrollState)
         ) {
             Text(
-                text = "Choose the right plan for you",
+                text = stringResource(id = R.string.account_upgrade_account_title_choose_right_plan),
                 style = subtitle1,
                 modifier = Modifier.padding(
                     start = 24.dp,
@@ -160,7 +163,7 @@ fun UpgradeAccountView(
                     )
             ) {
                 Text(
-                    text = "Save up to 16% with yearly billing",
+                    text = stringResource(id = R.string.account_upgrade_account_label_save_up_to),
                     style = subtitle2,
                     fontSize = 11.sp,
                     lineHeight = 14.sp,
@@ -202,7 +205,7 @@ fun UpgradeAccountView(
             FeaturesOfPlans()
 
             Text(
-                text = "Terms of Service",
+                text = stringResource(id = R.string.account_upgrade_account_terms_of_service_link),
                 style = MaterialTheme.typography.button,
                 color = MaterialTheme.colors.teal_300_teal_200,
                 modifier = Modifier
@@ -276,7 +279,7 @@ fun MonthlyYearlyTabs(
                 )
             }
             Text(
-                text = "Monthly",
+                text = stringResource(id = R.string.account_upgrade_account_tab_monthly),
                 color =
                 if (isMonthly) MaterialTheme.colors.white_grey_alpha_087
                 else MaterialTheme.colors.textColorSecondary,
@@ -327,7 +330,7 @@ fun MonthlyYearlyTabs(
                 )
             }
             Text(
-                text = "Yearly",
+                text = stringResource(id = R.string.account_upgrade_account_tab_yearly),
                 color =
                 if (isMonthly) MaterialTheme.colors.textColorSecondary
                 else MaterialTheme.colors.white_grey_alpha_087,
@@ -363,13 +366,27 @@ fun SubscriptionPlansInfoRowNew(
 
     val uiAccountType = mapUIAccountType(proPlan)
 
-    val storageString = "[B]Storage:[/B] [A]$storageValueString[/A]"
-    val transferString = "[B]Transfer:[/B] [A]$transferValueString[/A]"
+    val storageString = stringResource(
+        id = R.string.account_upgrade_account_pro_plan_info_storage,
+        storageValueString
+    )
+    val transferString = stringResource(
+        id = R.string.account_upgrade_account_pro_plan_info_transfer,
+        transferValueString
+    )
 
     val formattedPrice = subscription.localisePriceCurrencyCode(Locale.getDefault(), isMonthly)
     val priceString =
-        if (isMonthly) "[A]${formattedPrice.price}[/A]\r\n[B]${formattedPrice.currencyCode}/month[/B]"
-        else "[A]${formattedPrice.price}[/A]\r\n[B]${formattedPrice.currencyCode}/year[/B]"
+        if (isMonthly) stringResource(
+            id = R.string.account_upgrade_account_pro_plan_info_monthly_price,
+            formattedPrice.price,
+            formattedPrice.currencyCode
+        )
+        else stringResource(
+            id = R.string.account_upgrade_account_pro_plan_info_yearly_price,
+            formattedPrice.price,
+            formattedPrice.currencyCode
+        )
 
     Card(shape = RoundedCornerShape(12.dp),
         elevation = if (isClicked) 8.dp else 0.dp,
@@ -403,7 +420,7 @@ fun SubscriptionPlansInfoRowNew(
                 )
                 if (isCurrentPlan) {
                     Text(
-                        text = "Current plan",
+                        text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_current_plan_label),
                         style = subtitle2,
                         fontSize = 11.sp,
                         lineHeight = 14.sp,
@@ -423,7 +440,7 @@ fun SubscriptionPlansInfoRowNew(
                 }
                 if (isRecommended) {
                     Text(
-                        text = "Recommended",
+                        text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_recommended_label),
                         style = subtitle2,
                         fontSize = 11.sp,
                         lineHeight = 14.sp,
@@ -514,6 +531,14 @@ fun SubscriptionPlansInfoRowNew(
 
 @Composable
 private fun FeaturesOfPlans() {
+    val style = TextStyle(
+        fontFamily = FontFamily.SansSerif,
+        fontWeight = FontWeight.Normal,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.25.sp,
+        textIndent = TextIndent(restLine = 12.sp)
+    )
     Column(
         modifier = Modifier.padding(
             start = 24.dp,
@@ -523,7 +548,7 @@ private fun FeaturesOfPlans() {
         )
     ) {
         Text(
-            text = "Features of Pro plans",
+            text = stringResource(id = R.string.account_upgrade_account_description_title_features),
             style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.onPrimary,
             fontWeight = FontWeight.Medium,
@@ -531,10 +556,9 @@ private fun FeaturesOfPlans() {
         Column(
             modifier = Modifier.padding(top = 16.dp)
         ) {
-
             Text(
-                text = "•  Password-protected links",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_password),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
@@ -542,8 +566,8 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Links with expiry dates",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_link),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
@@ -551,8 +575,8 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Transfer quota sharing",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_transfer),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
@@ -560,8 +584,8 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Automatic backups",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_backup),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
@@ -569,17 +593,17 @@ private fun FeaturesOfPlans() {
                 )
             )
             Text(
-                text = "•  Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_rewind),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(
                     start = 10.dp,
                     bottom = 12.dp
-                )
+                ),
             )
             Text(
-                text = "•  Schedule rubbish bin clearing between 7 days and 10 years",
-                style = body2,
+                text = stringResource(id = R.string.account_upgrade_account_description_feature_rubbish_bin),
+                style = style,
                 color = MaterialTheme.colors.black_white,
                 modifier = Modifier.padding(start = 10.dp)
             )

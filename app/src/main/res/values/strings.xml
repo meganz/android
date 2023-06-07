@@ -4041,7 +4041,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Resume video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Resume</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4821,11 +4821,9 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">Set password</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again</string>
+    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
-    <!-- Call UI button label for answering with audio only -->
-    <string name="calls_answer_audio_button">Audio</string>
     <!-- Album import link label -->
     <string name="album_import_link">Album link</string>
     <!-- Album import error access title -->
@@ -4834,4 +4832,50 @@
     <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
     <!-- Album import error access confirmation -->
     <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">Audio</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">Choose the right plan for you</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Monthly</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Yearly</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Save up to 16% with yearly billing</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Recommended</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Current plan</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Password-protected links</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links with expiry dates</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Transfer quota sharing</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatic backups</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)</string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">Terms of Service</string>
 </resources>
