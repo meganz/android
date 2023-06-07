@@ -72,7 +72,17 @@ internal class EventIdentifierTest {
                 )
             },
             ButtonPressedEventIdentifier::class.simpleName
-        )
+        ),
+        Arguments.of(
+            { id: Int ->
+                NavigationEventIdentifier(
+                    uniqueIdentifier = id,
+                    navigationElementType = "",
+                    destination = "",
+                )
+            },
+            NavigationEventIdentifier::class.simpleName
+        ),
     )
 
 }
