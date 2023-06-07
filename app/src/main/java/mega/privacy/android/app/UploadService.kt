@@ -26,6 +26,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
@@ -244,36 +245,35 @@ internal class UploadService : LifecycleService() {
         }
 
         monitorTransferEventsJob = applicationScope.launch {
-            runCatching {
-                monitorTransferEventsUseCase()
-                    .filter {
-                        it.transfer.type == TransferType.TYPE_UPLOAD
-                                && !it.transfer.isCUUpload() && !it.transfer.isChatUpload()
+            monitorTransferEventsUseCase()
+                .filter {
+                    it.transfer.type == TransferType.TYPE_UPLOAD
+                            && !it.transfer.isCUUpload() && !it.transfer.isChatUpload()
+                }
+                .catch { Timber.e(it) }
+                .collect { transferEvent ->
+                    when (transferEvent) {
+                        is TransferEvent.TransferFinishEvent -> doOnTransferFinish(
+                            transferEvent.transfer,
+                            transferEvent.error
+                        )
+
+                        is TransferEvent.TransferStartEvent -> doOnTransferStart(
+                            transferEvent.transfer
+                        )
+
+                        is TransferEvent.TransferTemporaryErrorEvent -> doOnTransferTemporaryError(
+                            transferEvent.transfer,
+                            transferEvent.error
+                        )
+
+                        is TransferEvent.TransferUpdateEvent -> doOnTransferUpdate(
+                            transferEvent.transfer
+                        )
+
+                        else -> {}
                     }
-                    .conflate().collect { transferEvent ->
-                        when (transferEvent) {
-                            is TransferEvent.TransferFinishEvent -> doOnTransferFinish(
-                                transferEvent.transfer,
-                                transferEvent.error
-                            )
-
-                            is TransferEvent.TransferStartEvent -> doOnTransferStart(
-                                transferEvent.transfer
-                            )
-
-                            is TransferEvent.TransferTemporaryErrorEvent -> doOnTransferTemporaryError(
-                                transferEvent.transfer,
-                                transferEvent.error
-                            )
-
-                            is TransferEvent.TransferUpdateEvent -> doOnTransferUpdate(
-                                transferEvent.transfer
-                            )
-
-                            else -> {}
-                        }
-                    }
-            }.onFailure { Timber.e(it) }
+                }
         }
 
         lifecycleScope.launch {

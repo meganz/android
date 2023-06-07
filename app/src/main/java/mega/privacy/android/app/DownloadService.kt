@@ -49,7 +49,6 @@ import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
@@ -108,9 +107,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class DownloadService : Service(), MegaRequestListenerInterface {
-
-    @Inject
-    lateinit var getGlobalTransferUseCase: GetGlobalTransferUseCase
 
     @Inject
     lateinit var transfersManagement: TransfersManagement
