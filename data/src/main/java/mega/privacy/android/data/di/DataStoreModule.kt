@@ -71,7 +71,7 @@ internal object DataStoreModule {
             migrations = listOf(
                 SharedPreferencesMigration(
                     context,
-                    REQUEST_PHONE_NUMBER_FILE
+                    LAST_CAM_SYNC_TIMESTAMP_FILE
                 )
             ),
             scope = CoroutineScope(ioDispatcher),
