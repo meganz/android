@@ -31,6 +31,10 @@ COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 ARTIFACTORY_DEVELOP_CODE_COVERAGE = ""
 
+JSON_LINT_REPORT_LINK = ""
+
+NODE_LABELS = 'mac-jenkins-slave-android || mac-jenkins-slave'
+
 
 /**
  * Folder to contain build outputs, including APK, AAG and symbol files
@@ -70,6 +74,7 @@ def shouldSkipBuild() {
  * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
  */
 String getLastCommitMessage() {
+    println("entering getLastCommitMessage()")
     def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
     if (lastCommitMessage == null) {
         return '**N/A**'
@@ -80,7 +85,7 @@ String getLastCommitMessage() {
 }
 
 pipeline {
-    agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
+    agent { label NODE_LABELS }
     options {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
@@ -180,14 +185,11 @@ pipeline {
                                 "<b>WIP:</b> from the beginning of MR title."
                         common.sendToMR(skipMessage)
                     } else {
-                        // String containing the Lint Results
-                        String jsonLintReportLink = common.uploadFileToGitLab(LINT_REPORT_ARCHIVE)
-
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage = ":white_check_mark: Build Succeeded!\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
                                 "**Build Warnings:**\n" + getBuildWarnings() + "\n\n" +
-                                buildLintSummaryTable(jsonLintReportLink) + "\n\n" +
+                                buildLintSummaryTable(JSON_LINT_REPORT_LINK) + "\n\n" +
                                 buildCodeComparisonResults()
 
                         // Send mergeRequestMessage to MR
@@ -205,9 +207,8 @@ pipeline {
             }
         }
         cleanup {
-            // delete whole workspace after each successful build, to save Jenkins storage
-            // We do not clean workspace if build fails, for a chance to investigate the crime scene.
-            cleanWs(cleanWhenFailure: false)
+            // delete whole workspace after each build, to save Jenkins storage
+            cleanWs(cleanWhenFailure: true)
         }
     }
     stages {
@@ -240,69 +241,27 @@ pipeline {
                 }
             }
         }
-
-        stage('Download Dependency Lib for SDK') {
+        stage("Build, Test and Lint") {
             when {
                 expression { (!shouldSkipBuild()) }
             }
-            steps {
-                script {
-                    BUILD_STEP = "Download Dependency Lib for SDK"
-                }
-                gitlabCommitStatus(name: 'Download Dependency Lib for SDK') {
+            parallel {
+                stage('Build APK (GMS+QA)') {
+                    when {
+                        expression { (!shouldSkipBuild()) }
+                    }
+                    steps {
+                        script {
+                            BUILD_STEP = 'Build APK (GMS+QA)'
+                            common.downloadDependencyLibForSdk()
+                        }
+                        gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
+                            // Finish building and packaging the APK
+                            sh "./gradlew clean"
+                            sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
+                            sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
 
-                    sh """
-                        # we still have to download webrtc file for lint check. :( 
-                        cd "${WORKSPACE}/jenkinsfile/"
-                        bash download_webrtc.sh
-
-                        mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                        cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-
-                        pwd 
-                        ls -lh
-
-                        ## check default Google API
-                        if test -f "${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_FILE}"; then
-                            echo "${GOOGLE_MAP_API_FILE} already downloaded. Skip downloading."
-                        else
-                            echo "downloading google map api"
-                            mega-get ${GOOGLE_MAP_API_URL}
-                
-                            echo "unzipping google map api"
-                            rm -fr ${GOOGLE_MAP_API_UNZIPPED}
-                            unzip ${GOOGLE_MAP_API_FILE} -d ${GOOGLE_MAP_API_UNZIPPED}
-                        fi
-                
-                        ls -lh
-                
-                        cd ${WORKSPACE}
-                        pwd
-
-                        echo "Applying Google Map API patches"
-                        rm -fr app/src/debug/res/values/google_maps_api.xml
-                        rm -fr app/src/release/res/values/google_maps_api.xml
-                        cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
-                
-                    """
-                }
-            }
-        }
-        stage('Build APK (GMS+QA)') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build APK (GMS+QA)'
-                }
-                gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
-                    // Finish building and packaging the APK
-                    sh "./gradlew clean"
-                    sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
-                    sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
-
-                    sh """
+                            sh """
                         if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
                             echo GMS APK build failed. Exitting....
                             exit 1
@@ -312,76 +271,69 @@ pipeline {
                             exit 1
                         fi
                     """
-                }
-            }
-        }
-        stage('Unit Test and Code Coverage') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Unit Test and Code Coverage"
-                }
-                gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
-                    script {
-
-                        // domain coverage
-                        sh "./gradlew domain:jacocoTestReport"
-                        sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
-                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
-                        println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
-
-                        // data coverage
-                        sh "./gradlew data:testGmsDebugUnitTestCoverage"
-                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
-                        println("DATA_COVERAGE = ${DATA_COVERAGE}")
-
-                        // run coverage for app module
-                        sh "./gradlew app:createUnitTestCoverageReport"
-
-                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
-                        println("APP_COVERAGE = ${APP_COVERAGE}")
-
-                        sh "./gradlew feature:devicecenter:testDebugUnitTest"
-
-                        sh "./gradlew feature:sync:testDebugUnitTest"
-
-                        sh "./gradlew core-ui:testDebugUnitTest"
-
-                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                        // If UnitTest is failed, summary is collected at post.failure{} phase
-                        // We have to collect the report here, before they are cleaned in the last stage.
-                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                        APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
-                        DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
-                        DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
+                        }
                     }
-                }
-            }
-        }
-        stage('Compare Coverage') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    BUILD_STEP = "Compare Coverage"
-                }
-                gitlabCommitStatus(name: 'Compare Coverage') {
-                    script {
-                        withCredentials([
-                                string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                                string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
-                        ]) {
-                            String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+                } //stage('Build APK (GMS+QA)')
 
-                            // Navigate to the "/cicd/coverage/" path
-                            // Download the code coverage from Artifactory.
-                            // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
-                            sh """
+                stage('Unit Test and Code Coverage') {
+                    agent { label NODE_LABELS }
+                    when {
+                        expression { (!shouldSkipBuild()) }
+                    }
+                    steps {
+                        script {
+                            BUILD_STEP = "Unit Test and Code Coverage"
+                            common.downloadDependencyLibForSdk()
+                        }
+                        gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
+                            script {
+
+                                sh "./gradlew clean"
+
+                                // domain coverage
+                                sh "./gradlew domain:jacocoTestReport"
+                                sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
+                                DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                                println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
+
+                                // data coverage
+                                sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                                DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                                println("DATA_COVERAGE = ${DATA_COVERAGE}")
+
+                                // run coverage for app module
+                                sh "./gradlew app:createUnitTestCoverageReport"
+
+                                APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                                println("APP_COVERAGE = ${APP_COVERAGE}")
+
+                                sh "./gradlew feature:devicecenter:testDebugUnitTest"
+
+                                sh "./gradlew feature:sync:testDebugUnitTest"
+
+                                sh "./gradlew core-ui:testDebugUnitTest"
+
+                                // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                                // If UnitTest is failed, summary is collected at post.failure{} phase
+                                // We have to collect the report here, before they are cleaned in the last stage.
+                                APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                                DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                                DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+                                APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                                DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                                DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
+
+                                // Compare Coverage
+                                withCredentials([
+                                        string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                        string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                                ]) {
+                                    String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+
+                                    // Navigate to the "/cicd/coverage/" path
+                                    // Download the code coverage from Artifactory.
+                                    // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
+                                    sh """
                                 cd ${WORKSPACE}
                                 rm -frv cicd
                                 mkdir -pv ${WORKSPACE}/cicd/coverage
@@ -390,35 +342,43 @@ pipeline {
                                 ls
                             """
 
-                            // Once the file has been downloaded, call the script to parse the Code Coverage results
-                            ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
-                            println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                                    // Once the file has been downloaded, call the script to parse the Code Coverage results
+                                    ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
+                                    println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }
-        stage('Lint Check') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                // Run Lint and analyse the results
-                script {
-                    BUILD_STEP = "Lint Check"
-                }
+                } //stage('Unit Test and Code Coverage')
 
-                gitlabCommitStatus(name: 'Lint Check') {
-                    sh "mv custom_lint.xml lint.xml"
-                    sh "./gradlew lint"
-
-                    script {
-                        MODULE_LIST.each { module ->
-                            LINT_REPORT_SUMMARY_MAP.put(module, lintSummary(module))
-                        }
-                        archiveLintReports()
+                stage('Lint Check') {
+                    agent { label NODE_LABELS }
+                    when {
+                        expression { (!shouldSkipBuild()) }
                     }
-                }
+                    steps {
+                        // Run Lint and analyse the results
+                        script {
+                            BUILD_STEP = "Lint Check"
+                            common.downloadDependencyLibForSdk()
+                        }
+
+                        gitlabCommitStatus(name: 'Lint Check') {
+                            sh "mv custom_lint.xml lint.xml"
+                            sh "./gradlew clean"
+                            sh "./gradlew lint"
+
+                            script {
+                                MODULE_LIST.each { module ->
+                                    LINT_REPORT_SUMMARY_MAP.put(module, lintSummary(module))
+                                }
+                                archiveLintReports()
+
+                                JSON_LINT_REPORT_LINK = common.uploadFileToGitLab(LINT_REPORT_ARCHIVE)
+                            }
+                        }
+                    }
+                }  //stage('Lint Check')
             }
         }
     }
@@ -432,7 +392,7 @@ pipeline {
  * @return a Markdown table-formatted String
  */
 String buildLintSummaryTable(String jsonLintReportLink) {
-
+    println("Entering buildLintSummaryTable()")
     // Declare a JsonSlurperClassic object
     def jsonSlurperClassic = new JsonSlurperClassic()
 
@@ -477,6 +437,7 @@ String buildLintSummaryTable(String jsonLintReportLink) {
  * available modules between the source branch and the latest develop branch from Artifactory
  */
 String buildCodeComparisonResults() {
+    println("Entering buildCodeComparisonResults()")
     def latestDevelopResults = new JsonSlurperClassic().parseText(ARTIFACTORY_DEVELOP_CODE_COVERAGE)
 
     String codeComparisonSummary = "<details><summary><b>Code Coverage and Comparison:</b>"
@@ -666,6 +627,7 @@ String buildCoverageChangeColumn(def currentModuleCoverage, def latestDevelopMod
  * If there are no Build Warnings, return "None".
  */
 String getBuildWarnings() {
+    println("Entering getBuildWarnings()")
     String result = ""
     if (fileExists(GMS_APK_BUILD_LOG)) {
         String gmsBuildWarnings = sh(script: "cat ${GMS_APK_BUILD_LOG} | grep -a '^w:' || true", returnStdout: true).trim()
