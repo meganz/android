@@ -11,14 +11,4 @@ import mega.privacy.android.app.getLink.data.LinkItem
  */
 class LinkHeaderViewHolder(
     private val binding: ItemHeaderLinksBinding
-) : RecyclerView.ViewHolder(binding.root) {
-
-    /**
-     * Draws the header item.
-     *
-     * @param item [LinkItem.Header] containing the title to draw.
-     */
-    fun bind(item: LinkItem.Header) {
-        binding.linksHeader.text = item.title
-    }
-}
+) : RecyclerView.ViewHolder(binding.root)

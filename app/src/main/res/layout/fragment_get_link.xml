@@ -70,6 +70,7 @@
                 android:text="@string/cloud_drive_title_link_access"
                 android:textAppearance="?attr/textAppearanceSubtitle2"/>
             <TextView
+                android:id="@+id/get_link_access_subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/cloud_drive_subtitle_link_access"

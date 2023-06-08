@@ -25,6 +25,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.databinding.FragmentGetLinkBinding
 import mega.privacy.android.app.interfaces.ActivityLauncher
@@ -150,7 +151,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         binding.copyLinkButton.setOnClickListener {
             checkIfShouldHidePassword()
-            viewModel.copyLink { copyInfo -> copyToClipboard(copyInfo) }
+            viewModel.copyLink()
         }
 
         binding.copyKeyIcon.setOnClickListener {
@@ -180,6 +181,10 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.passwordProtectionProOnlyText.isVisible = true
         }
 
+        if (node?.isExported == false) {
+            viewModel.export(isFirstTime = true)
+        }
+
         binding.scrollViewGetLink.postDelayed(::checkScroll, POST_CHECK_SCROLL)
     }
 
@@ -187,6 +192,13 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
         viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
         viewModel.getPassword().observe(viewLifecycleOwner, ::updatePassword)
+
+        viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
+            it?.let { pair ->
+                copyToClipboard(pair)
+                viewModel.resetLink()
+            }
+        }
     }
 
     override fun onResume() {
@@ -210,10 +222,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun updateLink(text: String) {
         binding.linkText.text = text
-        viewModel.copyLink(isFirstTime = true) { copyInfo -> copyToClipboard(copyInfo) }
         val node = viewModel.getNode()
         val alpha = if (node?.isExported == true) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
-
         binding.decryptedKeyLayout.alpha = alpha
         binding.expiryDateLayout.alpha = alpha
         binding.passwordProtectionLayout.alpha = alpha
@@ -279,8 +289,12 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             if (binding.decryptedKeySwitch.isChecked) {
                 sendDecryptedKeySeparatelyClick(false)
             }
-
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
+            binding.getLinkAccessSubtitle.text =
+                getString(R.string.cloud_drive_subtitle_link_access_password)
+        } else {
+            binding.getLinkAccessSubtitle.text =
+                getString(R.string.cloud_drive_subtitle_link_access)
         }
 
         binding.passwordProtectionArrow.isVisible = isPasswordSet.not() && viewModel.isPro()

@@ -10,9 +10,13 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
@@ -52,6 +56,8 @@ class GetLinkViewModel @Inject constructor(
     private val password: MutableLiveData<String?> = MutableLiveData()
     private val expiryDate: MutableLiveData<String> = MutableLiveData()
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
+    private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
+    val linkCopied = _linkCopied.asStateFlow()
 
     private lateinit var linkFragmentTitle: String
     private var node: MegaNode? = null
@@ -120,13 +126,16 @@ class GetLinkViewModel @Inject constructor(
     /**
      * Exports the node.
      */
-    fun export() {
+    fun export(isFirstTime: Boolean = false) {
         exportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
                     updateLink(node?.handle)
+                    if (isFirstTime) {
+                        copyLink(true)
+                    }
                     password.notifyObserver()
                 },
                 onError = Timber::w
@@ -149,28 +158,6 @@ class GetLinkViewModel @Inject constructor(
                 onError = Timber::w
             )
             .addTo(composite)
-    }
-
-    /**
-     * Copies the link depending on the current configuration.
-     *
-     * @param isFirstTime if link created for first time
-     * @param action Copy action to perform.
-     */
-    fun copyLink(isFirstTime: Boolean = false, action: (Pair<String, String>) -> Unit) {
-        action.invoke(
-            Pair(
-                when {
-                    isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
-                    !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
-                    else -> node?.publicLink.orEmpty()
-                },
-                if (isFirstTime) context.getString(R.string.general_link_created_and_copied) else context.resources.getQuantityString(
-                    R.plurals.links_copied_clipboard,
-                    1
-                )
-            )
-        )
     }
 
     /**
@@ -265,8 +252,6 @@ class GetLinkViewModel @Inject constructor(
             linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
             key = LinksUtil.getKeyLink(link)
             updateLink()
-        } else {
-            export()
         }
         expiryDate.value = if ((node?.expirationTime ?: 0) > 0) getExpiredDateText() else ""
     }
@@ -405,5 +390,31 @@ class GetLinkViewModel @Inject constructor(
         df.timeZone = tz
         val date = cal.time
         return df.format(date)
+    }
+
+    /**
+     * Copies the link depending on the current configuration.
+     *
+     * @param isFirstTime if link created for first time
+     */
+    fun copyLink(isFirstTime: Boolean = false) {
+        _linkCopied.value = Pair(
+            when {
+                isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
+                !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
+                else -> node?.publicLink.orEmpty()
+            },
+            if (isFirstTime) context.getString(R.string.general_link_created_and_copied) else context.resources.getQuantityString(
+                R.plurals.links_copied_clipboard,
+                1
+            )
+        )
+    }
+
+    /**
+     * Reset link copied flow once value is consumed
+     */
+    fun resetLink() {
+        _linkCopied.value = null
     }
 }
