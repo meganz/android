@@ -4882,4 +4882,9 @@
     <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this links can view and download your data</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Only people with the password can open the link</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Apply this option to the next %1$d conflict</item>
+        <item quantity="other">Apply this option to the next %1$d conflicts</item>
+    </plurals>
 </resources>

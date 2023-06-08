@@ -386,8 +386,10 @@ class NameCollisionActivity : PasscodeActivity() {
             isVisible = pendingCollisions > 0
 
             if (isVisible) {
-                text =
-                    getString(R.string.file_apply_for_all, pendingCollisions)
+                text = context.resources.getQuantityString(
+                    R.plurals.general_name_collision_file_apply_for_all,
+                    pendingCollisions, pendingCollisions,
+                )
             }
         }
     }

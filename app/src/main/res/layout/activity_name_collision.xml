@@ -172,7 +172,7 @@
                 android:layout_marginTop="32dp"
                 android:textAppearance="@style/TextAppearance.Mega.Subtitle2.Normal.Grey700White075"
                 app:layout_constraintTop_toBottomOf="@+id/rename_button"
-                tools:text="@string/file_apply_for_all" />
+                tools:text="Apply this option to the next 5 conflicts" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
