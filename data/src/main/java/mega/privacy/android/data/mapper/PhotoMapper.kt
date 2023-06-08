@@ -29,6 +29,7 @@ typealias ImageMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards FileTypeInfo,
+    @JvmSuppressWildcards Long,
 ) -> @JvmSuppressWildcards Photo.Image
 
 internal fun toImage(
@@ -42,6 +43,7 @@ internal fun toImage(
     thumbnailFilePath: String?,
     previewFilePath: String?,
     fileTypeInfo: FileTypeInfo,
+    size: Long,
 ) = Photo.Image(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -52,7 +54,8 @@ internal fun toImage(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo
+    fileTypeInfo = fileTypeInfo,
+    size = size,
 )
 
 /**
@@ -69,6 +72,7 @@ typealias VideoMapper = (
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards String?,
     @JvmSuppressWildcards FileTypeInfo,
+    @JvmSuppressWildcards Long,
 ) -> @JvmSuppressWildcards Photo.Video
 
 internal fun toVideo(
@@ -82,6 +86,7 @@ internal fun toVideo(
     thumbnailFilePath: String?,
     previewFilePath: String?,
     fileTypeInfo: FileTypeInfo,
+    size: Long,
 ) = Photo.Video(
     id = id,
     albumPhotoId = albumPhotoId,
@@ -92,7 +97,8 @@ internal fun toVideo(
     modificationTime = modificationTime,
     thumbnailFilePath = thumbnailFilePath,
     previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo as VideoFileTypeInfo
+    fileTypeInfo = fileTypeInfo as VideoFileTypeInfo,
+    size = size,
 )
 
 class PhotoMapper @Inject constructor(
@@ -124,6 +130,7 @@ class PhotoMapper @Inject constructor(
                     getThumbnailFilePath(node),
                     getPreviewFilePath(node),
                     fileType,
+                    node.size,
                 )
             }
 
@@ -139,6 +146,7 @@ class PhotoMapper @Inject constructor(
                     getThumbnailFilePath(node),
                     getPreviewFilePath(node),
                     fileType,
+                    node.size,
                 )
             }
 

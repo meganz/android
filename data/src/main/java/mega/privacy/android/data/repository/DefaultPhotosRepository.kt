@@ -449,6 +449,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
             fileTypeInfoMapper(megaNode),
+            megaNode.size,
         )
 
     /**
@@ -468,6 +469,7 @@ internal class DefaultPhotosRepository @Inject constructor(
             getThumbnailCacheFilePath(megaNode),
             getPreviewCacheFilePath(megaNode),
             fileTypeInfoMapper(megaNode),
+            megaNode.size,
         )
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {

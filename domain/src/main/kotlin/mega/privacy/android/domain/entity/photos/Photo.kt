@@ -18,6 +18,7 @@ sealed interface Photo {
     val thumbnailFilePath: String?
     val previewFilePath: String?
     val fileTypeInfo: FileTypeInfo
+    val size: Long
 
     data class Video(
         override val id: Long,
@@ -30,6 +31,7 @@ sealed interface Photo {
         override val thumbnailFilePath: String?,
         override val previewFilePath: String?,
         override val fileTypeInfo: VideoFileTypeInfo,
+        override val size: Long = 0L,
     ) : Photo
 
     data class Image(
@@ -43,5 +45,6 @@ sealed interface Photo {
         override val thumbnailFilePath: String?,
         override val previewFilePath: String?,
         override val fileTypeInfo: FileTypeInfo,
+        override val size: Long = 0L,
     ) : Photo
 }
