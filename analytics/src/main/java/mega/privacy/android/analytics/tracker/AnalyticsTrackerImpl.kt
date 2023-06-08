@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
+import mega.privacy.android.analytics.event.MenuItemInfo
 import mega.privacy.android.analytics.event.NavigationInfo
 import mega.privacy.android.analytics.event.NotificationInfo
 import mega.privacy.android.analytics.event.ScreenInfo
@@ -15,11 +16,13 @@ import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ButtonPressedEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
+import mega.privacy.android.domain.entity.analytics.MenuItemEvent
 import mega.privacy.android.domain.entity.analytics.NavigationEvent
 import mega.privacy.android.domain.entity.analytics.NotificationEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.identifier.ButtonPressedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.MenuItemEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.NavigationEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.NotificationEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
@@ -107,10 +110,6 @@ class AnalyticsTrackerImpl @Inject constructor(
         }
     }
 
-    override fun trackDialogDisplayed(dialog: DialogInfo) {
-        trackDialog(dialog)
-    }
-
     override fun trackButtonPress(button: ButtonInfo) {
         appScope.launch {
             val identifier = ButtonPressedEventIdentifier(
@@ -144,6 +143,23 @@ class AnalyticsTrackerImpl @Inject constructor(
 
             trackEventUseCase(NotificationEvent(identifier))
         }
+    }
+
+    override fun trackMenuItem(menuItem: MenuItemInfo) {
+        appScope.launch {
+            val identifier = MenuItemEventIdentifier(
+                uniqueIdentifier = menuItem.uniqueIdentifier,
+                menuItem = menuItem.menuItemName,
+                menuType = menuItem.menuType.name.lowercase(),
+                screenName = menuItem.screen?.name
+            )
+
+            trackEventUseCase(MenuItemEvent(identifier, currentViewId))
+        }
+    }
+
+    override fun trackDialogDisplayed(dialog: DialogInfo) {
+        trackDialog(dialog)
     }
 
     override fun trackDialogDisplayed(dialog: DialogInfo, screen: ScreenInfo) {

@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
+import mega.privacy.android.analytics.event.menu.MenuType
 import mega.privacy.android.analytics.event.navigation.NavigationEventSource
 import mega.privacy.android.domain.entity.analytics.NotificationEvent
 import mega.privacy.android.domain.usecase.analytics.GetViewIdUseCase
@@ -270,6 +271,51 @@ internal class AnalyticsTrackerImplTest {
         })
 
         verifyBlocking(trackEventUseCase) { invoke(argWhere { it is NotificationEvent }) }
+    }
+
+
+    @Test
+    internal fun `test that track menu item uses null view id if it does not exist`() {
+        underTest.trackMenuItem(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { menuType }.thenReturn(MenuType.Toolbar)
+            on { menuItemName }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == null }) }
+    }
+
+    @Test
+    internal fun `test that track menu item uses existing view id if it exists`() {
+        val expectedViewId = "viewId"
+        trackScreenViewUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(expectedViewId)
+        }
+        val screen = mock<ScreenInfo> {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(12)
+        }
+        underTest.trackScreenView(screen)
+
+        underTest.trackMenuItem(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { menuType }.thenReturn(MenuType.Toolbar)
+            on { menuItemName }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == expectedViewId }) }
+    }
+
+    @ParameterizedTest(name = "Menu type {0} passed to event use case")
+    @EnumSource()
+    internal fun `test that menu type items are passed`(enumSource: MenuType) {
+        underTest.trackMenuItem(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { menuType }.thenReturn(enumSource)
+            on { menuItemName }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { data().containsValue(enumSource.name.lowercase()) }) }
     }
 
 }
