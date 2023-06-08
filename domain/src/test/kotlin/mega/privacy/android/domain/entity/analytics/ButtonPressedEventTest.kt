@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 internal class ButtonPressedEventTest {
     @Test
-    internal fun `test that dialog displayed event range starts at 302 000`() {
+    internal fun `test that button press event range starts at 302 000`() {
         val input = 123
         val expected = 300_000 + 2000 + input
         Truth.assertThat(

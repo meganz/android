@@ -104,6 +104,15 @@ internal class EventIdentifierTest {
             },
             GeneralEventIdentifier::class.simpleName
         ),
+        Arguments.of(
+            { id: Int ->
+                NotificationEventIdentifier(
+                    name = "",
+                    uniqueIdentifier = id
+                )
+            },
+            NotificationEventIdentifier::class.simpleName
+        ),
     )
 
 }

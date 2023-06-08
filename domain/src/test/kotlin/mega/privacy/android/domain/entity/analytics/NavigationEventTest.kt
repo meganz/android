@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 internal class NavigationEventTest {
     @Test
-    internal fun `test that dialog displayed event range starts at 304 000`() {
+    internal fun `test that navigation event range starts at 304 000`() {
         val input = 123
         val expected = 300_000 + 4000 + input
         Truth.assertThat(
