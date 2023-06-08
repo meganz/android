@@ -299,6 +299,8 @@ class LegacyGetImageUseCase @Inject constructor(
                             Constants.APP_DATA_BACKGROUND_TRANSFER,
                             highPriority,
                             null,
+                            MegaTransfer.COLLISION_CHECK_FINGERPRINT,
+                            MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N,
                             listener
                         )
                     }

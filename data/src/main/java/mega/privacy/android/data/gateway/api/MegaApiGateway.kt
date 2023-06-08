@@ -636,6 +636,8 @@ interface MegaApiGateway {
         appData: String?,
         startFirst: Boolean,
         cancelToken: MegaCancelToken?,
+        collisionCheck: Int,
+        collisionResolution: Int,
         listener: MegaTransferListenerInterface?,
     )
 

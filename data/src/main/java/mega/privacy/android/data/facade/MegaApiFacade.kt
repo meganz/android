@@ -434,8 +434,20 @@ internal class MegaApiFacade @Inject constructor(
         appData: String?,
         startFirst: Boolean,
         cancelToken: MegaCancelToken?,
+        collisionCheck: Int,
+        collisionResolution: Int,
         listener: MegaTransferListenerInterface?,
-    ) = megaApi.startDownload(node, localPath, fileName, appData, startFirst, cancelToken, listener)
+    ) = megaApi.startDownload(
+        node,
+        localPath,
+        fileName,
+        appData,
+        startFirst,
+        cancelToken,
+        collisionCheck,
+        collisionResolution,
+        listener
+    )
 
     override fun getUserEmail(userHandle: Long, callback: MegaRequestListenerInterface) =
         megaApi.getUserEmail(userHandle, callback)
@@ -532,6 +544,8 @@ internal class MegaApiFacade @Inject constructor(
             APP_DATA_BACKGROUND_TRANSFER,
             highPriority,
             null,
+            MegaTransfer.COLLISION_CHECK_FINGERPRINT,
+            MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N,
             listener
         )
     }

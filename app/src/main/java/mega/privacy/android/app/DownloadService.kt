@@ -510,7 +510,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 node.name,
                 appData,
                 highPriority,
-                token
+                token,
+                MegaTransfer.COLLISION_CHECK_FINGERPRINT,
+                MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
             )
             return true
         } else {
@@ -1638,7 +1640,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         it.name,
                         appData,
                         false,
-                        token
+                        token,
+                        MegaTransfer.COLLISION_CHECK_FINGERPRINT,
+                        MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
                     )
                 }
             }

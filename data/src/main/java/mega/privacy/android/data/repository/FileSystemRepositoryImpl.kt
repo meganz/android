@@ -41,6 +41,8 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
+import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
@@ -111,6 +113,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                         appData = APP_DATA_BACKGROUND_TRANSFER,
                         startFirst = true,
                         cancelToken = null,
+                        collisionCheck = COLLISION_CHECK_FINGERPRINT,
+                        collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
                         listener = OptionalMegaTransferListenerInterface(
                             onTransferTemporaryError = { _, error ->
                                 continuation.failWithError(error, "downloadBackgroundFile")

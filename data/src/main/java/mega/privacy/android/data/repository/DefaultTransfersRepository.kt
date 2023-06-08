@@ -35,8 +35,9 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
+import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import javax.inject.Inject
 
 /**
@@ -153,7 +154,9 @@ internal class DefaultTransfersRepository @Inject constructor(
                 appData = appData,
                 startFirst = shouldStartFirst,
                 cancelToken = cancelToken,
-                listener = listener
+                collisionCheck = COLLISION_CHECK_FINGERPRINT,
+                collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
+                listener = listener,
             )
 
             awaitClose {
