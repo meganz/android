@@ -7,8 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.GetPushToken
 import mega.privacy.android.domain.usecase.PushReceived
-import mega.privacy.android.domain.usecase.RegisterPushNotifications
-import mega.privacy.android.domain.usecase.SetPushToken
 
 /**
  * Pushes use cases module.
@@ -21,14 +19,6 @@ internal abstract class PushesModule {
         @Provides
         fun provideGetPushToken(pushesRepository: PushesRepository): GetPushToken =
             GetPushToken(pushesRepository::getPushToken)
-
-        @Provides
-        fun provideRegisterPushNotification(pushesRepository: PushesRepository): RegisterPushNotifications =
-            RegisterPushNotifications(pushesRepository::registerPushNotifications)
-
-        @Provides
-        fun provideSetPushToken(pushesRepository: PushesRepository): SetPushToken =
-            SetPushToken(pushesRepository::setPushToken)
 
         @Provides
         fun providePushReceived(pushesRepository: PushesRepository): PushReceived =

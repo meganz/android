@@ -17,24 +17,24 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.usecase.GetPushToken
-import mega.privacy.android.domain.usecase.RegisterPushNotifications
-import mega.privacy.android.domain.usecase.SetPushToken
+import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
+import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
 import timber.log.Timber
 
 /**
  * Worker class to manage device token updates.
  *
  * @property getPushToken               Required for getting push token.
- * @property registerPushNotifications  Required for registering push notifications.
- * @property setPushToken               Required for setting push token.
+ * @property registerPushNotificationsUseCase  Required for registering push notifications.
+ * @property setPushTokenUseCase               Required for setting push token.
  */
 @HiltWorker
 class NewTokenWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val getPushToken: GetPushToken,
-    private val registerPushNotifications: RegisterPushNotifications,
-    private val setPushToken: SetPushToken,
+    private val registerPushNotificationsUseCase: RegisterPushNotificationsUseCase,
+    private val setPushTokenUseCase: SetPushTokenUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result =
@@ -45,11 +45,17 @@ class NewTokenWorker @AssistedInject constructor(
                 Timber.d("No need to register new token.")
             } else {
                 Timber.d("Push service's new token: $newToken")
-
-                setPushToken(
-                    registerPushNotifications
-                        .invoke(inputData.getInt(DEVICE_TYPE, INVALID_VALUE), newToken)
-                )
+                runCatching {
+                    registerPushNotificationsUseCase(
+                        inputData.getInt(
+                            DEVICE_TYPE,
+                            INVALID_VALUE
+                        ), newToken
+                    )
+                }.onSuccess { token ->
+                    runCatching { setPushTokenUseCase(token) }
+                        .onFailure { Timber.w("Exception setting push token: $it") }
+                }.onFailure { Timber.w("Exception registering push notifications: $it") }
             }
 
             Result.success()
@@ -64,7 +70,8 @@ class NewTokenWorker @AssistedInject constructor(
             val notificationChannel = NotificationChannel(
                 RETRIEVING_NEW_TOKEN_ID,
                 RETRIEVING_NEW_TOKEN,
-                NotificationManager.IMPORTANCE_NONE).apply {
+                NotificationManager.IMPORTANCE_NONE
+            ).apply {
                 enableVibration(false)
                 setSound(null, null)
             }
@@ -72,8 +79,10 @@ class NewTokenWorker @AssistedInject constructor(
                 .createNotificationChannel(notificationChannel)
         }
 
-        val builder = NotificationCompat.Builder(applicationContext,
-            RETRIEVING_NEW_TOKEN_ID).apply {
+        val builder = NotificationCompat.Builder(
+            applicationContext,
+            RETRIEVING_NEW_TOKEN_ID
+        ).apply {
             setSmallIcon(R.drawable.ic_stat_notify)
         }
 
