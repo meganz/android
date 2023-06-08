@@ -94,6 +94,16 @@ internal class EventIdentifierTest {
             },
             MenuItemEventIdentifier::class.simpleName
         ),
+        Arguments.of(
+            { id: Int ->
+                GeneralEventIdentifier(
+                    name = "",
+                    info = "",
+                    uniqueIdentifier = id
+                )
+            },
+            GeneralEventIdentifier::class.simpleName
+        ),
     )
 
 }
