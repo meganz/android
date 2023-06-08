@@ -35,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,11 +59,11 @@ fun PhotosFilterView(
     onSourceSelected: (TimelinePhotosSource) -> Unit = {},
     applyFilter: () -> Unit = {},
     isRememberTimelinePreferencesEnabled: suspend () -> Boolean = { false },
+    onCheckboxClicked: (Boolean) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
-    var isPrefRemembered by rememberSaveable { mutableStateOf(false) }
 
-    val isRememberTimelinePreferencesEnabled by produceState(initialValue = false) {
+    val isRememberTimelinePreferenceAppFeatureEnabled by produceState(initialValue = false) {
         value = isRememberTimelinePreferencesEnabled()
     }
 
@@ -82,9 +81,11 @@ fun PhotosFilterView(
                 onSourceSelected = onSourceSelected
             )
 
-            if (isRememberTimelinePreferencesEnabled) {
+            if (isRememberTimelinePreferenceAppFeatureEnabled) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(all = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(all = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
@@ -94,8 +95,8 @@ fun PhotosFilterView(
                     )
 
                     Checkbox(
-                        checked = isPrefRemembered,
-                        onCheckedChange = { isPrefRemembered = !isPrefRemembered },
+                        checked = timelineViewState.rememberFilter,
+                        onCheckedChange = { onCheckboxClicked(!timelineViewState.rememberFilter) },
                     )
                 }
             }

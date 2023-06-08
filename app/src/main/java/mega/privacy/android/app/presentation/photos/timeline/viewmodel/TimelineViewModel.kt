@@ -15,9 +15,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.app.presentation.photos.model.LocationPreference
+import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
+import mega.privacy.android.app.presentation.photos.model.RememberPreferences
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
+import mega.privacy.android.app.presentation.photos.model.TimelineFilterPreferences
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
@@ -30,6 +36,7 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
@@ -38,8 +45,11 @@ import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import nz.mega.sdk.MegaNode
@@ -78,6 +88,10 @@ class TimelineViewModel @Inject constructor(
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
+    private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
+    private val timelinePreferencesMapper: TimelinePreferencesMapper,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
 
@@ -95,6 +109,20 @@ class TimelineViewModel @Inject constructor(
                     Timber.e(throwable)
                 }.collectLatest { photos ->
                     Timber.v("TimelineViewModel photos flow=>" + photos.size)
+                    if (getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)) {
+                        val latestPreferences = getTimelineFilterPreferencesUseCase()?.let {
+                            timelinePreferencesMapper(it)
+                        }
+
+                        latestPreferences?.let {
+                            val rememberPreferences: RememberPreferences =
+                                it[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences
+
+                            if (rememberPreferences.value) {
+                                setInitialCUFilter(it)
+                            }
+                        }
+                    }
                     val showingPhotos = filterMedias(photos)
                     handleAndUpdatePhotosUIState(
                         sourcePhotos = photos,
@@ -448,6 +476,44 @@ class TimelineViewModel @Inject constructor(
                 scrollStartOffset = startOffset
             )
         }
+    }
+
+    internal fun saveTimelineFilterPreferences() = viewModelScope.launch {
+        runCatching {
+            setTimelineFilterPreferencesUseCase(
+                mapOf(
+                    Pair(
+                        TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value,
+                        _state.value.rememberFilter.toString()
+                    ),
+                    Pair(
+                        TimelinePreferencesJSON.JSON_KEY_LOCATION.value,
+                        timelinePreferencesMapper.mapLocationToString(_state.value.currentMediaSource)
+                    ),
+                    Pair(
+                        TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value,
+                        timelinePreferencesMapper.mapMediaTypeToString(_state.value.currentFilterMediaType)
+                    ),
+                )
+            )
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    private fun setInitialCUFilter(preferences: Map<String, TimelineFilterPreferences>) {
+        _state.update {
+            it.copy(
+                rememberFilter =
+                (preferences[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences).value,
+                currentMediaSource =
+                (preferences[TimelinePreferencesJSON.JSON_KEY_LOCATION.value] as LocationPreference).value,
+                currentFilterMediaType =
+                (preferences[TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value] as MediaTypePreference).value,
+            )
+        }
+
+        createAndUpdateFilterType()
     }
 
     /**

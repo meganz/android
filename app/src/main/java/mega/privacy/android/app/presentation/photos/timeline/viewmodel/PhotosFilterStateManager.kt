@@ -36,6 +36,9 @@ fun TimelineViewModel.onSourceSelected(source: TimelinePhotosSource) {
 suspend fun TimelineViewModel.applyFilter() {
     withContext(ioDispatcher) {
         createAndUpdateFilterType()
+        if (_state.value.rememberFilter) {
+            saveTimelineFilterPreferences()
+        }
         handleAndUpdatePhotosUIState(_state.value.photos, filterMedias(_state.value.photos))
     }
 }
@@ -95,6 +98,10 @@ internal fun TimelineViewModel.updateFilterState(
             enableCameraUploadPageShowing = false,
         )
     }
+}
+
+fun TimelineViewModel.updateRememberPreferences(rememberFilter: Boolean) = _state.update {
+    it.copy(rememberFilter = rememberFilter)
 }
 
 private fun filterAllPhotos(photos: List<Photo>): List<Photo> = photos

@@ -15,8 +15,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
+import mega.privacy.android.app.presentation.photos.model.LocationPreference
+import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
+import mega.privacy.android.app.presentation.photos.model.RememberPreferences
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
@@ -26,14 +31,18 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import org.junit.After
@@ -79,6 +88,14 @@ class TimelineViewModelTest {
 
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
 
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+
+    private val getTimelineFilterPreferencesUseCase = mock<GetTimelineFilterPreferencesUseCase>()
+
+    private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
+
+    private val timelinePreferencesMapper = mock<TimelinePreferencesMapper>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -96,6 +113,10 @@ class TimelineViewModelTest {
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             monitorCameraUploadProgress = monitorCameraUploadProgress,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
+            setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            timelinePreferencesMapper = timelinePreferencesMapper,
         )
     }
 
@@ -183,9 +204,13 @@ class TimelineViewModelTest {
     fun `test that a single photo returned is returned by the state`() = runTest {
         val expectedDate = LocalDateTime.now()
         val photo = mock<Photo.Image> { on { modificationTime }.thenReturn(expectedDate) }
+        whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
+            false
+        )
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
 
-        underTest.state.drop(1).test {
+        underTest.state.test {
+            awaitItem()
             val initialisedState = awaitItem()
             assertWithMessage("Expected photos do not match").that(initialisedState.photos)
                 .containsExactly(photo)
@@ -363,5 +388,88 @@ class TimelineViewModelTest {
         underTest.enableCU()
         advanceUntilIdle()
         verify(startCameraUploadUseCase).invoke()
+    }
+
+    @Test
+    fun `test that if there is no preference set yet the saved timeline state is false`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
+                true
+            )
+
+            whenever(getTimelineFilterPreferencesUseCase()).thenReturn(null)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.rememberFilter).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that if there is preference set then it is saved in the state`() = runTest {
+        val expectedRememberPref = true
+        val expectedLocation = TimelinePhotosSource.CLOUD_DRIVE
+
+        val expectedMediaType = FilterMediaType.IMAGES
+        val latestPref = mapOf(
+            Pair(
+                TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value,
+                RememberPreferences(expectedRememberPref)
+            ),
+            Pair(
+                TimelinePreferencesJSON.JSON_KEY_LOCATION.value,
+                LocationPreference(expectedLocation)
+            ),
+            Pair(
+                TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value,
+                MediaTypePreference(expectedMediaType)
+            ),
+        )
+
+        val expectedDate = LocalDateTime.now()
+        val photo = mock<Photo.Image> { on { modificationTime }.thenReturn(expectedDate) }
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
+
+        whenever(getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)).thenReturn(
+            true
+        )
+
+        whenever(getTimelineFilterPreferencesUseCase()).thenReturn(mapOf())
+
+        whenever(timelinePreferencesMapper(any())).thenReturn(latestPref)
+
+        underTest.state.drop(3).test {
+            val state = awaitItem()
+            assertThat(state.rememberFilter).isTrue()
+            assertThat(state.currentMediaSource).isEqualTo(expectedLocation)
+            assertThat(state.currentFilterMediaType).isEqualTo(expectedMediaType)
+
+            assertWithMessage("Expected photos do not match").that(state.photos)
+                .containsExactly(photo)
+            assertWithMessage("Expected photosListItems do not match").that(state.photosListItems)
+                .containsExactlyElementsIn(
+                    listOf(
+                        PhotoListItem.Separator(expectedDate),
+                        PhotoListItem.PhotoGridItem(photo, false)
+                    )
+                )
+            val hasPhoto =
+                Correspondence.transforming<DateCard, Photo>({ it?.photo }, "contains photo")
+
+            assertWithMessage("Day card photos do not match").that(state.daysCardPhotos)
+                .comparingElementsUsing(hasPhoto)
+                .contains(photo)
+
+            assertWithMessage("Month card photos do not match").that(state.monthsCardPhotos)
+                .comparingElementsUsing(hasPhoto)
+                .contains(photo)
+
+            assertWithMessage("Year card photos do not match").that(state.yearsCardPhotos)
+                .comparingElementsUsing(hasPhoto)
+                .contains(photo)
+
+            assertWithMessage("Loading is not complete").that(state.loadPhotosDone)
+                .isTrue()
+        }
     }
 }

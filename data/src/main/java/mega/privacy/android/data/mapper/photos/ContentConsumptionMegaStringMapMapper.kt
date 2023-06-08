@@ -20,8 +20,11 @@ internal class ContentConsumptionMegaStringMapMapper @Inject constructor() {
         } ?: JSONObject()
 
         val asJSON = JSONObject(newPreferences)
+        val androidPreferences =
+            latestPreferences.getJSONObject(TimelinePreferencesJSON.JSON_KEY_ANDROID.value)
 
-        latestPreferences.put(TimelinePreferencesJSON.JSON_KEY_ANDROID.value, asJSON)
+        androidPreferences.put(TimelinePreferencesJSON.JSON_KEY_TIMELINE.value, asJSON)
+        latestPreferences.put(TimelinePreferencesJSON.JSON_KEY_ANDROID.value, androidPreferences)
 
         val preferences = currentPreferences ?: MegaStringMap.createInstance()
         preferences[TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value] =

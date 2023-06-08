@@ -12,6 +12,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.applyFilt
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onMediaTypeSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onSourceSelected
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateRememberPreferences
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 
 @Composable
@@ -34,6 +35,9 @@ fun PhotosFilterScreen(
                 onExitScreen()
             }
         },
-        isRememberTimelinePreferencesEnabled = { getFeatureFlagUseCase(AppFeatures.RememberTimelinePreferences)}
+        isRememberTimelinePreferencesEnabled = {
+            getFeatureFlagUseCase(AppFeatures.RememberTimelinePreferences)
+        },
+        onCheckboxClicked = timelineViewModel::updateRememberPreferences
     )
 }

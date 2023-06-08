@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property currentZoomLevel                           The current zoom level
  * @property scrollStartIndex                           Scroll start index
  * @property scrollStartOffset                          Scroll start index offset
+ * @property rememberFilter                             Whether or not user wants to remember filter preferences
  * @property applyFilterMediaType                       The current selected Media Type
  * @property currentFilterMediaType                     The current applied Media Type Filter
  * @property currentMediaSource                         The current applied Media Source Filter
@@ -58,6 +59,7 @@ data class TimelineViewState(
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     val scrollStartIndex: Int = 0,
     val scrollStartOffset: Int = 0,
+    val rememberFilter: Boolean = false,
     val applyFilterMediaType: ApplyFilterMediaType = ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU,
     val currentFilterMediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
     val currentMediaSource: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS,
