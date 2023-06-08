@@ -103,6 +103,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.file.IncomingSharesTabInfo
+import mega.privacy.android.analytics.event.file.LinkSharesTabInfo
+import mega.privacy.android.analytics.event.file.OutgoingSharesTabInfo
+import mega.privacy.android.analytics.event.file.SharedItemsScreenInfo
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -1297,22 +1302,31 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 supportInvalidateOptionsMenu()
                 checkScrollElevation()
                 when (SharesTab.fromPosition(position)) {
-                    SharesTab.INCOMING_TAB -> if (isOutgoingAdded) {
-                        outgoingSharesFragment?.hideActionMode()
-                    } else if (isLinksAdded) {
-                        linksFragment?.hideActionMode()
+                    SharesTab.INCOMING_TAB -> {
+                        Analytics.tracker.trackTabSelected(IncomingSharesTabInfo)
+                        if (isOutgoingAdded) {
+                            outgoingSharesFragment?.hideActionMode()
+                        } else if (isLinksAdded) {
+                            linksFragment?.hideActionMode()
+                        }
                     }
 
-                    SharesTab.OUTGOING_TAB -> if (isIncomingAdded) {
-                        incomingSharesFragment?.hideActionMode()
-                    } else if (isLinksAdded) {
-                        linksFragment?.hideActionMode()
+                    SharesTab.OUTGOING_TAB -> {
+                        Analytics.tracker.trackTabSelected(OutgoingSharesTabInfo)
+                        if (isIncomingAdded) {
+                            incomingSharesFragment?.hideActionMode()
+                        } else if (isLinksAdded) {
+                            linksFragment?.hideActionMode()
+                        }
                     }
 
-                    SharesTab.LINKS_TAB -> if (isIncomingAdded) {
-                        incomingSharesFragment?.hideActionMode()
-                    } else if (isOutgoingAdded) {
-                        outgoingSharesFragment?.hideActionMode()
+                    SharesTab.LINKS_TAB -> {
+                        Analytics.tracker.trackTabSelected(LinkSharesTabInfo)
+                        if (isIncomingAdded) {
+                            incomingSharesFragment?.hideActionMode()
+                        } else if (isOutgoingAdded) {
+                            outgoingSharesFragment?.hideActionMode()
+                        }
                     }
 
                     else -> {}
@@ -4325,6 +4339,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun onSelectSharedItemsDrawerItem() {
+        Analytics.tracker.trackScreenView(SharedItemsScreenInfo)
         lifecycleScope.launch {
             if (isSharesTabComposeEnabled()) {
 
@@ -5656,6 +5671,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.bottom_navigation_item_shared_items -> {
+                Analytics.tracker.trackScreenView(SharedItemsScreenInfo)
                 if (drawerItem === DrawerItem.SHARED_ITEMS) {
                     if (tabItemShares === SharesTab.INCOMING_TAB && this.incomingSharesState().incomingHandle != MegaApiJava.INVALID_HANDLE) {
                         incomingSharesViewModel.resetIncomingTreeDepth()

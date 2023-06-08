@@ -9,7 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.chat.ChatScreenInfo
+import mega.privacy.android.analytics.event.chat.ChatsTabInfo
+import mega.privacy.android.analytics.event.chat.MeetingsTabInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentChatTabsBinding
 import mega.privacy.android.app.main.ManagerActivity
@@ -53,6 +59,12 @@ class ChatTabsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         this.setupView()
         startActivity(Intent(requireContext(), AskForDisplayOverActivity::class.java))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackScreenView(ChatScreenInfo)
+        Firebase.crashlytics.log("Screen: ${ChatScreenInfo.name}")
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -109,6 +121,12 @@ class ChatTabsFragment : Fragment() {
     private fun buildPageChangeCallback() = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             (activity as? ManagerActivity?)?.closeSearchView()
+
+            if (position == CHAT.ordinal) {
+                Analytics.tracker.trackTabSelected(ChatsTabInfo)
+            } else {
+                Analytics.tracker.trackTabSelected(MeetingsTabInfo)
+            }
 
             if (!skipClearSelection) {
                 childFragmentManager.fragments.forEach { fragment ->

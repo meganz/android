@@ -28,6 +28,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.zhpan.bannerview.BannerViewPager
 import com.zhpan.bannerview.constants.IndicatorGravity
@@ -35,6 +37,10 @@ import com.zhpan.bannerview.utils.BannerUtils
 import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.file.HomeScreenInfo
+import mega.privacy.android.analytics.event.file.OfflineTabInfo
+import mega.privacy.android.analytics.event.file.RecentsTabInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -150,6 +156,15 @@ class HomepageFragment : Fragment() {
     private val pageChangeCallback by lazy {
         object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                when (position) {
+                    BottomSheetPagerAdapter.RECENT_INDEX -> {
+                        Analytics.tracker.trackTabSelected(RecentsTabInfo)
+                    }
+
+                    BottomSheetPagerAdapter.OFFLINE_INDEX -> {
+                        Analytics.tracker.trackTabSelected(OfflineTabInfo)
+                    }
+                }
                 currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
                 bottomSheetBehavior.invalidateScrollingChild(
                     // ViewPager2 has fragments tagged as fX (e.g. f0,f1) that X is the page
@@ -217,6 +232,9 @@ class HomepageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        Analytics.tracker.trackScreenView(HomeScreenInfo)
+        Firebase.crashlytics.log("Screen: ${HomeScreenInfo.name}")
 
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background
@@ -787,7 +805,10 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else getThemeColor(requireContext(), com.google.android.material.R.attr.colorSecondary)
+            if (isExpand) Color.WHITE else getThemeColor(
+                requireContext(),
+                com.google.android.material.R.attr.colorSecondary
+            )
         )
 
         AnimatorSet().apply {

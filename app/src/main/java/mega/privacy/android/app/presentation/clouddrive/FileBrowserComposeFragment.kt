@@ -23,12 +23,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.file.CloudDriveScreenInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -159,6 +163,12 @@ class FileBrowserComposeFragment : Fragment() {
                 ShowMediaDiscovery(uiState.showMediaDiscovery)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackScreenView(CloudDriveScreenInfo)
+        Firebase.crashlytics.log("Screen: ${CloudDriveScreenInfo.name}")
     }
 
     /**

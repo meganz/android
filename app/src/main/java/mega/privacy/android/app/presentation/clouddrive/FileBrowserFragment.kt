@@ -31,6 +31,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -40,6 +42,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.file.CloudDriveScreenInfo
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -255,6 +259,12 @@ class FileBrowserFragment : RotatableFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Analytics.tracker.trackScreenView(CloudDriveScreenInfo)
+        Firebase.crashlytics.log("Screen: ${CloudDriveScreenInfo.name}")
     }
 
     /**
