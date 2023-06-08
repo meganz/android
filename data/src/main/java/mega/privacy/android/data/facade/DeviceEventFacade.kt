@@ -8,12 +8,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.extensions.registerReceiverAsFlow
 import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import timber.log.Timber
 import javax.inject.Inject
 
 internal class DeviceEventFacade @Inject constructor(
@@ -31,6 +33,8 @@ internal class DeviceEventFacade @Inject constructor(
             val isCharging =
                 status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
             return@map BatteryInfo(level = level, isCharging = isCharging)
+        }.catch {
+            Timber.e(it, "MonitorBatteryInfo Exception")
         }.toSharedFlow(appScope)
 
     override val monitorChargingStoppedState =
@@ -39,6 +43,8 @@ internal class DeviceEventFacade @Inject constructor(
             Intent.ACTION_POWER_DISCONNECTED,
         ).map {
             true
+        }.catch {
+            Timber.e(it, "MonitorChargingStoppedState Exception")
         }.toSharedFlow(appScope)
 
 }

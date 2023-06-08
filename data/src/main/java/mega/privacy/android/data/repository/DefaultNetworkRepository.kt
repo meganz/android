@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -102,7 +103,9 @@ internal class DefaultNetworkRepository @Inject constructor(
         connectivityManager?.registerNetworkCallback(networkRequest, callback)
 
         awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
-    }.flowOn(ioDispatcher).shareIn(applicationScope, SharingStarted.Lazily)
+    }.flowOn(ioDispatcher)
+        .catch { Timber.e(it, "MonitorConnectivity Exception") }
+        .shareIn(applicationScope, SharingStarted.Lazily)
 
     override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
 
