@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
@@ -424,4 +425,9 @@ interface AccountRepository {
      * @return
      */
     fun monitorRefreshSession(): Flow<Unit>
+
+    /**
+     * Get user account type
+     */
+    suspend fun getAccountType(): AccountType
 }

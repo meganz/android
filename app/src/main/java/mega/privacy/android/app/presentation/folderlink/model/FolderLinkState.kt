@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -40,6 +41,7 @@ import nz.mega.sdk.MegaNode
  * @property snackbarMessageContent     State to show snackbar message
  * @property openMoreOption             State to open more option bottom sheet
  * @property moreOptionNode             Node to show more options for
+ * @property storageStatusDialogState   State of StorageStatusDialog
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -70,6 +72,7 @@ data class FolderLinkState(
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val openMoreOption: StateEvent = consumed,
     val moreOptionNode: NodeUIItem<TypedNode>? = null,
+    val storageStatusDialogState: StorageStatusDialogState? = null,
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

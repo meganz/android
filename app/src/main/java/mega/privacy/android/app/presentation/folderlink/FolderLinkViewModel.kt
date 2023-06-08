@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -34,9 +36,17 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -45,8 +55,12 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
@@ -81,6 +95,10 @@ class FolderLinkViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val getNodeUseCase: GetNodeUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase,
+    private val getAccountTypeUseCase: GetAccountTypeUseCase,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
+    private val getPricing: GetPricing,
 ) : ViewModel() {
 
     /**
@@ -282,6 +300,55 @@ class FolderLinkViewModel @Inject constructor(
             ).addTo(rxSubscriptions)
 
     }
+
+    /**
+     * Handle Storage Quota Exceed Exception
+     */
+    fun handleQuotaException(throwable: Throwable) = viewModelScope.launch {
+        val isAchievementsEnabled = areAchievementsEnabledUseCase()
+        val accountType = getAccountTypeUseCase()
+
+        if (accountType == AccountType.UNKNOWN) {
+            Timber.w("Do not show dialog, not info of the account received yet")
+            return@launch
+        }
+
+        val product =
+            getProductAccounts().firstOrNull { it.level == Constants.PRO_III && it.months == 1 }
+
+        when (throwable) {
+            is QuotaExceededMegaException -> {
+                val storageState = StorageStatusDialogState(
+                    storageState = StorageState.Red,
+                    accountType = accountType,
+                    product = product,
+                    isAchievementsEnabled = isAchievementsEnabled,
+                    overQuotaAlert = true,
+                    preWarning = false
+                )
+                _state.update { it.copy(storageStatusDialogState = storageState) }
+            }
+
+            is NotEnoughQuotaMegaException -> {
+                val storageState = StorageStatusDialogState(
+                    storageState = StorageState.Orange,
+                    accountType = accountType,
+                    product = product,
+                    isAchievementsEnabled = isAchievementsEnabled,
+                    overQuotaAlert = true,
+                    preWarning = true
+                )
+                _state.update { it.copy(storageStatusDialogState = storageState) }
+            }
+        }
+    }
+
+    /**
+     * Get product accounts
+     *
+     */
+    suspend fun getProductAccounts(): List<Product> =
+        runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
 
     /**
      * Reset values once collision activity is launched
@@ -599,7 +666,6 @@ class FolderLinkViewModel @Inject constructor(
      * Handle node imports
      *
      * @param toHandle  Handle of the destination node
-     * @param context   Context
      */
     fun importNodes(toHandle: Long) {
         viewModelScope.launch {
@@ -711,5 +777,31 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun resetMoreOptionNode() {
         _state.update { it.copy(moreOptionNode = null) }
+    }
+
+    /**
+     * Reset storageStatusDialogState to dismiss the dialog
+     */
+    fun dismissStorageStatusDialog() {
+        _state.update { it.copy(storageStatusDialogState = null) }
+    }
+
+    /**
+     * Handle action click on StorageStatusDialog
+     */
+    fun handleActionClick(context: Context) = viewModelScope.launch {
+        val email = getCurrentUserEmail() ?: ""
+        state.value.storageStatusDialogState?.accountType?.let { accountType ->
+            dismissStorageStatusDialog()
+            when (accountType) {
+                AccountType.PRO_III -> {
+                    AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+                }
+
+                else -> {
+                    context.startActivity(Intent(context, UpgradeAccountActivity::class.java))
+                }
+            }
+        }
     }
 }

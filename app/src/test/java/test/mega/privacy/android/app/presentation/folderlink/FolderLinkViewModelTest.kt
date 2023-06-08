@@ -32,8 +32,12 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.AddNodeType
+import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
@@ -73,6 +77,10 @@ class FolderLinkViewModelTest {
     private val getNodeListByIds: GetNodeListByIds = mock()
     private val getNodeUseCase: GetNodeUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
+    private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase = mock()
+    private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
+    private val getCurrentUserEmail: GetCurrentUserEmail = mock()
+    private val getPricing: GetPricing = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -107,7 +115,11 @@ class FolderLinkViewModelTest {
             getNodeByHandle,
             getNodeListByIds,
             getNodeUseCase,
-            getStringFromStringResMapper
+            getStringFromStringResMapper,
+            areAchievementsEnabledUseCase,
+            getAccountTypeUseCase,
+            getCurrentUserEmail,
+            getPricing
         )
     }
 

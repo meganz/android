@@ -47,6 +47,7 @@ import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.SubscriptionOption
@@ -845,6 +846,8 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun clearEphemeral() = ephemeralCredentialsGateway.clear()
 
     override fun monitorRefreshSession() = appEventGateway.monitorRefreshSession()
+    override suspend fun getAccountType(): AccountType =
+        accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
 
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
 

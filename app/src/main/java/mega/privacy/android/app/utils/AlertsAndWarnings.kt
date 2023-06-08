@@ -19,6 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.domain.entity.AccountType
 import timber.log.Timber
 
 object AlertsAndWarnings {
@@ -202,6 +203,39 @@ object AlertsAndWarnings {
             2 -> body.append(" (" + context.getString(R.string.my_account_pro2) + ")")
             3 -> body.append(" (" + context.getString(R.string.my_account_pro3) + ")")
             4 -> body.append(" (" + context.getString(R.string.my_account_prolite_feedback_email) + ")")
+            else -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
+        }
+
+        val emailAndroid = Constants.MAIL_SUPPORT
+        val subject = context.getString(R.string.title_mail_upgrade_plan)
+        val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$emailAndroid"))
+            .putExtra(Intent.EXTRA_SUBJECT, subject)
+            .putExtra(Intent.EXTRA_TEXT, body.toString())
+
+        context.startActivity(Intent.createChooser(emailIntent, " "))
+    }
+
+    @JvmStatic
+    fun askForCustomizedPlan(context: Context, myEmail: String?, accountType: AccountType) {
+        Timber.d("askForCustomizedPlan")
+        val body = StringBuilder()
+        body.append(context.getString(R.string.subject_mail_upgrade_plan))
+            .append("\n\n\n\n\n\n\n")
+            .append(
+                """${context.getString(R.string.settings_about_app_version)} v${
+                    context.getString(
+                        R.string.app_version
+                    )
+                }"""
+            )
+            .append(context.getString(R.string.user_account_feedback) + "  " + myEmail)
+
+        when (accountType) {
+            AccountType.FREE -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
+            AccountType.PRO_I -> body.append(" (" + context.getString(R.string.my_account_pro1) + ")")
+            AccountType.PRO_II -> body.append(" (" + context.getString(R.string.my_account_pro2) + ")")
+            AccountType.PRO_III -> body.append(" (" + context.getString(R.string.my_account_pro3) + ")")
+            AccountType.PRO_LITE -> body.append(" (" + context.getString(R.string.my_account_prolite_feedback_email) + ")")
             else -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
         }
 

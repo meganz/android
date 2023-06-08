@@ -27,15 +27,19 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ColorUtils
@@ -164,6 +168,10 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onResetSnackbarMessage = viewModel::resetSnackbarMessage,
                 onResetMoreOptionNode = viewModel::resetMoreOptionNode,
                 onResetOpenMoreOption = viewModel::resetOpenMoreOption,
+                onStorageStatusDialogDismiss = viewModel::dismissStorageStatusDialog,
+                onStorageDialogHorizontalActionButtonClick = { viewModel.handleActionClick(this) },
+                onStorageDialogVerticalActionButtonClick = { viewModel.handleActionClick(this) },
+                onStorageDialogAchievementButtonClick = ::navigateToAchievements,
                 emptyViewString = getEmptyViewString(),
                 thumbnailViewModel = thumbnailViewModel,
                 onDisputeTakeDownClicked = ::navigateToLink,
@@ -294,8 +302,20 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         viewModel.clearAllSelection()
         if (copyResultText != null) {
             viewModel.showSnackbar(copyResultText)
-        } else throwable?.let { manageCopyMoveException(it) }
+        } else throwable?.let { handleMoveCopyException(it) }
             ?: viewModel.showSnackbar(R.string.context_correctly_copied)
+    }
+
+    private fun handleMoveCopyException(throwable: Throwable) {
+        when (throwable) {
+            is QuotaExceededMegaException, is NotEnoughQuotaMegaException -> {
+                viewModel.handleQuotaException(throwable)
+            }
+
+            else -> {
+                manageCopyMoveException(throwable)
+            }
+        }
     }
 
     override fun onDialogPositiveClick(key: String?) {
@@ -377,6 +397,14 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         )
     }
 
+    private fun navigateToAchievements() {
+        viewModel.dismissStorageStatusDialog()
+        AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+        val accountIntent = Intent(this, MyAccountActivity::class.java)
+            .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+        startActivity(accountIntent)
+    }
+
     @SuppressLint("CheckResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
@@ -400,6 +428,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             .setData(uriUrl)
         startActivity(launchBrowser)
     }
+
     companion object {
         private const val TAG_DECRYPT = "decrypt"
     }
