@@ -51,9 +51,7 @@ class ContactRequestsViewModel @Inject constructor(
         contactRequests.map { items ->
             val query = queryString
             if (!query.isNullOrBlank()) {
-                items.filter { item ->
-                    item.name?.contains(query, true) == true || item.email.contains(query, true)
-                }
+                items.filter { item -> item.email.contains(query, true) }
             } else {
                 items
             }

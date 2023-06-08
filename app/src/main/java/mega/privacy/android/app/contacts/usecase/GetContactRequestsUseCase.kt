@@ -79,10 +79,6 @@ class GetContactRequestsUseCase @Inject constructor(
                                     requestItems[index] = currentContact.copy(
                                         avatarUri = File(request.file).toUri()
                                     )
-                                USER_ATTR_FIRSTNAME ->
-                                    requestItems[index] = currentContact.copy(
-                                        name = request.text
-                                    )
                             }
 
                             emitter.onNext(requestItems)
@@ -137,10 +133,6 @@ class GetContactRequestsUseCase @Inject constructor(
                     val userImageFile = AvatarUtil.getUserAvatarFile(context, request.email)?.absolutePath
                     megaApi.getUserAvatar(request.email, userImageFile, userAttrsListener)
                 }
-
-                if (request.name.isNullOrBlank()) {
-                    megaApi.getUserAttribute(request.email, USER_ATTR_FIRSTNAME, userAttrsListener)
-                }
             }
 
             emitter.setCancellable {
@@ -194,9 +186,8 @@ class GetContactRequestsUseCase @Inject constructor(
         var userImageUri: Uri? = null
 
         val userEmail = if (isOutgoing) targetEmail else sourceEmail
-        val userName = megaChatApi.getUserFirstnameFromCache(handle)
         val userImageColor = megaApi.getUserAvatarColor(handle.toString())?.toColorInt() ?: -1
-        val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
+        val placeholder = getImagePlaceholder(userEmail, userImageColor)
         val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
         if (userImageFile?.exists() == true) {
             userImageUri = userImageFile.toUri()
@@ -205,7 +196,6 @@ class GetContactRequestsUseCase @Inject constructor(
         return ContactRequestItem(
             handle = handle,
             email = userEmail,
-            name = userName,
             avatarUri = userImageUri,
             placeholder = placeholder,
             isOutgoing = isOutgoing,

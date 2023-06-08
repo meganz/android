@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.DiffUtil
  *
  * @property handle         Request handle
  * @property email          User email
- * @property name           User name
  * @property avatarUri      User avatar Uri
  * @property placeholder    User avatar placeholder
  * @property createdTime    Request creation time
@@ -18,19 +17,24 @@ import androidx.recyclerview.widget.DiffUtil
 data class ContactRequestItem constructor(
     val handle: Long,
     val email: String,
-    val name: String? = null,
     var avatarUri: Uri? = null,
     val placeholder: Drawable,
     val createdTime: String? = null,
-    val isOutgoing: Boolean = true
+    val isOutgoing: Boolean = true,
 ) {
 
     class DiffCallback : DiffUtil.ItemCallback<ContactRequestItem>() {
 
-        override fun areItemsTheSame(oldItem: ContactRequestItem, newItem: ContactRequestItem): Boolean =
+        override fun areItemsTheSame(
+            oldItem: ContactRequestItem,
+            newItem: ContactRequestItem,
+        ): Boolean =
             oldItem.handle == newItem.handle
 
-        override fun areContentsTheSame(oldItem: ContactRequestItem, newItem: ContactRequestItem): Boolean =
+        override fun areContentsTheSame(
+            oldItem: ContactRequestItem,
+            newItem: ContactRequestItem,
+        ): Boolean =
             oldItem == newItem
     }
 }

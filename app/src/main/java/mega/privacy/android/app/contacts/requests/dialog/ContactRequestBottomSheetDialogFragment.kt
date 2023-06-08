@@ -56,9 +56,8 @@ class ContactRequestBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         viewModel.getContactRequest(requestHandle).observe(viewLifecycleOwner) { item ->
             requireNotNull(item) { "Contact request not found" }
 
-            val isOutgoing = item.isOutgoing || item.name.isNullOrBlank()
-            binding.header.txtTitle.text = if (isOutgoing) item.email else item.name
-            binding.header.txtSubtitle.text = if (isOutgoing) item.createdTime else item.email
+            binding.header.txtTitle.text = item.email
+            binding.header.txtSubtitle.text = item.createdTime
             binding.header.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
             binding.header.imgThumbnail.setImageRequestFromUri(item.avatarUri)
             binding.groupReceived.isVisible = !item.isOutgoing

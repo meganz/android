@@ -15,9 +15,8 @@ class ContactRequestListViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(item: ContactRequestItem) {
-        val showEmail = item.isOutgoing || item.name.isNullOrBlank()
-        binding.txtTitle.text = if (showEmail) item.email else item.name
-        binding.txtSubtitle.text = if (showEmail) item.createdTime else item.email
+        binding.txtTitle.text = item.email
+        binding.txtSubtitle.text = item.createdTime
         binding.imgThumbnail.hierarchy.setPlaceholderImage(item.placeholder)
         binding.imgThumbnail.setImageRequestFromUri(item.avatarUri)
     }
