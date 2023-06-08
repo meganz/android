@@ -1,8 +1,6 @@
 package mega.privacy.android.app.sync.camerauploads
 
 import android.content.Intent
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.disposables.Disposable
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
@@ -13,11 +11,9 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -30,8 +26,6 @@ import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
-import java.io.File
-import java.util.concurrent.TimeUnit.SECONDS
 
 /**
  * Manager class used to launch CU(Camera Uploads) backup related requests and send sync heartbeat.
@@ -42,11 +36,6 @@ object CameraUploadSyncManager {
 
     private const val PROGRESS_FINISHED = 100
 
-    /**
-     * While CU process is running, send heartbeat every 30s.
-     */
-    private const val ACTIVE_HEARTBEAT_INTERVAL_SECONDS = 30L
-
     private val megaApplication = MegaApplication.getInstance()
 
     private val megaApi = megaApplication.megaApi
@@ -54,44 +43,9 @@ object CameraUploadSyncManager {
     private val databaseHandler = megaApplication.dbH
 
     /**
-     * Periodically execute task, used to send active sync heartbeat.
-     */
-    private var activeHeartbeatTask: Disposable? = null
-
-    /**
-     * How many files will be uploaded as CU backup.
-     */
-    private var cuPendingUploads = 0
-
-    /**
-     * Total size of all the files will be uploaded as CU backup.
-     */
-    private var cuUploadedBytes = 0L
-
-    /**
-     * When was the last file uploaded as CU backup, time unit, second.
-     */
-    private var cuLastActionTimestampSeconds = 0L
-
-    /**
      * Handle of last uploaded file as CU backup.
      */
     private var cuLastUploadedHandle = INVALID_HANDLE
-
-    /**
-     * How many files will be uploaded as MU backup.
-     */
-    private var muPendingUploads = 0
-
-    /**
-     * Total size of all the files will be uploaded as MU backup.
-     */
-    private var muUploadedBytes = 0L
-
-    /**
-     * When was the last file uploaded as MU backup, time unit, second.
-     */
-    private var muLastActionTimestampSeconds = 0L
 
     /**
      * Handle of last uploaded file as MU backup.
@@ -619,199 +573,6 @@ object CameraUploadSyncManager {
         TextUtil.isTextEmpty(value) || INVALID_NON_NULL_VALUE == value
 
     /**
-     * Start to send sync heartbeats when CU process starts.
-     *
-     * @param records Pending upload/copy files.
-     */
-    @Deprecated(
-        message = "Move to camera uploads worker and replace activeHeartbeatTask observable with use case",
-        replaceWith = ReplaceWith("SendBackupHeartBeatSyncUseCase")
-    )
-    fun startActiveHeartbeat(records: List<SyncRecord>) {
-        if (records.isEmpty()) {
-            return
-        }
-
-        cuPendingUploads = 0
-        var cuTotalUploadBytes = 0L
-        muPendingUploads = 0
-        var muTotalUploadBytes = 0L
-
-        for (record in records) {
-            val bytes = record.localPath?.let { File(it).length() } ?: 0L
-            if (record.isSecondary) {
-                muPendingUploads++
-                muTotalUploadBytes += bytes
-            } else {
-                cuPendingUploads++
-                cuTotalUploadBytes += bytes
-            }
-        }
-        Timber.d("CU pending upload file $cuPendingUploads, size: $cuTotalUploadBytes; MU pending upload file $muPendingUploads, size: $muTotalUploadBytes")
-
-        if (CameraUploadUtil.isPrimaryEnabled()) {
-            updatePrimaryFolderBackupState(BackupState.ACTIVE)
-            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-        }
-
-        if (CameraUploadUtil.isSecondaryEnabled()) {
-            updateSecondaryFolderBackupState(BackupState.ACTIVE)
-            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-        }
-
-        activeHeartbeatTask = Observable.interval(0L, ACTIVE_HEARTBEAT_INTERVAL_SECONDS, SECONDS)
-            .subscribe({
-                val cuBackup = databaseHandler.cuBackup
-                if (CameraUploadUtil.isPrimaryEnabled() && cuBackup != null
-                    && cuTotalUploadBytes != 0L && cuBackup.state != BackupState.PAUSE_UPLOADS
-                ) {
-                    Timber.d("Send CU heartbeat.")
-                    megaApi.sendBackupHeartbeat(
-                        cuBackup.backupId,
-                        HeartbeatStatus.SYNCING.value,
-                        (cuUploadedBytes / cuTotalUploadBytes.toFloat() * 100).toInt(),
-                        cuPendingUploads,
-                        0,
-                        cuLastActionTimestampSeconds,
-                        cuLastUploadedHandle,
-                        null
-                    )
-                }
-
-                val muBackup = databaseHandler.muBackup
-                if (CameraUploadUtil.isSecondaryEnabled() && muBackup != null
-                    && muTotalUploadBytes != 0L && muBackup.state != BackupState.PAUSE_UPLOADS
-                ) {
-                    Timber.d("Send MU heartbeat.")
-                    megaApi.sendBackupHeartbeat(
-                        muBackup.backupId,
-                        HeartbeatStatus.SYNCING.value,
-                        (muUploadedBytes / muTotalUploadBytes.toFloat() * 100).toInt(),
-                        muPendingUploads,
-                        0,
-                        muLastActionTimestampSeconds,
-                        muLastUploadedHandle,
-                        null
-                    )
-                }
-            }, logErr("CuSyncManager startActiveHeartbeat"))
-    }
-
-    /**
-     * Callback when a file is uploaded/a node is copied to the target node.
-     *
-     * @param node The uploaded/copied node.
-     * @param isSecondary Whether it is a MU backup.
-     */
-    fun onUploadSuccess(node: TypedFileNode, isSecondary: Boolean) {
-        if (isSecondary) {
-            muPendingUploads--
-            muUploadedBytes += node.size
-            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            muLastUploadedHandle = node.id.longValue
-        } else {
-            cuPendingUploads--
-            cuUploadedBytes += node.size
-            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            cuLastUploadedHandle = node.id.longValue
-        }
-    }
-
-    /**
-     * Callback when the process finished, report to server.
-     */
-    @Deprecated(
-        message = "Replace all usages with use case and update timestamp in lambda",
-        replaceWith = ReplaceWith("ReportUploadFinishedUseCase")
-    )
-    fun reportUploadFinish() {
-        val cuBackup = databaseHandler.cuBackup
-        if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
-            Timber.d("CU sync finished at $cuLastActionTimestampSeconds, last uploaded handle is $cuLastUploadedHandle backup id:${cuBackup.backupId}")
-            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            megaApi.sendBackupHeartbeat(
-                cuBackup.backupId,
-                HeartbeatStatus.UP_TO_DATE.value,
-                PROGRESS_FINISHED,
-                0,
-                0,
-                cuLastActionTimestampSeconds,
-                cuLastUploadedHandle,
-                null
-            )
-        }
-
-        val muBackup = databaseHandler.muBackup
-        if (muBackup != null && muLastUploadedHandle != INVALID_HANDLE) {
-            Timber.d("MU sync finished at $muLastActionTimestampSeconds, last uploaded handle is $muLastUploadedHandle backup id:${muBackup.backupId}")
-            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            megaApi.sendBackupHeartbeat(
-                muBackup.backupId,
-                HeartbeatStatus.UP_TO_DATE.value,
-                PROGRESS_FINISHED,
-                0,
-                0,
-                muLastActionTimestampSeconds,
-                muLastUploadedHandle,
-                null
-            )
-        }
-    }
-
-    /**
-     * Callback when the process is interrupted, report to server.
-     */
-    @Deprecated(
-        message = "Replace all usages with use case and update timestamp in lambda",
-        replaceWith = ReplaceWith("ReportUploadInterruptedUseCase")
-    )
-    fun reportUploadInterrupted() {
-        val cuBackup = databaseHandler.cuBackup
-        if (cuBackup != null && cuLastUploadedHandle != INVALID_HANDLE) {
-            Timber.d("CU sync is interrupted.")
-            cuLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            megaApi.sendBackupHeartbeat(
-                cuBackup.backupId,
-                HeartbeatStatus.INACTIVE.value,
-                INVALID_VALUE,
-                cuPendingUploads,
-                0,
-                cuLastActionTimestampSeconds,
-                cuLastUploadedHandle,
-                null
-            )
-        }
-
-        val muBackup = databaseHandler.muBackup
-        if (muBackup != null && muLastUploadedHandle != INVALID_HANDLE) {
-            Timber.d("MU sync is interrupted.")
-            muLastActionTimestampSeconds = System.currentTimeMillis() / 1000
-            megaApi.sendBackupHeartbeat(
-                muBackup.backupId,
-                HeartbeatStatus.INACTIVE.value,
-                INVALID_VALUE,
-                muPendingUploads,
-                0,
-                muLastActionTimestampSeconds,
-                muLastUploadedHandle,
-                null
-            )
-        }
-    }
-
-    /**
-     * Stop send active heartbeat and reset when CameraUploadsService destroys.
-     */
-    fun stopActiveHeartbeat() {
-        activeHeartbeatTask?.dispose()
-        activeHeartbeatTask = null
-        cuPendingUploads = 0
-        cuUploadedBytes = 0
-        muPendingUploads = 0
-        muUploadedBytes = 0
-    }
-
-    /**
      * When the CU service has nothing to upload, send [HeartbeatStatus.UP_TO_DATE]
      * Before sending, check the account state and login again when the rootNode is null.
      * Only call in Worker class.
@@ -888,13 +649,6 @@ object CameraUploadSyncManager {
         })
 
     /**
-     * Check if CU process is running by checking if there's a non-null active send heartbeat task.
-     *
-     * @return true, CU process is running, otherwise, false.
-     */
-    fun isActive() = activeHeartbeatTask != null
-
-    /**
      * Send a broadcast to re-enable CU/MU preference in settings fragment.
      * In order to prevent user enable/disable CU/MU too fast,
      * after enabled CU/MU, the corresponding preference in settings fragment will be set as disabled.
@@ -902,7 +656,7 @@ object CameraUploadSyncManager {
      *
      * @param which Re-enable which preference, CU or MU.
      */
-    fun reEnableCameraUploadsPreference(which: Int) = MegaApplication.getInstance()
+    private fun reEnableCameraUploadsPreference(which: Int) = MegaApplication.getInstance()
         .sendBroadcast(
             Intent(BROADCAST_ACTION_REENABLE_CU_PREFERENCE).putExtra(
                 KEY_REENABLE_WHICH_PREFERENCE,

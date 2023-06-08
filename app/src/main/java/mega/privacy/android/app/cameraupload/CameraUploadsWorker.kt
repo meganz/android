@@ -47,16 +47,6 @@ import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyComple
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadFinish
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.reportUploadInterrupted
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.sendPrimaryFolderHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.sendSecondaryFolderHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.startActiveHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.stopActiveHeartbeat
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderBackupState
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderBackupState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
@@ -74,6 +64,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
@@ -123,10 +114,17 @@ import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ReportUploadFinishedUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ReportUploadInterruptedUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -146,6 +144,7 @@ import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
+import java.time.Instant
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -351,7 +350,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var setSecondarySyncHandle: SetSecondarySyncHandle
 
     /**
-     * GetDefaultNodeHandle
+     * GetDefaultNodeHandleUseCase
      */
     @Inject
     lateinit var getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase
@@ -418,25 +417,25 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var cameraServiceIpChangeHandler: CameraServiceIpChangeHandler
 
     /**
-     * Cancel Transfer
+     * CancelTransferByTagUseCase
      */
     @Inject
     lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
 
     /**
-     * Cancel All Upload Transfers
+     * CancelAllUploadTransfersUseCase
      */
     @Inject
     lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
 
     /**
-     * Copy Node
+     * CopyNodeUseCase
      */
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
 
     /**
-     * Set Original Fingerprint
+     * SetOriginalFingerprintUseCase
      */
     @Inject
     lateinit var setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase
@@ -520,7 +519,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory
 
     /**
-     * Delete Camera Uploads Temporary Root Directory
+     * DeleteCameraUploadsTemporaryRootDirectoryUseCase
      */
     @Inject
     lateinit var deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -532,19 +531,61 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var broadcastCameraUploadProgress: BroadcastCameraUploadProgress
 
     /**
-     * Schedule Camera Upload
+     * ScheduleCameraUploadUseCase
      */
     @Inject
     lateinit var scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase
 
     /**
-     * Create temporary file and remove coordinates
+     * CreateTempFileAndRemoveCoordinatesUseCase
      */
     @Inject
     lateinit var createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase
 
     /**
-     * Add completed transfer to local storage
+     * SendCameraUploadsBackupHeartBeatUseCase
+     */
+    @Inject
+    lateinit var sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase
+
+    /**
+     * SendMediaUploadsBackupHeartBeatUseCase
+     */
+    @Inject
+    lateinit var sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase
+
+    /**
+     * UpdateCameraUploadsBackupUseCase
+     */
+    @Inject
+    lateinit var updateCameraUploadsBackupUseCase: UpdateCameraUploadsBackupUseCase
+
+    /**
+     * UpdateMediaUploadsBackupUseCase
+     */
+    @Inject
+    lateinit var updateMediaUploadsBackupUseCase: UpdateMediaUploadsBackupUseCase
+
+    /**
+     * SendBackupHeartBeatSyncUseCase
+     */
+    @Inject
+    lateinit var sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase
+
+    /**
+     * ReportUploadFinishedUseCase
+     */
+    @Inject
+    lateinit var reportUploadFinishedUseCase: ReportUploadFinishedUseCase
+
+    /**
+     * ReportUploadInterruptedUseCase
+     */
+    @Inject
+    lateinit var reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase
+
+    /**
+     * AddCompletedTransferUseCase
      */
     @Inject
     lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
@@ -594,14 +635,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     private lateinit var tempRoot: String
 
     /**
-     * Count of total files uploaded
+     * Camera Upload State holder
      */
-    private var totalUploaded = 0
-
-    /**
-     * Count of total files to upload
-     */
-    private var totalToUpload = 0
+    private val cameraUploadState = CameraUploadsState()
 
     /**
      * Time in milliseconds to flag the last update of the notification
@@ -628,6 +664,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Job to monitor upload pause flow
      */
     private var monitorUploadPauseStatusJob: Job? = null
+
+    /**
+     * Job to send backup heartbeat flow
+     */
+    private var sendBackupHeartbeatJob: Job? = null
 
     /**
      * Job to monitor connectivity status flow
@@ -678,7 +719,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 Result.failure()
             }
         } catch (throwable: Throwable) {
-            Timber.e(throwable)
+            Timber.e(throwable, "Worker cancelled")
             endService(aborted = true)
             Result.failure()
         }
@@ -1054,7 +1095,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             null
         }
-        totalUploaded = 0
+        cameraUploadState.totalUploaded = 0
         processMediaForUploadUseCase(
             primaryUploadNode.id,
             secondaryUploadNode?.id,
@@ -1104,15 +1145,22 @@ class CameraUploadsWorker @AssistedInject constructor(
         // BackupState.PAUSE_UPLOADS
         if (areTransfersPausedUseCase()) {
             Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
-            updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
-            updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
+            updateCameraUploadsBackupUseCase(
+                context.getString(R.string.section_photo_sync),
+                BackupState.PAUSE_UPLOADS
+            )
+            updateMediaUploadsBackupUseCase(
+                context.getString(R.string.section_secondary_media_uploads),
+                BackupState.PAUSE_UPLOADS
+            )
         }
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         val secondaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
 
-        startActiveHeartbeat(finalList)
+        startHeartbeat(finalList)
+
         for (file in finalList) {
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
@@ -1180,7 +1228,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
                 file.nodeHandle?.let { nodeHandle ->
                     getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
-                        totalToUpload++
+                        cameraUploadState.totalToUpload++
                         copyFileAsyncList.add(async {
                             handleCopyNode(
                                 nodeToCopy = nodeToCopy,
@@ -1204,7 +1252,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             deleteSyncRecord(it, isSecondary)
                         }
                     } else {
-                        totalToUpload++
+                        cameraUploadState.totalToUpload++
                         val lastModified = getLastModifiedTime(file)
 
                         // If the local file path exists, call the Use Case to upload the file
@@ -1246,6 +1294,41 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.d("No pending videos, finish.")
             onQueueComplete()
+        }
+    }
+
+    private suspend fun startHeartbeat(finalList: List<SyncRecord>) {
+        if (finalList.isNotEmpty()) {
+            with(cameraUploadState) {
+                finalList.forEach { record ->
+                    val bytes = record.localPath?.let { File(it).length() } ?: 0L
+                    if (record.isSecondary) {
+                        secondaryPendingUploads++
+                        secondaryTotalUploadBytes += bytes
+                    } else {
+                        primaryPendingUploads++
+                        primaryTotalUploadBytes += bytes
+                    }
+                }
+                totalNumber = finalList.size
+
+                updateCameraUploadsBackupUseCase(
+                    context.getString(R.string.section_photo_sync),
+                    BackupState.ACTIVE
+                ) { lastPrimaryTimeStamp = Instant.now().epochSecond }
+
+                updateMediaUploadsBackupUseCase(
+                    context.getString(R.string.section_secondary_media_uploads),
+                    BackupState.ACTIVE
+                ) { lastSecondaryTimeStamp = Instant.now().epochSecond }
+            }
+
+            sendBackupHeartbeatJob =
+                scope?.launch(ioDispatcher) {
+                    sendBackupHeartBeatSyncUseCase(cameraUploadState)
+                        .catch { Timber.e(it) }
+                        .collect()
+                }
         }
     }
 
@@ -1354,7 +1437,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                     )
                 }
                 // Update information when the file is copied to the target node
-                onUploadSuccess(
+                updateStateOnUpload(
                     node = retrievedNode,
                     isSecondary = isSecondary,
                 )
@@ -1365,6 +1448,22 @@ class CameraUploadsWorker @AssistedInject constructor(
             updateUpload()
         }
 
+    }
+
+    private fun updateStateOnUpload(node: TypedFileNode, isSecondary: Boolean) {
+        with(cameraUploadState) {
+            if (isSecondary) {
+                secondaryPendingUploads--
+                secondaryTotalUploadedBytes += node.size
+                lastSecondaryTimeStamp = Instant.now().epochSecond
+                lastSecondaryHandle = node.id.longValue
+            } else {
+                primaryPendingUploads--
+                primaryTotalUploadedBytes += node.size
+                lastPrimaryTimeStamp = Instant.now().epochSecond
+                lastPrimaryHandle = node.id.longValue
+            }
+        }
     }
 
     private suspend fun checkExistBySize(parent: Node, size: Long): FileNode? {
@@ -1386,10 +1485,23 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun onQueueComplete() {
         Timber.d("Stopping foreground!")
         resetTotalUploadsUseCase()
-        totalUploaded = 0
-        totalToUpload = 0
-        reportUploadFinish()
-        stopActiveHeartbeat()
+        with(cameraUploadState) {
+            cameraUploadState.totalUploaded = 0
+            cameraUploadState.totalToUpload = 0
+            reportUploadFinishedUseCase(
+                lastPrimaryNodeHandle = lastPrimaryHandle,
+                lastSecondaryNodeHandle = lastSecondaryHandle,
+                updatePrimaryTimeStamp = {
+                    Instant.now().epochSecond.also {
+                        lastPrimaryTimeStamp = it
+                    }
+                },
+                updateSecondaryTimeStamp = {
+                    Instant.now().epochSecond.also {
+                        lastSecondaryTimeStamp = it
+                    }
+                })
+        }
         endService()
     }
 
@@ -1548,8 +1660,8 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // Reset properties
         lastUpdated = 0
-        totalUploaded = 0
-        totalToUpload = 0
+        cameraUploadState.totalUploaded = 0
+        cameraUploadState.totalToUpload = 0
         missingAttributesChecked = false
 
         // Create temp root folder
@@ -1610,7 +1722,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         sendStatusToBackupCenter(aborted = aborted)
         cancelAllPendingTransfers()
         broadcastProgress(100, 0)
-        stopActiveHeartbeat()
         stopWakeAndWifiLocks()
         cancelNotification()
 
@@ -1631,6 +1742,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorConnectivityStatusJob?.cancel()
             monitorBatteryLevelStatusJob?.cancel()
             monitorChargingStoppedStatusJob?.cancel()
+            sendBackupHeartbeatJob?.cancel()
         }
     }
 
@@ -1639,7 +1751,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @param aborted true if the Camera Uploads has been stopped prematurely
      */
-    private fun sendStatusToBackupCenter(aborted: Boolean) {
+    private suspend fun sendStatusToBackupCenter(aborted: Boolean) {
         if (aborted)
             sendTransfersInterruptedInfoToBackupCenter()
         else
@@ -1651,14 +1763,34 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Secondary folders when the active Camera Uploads is interrupted by other means (e.g.
      * no user credentials, Wi-Fi not turned on)
      */
-    private fun sendTransfersInterruptedInfoToBackupCenter() {
-        if (isActive()) {
-            // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
-            updatePrimaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
-            updateSecondaryFolderBackupState(BackupState.TEMPORARILY_DISABLED)
+    private suspend fun sendTransfersInterruptedInfoToBackupCenter() {
+        // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
+        updateCameraUploadsBackupUseCase(
+            context.getString(R.string.section_photo_sync),
+            BackupState.TEMPORARILY_DISABLED
+        )
+        updateMediaUploadsBackupUseCase(
+            context.getString(R.string.section_secondary_media_uploads),
+            BackupState.TEMPORARILY_DISABLED
+        )
 
-            // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
-            reportUploadInterrupted()
+        // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
+        with(cameraUploadState) {
+            reportUploadInterruptedUseCase(
+                pendingPrimaryUploads = primaryPendingUploads,
+                pendingSecondaryUploads = secondaryPendingUploads,
+                lastPrimaryNodeHandle = lastPrimaryHandle,
+                lastSecondaryNodeHandle = lastSecondaryHandle,
+                updatePrimaryTimeStamp = {
+                    Instant.now().epochSecond.also {
+                        lastPrimaryTimeStamp = it
+                    }
+                },
+                updateSecondaryTimeStamp = {
+                    Instant.now().epochSecond.also {
+                        lastSecondaryTimeStamp = it
+                    }
+                })
         }
     }
 
@@ -1668,14 +1800,26 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * One particular case where these states are sent is when the user "Cancel all" uploads
      */
-    private fun sendTransfersUpToDateInfoToBackupCenter() {
+    private suspend fun sendTransfersUpToDateInfoToBackupCenter() {
         // Update both Primary and Secondary Backup States to ACTIVE
-        updatePrimaryFolderBackupState(BackupState.ACTIVE)
-        updateSecondaryFolderBackupState(BackupState.ACTIVE)
+        updateCameraUploadsBackupUseCase(
+            context.getString(R.string.section_photo_sync),
+            BackupState.ACTIVE
+        )
+        updateMediaUploadsBackupUseCase(
+            context.getString(R.string.section_secondary_media_uploads),
+            BackupState.ACTIVE
+        )
 
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
-        sendPrimaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
-        sendSecondaryFolderHeartbeat(HeartbeatStatus.UP_TO_DATE)
+        sendCameraUploadsBackupHeartBeatUseCase(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = cameraUploadState.lastPrimaryHandle,
+        )
+        sendMediaUploadsBackupHeartBeatUseCase(
+            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
+            lastNodeHandle = cameraUploadState.lastSecondaryHandle,
+        )
     }
 
     private fun cancelNotification() {
@@ -1698,7 +1842,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { nonNullNode ->
-                    onUploadSuccess(
+                    updateStateOnUpload(
                         node = nonNullNode,
                         isSecondary = record.isSecondary,
                     )
@@ -1786,13 +1930,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun updateUpload() {
         updateProgressNotification()
 
-        totalUploaded++
+        cameraUploadState.totalUploaded++
         @Suppress("DEPRECATION")
         Timber.d(
-            "Total to upload: %d Total uploaded: %d Pending uploads: %d",
-            totalToUpload,
-            totalUploaded,
-            megaApi.numPendingUploads
+            "Total to upload: ${cameraUploadState.totalToUpload} " +
+                    "Total uploaded: ${cameraUploadState.totalUploaded} " +
+                    "Pending uploads: ${megaApi.numPendingUploads}"
+
         )
     }
 
@@ -1812,8 +1956,8 @@ class CameraUploadsWorker @AssistedInject constructor(
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
             resetTotalUploadsUseCase()
-            totalUploaded = 0
-            totalToUpload = 0
+            cameraUploadState.totalUploaded = 0
+            cameraUploadState.totalToUpload = 0
             totalVideoSize = getTotalVideoSizeInMB(fullList)
             Timber.d(
                 "Total videos count are %d, %d mb to Conversion",
