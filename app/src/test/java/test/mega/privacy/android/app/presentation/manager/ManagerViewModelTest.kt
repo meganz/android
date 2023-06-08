@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
@@ -215,11 +216,11 @@ class ManagerViewModelTest {
     private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
         onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
     }
-
     private val getPricing = mock<GetPricing>()
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
+    private val monitorBackupFolder = mock<MonitorBackupFolder>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -273,6 +274,7 @@ class ManagerViewModelTest {
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            monitorBackupFolder = monitorBackupFolder,
         )
     }
 

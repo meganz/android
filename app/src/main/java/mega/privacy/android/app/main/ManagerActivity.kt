@@ -323,7 +323,6 @@ import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.data.model.MegaAttributes
@@ -449,9 +448,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
-
-    @Inject
-    lateinit var megaNodeUtilWrapper: MegaNodeUtilWrapper
 
     @Inject
     internal lateinit var uploadBottomSheetDialogActionHandler: ManagerUploadBottomSheetDialogActionHandler
@@ -1141,7 +1137,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("Backup warning dialog is not show")
             }
         }
-        megaNodeUtilWrapper.observeBackupFolder()
     }
 
     private fun setupView() {

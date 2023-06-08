@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Feature
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
@@ -115,6 +117,7 @@ import javax.inject.Inject
  * @param monitorContactRequestUpdates
  * @param monitorFinishActivityUseCase
  * @param monitorOfflineNodeAvailabilityUseCase monitor the offline availability of the file to update the UI
+ * @property monitorBackupFolder
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -163,6 +166,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val monitorBackupFolder: MonitorBackupFolder,
 ) : ViewModel() {
 
     /**
@@ -294,6 +298,14 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             monitorChatArchivedUseCase().conflate().collect { chatTitle ->
                 _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
+            }
+        }
+        viewModelScope.launch {
+            monitorBackupFolder().map {
+                // Default to an Invalid Handle of -1L when an error occurs
+                it.getOrDefault(NodeId(-1L))
+            }.collectLatest { backupsFolderNodeId ->
+                MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
             }
         }
     }

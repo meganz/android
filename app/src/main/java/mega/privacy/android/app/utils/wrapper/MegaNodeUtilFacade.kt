@@ -4,11 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -16,12 +11,7 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
@@ -31,24 +21,7 @@ import javax.inject.Singleton
  * Mega node util facade
  */
 @Singleton
-class MegaNodeUtilFacade @Inject constructor(
-    @ApplicationScope private val scope: CoroutineScope,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val monitorBackupFolder: MonitorBackupFolder,
-) : MegaNodeUtilWrapper {
-
-    override fun observeBackupFolder() {
-        scope.launch(ioDispatcher) {
-            monitorBackupFolder()
-                .map {
-                    it.getOrDefault(NodeId(MegaApiJava.INVALID_HANDLE))
-                }
-                .collectLatest {
-                    MegaNodeUtil.myBackupHandle = it.longValue
-                }
-        }
-    }
-
+class MegaNodeUtilFacade @Inject constructor() : MegaNodeUtilWrapper {
     override fun getMyChatFilesFolder() = MegaNodeUtil.myChatFilesFolder
 
     override fun getCloudRootHandle() = MegaNodeUtil.cloudRootHandle

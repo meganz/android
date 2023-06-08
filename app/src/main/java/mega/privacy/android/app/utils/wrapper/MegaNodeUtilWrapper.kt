@@ -20,13 +20,6 @@ import java.io.File
 
 interface MegaNodeUtilWrapper {
 
-
-    /**
-     * Initialise this component
-     *
-     */
-    fun observeBackupFolder()
-
     /**
      * Gets the node of the user attribute "My chat files" from the DB.
      *
