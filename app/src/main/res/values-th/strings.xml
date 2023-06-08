@@ -405,8 +405,6 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">ย้ายแล้ว</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">มี %d รายการที่ไม่ได้ถูกย้าย</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">ย้ายไปถังขยะแล้ว</string>
     <!-- error message -->
     <string name="context_no_moved">ผิดพลาด ยังไม่ได้ย้าย</string>
@@ -418,14 +416,6 @@
     <string name="context_correctly_removed">ลบเรียบร้อยแล้ว</string>
     <!-- error message -->
     <string name="context_no_removed">ข้อผิดพลาด ลบไม่สำเร็จ</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_removed">นำ %d รายการออกจาก MEGA แล้ว</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_removed">มี %d รายการที่ไม่ได้ถูกย้าย</string>
-    <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">ออกจากการแชร์แล้ว %d โฟลเดอร์</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_leaved">ยังไม่ได้ออกจากแชร์ %d โฟลเดอร์</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">คัดลอก %d รายการแล้ว</string>
     <!-- error message when sending multiple files -->
@@ -923,8 +913,6 @@
     <plurals name="number_correctly_invite_contact_request">
         <item quantity="other">ส่งคำเชิญ %d รายการแล้ว</item>
     </plurals>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">ส่งคำขอเชิญ %1$d รายการแล้ว แต่มีอีก %2$d รายการที่ยังไม่ได้ส่ง</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (ฉัน)</string>
     <!-- button -->
@@ -2215,10 +2203,6 @@
     <string name="subtitle_file_takedown_notification">[A]ไฟล์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B] ถูกลบแล้ว</string>
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]โฟลเดอร์ที่แชร์แบบสาธารณะของคุณ [/A][B]%s[/B] ถูกลบแล้ว</string>
-    <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">ไฟล์นี้ถูกแจ้งว่าให้ลบเนื้อหา</string>
-    <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">โฟลเดอร์นี้ถูกแจ้งว่าให้ลบเนื้อหา</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">ระงับข้อพิพาท</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2645,10 +2629,6 @@
     <string name="embed_web_browser_loading_message">กรุณารอสักครู่&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">ธุรกิจ</string>
-    <!-- Business user role -->
-    <string name="admin_label">แอดมิน</string>
-    <!-- Business user role -->
-    <string name="user_label">ผู้ใช้</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">สถานะ</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3289,10 +3269,6 @@
     <string name="view_meeting_chat">ดูแชทการประชุม</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">เชิญผู้เข้าร่วมประชุมเพิ่มเติม ปัดขึ้นเพื่อเชิญ</string>
-    <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">แตะเพื่อสร้างการประชุมใหม่</string>
-    <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">ตั้งค่าการประชุม MEGA อย่างรวดเร็วด้วยฟีเจอร์การประชุมที่เข้ารหัสใหม่ของเรา</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">คุณเป็นผู้จัดการประชุมคนใหม่</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -3956,7 +3932,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">เล่นวิดีโอต่อจากก่อนหน้านี้หรือไม่</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">ไฟล์ %1$s จะเริ่มเล่นต่อตั้งแต่ %2$s เป็นต้นไป</string>
+    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">เล่นต่อ</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4333,16 +4309,10 @@
     <string name="meetings_one_off_occurrence_info_today">วันนี้ %1$s ตั้งแต่ %2$s จนถึง %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_tomorrow">พรุ่งนี้ %1$s ตั้งแต่ %2$s จนถึง %3$s</string>
-    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s อัปเดต[/A][B]เวลาการประชุมที่เป็นกิจวัตรใหม่แล้ว[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">อัปเกรดความปลอดภัยของบัญชี</string>
     <!-- This is the body of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">เรากำลังอัปเกรดความปลอดภัยของบัญชีของคุณ คุณควรเห็นข้อความนี้เพียงครั้งเดียวเท่านั้น หากคุณเคยเห็นข้อความนี้มาก่อน กรุณาตรวจสอบให้แน่ใจว่าเป็นบัญชีเดียวกันและไม่ใช่บัญชี MEGA อื่นที่คุณมี\n\nหากคุณแน่ใจและคุณเห็นข้อความนี้เป็นครั้งที่สองสำหรับบัญชีนี้ กรุณาหยุดใช้บัญชีนี้โดยทันที</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="other">คุณกำลังแชร์โฟลเดอร์ต่อไปนี้: %s</item>
-    </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="other">[ไฟล์ยังไม่ได้ถอดรหัส]</item>
@@ -4504,9 +4474,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">ต้องระบุชื่อเรื่องการประชุม</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">กรอกได้สูงสุด 30&#160;ตัว</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">กรอกได้สูงสุด 3,000&#160;ตัว</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">กำหนดการจัดประชุมแล้ว</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4554,7 +4524,7 @@
         <item quantity="other">และมีอีก %1$d รายการที่ไม่สามารถลบออกอย่างถาวรได้</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">กรอกเวลา</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">เชิญเข้าร่วมการประชุม</string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -4568,21 +4538,20 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">การประชุมเริ่มขึ้นแล้ว</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">แชร์คีย์ถอดรหัสลับนี้ด้วยหรือไม่</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">ส่งออกคีย์ถอดรหัสลับแล้วและจะแชร์ไปพร้อมกับลิงก์ด้วย</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">แชร์แค่ลิงก์อย่างเดียว</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">แชร์ทั้งลิงก์และคีย์ด้วย</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="other">แชร์ลิงก์</item>
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="other">คัดลอกลิงก์ไปที่คลิปบอร์ดแล้ว</item>
     </plurals>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_title">
@@ -4590,8 +4559,7 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with, will lose access to the album.</item>
-        <item quantity="other">People you shared these links with, will lose access to the albums.</item>
+        <item quantity="other">คนที่คุณแชร์ลิงก์เหล่านี้ด้วยจะไม่สามารถเข้าถึงอัลบั้มได้</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4600,19 +4568,19 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">กรอกคีย์เพื่อถอดรหัสลับ</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">ในการเข้าถึงอัลบั้มนี้ ให้คุณกรอกคีย์ถอดรหัสลับก่อน หากคุณไม่มี ให้ติดต่อบุคคลที่แชร์ลิงก์นี้ให้กับคุณแทน</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">จำตัวเลือกการกำหนดลักษณะนี้ไว้</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
     <string name="device_center_list_of_devices_toolbar_title"></string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Every day</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">ทุกวัน</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Every week</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">ทุกสัปดาห์</string>
     <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Every month</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">ทุกเดือน</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">กำหนดเอง</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
@@ -4622,13 +4590,84 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
     <string name="meetings_schedule_meeting_recurrence_monthly_label">รายเดือน</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
-    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
+        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+    </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">ไม่สามารถเปิดโฟลเดอร์ได้</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">ไม่สามารถเปิดไฟล์ได้</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_description"></string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Pro only</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Link access</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">วันหมดอายุ</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">ตั้งรหัสผ่าน</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <!-- Album import link label -->
+    <string name="album_import_link">Album link</string>
+    <!-- Album import error access title -->
+    <string name="album_import_error_access_title">Cannot access album</string>
+    <!-- Album import error access description -->
+    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <!-- Album import error access confirmation -->
+    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">เสียง</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">เลือกแผนบริการที่ตรงกับความต้องการของคุณ</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">รายเดือน</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">รายปี</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">ถ้าเลือกเก็บเงินทุกปี จะประหยัดได้สูงสุดถึง 16%</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">แนะนำ</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">แผนปัจจุบัน</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">ซื้อ Pro Lite</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">ซื้อ Pro I</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">ซื้อ Pro II</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">ซื้อ Pro III</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">เงื่อนไขการให้บริการ</string>
 </resources>

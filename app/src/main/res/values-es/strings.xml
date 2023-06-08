@@ -423,8 +423,6 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Movido</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">No se han podido mover %d elementos</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Movido a la Papelera</string>
     <!-- error message -->
     <string name="context_no_moved">Error. No se ha podido mover</string>
@@ -436,14 +434,6 @@
     <string name="context_correctly_removed">Eliminado</string>
     <!-- error message -->
     <string name="context_no_removed">Error. No se ha podido eliminar de MEGA</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d elementos eliminados de MEGA</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_removed">No se han podido eliminar %d elementos</string>
-    <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Se han abandonado %d carpetas</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_leaved">No se han podido abandonar %d carpetas</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d elementos copiados</string>
     <!-- error message when sending multiple files -->
@@ -953,8 +943,6 @@
         <item quantity="many">Se han enviado %d de invitaciones</item>
         <item quantity="other">Se han enviado %d invitaciones</item>
     </plurals>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invitaciones enviadas correctamente y %2$d no enviadas.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Yo)</string>
     <!-- button -->
@@ -2313,10 +2301,6 @@
     <string name="subtitle_file_takedown_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B] ha sido retirado.</string>
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]La carpeta que has compartido públicamente [/A][B]%s[/B] ha sido retirada.</string>
-    <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">Este archivo ha sido sujeto a notificación y retirada.</string>
-    <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">Esta carpeta ha sido sujeta a notificación y retirada.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Disputar la retirada</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2789,10 +2773,6 @@
     <string name="embed_web_browser_loading_message">Por favor espera&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Business</string>
-    <!-- Business user role -->
-    <string name="admin_label">Administrador</string>
-    <!-- Business user role -->
-    <string name="user_label">Usuario</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">Estado</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3483,10 +3463,6 @@
     <string name="view_meeting_chat">Ver el chat de la reunión</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invita a más participantes a la reunión. Desliza hacia arriba para invitar.</string>
-    <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">Toca para crear una nueva reunión</string>
-    <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Organiza rápidamente una reunión en MEGA con nuestra nueva función de reunión cifrada</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Eres el nuevo anfitrión</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -4174,7 +4150,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">¿Reanudar vídeo?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s se reanudará desde %2$s</string>
+    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Reanudar</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4703,18 +4679,10 @@
     <string name="meetings_one_off_occurrence_info_today">Hoy, %1$s de %2$s a %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_tomorrow">Mañana, %1$s de %2$s a %3$s</string>
-    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s ha actualizado[/A][B] la fecha de la reunión periódica[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Actualización de seguridad de la cuenta</string>
     <!-- This is the body of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">Estamos mejorando la seguridad de tu cuenta. Deberías ver este mensaje solo una vez. Si lo has visto antes, primero asegúrate de que haya sido para esta cuenta y no para otra cuenta  que tengas en MEGA. \n\nSi estás seguro que es la segunda vez que ves este mensaje para esta cuenta, deja de usarla.</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="one">Actualmente estás compartiendo la siguiente carpeta: %s</item>
-        <item quantity="many">Actualmente estás compartiendo las siguientes carpetas: %s</item>
-        <item quantity="other">Actualmente estás compartiendo las siguientes carpetas: %s</item>
-    </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="one">[Archivo sin descifrar]</item>
@@ -5028,9 +4996,9 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Introducir la clave de descifrado</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Para acceder al álbum, introduce la clave de descifrado. Si no la tienes, contacta con la persona que te ha compartido el enlace.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">Recordar preferencias</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
@@ -5038,9 +5006,9 @@
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Cada día</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Todas las semanas</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_week_option">Cada semana</string>
     <!-- Every month option in dialog to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Todos los meses</string>
+    <string name="meetings_schedule_meeting_recurrence_dialog_every_month_option">Cada mes</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_dialog_custom_option">Personalizar</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs daily -->
@@ -5050,13 +5018,85 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensual</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
-    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
+        <item quantity="one">Algunos meses no tienen %1$d día. Para estos meses, el evento se programará para el último día del mes.</item>
+        <item quantity="many">Algunos meses no tienen %1$d días. Para estos meses, el evento se programará para el último día del mes.</item>
+        <item quantity="other">Algunos meses no tienen %1$d días. Para estos meses, el evento se programará para el último día del mes.</item>
+    </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">La carpeta no se puede abrir</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">El archivo no se puede abrir</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_description"></string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Solo para Pro</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Acceso al enlace</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Quien tenga este enlace puede ver y descargar lo que contiene.</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">Fecha de caducidad</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">Establecer contraseña</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Enlace actualizado. Copiar de nuevo.</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Enlace creado y copiado en el portapapeles</string>
+    <!-- Album import link label -->
+    <string name="album_import_link">Enlace del álbum</string>
+    <!-- Album import error access title -->
+    <string name="album_import_error_access_title">No se puede acceder al álbum</string>
+    <!-- Album import error access description -->
+    <string name="album_import_error_access_description">Se ha eliminado el enlace al álbum o el propio álbum. Ponte en contacto con la persona que te ha compartido el enlace.</string>
+    <!-- Album import error access confirmation -->
+    <string name="album_import_error_access_confirmation">Entendido</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">Audio</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">Elige el plan adecuado para ti</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Mensual</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Anual</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Ahorra hasta un 16&#160;% con el cobro anual</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomendado</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Plan actual</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite"></string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i"></string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii"></string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">Términos de servicio</string>
 </resources>

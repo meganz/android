@@ -365,7 +365,7 @@
     <!-- menu item -->
     <string name="context_send_file">Gửi tệp tin vào cuộc chát</string>
     <!-- menu item -->
-    <string name="context_send_contact">Chia sẻ tên liên lạc vào cuộc chát</string>
+    <string name="context_send_contact">Chia&#160;sẻ tên liên&#160;lạc vào cuộc chát</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_sharing_folder">Chia sẻ</string>
     <!-- Menu option to manage a shared folder. -->
@@ -405,8 +405,6 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">Đã di&#160;chuyển</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">Đã không di&#160;chuyển được %d mục</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Đã chuyển vào Thùng&#160;Rác</string>
     <!-- error message -->
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
@@ -418,14 +416,6 @@
     <string name="context_correctly_removed">Đã xóa</string>
     <!-- error message -->
     <string name="context_no_removed">Lỗi. Chưa xóa được</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d mục đã loại&#160;khỏi MEGA</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_removed">Đã không loại&#160;bỏ được %d mục</string>
-    <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Đã rời&#160;khỏi %d thư&#160;mục</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_leaved">Đã không rời&#160;khỏi được %d thư&#160;mục</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d mục đã được sao&#160;chép</string>
     <!-- error message when sending multiple files -->
@@ -730,7 +720,7 @@
     <!-- Confirmation message when enabling logs in the app -->
     <string name="settings_enable_logs">Bản ghi chép đã được bật</string>
     <!-- Confirmation message when disabling logs in the app -->
-    <string name="settings_disable_logs">Bản ghi chép đã được tắt</string>
+    <string name="settings_disable_logs">Bản ghi nhật&#160;ký đã tắt</string>
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Đến vị&#160;trí chứa tệp&#160;tin</string>
     <!-- message when a temporary error on logging in is due to SDK is waiting for the server to complete a request due to an API lock -->
@@ -923,8 +913,6 @@
     <plurals name="number_correctly_invite_contact_request">
         <item quantity="other">%d lời mời đã được gửi đi</item>
     </plurals>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d lời&#160;mời đã được gửi đi nhưng còn lại %2$d lời&#160;mời không gửi được.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Tôi)</string>
     <!-- button -->
@@ -1944,7 +1932,7 @@
     <!-- When it tries to add a contact in a list an is already added -->
     <string name="contact_not_added">Tên liên lạc này đã được thêm rồi.</string>
     <!-- Content of a normal message that cannot be recognized -->
-    <string name="error_message_invalid_format">Định dạng tin nhắn không hợp lệ</string>
+    <string name="error_message_invalid_format">Định&#160;dạng tin&#160;nhắn không hợp&#160;lệ</string>
     <!-- Content of a normal message that cannot be recognized -->
     <string name="error_message_invalid_signature">Chữ ký cho tin nhắn không hợp lệ</string>
     <!-- When the user tries to reproduce a file through streaming and ocurred an error creating it -->
@@ -2070,7 +2058,7 @@
     <!-- Title of the button in the contact info screen to start an audio call -->
     <string name="call_button">Gọi</string>
     <!-- Title of the button in the contact info screen to send a message -->
-    <string name="message_button">Tin nhắn</string>
+    <string name="message_button">Nhắn tin</string>
     <!-- Title of the button in the contact info screen to start a video call -->
     <string name="video_button">Video</string>
     <!-- Title of file explorer to send a link -->
@@ -2215,10 +2203,6 @@
     <string name="subtitle_file_takedown_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B] đã bị gỡ bỏ.</string>
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B] đã bị gỡ bỏ.</string>
-    <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">Tệp tin này đã bị yêu cầu cần phải gỡ bỏ.</string>
-    <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">Thư mục này đã bị yêu cầu cần phải gỡ bỏ.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Yêu cầu gỡ bỏ</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2645,10 +2629,6 @@
     <string name="embed_web_browser_loading_message">Vui lòng chờ&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Doanh Nghiệp</string>
-    <!-- Business user role -->
-    <string name="admin_label">Quản trị</string>
-    <!-- Business user role -->
-    <string name="user_label">Nhân viên</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">Trạng thái</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3289,10 +3269,6 @@
     <string name="view_meeting_chat">Xem tin nhắn cuộc họp mặt</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Mời thêm thành viên tham gia vào cuộc họp. Trượt lên để mời.</string>
-    <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">Chạm để tạo một cuộc họp mặt mới</string>
-    <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Lập nhanh một cuộc họp mặt trên MEGA với các tính năng mã hóa họp mặt an ninh mới</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Bạn đã được chọn là người chủ trì mới</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -3956,7 +3932,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Tiếp&#160;tục phát video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s sẽ tiếp&#160;tục phát tại %2$s</string>
+    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Tiếp tục truyền</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4333,16 +4309,10 @@
     <string name="meetings_one_off_occurrence_info_today">Hôm&#160;nay, %1$s từ %2$s đến %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_tomorrow">Ngày&#160;mai, %1$s từ %2$s đến %3$s</string>
-    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s đã cập&#160;nhật[/A][B] ngày của cuộc&#160;họp định&#160;kỳ[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Nâng&#160;cấp bảo&#160;mật tài&#160;khoản</string>
     <!-- This is the body of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">Chúng&#160;tôi đang nâng&#160;cấp bảo&#160;mật cho tài&#160;khoản của bạn. Bạn sẽ thấy thông&#160;báo này chỉ một lần duy&#160;nhất. Nếu bạn đã nhìn thấy cái này trước đây, trước tiên hãy đảm&#160;bảo rằng thông&#160;báo đó là dành cho tài&#160;khoản này chứ không phải tài&#160;khoản MEGA khác mà bạn có.\n\nNếu bạn chắc&#160;rằng đây là lần thứ hai bạn nhìn&#160;thấy thông&#160;báo này cho tài&#160;khoản này, hãy ngưng sử dụng tài khoản này.</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="other">Bạn hiện đang chia&#160;sẻ các thư&#160;mục sau&#160;đây: %s</item>
-    </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="other">[tệp&#160;tin chưa giải&#160;mã]</item>
@@ -4620,13 +4590,83 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Hàng tháng</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
-    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
+        <item quantity="other">Với những tháng không&#160;có %1$d ngày. Thời&#160;điểm tái&#160;diễn cuộc&#160;họp sẽ được lên lịch vào ngày cuối&#160;cùng của tháng đó.</item>
+    </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">Không&#160;thể mở được thư&#160;mục</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Không thể mở được tệp</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_description"></string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Chỉ cho hạng Pro</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Truy&#160;cập đường liên&#160;kết</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Bất&#160;kỳ ai có đường liên&#160;kết này đều có&#160;thể xem và tải&#160;xuống dữ liệu của bạn</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">Ngày hết hạn</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">Đặt mật&#160;khẩu</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Đường liên&#160;kết đã được cập&#160;nhật. Xin copy lại.</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Đường liên&#160;kết đã được tạo và ghi vào bảng&#160;nhớ&#160;tạm</string>
+    <!-- Album import link label -->
+    <string name="album_import_link">Đường liên&#160;kết album</string>
+    <!-- Album import error access title -->
+    <string name="album_import_error_access_title">Không thể truy&#160;cập album</string>
+    <!-- Album import error access description -->
+    <string name="album_import_error_access_description">Đường liên&#160;kết tới album đã bị loại bỏ hoặc album đã bị xóa. Liên&#160;hệ với người đã chia&#160;sẻ đường liên&#160;kết cho bạn.</string>
+    <!-- Album import error access confirmation -->
+    <string name="album_import_error_access_confirmation">OK, hiểu rồi</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">Âm Thanh</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">Chọn gói phù hợp với bạn</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Hàng tháng</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Hàng năm</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Tiết kiệm lên đến 16% khi thanh toán thường niên</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Khuyên dùng</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Gói hiện tại</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite"></string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i"></string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii"></string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">Điều&#160;Khoản Dịch&#160;Vụ</string>
 </resources>
