@@ -405,8 +405,6 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">옮겨짐</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">항목 %d개가 옮겨지지 않았습니다</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">휴지통으로 옮겨짐</string>
     <!-- error message -->
     <string name="context_no_moved">오류. 이동되지 않았습니다</string>
@@ -418,14 +416,6 @@
     <string name="context_correctly_removed">삭제됨</string>
     <!-- error message -->
     <string name="context_no_removed">오류. MEGA에서 삭제되지 않았습니다</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_removed">항목 %d개가 MEGA에서 삭제되었습니다</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_removed">항목 %d개가 제거되지 않음</string>
-    <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">폴더 %d개 남음</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_leaved">폴더 %d개를 떠날 수 없습니다</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">항목 %d개 복사됨</string>
     <!-- error message when sending multiple files -->
@@ -923,8 +913,6 @@
     <plurals name="number_correctly_invite_contact_request">
         <item quantity="other">%d개의 초대장이 발송되었습니다</item>
     </plurals>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d개의 초대 요청이 발송되었지만 %2$d개는 발송되지 않았습니다.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s(나)</string>
     <!-- button -->
@@ -2215,10 +2203,6 @@
     <string name="subtitle_file_takedown_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B] 이/가 게시중단 되었습니다.</string>
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]당신이 공개적으로 공유한 [/A][B]%s[/B] 폴더가 게시중단 되었습니다.</string>
-    <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">이 파일은 게시중단 통보 대상입니다.</string>
-    <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">이 폴더는 게시중단 통보 대상입니다.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">게시중단 이의제기</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2645,10 +2629,6 @@
     <string name="embed_web_browser_loading_message">잠시만 기다리세요&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">기업용</string>
-    <!-- Business user role -->
-    <string name="admin_label">관리자</string>
-    <!-- Business user role -->
-    <string name="user_label">이용자</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">상태</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3289,10 +3269,6 @@
     <string name="view_meeting_chat">회의 대화 보기</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">회의에 더 많은 참여자를 초대합니다. 초대하려면 위로 올리세요.</string>
-    <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">새 회의를 만들려면 탭하세요</string>
-    <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">우리의 새 암호화 회의 기능으로 MEGA 회의를 빠르게 설정하세요</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">당신은 새로운 주최자입니다.</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -3956,7 +3932,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">이어서 볼까요?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s은/는 %2$s부터 재개됩니다</string>
+    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">재개</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4333,16 +4309,10 @@
     <string name="meetings_one_off_occurrence_info_today">오늘, %1$s %2$s부터 %3$s까지</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_tomorrow">내일, %1$s %2$s부터 %3$s까지</string>
-    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s 님이 [B]반복 회의 날짜[/B]를 수정[/A]하였습니다</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">계정 보안 업그레이드</string>
     <!-- This is the body of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">우리가 당신 계정의 보안을 업그레이드 하고 있습니다. 당신은 이 메시지를 한번만 보아야 합니다. 만약 이전에 본 적이 있다면, 이 계정이 아니라 다른 MEGA 계정에서 본 것이 아닌지 확인하세요.\n\n만약 이 계정에서 이 메시지를 두번째 보는 것이 확실하다면, 이 계정의 이용을 멈추세요.</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="other">다음의 폴더를 공유하고 있습니다: %s</item>
-    </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="other">[복호화 되지 않은 파일]</item>
@@ -4589,7 +4559,7 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="other">이 링크를 가진 사람들이 사진첩에 접근하지 못 하게 됩니다.</item>
+        <item quantity="other">이 링크를 공유 받은 사람들이 사진첩에 접근하지 못 하게 됩니다.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4598,9 +4568,9 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">복호화 키를 입력하세요</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">사진첩에 접근하려면, 복호화 키를 입력하세요. 만약 가지고 있지 않다면, 링크를 공유해준 사람에게 연락하세요.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">설정 기억하기</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
@@ -4620,13 +4590,84 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
     <string name="meetings_schedule_meeting_recurrence_monthly_label">매월</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
-    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
+        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+    </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">폴더를 열 수 없습니다</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">파일을 열 수 없습니다</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_description"></string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Pro only</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Link access</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">만료일</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">암호 설정</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <!-- Album import link label -->
+    <string name="album_import_link">Album link</string>
+    <!-- Album import error access title -->
+    <string name="album_import_error_access_title">Cannot access album</string>
+    <!-- Album import error access description -->
+    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <!-- Album import error access confirmation -->
+    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">음성</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">당신에게 맞는 요금제를 선택하세요</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">매월</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">연간</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">연간 결제로 최대 16% 할인 받으세요</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">권고됨</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">현재 요금제</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro Lite 구입</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro I 구입</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro II 구입</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro III 구입</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">이용 약관</string>
 </resources>

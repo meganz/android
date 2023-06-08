@@ -423,8 +423,6 @@
     <!-- success message when moving a node -->
     <string name="context_correctly_moved">A été déplacé</string>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d&#160;éléments n’ont pas été déplacés</string>
-    <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Déplacé vers la Corbeille</string>
     <!-- error message -->
     <string name="context_no_moved">Erreur. N’a pas été déplacé</string>
@@ -436,14 +434,6 @@
     <string name="context_correctly_removed">Supprimé</string>
     <!-- error message -->
     <string name="context_no_removed">Erreur. Échec de suppression</string>
-    <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d&#160;éléments ont été supprimés de MEGA</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_removed">%d&#160;éléments n’ont pas été supprimés</string>
-    <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Vous avez quitté %d&#160;dossiers</string>
-    <!-- error message when moving a node -->
-    <string name="number_no_leaved">Vous n’avez pas quitté %d&#160;dossiers</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d&#160;éléments ont été copiés</string>
     <!-- error message when sending multiple files -->
@@ -658,7 +648,7 @@
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
     <string name="settings_camera_upload_require_plug_in">Exiger que je charge activement mon appareil</string>
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
-    <string name="settings_keep_file_names">Conserver les noms de fichier comme sur l’appareil</string>
+    <string name="settings_keep_file_names">Conserver les mêmes noms de fichier que sur l’appareil</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
     <string name="settings_local_camera_upload_folder">Dossier local de l’appareil photo</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
@@ -953,8 +943,6 @@
         <item quantity="many">%d d’invitations ont été envoyées</item>
         <item quantity="other">%d invitations ont été envoyées</item>
     </plurals>
-    <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d&#160;invitations ont été envoyées, mais %2$d&#160;n’ont pas été envoyées.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (moi)</string>
     <!-- button -->
@@ -2313,10 +2301,6 @@
     <string name="subtitle_file_takedown_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A] a été retiré.</string>
     <!-- Subtitle of folder takedown historic notification -->
     <string name="subtitle_folder_takedown_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A] a été retiré.</string>
-    <!-- Popup notification text on mouse-over of taken down file. -->
-    <string name="message_file_takedown_pop_out_notification">Ce fichier a fait l’objet d’un avis de retrait.</string>
-    <!-- Popup notification text on mouse-over taken down folder. -->
-    <string name="message_folder_takedown_pop_out_notification">Ce dossier a fait l’objet d’un avis de retrait.</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Contester le retrait</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2789,10 +2773,6 @@
     <string name="embed_web_browser_loading_message">Veuillez patienter&#8230;</string>
     <!-- Label in My Account section to show user account type -->
     <string name="business_label">Pour entreprise</string>
-    <!-- Business user role -->
-    <string name="admin_label">Administrateur</string>
-    <!-- Business user role -->
-    <string name="user_label">Utilisateur</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">État&#160;</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->
@@ -3483,10 +3463,6 @@
     <string name="view_meeting_chat">Visualiser l’historique de la réunion</string>
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">Invitez d’autres participants à la réunion. Balayez vers le haut pour en inviter.</string>
-    <!-- the content of tips when the user enters recent chat page first time-->
-    <string name="tip_create_meeting">Touchez pour créer une nouvelle réunion</string>
-    <!-- the content of tips when the user enters start conversation page first time-->
-    <string name="tip_setup_meeting">Mettez rapidement en place une réunion&#160;MEGA grâce à notre nouvelle fonction de réunion chiffrée</string>
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Vous êtes la nouvelle ou le nouvel hôte</string>
     <!-- the content of snack bar when copied meeting link-->
@@ -4174,7 +4150,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Reprendre la vidéo ?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s reprendra à %2$s</string>
+    <string name="video_playback_position_dialog_message">«&#160;%1$s&#160;» reprendra à %2$s</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Reprendre</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4703,18 +4679,10 @@
     <string name="meetings_one_off_occurrence_info_today">Aujourd’hui %1$s de %2$s à %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_tomorrow">Demain %1$s de %2$s à %3$s</string>
-    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s a mis à jour[/A][B] la date de la réunion périodique[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Mise à niveau de sécurité du compte</string>
     <!-- This is the body of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">Nous mettons à jour la sécurité de votre compte. Vous ne devriez voir ce message qu’une seule fois. Si vous l’avez vu auparavant, assurez-vous d’abord qu’il concernait ce compte et non un autre compte MEGA que vous auriez.\n\nAprès confirmation et si vous voyez ce message pour ce compte pour la seconde fois cessez d’utiliser le compte.</string>
-    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
-    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
-        <item quantity="one">Vous partagez actuellement le dossier suivant&#160;: %s</item>
-        <item quantity="many">Vous partagez actuellement les dossiers suivants&#160;: %s</item>
-        <item quantity="other">Vous partagez actuellement les dossiers suivants&#160;: %s</item>
-    </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="one">[Fichier non déchiffré]</item>
@@ -5050,13 +5018,85 @@
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs monthly -->
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensuelle</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
-    <string name="meetings_schedule_meeting_recurrence_monthly_description"></string>
+    <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
+        <item quantity="one">Certains mois ne comportent pas %1$d jour. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
+        <item quantity="many">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
+        <item quantity="other">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
+    </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">Impossible d’ouvrir le dossier</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Impossible d’ouvrir le fichier</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_description"></string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
+    <!-- Text of the button to show the dialog to update to pro -->
+    <string name="general_pro_only">Pro seulement</string>
+    <!-- Title of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_title_link_access">Accès du lien</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about link access-->
+    <string name="cloud_drive_subtitle_link_access">Quiconque disposant de ce lien peut consulter et télécharger vos données</string>
+    <!-- Text of setting expiry date to link-->
+    <string name="general_expiry_date">Date d’expiration</string>
+    <!-- Text of setting password to link -->
+    <string name="general_set_password">Définir un mot de passe</string>
+    <!-- Text when link of file gets updated after setting password to copy link again-->
+    <string name="general_link_updated_copy_again">Le lien a été mis à jour. Copiez-le de nouveau.</string>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <string name="general_link_created_and_copied">Le lien a été créé et copié dans votre presse-papiers</string>
+    <!-- Album import link label -->
+    <string name="album_import_link">Lien de l’album</string>
+    <!-- Album import error access title -->
+    <string name="album_import_error_access_title">Impossible d’accéder à l’album</string>
+    <!-- Album import error access description -->
+    <string name="album_import_error_access_description">Le lien de l’album ou l’album même a été supprimé. Contactez la personne qui a partagé le lien avec vous.</string>
+    <!-- Album import error access confirmation -->
+    <string name="album_import_error_access_confirmation">D’accord, j’ai compris</string>
+    <!-- Call UI button label for answering with audio only -->
+    <string name="calls_answer_audio_button">Vocal</string>
+    <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_title_choose_right_plan">Choisir l’abonnement qui vous convient</string>
+    <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_monthly">Mensuelle</string>
+    <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_tab_yearly">Annuel</string>
+    <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_label_save_up_to">Économisez 16&#160;% avec une facturation annuelle</string>
+    <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
+    <string name="account_upgrade_account_pro_plan_info_recommended_label">Recommandé</string>
+    <!-- Title of label, which will be shown next to the plan user have already purchased. -->
+    <string name="account_upgrade_account_pro_plan_info_current_plan_label">Abonnement actuel</string>
+    <!-- Title of description of features, which are available for users, if they buy plan. -->
+    <string name="account_upgrade_account_description_title_features"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_password"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_link"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_backup"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
+    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Acheter Pro&#160;Lite</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">Acheter Pro&#160;I</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Acheter Pro&#160;II</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Acheter Pro&#160;III</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_terms_of_service_link">Conditions générales d’utilisation</string>
 </resources>
