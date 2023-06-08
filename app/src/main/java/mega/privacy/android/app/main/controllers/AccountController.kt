@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -12,7 +11,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import androidx.print.PrintHelper
@@ -218,16 +216,6 @@ class AccountController @Inject constructor(
 
         showAlert(context, context.getString(R.string.general_text_error), null)
         return null
-    }
-
-    fun showConfirmDialogRecoveryKeySaved(sharingScope: CoroutineScope) {
-        AlertDialog.Builder(context).apply {
-            setMessage(context.getString(R.string.copy_MK_confirmation))
-            setPositiveButton(context.getString(R.string.action_logout)) { _: DialogInterface?, _: Int ->
-                logout(context, MegaApplication.getInstance().megaApi, sharingScope)
-            }
-            show()
-        }
     }
 
     companion object {

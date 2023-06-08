@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
@@ -15,8 +15,10 @@ import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERI
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -58,6 +60,7 @@ class BackgroundRequestListener @Inject constructor(
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
     private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
+    private val localLogoutAppUseCase: LocalLogoutAppUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -202,7 +205,9 @@ class BackgroundRequestListener @Inject constructor(
             Timber.w("TYPE_LOGOUT:API_ESID")
             myAccountInfo.resetDefaults()
             (application as MegaApplication).isEsid = true
-            AccountController.localLogoutApp(application, applicationScope)
+            applicationScope.launch {
+                localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
+            }
         } else if (e.errorCode == MegaError.API_EBLOCKED) {
             api.localLogout()
             megaChatApi.logout()
