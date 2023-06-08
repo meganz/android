@@ -9,16 +9,19 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.NavigationInfo
+import mega.privacy.android.analytics.event.NotificationInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ButtonPressedEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
 import mega.privacy.android.domain.entity.analytics.NavigationEvent
+import mega.privacy.android.domain.entity.analytics.NotificationEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.identifier.ButtonPressedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.NavigationEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.NotificationEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.ScreenViewEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.TabSelectedEventIdentifier
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -129,6 +132,17 @@ class AnalyticsTrackerImpl @Inject constructor(
             )
 
             trackEventUseCase(NavigationEvent(identifier, currentViewId))
+        }
+    }
+
+    override fun trackNotification(notification: NotificationInfo) {
+        appScope.launch {
+            val identifier = NotificationEventIdentifier(
+                name = notification.notificationName,
+                uniqueIdentifier = notification.uniqueIdentifier
+            )
+
+            trackEventUseCase(NotificationEvent(identifier))
         }
     }
 

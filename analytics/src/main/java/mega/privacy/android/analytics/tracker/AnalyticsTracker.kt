@@ -3,6 +3,7 @@ package mega.privacy.android.analytics.tracker
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.NavigationInfo
+import mega.privacy.android.analytics.event.NotificationInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 
@@ -52,4 +53,11 @@ interface AnalyticsTracker {
      * @param navigation
      */
     fun trackNavigation(navigation: NavigationInfo)
+
+    /**
+     * Track notification
+     *
+     * @param notification
+     */
+    fun trackNotification(notification: NotificationInfo)
 }

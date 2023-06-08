@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.analytics.event.navigation.NavigationEventSource
+import mega.privacy.android.domain.entity.analytics.NotificationEvent
 import mega.privacy.android.domain.usecase.analytics.GetViewIdUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackEventUseCase
 import mega.privacy.android.domain.usecase.analytics.TrackScreenViewUseCase
@@ -16,6 +17,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
+import org.mockito.kotlin.argWhere
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
@@ -259,4 +261,15 @@ internal class AnalyticsTrackerImplTest {
 
         verifyBlocking(trackEventUseCase) { invoke(argThat { data().containsValue(enumSource.name.lowercase()) }) }
     }
+
+    @Test
+    internal fun `test that track notification passes a notification event`() {
+        underTest.trackNotification(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { notificationName }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argWhere { it is NotificationEvent }) }
+    }
+
 }

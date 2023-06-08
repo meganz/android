@@ -5,6 +5,7 @@ import mega.privacy.android.analytics.event.AnalyticsInfo
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
 import mega.privacy.android.analytics.event.NavigationInfo
+import mega.privacy.android.analytics.event.NotificationInfo
 import mega.privacy.android.analytics.event.ScreenInfo
 import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
@@ -52,6 +53,10 @@ class AnalyticsTestRule(tracker: AnalyticsTracker? = null) : TestRule {
 
         override fun trackNavigation(navigation: NavigationInfo) {
             events.add(AnalyticsCall(navigation))
+        }
+
+        override fun trackNotification(notification: NotificationInfo) {
+            events.add(AnalyticsCall(notification))
         }
     }
 

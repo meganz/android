@@ -15,7 +15,6 @@ internal class NotificationEventTest {
                     uniqueIdentifier = input,
                     name = "",
                 ),
-                ""
             ).getEventIdentifier()
         ).isEqualTo(expected)
     }
