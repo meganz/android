@@ -2,11 +2,12 @@ package mega.privacy.android.data.mapper.transfer
 
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaTransfer
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import kotlin.random.Random
@@ -14,6 +15,11 @@ import kotlin.random.Random
 internal class TransferMapperTest {
     @Test
     fun `test that transfer mapper returns correctly`() {
+        val appDataRaw = "appData"
+        val appDataList = listOf(TransferAppData.CameraUpload)
+        val transferAppDataMapper = mock<TransferAppDataMapper> {
+            on { invoke("appData") }.thenReturn(appDataList)
+        }
         val megaTransfer = mock<MegaTransfer> {
             on { type }.thenReturn(MegaTransfer.TYPE_DOWNLOAD)
             on { transferredBytes }.thenReturn(Random.nextLong())
@@ -30,7 +36,7 @@ internal class TransferMapperTest {
             on { isStreamingTransfer }.thenReturn(true)
             on { isFinished }.thenReturn(Random.nextBoolean())
             on { isFolderTransfer }.thenReturn(Random.nextBoolean())
-            on { appData }.thenReturn("appData")
+            on { appData }.thenReturn(appDataRaw)
             on { state }.thenReturn(MegaTransfer.STATE_COMPLETED)
             on { priority }.thenReturn(BigInteger.ONE)
             on { notificationNumber }.thenReturn(Random.nextLong())
@@ -52,10 +58,12 @@ internal class TransferMapperTest {
             isFinished = megaTransfer.isFinished,
             isFolderTransfer = megaTransfer.isFolderTransfer,
             appData = megaTransfer.appData.orEmpty(),
+            transferAppData = appDataList,
             state = TransferState.STATE_COMPLETED,
             priority = megaTransfer.priority,
             notificationNumber = megaTransfer.notificationNumber,
         )
-        Truth.assertThat(TransferMapper().invoke(megaTransfer)).isEqualTo(expected)
+        Truth.assertThat(TransferMapper(transferAppDataMapper).invoke(megaTransfer))
+            .isEqualTo(expected)
     }
 }

@@ -33,6 +33,7 @@ import java.math.BigInteger
  * @property isFinished True if the transfer is at finished state (completed, cancelled or failed)
  * @property isFolderTransfer True if it's a folder transfer, false otherwise (file transfer).
  * @property appData  The application data associated with this transfer
+ * @property transferAppData A list of [TransferAppData] that represents the application data associated with this transfer
  * @property state [TransferState]
  * @property priority Returns the priority of the transfer.
  *                    This value is intended to keep the order of the transfer queue on apps.
@@ -54,7 +55,9 @@ data class Transfer(
     val isStreamingTransfer: Boolean,
     val isFinished: Boolean,
     val isFolderTransfer: Boolean,
+    @Deprecated(message = "use transferAppData")
     val appData: String,
+    val transferAppData: List<TransferAppData>,
     val state: TransferState,
     val priority: BigInteger,
     val notificationNumber: Long,
@@ -64,88 +67,41 @@ data class Transfer(
      *
      * @return True if the transfer is a voice clip, false otherwise.
      */
-    fun isVoiceClip(): Boolean = appData.contains(APP_DATA_VOICE_CLIP)
+    fun isVoiceClip(): Boolean = transferAppData.contains(TransferAppData.VoiceClip)
 
     /**
      * Is chat upload
      *
      * @return True if the transfer is a chat upload, false otherwise.
      */
-    fun isChatUpload(): Boolean = appData.contains(APP_DATA_CHAT)
+    fun isChatUpload(): Boolean = transferAppData.any { it is TransferAppData.ChatUpload }
 
     /**
      * Is CU upload
      *
      * @return True if the transfer is a CU upload, false otherwise.
      */
-    fun isCUUpload(): Boolean = appData.contains(APP_DATA_CU)
+    fun isCUUpload(): Boolean = transferAppData.contains(TransferAppData.CameraUpload)
 
     /**
      * Is SD card download
      *
      * @return True if the transfer is an SD card download, false otherwise.
      */
-    fun isSDCardDownload(): Boolean = appData.contains(APP_DATA_SD_CARD)
+    fun isSDCardDownload(): Boolean = transferAppData.any { it is TransferAppData.SdCardDownload }
 
     /**
      * Is text file upload
      *
      * @return True if the transfer is a text file upload, false otherwise.
      */
-    fun isTextFileUpload(): Boolean = appData.contains(APP_DATA_TXT_FILE)
+    fun isTextFileUpload(): Boolean = transferAppData.any { it is TransferAppData.TextFileUpload }
 
     /**
      * Is background transfer
      *
      * @return True if the transfer is a background transfer, false otherwise.
      */
-    fun isBackgroundTransfer(): Boolean = appData.contains(APP_DATA_BACKGROUND_TRANSFER)
-
-
-    companion object {
-        /**
-         * App data for Voice clips.
-         */
-        const val APP_DATA_VOICE_CLIP = "VOICE_CLIP"
-
-        /**
-         * App data for chat uploads
-         */
-        const val APP_DATA_CHAT = "CHAT_UPLOAD"
-
-        /**
-         * App data for CU uploads.
-         */
-        const val APP_DATA_CU = "CU_UPLOAD"
-
-        /**
-         * App data for SDK card downloads.
-         */
-        const val APP_DATA_SD_CARD = "SD_CARD_DOWNLOAD"
-
-        /**
-         * App data for text files.
-         */
-        const val APP_DATA_TXT_FILE = "TXT_FILE_UPLOAD"
-
-        /**
-         * App data for indicating the data after it, is the value of a transfer parameter
-         */
-        const val APP_DATA_INDICATOR = ">"
-
-        /**
-         * App data for indicating the data after it, is a new transfer parameter.
-         */
-        const val APP_DATA_SEPARATOR = "-"
-
-        /**
-         * App data for indicating the data after it, is a new AppData due to a repeated transfer.
-         */
-        const val APP_DATA_REPEATED_TRANSFER_SEPARATOR = "!"
-
-        /**
-         * App Data Background Transfer
-         */
-        const val APP_DATA_BACKGROUND_TRANSFER = "BACKGROUND_TRANSFER"
-    }
+    fun isBackgroundTransfer(): Boolean =
+        transferAppData.contains(TransferAppData.BackgroundTransfer)
 }

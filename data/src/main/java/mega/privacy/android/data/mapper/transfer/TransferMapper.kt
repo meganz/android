@@ -10,7 +10,9 @@ import javax.inject.Inject
 /**
  * [MegaTransfer] to [Transfer] mapper
  */
-class TransferMapper @Inject constructor() {
+internal class TransferMapper @Inject constructor(
+    private val transferAppDataMapper: TransferAppDataMapper,
+) {
     /**
      * Invoke
      *
@@ -33,6 +35,7 @@ class TransferMapper @Inject constructor() {
         isFinished = transfer.isFinished,
         isFolderTransfer = transfer.isFolderTransfer,
         appData = transfer.appData.orEmpty(),
+        transferAppData = transferAppDataMapper(transfer.appData.orEmpty()),
         state = transfer.state.mapTransferState(),
         priority = transfer.priority,
         notificationNumber = transfer.notificationNumber,

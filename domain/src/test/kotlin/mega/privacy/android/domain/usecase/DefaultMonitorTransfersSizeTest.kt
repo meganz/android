@@ -43,6 +43,7 @@ internal class DefaultMonitorTransfersSizeTest {
         isFinished = false,
         isFolderTransfer = false,
         appData = "",
+        transferAppData = emptyList(),
         state = TransferState.STATE_ACTIVE,
         priority = BigInteger.ONE,
         notificationNumber = 1L,
