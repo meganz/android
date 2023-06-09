@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.manager.model
 
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 
 
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property titleChatArchivedEvent
  * @property cancelTransfersResult
  * @property restoreNodeResult
+ * @property nodeNameCollisionResult
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -45,4 +47,5 @@ data class ManagerState(
     val titleChatArchivedEvent: String? = null,
     val cancelTransfersResult: Result<Unit>? = null,
     val restoreNodeResult: Result<RestoreNodeResult>? = null,
+    val nodeNameCollisionResult: NodeNameCollisionResult? = null,
 )

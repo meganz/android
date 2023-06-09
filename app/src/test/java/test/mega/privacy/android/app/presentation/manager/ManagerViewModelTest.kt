@@ -33,6 +33,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -65,6 +67,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -216,6 +219,7 @@ class ManagerViewModelTest {
     private val getPricing = mock<GetPricing>()
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
+    private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -267,7 +271,8 @@ class ManagerViewModelTest {
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
             monitorChatArchivedUseCase = monitorChatArchivedUseCase,
-            restoreNodesUseCase = restoreNodesUseCase
+            restoreNodesUseCase = restoreNodesUseCase,
+            checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
         )
     }
 
@@ -711,7 +716,7 @@ class ManagerViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.restoreNodeResult).isNull()
-            underTest.restoreNodes(listOf(node))
+            underTest.restoreNodes(mapOf(node.handle to node.restoreHandle))
             val updatedState = awaitItem()
             assertThat(updatedState.restoreNodeResult).isNotNull()
             assertThat(updatedState.restoreNodeResult?.isSuccess).isTrue()
@@ -731,10 +736,35 @@ class ManagerViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.restoreNodeResult).isNull()
-            underTest.restoreNodes(listOf(node))
+            underTest.restoreNodes(mapOf(node.handle to node.restoreHandle))
             val updatedState = awaitItem()
             assertThat(updatedState.restoreNodeResult).isNotNull()
             assertThat(updatedState.restoreNodeResult?.isFailure).isTrue()
         }
     }
+
+    @Test
+    fun `test that nodeNameCollisionResult updated when calling checkRestoreNodesNameCollision successfully`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val node = mock<MegaNode> {
+                on { handle }.thenReturn(1L)
+                on { restoreHandle }.thenReturn(100L)
+            }
+            val result = mock<NodeNameCollisionResult>()
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    mapOf(node.handle to node.restoreHandle),
+                    NodeNameCollisionType.RESTORE
+                )
+            ).thenReturn(result)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.restoreNodeResult).isNull()
+                underTest.checkRestoreNodesNameCollision(listOf(node))
+                val updatedState = awaitItem()
+                assertThat(updatedState.nodeNameCollisionResult).isNotNull()
+            }
+        }
 }

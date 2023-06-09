@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
@@ -63,6 +64,7 @@ import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -160,6 +162,7 @@ class ManagerViewModel @Inject constructor(
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
     private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
 ) : ViewModel() {
 
     /**
@@ -689,10 +692,10 @@ class ManagerViewModel @Inject constructor(
      *
      * @param nodes
      */
-    fun restoreNodes(nodes: List<MegaNode>) {
+    fun restoreNodes(nodes: Map<Long, Long>) {
         viewModelScope.launch {
             val result = runCatching {
-                restoreNodesUseCase(nodes.associate { it.handle to it.restoreHandle })
+                restoreNodesUseCase(nodes)
             }
             _state.update { it.copy(restoreNodeResult = result) }
         }
@@ -704,6 +707,34 @@ class ManagerViewModel @Inject constructor(
      */
     fun markHandleRestoreNodeResult() {
         _state.update { it.copy(restoreNodeResult = null) }
+    }
+
+    /**
+     * Check restore nodes name collision
+     *
+     * @param nodes
+     */
+    fun checkRestoreNodesNameCollision(nodes: List<MegaNode>) {
+        viewModelScope.launch {
+            runCatching {
+                checkNodesNameCollisionUseCase(
+                    nodes.associate { it.handle to it.restoreHandle },
+                    NodeNameCollisionType.RESTORE
+                )
+            }.onSuccess { result ->
+                _state.update { it.copy(nodeNameCollisionResult = result) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Mark handle node name collision result
+     *
+     */
+    fun markHandleNodeNameCollisionResult() {
+        _state.update { it.copy(nodeNameCollisionResult = null) }
     }
 
     internal companion object {

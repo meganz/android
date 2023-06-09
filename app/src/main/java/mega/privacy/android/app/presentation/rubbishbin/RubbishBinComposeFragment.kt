@@ -146,8 +146,8 @@ class RubbishBinComposeFragment : Fragment() {
                 }
 
                 RestoreType.RESTORE -> {
-                    selectedNodes?.let {
-                        ((requireActivity()) as ManagerActivity).restoreFromRubbish(it)
+                    if (!selectedNodes.isNullOrEmpty()) {
+                        ((requireActivity()) as ManagerActivity).restoreFromRubbish(selectedNodes)
                     }
                 }
             }

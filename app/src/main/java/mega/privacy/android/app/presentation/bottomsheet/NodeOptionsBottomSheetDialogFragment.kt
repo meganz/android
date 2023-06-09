@@ -1009,10 +1009,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         dismissAllowingStateLoss()
     }
 
-    private fun onRestoreClicked(node: MegaNode?) {
-        val nodes: MutableList<MegaNode?> = ArrayList()
-        nodes.add(node)
-        (requireActivity() as ManagerActivity).restoreFromRubbish(nodes)
+    private fun onRestoreClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).restoreFromRubbish(listOf(node))
         setStateBottomSheetBehaviorHidden()
     }
 

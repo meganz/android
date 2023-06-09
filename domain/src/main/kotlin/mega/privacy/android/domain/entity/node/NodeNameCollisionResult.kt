@@ -10,5 +10,5 @@ package mega.privacy.android.domain.entity.node
 data class NodeNameCollisionResult(
     val noConflictNodes: Map<Long, Long>,
     val conflictNodes: Map<Long, NodeNameCollision>,
-    val type: NameCollisionType,
+    val type: NodeNameCollisionType,
 )

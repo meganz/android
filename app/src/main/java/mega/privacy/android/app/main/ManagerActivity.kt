@@ -340,6 +340,8 @@ import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -2280,6 +2282,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.cancelTransfersResult != null) {
                 handleAllTransfersCanceled(managerState.cancelTransfersResult)
             }
+            val nodeNameCollisionResult = managerState.nodeNameCollisionResult
+            if (nodeNameCollisionResult != null) {
+                handleNodesNameCollisionResult(nodeNameCollisionResult)
+                viewModel.markHandleNodeNameCollisionResult()
+            }
             if (managerState.restoreNodeResult != null) {
                 handleRestoreNodeResult(managerState.restoreNodeResult)
                 viewModel.markHandleRestoreNodeResult()
@@ -2401,6 +2408,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         collectFlow(targetFlow = viewModel.monitorOfflineNodeAvailabilityEvent) {
             refreshCloudOrder()
+        }
+    }
+
+    private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
+        if (result.type == NodeNameCollisionType.RESTORE) {
+            if (result.conflictNodes.isNotEmpty()) {
+                nameCollisionActivityContract
+                    ?.launch(ArrayList(result.conflictNodes.values.map {
+                        NameCollision.Movement.getMovementCollision(it)
+                    }))
+            }
+            if (result.noConflictNodes.isNotEmpty()) {
+                viewModel.restoreNodes(result.noConflictNodes)
+            }
         }
     }
 
@@ -5710,27 +5731,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param nodes List of nodes.
      */
-    fun restoreFromRubbish(nodes: List<MegaNode?>?) {
-        if (nodes == null) return
-        checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { (collisions, nodesWithoutCollisions): Pair<ArrayList<NameCollision>, List<MegaNode>> ->
-                    if (collisions.isNotEmpty()) {
-                        nameCollisionActivityContract?.launch(collisions)
-                    }
-                    if (nodesWithoutCollisions.isNotEmpty()) {
-                        proceedWithRestoration(nodesWithoutCollisions)
-                    }
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
-            )
-            .addTo(composite)
-    }
-
-    private fun proceedWithRestoration(nodes: List<MegaNode>) {
-        viewModel.restoreNodes(nodes)
+    fun restoreFromRubbish(nodes: List<MegaNode>) {
+        viewModel.checkRestoreNodesNameCollision(nodes)
     }
 
     /**

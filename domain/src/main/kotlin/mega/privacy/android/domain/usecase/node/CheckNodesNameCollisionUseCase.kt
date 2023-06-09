@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import javax.inject.Inject
 
 /**
- * Check nodes name collision use case
+ * Check general nodes name collision use case (Cloud driver node)
  *
  * @property isNodeInRubbish
  * @property getChildNodeUseCase
@@ -29,9 +29,15 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val nodeRepository: NodeRepository,
 ) {
+    /**
+     * Invoke
+     *
+     * @param nodes
+     * @param type
+     */
     suspend operator fun invoke(
         nodes: Map<Long, Long>,
-        type: NameCollisionType,
+        type: NodeNameCollisionType,
     ): NodeNameCollisionResult {
         val noConflictNodes = hashMapOf<Long, Long>()
         val conflictNodes = hashMapOf<Long, NodeNameCollision>()

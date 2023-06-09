@@ -2,6 +2,7 @@ package mega.privacy.android.app.namecollision.data
 
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
+import mega.privacy.android.domain.entity.node.NodeNameCollision
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.io.Serializable
@@ -298,6 +299,21 @@ sealed class NameCollision : Serializable {
                 lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                 parentHandle = parentHandle,
                 isFile = node.isFile
+            )
+
+            @JvmStatic
+            fun getMovementCollision(
+                nameCollision: NodeNameCollision
+            ): Movement = Movement(
+                collisionHandle = nameCollision.collisionHandle,
+                nodeHandle = nameCollision.nodeHandle,
+                name = nameCollision.name,
+                size = nameCollision.size,
+                childFolderCount = nameCollision.childFolderCount,
+                childFileCount = nameCollision.childFileCount,
+                lastModified = nameCollision.lastModified,
+                parentHandle = nameCollision.parentHandle,
+                isFile = nameCollision.isFile
             )
         }
     }
