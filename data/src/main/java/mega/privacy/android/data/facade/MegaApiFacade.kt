@@ -239,7 +239,7 @@ internal class MegaApiFacade @Inject constructor(
         awaitClose {
             megaApi.removeTransferListener(listener)
         }
-    }.shareIn(sharingScope, SharingStarted.WhileSubscribed(), 1)
+    }.shareIn(sharingScope, SharingStarted.WhileSubscribed())
 
     override fun getFavourites(
         node: MegaNode?,
