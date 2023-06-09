@@ -79,7 +79,7 @@ fun LegacyUpgradeAccountView(
                 .verticalScroll(rememberScrollState(), enabled = true)
         ) {
             if (state.showBillingWarning) {
-                BillingWarning(hideBillingWarning)
+                LegacyBillingWarning(hideBillingWarning)
             }
             CurrentSubscriptionPlanBox(state = state)
             state.localisedSubscriptionsList.forEach {
@@ -128,7 +128,7 @@ fun LegacyUpgradeAccountView(
 }
 
 @Composable
-fun BillingWarning(hideBillingWarning: () -> Unit) {
+fun LegacyBillingWarning(hideBillingWarning: () -> Unit) {
     val isLight = MaterialTheme.colors.isLight
     Box(
         modifier = Modifier

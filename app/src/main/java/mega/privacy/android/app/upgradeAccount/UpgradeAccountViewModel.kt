@@ -17,11 +17,14 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
+import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -34,6 +37,7 @@ import javax.inject.Inject
  * @param getCurrentPaymentUseCase use case to get the current payment option
  * @param isBillingAvailableUseCase use case to check if billing is available
  * @param localisedSubscriptionMapper mapper to map Subscription class to LocalisedSubscription class
+ * @param getPaymentMethodUseCase use case to to get available payment method (Google Wallet)
  *
  * @property state The current UI state
  */
@@ -45,6 +49,7 @@ class UpgradeAccountViewModel @Inject constructor(
     private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
+    private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         UpgradeAccountState(
@@ -103,6 +108,21 @@ class UpgradeAccountViewModel @Inject constructor(
                         )
                     )
                 }
+            }
+        }
+        viewModelScope.launch {
+            val paymentMethod =
+                runCatching { getPaymentMethodUseCase(false) }.getOrElse { PaymentMethodFlags(0L) }
+            if (paymentMethod.flag == 0L) {
+                Timber.w("Payment method flag is not received: ${paymentMethod.flag}")
+            }
+            val isBillingAvailable = isBillingAvailableUseCase()
+                    && ((paymentMethod.flag and (1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)) != 0L) // check bit enable
+            _state.update {
+                it.copy(
+                    isPaymentMethodAvailable = isBillingAvailable,
+                    showBillingWarning = !isBillingAvailable
+                )
             }
         }
     }

@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -23,13 +24,16 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
+import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
+import nz.mega.sdk.MegaApiJava
 import org.junit.After
-
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -55,153 +59,7 @@ class UpgradeAccountViewModelTest {
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
-
-
-    private val subscriptionProIMonthly = Subscription(
-        accountType = AccountType.PRO_I,
-        handle = 1560943707714440503,
-        storage = 2048,
-        transfer = 2048,
-        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProIIMonthly = Subscription(
-        accountType = AccountType.PRO_II,
-        handle = 7974113413762509455,
-        storage = 8192,
-        transfer = 8192,
-        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProIIIMonthly = Subscription(
-        accountType = AccountType.PRO_III,
-        handle = -2499193043825823892,
-        storage = 16384,
-        transfer = 16384,
-        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProLiteMonthly = Subscription(
-        accountType = AccountType.PRO_LITE,
-        handle = -4226692769210777158,
-        storage = 400,
-        transfer = 1024,
-        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR"))
-    )
-
-    private val expectedMonthlySubscriptionsList = listOf(
-        subscriptionProLiteMonthly,
-        subscriptionProIMonthly,
-        subscriptionProIIMonthly,
-        subscriptionProIIIMonthly
-    )
-
-    private val subscriptionProIYearly = Subscription(
-        accountType = AccountType.PRO_I,
-        handle = 7472683699866478542,
-        storage = 2048,
-        transfer = 24576,
-        amount = CurrencyAmount(99.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProIIYearly = Subscription(
-        accountType = AccountType.PRO_II,
-        handle = 370834413380951543,
-        storage = 8192,
-        transfer = 98304,
-        amount = CurrencyAmount(199.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProIIIYearly = Subscription(
-        accountType = AccountType.PRO_III,
-        handle = 7225413476571973499,
-        storage = 16384,
-        transfer = 196608,
-        amount = CurrencyAmount(299.99.toFloat(), Currency("EUR"))
-    )
-
-    private val subscriptionProLiteYearly = Subscription(
-        accountType = AccountType.PRO_LITE,
-        handle = -5517769810977460898,
-        storage = 400,
-        transfer = 12288,
-        amount = CurrencyAmount(49.99.toFloat(), Currency("EUR"))
-    )
-
-    private val expectedYearlySubscriptionsList = listOf(
-        subscriptionProLiteYearly,
-        subscriptionProIYearly,
-        subscriptionProIIYearly,
-        subscriptionProIIIYearly
-    )
-
-    private val localisedSubscriptionProI = LocalisedSubscription(
-        accountType = AccountType.PRO_I,
-        storage = 2048,
-        monthlyTransfer = 2048,
-        yearlyTransfer = 24576,
-        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            99.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProII = LocalisedSubscription(
-        accountType = AccountType.PRO_II,
-        storage = 8192,
-        monthlyTransfer = 8192,
-        yearlyTransfer = 98304,
-        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            199.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProIII = LocalisedSubscription(
-        accountType = AccountType.PRO_III,
-        storage = 16384,
-        monthlyTransfer = 16384,
-        yearlyTransfer = 196608,
-        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            299.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val localisedSubscriptionProLite = LocalisedSubscription(
-        accountType = AccountType.PRO_LITE,
-        storage = 400,
-        monthlyTransfer = 1024,
-        yearlyTransfer = 12288,
-        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
-        yearlyAmount = CurrencyAmount(
-            49.99.toFloat(),
-            Currency("EUR")
-        ),
-        localisedPrice = localisedPriceStringMapper,
-        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
-        formattedSize = formattedSizeMapper,
-    )
-
-    private val expectedLocalisedSubscriptionsList = listOf(
-        localisedSubscriptionProLite,
-        localisedSubscriptionProI,
-        localisedSubscriptionProII,
-        localisedSubscriptionProIII
-    )
-
+    private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
     private val expectedInitialCurrentPlan = AccountType.FREE
     private val expectedCurrentPlan = AccountType.PRO_I
     private val expectedShowBuyNewSubscriptionDialog = true
@@ -214,13 +72,18 @@ class UpgradeAccountViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = UpgradeAccountViewModel(
             getMonthlySubscriptionsUseCase = getMonthlySubscriptionsUseCase,
             getYearlySubscriptionsUseCase = getYearlySubscriptionsUseCase,
             getCurrentSubscriptionPlanUseCase = getCurrentSubscriptionPlanUseCase,
             getCurrentPaymentUseCase = getCurrentPaymentUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
-            localisedSubscriptionMapper = localisedSubscriptionMapper
+            localisedSubscriptionMapper = localisedSubscriptionMapper,
+            getPaymentMethodUseCase = getPaymentMethodUseCase,
         )
     }
 
@@ -378,4 +241,161 @@ class UpgradeAccountViewModelTest {
                 assertThat(chosenPlan).isEqualTo(AccountType.PRO_II)
             }
         }
+
+    @Test
+    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+        runTest {
+            whenever(isBillingAvailableUseCase()).thenReturn(true)
+            whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
+            initViewModel()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isPaymentMethodAvailable).isTrue()
+            }
+        }
+
+    private val subscriptionProIMonthly = Subscription(
+        accountType = AccountType.PRO_I,
+        handle = 1560943707714440503,
+        storage = 2048,
+        transfer = 2048,
+        amount = CurrencyAmount(9.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProIIMonthly = Subscription(
+        accountType = AccountType.PRO_II,
+        handle = 7974113413762509455,
+        storage = 8192,
+        transfer = 8192,
+        amount = CurrencyAmount(19.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProIIIMonthly = Subscription(
+        accountType = AccountType.PRO_III,
+        handle = -2499193043825823892,
+        storage = 16384,
+        transfer = 16384,
+        amount = CurrencyAmount(29.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProLiteMonthly = Subscription(
+        accountType = AccountType.PRO_LITE,
+        handle = -4226692769210777158,
+        storage = 400,
+        transfer = 1024,
+        amount = CurrencyAmount(4.99.toFloat(), Currency("EUR"))
+    )
+
+    private val expectedMonthlySubscriptionsList = listOf(
+        subscriptionProLiteMonthly,
+        subscriptionProIMonthly,
+        subscriptionProIIMonthly,
+        subscriptionProIIIMonthly
+    )
+
+    private val subscriptionProIYearly = Subscription(
+        accountType = AccountType.PRO_I,
+        handle = 7472683699866478542,
+        storage = 2048,
+        transfer = 24576,
+        amount = CurrencyAmount(99.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProIIYearly = Subscription(
+        accountType = AccountType.PRO_II,
+        handle = 370834413380951543,
+        storage = 8192,
+        transfer = 98304,
+        amount = CurrencyAmount(199.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProIIIYearly = Subscription(
+        accountType = AccountType.PRO_III,
+        handle = 7225413476571973499,
+        storage = 16384,
+        transfer = 196608,
+        amount = CurrencyAmount(299.99.toFloat(), Currency("EUR"))
+    )
+
+    private val subscriptionProLiteYearly = Subscription(
+        accountType = AccountType.PRO_LITE,
+        handle = -5517769810977460898,
+        storage = 400,
+        transfer = 12288,
+        amount = CurrencyAmount(49.99.toFloat(), Currency("EUR"))
+    )
+
+    private val expectedYearlySubscriptionsList = listOf(
+        subscriptionProLiteYearly,
+        subscriptionProIYearly,
+        subscriptionProIIYearly,
+        subscriptionProIIIYearly
+    )
+
+    private val localisedSubscriptionProI = LocalisedSubscription(
+        accountType = AccountType.PRO_I,
+        storage = 2048,
+        monthlyTransfer = 2048,
+        yearlyTransfer = 24576,
+        monthlyAmount = CurrencyAmount(9.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            99.99.toFloat(),
+            Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProII = LocalisedSubscription(
+        accountType = AccountType.PRO_II,
+        storage = 8192,
+        monthlyTransfer = 8192,
+        yearlyTransfer = 98304,
+        monthlyAmount = CurrencyAmount(19.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            199.99.toFloat(),
+            Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProIII = LocalisedSubscription(
+        accountType = AccountType.PRO_III,
+        storage = 16384,
+        monthlyTransfer = 16384,
+        yearlyTransfer = 196608,
+        monthlyAmount = CurrencyAmount(29.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            299.99.toFloat(),
+            Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val localisedSubscriptionProLite = LocalisedSubscription(
+        accountType = AccountType.PRO_LITE,
+        storage = 400,
+        monthlyTransfer = 1024,
+        yearlyTransfer = 12288,
+        monthlyAmount = CurrencyAmount(4.99.toFloat(), Currency("EUR")),
+        yearlyAmount = CurrencyAmount(
+            49.99.toFloat(),
+            Currency("EUR")
+        ),
+        localisedPrice = localisedPriceStringMapper,
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val expectedLocalisedSubscriptionsList = listOf(
+        localisedSubscriptionProLite,
+        localisedSubscriptionProI,
+        localisedSubscriptionProII,
+        localisedSubscriptionProIII
+    )
 }

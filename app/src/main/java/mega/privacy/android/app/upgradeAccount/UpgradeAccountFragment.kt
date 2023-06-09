@@ -106,7 +106,17 @@ class UpgradeAccountFragment : Fragment() {
                     },
                     onTOSClicked = { redirectToTOSPage() },
                     onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
-                    onChoosingPlanType = upgradeAccountViewModel::onSelectingPlanType
+                    onChoosingPlanType = {
+                        with(upgradeAccountViewModel) {
+                            if (!isBillingAvailable()) {
+                                Timber.w("Billing not available")
+                                setBillingWarningVisibility(true)
+                            } else {
+                                onSelectingPlanType(it)
+                            }
+                        }
+                    },
+                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
                 )
             } else {
                 LegacyUpgradeAccountView(

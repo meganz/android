@@ -22,6 +22,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -30,6 +31,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
@@ -59,11 +62,13 @@ import mega.privacy.android.core.ui.controls.MegaSpannedAlignedText
 import mega.privacy.android.core.ui.controls.MegaSpannedText
 import mega.privacy.android.core.ui.controls.SimpleNoTitleTopAppBar
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -71,6 +76,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.extensions.white_grey_alpha_087
+import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
 import mega.privacy.android.core.ui.theme.subtitle1
 import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.core.ui.theme.teal_100
@@ -87,15 +93,18 @@ fun UpgradeAccountView(
     onTOSClicked: () -> Unit = {},
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit = {},
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit = {},
+    hideBillingWarning: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
+    val isPaymentMethodAvailable = state.isPaymentMethodAvailable
     Scaffold(
         topBar = {
             SimpleNoTitleTopAppBar(
-                elevation = false,
+                elevation = state.showBillingWarning,
                 onBackPressed = onBackPressed
             )
         },
@@ -134,6 +143,9 @@ fun UpgradeAccountView(
                 .padding(paddingValues)
                 .verticalScroll(state = scrollState)
         ) {
+            if (state.showBillingWarning) {
+                BillingWarning(hideBillingWarning)
+            }
             Text(
                 text = stringResource(id = R.string.account_upgrade_account_title_choose_right_plan),
                 style = subtitle1,
@@ -181,24 +193,30 @@ fun UpgradeAccountView(
                 val isRecommended = remember {
                     derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
                 }
-                if (isRecommended.value && !isPreselectedPlanOnce) {
+                if (isRecommended.value && !isPreselectedPlanOnce && isPaymentMethodAvailable) {
                     chosenPlan = it.accountType
                     onChoosingMonthlyYearlyPlan(isMonthly)
                     onChoosingPlanType(it.accountType)
                 }
-                SubscriptionPlansInfoRowNew(
+                SubscriptionPlansInfoCard(
                     proPlan = it.accountType,
                     subscription = it,
                     isCurrentPlan = isCurrentPlan.value,
                     isRecommended = isRecommended.value,
                     onPlanClicked = {
-                        chosenPlan = it.accountType
+                        chosenPlan =
+                            if (isPaymentMethodAvailable) it.accountType else AccountType.FREE
                         isPreselectedPlanOnce = true
                         onChoosingMonthlyYearlyPlan(isMonthly)
                         onChoosingPlanType(it.accountType)
+                        if (!isPaymentMethodAvailable) {
+                            coroutineScope.launch {
+                                scrollState.animateScrollTo(0)
+                            }
+                        }
                     },
-                    chosenPlan = chosenPlan,
                     isMonthly = isMonthly,
+                    isClicked = (chosenPlan == it.accountType) && isPaymentMethodAvailable
                 )
             }
 
@@ -222,6 +240,58 @@ fun UpgradeAccountView(
     }
 }
 
+@Composable
+fun BillingWarning(hideBillingWarning: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = MaterialTheme.colors.yellow_100_yellow_700_alpha_015
+            )
+            .testTag("BILLING_WARNING_TAG")
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(.9f)
+                    .padding(
+                        horizontal = 16.dp,
+                        vertical = 14.dp
+                    )
+            ) {
+                Text(
+                    text = stringResource(id = R.string.upgrade_billing_warning),
+                    fontSize = 13.sp,
+                    style = Typography.caption,
+                    color = MaterialTheme.colors.black_yellow_700,
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(.1f)
+                    .padding(
+                        top = 0.dp,
+                        end = 17.dp
+                    )
+            ) {
+                IconButton(
+                    onClick = hideBillingWarning,
+                    modifier = Modifier.testTag("BILLING_WARNING_CLOSE_BUTTON_TAG")
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_remove_billing_warning),
+                        contentDescription = null,
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun MonthlyYearlyTabs(
@@ -342,17 +412,15 @@ fun MonthlyYearlyTabs(
 }
 
 @Composable
-fun SubscriptionPlansInfoRowNew(
+fun SubscriptionPlansInfoCard(
     proPlan: AccountType,
     subscription: LocalisedSubscription,
     isCurrentPlan: Boolean,
     isRecommended: Boolean,
     onPlanClicked: () -> Unit,
-    chosenPlan: AccountType,
     isMonthly: Boolean,
+    isClicked: Boolean,
 ) {
-    val isClicked = chosenPlan == proPlan
-
     val storageValueString =
         stringResource(
             id = subscription.formatStorageSize().unit,
@@ -625,7 +693,7 @@ private fun mapUIAccountType(plan: AccountType) = when (plan) {
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun PreviewUpgradeAccountViewNew() {
+fun PreviewUpgradeAccountView() {
     val localisedPriceStringMapper = LocalisedPriceStringMapper()
     val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     val formattedSizeMapper = FormattedSizeMapper()

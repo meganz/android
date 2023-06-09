@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.upgradeAccount
 
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -107,7 +108,11 @@ class UpgradeAccountViewTest {
     fun `test that if monthly tab is selected the monthly button displays correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.FREE, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -123,7 +128,11 @@ class UpgradeAccountViewTest {
     fun `test that if yearly tab is selected the yearly button displays correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.FREE, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -139,7 +148,11 @@ class UpgradeAccountViewTest {
     fun `test that current subscription label is shown correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.PRO_I, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -157,7 +170,11 @@ class UpgradeAccountViewTest {
     fun `test that recommended label is shown correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.PRO_I, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -175,7 +192,11 @@ class UpgradeAccountViewTest {
     fun `test that buy button shows pre-selected plan correctly`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.PRO_I, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -190,7 +211,11 @@ class UpgradeAccountViewTest {
     fun `test that buy button shows selected plan correctly if user taps on specific plan`() {
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.FREE, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = {},
                 onTOSClicked = {},
@@ -209,7 +234,11 @@ class UpgradeAccountViewTest {
         val onBuyClicked = mock<() -> Unit>()
         composeRule.setContent {
             UpgradeAccountView(
-                getUpgradeAccountState(AccountType.FREE, false),
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
                 onBackPressed = {},
                 onBuyClicked = onBuyClicked,
                 onTOSClicked = {},
@@ -224,10 +253,48 @@ class UpgradeAccountViewTest {
         verify(onBuyClicked).invoke()
     }
 
+    @Test
+    fun `test that billing warning is displayed when billing is not available`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = true,
+                    isPaymentMethodAvailable = false
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+            )
+        }
+        composeRule.onNodeWithTag("BILLING_WARNING_TAG").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clicking close button on billing warning triggers onclick event`() {
+        val hideBillingWarning = mock<() -> Unit>()
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.FREE,
+                    showBillingWarning = true,
+                    isPaymentMethodAvailable = false
+                ),
+                onBackPressed = {},
+                onBuyClicked = {},
+                onTOSClicked = {},
+                hideBillingWarning = hideBillingWarning,
+            )
+        }
+        composeRule.onNodeWithTag("BILLING_WARNING_CLOSE_BUTTON_TAG").performClick()
+        verify(hideBillingWarning).invoke()
+    }
+
 
     private fun getUpgradeAccountState(
         accountType: AccountType,
         showBillingWarning: Boolean,
+        isPaymentMethodAvailable: Boolean,
     ): UpgradeAccountState =
         UpgradeAccountState(
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
@@ -236,6 +303,7 @@ class UpgradeAccountViewTest {
             currentPayment = UpgradePayment(
                 upgradeType = Constants.INVALID_VALUE,
                 currentPayment = null
-            )
+            ),
+            isPaymentMethodAvailable = isPaymentMethodAvailable
         )
 }

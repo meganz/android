@@ -46,9 +46,11 @@ import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_050
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_300
 import mega.privacy.android.core.ui.theme.yellow_600
 import mega.privacy.android.core.ui.theme.yellow_700
+import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
 
 /**
  * Text Color Primary for Composable
@@ -277,4 +279,16 @@ val Colors.red_300_red_200: Color
  */
 val Colors.blue_400_blue_300: Color
     get() = if (isLight) blue_400 else blue_300
+
+/**
+ * Color when light [yellow_100] and when dark [yellow_700_alpha_015]
+ */
+val Colors.yellow_100_yellow_700_alpha_015: Color
+    get() = if (isLight) yellow_100 else yellow_700_alpha_015
+
+/**
+ * Color [black] when light and [yellow_700] when dark
+ */
+val Colors.black_yellow_700: Color
+    get() = if (isLight) black else yellow_700
 
