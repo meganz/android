@@ -264,6 +264,38 @@ internal class AnalyticsTrackerImplTest {
     }
 
     @Test
+    internal fun `test that track general event uses null view id if it does not exist`() {
+        underTest.trackGeneralEvent(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { name }.thenReturn("")
+            on { info }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == null }) }
+    }
+
+    @Test
+    internal fun `test that track general event uses existing view id if it exists`() {
+        val expectedViewId = "viewId"
+        trackScreenViewUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(expectedViewId)
+        }
+        val screen = mock<ScreenInfo> {
+            on { name }.thenReturn("")
+            on { uniqueIdentifier }.thenReturn(12)
+        }
+        underTest.trackScreenView(screen)
+
+        underTest.trackGeneralEvent(mock {
+            on { uniqueIdentifier }.thenReturn(5)
+            on { name }.thenReturn("")
+            on { info }.thenReturn("")
+        })
+
+        verifyBlocking(trackEventUseCase) { invoke(argThat { viewId == expectedViewId }) }
+    }
+
+    @Test
     internal fun `test that track notification passes a notification event`() {
         underTest.trackNotification(mock {
             on { uniqueIdentifier }.thenReturn(5)

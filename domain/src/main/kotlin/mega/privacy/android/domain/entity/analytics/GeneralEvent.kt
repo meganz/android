@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.analytics.identifier.GeneralEventIdent
  */
 data class GeneralEvent(
     private val identifier: GeneralEventIdentifier,
-    override val viewId: String,
+    override val viewId: String?,
 ) : AnalyticsEvent() {
     override val eventTypeIdentifier = 7000
     override val uniqueEventIdentifier: Int

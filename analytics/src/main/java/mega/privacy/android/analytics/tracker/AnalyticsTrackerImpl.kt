@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.event.ButtonInfo
 import mega.privacy.android.analytics.event.DialogInfo
+import mega.privacy.android.analytics.event.GeneralInfo
 import mega.privacy.android.analytics.event.MenuItemInfo
 import mega.privacy.android.analytics.event.NavigationInfo
 import mega.privacy.android.analytics.event.NotificationInfo
@@ -16,12 +17,14 @@ import mega.privacy.android.analytics.event.TabInfo
 import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.entity.analytics.ButtonPressedEvent
 import mega.privacy.android.domain.entity.analytics.DialogDisplayedEvent
+import mega.privacy.android.domain.entity.analytics.GeneralEvent
 import mega.privacy.android.domain.entity.analytics.MenuItemEvent
 import mega.privacy.android.domain.entity.analytics.NavigationEvent
 import mega.privacy.android.domain.entity.analytics.NotificationEvent
 import mega.privacy.android.domain.entity.analytics.TabSelectedEvent
 import mega.privacy.android.domain.entity.analytics.identifier.ButtonPressedEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.DialogDisplayedEventIdentifier
+import mega.privacy.android.domain.entity.analytics.identifier.GeneralEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.MenuItemEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.NavigationEventIdentifier
 import mega.privacy.android.domain.entity.analytics.identifier.NotificationEventIdentifier
@@ -131,6 +134,18 @@ class AnalyticsTrackerImpl @Inject constructor(
             )
 
             trackEventUseCase(NavigationEvent(identifier, currentViewId))
+        }
+    }
+
+    override fun trackGeneralEvent(event: GeneralInfo) {
+        appScope.launch {
+            val identifier = GeneralEventIdentifier(
+                uniqueIdentifier = event.uniqueIdentifier,
+                name = event.name,
+                info = event.info
+            )
+
+            trackEventUseCase(GeneralEvent(identifier, currentViewId))
         }
     }
 
