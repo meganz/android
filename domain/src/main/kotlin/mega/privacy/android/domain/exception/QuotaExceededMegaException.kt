@@ -12,4 +12,5 @@ class QuotaExceededMegaException(
     errorCode: Int,
     errorString: String? = null,
     value: Long = 0L,
-) : MegaException(errorCode, errorString, value)
+    methodName: String? = null,
+) : MegaException(errorCode, errorString, value, methodName)
