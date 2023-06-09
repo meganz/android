@@ -1,7 +1,7 @@
-diff --git a/ares_android.c b/ares_android.c
-index bf77131..6f834ce 100644
---- a/ares_android.c
-+++ b/ares_android.c
+diff --git a/orig/ares_android.c b/dest/ares_android.c
+index 5b00b80..7f08301 100644
+--- a/orig/ares_android.c
++++ b/dest/ares_android.c
 @@ -21,6 +21,8 @@
  #include "ares_android.h"
  #include "ares_private.h"
@@ -108,3 +108,31 @@ index bf77131..6f834ce 100644
    *num_servers = (size_t)nserv;
  
    dns_list = ares_malloc(sizeof(*dns_list)*(*num_servers));
+@@ -337,18 +374,27 @@ char **ares_get_android_server_list(size_t max_servers,
+   }
+ 
+ done:
++  crashlytics_log("ares_get_android_server_list: checking ExceptionOccurred");
+   if ((*env)->ExceptionOccurred(env))
+     (*env)->ExceptionClear(env);
+ 
++  crashlytics_log("ares_get_android_server_list: checking server_list");
+   if (server_list != NULL)
+     (*env)->DeleteLocalRef(env, server_list);
++
++  crashlytics_log("ares_get_android_server_list: checking link_properties.");
+   if (link_properties != NULL)
+     (*env)->DeleteLocalRef(env, link_properties);
++
++  crashlytics_log("ares_get_android_server_list: check active_network.");
+   if (active_network != NULL)
+     (*env)->DeleteLocalRef(env, active_network);
+ 
++  crashlytics_log("ares_get_android_server_list: checking need_detach.");
+   if (need_detatch)
+     (*android_jvm)->DetachCurrentThread(android_jvm);
++
++  crashlytics_log("ares_get_android_server_list: done.");
+   return dns_list;
+ }
+ 
