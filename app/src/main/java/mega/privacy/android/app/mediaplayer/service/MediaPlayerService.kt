@@ -126,6 +126,15 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         needPlayWhenGoForeground = false
                         needPlayWhenReceiveResumeCommand = false
                     }
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        audioFocusRequested = false
+                    }
+                }
+
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    if (!mediaPlayerGateway.getPlayWhenReady()) {
+                        setPlayWhenReady(true)
+                    }
                 }
             }
         }
@@ -362,6 +371,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
 
             COMMAND_RESUME -> {
+                requestAudioFocus()
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
             }
 
@@ -470,13 +480,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     private fun playSource(mediaPlaySources: MediaPlaySources) {
         Timber.d("playSource ${mediaPlaySources.mediaItems.size} items")
 
-        if (!audioFocusRequested) {
-            audioFocusRequested = true
-            getAudioFocus(
-                audioManager, audioFocusListener, audioFocusRequest, AUDIOFOCUS_DEFAULT,
-                STREAM_MUSIC_DEFAULT
-            )
-        }
+        requestAudioFocus()
         mediaPlaySources.nameToDisplay?.run {
             metadata.value = Metadata(title = null, artist = null, album = null, nodeName = this)
         }
@@ -698,6 +702,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             it.copy(showPlaybackDialog = false)
         }
         videoPlayType = type
+    }
+
+    private fun requestAudioFocus() {
+        if (!audioFocusRequested) {
+            audioFocusRequested = true
+            getAudioFocus(
+                audioManager, audioFocusListener, audioFocusRequest, AUDIOFOCUS_DEFAULT,
+                STREAM_MUSIC_DEFAULT
+            )
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
