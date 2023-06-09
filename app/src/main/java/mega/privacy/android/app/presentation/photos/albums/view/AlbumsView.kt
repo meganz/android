@@ -67,6 +67,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.content.DeleteAlbumCancelButtonInfo
+import mega.privacy.android.analytics.event.content.DeleteAlbumConfirmButtonInfo
 import mega.privacy.android.analytics.event.content.DeleteAlbumsConfirmationDialogInfo
 import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.analytics.event.content.RemoveLinksConfirmationDialogInfo
@@ -433,10 +435,14 @@ fun DeleteAlbumsConfirmationDialog(
                 style = subtitle1,
             )
         },
-        onDismissRequest = onCancelClicked,
+        onDismissRequest = {
+            Analytics.tracker.trackButtonPress(DeleteAlbumCancelButtonInfo)
+            onCancelClicked()
+        },
         confirmButton = {
             TextButton(
                 onClick = {
+                    Analytics.tracker.trackButtonPress(DeleteAlbumConfirmButtonInfo)
                     onCancelClicked()
                     onDeleteClicked(selectedAlbumIds)
                 },
