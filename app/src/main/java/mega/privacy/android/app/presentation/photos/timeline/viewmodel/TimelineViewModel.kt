@@ -478,28 +478,29 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    internal fun saveTimelineFilterPreferences() = viewModelScope.launch {
-        runCatching {
-            setTimelineFilterPreferencesUseCase(
-                mapOf(
-                    Pair(
-                        TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value,
-                        _state.value.rememberFilter.toString()
-                    ),
-                    Pair(
-                        TimelinePreferencesJSON.JSON_KEY_LOCATION.value,
-                        timelinePreferencesMapper.mapLocationToString(_state.value.currentMediaSource)
-                    ),
-                    Pair(
-                        TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value,
-                        timelinePreferencesMapper.mapMediaTypeToString(_state.value.currentFilterMediaType)
-                    ),
+    internal fun saveTimelineFilterPreferences(rememberPreferences: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                setTimelineFilterPreferencesUseCase(
+                    mapOf(
+                        Pair(
+                            TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value,
+                            rememberPreferences.toString()
+                        ),
+                        Pair(
+                            TimelinePreferencesJSON.JSON_KEY_LOCATION.value,
+                            timelinePreferencesMapper.mapLocationToString(_state.value.currentMediaSource)
+                        ),
+                        Pair(
+                            TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value,
+                            timelinePreferencesMapper.mapMediaTypeToString(_state.value.currentFilterMediaType)
+                        ),
+                    )
                 )
-            )
-        }.onFailure { exception ->
-            Timber.e(exception)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
         }
-    }
 
     private fun setInitialCUFilter(preferences: Map<String, TimelineFilterPreferences>) {
         _state.update {

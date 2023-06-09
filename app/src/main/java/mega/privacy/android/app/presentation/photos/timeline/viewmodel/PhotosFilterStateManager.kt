@@ -36,9 +36,7 @@ fun TimelineViewModel.onSourceSelected(source: TimelinePhotosSource) {
 suspend fun TimelineViewModel.applyFilter() {
     withContext(ioDispatcher) {
         createAndUpdateFilterType()
-        if (_state.value.rememberFilter) {
-            saveTimelineFilterPreferences()
-        }
+        saveTimelineFilterPreferences(_state.value.rememberFilter)
         handleAndUpdatePhotosUIState(_state.value.photos, filterMedias(_state.value.photos))
     }
 }
