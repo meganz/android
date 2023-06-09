@@ -101,7 +101,7 @@ public class CustomInstallReferrerReceiver extends BroadcastReceiver {
             }
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     public static Map<String, String> retrieveReferralParams(Context context) {
