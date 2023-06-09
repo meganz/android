@@ -269,7 +269,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             supportActionBar?.apply {
                 setHomeButtonEnabled(true)
                 setDisplayHomeAsUpEnabled(true)
-                title = getString(R.string.group_chat_info_label)
+                title = if (chat?.isMeeting == true) {
+                    getString(R.string.meetings_info_title)
+                } else {
+                    getString(R.string.group_chat_info_label)
+                }
             }
 
             linearLayoutManager = LinearLayoutManager(this)
@@ -824,12 +828,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      * Shows dialogue to confirm leaving chat
      */
     fun showConfirmationLeaveChat() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(resources.getString(R.string.title_confirmation_leave_group_chat))
-            .setMessage(getString(R.string.confirmation_leave_group_chat))
+        MaterialAlertDialogBuilder(this).setTitle(
+            if (chat?.isMeeting == true) {
+                resources.getString(R.string.meetings_leave_meeting_confirmation_dialog_title)
+            } else {
+                resources.getString(R.string.title_confirmation_leave_group_chat)
+            }
+        ).setMessage(getString(R.string.confirmation_leave_group_chat))
             .setPositiveButton(R.string.general_leave) { _: DialogInterface?, _: Int -> notifyShouldLeaveChat() }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
+            .setNegativeButton(R.string.general_cancel, null).show()
     }
 
     /**

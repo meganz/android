@@ -241,7 +241,7 @@ private fun LeaveGroupAlertDialog(
 ) {
     if (state.leaveGroupDialog) {
         MegaAlertDialog(
-            title = stringResource(id = R.string.title_confirmation_leave_group_chat),
+            title = stringResource(id = R.string.meetings_leave_meeting_confirmation_dialog_title),
             text = stringResource(id = R.string.confirmation_leave_group_chat),
             confirmButtonText = stringResource(id = R.string.general_leave),
             cancelButtonText = stringResource(id = R.string.general_cancel),

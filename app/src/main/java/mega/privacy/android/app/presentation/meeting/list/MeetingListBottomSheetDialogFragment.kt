@@ -287,15 +287,20 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * Show leave chat dialog
      */
     private fun showLeaveChatDialog() {
-        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setTitle(R.string.title_confirmation_leave_group_chat)
-            .setMessage(R.string.confirmation_leave_group_chat)
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        ).setTitle(
+            if (megaChatApi.getChatRoom(chatId)?.isMeeting == true) {
+                R.string.meetings_leave_meeting_confirmation_dialog_title
+            } else {
+                R.string.title_confirmation_leave_group_chat
+            }
+        ).setMessage(R.string.confirmation_leave_group_chat)
             .setPositiveButton(R.string.general_leave) { _, _ ->
                 viewModel.leaveChat(chatId)
                 dismissAllowingStateLoss()
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
+            }.setNegativeButton(R.string.general_cancel, null).show()
     }
 
     private fun getImagePlaceholder(placeholder: String?, avatarColor: Int?): Drawable =

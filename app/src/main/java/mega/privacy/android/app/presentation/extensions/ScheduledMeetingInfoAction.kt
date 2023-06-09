@@ -7,11 +7,11 @@ internal val ScheduledMeetingInfoAction.title: Int
     get() = when (this) {
         ScheduledMeetingInfoAction.MeetingLink -> R.string.meeting_link
         ScheduledMeetingInfoAction.ShareMeetingLink -> R.string.meetings_scheduled_meeting_info_share_meeting_link_label
-        ScheduledMeetingInfoAction.ChatNotifications -> R.string.title_properties_contact_notifications_for_chat
+        ScheduledMeetingInfoAction.ChatNotifications -> R.string.meetings_info_notifications_option
         ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> R.string.chat_group_chat_info_allow_non_host_participants_option
         ScheduledMeetingInfoAction.ShareFiles -> R.string.title_chat_shared_files_info
         ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> R.string.meetings_scheduled_meeting_info_share_meeting_link_label
-        ScheduledMeetingInfoAction.ManageChatHistory -> R.string.title_properties_manage_chat
+        ScheduledMeetingInfoAction.ManageChatHistory -> R.string.meetings_info_manage_history_option
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> R.string.make_chat_private_option
         ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> R.string.private_chat
     }

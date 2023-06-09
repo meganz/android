@@ -172,7 +172,7 @@ class MeetingListFragment : Fragment() {
                             requireContext(),
                             R.style.ThemeOverlay_Mega_MaterialAlertDialog
                         )
-                            .setTitle(getString(R.string.title_confirmation_leave_group_chat))
+                            .setTitle(getString(R.string.meetings_leave_meeting_confirmation_dialog_title))
                             .setMessage(getString(R.string.confirmation_leave_group_chat))
                             .setPositiveButton(getString(R.string.general_leave)) { _, _ ->
                                 viewModel.leaveChats(selectedMeetings)

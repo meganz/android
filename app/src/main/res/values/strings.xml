@@ -4834,6 +4834,26 @@
     <string name="album_import_error_access_confirmation">Ok, got it</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">Info</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">Meeting notifications</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">Manage meeting history</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">Leave meeting</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">Manage meeting history</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">Clear meeting history</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">Clear meeting history</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">Are you sure you want to clear the full message history of this meeting?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">Mute meeting notifications for</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_title_choose_right_plan">Choose the right plan for you</string>
     <!-- Title of Monthly tab, if user click on this tab the info related to monthly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->

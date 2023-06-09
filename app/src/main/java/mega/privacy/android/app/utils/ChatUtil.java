@@ -1015,7 +1015,9 @@ public class ChatUtil {
             View view = context.getLayoutInflater().inflate(R.layout.title_mute_notifications, null);
             dialogBuilder.setCustomTitle(view);
         } else {
-            dialogBuilder.setTitle(context.getString(R.string.title_dialog_mute_chatroom_notifications));
+            dialogBuilder.setTitle(chats.get(0).isMeeting() ?
+                    context.getString(R.string.meetings_mute_notifications_dialog_title) :
+                    context.getString(R.string.title_dialog_mute_chatroom_notifications));
         }
 
         boolean isUntilThisMorning = isUntilThisMorning();
@@ -1283,9 +1285,11 @@ public class ChatUtil {
      */
     public static void showConfirmationClearChat(Activity context, MegaChatRoom chat) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context);
-        String message = context.getString(R.string.confirmation_clear_chat_history);
+        String message = chat.isMeeting() ?
+                context.getString(R.string.meetings_clear_history_confirmation_dialog_message) :
+                context.getString(R.string.confirmation_clear_chat_history);
 
-        builder.setTitle(R.string.title_properties_chat_clear)
+        builder.setTitle(chat.isMeeting() ? R.string.meetings_clear_history_confirmation_dialog_title : R.string.title_properties_chat_clear)
                 .setMessage(message)
                 .setPositiveButton(R.string.general_clear, (dialog, which) -> new ChatController(context).clearHistory(chat))
                 .setNegativeButton(R.string.general_cancel, null)
@@ -1528,8 +1532,9 @@ public class ChatUtil {
     }
 
     public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
+        MegaChatRoom chatRoom = MegaApplication.getInstance().getMegaChatApi().getChatRoom(chatId);
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(context.getString(R.string.title_confirmation_leave_group_chat))
+        builder.setTitle(chatRoom != null && chatRoom.isMeeting() ? context.getString(R.string.meetings_leave_meeting_confirmation_dialog_title) : context.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(context.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(context.getString(R.string.general_leave), (dialog, which)
                         -> chatManagementCallback.confirmLeaveChat(chatId))
@@ -1539,7 +1544,7 @@ public class ChatUtil {
 
     public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(context.getString(R.string.title_confirmation_leave_group_chat))
+        builder.setTitle(chats.get(0).isMeeting() ? context.getString(R.string.meetings_leave_meeting_confirmation_dialog_title) : context.getString(R.string.title_confirmation_leave_group_chat))
                 .setMessage(context.getString(R.string.confirmation_leave_group_chat))
                 .setPositiveButton(context.getString(R.string.general_leave), (dialog, which)
                         -> chatManagementCallback.confirmLeaveChats(chats))

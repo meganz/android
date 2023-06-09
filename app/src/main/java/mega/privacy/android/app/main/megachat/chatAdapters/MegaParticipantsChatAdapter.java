@@ -155,6 +155,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private LinearLayout notificationsLayout;
         private RelativeLayout notificationsSwitchLayout;
         private SwitchCompat notificationsSwitch;
+        private TextView notificationsTitle;
         private TextView notificationsSubTitle;
         private View dividerNotifications;
         private LinearLayout allowParticipantsLayout;
@@ -168,9 +169,11 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
         private View privateSeparator;
         private RelativeLayout sharedFilesLayout;
         private RelativeLayout manageChatLayout;
+        private TextView manageChatTitle;
         private TextView retentionTimeText;
         private View dividerClearLayout;
         private RelativeLayout leaveChatLayout;
+        private TextView leaveChatTitle;
         private View dividerLeaveLayout;
         private RelativeLayout endCallForAllLayout;
         private View dividerEndCallForAllLayout;
@@ -204,6 +207,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 //Notifications Layout
                 holderHeader.notificationsLayout = v.findViewById(R.id.chat_group_contact_properties_notifications_layout);
                 holderHeader.notificationsLayout.setVisibility(View.VISIBLE);
+                holderHeader.notificationsTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_title);
+                if (getChat() != null && getChat().isMeeting()) {
+                    holderHeader.notificationsTitle.setText(R.string.meetings_info_notifications_option);
+                } else {
+                    holderHeader.notificationsTitle.setText(R.string.title_properties_chat_notifications_contact);
+                }
                 holderHeader.notificationsSubTitle = v.findViewById(R.id.chat_group_contact_properties_notifications_muted_text);
                 holderHeader.notificationsSubTitle.setVisibility(View.GONE);
                 holderHeader.notificationsSwitchLayout = v.findViewById(R.id.chat_group_contact_properties_layout);
@@ -239,6 +248,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 //Clear chat Layout
                 holderHeader.manageChatLayout = v.findViewById(R.id.manage_chat_history_group_info_layout);
                 holderHeader.manageChatLayout.setOnClickListener(this);
+                holderHeader.manageChatTitle = v.findViewById(R.id.manage_chat_history_group_info_title);
+                if (getChat() != null && getChat().isMeeting()) {
+                    holderHeader.manageChatTitle.setText(R.string.meetings_info_manage_history_option);
+                } else {
+                    holderHeader.manageChatTitle.setText(R.string.title_properties_manage_chat);
+                }
                 holderHeader.retentionTimeText = v.findViewById(R.id.manage_chat_history_group_info_subtitle);
                 holderHeader.retentionTimeText.setVisibility(View.GONE);
                 holderHeader.dividerClearLayout = v.findViewById(R.id.divider_clear_layout);
@@ -255,6 +270,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 //Leave chat Layout
                 holderHeader.leaveChatLayout = v.findViewById(R.id.chat_group_contact_properties_leave_layout);
                 holderHeader.leaveChatLayout.setOnClickListener(this);
+                holderHeader.leaveChatTitle = v.findViewById(R.id.chat_group_contact_properties_leave);
+                if (getChat() != null && getChat().isMeeting()) {
+                    holderHeader.leaveChatTitle.setText(R.string.meetings_info_leave_option);
+                } else {
+                    holderHeader.leaveChatTitle.setText(R.string.title_properties_chat_leave_chat);
+                }
                 holderHeader.dividerLeaveLayout = v.findViewById(R.id.divider_leave_layout);
 
                 //Leave chat Layout

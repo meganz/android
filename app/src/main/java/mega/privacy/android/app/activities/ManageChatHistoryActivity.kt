@@ -125,8 +125,11 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
         val actionBar = supportActionBar
         actionBar?.setDisplayHomeAsUpEnabled(true)
         actionBar?.setHomeButtonEnabled(true)
-        actionBar?.title =
+        actionBar?.title = if (chat?.isMeeting == true) {
+            getString(R.string.meetings_manage_history_view_title)
+        } else {
             getString(R.string.title_properties_manage_chat)
+        }
 
         binding.historyRetentionSwitch.isClickable = false
         binding.historyRetentionSwitch.isChecked = false
@@ -145,6 +148,11 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
             Timber.d("The chat exists")
             binding.historyRetentionSwitchLayout.setOnClickListener(this)
             binding.clearChatHistoryLayout.setOnClickListener(this)
+            binding.clearChatHistoryLayoutTitle.text = if (chat?.isMeeting == true) {
+                getString(R.string.meetings_manage_history_clear)
+            } else {
+                getString(R.string.title_properties_clear_chat_history)
+            }
 
             val seconds = chat!!.retentionTime
             updateRetentionTimeUI(seconds)

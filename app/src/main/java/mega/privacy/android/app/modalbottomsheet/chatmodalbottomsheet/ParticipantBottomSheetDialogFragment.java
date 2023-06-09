@@ -128,6 +128,12 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
         LinearLayout optionStartConversationChat = contentView.findViewById(R.id.start_chat_group_participants_chat_layout);
         LinearLayout optionStartCall = contentView.findViewById(R.id.contact_list_option_call_layout);
         LinearLayout optionLeaveChat = contentView.findViewById(R.id.leave_group_participants_chat_layout);
+        TextView optionLeaveChatText = contentView.findViewById(R.id.leave_group_participants_chat_text);
+        if (megaChatApi.getChatRoom(chatId) != null && megaChatApi.getChatRoom(chatId).isMeeting()) {
+            optionLeaveChatText.setText(R.string.meetings_info_leave_option);
+        } else {
+            optionLeaveChatText.setText(R.string.title_properties_chat_leave_chat);
+        }
         LinearLayout optionChangePermissionsChat = contentView.findViewById(R.id.change_permissions_group_participants_chat_layout);
         LinearLayout optionRemoveParticipantChat = contentView.findViewById(R.id.remove_group_participants_chat_layout);
         LinearLayout optionInvite = contentView.findViewById(R.id.invite_group_participants_chat_layout);

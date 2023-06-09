@@ -91,7 +91,7 @@ class ScheduledMeetingInfoViewTest {
                 scheduledMeeting = getChatScheduledMeeting()
             )
         )
-        composeRule.onNodeWithText(R.string.title_properties_contact_notifications_for_chat)
+        composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
     }
 
@@ -107,7 +107,7 @@ class ScheduledMeetingInfoViewTest {
             onButtonClicked = onButtonClicked
         )
 
-        composeRule.onNodeWithText(R.string.title_properties_contact_notifications_for_chat)
+        composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .performClick()
 
         verify(onButtonClicked).invoke(ScheduledMeetingInfoAction.ChatNotifications)
@@ -210,7 +210,7 @@ class ScheduledMeetingInfoViewTest {
                 scheduledMeeting = getChatScheduledMeeting()
             )
         )
-        composeRule.onNodeWithText(R.string.title_properties_manage_chat)
+        composeRule.onNodeWithText(R.string.meetings_info_manage_history_option)
             .assertExists()
     }
 
@@ -225,7 +225,7 @@ class ScheduledMeetingInfoViewTest {
             onButtonClicked = onButtonClicked
         )
 
-        composeRule.onNodeWithText(R.string.title_properties_manage_chat)
+        composeRule.onNodeWithText(R.string.meetings_info_manage_history_option)
             .performClick()
 
         verify(onButtonClicked).invoke(ScheduledMeetingInfoAction.ManageChatHistory)
@@ -240,7 +240,7 @@ class ScheduledMeetingInfoViewTest {
                 scheduledMeeting = getChatScheduledMeeting()
             )
         )
-        composeRule.onNodeWithText(R.string.title_properties_contact_notifications_for_chat)
+        composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
     }
 
