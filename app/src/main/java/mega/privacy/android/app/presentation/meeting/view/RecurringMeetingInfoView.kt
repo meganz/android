@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
@@ -352,7 +353,7 @@ private fun SeeMoreOccurrencesButton(
         ) {
             Icon(
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp),
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_chevron_down),
+                imageVector = ImageVector.vectorResource(id = CoreUiR.drawable.ic_chevron_down),
                 contentDescription = "See more Icon",
                 tint = MaterialTheme.colors.secondary
             )

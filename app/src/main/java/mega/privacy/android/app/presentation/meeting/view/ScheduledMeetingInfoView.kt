@@ -60,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.presentation.contact.view.ContactStatus
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
@@ -741,7 +742,7 @@ private fun SeeMoreOrLessParticipantsButton(
         ) {
             Icon(
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp),
-                imageVector = ImageVector.vectorResource(id = if (state.seeMoreVisible) R.drawable.ic_chevron_down else R.drawable.ic_chevron_up),
+                imageVector = ImageVector.vectorResource(id = if (state.seeMoreVisible) CoreUiR.drawable.ic_chevron_down else CoreUiR.drawable.ic_chevron_up),
                 contentDescription = "See more Icon",
                 tint = MaterialTheme.colors.secondary
             )

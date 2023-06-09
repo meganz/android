@@ -31,6 +31,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.feature.sync.R
+import mega.privacy.android.core.R as CoreUiR
 
 
 @Composable
@@ -77,7 +78,7 @@ internal fun InputSyncInformationView(
         )
 
         TwoLinesItem(
-            mega.privacy.android.core.R.drawable.ic_smartphone,
+            CoreUiR.drawable.ic_smartphone,
             "Device folder",
             selectedDeviceFolder,
             stringResource(R.string.general_select),
@@ -91,7 +92,7 @@ internal fun InputSyncInformationView(
         )
 
         TwoLinesItem(
-            mega.privacy.android.core.R.drawable.ic_mega,
+            CoreUiR.drawable.ic_mega,
             "MEGA folder",
             selectedMEGAFolder,
             stringResource(R.string.general_select),
@@ -106,7 +107,7 @@ internal fun InputSyncInformationView(
             modifier = Modifier.padding(start = 72.dp)
         )
         TwoLinesItem(
-            mega.privacy.android.core.R.drawable.ic_sync,
+            CoreUiR.drawable.ic_sync,
             "Method",
             "Two way sync",
             ""
