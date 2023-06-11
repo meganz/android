@@ -155,7 +155,7 @@ fun MediaDiscoveryScreen(
                 daysCardList = uiState.daysCardList,
                 currentZoomLevel = uiState.currentZoomLevel,
                 selectedPhotoIds = uiState.selectedPhotoIds,
-                onPhotoDownload = photoDownloaderViewModel::downloadPhoto,
+                onPhotoDownload = photoDownloaderViewModel::downloadPublicNodePhoto,
                 onPhotoClicked = onPhotoClicked,
                 onPhotoLongPressed = onPhotoLongPressed,
                 onCardClicked = { dateCard ->
@@ -215,7 +215,9 @@ private fun MDHeader(
         navigationIcon = {
             IconButton(onClick = onBackClicked) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back_white),
+                    painter = if (numSelectedPhotos > 0)
+                        painterResource(id = R.drawable.ic_arrow_back_white)
+                    else painterResource(id = R.drawable.ic_close_white),
                     contentDescription = null,
                     tint = tealIconTint().takeIf {
                         numSelectedPhotos > 0

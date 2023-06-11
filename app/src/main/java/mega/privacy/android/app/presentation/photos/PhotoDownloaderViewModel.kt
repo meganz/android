@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.DownloadPreview
+import mega.privacy.android.domain.usecase.DownloadPublicNodePreview
+import mega.privacy.android.domain.usecase.DownloadPublicNodeThumbnail
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import java.io.File
 import javax.inject.Inject
@@ -20,6 +22,8 @@ import javax.inject.Inject
 class PhotoDownloaderViewModel @Inject constructor(
     private val downloadThumbnail: DownloadThumbnail,
     private val downloadPreview: DownloadPreview,
+    private val downloadPublicNodeThumbnail: DownloadPublicNodeThumbnail,
+    private val downloadPublicNodePreview: DownloadPublicNodePreview,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val channel = Channel<PhotoCover>(
@@ -35,15 +39,35 @@ class PhotoDownloaderViewModel @Inject constructor(
 
     private suspend fun handleChannel() {
         for (photoCover in channel) {
-            if (photoCover.isPreview) {
-                downloadPreview(photoCover.photo.id) {
-                    photoCover.callback(it)
-                }
+            if (photoCover.isPublicNode) {
+                downloadPhotoCover(photoCover)
             } else {
-                downloadThumbnail(photoCover.photo.id) {
-                    photoCover.callback(it)
-                }
+                downloadPublicNodePhotoCover(photoCover)
             }
+        }
+    }
+
+    private suspend fun downloadPublicNodePhotoCover(
+        photoCover: PhotoCover,
+    ) {
+        if (photoCover.isPreview) {
+            downloadPreview(photoCover.photo.id) {
+                photoCover.callback(it)
+            }
+        } else {
+            downloadThumbnail(photoCover.photo.id) {
+                photoCover.callback(it)
+            }
+        }
+    }
+
+    private suspend fun downloadPhotoCover(
+        photoCover: PhotoCover,
+    ) {
+        if (photoCover.isPreview) {
+            photoCover.callback(downloadPublicNodePreview(photoCover.photo.id))
+        } else {
+            photoCover.callback(downloadPublicNodeThumbnail(photoCover.photo.id))
         }
     }
 
@@ -79,6 +103,39 @@ class PhotoDownloaderViewModel @Inject constructor(
         }
     }
 
+    suspend fun downloadPublicNodePhoto(
+        isPreview: Boolean,
+        photo: Photo,
+        callback: (success: Boolean) -> Unit,
+    ) {
+        withContext(ioDispatcher) {
+            if (isPreview) {
+                if (photo.previewFilePath == null)
+                    return@withContext
+                if (File(photo.previewFilePath ?: "").exists()) {
+                    callback(true)
+                    return@withContext
+                }
+            } else {
+                if (photo.thumbnailFilePath == null)
+                    return@withContext
+                if (File(photo.thumbnailFilePath ?: "").exists()) {
+                    callback(true)
+                    return@withContext
+                }
+            }
+
+            enterChannel(
+                PhotoCover(
+                    isPreview = isPreview,
+                    photo = photo,
+                    callback = callback,
+                    isPublicNode = true
+                )
+            )
+        }
+    }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun enterChannel(
         cover: PhotoCover,
@@ -98,4 +155,5 @@ data class PhotoCover(
     val isPreview: Boolean,
     val photo: Photo,
     val callback: (success: Boolean) -> Unit,
+    val isPublicNode: Boolean = false,
 )

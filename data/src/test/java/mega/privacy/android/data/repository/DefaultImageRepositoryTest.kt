@@ -9,6 +9,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
@@ -41,6 +42,7 @@ class DefaultImageRepositoryTest {
 
     private val context: Context = mock()
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val cacheGateway = mock<CacheGateway>()
     private val fileManagementPreferencesGateway = mock<FileManagementPreferencesGateway>()
@@ -69,6 +71,7 @@ class DefaultImageRepositoryTest {
         underTest = DefaultImageRepository(
             context = context,
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             cacheGateway = cacheGateway,

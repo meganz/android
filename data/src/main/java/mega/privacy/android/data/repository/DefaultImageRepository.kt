@@ -27,12 +27,14 @@ import mega.privacy.android.data.extensions.encodeBase64
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getPreviewFileName
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getScreenSize
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
@@ -68,6 +70,7 @@ import kotlin.coroutines.resumeWithException
 internal class DefaultImageRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
@@ -205,6 +208,52 @@ internal class DefaultImageRepository @Inject constructor(
                     }
                 )
             )
+        }
+    }
+
+    override suspend fun downloadPublicNodeThumbnail(
+        handle: Long,
+    ): Boolean = withContext(ioDispatcher) {
+        val node = megaApiFolderGateway.getMegaNodeByHandle(handle)
+        val thumbnailFolderPath = thumbnailFolderPath
+        if (node == null || thumbnailFolderPath == null || !node.hasThumbnail()) {
+            return@withContext false
+        } else {
+            return@withContext suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getThumbnail") {
+                    true
+                }
+                megaApiGateway.getThumbnail(
+                    node,
+                    getThumbnailPath(thumbnailFolderPath, node),
+                    listener
+                )
+
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
+    }
+
+    override suspend fun downloadPublicNodePreview(
+        handle: Long,
+    ): Boolean = withContext(ioDispatcher) {
+        val node = megaApiFolderGateway.getMegaNodeByHandle(handle)
+        val previewFolderPath = previewFolderPath
+        if (node == null || previewFolderPath == null || !node.hasPreview()) {
+            return@withContext false
+        } else {
+            return@withContext suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("getThumbnail") {
+                    true
+                }
+                megaApiGateway.getPreview(
+                    node,
+                    getPreviewPath(previewFolderPath, node),
+                    listener
+                )
+
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
         }
     }
 

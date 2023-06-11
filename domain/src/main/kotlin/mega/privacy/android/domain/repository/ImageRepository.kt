@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
@@ -56,6 +55,22 @@ interface ImageRepository {
      * @param callback is download success
      */
     suspend fun downloadPreview(handle: Long, callback: (success: Boolean) -> Unit)
+
+    /**
+     * Download public node thumbnail
+     *
+     * @param handle
+     * @param callback is download success
+     */
+    suspend fun downloadPublicNodeThumbnail(handle: Long): Boolean
+
+    /**
+     * Download public node preview
+     *
+     * @param handle
+     * @param callback is download success
+     */
+    suspend fun downloadPublicNodePreview(handle: Long): Boolean
 
     /**
      * Get Image Result given Offline File
