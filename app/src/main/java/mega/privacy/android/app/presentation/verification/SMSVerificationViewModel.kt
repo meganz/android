@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.verification.model.SMSVerificationU
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
+import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
@@ -36,7 +36,7 @@ class SMSVerificationViewModel @Inject constructor(
     private val setSMSVerificationShown: SetSMSVerificationShown,
     private val getCountryCallingCodes: GetCountryCallingCodes,
     private val sendSMSVerificationCode: SendSMSVerificationCode,
-    private val areAccountAchievementsEnabled: AreAccountAchievementsEnabled,
+    private val areAccountAchievementsEnabledUseCase: AreAccountAchievementsEnabledUseCase,
     private val getAccountAchievements: GetAccountAchievements,
     private val stringUtilWrapper: StringUtilWrapper,
     private val getCurrentCountryCode: GetCurrentCountryCode,
@@ -157,7 +157,7 @@ class SMSVerificationViewModel @Inject constructor(
 
     private suspend fun getBonusStorage(context: Context) {
         if (!_uiState.value.isUserLocked) {
-            val isAchievementUser = areAccountAchievementsEnabled()
+            val isAchievementUser = areAccountAchievementsEnabledUseCase()
             if (isAchievementUser) {
                 runCatching {
                     getAccountAchievements(

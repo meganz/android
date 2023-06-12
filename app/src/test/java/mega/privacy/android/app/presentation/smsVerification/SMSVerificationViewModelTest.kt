@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.verification.model.SMSVerificationU
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.entity.achievement.DefaultMegaAchievement
-import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
+import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
@@ -45,7 +45,7 @@ class SMSVerificationViewModelTest {
     private val setSMSVerificationShown: SetSMSVerificationShown = mock()
     private val getCountryCallingCodes: GetCountryCallingCodes = mock()
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
-    private val areAccountAchievementsEnabled: AreAccountAchievementsEnabled = mock()
+    private val areAccountAchievementsEnabledUseCase: AreAccountAchievementsEnabledUseCase = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
@@ -83,7 +83,7 @@ class SMSVerificationViewModelTest {
             setSMSVerificationShown = setSMSVerificationShown,
             getCountryCallingCodes = getCountryCallingCodes,
             sendSMSVerificationCode = sendSMSVerificationCode,
-            areAccountAchievementsEnabled = areAccountAchievementsEnabled,
+            areAccountAchievementsEnabledUseCase = areAccountAchievementsEnabledUseCase,
             getAccountAchievements = getAccountAchievements,
             getCurrentCountryCode = getCurrentCountryCode,
             formatPhoneNumber = formatPhoneNumber,
@@ -138,7 +138,7 @@ class SMSVerificationViewModelTest {
         val expected =
             getInitialState().copy(isUserLocked = false, bonusStorageSMS = bonusStorage)
         whenever(smsVerificationTextMapper(any())).thenReturn(expected)
-        whenever(areAccountAchievementsEnabled()).thenReturn(true)
+        whenever(areAccountAchievementsEnabledUseCase()).thenReturn(true)
         whenever(getAccountAchievements(any(), any())).thenReturn(mock<DefaultMegaAchievement>())
         whenever(stringUtilWrapper.getSizeString(any(), any())).thenReturn(bonusStorage)
         underTest.setIsUserLocked(false, mock())

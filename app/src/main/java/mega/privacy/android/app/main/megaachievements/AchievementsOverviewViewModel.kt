@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
-import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.achievements.IsAddPhoneRewardEnabledUseCase
 import timber.log.Timber
 import java.util.Calendar
@@ -24,7 +24,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class AchievementsOverviewViewModel @Inject constructor(
-    private val getAccountAchievementsOverview: GetAccountAchievementsOverview,
+    private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase,
     private val isAddPhoneRewardEnabled: IsAddPhoneRewardEnabledUseCase,
 ) : ViewModel() {
@@ -50,7 +50,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun getAchievementsInformation() {
         viewModelScope.launch {
             runCatching {
-                val achievementsOverview = async { getAccountAchievementsOverview() }
+                val achievementsOverview = async { getAccountAchievementsOverviewUseCase() }
                 val phoneRewardEnabled = async { isAddPhoneRewardEnabled() }
                 Pair(achievementsOverview.await(), phoneRewardEnabled.await())
             }

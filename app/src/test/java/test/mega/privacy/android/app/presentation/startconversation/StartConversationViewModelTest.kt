@@ -18,21 +18,21 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.startconversation.StartConversationViewModel
+import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
-import mega.privacy.android.domain.usecase.GetContactData
+import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.core.ui.controls.SearchWidgetState
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -85,7 +85,7 @@ class StartConversationViewModelTest {
         onBlocking { invoke() }.thenReturn(testContactList)
     }
 
-    private val getContactData = mock<GetContactData> {
+    private val getContactDataUseCase = mock<GetContactDataUseCase> {
         onBlocking { invoke(mock()) }.thenReturn(mock())
     }
 
@@ -131,7 +131,7 @@ class StartConversationViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = StartConversationViewModel(
             getVisibleContactsUseCase = getVisibleContactsUseCase,
-            getContactData = getContactData,
+            getContactDataUseCase = getContactDataUseCase,
             startConversationUseCase = startConversationUseCase,
             monitorContactUpdates = monitorContactUpdates,
             applyContactUpdates = applyContactUpdates,

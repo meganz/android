@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
-import mega.privacy.android.domain.usecase.GetContactData
+import mega.privacy.android.domain.usecase.GetContactDataUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * StartConversationFragment view model.
  *
  * @property getVisibleContactsUseCase          [GetVisibleContactsUseCase]
- * @property getContactData                     [GetContactData]
+ * @property getContactDataUseCase                     [GetContactDataUseCase]
  * @property startConversationUseCase                  [StartConversationUseCase]
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property applyContactUpdates                [ApplyContactUpdates]
@@ -54,7 +54,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StartConversationViewModel @Inject constructor(
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val getContactData: GetContactData,
+    private val getContactDataUseCase: GetContactDataUseCase,
     private val startConversationUseCase: StartConversationUseCase,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val applyContactUpdates: ApplyContactUpdates,
@@ -175,7 +175,7 @@ class StartConversationViewModel @Inject constructor(
 
     private suspend fun getContactsData(contactList: List<ContactItem>) {
         contactList.forEach { contactItem ->
-            val contactData = getContactData(contactItem)
+            val contactData = getContactDataUseCase(contactItem)
             _state.value.contactItemList.apply {
                 findItemByHandle(contactItem.handle)?.apply {
                     toMutableList().apply {

@@ -21,7 +21,7 @@ import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
-import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
@@ -57,7 +57,8 @@ object TestAccountModule {
 
     private val createContactLink = mock<CreateContactLink>()
 
-    private val getAccountAchievementsOverview = mock<GetAccountAchievementsOverview>()
+    private val getAccountAchievementsOverviewUseCase =
+        mock<GetAccountAchievementsOverviewUseCase>()
 
     private val isUserLoggedIn = mock<IsUserLoggedIn>()
 
@@ -74,7 +75,7 @@ object TestAccountModule {
     fun provideGetAccountAchievements() = getAccountAchievements
 
     @Provides
-    fun provideGetAccountAchievementsOverview() = getAccountAchievementsOverview
+    fun provideGetAccountAchievementsOverview() = getAccountAchievementsOverviewUseCase
 
     @Provides
     fun provideGetMyCredentials() = getMyCredentials

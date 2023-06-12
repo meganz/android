@@ -6,7 +6,7 @@ import javax.inject.Inject
 
 /**
  * Use case for getting visible contacts with the cached data, not the updated one.
- * For getting the updated date see [GetContactData].
+ * For getting the updated date see [GetContactDataUseCase].
  */
 class GetVisibleContactsUseCase @Inject constructor(
     private val contactsRepository: ContactsRepository

@@ -23,7 +23,6 @@ import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.UpgradeSecurity
-import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
  * Account module.
@@ -54,11 +53,6 @@ internal abstract class InternalAccountModule {
     abstract fun bindIsUserLoggedIn(useCase: DefaultIsUserLoggedIn): IsUserLoggedIn
 
     companion object {
-
-        @Provides
-        fun provideAchievementsDetailUseCase(accountRepository: AccountRepository): GetAccountAchievementsOverview =
-            GetAccountAchievementsOverview(accountRepository::getAccountAchievementsOverview)
-
         /**
          * Provides the Use Case [RetryPendingConnections]
          */
