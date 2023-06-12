@@ -621,7 +621,7 @@ public class ContactFileListActivity extends PasscodeActivity
                 .subscribe((result, throwable) -> {
                     if (throwable == null) {
                         showMovementResult(result, handleList.get(0));
-                        showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
+                        showSnackbar(SNACKBAR_TYPE, moveRequestMessageMapper.invoke(result), MEGACHAT_INVALID_HANDLE);
                     }
                 }));
     }

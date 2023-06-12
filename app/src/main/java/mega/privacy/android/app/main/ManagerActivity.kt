@@ -5837,7 +5837,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             showMovementResult(result, handleList[0])
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
-                                result.getResultText(),
+                                moveRequestMessageMapper(result),
                                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                             )
                         },

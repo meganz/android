@@ -237,7 +237,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
             count = handles.size,
             errorCount = errorCount,
             oldParentHandle = oldParentHandle,
-            context = context
         )
 
     }
