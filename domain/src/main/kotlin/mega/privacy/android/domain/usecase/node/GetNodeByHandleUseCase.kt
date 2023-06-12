@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Get node by handles use case
  *
  */
-class GetNodeByHandlesUseCase @Inject constructor(
+class GetNodeByHandleUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
 ) {
     /**

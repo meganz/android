@@ -23,7 +23,7 @@ internal class RestoreNodesUseCaseTest {
 
     private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
-    private val getNodeByHandlesUseCase: GetNodeByHandlesUseCase = mock()
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val accountRepository: AccountRepository = mock()
 
     @Before
@@ -31,7 +31,7 @@ internal class RestoreNodesUseCaseTest {
         underTest = RestoreNodesUseCase(
             moveNodeUseCase = moveNodeUseCase,
             isNodeInRubbish = isNodeInRubbish,
-            getNodeByHandlesUseCase = getNodeByHandlesUseCase,
+            getNodeByHandleUseCase = getNodeByHandleUseCase,
             accountRepository = accountRepository
         )
     }
@@ -81,7 +81,7 @@ internal class RestoreNodesUseCaseTest {
             val fileNode = mock<FileNode> {
                 on { name }.thenReturn("name")
             }
-            whenever(getNodeByHandlesUseCase(moveFirstNode.second)).thenReturn(fileNode)
+            whenever(getNodeByHandleUseCase(moveFirstNode.second)).thenReturn(fileNode)
             whenever(isNodeInRubbish(any())).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), NodeId(moveFirstNode.second)))
                 .thenReturn(NodeId(moveFirstNode.first))

@@ -18,14 +18,14 @@ import javax.inject.Inject
  *
  * @property isNodeInRubbish
  * @property getChildNodeUseCase
- * @property getNodeByHandlesUseCase
+ * @property getNodeByHandleUseCase
  * @property getRootNodeUseCase
  * @property nodeRepository
  */
 class CheckNodesNameCollisionUseCase @Inject constructor(
     private val isNodeInRubbish: IsNodeInRubbish,
     private val getChildNodeUseCase: GetChildNodeUseCase,
-    private val getNodeByHandlesUseCase: GetNodeByHandlesUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val nodeRepository: NodeRepository,
 ) {
@@ -48,7 +48,7 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
                 noConflictNodes[nodeHandle] = parentNodeHandle
             } else {
                 val currentNode =
-                    getNodeByHandlesUseCase(nodeHandle) ?: throw NodeDoesNotExistsException()
+                    getNodeByHandleUseCase(nodeHandle) ?: throw NodeDoesNotExistsException()
                 getChildNodeUseCase(
                     NodeId(parentNodeHandle),
                     currentNode.name
@@ -84,6 +84,6 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
         if (parentHandle == nodeRepository.getInvalidHandle()) {
             getRootNodeUseCase()
         } else {
-            getNodeByHandlesUseCase(parentHandle)
+            getNodeByHandleUseCase(parentHandle)
         }?.takeUnless { isNodeInRubbish(parentHandle) }
 }

@@ -19,7 +19,7 @@ import kotlin.coroutines.coroutineContext
 class RestoreNodesUseCase @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
-    private val getNodeByHandlesUseCase: GetNodeByHandlesUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val accountRepository: AccountRepository,
 ) {
     /**
@@ -47,7 +47,7 @@ class RestoreNodesUseCase @Inject constructor(
             results.size == 1 -> SingleNodeRestoreResult(
                 successCount = successCount,
                 destinationFolderName = takeIf { successCount > 0 }
-                    ?.let { getNodeByHandlesUseCase(nodes.values.first())?.name }
+                    ?.let { getNodeByHandleUseCase(nodes.values.first())?.name }
             )
 
             else -> MultipleNodesRestoreResult(
