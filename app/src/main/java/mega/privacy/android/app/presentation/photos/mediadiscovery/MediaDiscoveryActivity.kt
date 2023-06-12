@@ -48,6 +48,9 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * This activity using for handling folder link MD case
+ */
 @AndroidEntryPoint
 class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShower {
 
@@ -261,7 +264,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
             if (photo is Photo.Video) {
                 lifecycleScope.launch {
-                    launchVideoScreen(photo)
+                    launchVideoScreenForFolderLink(photo)
                 }
             } else {
                 openPhoto(photo)
@@ -280,11 +283,11 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
     }
 
     /**
-     * Launch video player
+     * Launch video player for folder link
      *
      * @param photo Photo item
      */
-    private suspend fun launchVideoScreen(photo: Photo) {
+    private suspend fun launchVideoScreenForFolderLink(photo: Photo) {
         val nodeHandle = photo.id
         val nodeName = photo.name
         val intent = Util.getMediaIntent(this, nodeName).apply {
@@ -293,7 +296,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.FROM_MEDIA_DISCOVERY
+                Constants.FOLDER_LINK_ADAPTER //FolderLink type
             )
             putExtra(
                 Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
@@ -330,6 +333,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     name = nodeName,
                     isNeedsMoreBufferSize = memoryInfo.totalMem > Constants.BUFFER_COMP,
                     intent = intent,
+                    isFolderLink = true
                 )
             }
         )

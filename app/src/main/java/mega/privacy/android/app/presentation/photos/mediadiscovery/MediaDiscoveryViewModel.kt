@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
@@ -76,6 +77,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val authorizeNode: AuthorizeNode,
@@ -432,6 +434,7 @@ class MediaDiscoveryViewModel @Inject constructor(
      * @param name node name
      * @param isNeedsMoreBufferSize true is that sets 32MB, otherwise is false
      * @param intent Intent
+     * @param isFolderLink true is from folder link, otherwise is false
      * @return updated intent
      */
     suspend fun updateIntent(
@@ -439,6 +442,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         name: String,
         isNeedsMoreBufferSize: Boolean,
         intent: Intent,
+        isFolderLink: Boolean = false,
     ): Intent {
         if (megaApiHttpServerIsRunningUseCase() == 0) {
             megaApiHttpServerStartUseCase()
@@ -453,7 +457,11 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
         )
 
-        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
+        if (isFolderLink) {
+            getLocalFolderLinkFromMegaApiUseCase(handle)
+        } else {
+            getFileUrlByNodeHandleUseCase(handle)
+        }?.let { url ->
             Uri.parse(url)?.let { uri ->
                 intent.setDataAndType(uri, typeForName(name).type)
             }
