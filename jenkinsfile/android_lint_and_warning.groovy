@@ -282,6 +282,6 @@ static boolean isDefined(String value) {
  * @return
  */
 String generateWarningReport(String targetFileLocation) {
-    sh "./gradlew -w clean compileGmsReleaseUnitTestSources > ${WARNING_SOURCE_FILE} 2>&1"
+    sh "./gradlew -w clean compileGmsReleaseUnitTestSources 2>&1 | tee ${WARNING_SOURCE_FILE}"
     sh "python3 ${WORKSPACE}/jenkinsfile/warning_report.py ${WARNING_SOURCE_FILE} ${targetFileLocation}"
 }

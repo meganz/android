@@ -12,7 +12,7 @@ import sys
 
 
 def create_model(matches):
-    type = "warning" if matches.group(1) == "w:" else "error"
+    type = "warning" if matches.group(1) == "w" else "error"
     issue_dictionary = {
         "type" : type,
         "file" : matches.group(2),
@@ -33,7 +33,7 @@ if not os.path.exists(gradle_log_file):
     print("Specified log file does not exist. Please ensure path is correct.")
     exit(0)
 
-pattern = re.compile("(w:|e:) ?(?:\\/.*(?=\\/))*\\/(\\w*\\.kt): \\((\\d*), \\d*\\):(.*)")
+pattern = re.compile("(w|e):.*\/([^:]+):(\d+):.*?\'(.*)$")
 log = open(gradle_log_file)
 log_lines = log.readlines()
 count = 0
