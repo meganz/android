@@ -41,7 +41,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings

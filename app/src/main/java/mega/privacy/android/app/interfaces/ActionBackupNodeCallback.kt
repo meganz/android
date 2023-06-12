@@ -2,7 +2,7 @@ package mega.privacy.android.app.interfaces
 
 import android.content.DialogInterface
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_NONE
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.ArrayList

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.movenode.mapper
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import javax.inject.Inject
 
 /**

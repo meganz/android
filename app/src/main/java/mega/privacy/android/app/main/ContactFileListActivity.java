@@ -105,7 +105,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
+import mega.privacy.android.domain.entity.node.MoveRequestResult;
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase;

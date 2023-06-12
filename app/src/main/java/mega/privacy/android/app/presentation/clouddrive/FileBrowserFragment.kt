@@ -68,7 +68,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings

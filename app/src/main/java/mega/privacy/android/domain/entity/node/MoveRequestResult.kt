@@ -1,8 +1,4 @@
-package mega.privacy.android.app.presentation.movenode
-
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult.GeneralMovement
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult.RubbishMovement
-import nz.mega.sdk.MegaApiJava
+package mega.privacy.android.domain.entity.node
 
 /**
  * Sealed class containing all the info related to a movement request.
@@ -15,7 +11,7 @@ import nz.mega.sdk.MegaApiJava
 sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
-    val oldParentHandle: Long? = MegaApiJava.INVALID_HANDLE,
+    val oldParentHandle: Long? = -1L,
 ) {
     /**
      * Count of success move request

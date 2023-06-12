@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult.GeneralMovement
+import mega.privacy.android.domain.entity.node.MoveRequestResult.GeneralMovement
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import org.junit.Test
 import org.junit.runner.RunWith
