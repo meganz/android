@@ -382,8 +382,8 @@ class DefaultCameraUploadRepositoryTest {
         @ParameterizedTest(name = "sync enabled: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that camera uploads is enabled or not`(syncEnabled: Boolean) = runTest {
-            whenever(localStorageGateway.isSyncEnabled()).thenReturn(syncEnabled)
-            assertThat(underTest.isSyncEnabled()).isEqualTo(syncEnabled)
+            whenever(localStorageGateway.isCameraUploadsEnabled()).thenReturn(syncEnabled)
+            assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(syncEnabled)
         }
 
         @ParameterizedTest(name = "clear all sync records: {0}")

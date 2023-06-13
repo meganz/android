@@ -72,7 +72,7 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
     @Test
     internal fun `test that camera uploads status is updated when sync is enabled and backup id exists and is valid and has changed`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             underTest(
                 backupName = "", backupState = BackupState.ACTIVE
@@ -83,7 +83,7 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
     @Test
     internal fun `test that camera uploads status is not updated when sync is disabled`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(false)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             underTest(
                 backupName = "", backupState = BackupState.ACTIVE
             )
@@ -93,7 +93,7 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
     @Test
     internal fun `test that camera uploads status is not updated when sync is enabled and backup id is invalid`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(invalidBackup)
             underTest(
@@ -105,7 +105,7 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
     @Test
     internal fun `test that camera uploads status is not updated when sync is enabled and backup id exists and is valid but not changed`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             underTest(
                 backupName = "", backupState = BackupState.INVALID
@@ -116,7 +116,7 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
     @Test
     internal fun `test that camera uploads status is not updated when sync is enabled and backup is null`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(null)
             underTest(
                 backupName = "", backupState = BackupState.INVALID

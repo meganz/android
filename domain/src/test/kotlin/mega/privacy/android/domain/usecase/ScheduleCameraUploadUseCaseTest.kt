@@ -27,7 +27,7 @@ class ScheduleCameraUploadUseCaseTest {
     @Test
     fun `test that if camera upload is enabled that schedule camera upload repository method is invoked`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             underTest()
             verify(cameraUploadRepository).scheduleCameraUploadJob()
         }
@@ -35,7 +35,7 @@ class ScheduleCameraUploadUseCaseTest {
     @Test
     fun `test that if camera upload is not enabled that schedule camera upload repository method is not invoked`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(false)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             underTest()
             verify(cameraUploadRepository, times(0)).scheduleCameraUploadJob()
         }

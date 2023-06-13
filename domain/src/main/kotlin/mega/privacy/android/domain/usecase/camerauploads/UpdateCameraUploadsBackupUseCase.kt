@@ -22,7 +22,7 @@ class UpdateCameraUploadsBackupUseCase @Inject constructor(
         backupState: BackupState,
         updateTimeStamp: () -> Unit = {},
     ) {
-        if (cameraUploadRepository.isSyncEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.getCuBackUp()?.let { backup ->
                 if (backupState != backup.state && backup.backupId != cameraUploadRepository.getInvalidHandle()) {
                     updateBackupUseCase(

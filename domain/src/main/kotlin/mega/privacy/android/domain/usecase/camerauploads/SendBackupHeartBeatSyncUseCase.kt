@@ -85,7 +85,7 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
     private suspend fun shouldSendCameraUploadsHeartbeat(
         cameraUploadsState: CameraUploadsState,
         backup: Backup,
-    ) = cameraUploadRepository.isSyncEnabled() &&
+    ) = cameraUploadRepository.isCameraUploadsEnabled() &&
             cameraUploadsState.primaryTotalUploadBytes != 0L &&
             backup.state != BackupState.PAUSE_UPLOADS
 

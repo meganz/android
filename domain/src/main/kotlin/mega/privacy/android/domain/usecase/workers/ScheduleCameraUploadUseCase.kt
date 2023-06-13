@@ -11,7 +11,7 @@ class ScheduleCameraUploadUseCase @Inject constructor(private val cameraUploadRe
      * invoke
      */
     suspend operator fun invoke() {
-        if (cameraUploadRepository.isSyncEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.scheduleCameraUploadJob()
         }
     }

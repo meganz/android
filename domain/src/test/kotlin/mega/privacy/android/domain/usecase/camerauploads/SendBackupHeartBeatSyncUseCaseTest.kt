@@ -82,7 +82,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     @Test
     internal fun `test that backup heartbeat sync is not sent when upload sync is not enabled`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(false)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
             underTest(fakeCameraUploadsState).test {
                 verify(cameraUploadRepository, times(0)).sendBackupHeartbeatSync(
@@ -100,7 +100,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     @Test
     internal fun `test that backup heartbeat sync is not sent when upload sync is enabled but no upload bytes exist`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
@@ -120,7 +120,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     @Test
     internal fun `test that backup heartbeat sync is not sent when upload sync is enabled but backup state is PAUSE_UPLOADS`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(doNotSyncBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(doNotSyncBackup)
@@ -143,7 +143,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
         numberOfHeartbeats: Int,
     ) =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(false)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
@@ -164,7 +164,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
         numberOfHeartbeats: Int,
     ) =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(false)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
@@ -185,7 +185,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
         numberOfHeartbeats: Int,
     ) =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(null)
@@ -206,7 +206,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
         numberOfHeartbeats: Int,
     ) =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(null)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)
@@ -227,7 +227,7 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
         numberOfHeartbeats: Int,
     ) =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.isSecondaryMediaFolderEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
             whenever(cameraUploadRepository.getMuBackUp()).thenReturn(fakeBackup)

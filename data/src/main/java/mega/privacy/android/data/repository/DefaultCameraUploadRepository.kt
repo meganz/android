@@ -269,8 +269,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.doesSyncEnabledExist()
     }
 
-    override suspend fun isSyncEnabled(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.isSyncEnabled()
+    override suspend fun isCameraUploadsEnabled(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.isCameraUploadsEnabled()
     }
 
     override suspend fun getPrimaryFolderLocalPath(): String = withContext(ioDispatcher) {
@@ -623,7 +623,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun listenToNewMedia() {
         withContext(ioDispatcher) {
-            if (isSyncEnabled()) {
+            if (isCameraUploadsEnabled()) {
                 NewMediaWorker.scheduleWork(context, false)
             }
         }

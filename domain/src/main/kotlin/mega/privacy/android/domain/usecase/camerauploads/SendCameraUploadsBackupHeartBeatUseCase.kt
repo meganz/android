@@ -19,7 +19,7 @@ class SendCameraUploadsBackupHeartBeatUseCase @Inject constructor(private val ca
         heartbeatStatus: HeartbeatStatus,
         lastNodeHandle: Long,
     ) {
-        if (cameraUploadRepository.isSyncEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.getCuBackUpId()?.let { backupId ->
                 cameraUploadRepository.sendBackupHeartbeat(
                     backupId = backupId,

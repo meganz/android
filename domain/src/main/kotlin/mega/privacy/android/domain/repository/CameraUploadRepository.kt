@@ -229,11 +229,11 @@ interface CameraUploadRepository {
     suspend fun doesSyncEnabledExist(): Boolean
 
     /**
-     * Is camera upload sync enabled
+     * Is camera uploads enabled
      *
      * @return true if camera upload sync enabled
      */
-    suspend fun isSyncEnabled(): Boolean
+    suspend fun isCameraUploadsEnabled(): Boolean
 
     /**
      * Retrieves the Primary Folder local path

@@ -178,7 +178,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun doesSyncEnabledExist() = dbHandler.preferences?.camSyncEnabled != null
 
-    override suspend fun isSyncEnabled(): Boolean =
+    override suspend fun isCameraUploadsEnabled(): Boolean =
         dbHandler.preferences?.camSyncEnabled.toBoolean()
 
     override suspend fun getPrimaryFolderLocalPath(): String =

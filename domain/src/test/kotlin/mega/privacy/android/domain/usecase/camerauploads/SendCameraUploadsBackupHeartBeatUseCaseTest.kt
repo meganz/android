@@ -41,7 +41,7 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that camera uploads backup heart beat is sent when sync is enabled and backup id exists`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(69L)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadRepository, times(1)).sendBackupHeartbeat(
@@ -53,7 +53,7 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that camera uploads backup heart beat is not sent when sync is enabled and backup id does not exist`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(true)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(null)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
@@ -65,7 +65,7 @@ internal class SendCameraUploadsBackupHeartBeatUseCaseTest {
     @Test
     internal fun `test that camera uploads backup heart beat is not sent when sync is not enabled`() =
         runTest {
-            whenever(cameraUploadRepository.isSyncEnabled()).thenReturn(false)
+            whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
             whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(69L)
             underTest(HeartbeatStatus.values().random(), 1L)
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(

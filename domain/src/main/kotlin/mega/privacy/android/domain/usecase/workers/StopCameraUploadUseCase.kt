@@ -12,7 +12,7 @@ class StopCameraUploadUseCase @Inject constructor(private val cameraUploadReposi
      * @param aborted
      */
     suspend operator fun invoke(aborted: Boolean = true) {
-        if (cameraUploadRepository.isSyncEnabled()) {
+        if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.fireStopCameraUploadJob(aborted = aborted)
         }
     }

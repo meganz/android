@@ -122,7 +122,7 @@ abstract class CameraUploadUseCases {
          */
         @Provides
         fun provideIsCameraUploadSyncEnabled(cameraUploadRepository: CameraUploadRepository): IsCameraUploadSyncEnabled =
-            IsCameraUploadSyncEnabled(cameraUploadRepository::isSyncEnabled)
+            IsCameraUploadSyncEnabled(cameraUploadRepository::isCameraUploadsEnabled)
 
         /**
          * Provide the [GetPendingSyncRecords] implementation

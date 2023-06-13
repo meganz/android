@@ -251,9 +251,9 @@ interface MegaLocalStorageGateway {
     suspend fun doesSyncEnabledExist(): Boolean
 
     /**
-     * Is camera upload sync enabled
+     * Is camera uploads enabled
      */
-    suspend fun isSyncEnabled(): Boolean
+    suspend fun isCameraUploadsEnabled(): Boolean
 
     /**
      * Retrieves the Primary Folder local path
