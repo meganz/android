@@ -28,9 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
+import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
 import mega.privacy.android.app.presentation.view.extension.getPainter
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
@@ -144,14 +145,14 @@ internal fun <T : TypedNode> NodeGridViewItem(
                 )
         ) {
             Box(contentAlignment = Alignment.TopStart) {
-                ThumbnailView<T>(
+                ThumbnailView(
                     modifier = Modifier
                         .height(172.dp)
                         .fillMaxSize()
                         .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
                     contentDescription = "File",
                     imageFile = imageState.value,
-                    node = nodeUIItem,
+                    defaultImage = MimeTypeList.typeForName(nodeUIItem.name).iconResourceId,
                     contentScale = ContentScale.FillHeight,
                 )
                 if (nodeUIItem.isSelected) {

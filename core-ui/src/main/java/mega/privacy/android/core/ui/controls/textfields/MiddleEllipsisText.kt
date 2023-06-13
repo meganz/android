@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums.view
+package mega.privacy.android.core.ui.controls.textfields
 
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.Text
@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.TextUnit
  * and intended for internal use only for photos domain.
  */
 @Composable
-internal fun MiddleEllipsisText(
+fun MiddleEllipsisText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,

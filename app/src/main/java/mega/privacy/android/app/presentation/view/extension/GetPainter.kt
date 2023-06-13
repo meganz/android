@@ -11,12 +11,16 @@ import mega.privacy.android.domain.entity.node.FolderNode
  * @param this@getPainter [FolderNode]
  */
 @Composable
-internal fun FolderNode.getPainter(): Painter {
+internal fun FolderNode.getPainter(): Painter =
+    painterResource(id = getIcon())
+
+@Composable
+internal fun FolderNode.getIcon(): Int {
     return if (isIncomingShare) {
-        painterResource(id = R.drawable.ic_folder_incoming)
+        R.drawable.ic_folder_incoming
     } else if (isShared || isPendingShare) {
-        painterResource(id = R.drawable.ic_folder_outgoing)
+        R.drawable.ic_folder_outgoing
     } else {
-        painterResource(id = R.drawable.ic_folder_list)
+        R.drawable.ic_folder_list
     }
 }

@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.view
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.absolutePadding
@@ -17,37 +20,50 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
-import mega.privacy.android.app.presentation.view.extension.fileSize
-import mega.privacy.android.app.presentation.view.extension.folderInfo
-import mega.privacy.android.app.presentation.view.extension.formattedModifiedDate
-import mega.privacy.android.app.presentation.view.extension.getPainter
+import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import java.io.File
 
 /**
  * List view item for file/folder info
  * @param modifier [Modifier]
- * @param nodeUIItem [NodeUIItem]
+ * @param isSelected is item selected
+ * @param folderInfo folder info, if null the item is a File
+ * @param icon icon resource
+ * @param fileSize file size
+ * @param modifiedDate modified date
+ * @param name name
+ * @param isTakenDown is taken down
+ * @param isFavourite is favourite
+ * @param isSharedWithPublicLink is shared with public link
  * @param onLongClick onLongItemClick
  * @param onItemClicked itemClick
  * @param onMenuClick three dots click
@@ -55,19 +71,27 @@ import java.io.File
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun <T : TypedNode> NodeListViewItem(
+internal fun NodeListViewItem(
     modifier: Modifier,
-    nodeUIItem: NodeUIItem<T>,
-    onMenuClick: (NodeUIItem<T>) -> Unit,
-    onItemClicked: (NodeUIItem<T>) -> Unit,
-    onLongClick: (NodeUIItem<T>) -> Unit,
+    isSelected: Boolean,
+    folderInfo: String?,
+    @DrawableRes icon: Int,
+    fileSize: String?,
+    modifiedDate: String?,
+    name: String,
+    isTakenDown: Boolean,
+    isFavourite: Boolean,
+    isSharedWithPublicLink: Boolean,
+    onMenuClick: () -> Unit,
+    onItemClicked: () -> Unit,
+    onLongClick: () -> Unit,
     imageState: State<File?>,
 ) {
     Column(
         modifier = modifier
             .combinedClickable(
-                onClick = { onItemClicked(nodeUIItem) },
-                onLongClick = { onLongClick(nodeUIItem) }
+                onClick = { onItemClicked() },
+                onLongClick = { onLongClick() }
             )
             .fillMaxWidth()
             .padding(vertical = 8.dp)
@@ -82,7 +106,7 @@ internal fun <T : TypedNode> NodeListViewItem(
                 .width(48.dp)
                 .padding(4.dp)
                 .clip(RoundedCornerShape(8.dp))
-            if (nodeUIItem.isSelected) {
+            if (isSelected) {
                 Image(
                     modifier = thumbNailModifier
                         .testTag(SELECTED_TEST_TAG),
@@ -90,20 +114,20 @@ internal fun <T : TypedNode> NodeListViewItem(
                     contentDescription = "Selected",
                 )
             } else {
-                if (nodeUIItem.node is FolderNode) {
+                if (folderInfo != null) {
                     Image(
                         modifier = thumbNailModifier
                             .testTag(FOLDER_TEST_TAG),
-                        painter = nodeUIItem.node.getPainter(),
+                        painter = painterResource(id = icon),
                         contentDescription = "Folder Thumbnail"
                     )
-                } else if (nodeUIItem.node is FileNode) {
+                } else {
                     imageState.value
-                    ThumbnailView<T>(
+                    ThumbnailView(
                         modifier = thumbNailModifier
                             .testTag(FILE_TEST_TAG),
                         imageFile = imageState.value,
-                        node = nodeUIItem,
+                        defaultImage = icon,
                         contentDescription = "Thumbnail"
                     )
                 }
@@ -124,7 +148,7 @@ internal fun <T : TypedNode> NodeListViewItem(
                                 top.linkTo(parent.top)
                                 bottom.linkTo(parent.bottom)
                             }
-                            .clickable { onMenuClick.invoke(nodeUIItem) }
+                            .clickable { onMenuClick() }
                     )
                     Row(modifier = Modifier
                         .constrainAs(nodeInfo) {
@@ -138,13 +162,13 @@ internal fun <T : TypedNode> NodeListViewItem(
                             .align(Alignment.CenterVertically)
                             .absolutePadding(left = 4.dp)
                         MiddleEllipsisText(
-                            text = nodeUIItem.name,
+                            text = name,
                             style = MaterialTheme.typography.subtitle1,
-                            color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
+                            color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                             maxLines = 1
                         )
 
-                        if (nodeUIItem.isFavourite) {
+                        if (isFavourite) {
                             Image(
                                 alignment = Alignment.Center,
                                 modifier = iconModifier
@@ -154,7 +178,7 @@ internal fun <T : TypedNode> NodeListViewItem(
 
                                 )
                         }
-                        if (nodeUIItem.exportedData != null) {
+                        if (isSharedWithPublicLink) {
                             Image(
                                 alignment = Alignment.Center,
                                 modifier = iconModifier
@@ -166,7 +190,7 @@ internal fun <T : TypedNode> NodeListViewItem(
                                 )
                             )
                         }
-                        if (nodeUIItem.isTakenDown) {
+                        if (isTakenDown) {
                             Image(
                                 alignment = Alignment.Center,
                                 modifier = iconModifier
@@ -178,16 +202,7 @@ internal fun <T : TypedNode> NodeListViewItem(
                     }
                 }
                 Text(
-                    text = if (nodeUIItem.node is FolderNode) {
-                        nodeUIItem.node.folderInfo()
-                    } else {
-                        val fileItem = nodeUIItem.node as FileNode
-                        val current = Locale.current
-                        val javaLocale = java.util.Locale(
-                            current.language, current.region
-                        )
-                        "${fileItem.fileSize()} · ${fileItem.formattedModifiedDate(javaLocale)}"
-                    },
+                    text = folderInfo ?: "$fileSize · $modifiedDate",
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.textColorSecondary,
                     modifier = Modifier
@@ -241,3 +256,58 @@ const val EXPORTED_TEST_TAG = "exported Tag"
  * Test tag for taken item
  */
 const val TAKEN_TEST_TAG = "taken Tag"
+
+
+@Preview
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun FilePreview() {
+    val imageState = remember {
+        mutableStateOf(null as File?)
+    }
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        NodeListViewItem(
+            modifier = Modifier,
+            isSelected = false,
+            folderInfo = null,
+            icon = R.drawable.ic_pdf_list,
+            fileSize = "1.2 MB",
+            modifiedDate = "Dec 29, 2022",
+            name = "documentation.pdf",
+            isFavourite = false,
+            isSharedWithPublicLink = false,
+            isTakenDown = false,
+            onMenuClick = {},
+            onItemClicked = {},
+            onLongClick = {},
+            imageState = imageState
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = UI_MODE_NIGHT_YES)
+@Composable
+private fun FolderPreview() {
+    val imageState = remember {
+        mutableStateOf(null as File?)
+    }
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        NodeListViewItem(
+            modifier = Modifier,
+            isSelected = false,
+            folderInfo = "Empty Folder",
+            icon = R.drawable.ic_folder_list,
+            fileSize = "1.2 MB",
+            modifiedDate = "Dec 29, 2022",
+            name = "documentation.pdf",
+            isFavourite = false,
+            isSharedWithPublicLink = false,
+            isTakenDown = false,
+            onMenuClick = {},
+            onItemClicked = {},
+            onLongClick = {},
+            imageState = imageState
+        )
+    }
+}

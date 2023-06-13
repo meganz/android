@@ -5,7 +5,15 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.view.extension.fileSize
+import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.app.presentation.view.extension.formattedModifiedDate
+import mega.privacy.android.app.presentation.view.extension.getIcon
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 
@@ -56,17 +64,39 @@ fun <T : TypedNode> NodeListView(
             key = {
                 nodeUIItemList[it].node.id.longValue
             }) {
+            val nodeEntity = nodeUIItemList[it].node
             val imageState = produceState<File?>(initialValue = null) {
-                getThumbnail(nodeUIItemList[it].node.id.longValue) { file ->
+                getThumbnail(nodeEntity.id.longValue) { file ->
                     value = file
                 }
             }
-            NodeListViewItem<T>(
+            NodeListViewItem(
                 modifier = modifier,
-                nodeUIItem = nodeUIItemList[it],
-                onMenuClick = onMenuClick,
-                onItemClicked = onItemClicked,
-                onLongClick = onLongClick,
+                isSelected = nodeUIItemList[it].isSelected,
+                folderInfo = nodeEntity
+                    .let { node -> node as? FolderNode }
+                    ?.folderInfo(),
+                icon = nodeEntity
+                    .let { node -> node as? FolderNode }
+                    ?.getIcon()
+                    ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
+                fileSize = nodeEntity
+                    .let { node -> node as? FileNode }
+                    ?.fileSize(),
+                modifiedDate = nodeEntity
+                    .let { node -> node as? FileNode }
+                    ?.formattedModifiedDate(
+                        java.util.Locale(
+                            Locale.current.language, Locale.current.region
+                        )
+                    ),
+                name = nodeEntity.name,
+                isTakenDown = nodeEntity.isTakenDown,
+                isFavourite = nodeEntity.isFavourite,
+                isSharedWithPublicLink = nodeEntity.exportedData != null,
+                onMenuClick = { onMenuClick(nodeUIItemList[it]) },
+                onItemClicked = { onItemClicked(nodeUIItemList[it]) },
+                onLongClick = { onLongClick(nodeUIItemList[it]) },
                 imageState = imageState
             )
         }
