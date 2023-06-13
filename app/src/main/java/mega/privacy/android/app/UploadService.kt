@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -798,7 +797,10 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun doOnTransferFinish(transfer: Transfer, error: MegaException) = with(transfer) {
+    private suspend fun doOnTransferFinish(
+        transfer: Transfer,
+        error: MegaException,
+    ) = with(transfer) {
         Timber.d("Path: $localPath, Size: $transferredBytes")
 
         if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
@@ -808,10 +810,10 @@ internal class UploadService : LifecycleService() {
         transfersManagement.checkScanningTransferOnFinish(transfer)
 
         if (!isFolderTransfer) {
-            val completedTransfer = AndroidCompletedTransfer(transfer, error, this@UploadService)
-            runBlocking {
-                addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
-            }
+            val completedTransfer =
+                AndroidCompletedTransfer(transfer, error, this@UploadService)
+
+            addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
             if (appData.isNotEmpty() && appData.contains(Constants.APP_DATA_TXT_FILE)) {
                 val message =
                     getCreationOrEditorText(

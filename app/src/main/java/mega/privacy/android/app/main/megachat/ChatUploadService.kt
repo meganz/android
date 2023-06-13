@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -1029,7 +1028,10 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         }
     }
 
-    private fun onTransferFinish(transfer: Transfer, error: MegaException) = with(transfer) {
+    private suspend fun onTransferFinish(
+        transfer: Transfer,
+        error: MegaException,
+    ) = with(transfer) {
         if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
@@ -1044,10 +1046,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             transfersCount--
             totalUploadsCompleted++
         }
-        val completedTransfer = AndroidCompletedTransfer(transfer, error, this@ChatUploadService)
-        runBlocking {
-            addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
-        }
+        val completedTransfer =
+            AndroidCompletedTransfer(transfer, error, this@ChatUploadService)
+        addCompletedTransferUseCase(legacyCompletedTransferMapper(completedTransfer))
         mapProgressTransfers[tag] = transfer
 
         if (canceled) {
@@ -1178,7 +1179,11 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
                         //Attach node one the request finish
                         requestSent++
-                        megaApi.setPreview(pdfNode, preview.absolutePath, this@ChatUploadService)
+                        megaApi.setPreview(
+                            pdfNode,
+                            preview.absolutePath,
+                            this@ChatUploadService
+                        )
                         pdfiumCore.closeDocument(pdfDocument)
                         updatePdfAttachStatus(transfer)
                     } catch (e: Exception) {

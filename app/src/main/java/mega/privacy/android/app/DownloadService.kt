@@ -1333,13 +1333,11 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 if (!TextUtil.isTextEmpty(targetPath)) {
                     completedTransfer.path = targetPath
                 }
-                runBlocking {
-                    addCompletedTransferUseCase(
-                        legacyCompletedTransferMapper(
-                            completedTransfer
-                        )
+                addCompletedTransferUseCase(
+                    legacyCompletedTransferMapper(
+                        completedTransfer
                     )
-                }
+                )
             }
             if (transfer.state == TransferState.STATE_FAILED) {
                 transfersManagement.setAreFailedTransfers(true)
