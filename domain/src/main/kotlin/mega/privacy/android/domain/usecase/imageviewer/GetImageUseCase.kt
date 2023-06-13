@@ -31,35 +31,51 @@ class GetImageUseCase @Inject constructor(
         highPriority: Boolean,
         resetDownloads: () -> Unit,
     ): Flow<ImageResult> = flow {
-        val imageResult = ImageResult(isVideo = node.type is VideoFileTypeInfo)
-        emit(imageResult)
-
-        runCatching {
-            node.fetchThumbnail()
-        }.onSuccess {
-            imageResult.thumbnailUri = "$FILE$it"
-            emit(imageResult)
-        }
+        val imageResult = ImageResult(
+            isVideo = node.type is VideoFileTypeInfo,
+            thumbnailUri = node.thumbnailPath?.let { "$FILE$it" },
+            previewUri = node.previewPath?.let { "$FILE$it" },
+            fullSizeUri = node.fullSizePath?.let { "$FILE$it" },
+        )
 
         val fullSizeRequired = isFullSizeRequiredUseCase(
             node,
             fullSize
         )
 
-        runCatching {
-            node.fetchPreview()
-        }.onSuccess {
-            imageResult.previewUri = "$FILE$it"
-            if (fullSizeRequired) {
+        if ((!fullSizeRequired && node.previewPath != null) || node.fullSizePath != null) {
+            imageResult.isFullyLoaded = true
+            emit(imageResult)
+            return@flow
+        } else {
+            emit(imageResult)
+        }
+
+        if (node.thumbnailPath == null) {
+            runCatching {
+                node.fetchThumbnail()
+            }.onSuccess {
+                imageResult.thumbnailUri = "$FILE$it"
                 emit(imageResult)
-            } else {
-                imageResult.isFullyLoaded = true
-                emit(imageResult)
-                return@flow
             }
-        }.onFailure { exception ->
-            if (!fullSizeRequired) {
-                throw exception
+        }
+
+        if (node.previewPath == null) {
+            runCatching {
+                node.fetchPreview()
+            }.onSuccess {
+                imageResult.previewUri = "$FILE$it"
+                if (fullSizeRequired) {
+                    emit(imageResult)
+                } else {
+                    imageResult.isFullyLoaded = true
+                    emit(imageResult)
+                    return@flow
+                }
+            }.onFailure { exception ->
+                if (!fullSizeRequired) {
+                    throw exception
+                }
             }
         }
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app.imageviewer
 import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,12 +21,16 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
@@ -33,7 +38,6 @@ import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPED
 import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
-import mega.privacy.android.app.imageviewer.usecase.LegacyGetImageUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -45,7 +49,6 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
-import mega.privacy.android.app.usecase.exception.HttpMegaException
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.ResourceAlreadyExistsMegaException
@@ -57,8 +60,15 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.ResetTotalDownloads
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByOfflineNodeHandleUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
@@ -72,7 +82,13 @@ import javax.inject.Inject
  * This is shared between ImageViewerActivity behaving as the main container and
  * each individual ImageViewerPageFragment representing a single image within the ViewPager.
  *
- * @property legacyGetImageUseCase      Needed to retrieve each individual image based on a node
+ * @property getImageByNodeHandleUseCase            Needed to retrieve each individual image based on a node handle
+ * @property getImageByNodePublicLinkUseCase        Needed to retrieve each individual image based on a node public link
+ * @property getImageForChatMessageUseCase          Needed to retrieve each individual image based on chat details
+ * @property getImageByOfflineNodeHandleUseCase     Needed to retrieve each individual image based on offline node handle
+ * @property getImageFromFileUseCase                Needed to retrieve each individual image based on file Uri
+ * @property getNumPendingDownloadsNonBackground    UseCase to get number of pending downloads that are not background transfers
+ * @property resetTotalDownloads                    UseCase to reset total downloads
  * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
  * @property getGlobalChangesUseCase    Use case required to get node changes
  * @property getNodeUseCase             Needed to retrieve each individual node based on a node handle,
@@ -93,7 +109,13 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ImageViewerViewModel @Inject constructor(
-    private val legacyGetImageUseCase: LegacyGetImageUseCase,
+    private val getImageByNodeHandleUseCase: GetImageByNodeHandleUseCase,
+    private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase,
+    private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase,
+    private val getImageByOfflineNodeHandleUseCase: GetImageByOfflineNodeHandleUseCase,
+    private val getImageFromFileUseCase: GetImageFromFileUseCase,
+    private val getNumPendingDownloadsNonBackground: GetNumPendingDownloadsNonBackground,
+    private val resetTotalDownloads: ResetTotalDownloads,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
@@ -340,48 +362,79 @@ class ImageViewerViewModel @Inject constructor(
         ) return // Already downloaded
 
         val highPriority = itemId == getCurrentImageItem()?.id
-        val subscription = when (imageItem) {
-            is ImageItem.PublicNode ->
-                legacyGetImageUseCase.get(imageItem.nodePublicLink, fullSize, highPriority)
-
-            is ImageItem.ChatNode ->
-                legacyGetImageUseCase.get(
-                    imageItem.chatRoomId,
-                    imageItem.chatMessageId,
+        viewModelScope.launch {
+            when (imageItem) {
+                is ImageItem.PublicNode -> getImageByNodePublicLinkUseCase(
+                    imageItem.nodePublicLink,
                     fullSize,
                     highPriority
-                )
-
-            is ImageItem.OfflineNode ->
-                legacyGetImageUseCase.getOfflineNode(imageItem.handle, highPriority).toFlowable()
-
-            is ImageItem.Node ->
-                legacyGetImageUseCase.get(imageItem.handle, fullSize, highPriority)
-
-            is ImageItem.File ->
-                legacyGetImageUseCase.getImageUri(imageItem.fileUri, highPriority).toFlowable()
-        }
-
-        subscription
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .retry(2) { error ->
-                error is ResourceAlreadyExistsMegaException || error is HttpMegaException
-            }
-            .subscribeBy(
-                onNext = { imageResult ->
-                    updateItemIfNeeded(itemId, imageResult = imageResult)
-                },
-                onError = { error ->
-                    Timber.e(error)
-                    if (itemId == getCurrentImageItem()?.id
-                        && error is MegaException && error !is ResourceAlreadyExistsMegaException
-                    ) {
-                        snackBarMessage.value = error.getTranslatedErrorString()
-                    }
+                ) { resetTotalDownloadsIfNeeded() }.catch {
+                    onLoadSingleImageFailure(itemId, it)
+                }.collectLatest {
+                    onLoadSingleImageSuccess(itemId, it)
                 }
-            )
-            .addTo(composite)
+
+                is ImageItem.ChatNode -> getImageForChatMessageUseCase(
+                    imageItem.chatRoomId,
+                    imageItem.chatMessageId, fullSize, highPriority
+                ) { resetTotalDownloadsIfNeeded() }.catch {
+                    onLoadSingleImageFailure(itemId, it)
+                }.collectLatest {
+                    onLoadSingleImageSuccess(itemId, it)
+                }
+
+                is ImageItem.OfflineNode -> runCatching {
+                    getImageByOfflineNodeHandleUseCase(imageItem.handle, highPriority)
+                }.onSuccess {
+                    onLoadSingleImageSuccess(itemId, it)
+                }.onFailure {
+                    onLoadSingleImageFailure(itemId, it)
+                }
+
+                is ImageItem.Node -> getImageByNodeHandleUseCase(
+                    imageItem.handle,
+                    fullSize, highPriority
+                ) { resetTotalDownloadsIfNeeded() }.catch {
+                    onLoadSingleImageFailure(itemId, it)
+                }.collectLatest {
+                    onLoadSingleImageSuccess(itemId, it)
+                }
+
+                is ImageItem.File -> runCatching {
+                    getImageFromFileUseCase(imageItem.fileUri.toFile(), highPriority)
+                }.onSuccess {
+                    onLoadSingleImageSuccess(itemId, it)
+                }.onFailure {
+                    onLoadSingleImageFailure(itemId, it)
+                }
+            }
+        }
+    }
+
+    private fun resetTotalDownloadsIfNeeded() {
+        viewModelScope.launch {
+            val currentTransfers = getNumPendingDownloadsNonBackground()
+            val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
+            if (currentTransfers == 0 && !isServiceRunning) {
+                resetTotalDownloads()
+            }
+        }
+    }
+
+    private fun onLoadSingleImageSuccess(
+        itemId: Long,
+        imageResult: ImageResult,
+    ) {
+        updateItemIfNeeded(itemId, imageResult = imageResult)
+    }
+
+    private fun onLoadSingleImageFailure(itemId: Long, error: Throwable) {
+        Timber.e(error)
+        if (itemId == getCurrentImageItem()?.id
+            && error is MegaException && error !is ResourceAlreadyExistsMegaException
+        ) {
+            snackBarMessage.value = error.getTranslatedErrorString()
+        }
     }
 
     /**

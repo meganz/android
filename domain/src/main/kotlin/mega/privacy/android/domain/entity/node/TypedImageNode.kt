@@ -8,10 +8,27 @@ import mega.privacy.android.domain.entity.imageviewer.ImageProgress
  */
 class TypedImageNode(
     private val imageNode: ImageNode,
+
+    /**
+     *  Thumbnail path
+     */
+    override val thumbnailPath: String?,
+
+    /**
+     *  Preview path
+     */
+    override val previewPath: String?,
+
+    /**
+     *  Full Image path
+     */
+    override val fullSizePath: String?,
+
     /**
      *  Fetch Thumbnail
      */
     val fetchThumbnail: suspend () -> String,
+
     /**
      *  Fetch Preview
      */

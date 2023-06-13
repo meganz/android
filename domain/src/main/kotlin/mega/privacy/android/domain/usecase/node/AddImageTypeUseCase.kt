@@ -26,10 +26,48 @@ class AddImageTypeUseCase @Inject constructor(
     suspend operator fun invoke(node: ImageNode): TypedImageNode {
         return TypedImageNode(
             imageNode = node,
+            thumbnailPath = getThumbnailPath(node.base64Id),
+            previewPath = getPreviewPath(node.base64Id),
+            fullSizePath = getFullImagePath(node),
             fetchThumbnail = getFetchThumbnailFunction(node.downloadThumbnail, node.base64Id),
             fetchPreview = getFetchPreviewFunction(node.downloadPreview, node.base64Id),
             fetchFullImage = getFetchFullImageFunction(node),
         )
+    }
+
+    private suspend fun getThumbnailPath(
+        nodeName: String,
+    ): String? {
+        val path = "${imageRepository.getThumbnailPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        if (fileSystemRepository.doesFileExist(path)) {
+            return path
+        }
+        return null
+    }
+
+
+    private suspend fun getPreviewPath(
+        nodeName: String,
+    ): String? {
+        val path = "${imageRepository.getPreviewPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        if (fileSystemRepository.doesFileExist(path)) {
+            return path
+        }
+        return null
+    }
+
+
+    private suspend fun getFullImagePath(node: ImageNode): String? {
+        val path =
+            "${imageRepository.getFullImagePath()}${File.separator}${node.base64Id}.${node.type.extension}"
+        val fullSizeFile = File(path)
+        if (!isValidNodeFileUseCase(node, fullSizeFile)) {
+            fileSystemRepository.deleteFile(fullSizeFile)
+        }
+        if (fileSystemRepository.doesFileExist(path)) {
+            return path
+        }
+        return null
     }
 
     private suspend fun getFetchThumbnailFunction(

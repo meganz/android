@@ -1,10 +1,12 @@
 package mega.privacy.android.domain.usecase.node
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -93,6 +95,30 @@ internal class AddImageTypeUseCaseTest {
                 // lambda should be triggered only once, the second will return the already downloaded file
                 verify(downloadPreviewLambda).invoke(any())
             }
+
+        @Test
+        fun `test that preview path is not null when file exists`() = runTest {
+            val nodeName = "test"
+            val thumbnailPath = "cache/previewsMEGA"
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageRepository.getPreviewPath()).thenReturn(thumbnailPath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
+            val result = underTest(imageNode)
+            assertThat(result.previewPath).isEqualTo("$thumbnailPath/$nodeName.jpg")
+        }
+
+        @Test
+        fun `test that preview path is null when file doesn't exist`() = runTest {
+            val nodeName = "test"
+            val thumbnailPath = "cache/previewsMEGA"
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageRepository.getPreviewPath()).thenReturn(thumbnailPath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
+            val result = underTest(imageNode)
+            assertThat(result.previewPath).isNull()
+        }
     }
 
     @Nested
@@ -140,6 +166,30 @@ internal class AddImageTypeUseCaseTest {
                 // lambda should be triggered only once, the second will return the already downloaded file
                 verify(downloadThumbnailLambda).invoke(any())
             }
+
+        @Test
+        fun `test that thumbnail path is not null when file exists`() = runTest {
+            val nodeName = "test"
+            val thumbnailPath = "cache/thumbMEGA"
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageRepository.getThumbnailPath()).thenReturn(thumbnailPath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
+            val result = underTest(imageNode)
+            assertThat(result.thumbnailPath).isEqualTo("$thumbnailPath/$nodeName.jpg")
+        }
+
+        @Test
+        fun `test that thumbnail path is null when file doesn't exist`() = runTest {
+            val nodeName = "test"
+            val thumbnailPath = "cache/thumbMEGA"
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageRepository.getThumbnailPath()).thenReturn(thumbnailPath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
+            val result = underTest(imageNode)
+            assertThat(result.thumbnailPath).isNull()
+        }
     }
 
     @Nested
@@ -196,5 +246,39 @@ internal class AddImageTypeUseCaseTest {
                     cancelAndIgnoreRemainingEvents()
                 }
             }
+
+        @Test
+        fun `test that full size path is not null when file exists`() = runTest {
+            val nodeName = "test"
+            val fullImagePath = "cache/tempMEGA"
+            val imageExtension = "jpg"
+            val fileTypeInfo = mock<StaticImageFileTypeInfo> {
+                on { extension }.thenReturn(imageExtension)
+            }
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageNode.type).thenReturn(fileTypeInfo)
+            whenever(imageRepository.getFullImagePath()).thenReturn(fullImagePath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(true)
+            val result = underTest(imageNode)
+            assertThat(result.fullSizePath).isEqualTo("$fullImagePath/$nodeName.$imageExtension")
+        }
+
+        @Test
+        fun `test that full size path is null when file doesn't exist`() = runTest {
+            val nodeName = "test"
+            val fullImagePath = "cache/tempMEGA"
+            val imageExtension = "jpg"
+            val fileTypeInfo = mock<StaticImageFileTypeInfo> {
+                on { extension }.thenReturn(imageExtension)
+            }
+            whenever(isValidNodeFileUseCase(any(), any())).thenReturn(true)
+            whenever(imageNode.base64Id).thenReturn(nodeName)
+            whenever(imageNode.type).thenReturn(fileTypeInfo)
+            whenever(imageRepository.getFullImagePath()).thenReturn(fullImagePath)
+            whenever(fileSystemRepository.doesFileExist(any())).thenReturn(false)
+            val result = underTest(imageNode)
+            assertThat(result.fullSizePath).isNull()
+        }
     }
 }
