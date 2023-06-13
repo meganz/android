@@ -26,7 +26,6 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundNotifications
@@ -184,16 +183,6 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override fun isCameraSyncPreferenceEnabled(): Boolean =
         databaseHandler.preferences?.camSyncEnabled.toBoolean()
-
-    override suspend fun setEnableCameraUpload(enable: Boolean) {
-        megaLocalStorageGateway.setCamSyncEnabled(enable)
-    }
-
-    override suspend fun setCameraUploadFileType(syncVideo: Boolean) {
-        val fileUpload =
-            if (syncVideo) MegaPreferences.PHOTOS_AND_VIDEOS else MegaPreferences.ONLY_PHOTOS
-        megaLocalStorageGateway.setCamSyncFileUpload(fileUpload)
-    }
 
     override suspend fun getStorageDownloadAskAlways(): Boolean {
         return megaLocalStorageGateway.getStorageAskAlways()

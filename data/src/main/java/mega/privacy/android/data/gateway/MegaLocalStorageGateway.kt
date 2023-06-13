@@ -555,7 +555,7 @@ interface MegaLocalStorageGateway {
      *
      * @param enable
      */
-    suspend fun setCamSyncEnabled(enable: Boolean)
+    suspend fun setCameraUploadsEnabled(enable: Boolean)
 
     /**
      * Gets attributes from DB

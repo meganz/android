@@ -273,6 +273,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isCameraUploadsEnabled()
     }
 
+    override suspend fun setCameraUploadsEnabled(enable: Boolean) {
+        localStorageGateway.setCameraUploadsEnabled(enable)
+    }
+
     override suspend fun getPrimaryFolderLocalPath(): String = withContext(ioDispatcher) {
         localStorageGateway.getPrimaryFolderLocalPath()
     }

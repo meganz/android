@@ -325,7 +325,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.updateVideoState(syncStatus)
     }
 
-    override suspend fun setCamSyncEnabled(enable: Boolean) {
+    override suspend fun setCameraUploadsEnabled(enable: Boolean) {
         dbHandler.setCamSyncEnabled(enable)
     }
 

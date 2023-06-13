@@ -1,7 +1,8 @@
 package mega.privacy.android.domain.usecase.photos
 
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
@@ -14,7 +15,7 @@ import javax.inject.Inject
  * Use Case to enable Camera Uploads in the Photos feature
  *
  * @property listenToNewMediaUseCase [ListenToNewMediaUseCase]
- * @property settingsRepository [SettingsRepository]
+ * @property cameraUploadRepository [CameraUploadRepository]
  * @property setCameraUploadsByWifiUseCase [SetCameraUploadsByWifiUseCase]
  * @property setChargingRequiredForVideoCompressionUseCase [SetChargingRequiredForVideoCompressionUseCase]
  * @property setDefaultPrimaryFolderPathUseCase [SetDefaultPrimaryFolderPathUseCase]
@@ -23,7 +24,7 @@ import javax.inject.Inject
  */
 class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
-    private val settingsRepository: SettingsRepository,
+    private val cameraUploadRepository: CameraUploadRepository,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setDefaultPrimaryFolderPathUseCase: SetDefaultPrimaryFolderPathUseCase,
@@ -48,11 +49,11 @@ class EnableCameraUploadsInPhotosUseCase @Inject constructor(
     ) {
         setDefaultPrimaryFolderPathUseCase()
         setCameraUploadsByWifiUseCase(shouldUseWiFiOnly)
-        settingsRepository.setCameraUploadFileType(shouldSyncVideos)
+        cameraUploadRepository.setUploadOption(if (shouldSyncVideos) UploadOption.PHOTOS_AND_VIDEOS else UploadOption.PHOTOS)
         setUploadVideoQualityUseCase(videoUploadQuality)
         setChargingRequiredForVideoCompressionUseCase(true)
         setVideoCompressionSizeLimitUseCase(videoCompressionSizeLimit)
-        settingsRepository.setEnableCameraUpload(true)
+        cameraUploadRepository.setCameraUploadsEnabled(true)
         listenToNewMediaUseCase()
     }
 }

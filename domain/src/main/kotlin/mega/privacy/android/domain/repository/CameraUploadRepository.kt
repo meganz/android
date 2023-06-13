@@ -236,6 +236,11 @@ interface CameraUploadRepository {
     suspend fun isCameraUploadsEnabled(): Boolean
 
     /**
+     * Set camera uploads enabled
+     */
+    suspend fun setCameraUploadsEnabled(enable: Boolean)
+
+    /**
      * Retrieves the Primary Folder local path
      *
      * @return A [String] that contains the Primary Folder local path

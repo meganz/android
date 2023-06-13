@@ -84,16 +84,6 @@ interface SettingsRepository {
     fun isCameraSyncPreferenceEnabled(): Boolean
 
     /**
-     * Set camera upload
-     */
-    suspend fun setEnableCameraUpload(enable: Boolean)
-
-    /**
-     * Set if photos only or photos and videos
-     */
-    suspend fun setCameraUploadFileType(syncVideo: Boolean)
-
-    /**
      * Get always ask for storage value
      *
      * @return isStorageAskAlways as [Boolean]
