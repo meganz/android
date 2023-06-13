@@ -316,13 +316,6 @@
                     app:tint="@color/red_600_white_087" />
 
                 <TextView
-                    android:id="@+id/create_account_generating_keys_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/login_generating_key" />
-
-                <TextView
                     android:id="@+id/create_account_creating_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
