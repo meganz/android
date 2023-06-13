@@ -155,7 +155,7 @@ class ImageViewerPageFragment : Fragment() {
                     }
 
                     override fun onScroll(
-                        e1: MotionEvent,
+                        e1: MotionEvent?,
                         e2: MotionEvent,
                         distanceX: Float,
                         distanceY: Float,

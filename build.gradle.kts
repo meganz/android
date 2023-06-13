@@ -50,10 +50,10 @@ tasks.register("clean", Delete::class) {
 extra["appVersion"] = "8.3"
 
 // Sdk and tools
-extra["compileSdkVersion"] = 33
+extra["compileSdkVersion"] = 34
 extra["minSdkVersion"] = 24
 extra["targetSdkVersion"] = 33
-extra["buildToolsVersion"] = "33.0.1"
+extra["buildToolsVersion"] = "34.0.0"
 
 // Prebuilt MEGA SDK version
 extra["megaSdkVersion"] = "20230608.065330-dev"
