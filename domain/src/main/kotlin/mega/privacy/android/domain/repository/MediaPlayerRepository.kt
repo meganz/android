@@ -14,14 +14,6 @@ import mega.privacy.android.domain.exception.MegaException
 interface MediaPlayerRepository {
 
     /**
-     * Get [UnTypedNode] by handle
-     *
-     * @param handle node handle
-     * @return [UnTypedNode]?
-     */
-    suspend fun getUnTypedNodeByHandle(handle: Long): UnTypedNode?
-
-    /**
      * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApiFolder
      *
      * @param nodeHandle node Handle
@@ -85,42 +77,6 @@ interface MediaPlayerRepository {
      * @return true is null, otherwise is false
      */
     suspend fun areCredentialsNull(): Boolean
-
-    /**
-     * Get rubbish node
-     *
-     * @return [UnTypedNode]?
-     */
-    suspend fun getRubbishNode(): UnTypedNode?
-
-    /**
-     * Get inbox node
-     *
-     * @return [UnTypedNode]?
-     */
-    suspend fun getInboxNode(): UnTypedNode?
-
-    /**
-     * Get root node
-     *
-     * @return [UnTypedNode]?
-     */
-    suspend fun getRootNode(): UnTypedNode?
-
-    /**
-     * MegaApiFolder gets root node
-     *
-     * @return [UnTypedNode]?
-     */
-    suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode?
-
-    /**
-     * MegaApiFolder gets parent node by handle
-     *
-     * @param parentHandle node handle
-     * @return [UnTypedNode]?
-     */
-    suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
 
     /**
      * Get audio children by parent node handle
@@ -235,14 +191,6 @@ interface MediaPlayerRepository {
      * @return username
      */
     suspend fun getUserNameByEmail(email: String): String?
-
-    /**
-     * Get nodes by handles
-     *
-     * @param handles handle list
-     * @return List<[UnTypedNode]>
-     */
-    suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode>
 
     /**
      * MegaApi http server stop

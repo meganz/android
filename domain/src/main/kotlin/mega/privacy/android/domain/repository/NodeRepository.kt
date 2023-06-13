@@ -398,4 +398,49 @@ interface NodeRepository {
      * @param handle
      */
     suspend fun getNodeByHandle(handle: Long): UnTypedNode?
+
+    /**
+     * Get nodes by handles
+     *
+     * @param handles handle list
+     * @return List<[UnTypedNode]>
+     */
+    suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode>
+
+    /**
+     * Get rubbish node
+     *
+     * @return [UnTypedNode]?
+     */
+    suspend fun getRubbishNode(): UnTypedNode?
+
+    /**
+     * Get inbox node
+     *
+     * @return [UnTypedNode]?
+     */
+    suspend fun getInboxNode(): UnTypedNode?
+
+    /**
+     * Get root node
+     *
+     * @return [UnTypedNode]?
+     */
+    suspend fun getUnTypedRootNode(): UnTypedNode?
+
+    /**
+     * MegaApiFolder gets root node
+     *
+     * @return [UnTypedNode]?
+     */
+    suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode?
+
+    /**
+     * MegaApiFolder gets parent node by handle
+     *
+     * @param parentHandle node handle
+     * @return [UnTypedNode]?
+     */
+    suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
+
 }

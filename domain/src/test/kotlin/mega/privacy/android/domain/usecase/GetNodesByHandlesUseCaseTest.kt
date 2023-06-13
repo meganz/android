@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +16,7 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class GetNodesByHandlesUseCaseTest {
     lateinit var underTest: GetNodesByHandlesUseCase
-    private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val nodeRepository = mock<NodeRepository>()
     private val addNodeType = mock<AddNodeType>()
 
     private val unTypeNodeOne = mock<FolderNode>()
@@ -25,14 +25,14 @@ class GetNodesByHandlesUseCaseTest {
 
     @Before
     fun setUp() {
-        underTest = GetNodesByHandlesUseCase(mediaPlayerRepository, addNodeType)
+        underTest = GetNodesByHandlesUseCase(nodeRepository, addNodeType)
     }
 
     @Test
     fun `test that the AddNodeType has been invoked`() =
         runTest {
             val handles: List<Long> = listOf(12345, 23456)
-            whenever(mediaPlayerRepository.getNodesByHandles(handles)).thenReturn(
+            whenever(nodeRepository.getNodesByHandles(handles)).thenReturn(
                 unTypedNodeList
             )
 

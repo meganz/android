@@ -50,13 +50,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
 
-    override suspend fun getUnTypedNodeByHandle(handle: Long): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(handle)?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
     override suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String? =
         withContext(ioDispatcher) {
             megaApiFolder.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
@@ -147,41 +140,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     override suspend fun areCredentialsNull(): Boolean = dbHandler.credentials == null
-
-    override suspend fun getRubbishNode(): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApi.getRubbishBinNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
-    override suspend fun getInboxNode(): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApi.getInboxNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
-    override suspend fun getRootNode(): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApi.getRootNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
-    override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getRootNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
-    override suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
 
     override suspend fun getAudioNodesByParentHandle(
         parentHandle: Long,
@@ -385,13 +343,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             megaApi.getContact(email)?.let { megaUser ->
                 getMegaUserNameDB(megaUser)
             }
-        }
-
-    override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> =
-        handles.mapNotNull { handle ->
-            megaApi.getMegaNodeByHandle(handle)
-        }.map { node ->
-            convertToUnTypedNode(node)
         }
 
     override suspend fun megaApiHttpServerStop() = megaApi.httpServerStop()

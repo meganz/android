@@ -1,13 +1,13 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
  * The use case for getting root node
  */
 class GetRootNodeUseCase @Inject constructor(
-    private val mediaPlayerRepository: MediaPlayerRepository
+    private val nodeRepository: NodeRepository
 ) {
 
     /**
@@ -15,5 +15,5 @@ class GetRootNodeUseCase @Inject constructor(
      *
      * @return root node
      */
-    suspend operator fun invoke() = mediaPlayerRepository.getRootNode()
+    suspend operator fun invoke() = nodeRepository.getUnTypedRootNode()
 }

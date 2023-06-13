@@ -117,7 +117,6 @@ import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandleUseCase
@@ -142,6 +141,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -188,7 +188,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
-    private val getUnTypedNodeByHandleUseCase: GetUnTypedNodeByHandleUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val getAudioNodesFromPublicLinksUseCase: GetAudioNodesFromPublicLinksUseCase,
     private val getVideoNodesFromPublicLinksUseCase: GetVideoNodesFromPublicLinksUseCase,
     private val getAudioNodesFromInSharesUseCase: GetAudioNodesFromInSharesUseCase,
@@ -493,7 +493,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 else -> getRootNodeUseCase()
                             }
                         } else {
-                            getUnTypedNodeByHandleUseCase(parentHandle)
+                            getNodeByHandleUseCase(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
                                 context.getString(
@@ -603,7 +603,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             playlistItems.clear()
 
             val node: TypedFileNode? =
-                getUnTypedNodeByHandleUseCase(firstPlayHandle) as? TypedFileNode
+                getNodeByHandleUseCase(firstPlayHandle) as? TypedFileNode
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
                     offlineThumbnailFileWrapper.getThumbnailFile(

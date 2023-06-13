@@ -20,6 +20,7 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineInformationMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -89,6 +90,7 @@ class NodeRepositoryImplTest {
     private val folderNode: TypedFolderNode = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
+    private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
             cacheFolderGateway = cacheFolderGateway,
@@ -97,7 +99,7 @@ class NodeRepositoryImplTest {
         ),
         folderNodeMapper = FolderNodeMapper(
             megaApiGateway = megaApiGateway,
-            fetChildrenMapper = mock()
+            fetChildrenMapper = fetChildrenMapper
         )
     )
 

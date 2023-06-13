@@ -566,4 +566,46 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getMegaNodeByHandle(handle)
             ?.let { nodeMapper(it) }
     }
+
+    override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> =
+        handles.mapNotNull { handle ->
+            megaApiGateway.getMegaNodeByHandle(handle)
+        }.map { node ->
+            convertToUnTypedNode(node)
+        }
+
+    override suspend fun getRubbishNode(): UnTypedNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getRubbishBinNode()?.let { megaNode ->
+                convertToUnTypedNode(megaNode)
+            }
+        }
+
+    override suspend fun getInboxNode(): UnTypedNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getInboxNode()?.let { megaNode ->
+                convertToUnTypedNode(megaNode)
+            }
+        }
+
+    override suspend fun getUnTypedRootNode(): UnTypedNode? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getRootNode()?.let { megaNode ->
+                convertToUnTypedNode(megaNode)
+            }
+        }
+
+    override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getRootNode()?.let { megaNode ->
+                convertToUnTypedNode(megaNode)
+            }
+        }
+
+    override suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode? =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(parentHandle)?.let { megaNode ->
+                convertToUnTypedNode(megaNode)
+            }
+        }
 }
