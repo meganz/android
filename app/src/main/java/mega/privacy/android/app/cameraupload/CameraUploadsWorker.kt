@@ -88,7 +88,6 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -111,6 +110,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUse
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
@@ -212,10 +212,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var hasPreferencesUseCase: HasPreferencesUseCase
 
     /**
-     * IsCameraUploadSyncEnabled
+     * IsCameraUploadsEnabledUseCase
      */
     @Inject
-    lateinit var isCameraUploadSyncEnabled: IsCameraUploadSyncEnabled
+    lateinit var isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase
 
     /**
      * IsWifiNotSatisfied Use Case
@@ -952,7 +952,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return true if enabled, and false if otherwise
      */
     private suspend fun cameraUploadsSyncEnabled(): Boolean =
-        isCameraUploadSyncEnabled().also {
+        isCameraUploadsEnabledUseCase().also {
             if (!it) Timber.w("Camera Upload sync disabled")
         }
 

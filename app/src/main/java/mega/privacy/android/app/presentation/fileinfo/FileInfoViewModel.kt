@@ -51,7 +51,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -61,6 +60,7 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -119,7 +119,7 @@ class FileInfoViewModel @Inject constructor(
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
-    private val isCameraUploadSyncEnabled: IsCameraUploadSyncEnabled,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
@@ -486,7 +486,7 @@ class FileInfoViewModel @Inject constructor(
                 if (sendToRubbish) {
                     val handle = nodeId.longValue
                     when {
-                        getPrimarySyncHandleUseCase() == handle && isCameraUploadSyncEnabled() -> {
+                        getPrimarySyncHandleUseCase() == handle && isCameraUploadsEnabledUseCase() -> {
                             FileInfoExtraAction.ConfirmRemove.SendToRubbishCameraUploads
                         }
 

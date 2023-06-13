@@ -72,7 +72,6 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
-import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
@@ -116,13 +115,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideHasCredentials(cameraUploadRepository: CameraUploadRepository): HasCredentials =
             HasCredentials(cameraUploadRepository::doCredentialsExist)
-
-        /**
-         * Provide the [IsCameraUploadSyncEnabled] implementation
-         */
-        @Provides
-        fun provideIsCameraUploadSyncEnabled(cameraUploadRepository: CameraUploadRepository): IsCameraUploadSyncEnabled =
-            IsCameraUploadSyncEnabled(cameraUploadRepository::isCameraUploadsEnabled)
 
         /**
          * Provide the [GetPendingSyncRecords] implementation

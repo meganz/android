@@ -54,7 +54,6 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
@@ -64,6 +63,7 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -141,7 +141,7 @@ internal class FileInfoViewModelTest {
     private val clipboardGateway = mock<ClipboardGateway>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
-    private val isCameraUploadSyncEnabled = mock<IsCameraUploadSyncEnabled>()
+    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
 
     private val typedFileNode: TypedFileNode = mock()
@@ -199,7 +199,7 @@ internal class FileInfoViewModelTest {
             clipboardGateway = clipboardGateway,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
-            isCameraUploadSyncEnabled = isCameraUploadSyncEnabled,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
         )
     }
@@ -856,7 +856,7 @@ internal class FileInfoViewModelTest {
     fun `test that when initiate remove node on the primary camera upload folder then the SendToRubbishCameraUploads confirmation action is set`() =
         runTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(nodeId.longValue)
-            whenever(isCameraUploadSyncEnabled()).thenReturn(true)
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
             underTest.setNode(node.handle)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {

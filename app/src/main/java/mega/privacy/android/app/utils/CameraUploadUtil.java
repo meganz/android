@@ -6,9 +6,8 @@ import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaPreferences;
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase;
-import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled;
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled;
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase;
 
 public class CameraUploadUtil {
 
@@ -32,7 +31,7 @@ public class CameraUploadUtil {
     }
 
     /**
-     * @see IsCameraUploadSyncEnabled
+     * @see mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
      * @deprecated Replace all calls with use case
      */
     public static boolean isPrimaryEnabled() {
