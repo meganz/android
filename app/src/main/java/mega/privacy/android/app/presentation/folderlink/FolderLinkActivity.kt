@@ -666,10 +666,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
             .observe(this) { isList: Boolean -> viewModel.updateViewType(isList) }
 
-        collectFlow(viewModel.onViewTypeChanged, Lifecycle.State.STARTED) { viewType: ViewType ->
-            updateViewType(viewType)
-        }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
@@ -689,6 +685,11 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             megaApiFolder.fetchNodes(this@FolderLinkActivity)
                             // Get cookies settings after login.
                             getInstance().checkEnabledCookies()
+                        }
+
+                        (it.currentViewType == ViewType.LIST && !viewModel.isList) || (it.currentViewType == ViewType.GRID && viewModel.isList) -> {
+                            viewModel.isList = it.currentViewType === ViewType.LIST
+                            setupRecyclerViewAdapter()
                         }
 
                         it.collisions != null -> {
@@ -1064,6 +1065,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
         adapterList?.apply {
             isMultipleSelect = false
+            actionMode?.finish()
             setNodes(ArrayList(nodes))
             recyclerView.adapter = this
         }
@@ -1426,17 +1428,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private fun showSnackbar(string: String) {
         Timber.d("showSnackbar")
         showSnackbar(Constants.SNACKBAR_TYPE, binding.folderLinkFragmentContainer, string)
-    }
-
-    /**
-     * Updates the View Type
-     *
-     * @param viewType The new View Type
-     */
-    private fun updateViewType(viewType: ViewType) {
-        Timber.d("The updated View Type is ${viewType.name}")
-        viewModel.isList = viewType === ViewType.LIST
-        setupRecyclerViewAdapter()
     }
 
     companion object {

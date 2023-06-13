@@ -14,7 +14,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -123,12 +122,6 @@ class FolderLinkViewModel @Inject constructor(
      * Determine whether to show data in list or grid view
      */
     var isList = true
-
-    /**
-     * Flow that monitors the View Type
-     */
-    val onViewTypeChanged: Flow<ViewType>
-        get() = monitorViewType()
 
     init {
         checkViewType()
