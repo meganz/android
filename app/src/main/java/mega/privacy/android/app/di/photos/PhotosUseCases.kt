@@ -9,7 +9,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.PhotosRepository
-import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
@@ -30,7 +29,6 @@ import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
-import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -78,9 +76,6 @@ abstract class PhotosUseCases {
     abstract fun bindUpdateAlbumPhotosRemovingProgressCompleted(useCase: DefaultUpdateAlbumPhotosRemovingProgressCompleted): UpdateAlbumPhotosRemovingProgressCompleted
 
     companion object {
-        @Provides
-        fun providesIsCameraSyncPreferenceEnabled(settingsRepository: SettingsRepository): IsCameraSyncPreferenceEnabled =
-            IsCameraSyncPreferenceEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
 
         @Provides
         fun provideDownloadThumbnail(repository: ImageRepository): DownloadThumbnail =

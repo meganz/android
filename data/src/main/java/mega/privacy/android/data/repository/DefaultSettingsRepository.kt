@@ -181,9 +181,6 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setMediaDiscoveryView(value: Int) =
         uiPreferencesGateway.setMediaDiscoveryView(value)
 
-    override fun isCameraSyncPreferenceEnabled(): Boolean =
-        databaseHandler.preferences?.camSyncEnabled.toBoolean()
-
     override suspend fun getStorageDownloadAskAlways(): Boolean {
         return megaLocalStorageGateway.getStorageAskAlways()
     }

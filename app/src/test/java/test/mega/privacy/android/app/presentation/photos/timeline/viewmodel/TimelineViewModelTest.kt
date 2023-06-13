@@ -35,9 +35,9 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
@@ -58,8 +58,8 @@ import java.time.LocalDateTime
 class TimelineViewModelTest {
     private lateinit var underTest: TimelineViewModel
 
-    private val isCameraSyncPreferenceEnabled =
-        mock<IsCameraSyncPreferenceEnabled> { on { invoke() }.thenReturn(true) }
+    private val isCameraUploadsEnabledUseCase =
+        mock<IsCameraUploadsEnabledUseCase> { onBlocking { invoke() }.thenReturn(true) }
 
     private val getTimelinePhotosUseCase =
         mock<GetTimelinePhotosUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
@@ -100,7 +100,7 @@ class TimelineViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = TimelineViewModel(
-            isCameraSyncPreferenceEnabled = isCameraSyncPreferenceEnabled,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             getCameraUploadPhotos = filterCameraUploadPhotos,
             getCloudDrivePhotos = filterCloudDrivePhotos,

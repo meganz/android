@@ -43,9 +43,9 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
@@ -61,7 +61,7 @@ import javax.inject.Inject
 /**
  * View Model for Timeline
  *
- * @property isCameraSyncPreferenceEnabled
+ * @property IsCameraUploadsEnabledUseCase
  * @property getTimelinePhotosUseCase
  * @property getCameraUploadPhotos
  * @property getCloudDrivePhotos
@@ -77,7 +77,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
-    val isCameraSyncPreferenceEnabled: IsCameraSyncPreferenceEnabled,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     val getCameraUploadPhotos: FilterCameraUploadPhotos,
     val getCloudDrivePhotos: FilterCloudDrivePhotos,
@@ -371,7 +371,7 @@ class TimelineViewModel @Inject constructor(
 
     internal fun resetCUButtonAndProgress() {
         viewModelScope.launch(ioDispatcher) {
-            if (isCameraSyncPreferenceEnabled()) {
+            if (isCameraUploadsEnabledUseCase()) {
                 _state.update {
                     it.copy(
                         enableCameraUploadButtonShowing = false,

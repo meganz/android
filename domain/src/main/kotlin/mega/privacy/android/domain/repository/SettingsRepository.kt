@@ -77,13 +77,6 @@ interface SettingsRepository {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
-     * Is camera sync enabled
-     *
-     * @return
-     */
-    fun isCameraSyncPreferenceEnabled(): Boolean
-
-    /**
      * Get always ask for storage value
      *
      * @return isStorageAskAlways as [Boolean]

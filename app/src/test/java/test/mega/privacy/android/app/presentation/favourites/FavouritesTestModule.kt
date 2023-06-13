@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
-import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
@@ -84,9 +83,6 @@ object FavouritesTestModule {
 
     @Provides
     fun provideGetNodeListByIds(): GetNodeListByIds = mock()
-
-    @Provides
-    fun provideIsCameraSyncPreferenceEnabled(): IsCameraSyncPreferenceEnabled = mock()
 
     @Provides
     fun provideMapFavouriteSortOrder(): MapFavouriteSortOrderUseCase = mock()
