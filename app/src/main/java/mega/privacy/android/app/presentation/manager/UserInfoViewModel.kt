@@ -62,7 +62,7 @@ internal class UserInfoViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorUserUpdates()
-                .catch { Timber.e(it) }
+                .catch { Timber.w("Exception monitoring user updates: $it") }
                 .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
                 .collect {
                     when (it) {

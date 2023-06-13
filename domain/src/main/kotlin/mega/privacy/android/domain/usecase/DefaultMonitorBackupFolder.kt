@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
@@ -33,7 +34,7 @@ class DefaultMonitorBackupFolder @Inject constructor(
                     .filter { it == UserChanges.MyBackupsFolder }
                     .map {
                         kotlin.runCatching { nodeRepository.getBackupFolderId() }
-                    }
+                    }.catch { emit(Result.failure(it)) }
             )
         }.shareIn(
             scope = CoroutineScope(dispatcher),

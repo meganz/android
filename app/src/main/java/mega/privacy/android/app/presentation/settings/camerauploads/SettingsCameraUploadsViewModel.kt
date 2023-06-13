@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -211,21 +212,26 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         }
 
     /**
+     *
      * Checks whether Camera Uploads can be enabled and handles the Status accordingly, as
      * determined by the Use Case [checkEnableCameraUploadsStatus]
      */
     fun handleEnableCameraUploads() = viewModelScope.launch {
-        when (checkEnableCameraUploadsStatus.invoke()) {
-            EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> {
-                _state.update { it.copy(shouldTriggerCameraUploads = true) }
+        runCatching { checkEnableCameraUploadsStatus() }.onSuccess { status ->
+            when (status) {
+                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS -> {
+                    _state.update { it.copy(shouldTriggerCameraUploads = true) }
+                }
+
+                EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
+                    _state.update { it.copy(shouldShowBusinessAccountPrompt = true) }
+                }
+
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
+                    _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = true) }
+                }
             }
-            EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
-                _state.update { it.copy(shouldShowBusinessAccountPrompt = true) }
-            }
-            EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
-                _state.update { it.copy(shouldShowBusinessAccountSuspendedPrompt = true) }
-            }
-        }
+        }.onFailure { Timber.w("Exception checking CU status: $it") }
     }
 
     /**

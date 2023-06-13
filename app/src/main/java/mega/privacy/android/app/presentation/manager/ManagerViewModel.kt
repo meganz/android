@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
@@ -277,6 +278,7 @@ class ManagerViewModel @Inject constructor(
         }
         viewModelScope.launch {
             monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
                 .filter { it == UserChanges.CameraUploadsFolder }
                 .collect {
                     Timber.d(
@@ -301,12 +303,14 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            monitorBackupFolder().map {
-                // Default to an Invalid Handle of -1L when an error occurs
-                it.getOrDefault(NodeId(-1L))
-            }.collectLatest { backupsFolderNodeId ->
-                MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
-            }
+            monitorBackupFolder()
+                .catch { Timber.w("Exception monitoring backups folder: $it") }
+                .map {
+                    // Default to an Invalid Handle of -1L when an error occurs
+                    it.getOrDefault(NodeId(-1L))
+                }.collectLatest { backupsFolderNodeId ->
+                    MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
+                }
         }
     }
 

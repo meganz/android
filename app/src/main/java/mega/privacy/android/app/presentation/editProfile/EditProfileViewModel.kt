@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,6 +54,7 @@ class EditProfileViewModel @Inject constructor(
         }
         viewModelScope.launch {
             monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
                 .filter { it == UserChanges.Firstname || it == UserChanges.Lastname }
                 .collect {
                     if (it == UserChanges.Firstname) {

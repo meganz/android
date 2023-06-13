@@ -92,6 +92,7 @@ class NameCollisionViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
                 .filter { it == UserChanges.DisableVersions }
                 .map {
                     getFileVersionsOption(true)
@@ -99,7 +100,6 @@ class NameCollisionViewModel @Inject constructor(
                 .onStart {
                     getFileVersionsOption(true)
                 }
-                .catch { Timber.e(it) }
                 .collect {
                     updateFileVersioningInfo()
                 }

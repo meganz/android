@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
@@ -87,7 +88,9 @@ class MyAccountHomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             flow {
-                emitAll(monitorUserUpdates().filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+                emitAll(monitorUserUpdates()
+                    .catch { Timber.w("Exception monitoring user updates: $it") }
+                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
             }.collectLatest {
                 when (it) {
                     UserChanges.Email -> refreshCurrentUserEmail()

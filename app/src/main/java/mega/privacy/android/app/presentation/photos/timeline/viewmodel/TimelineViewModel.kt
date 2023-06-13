@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
@@ -191,17 +192,21 @@ class TimelineViewModel @Inject constructor(
      * determined by the Use Case [checkEnableCameraUploadsStatus]
      */
     fun handleEnableCameraUploads() = viewModelScope.launch {
-        when (checkEnableCameraUploadsStatus.invoke()) {
-            CAN_ENABLE_CAMERA_UPLOADS -> {
-                setTriggerCameraUploadsState(shouldTrigger = true)
+        runCatching { checkEnableCameraUploadsStatus() }.onSuccess { status ->
+            when (status) {
+                CAN_ENABLE_CAMERA_UPLOADS -> {
+                    setTriggerCameraUploadsState(shouldTrigger = true)
+                }
+
+                SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
+                    setBusinessAccountPromptState(shouldShow = true)
+                }
+
+                SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
+                    setBusinessAccountSuspendedPromptState(shouldShow = true)
+                }
             }
-            SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT -> {
-                setBusinessAccountPromptState(shouldShow = true)
-            }
-            SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT -> {
-                setBusinessAccountSuspendedPromptState(shouldShow = true)
-            }
-        }
+        }.onFailure { Timber.w("Exception checking CU status: $it") }
     }
 
     /**

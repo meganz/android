@@ -20,6 +20,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
@@ -212,7 +213,9 @@ class MyAccountViewModel @Inject constructor(
 
         viewModelScope.launch {
             flow {
-                emitAll(monitorUserUpdates().filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+                emitAll(monitorUserUpdates()
+                    .catch { Timber.w("Exception monitoring user updates: $it") }
+                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
             }.collect {
                 when (it) {
                     UserChanges.Email -> refreshCurrentUserEmail()

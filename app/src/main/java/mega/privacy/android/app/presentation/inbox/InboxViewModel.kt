@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -89,6 +90,7 @@ class InboxViewModel @Inject constructor(
      */
     private fun observeMyBackupsFolderUpdates() = viewModelScope.launch {
         monitorBackupFolder()
+            .catch { Timber.w("Exception monitoring backups folder: $it") }
             .map {
                 // Emit an Invalid Handle if the Result is a failure
                 Timber.e("Unable to retrieve the My Backups Folder")
