@@ -48,6 +48,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -383,7 +384,7 @@ internal class DefaultImageRepository @Inject constructor(
         isVideo: Boolean,
         file: File,
         highPriority: Boolean,
-    ): String? {
+    ): String? = withContext(ioDispatcher) {
         val previewFile = getPreviewFile(previewFileName)
         val previewUri = if (previewFile?.exists() == true) {
             previewFile.toUri().toString()
@@ -398,7 +399,7 @@ internal class DefaultImageRepository @Inject constructor(
                 )
             }
         }
-        return previewUri
+        previewUri
     }
 
     private suspend fun getImagePreview(
@@ -441,6 +442,7 @@ internal class DefaultImageRepository @Inject constructor(
                                         }
                                     }
                                     bitmap.recycle()
+                                    Timber.d("Preview generated for ${previewFile.name} and ${previewFile.absolutePath}")
                                     continuation.resumeWith(
                                         Result.success(
                                             previewFile.toUri().toString()
@@ -448,12 +450,17 @@ internal class DefaultImageRepository @Inject constructor(
                                     )
                                     dataSource.close()
                                 } ?: run {
+                                    Timber.e("Preview generation failed ${previewFile.name}")
                                     continuation.resumeWithException(NullPointerException())
                                     dataSource.close()
                                 }
                             }
 
                             override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+                                Timber.e(
+                                    dataSource.failureCause,
+                                    "Preview generation failed ${previewFile.name}"
+                                )
                                 continuation.resumeWithException(dataSource.failureCause ?: return)
                                 dataSource.close()
                             }
@@ -469,8 +476,8 @@ internal class DefaultImageRepository @Inject constructor(
     private suspend fun getPreviewFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
 
-    @Suppress("DEPRECATION")
-    suspend fun getVideoThumbnail(previewFilePath: String?, file: File): String? =
+
+    private suspend fun getVideoThumbnail(previewFilePath: String?, file: File): String? =
         withContext(ioDispatcher) {
             previewFilePath?.let {
                 val previewFile = File(previewFilePath)
@@ -509,9 +516,79 @@ internal class DefaultImageRepository @Inject constructor(
             }
         }
 
+    override suspend fun generatePreview(handle: Long, file: File): String? {
+        val previewFileName =
+            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        val isVideo = MimeTypeList.typeForName(file.name).isVideo
+        return getOrGeneratePreview(previewFileName, isVideo, file, false)
+    }
+
+    override suspend fun generateThumbnail(handle: Long, imageFile: File): String? =
+        withContext(ioDispatcher) {
+            if (MimeTypeList.typeForName(imageFile.name).isVideo.not()) return@withContext null
+            if (!imageFile.exists()) return@withContext null
+            val fileName =
+                "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+            val thumbnailFile = getThumbnailFile(fileName)
+            if (thumbnailFile?.exists() == true) thumbnailFile.delete()
+            thumbnailFile?.absolutePath?.let {
+                val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageFile.toUri())
+                    .setRotationOptions(RotationOptions.autoRotate())
+                    .setRequestPriority(Priority.LOW)
+                    .setResizeOptions(
+                        ResizeOptions.forSquareSize(THUMBNAIL_SIZE)
+                    )
+                    .build()
+
+                return@withContext suspendCancellableCoroutine { continuation ->
+                    val dataSource =
+                        Fresco.getImagePipeline().fetchDecodedImage(imageRequest, imageFile.toUri())
+                    dataSource.subscribe(object : BaseBitmapDataSubscriber() {
+                        override fun onNewResultImpl(bitmap: Bitmap?) {
+                            bitmap?.let {
+                                BufferedOutputStream(FileOutputStream(thumbnailFile)).apply {
+                                    this.use {
+                                        bitmap.compress(
+                                            Bitmap.CompressFormat.JPEG,
+                                            BITMAP_COMPRESS_QUALITY,
+                                            it
+                                        )
+                                    }
+                                }
+                                bitmap.recycle()
+                                Timber.d("Thumbnail generated ${imageFile.name} and ${thumbnailFile.absolutePath}")
+                                continuation.resumeWith(
+                                    Result.success(
+                                        thumbnailFile.toUri().toString()
+                                    )
+                                )
+                                dataSource.close()
+                            } ?: run {
+                                Timber.e("Thumbnail generation failed ${thumbnailFile.name}")
+                                continuation.resumeWithException(NullPointerException())
+                                dataSource.close()
+                            }
+                        }
+
+                        override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+                            Timber.e(
+                                dataSource.failureCause,
+                                "Thumbnail generation failed ${thumbnailFile.name}"
+                            )
+                            continuation.resumeWithException(dataSource.failureCause ?: return)
+                            dataSource.close()
+                        }
+                    }, CallerThreadExecutor.getInstance())
+                    continuation.invokeOnCancellation {
+                        dataSource.close()
+                    }
+                }
+            }
+        }
+
     companion object {
         private const val SIZE_1_MB = 1024 * 1024 * 1L
         private const val BITMAP_COMPRESS_QUALITY = 75
+        private const val THUMBNAIL_SIZE = 200
     }
-
 }

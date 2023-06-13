@@ -139,4 +139,26 @@ interface ImageRepository {
         chatRoomId: Long,
         chatMessageId: Long,
     ): ImageNode
+
+    /**
+     * generate Preview for a File
+     * @param handle
+     * @param file
+     * @return path
+     */
+    suspend fun generatePreview(
+        handle: Long,
+        file: File,
+    ): String?
+
+    /**
+     * generate Thumbnail for a File
+     * @param handle
+     * @param imageFile
+     * @return path
+     */
+    suspend fun generateThumbnail(
+        handle: Long,
+        imageFile: File,
+    ): String?
 }

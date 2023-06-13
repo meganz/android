@@ -379,7 +379,7 @@ internal class UploadService : LifecycleService() {
                 Constants.ACTION_RESTART_SERVICE -> {
                     applicationScope.launch {
                         getTransferDataUseCase()?.let { transferData ->
-                            for (i in 0..transferData.numUploads) {
+                            for (i in 0 until transferData.numUploads) {
                                 getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
                                     !transfer.isCUUpload() && !transfer.isChatUpload()
                                             && transfer.appData.isEmpty() && !transfer.isFolderTransfer

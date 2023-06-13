@@ -320,7 +320,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                 getTransferDataUseCase()?.let { transferData ->
                     var voiceClipsInProgress = 0
 
-                    for (i in 0..transferData.numUploads) {
+                    for (i in 0 until transferData.numUploads) {
                         getTransferByTagUseCase(transferData.uploadTags[i])?.takeIf { transfer ->
                             transfer.isChatUpload()
                         }?.let { transfer ->
