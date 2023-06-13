@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.ConnectionState
@@ -309,4 +310,32 @@ interface ChatRepository {
      * @param chatId [Long] ID of the chat to leave.
      */
     suspend fun broadcastLeaveChat(chatId: Long)
+
+    /**
+     * Returns the [ChatMessage] specified from the chat room.
+     *
+     * This function allows to retrieve only those messages that are been loaded, received and/or
+     * sent (confirmed and not yet confirmed). For any other message, this function
+     * will return NULL.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param msgId MegaChatHandle that identifies the message
+     * @return The [ChatMessage] object, or NULL if not found.
+     */
+    suspend fun getMessage(chatId: Long, msgId: Long): ChatMessage?
+
+    /**
+     * Returns the [ChatMessage] specified from the chat room stored in node history
+     *
+     * This function allows to retrieve only those messages that are in the node history
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param msgId MegaChatHandle that identifies the message
+     * @return The [ChatMessage] object, or NULL if not found.
+     */
+    suspend fun getMessageFromNodeHistory(chatId: Long, msgId: Long): ChatMessage?
 }

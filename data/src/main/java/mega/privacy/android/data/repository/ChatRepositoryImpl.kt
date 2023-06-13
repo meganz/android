@@ -25,6 +25,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
+import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
@@ -87,6 +88,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val chatConnectionStatusMapper: ChatConnectionStatusMapper,
     private val connectionStateMapper: ConnectionStateMapper,
+    private val chatMessageMapper: ChatMessageMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val deviceEventGateway: DeviceEventGateway,
@@ -491,4 +493,14 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun broadcastLeaveChat(chatId: Long) =
         appEventGateway.broadcastLeaveChat(chatId)
+
+    override suspend fun getMessage(chatId: Long, msgId: Long) = withContext(ioDispatcher) {
+        megaChatApiGateway.getMessage(chatId, msgId)?.let { chatMessageMapper(it) }
+    }
+
+    override suspend fun getMessageFromNodeHistory(chatId: Long, msgId: Long) =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getMessageFromNodeHistory(chatId, msgId)
+                ?.let { chatMessageMapper(it) }
+        }
 }
