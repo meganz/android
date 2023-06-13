@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_chat_mute"
+        android:icon="@drawable/ic_bell_off"
+        android:orderInCategory="10"
+        android:title="@string/general_mute"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_chat_unmute"
+        android:icon="@drawable/ic_bell"
+        android:orderInCategory="10"
+        android:title="@string/general_unmute"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_chat_archive"
+        android:icon="@drawable/ic_chat_archive"
+        android:orderInCategory="20"
+        android:title="@string/tab_archive_chat"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_chat_leave"
+        android:icon="@drawable/ic_log_out"
+        android:orderInCategory="20"
+        android:title="@string/general_leave"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_chat_select_all"
+        android:orderInCategory="40"
+        android:title="@string/action_select_all"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_chat_unselect_all"
+        android:orderInCategory="40"
+        android:title="@string/action_unselect_all"
+        app:showAsAction="never" />
+</menu>
