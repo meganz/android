@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -11,6 +12,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
@@ -81,7 +83,7 @@ class UploadFolderViewModel @Inject constructor(
         parentHandle: Long,
         order: SortOrder,
         isList: Boolean,
-    ) {
+    ) = viewModelScope.launch {
         parentFolder = documentFile.name.toString()
         currentFolder.value = FolderContent.Data(
             null, documentFile, info = documentFile.getInfo(
@@ -89,9 +91,9 @@ class UploadFolderViewModel @Inject constructor(
             )
         )
         selectedItems.value = mutableListOf()
-        this.parentHandle = parentHandle
-        this.order = order
-        this.isList = isList
+        this@UploadFolderViewModel.parentHandle = parentHandle
+        this@UploadFolderViewModel.order = order
+        this@UploadFolderViewModel.isList = isList
         setFolderItems()
     }
 
@@ -276,7 +278,7 @@ class UploadFolderViewModel @Inject constructor(
      *
      * @param remove True if the selection has been removed, false otherwise.
      */
-    private fun finishSelection(remove: Boolean = false) {
+    private fun finishSelection(remove: Boolean = false) = viewModelScope.launch {
         val finalList = mutableListOf<FolderContent>()
 
         if (remove) {
