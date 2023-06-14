@@ -51,7 +51,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
@@ -94,7 +94,7 @@ class LoginViewModel @Inject constructor(
     private val getSessionUseCase: GetSessionUseCase,
     private val hasPreferencesUseCase: HasPreferencesUseCase,
     private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase,
-    private val isCameraSyncEnabledUseCase: IsCameraSyncEnabledUseCase,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val querySignupLinkUseCase: QuerySignupLinkUseCase,
     private val cancelTransfersUseCase: CancelTransfersUseCase,
     private val localLogoutUseCase: LocalLogoutUseCase,
@@ -162,7 +162,7 @@ class LoginViewModel @Inject constructor(
                 flowOf(hasCameraSyncEnabledUseCase()).map { hasCameraSyncEnabled ->
                     { state: LoginState -> state.copy(hasCUSetting = hasCameraSyncEnabled) }
                 },
-                flowOf(isCameraSyncEnabledUseCase()).map { isCameraSyncEnabled ->
+                flowOf(isCameraUploadsEnabledUseCase()).map { isCameraSyncEnabled ->
                     { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
                 },
                 monitorFetchNodesFinishUseCase().map {

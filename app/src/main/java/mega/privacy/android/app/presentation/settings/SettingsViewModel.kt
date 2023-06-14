@@ -42,7 +42,7 @@ import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -54,7 +54,7 @@ class SettingsViewModel @Inject constructor(
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     areSdkLogsEnabled: AreSdkLogsEnabled,
     areChatLogsEnabled: AreChatLogsEnabled,
-    private val isCameraSyncEnabledUseCase: IsCameraSyncEnabledUseCase,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
@@ -101,7 +101,8 @@ class SettingsViewModel @Inject constructor(
             multiFactorVisible = false,
             deleteAccountVisible = false,
             deleteEnabled = false,
-            cameraUploadEnabled = true,
+            cameraUploadsEnabled = true,
+            cameraUploadsOn = false,
             chatEnabled = true,
             callsEnabled = true,
             startScreen = 0,
@@ -114,13 +115,13 @@ class SettingsViewModel @Inject constructor(
 
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
-    val isCamSyncEnabled: Boolean
-        get() = isCameraSyncEnabledUseCase()
-
 
     init {
         viewModelScope.launch {
             merge(
+                flow { emit(isCameraUploadsEnabledUseCase()) }.map { enabled ->
+                    { state: SettingsState -> state.copy(cameraUploadsOn = enabled) }
+                },
                 flow { emit(getAccountDetailsUseCase(false)) }.map {
                     updateAccountState(it)
                 },
@@ -143,7 +144,7 @@ class SettingsViewModel @Inject constructor(
                     .map { online ->
                         { state: SettingsState ->
                             state.copy(
-                                cameraUploadEnabled = online,
+                                cameraUploadsEnabled = online,
                                 autoAcceptEnabled = online,
                                 multiFactorEnabled = online,
                                 deleteEnabled = online,
@@ -181,6 +182,20 @@ class SettingsViewModel @Inject constructor(
                 state.update(it)
             }
         }
+
+    }
+
+    /**
+     * Refresh Camera Uploads On/Off state
+     */
+    fun refreshCameraUploadsOn() = viewModelScope.launch {
+        runCatching { isCameraUploadsEnabledUseCase() }
+            .onSuccess { isEnabled ->
+                state.update { it.copy(cameraUploadsOn = isEnabled) }
+            }
+            .onFailure {
+                Timber.e(it)
+            }
 
     }
 

@@ -160,8 +160,12 @@ class SettingsFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.uiState.collect { state ->
-                    findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.isEnabled =
-                        state.cameraUploadEnabled
+                    findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.apply {
+                        isEnabled = state.cameraUploadsEnabled
+                        summary =
+                            getString(if (state.cameraUploadsOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+                    }
+
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
 
@@ -238,14 +242,8 @@ class SettingsFragment :
     }
 
     private fun refreshSummaries() {
-        updateCameraUploadSummary()
+        viewModel.refreshCameraUploadsOn()
         updatePasscodeLockSummary()
-    }
-
-    private fun updateCameraUploadSummary() {
-        val isCameraUploadOn = viewModel.isCamSyncEnabled
-        findPreference<Preference>(KEY_FEATURES_CAMERA_UPLOAD)?.summary =
-            getString(if (isCameraUploadOn) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
     private fun updatePasscodeLockSummary() {

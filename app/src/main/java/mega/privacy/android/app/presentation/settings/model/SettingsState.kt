@@ -10,7 +10,8 @@ package mega.privacy.android.app.presentation.settings.model
  * @property multiFactorVisible
  * @property deleteAccountVisible
  * @property deleteEnabled
- * @property cameraUploadEnabled
+ * @property cameraUploadsEnabled
+ * @property cameraUploadsOn
  * @property chatEnabled
  * @property callsEnabled
  * @property startScreen
@@ -27,7 +28,8 @@ data class SettingsState(
     val multiFactorVisible: Boolean,
     val deleteAccountVisible: Boolean,
     val deleteEnabled: Boolean,
-    val cameraUploadEnabled: Boolean,
+    val cameraUploadsEnabled: Boolean,
+    val cameraUploadsOn: Boolean,
     val chatEnabled: Boolean,
     val callsEnabled: Boolean,
     val startScreen: Int,

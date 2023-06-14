@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
@@ -82,7 +82,7 @@ internal class LoginViewModelTest {
     private val getSessionUseCase: GetSessionUseCase = mock()
     private val hasPreferencesUseCase: HasPreferencesUseCase = mock()
     private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase = mock()
-    private val isCameraSyncEnabledUseCase: IsCameraSyncEnabledUseCase = mock()
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val querySignupLinkUseCase: QuerySignupLinkUseCase = mock()
     private val cancelTransfersUseCase: CancelTransfersUseCase = mock()
     private val localLogoutUseCase: LocalLogoutUseCase = mock()
@@ -114,7 +114,7 @@ internal class LoginViewModelTest {
             getSessionUseCase = getSessionUseCase,
             hasPreferencesUseCase = hasPreferencesUseCase,
             hasCameraSyncEnabledUseCase = hasCameraSyncEnabledUseCase,
-            isCameraSyncEnabledUseCase = isCameraSyncEnabledUseCase,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             querySignupLinkUseCase = querySignupLinkUseCase,
             cancelTransfersUseCase = cancelTransfersUseCase,
             localLogoutUseCase = localLogoutUseCase,

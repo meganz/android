@@ -34,7 +34,6 @@ import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -86,9 +85,6 @@ object TestSettingsModule {
     @Provides
     fun provideIsChatLoggingEnabled(): AreChatLogsEnabled =
         mock { on { invoke() }.thenReturn(flowOf(true)) }
-
-    @Provides
-    fun provideIsCameraSyncEnabledUseCase(): IsCameraSyncEnabledUseCase = mock()
 
     @Provides
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =

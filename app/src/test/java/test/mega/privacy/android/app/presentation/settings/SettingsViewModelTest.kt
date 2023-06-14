@@ -77,7 +77,7 @@ class SettingsViewModelTest {
             refreshPasscodeLockPreference = mock(),
             areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             areChatLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            isCameraSyncEnabledUseCase = mock(),
+            isCameraUploadsEnabledUseCase = mock { onBlocking { invoke() }.thenReturn(false) },
             rootNodeExistsUseCase = mock { on { runBlocking { invoke() } }.thenReturn(true) },
             isMultiFactorAuthAvailable = mock { on { invoke() }.thenReturn(true) },
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
@@ -163,7 +163,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that camera uploads is enabled by default`() = runTest {
         underTest.uiState
-            .map { it.cameraUploadEnabled }
+            .map { it.cameraUploadsEnabled }
             .test {
                 assertThat(awaitItem()).isTrue()
             }
