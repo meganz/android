@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.referral
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi

@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.referral
 
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
@@ -9,9 +9,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.main.megaachievements.ReferralBonusView
-import mega.privacy.android.app.main.megaachievements.ReferralBonusesUIState
-import mega.privacy.android.app.main.megaachievements.TestTags
+import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
+import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusView
+import mega.privacy.android.app.presentation.achievements.referral.view.TestTags
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
 import org.junit.Rule

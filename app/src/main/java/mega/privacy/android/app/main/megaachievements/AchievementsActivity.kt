@@ -19,6 +19,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber

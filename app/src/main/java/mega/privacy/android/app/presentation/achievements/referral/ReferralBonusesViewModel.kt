@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.referral
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements

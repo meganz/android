@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.referral
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.megaachievements.ReferralBonusesViewModel
+import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesViewModel
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite

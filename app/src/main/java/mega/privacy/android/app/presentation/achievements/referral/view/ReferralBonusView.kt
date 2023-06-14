@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.referral.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import coil.compose.AsyncImage
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
