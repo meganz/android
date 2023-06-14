@@ -44,6 +44,7 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -74,7 +75,6 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -83,6 +83,7 @@ import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
@@ -108,6 +109,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 internal class DownloadService : Service(), MegaRequestListenerInterface {
+
+    @Inject
+    lateinit var crashReporter: CrashReporter
 
     @Inject
     lateinit var transfersManagement: TransfersManagement
@@ -313,6 +317,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 Constants.NOTIFICATION_DOWNLOAD,
                 notification
             )
+        }.onFailure {
+            Timber.e(it, "Exception starting foreground")
+            crashReporter.log("Exception starting foreground: ${it.message}")
         }.isSuccess
     }
 
