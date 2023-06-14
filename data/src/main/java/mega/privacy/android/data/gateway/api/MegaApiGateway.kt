@@ -2562,4 +2562,19 @@ interface MegaApiGateway {
      * @return true if foreign node
      */
     suspend fun isForeignNode(handle: Long): Boolean
+
+    /**
+     * @param backupId backup id identifying the backup to be removed
+     * @param listener MegaRequestListener to track this request
+     *                 Unregister a backup already registered for the Backup Centre
+     *                 <p>
+     *                 This method allows to remove a backup from the list of backups displayed in the
+     *                 Backup Centre. @see \c MegaApi::setBackup.
+     *                 <p>
+     *                 The associated request type with this request is MegaRequest::TYPE_BACKUP_REMOVE
+     *                 Valid data in the MegaRequest object received on callbacks:
+     *                 - MegaRequest::getParentHandle - Returns the backupId
+     *                 - MegaRequest::getListener - Returns the MegaRequestListener to track this request
+     */
+    fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface)
 }

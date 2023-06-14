@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -96,7 +97,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val deviceEventGateway: DeviceEventGateway,
     private val workerGateway: WorkerGateway,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
@@ -107,6 +107,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
     private val deviceGateway: AndroidDeviceGateway,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : CameraUploadRepository {
 
@@ -755,5 +756,36 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun isCharging() = deviceGateway.isCharging().also {
         Timber.d("Is Device charging $it")
+    }
+
+    override suspend fun getBackupFolderId(cameraUploadFolderType: CameraUploadFolderType): Long? =
+        withContext(ioDispatcher) {
+            if (cameraUploadFolderType == CameraUploadFolderType.Primary) {
+                localStorageGateway.getCuBackUpId()
+            } else {
+                localStorageGateway.getMuBackUpId()
+            }
+        }
+
+    override suspend fun removeBackupFolder(backupId: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    continuation.resumeWith(Result.success(request.parentHandle to error.errorCode))
+                },
+            )
+            megaApiGateway.removeBackup(backupId, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun deleteBackupById(backupId: Long) = withContext(ioDispatcher) {
+        localStorageGateway.deleteBackupById(backupId)
+    }
+
+    override suspend fun setBackupAsOutdated(backupId: Long) = withContext(ioDispatcher) {
+        localStorageGateway.setBackupAsOutdated(backupId)
     }
 }

@@ -16,7 +16,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
@@ -544,6 +543,10 @@ object CameraUploadSyncManager {
      *
      * @param id the ID of the Backup to be removed
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in camera upload type",
+        replaceWith = ReplaceWith("RemoveBackupFolderUseCase")
+    )
     private fun removeBackup(id: Long?) {
         id?.let { megaApi.removeBackup(id, onBackupRemoved) }
     }

@@ -788,4 +788,17 @@ interface MegaLocalStorageGateway {
      * Delete oldest completed transfers
      */
     suspend fun deleteOldestCompletedTransfers()
+
+    /**
+     * Remove back up folder
+     *
+     * @param backupId back up id to be removed
+     */
+    suspend fun deleteBackupById(backupId: Long)
+
+    /**
+     * Set up back up as outdated
+     * @param backupId back up id to be removed
+     */
+    suspend fun setBackupAsOutdated(backupId: Long)
 }

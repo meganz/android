@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -731,4 +732,34 @@ interface CameraUploadRepository {
      * @return [Boolean] whether device is charging or not
      */
     suspend fun isCharging(): Boolean
+
+    /**
+     * Get backup folder Id
+     *
+     * @param cameraUploadFolderType chooses between primary and secondary backup folder
+     */
+    suspend fun getBackupFolderId(cameraUploadFolderType: CameraUploadFolderType): Long?
+
+    /**
+     * Remove backup folder
+     *
+     * @param backupId id of the folder to be removed
+     */
+    suspend fun removeBackupFolder(backupId: Long): Pair<Long, Int>
+
+
+    /**
+     * Remove backup folder
+     *
+     * @param backupId backup folder id to be removed
+     */
+    suspend fun deleteBackupById(backupId: Long)
+
+    /**
+     * Set up backup as outdated
+     *
+     * @param backupId backup folder id to be removed
+     */
+    suspend fun setBackupAsOutdated(backupId: Long)
+
 }

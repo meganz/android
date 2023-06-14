@@ -1042,7 +1042,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun setUserAttribute(
         type: Int,
         value: MegaStringMap,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.setUserAttribute(type, value, listener)
 
     @Suppress("DEPRECATION")
@@ -1238,4 +1238,8 @@ internal class MegaApiFacade @Inject constructor(
     ) = megaApi.shouldShowPasswordReminderDialog(atLogout, listener)
 
     override suspend fun isForeignNode(handle: Long) = megaApi.isForeignNode(handle)
+
+    override fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface) {
+        megaApi.removeBackup(backupId, listener)
+    }
 }

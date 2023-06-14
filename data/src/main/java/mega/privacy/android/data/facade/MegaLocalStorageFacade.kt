@@ -428,6 +428,11 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun deleteOldestCompletedTransfers() =
         dbHandler.deleteOldestCompletedTransfers()
 
+    override suspend fun deleteBackupById(backupId: Long) = dbHandler.deleteBackupById(backupId)
+
+    override suspend fun setBackupAsOutdated(backupId: Long) =
+        dbHandler.setBackupAsOutdated(backupId)
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
