@@ -111,6 +111,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUs
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
@@ -602,6 +603,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     @Inject
     lateinit var setCoordinatesUseCase: SetCoordinatesUseCase
+
+    /**
+     * [IsChargingUseCase]
+     */
+    @Inject
+    lateinit var isChargingUseCase: IsChargingUseCase
 
     /**
      * True if the camera uploads attributes have already been requested
@@ -2038,7 +2045,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         records.sumOf { it.localPath?.let { path -> File(path).length() } ?: 0 } / (1024 * 1024)
 
     private suspend fun shouldStartVideoCompression(queueSize: Long): Boolean {
-        if (isChargingRequired(queueSize) && !Util.isCharging(context)) {
+        if (isChargingRequired(queueSize) && !isChargingUseCase()) {
             Timber.d("Should not start video compression.")
             return false
         }

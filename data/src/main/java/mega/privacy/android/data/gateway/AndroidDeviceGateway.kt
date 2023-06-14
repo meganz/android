@@ -2,6 +2,9 @@ package mega.privacy.android.data.gateway
 
 import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.BatteryManager
 import android.os.Build
 import android.os.StatFs
 import android.os.SystemClock
@@ -71,4 +74,11 @@ internal class AndroidDeviceGateway @Inject constructor(
 
     override val nanoTime: Long
         get() = System.nanoTime()
+
+    override suspend fun isCharging(): Boolean {
+        val batteryIntent =
+            context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val status = batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+        return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
+    }
 }

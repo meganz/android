@@ -725,4 +725,10 @@ interface CameraUploadRepository {
      * @return selection query
      */
     fun getSelectionQuery(currentTimeStamp: Long, localPath: String): String
+
+    /**
+     * isCharging
+     * @return [Boolean] whether device is charging or not
+     */
+    suspend fun isCharging(): Boolean
 }

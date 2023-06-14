@@ -10,6 +10,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
@@ -105,6 +106,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
+    private val deviceGateway: AndroidDeviceGateway,
     @ApplicationContext private val context: Context,
 ) : CameraUploadRepository {
 
@@ -748,7 +750,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             }
         }
 
-    override fun getSelectionQuery(currentTimeStamp: Long, localPath: String): String {
-        return """((${MediaStore.MediaColumns.DATE_MODIFIED}*1000) > $currentTimeStamp OR (${MediaStore.MediaColumns.DATE_ADDED}*1000) > $currentTimeStamp) AND ${MediaStore.MediaColumns.DATA} LIKE '${localPath}%'"""
+    override fun getSelectionQuery(currentTimeStamp: Long, localPath: String) =
+        """((${MediaStore.MediaColumns.DATE_MODIFIED}*1000) > $currentTimeStamp OR (${MediaStore.MediaColumns.DATE_ADDED}*1000) > $currentTimeStamp) AND ${MediaStore.MediaColumns.DATA} LIKE '${localPath}%'"""
+
+    override suspend fun isCharging() = deviceGateway.isCharging().also {
+        Timber.d("Is Device charging $it")
     }
 }

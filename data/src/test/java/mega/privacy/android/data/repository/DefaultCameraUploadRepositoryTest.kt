@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
@@ -87,6 +88,7 @@ class DefaultCameraUploadRepositoryTest {
     private val appEventGateway = mock<AppEventGateway>()
     private val uploadOptionIntMapper = mock<UploadOptionIntMapper>()
     private val uploadOptionMapper = mock<UploadOptionMapper>()
+    private val deviceGateway = mock<AndroidDeviceGateway>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -130,6 +132,7 @@ class DefaultCameraUploadRepositoryTest {
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,
             uploadOptionIntMapper = uploadOptionIntMapper,
+            deviceGateway = deviceGateway,
             context = mock(),
         )
     }
@@ -748,6 +751,17 @@ class DefaultCameraUploadRepositoryTest {
                     localStorageGateway,
                     times(1)
                 ).setChargingRequiredForVideoCompression(chargingRequired)
+            }
+
+        @ParameterizedTest(name = "device charging: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that charging state is correctly returned`(
+            isCharging: Boolean,
+        ) =
+            runTest {
+                whenever(deviceGateway.isCharging()).thenReturn(isCharging)
+                val actual = underTest.isCharging()
+                assertThat(actual).isEqualTo(isCharging)
             }
 
         @Test

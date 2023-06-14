@@ -701,14 +701,6 @@ public class Util {
         return null;
     }
 
-    @SuppressLint("InlinedApi")
-    public static boolean isCharging(Context context) {
-        final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-
-        return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
-    }
-
     /**
      * Returns the consumer friendly device name.
      * If Android version is above 7, the name is manufacturer + custom name set by user, otherwise, will be manufacturer + model.

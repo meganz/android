@@ -76,4 +76,10 @@ interface DeviceGateway {
      * get nano time
      */
     val nanoTime: Long
+
+    /**
+     * isCharging
+     * @return [Boolean] whether device is charging or not
+     */
+    suspend fun isCharging(): Boolean
 }
