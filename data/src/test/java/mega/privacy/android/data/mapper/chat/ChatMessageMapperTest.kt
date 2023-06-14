@@ -8,11 +8,23 @@ import mega.privacy.android.domain.entity.chat.ChatMessageTermCode
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import kotlin.test.assertEquals
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatMessageMapperTest {
+
+    private lateinit var underTest: ChatMessageMapper
+    private lateinit var chatPermissionsMapper: ChatPermissionsMapper
+
+    @BeforeAll
+    fun setup() {
+        chatPermissionsMapper = ChatPermissionsMapper()
+        underTest = ChatMessageMapper(chatPermissionsMapper)
+    }
 
     @Test
     fun `test that chat message mapper returns correctly`() {

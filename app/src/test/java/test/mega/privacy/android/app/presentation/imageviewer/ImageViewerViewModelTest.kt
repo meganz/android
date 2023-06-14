@@ -86,7 +86,7 @@ internal class ImageViewerViewModelTest {
             getImageForChatMessageUseCase = mock(),
             getImageByOfflineNodeHandleUseCase = mock(),
             getImageFromFileUseCase = mock(),
-            getNumPendingDownloadsNonBackground = mock(),
+            getNumPendingDownloadsNonBackgroundUseCase = mock(),
             resetTotalDownloads = mock(),
             getImageHandlesUseCase = mock(),
             getGlobalChangesUseCase = getGlobalChangesUseCase,

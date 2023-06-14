@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
@@ -34,7 +34,7 @@ import javax.inject.Inject
 /**
  * ViewModel for managing transfers data.
  *
- * @property getNumPendingDownloadsNonBackground    [GetNumPendingDownloadsNonBackground]
+ * @property getNumPendingDownloadsNonBackgroundUseCase    [GetNumPendingDownloadsNonBackgroundUseCase]
  * @property getNumPendingUploads                   [GetNumPendingUploads]
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmpty              [IsCompletedTransfersEmpty]
@@ -44,7 +44,7 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class TransfersManagementViewModel @Inject constructor(
-    private val getNumPendingDownloadsNonBackground: GetNumPendingDownloadsNonBackground,
+    private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val getNumPendingUploads: GetNumPendingUploads,
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
@@ -108,7 +108,7 @@ class TransfersManagementViewModel @Inject constructor(
         unHideWidget: Boolean = false,
     ) {
         viewModelScope.launch {
-            val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackground()
+            val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackgroundUseCase()
             val numPendingUploads = getNumPendingUploads()
             val areTransfersPaused = areAllTransfersPaused()
             _state.update {

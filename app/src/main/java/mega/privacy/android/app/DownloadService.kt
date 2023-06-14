@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNonBackground
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.TextUtil
@@ -75,7 +74,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
@@ -132,7 +131,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     lateinit var ioDispatcher: CoroutineDispatcher
 
     @Inject
-    lateinit var getDownloadCount: GetNumPendingDownloadsNonBackground
+    lateinit var getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase
 
     @Inject
     lateinit var rootNodeExistsUseCase: RootNodeExistsUseCase
@@ -259,7 +258,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             monitorPausedTransfers().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 Handler(Looper.getMainLooper()).postDelayed(
-                    { updateProgressNotification(true) },
+                    { applicationScope.launch { updateProgressNotification(true) } },
                     TransfersManagement.WAIT_TIME_BEFORE_UPDATE
                 )
             }
@@ -426,7 +425,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         // we don't need to create ioDispatcher here, in already run in Background Thread by rx java setup
         runBlocking {
             val isScheduleDownload = processIntent(intent)
-            if (!isScheduleDownload && getDownloadCount() <= 0) {
+            if (!isScheduleDownload && getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
                 cancel()
             }
         }
@@ -461,8 +460,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (currentDocument?.let { checkCurrentFile(it) } != true) {
             Timber.d("checkCurrentFile == false")
             alreadyDownloaded++
-            if (megaApi.getNumPendingDownloadsNonBackground() == 0) {
-                onQueueComplete(node.handle)
+            applicationScope.launch {
+                if (getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
+                    onQueueComplete(node.handle)
+                }
             }
             return true
         }
@@ -626,12 +627,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         return sDCardAppData
     }
 
-    private fun onQueueComplete(handle: Long) {
+    private suspend fun onQueueComplete(handle: Long) {
         Timber.d("onQueueComplete")
         releaseLocks()
         showCompleteNotification(handle)
         stopForeground()
-        val pendingDownloads = megaApi.getNumPendingDownloadsNonBackground()
+        val pendingDownloads = getNumPendingDownloadsNonBackgroundUseCase()
         Timber.d("onQueueComplete: total of files before reset %s", pendingDownloads)
         if (pendingDownloads <= 0) {
             Timber.d("onQueueComplete: reset total downloads")
@@ -1135,8 +1136,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      * Update notification download progress
      */
     @SuppressLint("NewApi")
-    private fun updateProgressNotification(pausedTransfers: Boolean = false) {
-        val pendingTransfers = megaApi.getNumPendingDownloadsNonBackground()
+    private suspend fun updateProgressNotification(pausedTransfers: Boolean = false) {
+        val pendingTransfers = getNumPendingDownloadsNonBackgroundUseCase()
         val totalTransfers = megaApi.totalDownloads - backgroundTransfers.size
         val totalSizePendingTransfer = megaApi.totalDownloadBytes
         val totalSizeTransferred = megaApi.totalDownloadedBytes
@@ -1284,7 +1285,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         return null
     }
 
-    private fun doOnTransferStart(transfer: Transfer) {
+    private suspend fun doOnTransferStart(transfer: Transfer) {
         Timber.d(
             "Download start: %d, totalDownloads: %d",
             transfer.nodeHandle,
@@ -1452,7 +1453,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             }
         }
         if (isVoiceClip || isBackgroundTransfer) return
-        if (megaApi.getNumPendingDownloadsNonBackground() == 0 && transfersCount == 0) {
+        if (getNumPendingDownloadsNonBackgroundUseCase() <= 0 && transfersCount == 0) {
             onQueueComplete(transfer.nodeHandle)
         }
     }

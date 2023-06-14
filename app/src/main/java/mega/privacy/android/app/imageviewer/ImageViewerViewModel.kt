@@ -60,7 +60,7 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.ResetTotalDownloads
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
@@ -87,7 +87,7 @@ import javax.inject.Inject
  * @property getImageForChatMessageUseCase          Needed to retrieve each individual image based on chat details
  * @property getImageByOfflineNodeHandleUseCase     Needed to retrieve each individual image based on offline node handle
  * @property getImageFromFileUseCase                Needed to retrieve each individual image based on file Uri
- * @property getNumPendingDownloadsNonBackground    UseCase to get number of pending downloads that are not background transfers
+ * @property getNumPendingDownloadsNonBackgroundUseCase    UseCase to get number of pending downloads that are not background transfers
  * @property resetTotalDownloads                    UseCase to reset total downloads
  * @property getImageHandlesUseCase     Needed to retrieve node handles given sent params
  * @property getGlobalChangesUseCase    Use case required to get node changes
@@ -114,7 +114,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase,
     private val getImageByOfflineNodeHandleUseCase: GetImageByOfflineNodeHandleUseCase,
     private val getImageFromFileUseCase: GetImageFromFileUseCase,
-    private val getNumPendingDownloadsNonBackground: GetNumPendingDownloadsNonBackground,
+    private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
     private val resetTotalDownloads: ResetTotalDownloads,
     private val getImageHandlesUseCase: GetImageHandlesUseCase,
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
@@ -413,7 +413,7 @@ class ImageViewerViewModel @Inject constructor(
 
     private fun resetTotalDownloadsIfNeeded() {
         viewModelScope.launch {
-            val currentTransfers = getNumPendingDownloadsNonBackground()
+            val currentTransfers = getNumPendingDownloadsNonBackgroundUseCase()
             val isServiceRunning = TransfersManagement.isServiceRunning(DownloadService::class.java)
             if (currentTransfers == 0 && !isServiceRunning) {
                 resetTotalDownloads()
