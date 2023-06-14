@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
@@ -65,6 +66,7 @@ import javax.inject.Inject
 /**
  * [ViewModel] class for SettingsCameraUploadsFragment
  *
+ * @property isCameraUploadsEnabledUseCase Retrieves the enable status of Camera Uploads
  * @property areLocationTagsEnabledUseCase When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
  * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
  * @property checkEnableCameraUploadsStatus Checks the Camera Uploads status before enabling
@@ -104,6 +106,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
@@ -352,12 +355,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Sets whether Camera Uploads is running or not
+     * Sets whether Camera Uploads is enabled or not
      *
-     * @param isRunning True if Camera Uploads is running, and false if otherwise
+     * @param isEnabled True if Camera Uploads is enabled, and false if otherwise
      */
-    fun setCameraUploadsRunning(isRunning: Boolean) =
-        _state.update { it.copy(isCameraUploadsRunning = isRunning) }
+    fun setCameraUploadsEnabled(isEnabled: Boolean) =
+        _state.update { it.copy(isCameraUploadsEnabled = isEnabled) }
 
     /**
      * Change the Upload Connection Type for Camera Uploads
@@ -483,6 +486,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             preparePrimaryFolderPathUseCase()
 
+            val isCameraUploadsEnabled = async { isCameraUploadsEnabledUseCase() }
             val areLocationTagsIncluded = async { areLocationTagsEnabledUseCase() }
             val areUploadFileNamesKept = async { areUploadFileNamesKeptUseCase() }
             val isChargingRequiredForVideoCompression =
@@ -494,6 +498,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             val videoQuality = async { getUploadVideoQualityUseCase() }
             _state.update {
                 it.copy(
+                    isCameraUploadsEnabled = isCameraUploadsEnabled.await(),
                     areLocationTagsIncluded = areLocationTagsIncluded.await(),
                     areUploadFileNamesKept = areUploadFileNamesKept.await(),
                     isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression.await(),

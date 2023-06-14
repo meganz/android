@@ -3011,7 +3011,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         getString(R.string.general_yes)
                     ) { _: DialogInterface?, _: Int ->
                         viewModel.stopCameraUpload()
-                        dbH.setCamSyncEnabled(false)
                         sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_SETTING))
                         transfersFragment?.destroyActionMode()
                     }
@@ -5624,7 +5623,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         get() {
             if (viewModel.state.value.isFirstLogin) {
                 viewModel.setIsFirstLogin(false)
-                dbH.setCamSyncEnabled(false)
                 bottomNavigationCurrentItem = CLOUD_DRIVE_BNV
             }
         }

@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property accessMediaLocationRationaleText Displays the Access Media Location rationale with the message
  * @property areUploadFileNamesKept Checks whether the File Names are kept or not when uploading content
  * @property areLocationTagsIncluded When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
- * @property isCameraUploadsRunning Checks whether Camera Uploads is running or not
+ * @property isCameraUploadsEnabled Checks whether Camera Uploads is enabled or not
  * @property isChargingRequiredForVideoCompression Checks whether compressing videos require the device to be charged or not
  * @property invalidFolderSelectedTextId Displays the message when an invalid Folder is selected
  * @property primaryFolderPath The Primary Folder path
@@ -28,7 +28,7 @@ data class SettingsCameraUploadsState(
     @StringRes val accessMediaLocationRationaleText: Int? = null,
     val areLocationTagsIncluded: Boolean = false,
     val areUploadFileNamesKept: Boolean = false,
-    val isCameraUploadsRunning: Boolean = false,
+    val isCameraUploadsEnabled: Boolean = false,
     val isChargingRequiredForVideoCompression: Boolean = false,
     @StringRes val invalidFolderSelectedTextId: Int? = null,
     val primaryFolderPath: String = "",

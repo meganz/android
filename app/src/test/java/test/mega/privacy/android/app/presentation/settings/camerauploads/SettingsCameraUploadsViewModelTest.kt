@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
@@ -72,6 +73,7 @@ class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
+    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
@@ -127,6 +129,7 @@ class SettingsCameraUploadsViewModelTest {
         isPrimaryFolderPathValid: IsPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
     ) {
         underTest = SettingsCameraUploadsViewModel(
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
@@ -175,7 +178,7 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.accessMediaLocationRationaleText).isNull()
             assertThat(state.areLocationTagsIncluded).isFalse()
             assertThat(state.areUploadFileNamesKept).isFalse()
-            assertThat(state.isCameraUploadsRunning).isFalse()
+            assertThat(state.isCameraUploadsEnabled).isFalse()
             assertThat(state.isChargingRequiredForVideoCompression).isFalse()
             assertThat(state.invalidFolderSelectedTextId).isNull()
             assertThat(state.primaryFolderPath).isEmpty()
@@ -267,15 +270,15 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
-    fun `test that isCameraUploadsRunning is updated correctly`() = runTest {
+    fun `test that isCameraUploadsEnabled is updated correctly`() = runTest {
         setupUnderTest()
 
-        underTest.setCameraUploadsRunning(true)
+        underTest.setCameraUploadsEnabled(true)
 
-        underTest.state.map { it.isCameraUploadsRunning }.distinctUntilChanged().test {
+        underTest.state.map { it.isCameraUploadsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isTrue()
 
-            underTest.setCameraUploadsRunning(false)
+            underTest.setCameraUploadsEnabled(false)
             assertThat(awaitItem()).isFalse()
         }
     }

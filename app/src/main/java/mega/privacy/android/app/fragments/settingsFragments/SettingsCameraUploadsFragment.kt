@@ -107,7 +107,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var localSecondaryFolder: Preference? = null
     private var megaSecondaryFolder: Preference? = null
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
-    private var cameraUpload = false
     private var secondaryUpload = false
     private var camSyncHandle: Long? = null
     private var camSyncMegaNode: MegaNode? = null
@@ -208,7 +207,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             it.setOnPreferenceChangeListener { _, _ ->
                 if (viewModel.isConnected) {
                     dbH.setCamSyncTimeStamp(0)
-                    cameraUpload = !cameraUpload
                     refreshCameraUploadsSettings()
                 }
                 false
@@ -254,7 +252,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         megaSecondaryFolder = findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER)
         megaSecondaryFolder?.onPreferenceClickListener = this
 
-        cameraUpload = prefs.camSyncEnabled.toBoolean()
         val tempHandle = prefs.camSyncHandle
         if (tempHandle != null) {
             camSyncHandle = tempHandle.toLongOrNull()
@@ -281,35 +278,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             Timber.d("Secondary is: %s", secondaryUpload)
         }
         isExternalSDCardMU = dbH.mediaFolderExternalSdCard
-        if (cameraUpload) {
-            Timber.d("Camera Uploads ON")
-            cameraUploadOnOff?.isChecked = true
-            megaCameraFolder?.summary = camSyncMegaPath
-            megaSecondaryFolder?.summary = megaPathSecMediaFolder
-
-            viewModel.setCameraUploadsRunning(true)
-
-            checkSecondaryMediaFolder()
-        } else {
-            Timber.d("Camera Uploads Off")
-            cameraUploadOnOff?.isChecked = false
-            secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
-
-            viewModel.setCameraUploadsRunning(false)
-
-            megaCameraFolder?.let {
-                it.summary = ""
-                preferenceScreen.removePreference(it)
-            }
-            localSecondaryFolder?.let {
-                it.summary = ""
-                preferenceScreen.removePreference(it)
-            }
-            megaSecondaryFolder?.let {
-                it.summary = ""
-                preferenceScreen.removePreference(it)
-            }
-        }
 
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
@@ -595,44 +563,47 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 setOnlineOptions(isConnected)
             }
             collectFlow(viewModel.state) {
+                handleIsCameraUploadsEnabled(
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled
+                )
                 handleFileUpload(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadOption = it.uploadOption,
                 )
                 handleHowToUpload(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadConnectionType = it.uploadConnectionType,
                 )
                 handleIncludeLocationTags(
                     areLocationTagsIncluded = it.areLocationTagsIncluded,
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadOption = it.uploadOption,
                 )
                 handleUploadVideoQuality(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     uploadOption = it.uploadOption,
                     videoQuality = it.videoQuality,
                 )
                 handleChargingOnVideoCompression(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     isChargingRequiredForVideoCompression = it.isChargingRequiredForVideoCompression,
                     uploadOption = it.uploadOption,
                     videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
                 handleVideoCompressionSizeChange(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     isChargingRequiredForVideoCompression = it.isChargingRequiredForVideoCompression,
                     uploadOption = it.uploadOption,
                     videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
                 handleKeepUploadFileNames(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     areUploadFileNamesKept = it.areUploadFileNamesKept,
                 )
                 handlePrimaryFolderPath(
-                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isCameraUploadsEnabled = it.isCameraUploadsEnabled,
                     primaryFolderPath = it.primaryFolderPath,
                 )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
@@ -647,17 +618,50 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
+     * Handles the Camera Uploads enable option
+     *
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
+     */
+    private fun handleIsCameraUploadsEnabled(isCameraUploadsEnabled: Boolean) {
+        if (isCameraUploadsEnabled) {
+            Timber.d("Camera Uploads ON")
+            cameraUploadOnOff?.isChecked = true
+            megaCameraFolder?.summary = camSyncMegaPath
+            megaSecondaryFolder?.summary = megaPathSecMediaFolder
+
+            checkSecondaryMediaFolder()
+        } else {
+            Timber.d("Camera Uploads Off")
+            cameraUploadOnOff?.isChecked = false
+            secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
+
+            megaCameraFolder?.let {
+                it.summary = ""
+                preferenceScreen.removePreference(it)
+            }
+            localSecondaryFolder?.let {
+                it.summary = ""
+                preferenceScreen.removePreference(it)
+            }
+            megaSecondaryFolder?.let {
+                it.summary = ""
+                preferenceScreen.removePreference(it)
+            }
+        }
+    }
+
+    /**
      * Handles the "File upload" option visibility and content when a UI State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param uploadOption the specific [UploadOption] which can be nullable
      */
     private fun handleFileUpload(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         uploadOption: UploadOption?,
     ) {
         optionFileUpload?.run {
-            summary = if (isCameraUploadsRunning && uploadOption != null) {
+            summary = if (isCameraUploadsEnabled && uploadOption != null) {
                 preferenceScreen.addPreference(this)
                 setValueIndex(uploadOption.position)
                 when (uploadOption) {
@@ -675,15 +679,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Handles the "How to Upload" option visibility and content when a UI State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param uploadConnectionType the specific [UploadConnectionType] which can be nullable
      */
     private fun handleHowToUpload(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         uploadConnectionType: UploadConnectionType?,
     ) {
         optionHowToUpload?.run {
-            if (isCameraUploadsRunning && uploadConnectionType != null) {
+            if (isCameraUploadsEnabled && uploadConnectionType != null) {
                 preferenceScreen.addPreference(this)
                 summary = getString(uploadConnectionType.textRes)
                 setValueIndex(uploadConnectionType.position)
@@ -698,18 +702,18 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Handles the "Include location tags" option visibility and checked state when a UI State change happens
      *
      * @param areLocationTagsIncluded Whether Location Tags are embedded when uploading Photos or not
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param uploadOption The specific [UploadOption] which can be nullable
      */
     private fun handleIncludeLocationTags(
         areLocationTagsIncluded: Boolean,
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         uploadOption: UploadOption?,
     ) {
         val allowedOptions = listOf(UploadOption.PHOTOS, UploadOption.PHOTOS_AND_VIDEOS)
 
         optionIncludeLocationTags?.run {
-            if (isCameraUploadsRunning && allowedOptions.contains(uploadOption)) {
+            if (isCameraUploadsEnabled && allowedOptions.contains(uploadOption)) {
                 preferenceScreen.addPreference(this)
                 this.isChecked = areLocationTagsIncluded
             } else {
@@ -722,17 +726,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Handles the "Video quality" option visibility and content when a UI State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param uploadOption The specific [UploadOption] which can be nullable
      * @param videoQuality The specific [VideoQuality] which can be nullable
      */
     private fun handleUploadVideoQuality(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         uploadOption: UploadOption?,
         videoQuality: VideoQuality?,
     ) {
         optionVideoQuality?.run {
-            summary = if (isCameraUploadsRunning && videoQuality != null && uploadOption in listOf(
+            summary = if (isCameraUploadsEnabled && videoQuality != null && uploadOption in listOf(
                     UploadOption.VIDEOS,
                     UploadOption.PHOTOS_AND_VIDEOS
                 )
@@ -751,7 +755,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Handles the "Require me to actively charge my device" option visibility, content and checked
      * state when a UI State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param isChargingRequiredForVideoCompression Whether compressing videos require the device
      * to be charged or not
      * @param uploadOption The specific [UploadOption] which can be nullable
@@ -759,7 +763,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * @param videoQuality The specific [VideoQuality] which can be nullable
      */
     private fun handleChargingOnVideoCompression(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         isChargingRequiredForVideoCompression: Boolean,
         uploadOption: UploadOption?,
         videoCompressionSizeLimit: Int,
@@ -767,7 +771,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     ) {
         optionChargingOnVideoCompression?.run {
             summary =
-                if (isCameraUploadsRunning && uploadOption in listOf(
+                if (isCameraUploadsEnabled && uploadOption in listOf(
                         UploadOption.VIDEOS,
                         UploadOption.PHOTOS_AND_VIDEOS,
                     ) && videoQuality != null && videoQuality != VideoQuality.ORIGINAL
@@ -793,7 +797,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Handles the "If videos to compress are larger than" option visibility and content when a UI
      * State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param isChargingRequiredForVideoCompression Whether compressing videos require the device
      * to be charged or not
      * @param uploadOption The specific [UploadOption] which can be nullable
@@ -801,7 +805,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * @param videoQuality The specific [VideoQuality] which can be nullable
      */
     private fun handleVideoCompressionSizeChange(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         isChargingRequiredForVideoCompression: Boolean,
         uploadOption: UploadOption?,
         videoCompressionSizeLimit: Int,
@@ -809,7 +813,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     ) {
         optionVideoCompressionSize?.run {
             summary =
-                if (isCameraUploadsRunning && uploadOption in listOf(
+                if (isCameraUploadsEnabled && uploadOption in listOf(
                         UploadOption.VIDEOS,
                         UploadOption.PHOTOS_AND_VIDEOS,
                     ) && videoQuality != null && videoQuality != VideoQuality.ORIGINAL && isChargingRequiredForVideoCompression
@@ -830,15 +834,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * Handles the "Keep file names as in the device" option visibility and content when a UI State
      * change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param areUploadFileNamesKept Whether the File Names are kept or not when uploading content
      */
     private fun handleKeepUploadFileNames(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         areUploadFileNamesKept: Boolean,
     ) {
         optionKeepUploadFileNames?.run {
-            isChecked = if (isCameraUploadsRunning) {
+            isChecked = if (isCameraUploadsEnabled) {
                 preferenceScreen.addPreference(this)
                 areUploadFileNamesKept
             } else {
@@ -851,15 +855,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Handles the "Local Camera folder" option visibility and content when a UI State change happens
      *
-     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isCameraUploadsEnabled Whether Camera Uploads is enabled or not
      * @param primaryFolderPath The Primary Folder path
      */
     private fun handlePrimaryFolderPath(
-        isCameraUploadsRunning: Boolean,
+        isCameraUploadsEnabled: Boolean,
         primaryFolderPath: String,
     ) {
         optionLocalCameraFolder?.run {
-            summary = if (isCameraUploadsRunning) {
+            summary = if (isCameraUploadsEnabled) {
                 preferenceScreen.addPreference(this)
                 primaryFolderPath
             } else {
@@ -1348,10 +1352,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private fun enableCameraUploads() {
         Timber.d("Camera Uploads Enabled")
 
-        cameraUpload = true
         prefs = dbH.preferences
 
-        viewModel.setCameraUploadsRunning(true)
+        viewModel.setCameraUploadsEnabled(true)
 
         // Local Primary Folder
         viewModel.restorePrimaryTimestampsAndSyncRecordProcess()
@@ -1394,10 +1397,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     fun disableCameraUploadUIProcess() {
         Timber.d("Camera Uploads Disabled")
-        cameraUpload = false
         cameraUploadOnOff?.isChecked = false
 
-        viewModel.setCameraUploadsRunning(false)
+        viewModel.setCameraUploadsEnabled(false)
 
         megaCameraFolder?.let { preferenceScreen.removePreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
