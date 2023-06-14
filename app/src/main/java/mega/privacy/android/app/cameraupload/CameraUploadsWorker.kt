@@ -52,11 +52,11 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
@@ -172,6 +172,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
         private const val notificationChannelName =
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
+        private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
     }
 
     /**
@@ -609,6 +610,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     @Inject
     lateinit var isChargingUseCase: IsChargingUseCase
+
+    /**
+     * [StringWrapper]
+     */
+    @Inject
+    lateinit var stringWrapper: StringWrapper
 
     /**
      * True if the camera uploads attributes have already been requested
@@ -2137,7 +2144,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun updateProgressNotification() = withContext(ioDispatcher) {
         // refresh UI every 1 seconds to avoid too much workload on main thread
         val now = System.currentTimeMillis()
-        lastUpdated = if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS) {
+        lastUpdated = if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS) {
             now
         } else {
             return@withContext
@@ -2181,7 +2188,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
         val info =
-            Util.getProgressSize(context, totalSizeTransferred, totalSizePendingTransfer)
+            stringWrapper.getProgressSize(totalSizeTransferred, totalSizePendingTransfer)
 
         showProgressNotification(
             progressPercent,

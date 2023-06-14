@@ -1160,7 +1160,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             if (!isOverQuota) {
                 val now = System.currentTimeMillis()
                 lastUpdated =
-                    if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS || dbH.transferQueueStatus) {
+                    if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS || dbH.transferQueueStatus) {
                         now
                     } else {
                         return
@@ -1689,5 +1689,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         const val EXTRA_DOWNLOAD_BY_OPEN_WITH = "EXTRA_DOWNLOAD_BY_OPEN_WITH"
         const val EXTRA_DOWNLOAD_FOR_OFFLINE = "EXTRA_DOWNLOAD_FOR_OFFLINE"
         private var errorEBlocked = 0
+        private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
     }
 }

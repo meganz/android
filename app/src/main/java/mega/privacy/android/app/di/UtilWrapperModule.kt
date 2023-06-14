@@ -7,6 +7,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
@@ -15,6 +16,7 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 
 /**
@@ -101,6 +104,17 @@ abstract class UtilWrapperModule {
             override fun getFirstLetter(name: String): String =
                 AvatarUtil.getFirstLetter(name)
         }
+
+
+        /**
+         * Provides the [StringWrapper]
+         */
+        @Provides
+        fun provideStringWrapper(@ApplicationContext context: Context) =
+            object : StringWrapper {
+                override fun getProgressSize(progress: Long, size: Long): String =
+                    Util.getProgressSize(context, progress, size)
+            }
 
         /**
          * provide default implementation for FileUtilWrapper

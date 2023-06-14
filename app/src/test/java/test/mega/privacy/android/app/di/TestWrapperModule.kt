@@ -13,6 +13,7 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.data.wrapper.StringWrapper
 import org.mockito.kotlin.mock
 
 @Module
@@ -55,4 +56,8 @@ object TestWrapperModule {
 
     @Provides
     fun providesFileUtilWrapper(): FileUtilWrapper = mock()
+
+    @Provides
+    fun provideStringWrapper(): StringWrapper = mock()
+
 }

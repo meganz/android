@@ -136,8 +136,6 @@ import timber.log.Timber;
 public class Util {
 
     public static final String DATE_AND_TIME_PATTERN = "yyyy-MM-dd HH.mm.ss";
-    public static int ONTRANSFERUPDATE_REFRESH_MILLIS = 1000;
-
     public static float dpWidthAbs = 360;
     public static float dpHeightAbs = 592;
 
