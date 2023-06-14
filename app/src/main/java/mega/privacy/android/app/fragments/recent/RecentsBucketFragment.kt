@@ -28,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
@@ -478,7 +479,7 @@ class RecentsBucketFragment : Fragment() {
                     }
 
                     imageView.run {
-                        setImageResource(R.drawable.ic_select_folder)
+                        setImageResource(CoreUiR.drawable.ic_select_folder)
                         visibility = View.VISIBLE
 
                         val animator =

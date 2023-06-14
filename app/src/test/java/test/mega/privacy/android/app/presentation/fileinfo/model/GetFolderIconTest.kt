@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.fileinfo.model
 
 import com.google.common.truth.Truth
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.domain.entity.DeviceType
@@ -79,7 +80,7 @@ class GetFolderIconTest {
         )
 
         private val expectedFolderNodeToResource = listOf(
-            FolderMockNameResource("InRubbishBin", R.drawable.ic_folder_list) {
+            FolderMockNameResource("InRubbishBin", CoreUiR.drawable.ic_folder_list) {
                 on { isInRubbishBin }.thenReturn(true)
             },
             FolderMockNameResource("IncomingShare", R.drawable.ic_folder_incoming) {
@@ -115,7 +116,7 @@ class GetFolderIconTest {
             FolderMockNameResource("BackupChild", R.drawable.ic_folder_backup) {
                 on { type }.thenReturn(FolderType.ChildBackup)
             },
-            FolderMockNameResource("Simple", R.drawable.ic_folder_list) {},
+            FolderMockNameResource("Simple", CoreUiR.drawable.ic_folder_list) {},
         )
     }
 }

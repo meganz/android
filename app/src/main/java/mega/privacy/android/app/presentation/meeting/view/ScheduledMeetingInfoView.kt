@@ -1045,7 +1045,7 @@ private fun ParticipantItemView(
                 Row(modifier = Modifier.align(Alignment.Center)) {
                     ParticipantsPermissionView(participant)
                     Icon(modifier = Modifier.padding(start = 30.dp),
-                        painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                        painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
                         tint = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038)
                 }

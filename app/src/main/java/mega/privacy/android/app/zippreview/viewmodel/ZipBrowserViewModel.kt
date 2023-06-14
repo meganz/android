@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -103,7 +103,7 @@ class ZipBrowserViewModel @Inject constructor(
      */
     private fun zipTreeNodeToZipInfoUIO(zipTreeNode: ZipTreeNode, context: Context): ZipInfoUIO {
         val imageResourceId = if (zipTreeNode.fileType == FileType.FOLDER) {
-            R.drawable.ic_folder_list
+            CoreUiR.drawable.ic_folder_list
         } else {
             MimeTypeList.typeForName(zipTreeNode.path).iconResourceId
         }

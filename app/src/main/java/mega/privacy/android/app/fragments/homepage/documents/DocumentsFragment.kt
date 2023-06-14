@@ -64,6 +64,7 @@ import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.core.R as CoreUiR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -468,7 +469,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                     }
 
                     imageView?.run {
-                        setImageResource(R.drawable.ic_select_folder)
+                        setImageResource(CoreUiR.drawable.ic_select_folder)
                         visibility = View.VISIBLE
 
                         val animator =

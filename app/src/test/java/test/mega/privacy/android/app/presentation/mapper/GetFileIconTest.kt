@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getFileIcon
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -93,7 +94,7 @@ class GetFileIconTest {
             it[R.drawable.html_thumbnail] = arrayOf("dhtml", "htm", "html", "shtml", "xhtml")
             it[R.drawable.ic_illustrator_thumbnail] =
                 arrayOf("ai", "aia", "aip", "ait", "art", "irs")
-            it[R.drawable.ic_image_thumbnail] =
+            it[CoreUiR.drawable.ic_image_thumbnail] =
                 arrayOf("jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png")
             it[R.drawable.ic_indesign_thumbnail] = arrayOf("indd")
             it[R.drawable.java_thumbnail] = arrayOf("class", "jar", "java")

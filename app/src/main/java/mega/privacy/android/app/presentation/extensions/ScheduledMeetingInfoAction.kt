@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.extensions
 
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 
@@ -36,7 +37,7 @@ internal val ScheduledMeetingInfoAction.icon: Int?
         ScheduledMeetingInfoAction.ChatNotifications -> R.drawable.ic_bell
         ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> R.drawable.ic_users
         ScheduledMeetingInfoAction.ShareFiles -> R.drawable.ic_share_files
-        ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> R.drawable.link_ic
+        ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts -> CoreUiR.drawable.link_ic
         ScheduledMeetingInfoAction.ManageChatHistory -> R.drawable.ic_manage_history
         ScheduledMeetingInfoAction.EnableEncryptedKeyRotation -> null
         ScheduledMeetingInfoAction.EnabledEncryptedKeyRotation -> null

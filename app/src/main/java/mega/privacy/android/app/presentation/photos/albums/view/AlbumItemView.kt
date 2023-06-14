@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
@@ -320,7 +321,7 @@ private fun AlbumPhotoContainer(
         }
         if (isSelected) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_select_folder),
+                painter = painterResource(id = CoreUiR.drawable.ic_select_folder),
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -361,8 +362,8 @@ private fun AlbumPhotoView(
             .crossfade(true)
             .build(),
         contentDescription = null,
-        placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
-        error = painterResource(id = R.drawable.ic_image_thumbnail),
+        placeholder = painterResource(id = CoreUiR.drawable.ic_image_thumbnail),
+        error = painterResource(id = CoreUiR.drawable.ic_image_thumbnail),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .width(width)

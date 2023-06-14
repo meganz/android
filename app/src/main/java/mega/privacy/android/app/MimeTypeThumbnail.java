@@ -3,6 +3,7 @@ package mega.privacy.android.app;
 import android.annotation.SuppressLint;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
+import mega.privacy.android.app.R;
 
 import java.util.HashMap;
 
@@ -33,7 +34,7 @@ public class MimeTypeThumbnail {
 		resources.put(R.drawable.gis_thumbnail, new String[] {"gpx", "kml", "kmz", });
 		resources.put(R.drawable.html_thumbnail, new String[] {"dhtml", "htm", "html", "shtml", "xhtml", });
 		resources.put(R.drawable.ic_illustrator_thumbnail, new String[] {"ai", "aia", "aip", "ait", "art", "irs", });
-		resources.put(R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
+		resources.put(mega.privacy.android.core.R.drawable.ic_image_thumbnail, new String[] {"jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png",});
 		resources.put(R.drawable.ic_indesign_thumbnail, new String[] {"indd", });
 		resources.put(R.drawable.java_thumbnail, new String[] {"class", "jar", "java", });
 		resources.put(R.drawable.midi_thumbnail, new String[] {"mid", "midi", });

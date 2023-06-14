@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.view
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
@@ -33,23 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.domain.entity.FolderType
-import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.ExportedData
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import java.io.File
 
 /**
@@ -71,7 +61,7 @@ import java.io.File
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun NodeListViewItem(
+fun NodeListViewItem(
     modifier: Modifier,
     isSelected: Boolean,
     folderInfo: String?,

@@ -615,7 +615,7 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
                 paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
                 paramsMultiselect.setMargins(0, 0, 0, 0);
                 holder.imageView.setLayoutParams(paramsMultiselect);
-                holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 Timber.d("Check the thumb");
                 holder.itemLayout.setBackground(null);

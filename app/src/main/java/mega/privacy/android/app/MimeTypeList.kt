@@ -6,6 +6,7 @@ import android.webkit.MimeTypeMap
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.getMimeType
+import mega.privacy.android.core.R as CoreUiR
 import java.io.File
 
 /**
@@ -180,7 +181,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             put(R.drawable.ic_indesign_list, arrayOf("indd"))
             put(R.drawable.ic_java_list, arrayOf("class", "jar", "java"))
             put(R.drawable.ic_midi_list, arrayOf("mid", "midi"))
-            put(R.drawable.ic_pdf_list, arrayOf("pdf"))
+            put(CoreUiR.drawable.ic_pdf_list, arrayOf("pdf"))
             put(R.drawable.ic_photoshop_list, arrayOf("abr", "csh", "psb", "psd"))
             put(R.drawable.ic_playlist_list, arrayOf("asx", "m3u", "pls"))
             put(R.drawable.ic_podcast_list, arrayOf("pcast"))

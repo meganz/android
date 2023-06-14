@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.view
+package mega.privacy.android.core.ui.controls
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import mega.privacy.android.app.R
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import java.io.File
 

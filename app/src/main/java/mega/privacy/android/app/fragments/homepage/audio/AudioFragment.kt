@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
+import mega.privacy.android.core.R as CoreUiR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -539,7 +540,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
                     }
 
                     imageView?.run {
-                        setImageResource(R.drawable.ic_select_folder)
+                        setImageResource(CoreUiR.drawable.ic_select_folder)
                         visibility = View.VISIBLE
 
                         val animator =

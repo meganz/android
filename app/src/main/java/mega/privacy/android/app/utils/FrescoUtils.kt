@@ -23,7 +23,7 @@ import com.facebook.imagepipeline.image.CloseableImage
 import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
-import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter
 import timber.log.Timber
@@ -52,7 +52,7 @@ object FrescoUtils {
         if (shouldDisplayPlaceHolder) {
             if (placeholder == null) {
                 gifImgDisplay.hierarchy.setPlaceholderImage(
-                    R.drawable.ic_image_thumbnail,
+                    CoreUiR.drawable.ic_image_thumbnail,
                     ScalingUtils.ScaleType.CENTER_INSIDE
                 )
             } else {

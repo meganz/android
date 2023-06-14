@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.domain.entity.DeviceType
@@ -18,8 +19,9 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_list)
+        ).isEqualTo(CoreUiR.drawable.ic_folder_list)
     }
+
 
     @Test
     fun `test that incoming share returns the incoming folder icon`() {
@@ -179,7 +181,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_list)
+        ).isEqualTo(CoreUiR.drawable.ic_folder_list)
     }
 
 }

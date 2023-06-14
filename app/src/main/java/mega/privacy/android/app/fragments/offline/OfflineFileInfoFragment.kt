@@ -20,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import com.google.android.material.R as MaterialR
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
@@ -80,7 +81,7 @@ class OfflineFileInfoFragment : Fragment() {
                 if (it.node.isFolder || it.thumbnail == null) {
                     binding.toolbarNodeIcon.setImageResource(
                         if (it.node.isFolder) {
-                            R.drawable.ic_folder_list
+                            CoreUiR.drawable.ic_folder_list
                         } else {
                             MimeTypeThumbnail.typeForName(it.node.name).iconResourceId
                         }

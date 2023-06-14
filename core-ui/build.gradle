@@ -61,6 +61,7 @@ dependencies {
     testImplementation project(':core-ui-test')
 
     implementation platform(androidx.compose.bom)
+    implementation androidx.constraintlayout.compose
     implementation androidx.bundles.compose.bom
     implementation lib.kotlin.ktx
     implementation androidx.appcompat
@@ -70,6 +71,7 @@ dependencies {
     implementation androidx.lifecycle.runtime
     implementation lib.showkase
     implementation lib.compose.state.events
+    implementation lib.coil.compose
     kapt lib.showkase.processor
 
     testImplementation testlib.bundles.ui.test

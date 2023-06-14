@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
@@ -59,7 +60,7 @@ internal fun SharedInfoContactItemView(
         onClick = onMoreOptionsClick,
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+            painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
             contentDescription = "More options"
         )
     }

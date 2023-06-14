@@ -29,10 +29,12 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
 import mega.privacy.android.app.presentation.view.extension.getPainter
+import mega.privacy.android.core.ui.controls.ThumbnailView
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -79,7 +81,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
         ) {
             val (menuImage, txtTitle, thumbImage, takenDownImage) = createRefs()
             Image(
-                painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
                 contentDescription = "3 dots",
                 modifier = Modifier
                     .clickable { onMenuClick.invoke(nodeUIItem) }
@@ -90,7 +92,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     }
             )
             Image(
-                painter = if (nodeUIItem.isSelected) painterResource(id = R.drawable.ic_select_folder) else nodeUIItem.node.getPainter(),
+                painter = if (nodeUIItem.isSelected) painterResource(id = CoreUiR.drawable.ic_select_folder) else nodeUIItem.node.getPainter(),
                 contentDescription = "Folder",
                 modifier = Modifier
                     .height(24.dp)
@@ -157,7 +159,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                 )
                 if (nodeUIItem.isSelected) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_select_folder),
+                        painter = painterResource(id = CoreUiR.drawable.ic_select_folder),
                         contentDescription = "checked",
                         modifier = Modifier.padding(12.dp)
                     )
@@ -170,7 +172,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
             ) {
                 val (menuImage, txtTitle, takenDownImage) = createRefs()
                 Image(
-                    painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                    painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
                     modifier = Modifier
                         .clickable { onMenuClick.invoke(nodeUIItem) }

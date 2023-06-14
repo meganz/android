@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.managerSections.TransfersViewModel
@@ -176,7 +177,7 @@ class MegaTransfersAdapter(
 
         holder.iconDownloadUploadView.isVisible = !isItemChecked
         if (isItemChecked) {
-            showDefaultIcon(holder = holder, drawableId = R.drawable.ic_select_folder)
+            showDefaultIcon(holder = holder, drawableId = CoreUiR.drawable.ic_select_folder)
         }
 
         holder.optionReorder.isVisible = !isMultipleSelect()

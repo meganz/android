@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.fileSize
@@ -87,7 +88,7 @@ private fun BottomSheetContent(
         val imageResource = if (nodeUIItem != null && nodeUIItem.node is FileNode)
             rememberAsyncImagePainter(model = nodeUIItem.node.thumbnailPath)
         else
-            painterResource(id = R.drawable.ic_folder_list)
+            painterResource(id = CoreUiR.drawable.ic_folder_list)
 
         val infoText = nodeUIItem?.let {
             if (it.node is FolderNode) {

@@ -15,6 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.R as CoreUiR
 import java.io.File
 
 @Suppress("UNCHECKED_CAST")
@@ -36,7 +37,7 @@ fun setListItemThumbnail(
         when {
             selected -> {
                 hierarchy.setOverlayImage(ContextCompat.getDrawable(context,
-                    R.drawable.ic_select_folder))
+                    CoreUiR.drawable.ic_select_folder))
             }
             isFileAvailable(file) -> {
                 hierarchy.setOverlayImage(null)

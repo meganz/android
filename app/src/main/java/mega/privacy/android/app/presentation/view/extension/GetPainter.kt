@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.view.extension
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.FolderNode
 
@@ -21,6 +22,6 @@ internal fun FolderNode.getIcon(): Int {
     } else if (isShared || isPendingShare) {
         R.drawable.ic_folder_outgoing
     } else {
-        R.drawable.ic_folder_list
+        CoreUiR.drawable.ic_folder_list
     }
 }

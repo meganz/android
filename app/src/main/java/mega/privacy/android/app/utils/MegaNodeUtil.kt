@@ -29,6 +29,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -538,11 +539,11 @@ object MegaNodeUtil {
         } else if (isOutShare(node)) {
             R.drawable.ic_folder_outgoing
         } else if (isRootBackupFolder(node)) {
-            R.drawable.ic_folder_list
+            CoreUiR.drawable.ic_folder_list
         } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
         } else {
-            R.drawable.ic_folder_list
+            CoreUiR.drawable.ic_folder_list
         }
     }
 
@@ -600,7 +601,7 @@ object MegaNodeUtil {
      * @return The resource ID
      */
     private fun getMyBackupSubFolderIcon(node: MegaNode?): Int {
-        if (node?.deviceId.isNullOrBlank()) return R.drawable.ic_folder_list
+        if (node?.deviceId.isNullOrBlank()) return CoreUiR.drawable.ic_folder_list
 
         val folderName = node?.name
         return when {

@@ -103,7 +103,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
                 holder.itemLayout.setEnabled(isEnabled(position));
 
                 if (document.isFolder()) {
-                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                    holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
                 } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                 }
@@ -111,7 +111,7 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
 
             case BROWSE_FILES:
                 if (document.isFolder()) {
-                    holder.imageView.setImageResource(R.drawable.ic_folder_list);
+                    holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
                 } else {
                     holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                     ThumbnailUtils.createThumbnailExplorer(context, document, holder, this.megaApi, this, position);

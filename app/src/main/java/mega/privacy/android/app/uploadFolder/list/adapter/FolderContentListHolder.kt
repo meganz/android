@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemFolderContentBinding
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -29,13 +30,13 @@ class FolderContentListHolder(
 
                 if (!isSelected) {
                     if (item.isFolder) {
-                        hierarchy.setPlaceholderImage(R.drawable.ic_folder_list)
-                        setActualImageResource(R.drawable.ic_folder_list)
+                        hierarchy.setPlaceholderImage(CoreUiR.drawable.ic_folder_list)
+                        setActualImageResource(CoreUiR.drawable.ic_folder_list)
                     } else {
                         hierarchy.setPlaceholderImage(MimeTypeList.typeForName(item.name).iconResourceId)
 
                         if (item.isSelected) {
-                            setActualImageResource(R.drawable.ic_select_folder)
+                            setActualImageResource(CoreUiR.drawable.ic_select_folder)
                         } else {
                             setImageURI(null as Uri?)
                             setImageRequest(

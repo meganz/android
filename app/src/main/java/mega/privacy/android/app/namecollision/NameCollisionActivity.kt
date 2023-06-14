@@ -19,6 +19,7 @@ import com.facebook.imagepipeline.image.ImageInfo
 import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -245,7 +246,7 @@ class NameCollisionActivity : PasscodeActivity() {
                 else -> {
                     thumbnailIcon.setImageResource(
                         if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                        else R.drawable.ic_folder_list
+                        else CoreUiR.drawable.ic_folder_list
                     )
 
                     if (isFile && collisionResult.nameCollision is NameCollision.Upload) {
@@ -310,7 +311,7 @@ class NameCollisionActivity : PasscodeActivity() {
             } else {
                 thumbnailIcon.setImageResource(
                     if (isFile) MimeTypeList.typeForName(name).iconResourceId
-                    else R.drawable.ic_folder_list
+                    else CoreUiR.drawable.ic_folder_list
                 )
             }
             this.name.text = collisionResult.collisionName

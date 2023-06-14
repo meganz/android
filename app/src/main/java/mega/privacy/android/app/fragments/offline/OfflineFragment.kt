@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
@@ -735,7 +736,7 @@ class OfflineFragment : Fragment(), OfflineNodeListener, ActionMode.Callback, Sc
                     }
 
                     imageView?.run {
-                        setImageResource(R.drawable.ic_select_folder)
+                        setImageResource(CoreUiR.drawable.ic_select_folder)
                         visibility = View.VISIBLE
 
                         val animator =

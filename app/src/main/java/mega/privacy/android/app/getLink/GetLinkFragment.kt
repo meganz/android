@@ -23,6 +23,7 @@ import com.google.android.material.datepicker.MaterialStyledDatePickerDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -328,7 +329,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.nodeThumbnail.setImageDrawable(
                 ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_folder_list,
+                    CoreUiR.drawable.ic_folder_list,
                     null
                 )
             )

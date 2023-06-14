@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.facebook.drawee.generic.RoundingParams
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.databinding.OfflineItemListBinding
 import mega.privacy.android.app.utils.Util.dp2px
 
@@ -29,7 +29,7 @@ class OfflineListViewHolder(
                 hierarchy.setOverlayImage(
                     ContextCompat.getDrawable(
                         context,
-                        R.drawable.ic_select_folder
+                        CoreUiR.drawable.ic_select_folder
                     )
                 )
             } else {
@@ -39,7 +39,7 @@ class OfflineListViewHolder(
                 if (node.thumbnail != null) {
                     setImageURI(Uri.fromFile(node.thumbnail))
                 } else {
-                    setActualImageResource(if (node.node.isFolder) R.drawable.ic_folder_list else placeHolderRes)
+                    setActualImageResource(if (node.node.isFolder) CoreUiR.drawable.ic_folder_list else placeHolderRes)
                 }
 
                 hierarchy.roundingParams = RoundingParams.fromCornersRadius(5F)

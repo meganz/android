@@ -2,7 +2,7 @@ package mega.privacy.android.app.meeting.adapter
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.databinding.ItemParticipantChatListBinding
 import mega.privacy.android.app.databinding.ItemSelectedParticipantBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -34,7 +34,7 @@ class AssignParticipantViewHolder(
         )
 
         if (participant.isChosenForAssign) {
-            binding.participantListThumbnail.setImageResource(R.drawable.ic_select_folder)
+            binding.participantListThumbnail.setImageResource(CoreUiR.drawable.ic_select_folder)
         } else {
             // Set actual avatar
             binding.participantListThumbnail.setImageBitmap(

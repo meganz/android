@@ -9,12 +9,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.view.EXPORTED_TEST_TAG
-import mega.privacy.android.app.presentation.view.FAVORITE_TEST_TAG
-import mega.privacy.android.app.presentation.view.INFO_TEXT_TEST_TAG
+import mega.privacy.android.core.ui.controls.EXPORTED_TEST_TAG
+import mega.privacy.android.core.ui.controls.FAVORITE_TEST_TAG
+import mega.privacy.android.core.ui.controls.INFO_TEXT_TEST_TAG
 import mega.privacy.android.app.presentation.view.NodesView
-import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
-import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
+import mega.privacy.android.core.ui.controls.SELECTED_TEST_TAG
+import mega.privacy.android.core.ui.controls.TAKEN_TEST_TAG
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode

@@ -24,6 +24,7 @@ import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -467,7 +468,7 @@ class UploadFolderActivity : TransfersManagementActivity(), Scrollable {
                 }
 
                 imageView.run {
-                    setImageResource(R.drawable.ic_select_folder)
+                    setImageResource(CoreUiR.drawable.ic_select_folder)
                     isVisible = true
 
                     val animator = AnimatorInflater.loadAnimator(context, R.animator.icon_select)

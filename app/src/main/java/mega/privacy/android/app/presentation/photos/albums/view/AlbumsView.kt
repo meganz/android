@@ -72,6 +72,7 @@ import mega.privacy.android.analytics.event.content.DeleteAlbumConfirmButtonInfo
 import mega.privacy.android.analytics.event.content.DeleteAlbumsConfirmationDialogInfo
 import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.analytics.event.content.RemoveLinksConfirmationDialogInfo
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -337,7 +338,7 @@ fun AlbumsView(
                         }
                         if (isAlbumSelected(album, albumsViewState.selectedAlbumIds)) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_select_folder),
+                                painter = painterResource(id = CoreUiR.drawable.ic_select_folder),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .align(Alignment.TopStart)

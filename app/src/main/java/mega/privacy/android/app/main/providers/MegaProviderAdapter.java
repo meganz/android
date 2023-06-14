@@ -172,7 +172,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
             int margin = dp2px(ICON_MARGIN_DP);
             params.setMargins(margin, margin, margin, margin);
 
-            holder.imageView.setImageResource(R.drawable.ic_folder_list);
+            holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
             holder.textViewFileSize.setText(getMegaNodeFolderInfo(node, context));
 
             if (node.isInShare()) {
@@ -205,11 +205,11 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
             }
 
             if (isMultipleSelect() && isItemChecked(position)) {
-                holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 holder.imageView.setImageResource(node.isInShare()
                         ? R.drawable.ic_folder_incoming_list
-                        : R.drawable.ic_folder_list);
+                        : mega.privacy.android.core.R.drawable.ic_folder_list);
             }
         } else {
             holder.permissionsIcon.setVisibility(View.GONE);
@@ -219,7 +219,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
             if (isMultipleSelect() && isItemChecked(position)) {
                 params.height = params.width = dp2px(ICON_SIZE_DP);
                 params.setMargins(dp2px(ICON_MARGIN_DP), 0, 0, 0);
-                holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 Bitmap thumb = ThumbnailUtils.getThumbnailFromCache(node);
 

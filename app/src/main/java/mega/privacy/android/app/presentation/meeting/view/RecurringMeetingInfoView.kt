@@ -266,7 +266,7 @@ private fun OccurrenceItemView(
             ) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
                     Icon(modifier = Modifier.padding(start = 30.dp, end = 20.dp),
-                        painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                        painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
                         tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
                 }

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionPlural
@@ -21,7 +22,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     ), FileInfoMenuAction
 
     object GetLink : MenuActionPlural(
-        R.drawable.link_ic_white,
+        CoreUiR.drawable.link_ic_white,
         R.plurals.get_links, 1
     ), FileInfoMenuAction
 

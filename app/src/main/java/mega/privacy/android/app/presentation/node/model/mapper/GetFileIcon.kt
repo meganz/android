@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
 import androidx.annotation.DrawableRes
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.TypedFileNode
 
@@ -38,7 +39,7 @@ private fun getFileIcon(extension: String) =
         "gpx", "kml", "kmz" -> R.drawable.gis_thumbnail
         "dhtml", "htm", "html", "shtml", "xhtml" -> R.drawable.html_thumbnail
         "ai", "aia", "aip", "ait", "art", "irs" -> R.drawable.ic_illustrator_thumbnail
-        "jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png" -> R.drawable.ic_image_thumbnail
+        "jpg", "jpeg", "tga", "tif", "tiff", "bmp", "gif", "png" -> CoreUiR.drawable.ic_image_thumbnail
         "indd" -> R.drawable.ic_indesign_thumbnail
         "class", "jar", "java" -> R.drawable.java_thumbnail
         "mid", "midi" -> R.drawable.midi_thumbnail

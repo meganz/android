@@ -948,7 +948,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             if (isMultipleSelect() && isItemChecked(position)) {
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-                holder.fileGridSelected.setImageResource(R.drawable.ic_select_folder);
+                holder.fileGridSelected.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
 
             } else {
                 holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
@@ -971,7 +971,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, context.getResources().getDisplayMetrics());
             holder.imageViewIcon.setLayoutParams(paramsMultiselect);
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid_selected));
-            holder.imageViewIcon.setImageResource(R.drawable.ic_select_folder);
+            holder.imageViewIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
         } else {
             holder.itemLayout.setBackground(ContextCompat.getDrawable(context, R.drawable.background_item_grid));
             holder.imageViewIcon.setImageResource(folderDrawableResId);
@@ -985,7 +985,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
             paramsMultiselect.setMargins(0, 0, 0, 0);
             holder.imageView.setLayoutParams(paramsMultiselect);
-            holder.imageView.setImageResource(R.drawable.ic_select_folder);
+            holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
         } else {
             holder.itemLayout.setBackground(null);
             holder.imageView.setImageResource(folderDrawableResId);
@@ -1172,7 +1172,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     paramsMultiselect.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48, context.getResources().getDisplayMetrics());
                     paramsMultiselect.setMargins(0, 0, 0, 0);
                     holder.imageView.setLayoutParams(paramsMultiselect);
-                    holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                    holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
                 } else {
                     holder.itemLayout.setBackground(null);
                     Timber.d("Check the thumb");

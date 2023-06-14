@@ -310,7 +310,7 @@ public class MultipleBucketAdapter
             }
 
             if (node.getSelected()) {
-                holder.thumbnailList.setImageResource(R.drawable.ic_select_folder);
+                holder.thumbnailList.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 holder.thumbnailList.setImageDrawable(null);
                 int placeHolderRes = MimeTypeList.typeForName(node.getNode().getName()).getIconResourceId();
@@ -320,7 +320,7 @@ public class MultipleBucketAdapter
                 } else {
                     int imgResource;
                     if (megaNode.isFolder()) {
-                        imgResource = R.drawable.ic_folder_list;
+                        imgResource = mega.privacy.android.core.R.drawable.ic_folder_list;
                     } else {
                         imgResource = placeHolderRes;
                     }

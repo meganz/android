@@ -113,6 +113,7 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.OpenPasswordLinkActivity
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
@@ -3859,7 +3860,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 SharesTab.LINKS_TAB.position -> {
                     tab.setText(R.string.tab_links_shares)
-                    tab.setIcon(R.drawable.link_ic)
+                    tab.setIcon(CoreUiR.drawable.link_ic)
                 }
             }
         }.attach()

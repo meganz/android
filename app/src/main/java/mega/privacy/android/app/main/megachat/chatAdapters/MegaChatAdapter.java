@@ -3235,7 +3235,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(getSizeString(node.getSize(), context));
                 } else {
                     ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(androidMessage.getRichLinkMessage().getFolderName());
-                    holder.urlOwnMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    holder.urlOwnMessageImage.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
                     ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else if (androidMessage.getRichLinkMessage() != null && androidMessage.getRichLinkMessage().isChat()) {
@@ -3396,7 +3396,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(getSizeString(node.getSize(), context));
                 } else {
                     ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(androidMessage.getRichLinkMessage().getFolderName());
-                    ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_list);
+                    ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(mega.privacy.android.core.R.drawable.ic_folder_list);
                     ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(androidMessage.getRichLinkMessage().getFolderContent());
                 }
             } else {
@@ -8524,7 +8524,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (ownMessage) {
                 holder.ownMessageSelectLayout.setVisibility(View.VISIBLE);
                 if (this.isItemChecked(messageId)) {
-                    holder.ownMessageSelectIcon.setImageResource(R.drawable.ic_select_folder);
+                    holder.ownMessageSelectIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
                     holder.ownMessageSelectIcon.setColorFilter(null);
                 } else {
                     holder.ownMessageSelectIcon.setImageResource(R.drawable.ic_unselect_chatroom);
@@ -8535,7 +8535,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             } else {
                 holder.contactMessageSelectLayout.setVisibility(View.VISIBLE);
                 if (this.isItemChecked(messageId)) {
-                    holder.contactMessageSelectIcon.setImageResource(R.drawable.ic_select_folder);
+                    holder.contactMessageSelectIcon.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
                     holder.contactMessageSelectIcon.setColorFilter(null);
                 } else {
                     holder.contactMessageSelectIcon.setImageResource(R.drawable.ic_unselect_chatroom);

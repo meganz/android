@@ -446,7 +446,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
             Timber.d("Multiselection ON");
             if (this.isItemChecked(position)) {
                 holder.imageView.setLayoutParams(paramsLarge);
-                holder.imageView.setImageResource(R.drawable.ic_select_folder);
+                holder.imageView.setImageResource(mega.privacy.android.core.R.drawable.ic_select_folder);
             } else {
                 holder.itemLayout.setBackground(null);
 

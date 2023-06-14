@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node.model.mapper
 
 import androidx.annotation.DrawableRes
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
@@ -14,7 +15,7 @@ internal fun getDefaultFolderIcon(
     folderNode: TypedFolderNode,
 ) = with(folderNode) {
     when {
-        isInRubbishBin -> R.drawable.ic_folder_list
+        isInRubbishBin -> CoreUiR.drawable.ic_folder_list
         isIncomingShare -> R.drawable.ic_folder_incoming
         type is FolderType.MediaSyncFolder -> R.drawable.ic_folder_camera_uploads_list
         type is FolderType.ChatFilesFolder -> R.drawable.ic_folder_chat_list
@@ -22,7 +23,7 @@ internal fun getDefaultFolderIcon(
         type is FolderType.RootBackup -> R.drawable.backup
         type is FolderType.DeviceBackup -> getDeviceFolderIcon((type as FolderType.DeviceBackup).deviceType)
         type is FolderType.ChildBackup -> R.drawable.ic_folder_backup
-        else -> R.drawable.ic_folder_list
+        else -> CoreUiR.drawable.ic_folder_list
     }
 }
 

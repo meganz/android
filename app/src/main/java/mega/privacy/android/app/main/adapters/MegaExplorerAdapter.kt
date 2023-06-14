@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeThumbnail
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
@@ -604,7 +605,7 @@ class MegaExplorerAdapter(
                         }
 
                         if (multipleSelected && isItemChecked(position)) {
-                            imageView.setImageResource(R.drawable.ic_select_folder)
+                            imageView.setImageResource(CoreUiR.drawable.ic_select_folder)
                             Timber.d("Do not show thumb")
                             return
                         } else {
@@ -812,7 +813,7 @@ class MegaExplorerAdapter(
                                 context,
                                 R.drawable.background_item_grid_selected
                             )
-                        fileSelectedIcon.setImageResource(R.drawable.ic_select_folder)
+                        fileSelectedIcon.setImageResource(CoreUiR.drawable.ic_select_folder)
                     } else {
                         binding.fileExplorerGridLayout.background =
                             ContextCompat.getDrawable(
