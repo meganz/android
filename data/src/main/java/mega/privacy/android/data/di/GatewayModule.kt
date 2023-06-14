@@ -65,6 +65,7 @@ import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
@@ -78,6 +79,7 @@ import mega.privacy.android.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.data.preferences.EphemeralCredentialsDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
+import mega.privacy.android.data.preferences.MediaPlayerPreferencesDatastore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
@@ -148,6 +150,9 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindAccountPreferencesGateway(implementation: AccountPreferencesDataStore): AccountPreferencesGateway
+
+    @Binds
+    abstract fun MediaPlayerPreferencesGateway(implementation: MediaPlayerPreferencesDatastore): MediaPlayerPreferencesGateway
 
     @Binds
     abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway

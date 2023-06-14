@@ -12,20 +12,31 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.mediaplayer.RepeatToggleModeMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import nz.mega.sdk.MegaNode
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultMediaPlayerRepositoryTest {
     private lateinit var underTest: MediaPlayerRepository
 
@@ -36,6 +47,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
     private val subtitleFileInfoMapper = mock<SubtitleFileInfoMapper>()
+    private val mediaPlayerPreferencesGateway = mock<MediaPlayerPreferencesGateway>()
 
     private val expectedHandle = 100L
     private val expectedMediaId: Long = 1234567
@@ -43,8 +55,8 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedCurrentPosition: Long = 16000
     private val nodeMapper = mock<NodeMapper>()
 
-    @Before
-    fun setUp() {
+    @BeforeAll
+    fun initialise() {
         underTest = DefaultMediaPlayerRepository(
             megaApi = megaApi,
             megaApiFolder = megaApiFolder,
@@ -55,6 +67,22 @@ class DefaultMediaPlayerRepositoryTest {
             appPreferencesGateway = appPreferencesGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             subtitleFileInfoMapper = subtitleFileInfoMapper,
+            mediaPlayerPreferencesGateway = mediaPlayerPreferencesGateway,
+            repeatToggleModeMapper = RepeatToggleModeMapper()
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            megaApi,
+            megaApiFolder,
+            dbHandler,
+            fileGateway,
+            sortOrderIntMapper,
+            appPreferencesGateway,
+            subtitleFileInfoMapper,
+            mediaPlayerPreferencesGateway
         )
     }
 
@@ -195,6 +223,53 @@ class DefaultMediaPlayerRepositoryTest {
 
             assertThat(actual).isEmpty()
         }
+
+    @ParameterizedTest(name = "when audio repeatMode is {0}, the result of monitorAudioRepeatMode is {1}")
+    @MethodSource("provideRepeatModeParameters")
+    fun `test that the result of monitorAudioRepeatMode functions are correct`(
+        repeatMode: Int,
+        repeatToggleMode: RepeatToggleMode,
+    ) =
+        runTest {
+            whenever(mediaPlayerPreferencesGateway.monitorAudioRepeatMode()).thenReturn(
+                flowOf(
+                    repeatMode
+                )
+            )
+            assertThat(
+                underTest.monitorAudioRepeatMode().firstOrNull()
+            ).isEqualTo(repeatToggleMode)
+        }
+
+    @ParameterizedTest(name = "when video repeatMode is {0}, the result of monitorVideoRepeatMode is {1}")
+    @MethodSource("provideRepeatModeParameters")
+    fun `test that the result of monitorVideoRepeatMode functions are correct`(
+        repeatMode: Int,
+        repeatToggleMode: RepeatToggleMode,
+    ) =
+        runTest {
+            whenever(mediaPlayerPreferencesGateway.monitorVideoRepeatMode()).thenReturn(
+                flowOf(
+                    repeatMode
+                )
+            )
+            assertThat(
+                underTest.monitorVideoRepeatMode().firstOrNull()
+            ).isEqualTo(repeatToggleMode)
+        }
+
+    /**
+     * Provides parameters for the test that the result of monitorAudioRepeatMode
+     *
+     * The parameters:
+     * 1. Int value of repeat mode
+     * 2. RepeatToggleMode
+     */
+    private fun provideRepeatModeParameters() = Stream.of(
+        Arguments.of(RepeatToggleMode.REPEAT_ALL.ordinal, RepeatToggleMode.REPEAT_ALL),
+        Arguments.of(RepeatToggleMode.REPEAT_NONE.ordinal, RepeatToggleMode.REPEAT_NONE),
+        Arguments.of(RepeatToggleMode.REPEAT_ONE.ordinal, RepeatToggleMode.REPEAT_ONE),
+    )
 
     private fun createPlaybackInformation() = PlaybackInformation(
         mediaId = expectedMediaId,

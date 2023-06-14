@@ -1,4 +1,4 @@
-package mega.privacy.android.app.mediaplayer.model
+package mega.privacy.android.domain.entity.mediaplayer
 
 /**
  * For defining the repeat mode

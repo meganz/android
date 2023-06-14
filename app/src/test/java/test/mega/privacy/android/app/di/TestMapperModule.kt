@@ -7,8 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
-import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
-import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
+import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
+import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
@@ -30,10 +30,10 @@ object TestMapperModule {
     val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     @Provides
-    fun provideRepeatModeMapper(): RepeatModeMapper = mock()
+    fun provideRepeatModeMapper(): RepeatToggleModeByExoPlayerMapper = mock()
 
     @Provides
-    fun provideRepeatToggleModeMapper(): RepeatToggleModeMapper = mock()
+    fun provideRepeatToggleModeMapper(): ExoPlayerRepeatModeMapper = mock()
 
     @Provides
     fun provideUIAlbumMapper(): UIAlbumMapper = mock()

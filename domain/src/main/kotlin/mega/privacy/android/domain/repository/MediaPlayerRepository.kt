@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -295,4 +296,60 @@ interface MediaPlayerRepository {
      * @return [SubtitleFileInfo] list
      */
     suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo>
+
+    /**
+     * Monitor the value of AudioBackgroundPlayEnabled
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorAudioBackgroundPlayEnabled(): Flow<Boolean?>
+
+    /**
+     * Set the value of AudioBackgroundPlayEnabled
+     *
+     * @param value true is enable audio background play, otherwise is false.
+     */
+    suspend fun setAudioBackgroundPlayEnabled(value: Boolean)
+
+    /**
+     * Monitor the value of AudioShuffleEnabled
+     *
+     * @return Flow of Boolean
+     */
+    fun monitorAudioShuffleEnabled(): Flow<Boolean?>
+
+    /**
+     * Set the value of AudioShuffleEnabled
+     *
+     * @param value true is shuffled, otherwise is false.
+     */
+    suspend fun setAudioShuffleEnabled(value: Boolean)
+
+    /**
+     * Monitor the value of AudioRepeatMode
+     *
+     * @return Flow of RepeatToggleMode
+     */
+    fun monitorAudioRepeatMode(): Flow<RepeatToggleMode>
+
+    /**
+     * Set the value of AudioRepeatMode
+     *
+     * @param value Int value of audio repeat mode
+     */
+    suspend fun setAudioRepeatMode(value: Int)
+
+    /**
+     * Monitor the value of VideoRepeatMode
+     *
+     * @return Flow of RepeatToggleMode
+     */
+    fun monitorVideoRepeatMode(): Flow<RepeatToggleMode>
+
+    /**
+     * Set the value of VideoRepeatMode
+     *
+     * @param value Int value of video repeat mode
+     */
+    suspend fun setVideoRepeatMode(value: Int)
 }

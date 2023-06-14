@@ -8,8 +8,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.usecase.DefaultStopAudioService
-import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
-import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
+import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
+import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.domain.usecase.StopAudioService
 import javax.inject.Singleton
@@ -30,10 +30,10 @@ class MediaPlayerModule {
     fun provideVideoPlayerFacade(
         @ApplicationContext context: Context,
         crashReporter: CrashReporter,
-        repeatModeMapper: RepeatModeMapper,
-        repeatToggleModeMapper: RepeatToggleModeMapper,
+        repeatToggleModeMapper: RepeatToggleModeByExoPlayerMapper,
+        exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
     ): MediaPlayerFacade =
-        MediaPlayerFacade(context, crashReporter, repeatModeMapper, repeatToggleModeMapper)
+        MediaPlayerFacade(context, crashReporter, repeatToggleModeMapper, exoPlayerRepeatModeMapper)
 
     /**
      * Provide the MediaPlayerFacade implementation for audio player
@@ -44,10 +44,10 @@ class MediaPlayerModule {
     fun provideAudioPlayerFacade(
         @ApplicationContext context: Context,
         crashReporter: CrashReporter,
-        repeatModeMapper: RepeatModeMapper,
-        repeatToggleModeMapper: RepeatToggleModeMapper,
+        repeatToggleModeMapper: RepeatToggleModeByExoPlayerMapper,
+        exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
     ): MediaPlayerFacade =
-        MediaPlayerFacade(context, crashReporter, repeatModeMapper, repeatToggleModeMapper)
+        MediaPlayerFacade(context, crashReporter, repeatToggleModeMapper, exoPlayerRepeatModeMapper)
 
     /**
      * Provide the implementation for [StopAudioService]

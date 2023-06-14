@@ -18,17 +18,21 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.presentation.extensions.getStateFlow
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.mediaplayer.MonitorVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import timber.log.Timber
 import java.io.File
@@ -48,6 +52,7 @@ import javax.inject.Inject
 class VideoPlayerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
+    monitorVideoRepeatModeUseCase: MonitorVideoRepeatModeUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     /**
@@ -111,6 +116,13 @@ class VideoPlayerViewModel @Inject constructor(
             null
         )
 
+    private var videoRepeatToggleMode = monitorVideoRepeatModeUseCase().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        RepeatToggleMode.REPEAT_NONE
+    )
+
+
     init {
         viewModelScope.launch {
             combine(
@@ -126,6 +138,13 @@ class VideoPlayerViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get video repeat mode
+     *
+     * @return repeat mode
+     */
+    fun getVideoRepeatMode() = videoRepeatToggleMode.value
 
     private fun mapToSubtitleDisplayState(
         subtitleShown: Boolean,

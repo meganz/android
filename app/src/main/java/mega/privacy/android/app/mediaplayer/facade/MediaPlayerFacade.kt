@@ -30,15 +30,15 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
-import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
+import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
+import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
-import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -48,8 +48,8 @@ import javax.inject.Inject
 class MediaPlayerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crashReporter: CrashReporter,
-    private val repeatModeMapper: RepeatModeMapper,
-    private val repeatToggleModeMapper: RepeatToggleModeMapper,
+    private val repeatToggleModeMapper: RepeatToggleModeByExoPlayerMapper,
+    private val exoPlayerRepeatModeMapper: ExoPlayerRepeatModeMapper,
 ) : MediaPlayerGateway {
 
     private lateinit var exoPlayer: ExoPlayer
@@ -90,7 +90,11 @@ class MediaPlayerFacade @Inject constructor(
                     }
 
                     override fun onRepeatModeChanged(repeatMode: Int) {
-                        mediaPlayerCallback.onRepeatModeChangedCallback(repeatModeMapper(repeatMode))
+                        mediaPlayerCallback.onRepeatModeChangedCallback(
+                            repeatToggleModeMapper(
+                                repeatMode
+                            )
+                        )
                     }
 
                     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
@@ -301,7 +305,7 @@ class MediaPlayerFacade @Inject constructor(
     }
 
     private fun convertToRepeatMode(repeatToggleMode: RepeatToggleMode) =
-        repeatToggleModeMapper(repeatToggleMode)
+        exoPlayerRepeatModeMapper(repeatToggleMode)
 
     override fun addPlayerListener(listener: Player.Listener) =
         player.wrappedPlayer.addListener(listener)

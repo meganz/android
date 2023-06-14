@@ -13,7 +13,9 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.MediaPlayerPreferencesGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.mediaplayer.RepeatToggleModeMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.model.MimeTypeList
@@ -46,6 +48,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val appPreferencesGateway: AppPreferencesGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val subtitleFileInfoMapper: SubtitleFileInfoMapper,
+    private val mediaPlayerPreferencesGateway: MediaPlayerPreferencesGateway,
+    private val repeatToggleModeMapper: RepeatToggleModeMapper,
 ) : MediaPlayerRepository {
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
@@ -444,6 +448,34 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 )
             } ?: emptyList()
         }
+
+    override fun monitorAudioBackgroundPlayEnabled() =
+        mediaPlayerPreferencesGateway.monitorAudioBackgroundPlayEnabled()
+
+    override suspend fun setAudioBackgroundPlayEnabled(value: Boolean) =
+        mediaPlayerPreferencesGateway.setAudioBackgroundPlayEnabled(value)
+
+    override fun monitorAudioShuffleEnabled() =
+        mediaPlayerPreferencesGateway.monitorAudioShuffleEnabled()
+
+    override suspend fun setAudioShuffleEnabled(value: Boolean) =
+        mediaPlayerPreferencesGateway.setAudioShuffleEnabled(value)
+
+    override fun monitorAudioRepeatMode() =
+        mediaPlayerPreferencesGateway.monitorAudioRepeatMode().map {
+            repeatToggleModeMapper(it)
+        }
+
+    override suspend fun setAudioRepeatMode(value: Int) =
+        mediaPlayerPreferencesGateway.setAudioRepeatMode(value)
+
+    override fun monitorVideoRepeatMode() =
+        mediaPlayerPreferencesGateway.monitorVideoRepeatMode().map {
+            repeatToggleModeMapper(it)
+        }
+
+    override suspend fun setVideoRepeatMode(value: Int) =
+        mediaPlayerPreferencesGateway.setVideoRepeatMode(value)
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
         MimeTypeList.typeForName(name).let { mimeType ->

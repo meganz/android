@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
-import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 
 /**

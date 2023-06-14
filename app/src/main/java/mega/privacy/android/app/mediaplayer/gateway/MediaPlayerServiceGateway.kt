@@ -5,7 +5,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
-import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.Metadata
 
 /**

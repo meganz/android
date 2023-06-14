@@ -1,6 +1,6 @@
 package mega.privacy.android.app.mediaplayer.service
 
-import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
 /**
  * For callback from Player.Listener

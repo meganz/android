@@ -39,11 +39,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
-import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -52,7 +51,6 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import org.jetbrains.anko.configuration
-import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
 
@@ -436,15 +434,7 @@ class VideoPlayerFragment : Fragment() {
 
     private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
         serviceGateway?.run {
-            val defaultRepeatMode = when (
-                requireContext().defaultSharedPreferences.getInt(
-                    KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal
-                )
-            ) {
-                RepeatToggleMode.REPEAT_NONE.ordinal -> RepeatToggleMode.REPEAT_NONE
-                RepeatToggleMode.REPEAT_ONE.ordinal -> RepeatToggleMode.REPEAT_ONE
-                else -> RepeatToggleMode.REPEAT_ALL
-            }
+            val defaultRepeatMode = viewModel.getVideoRepeatMode()
 
             setRepeatModeForVideo(
                 if (defaultRepeatMode == RepeatToggleMode.REPEAT_NONE) {

@@ -49,7 +49,8 @@ internal class VideoPlayerViewModelTest {
         underTest = VideoPlayerViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
             sendStatisticsMediaPlayerUseCase = mock(),
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            monitorVideoRepeatModeUseCase = mock()
         )
         savedStateHandle[underTest.subtitleDialogShowKey] = false
         savedStateHandle[underTest.subtitleShowKey] = false
