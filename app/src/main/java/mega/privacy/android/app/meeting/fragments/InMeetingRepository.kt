@@ -181,12 +181,11 @@ class InMeetingRepository @Inject constructor(
     /**
      * Get the avatar
      *
-     * @param chat The chat room of a meeting
      * @param peerId user Handle of a participant
      * @return the avatar the avatar of a participant
      */
-    fun getAvatarBitmap(chat: MegaChatRoom, peerId: Long): Bitmap? {
-        var avatar = CallUtil.getImageAvatarCall(chat, peerId)
+    fun getAvatarBitmap(peerId: Long): Bitmap? {
+        var avatar = CallUtil.getImageAvatarCall(peerId)
         if (avatar == null) {
             getRemoteAvatar(peerId)
 
@@ -223,7 +222,7 @@ class InMeetingRepository @Inject constructor(
             isVideoOn = it.hasLocalVideo()
         }
 
-        val avatar = getAvatarBitmap(chat, megaApi.myUserHandleBinary)
+        val avatar = getAvatarBitmap(megaApi.myUserHandleBinary)
         return Participant(
             megaApi.myUserHandleBinary,
             MEGACHAT_INVALID_HANDLE,

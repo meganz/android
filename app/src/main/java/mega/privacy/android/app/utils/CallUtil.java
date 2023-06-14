@@ -918,12 +918,11 @@ public class CallUtil {
     /**
      * Method to get the image avatar in calls.
      *
-     * @param chat   Chat room identifier where the call is.
      * @param peerId User handle from whom the avatar is obtained.
      * @return Bitmap with the image avatar created.
      */
-    public static Bitmap getImageAvatarCall(MegaChatRoom chat, long peerId) {
-        String mail = getUserMailCall(chat, peerId);
+    public static Bitmap getImageAvatarCall(long peerId) {
+        String mail = getUserMailCall(peerId);
         MegaChatApiAndroid megaChatApi = MegaApplication.getInstance().getMegaChatApi();
 
         String userHandleString = MegaApiAndroid.userHandleToBase64(peerId);
@@ -939,15 +938,14 @@ public class CallUtil {
     /**
      * Method to get the email from a handle.
      *
-     * @param chat   Chat room identifier.
      * @param peerId User handle from whom the email is obtained.
      * @return The email.
      */
-    public static String getUserMailCall(MegaChatRoom chat, long peerId) {
+    public static String getUserMailCall(long peerId) {
         if (peerId == MegaApplication.getInstance().getMegaChatApi().getMyUserHandle()) {
             return MegaApplication.getInstance().getMegaChatApi().getMyEmail();
         } else {
-            return chat.getPeerEmailByHandle(peerId);
+            return MegaApplication.getInstance().getMegaChatApi().getUserEmailFromCache(peerId);
         }
     }
 

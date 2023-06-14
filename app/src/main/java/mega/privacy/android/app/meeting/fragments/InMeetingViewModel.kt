@@ -1379,7 +1379,7 @@ class InMeetingViewModel @Inject constructor(
             val name = getParticipantName(session.peerid)
             val isContact = isMyContact(session.peerid)
             val hasHiRes = needHiRes(status)
-            val avatar = inMeetingRepository.getAvatarBitmap(it, session.peerid)
+            val avatar = inMeetingRepository.getAvatarBitmap(session.peerid)
             val email = inMeetingRepository.getEmailParticipant(
                 session.peerid,
                 GetUserEmailListener(MegaApplication.getInstance().applicationContext, this)
@@ -1610,7 +1610,7 @@ class InMeetingViewModel @Inject constructor(
      */
     fun getAvatarBitmap(peerId: Long): Bitmap? =
         inMeetingRepository.getChatRoom(currentChatId)
-            ?.let { inMeetingRepository.getAvatarBitmap(it, peerId) }
+            ?.let { inMeetingRepository.getAvatarBitmap(peerId) }
 
     /**
      * Method to get the first participant in the list, who will be the new speaker

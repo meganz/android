@@ -555,7 +555,7 @@ public final class ChatAdvancedNotificationBuilder {
     private Bitmap setUserAvatar(MegaChatRoom chat) {
         Timber.d("Chat ID: %s", chat.getChatId());
         if (!chat.isGroup()) {
-            Bitmap bitmap = getImageAvatarCall(chat, chat.getPeerHandle(0));
+            Bitmap bitmap = getImageAvatarCall(chat.getPeerHandle(0));
             if (bitmap != null)
                 return getCircleBitmap(bitmap);
         }

@@ -165,7 +165,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             if (inMeetingViewModel.isOneToOneCall()) {
                 val callerId = it.getPeerHandle(0)
 
-                bitmap = getImageAvatarCall(it, callerId)
+                bitmap = getImageAvatarCall(callerId)
                 if (bitmap == null) {
                     bitmap = getDefaultAvatarCall(context, callerId)
                 }
