@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel
-import mega.privacy.android.app.upgradeAccount.payment.UserSubscription
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.core.ui.controls.MegaSpannedText
 import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.model.SpanIndicator

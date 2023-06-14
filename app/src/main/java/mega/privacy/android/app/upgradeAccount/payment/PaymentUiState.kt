@@ -2,6 +2,7 @@ package mega.privacy.android.app.upgradeAccount.payment
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.utils.Constants
 
 internal data class PaymentUiState(
