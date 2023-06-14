@@ -2,9 +2,9 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AchievementType.INVALID_ACHIEVEMENT
 import mega.privacy.android.domain.entity.achievement.AchievementType.MEGA_ACHIEVEMENT_INVITE
+import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievement
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import nz.mega.sdk.MegaAchievementsDetails
@@ -59,11 +59,13 @@ private fun convertAllAwards(megaAchievementsDetails: MegaAchievementsDetails): 
                 AwardedAchievement(
                     awardId = awardId,
                     type = type,
-                    expirationTimestampInDays = megaAchievementsDetails.getAwardExpirationTs(index),
+                    expirationInDays = megaAchievementsDetails.getAwardExpirationTs(index),
                     rewardedStorageInBytes = megaAchievementsDetails.getRewardStorageByAwardId(
-                        awardId),
+                        awardId
+                    ),
                     rewardedTransferInBytes = megaAchievementsDetails.getRewardTransferByAwardId(
-                        awardId)
+                        awardId
+                    )
                 )
 
             when (type) {

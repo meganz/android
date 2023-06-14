@@ -5,6 +5,7 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.di.AccountModule
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.usecase.CreateContactLink
@@ -121,4 +122,7 @@ object TestAccountModule {
 
     @Provides
     fun providesMonitorAccountDetail() = mock<MonitorAccountDetail>()
+
+    @Provides
+    fun provideReferralBonusAchievementsMapper() = mock<ReferralBonusAchievementsMapper>()
 }

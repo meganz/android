@@ -1005,8 +1005,8 @@ internal fun MyAccountHomePreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
             uiState = MyAccountHomeUIState(
-                name = "Kevin Gozali",
-                email = "kgozali23@gmail.com",
+                name = "Qwerty Uiop",
+                email = "qwerty@uiop.com",
                 verifiedPhoneNumber = "+6282141058000",
                 avatarColor = R.color.dark_grey,
                 accountType = AccountType.BUSINESS,

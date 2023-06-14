@@ -5,17 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.SimpleDividerItemDecoration
-import mega.privacy.android.app.databinding.FragmentReferralBonusesBinding
-import mega.privacy.android.app.listeners.GetAchievementsListener
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -23,11 +27,12 @@ import javax.inject.Inject
  * ReferralBonusesFragment
  */
 @AndroidEntryPoint
-class ReferralBonusesFragment : Fragment(), GetAchievementsListener.DataCallback {
-    private var _binding: FragmentReferralBonusesBinding? = null
-    private val binding get() = _binding!!
-
-    private var mAdapter: MegaReferralBonusesAdapter? = null
+class ReferralBonusesFragment : Fragment() {
+    /**
+     * View Model for [ReferralBonusesFragment]
+     * @see ReferralBonusesViewModel
+     */
+    private val viewModel by viewModels<ReferralBonusesViewModel>()
 
     /**
      * [MegaApiAndroid] injection
@@ -44,10 +49,10 @@ class ReferralBonusesFragment : Fragment(), GetAchievementsListener.DataCallback
     lateinit var ioDispatcher: CoroutineDispatcher
 
     /**
-     * [GetAchievementsListener] injection
+     * Get system's default theme mode
      */
     @Inject
-    lateinit var getAchievementsListener: GetAchievementsListener
+    lateinit var getThemeMode: GetThemeMode
 
     /**
      * onCreateView
@@ -56,14 +61,17 @@ class ReferralBonusesFragment : Fragment(), GetAchievementsListener.DataCallback
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentReferralBonusesBinding.inflate(layoutInflater)
-        binding.referralBonusesRecyclerView.apply {
-            addItemDecoration(SimpleDividerItemDecoration(requireContext()))
-            layoutManager = LinearLayoutManager(requireContext())
-            itemAnimator = DefaultItemAnimator()
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            val themeMode by getThemeMode()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                ReferralBonusView(uiState = uiState)
+            }
         }
-        return binding.root
     }
 
     /**
@@ -74,37 +82,5 @@ class ReferralBonusesFragment : Fragment(), GetAchievementsListener.DataCallback
         // Activity actionbar has been created which might be accessed by UpdateUI().
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.title =
             getString(R.string.title_referral_bonuses)
-
-        // The root view has been created, fill it with the data when data ready
-        getAchievementsListener.setDataCallback(this)
-    }
-
-    /**
-     * onDestroyView
-     */
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun updateUI() {
-        val bonuses = getAchievementsListener.referralBonuses
-
-        if (mAdapter == null) {
-            mAdapter = MegaReferralBonusesAdapter(
-                requireActivity(),
-                this,
-                bonuses,
-                binding.referralBonusesRecyclerView
-            )
-        } else {
-            mAdapter?.setReferralBonuses(bonuses)
-        }
-
-        binding.referralBonusesRecyclerView.adapter = mAdapter
-    }
-
-    override fun onAchievementsReceived() {
-        updateUI()
     }
 }
