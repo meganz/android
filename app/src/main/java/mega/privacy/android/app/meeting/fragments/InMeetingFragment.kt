@@ -1394,7 +1394,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         // Need not consider the snack bar
-        adjustPositionOfFloatingWindow(bTop = true, bBottom = true)
+        floatingWindowContainer.post {
+            adjustPositionOfFloatingWindow(bTop = true, bBottom = true)
+        }
 
         lastTouch = System.currentTimeMillis()
     }
@@ -2113,10 +2115,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 it.alpha = 0f
             }
 
-            adjustPositionOfFloatingWindow(
-                bTop = true,
-                bBottom = false
-            )
+            floatingWindowContainer.post {
+                adjustPositionOfFloatingWindow(bTop = true, bBottom = false)
+            }
         }
     }
 
