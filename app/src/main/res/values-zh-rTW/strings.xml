@@ -4669,4 +4669,32 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">購買Pro III</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">服務條款</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">任何擁有此連結的人都可以查看和下載您的資料</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">只有擁有密碼的人才能開啟連結</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="other">套用至所有%1$d個重複的項目</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">資訊</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">會議通知</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">管理會議記錄</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">離開會議</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">管理會議記錄</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">清空會議記錄</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">清空會議記錄</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">您確定要刪除此會議全部的訊息記錄嗎？</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">會議通知靜音</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">要離開會議嗎？</string>
 </resources>

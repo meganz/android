@@ -3932,7 +3932,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">이어서 볼까요?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">%1$s은/는 %2$s부터 재개됩니다</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">재개</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4591,8 +4591,7 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">매월</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="other">몇몇 달은 %1$d일이 없습니다. 이러한 달은 되풀이 항목이 그 달의 마지막 날로 예약됩니다.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">폴더를 열 수 없습니다</string>
@@ -4603,27 +4602,27 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Pro only</string>
+    <string name="general_pro_only">Pro 전용</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">링크 접근</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <string name="cloud_drive_subtitle_link_access">이 링크가 있는 누구나 당신의 데이터를 보고 다운로드할 수 있습니다</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">만료일</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">암호 설정</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <string name="general_link_updated_copy_again">링크가 업데이트 되었습니다. 다시 복사하세요.</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <string name="general_link_created_and_copied">링크가 생성되어 클립보드에 복사되었습니다</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Album link</string>
+    <string name="album_import_link">사진첩 링크</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">사진첩에 접근할 수 없습니다</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">사진첩에 대한 링크가 삭제되었거나 사진첩이 삭제되었습니다. 링크를 공유해준 사람에게 연락하세요.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">알겠습니다</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">음성</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4670,4 +4669,32 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro III 구입</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">이용 약관</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">이 링크가 있는 누구나 당신의 데이터를 보고 다운로드할 수 있습니다</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">비밀번호가 있는 사람만 링크를 열 수 있습니다</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="other">모든 %1$d개의 중복에 적용</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">정보</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">회의 알림</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">회의 기록 관리</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">회의 떠나기</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">회의 기록 관리</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">회의 기록 삭제</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">회의 기록 삭제</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">이 회의의 모든 메시지 기록을 삭제하시겠습니까?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">다음의 기간 동안 회의 알림 끄기</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">회의를 떠날까요?</string>
 </resources>

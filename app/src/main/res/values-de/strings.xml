@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">Kein externes Speichermedium gefunden</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Ausloggen</string>
+    <string name="action_logout">Abmelden</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Hochladen</string>
     <!-- Menu item -->
@@ -481,7 +481,7 @@
     <!-- error message while browsing the local filesystem -->
     <string name="error_io_problem">Problem mit dem Dateisystem</string>
     <!-- error message while browsing the local filesystem -->
-    <string name="general_error">Ein Fehler ist aufgetreten</string>
+    <string name="general_error">Bei der Ausführung dieser Aktion ist ein Fehler aufgetreten</string>
     <!-- menu item -->
     <string name="my_account_change_password">Passwort ändern</string>
     <!-- Dialog text overquota error -->
@@ -529,7 +529,7 @@
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
     <string name="camera_notif_secondary_local_unavailable">Medienuploads wurden deaktiviert. Ihr lokaler Ordner ist nicht verfügbar.</string>
     <!-- settings of the Appearance section -->
-    <string name="settings_appearance">Helligkeit</string>
+    <string name="settings_appearance">Darstellung</string>
     <!-- settings of the Features section -->
     <string name="settings_features">Features</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
@@ -1076,7 +1076,7 @@
     <!-- settings of the chat to choose the status -->
     <string name="settings_chat_vibration">Vibration</string>
     <!-- Button text shown on SMS verification page, if the user wants to logout current suspended account and login with another account, user can press this button to logout -->
-    <string name="sms_logout">[A]Ausloggen[/A], um zu einem anderen MEGA-Account zu wechseln</string>
+    <string name="sms_logout">[A]Abmelden[/A], um zu einem anderen MEGA-Account zu wechseln</string>
     <!-- On SMS verification page, if the user presses the logout button, a dialog with this text will show to ask for user’s confirmation. -->
     <string name="confirm_logout_from_sms_verification">Sind Sie sicher, dass Sie sich ausloggen möchten?</string>
     <!-- Text shown when a message has been deleted in the chat -->
@@ -1134,7 +1134,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">Weitere</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Speicherung</string>
+    <string name="storage_space">Speicherplatz</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Aus Offline-Bereich entfernen?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1306,8 +1306,8 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Der Link wurde entfernt</item>
-        <item quantity="other">Die Links wurden entfernt</item>
+        <item quantity="one">Link entfernt</item>
+        <item quantity="other">Links entfernt</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Kontakte angehängt</string>
@@ -1432,7 +1432,7 @@
     <!-- title of the section for referral bonuses in achivements section (maximum 24 chars) -->
     <string name="title_referral_bonuses">Einladungsboni</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
-    <string name="title_install_app">Mobil-App installieren</string>
+    <string name="title_install_app">MEGA-Mobil-App installieren</string>
     <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
     <string name="title_add_phone">Telefonnummer hinzufügen</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
@@ -2907,7 +2907,7 @@
     <!-- Text that indicates that there’s no video to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_video">[B]Keine[/B] [A]Videos[/A] [B]vorhanden[/B]</string>
     <!-- Title of the screen to attach GIFs -->
-    <string name="search_giphy_title">Search GIPHY</string>
+    <string name="search_giphy_title">Auf GIPHY suchen</string>
     <!-- Label indicating an empty search of GIFs. The format placeholders are to showing it in different colors. -->
     <string name="empty_search_giphy">Keine [A]GIFs[/A] gefunden</string>
     <!-- Label indicating there is not available GIFs due to down server -->
@@ -2959,7 +2959,7 @@
     <!-- Subtitle of the dialogue to select a retention time -->
     <string name="subtitle_properties_manage_chat">Nachrichten automatisch löschen, die älter sind als:</string>
     <!-- Text of the confirmation dialog to clear the chat history from Manage chat history section -->
-    <string name="confirmation_clear_chat_history">Der Chatverlauf wird komplett gelöscht. Sind Sie sicher?</string>
+    <string name="confirmation_clear_chat_history">Der Nachrichtenverlauf dieser Unterhaltung wird komplett gelöscht. Sind Sie sicher?</string>
     <!-- Text on the label indicating that the oldest messages of a year will be automatically deleted. -->
     <string name="subtitle_properties_manage_chat_label_year">1 Jahr</string>
     <!-- Picker text to choose custom retention time. This option indicates several hours -->
@@ -3026,7 +3026,7 @@
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
     <string name="link_and_password_sent">Link und Passwort versandt</string>
     <!-- Title of a warning recommending upgrade to Pro -->
-    <string name="upgrade_pro">Auf Pro umsteigen</string>
+    <string name="upgrade_pro">Zu Pro wechseln</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA-Pro schaltet erweiterte Link-Features frei.</string>
     <!-- Meaning of links decryption key -->
@@ -3090,9 +3090,9 @@
     <!-- Preference screen item title -->
     <string name="preference_cookies_accept">Cookies akzeptieren</string>
     <!-- Preference screen item title -->
-    <string name="preference_cookies_essential_title">Cookies für Grundfunktionalität</string>
+    <string name="preference_cookies_essential_title">Notwendige Cookies</string>
     <!-- Preference screen item summary -->
-    <string name="preference_cookies_essential_summary">Essentiell für die Bereitstellung unserer Dienstleistungen. Diese sind immer aktiv.</string>
+    <string name="preference_cookies_essential_summary">Notwendig für die Bereitstellung unserer Dienstleistungen. Diese sind immer aktiv.</string>
     <!-- Preference screen item title -->
     <string name="preference_cookies_performance_title">Performance/Analytics-Cookies</string>
     <!-- Preference screen item summary -->
@@ -3138,11 +3138,11 @@
     <!-- Warning which alerts the user a file cannot be created because there is already one with the same name-->
     <string name="same_file_name_warning">Eine Datei dieses Namens existiert bereits</string>
     <!-- Warning which alerts the user an item cannot be created because there is already one with the same name -->
-    <string name="same_item_name_warning">Eine Datei oder ein Ordner desselben Namens existiert bereits</string>
+    <string name="same_item_name_warning">Eine Datei oder ein Ordner dieses Namens existiert bereits</string>
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Info</string>
     <!-- settings of the Media section -->
-    <string name="settings_media">Media</string>
+    <string name="settings_media">Medien</string>
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Audiodateien</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
@@ -3173,9 +3173,9 @@
     <!-- Indicates pagination progress. E.g.: 3/49 -->
     <string name="pagination_progress">%1$s/%2$s</string>
     <!-- An error shown as transfer error when uploading something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="error_share_owner_storage_quota">Der Eigentümer der Ordnerfreigabe hat sein Speicherplatzlimit überschritten.</string>
+    <string name="error_share_owner_storage_quota">Der Eigentümer der Freigabe hat sein Speicherlimit überschritten.</string>
     <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
-    <string name="warning_share_owner_storage_quota">Die Datei kann nicht versandt werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
+    <string name="warning_share_owner_storage_quota">Die Datei kann nicht versendet werden, da der Empfänger sein Speicherplatzlimit überschritten hat.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
         <item quantity="one">1 Datei bereits heruntergeladen. %d Datei in der Warteschlange.</item>
@@ -3237,7 +3237,7 @@
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
-    <string name="add_phone_label">Mobiltelefonnummer hinzufügen</string>
+    <string name="add_phone_label">Telefonnummer hinzufügen</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
     <string name="backup_recovery_key_subtitle">Können Sie sich noch an Ihr Passwort erinnern?\nMEGA kann Ihr Passwort nicht zurücksetzen, wenn Sie es vergessen.</string>
     <!-- Action to change name -->
@@ -3251,7 +3251,7 @@
     <!-- Date indicating is tomorrow. E.g: Tomorrow, 3 Jul 2021 -->
     <string name="tomorrow_date">Morgen, %1$s</string>
     <!-- Title of the confirmation dialog shown when a subscription has been processed successfully -->
-    <string name="title_user_purchased_subscription">Warte auf Bestätigung</string>
+    <string name="title_user_purchased_subscription">Warten auf Bestätigung</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
         <item quantity="one">%1$d Kontakt</item>
@@ -3341,7 +3341,7 @@
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Bitte wählen Sie einen oder mehrere neue Gastgeber aus.</string>
     <!-- The title of dialog for changing meeting name-->
-    <string name="change_meeting_name">Namen des Meetings ändern</string>
+    <string name="change_meeting_name">Meetingnamen ändern</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Meetinglink</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
@@ -3359,7 +3359,7 @@
     <!-- Message of a dialog to show user the permissions that needed-->
     <string name="meeting_permission_info_message">Für Meetings benötigt MEGA Zugriff auf Ihr Mikrofon und Ihre Kamera.</string>
     <!-- Button to confirm the action of restarting one transfer-->
-    <string name="button_permission_info">Verstanden</string>
+    <string name="button_permission_info">Alles klar</string>
     <!-- Warning show to the user when the app needs permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_required_permissions_warning">Öffnen Sie die Einstellungen und gewähren Sie MEGA Zugriff auf Ihre Kamera und Ihr Mikrofon.</string>
     <!-- The button text in the meeting ended alert dialog. Click the button to open the group chat screen of the meeting-->
@@ -3387,7 +3387,7 @@
     <!-- the bonus title of join without account on left meeting page-->
     <string name="left_meeting_bonus_title">Erhalten Sie 20&#160;GB kostenlos</string>
     <!-- the bonus content of join without account on left meeting page-->
-    <string name="left_meeting_bonus_content">Melden Sie sich jetzt an und nutzen Sie erweiterte Collaboration-Funktionen kostenlos.</string>
+    <string name="left_meeting_bonus_content">Melden Sie sich jetzt an und nutzen Sie kostenlos erweiterte Funktionen für die Zusammenarbeit.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
     <string name="ongoing_call_content">Ein anderer Anruf ist aktiv. Bitte beenden Sie Ihren aktuellen Anruf, bevor Sie einen neuen Anruf starten.</string>
     <!-- The hint text when changing meeting name-->
@@ -3423,13 +3423,13 @@
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">[B]Letzte Aktivitäten[/B] ausgeblendet</string>
     <!-- Label indicating video original quality -->
-    <string name="original_quality">Höchste Qualitätsstufe</string>
+    <string name="original_quality">Originalqualität</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">Fingerabdruck-ID</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->
     <string name="title_enable_fingerprint">Bestätigen Sie zum Entsperren Ihren Fingerabdruck</string>
     <!-- Title of the dialog which allows to unlock the app with the fingerprint. -->
-    <string name="title_unlock_fingerprint">Entsperren mit Ihrem Fingerabdruck</string>
+    <string name="title_unlock_fingerprint">Entsperren mit Fingerabdruck</string>
     <!-- Button of the dialog which allows to unlock the app with the fingerprint. Gives the option to unlock with the passcode instead -->
     <string name="action_use_passcode">Passcode verwenden</string>
     <!-- Message informing the fingerprint was enabled successfully -->
@@ -3455,7 +3455,7 @@
     <!-- Menu option to open a link. Also title of the dialog to open a link. -->
     <string name="action_open_link">Link öffnen</string>
     <!-- error message shown when a chat link is not well formed. -->
-    <string name="invalid_chat_link_args">Chatlink ungültig</string>
+    <string name="invalid_chat_link_args">Ungültiger Chatlink</string>
     <!-- Menu option to open a chat link. -->
     <string name="action_open_chat_link">Chatlink öffnen</string>
     <!-- Hint shown in the open chat link alert dialog. -->
@@ -3477,7 +3477,7 @@
     <!-- title for the settings to enable high resolution images when on mobile data -->
     <string name="settings_mobile_data_resoluton_title">Bei mobiler Datenverbindung hochauflösende Vorschaubilder anzeigen</string>
     <!-- summary for the settings to enable high resolution images when on mobile data -->
-    <string name="settings_mobile_data_resoluton_summary">Originaldatei für ungezoomete Bildansicht verwenden. Das Deaktivieren dieser Option führt zu grobpixeliger Darstellung hochauflösender Bilder, bis Sie in sie hineinzoomen.</string>
+    <string name="settings_mobile_data_resoluton_summary">Auch bei Mobilverbindung hochauflösende Vorschaubilder laden. Bei deaktivierter Option wird das Originalbild nur dann geladen, wenn Sie hineinzoomen.</string>
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">Sie sind dabei, Ihren Backup-Ordner zu löschen. Dadurch werden alle eingerichteten Backups entfernt. Sind Sie sicher, dass Sie fortfahren möchten?</string>
     <!-- The title of warning dialog for single folder deleting -->
@@ -3495,7 +3495,7 @@
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_add_item_to_root_text">Damit die Elemente, die Sie Ihrem Backup-Ordner hinzugefügt haben, automatisch mit der MEGA Cloud synchronisiert werden, richten Sie sie bitte in der MEGA-Desktop-App ein.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_title">Nur lesen</string>
+    <string name="backup_share_permission_title">Schreibgeschützt</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Dieser Ordner kann nur schreibgeschützt freigegeben werden, da es sich um einen Backup-Ordner handelt. Änderungen am Inhalt des Ordners könnten dazu führen, dass das Backup deaktiviert wird.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
@@ -3529,7 +3529,7 @@
     <!-- Dialog message when the existing subscription is from iTunes  -->
     <string name="message_subscription_from_itunes">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement in Ihrem iTunes-Account. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Dialog message when the existing subscription is from other platform (Stripe and ECP)  -->
-    <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <string name="message_subscription_from_other_platform">Sie haben bereits ein Abonnement. Wenn Sie ein weiteres Abonnement kaufen, müssen Sie doppelt zahlen. Um dies zu vermeiden, kündigen Sie Ihr aktuelles Abonnement, indem Sie MEGA in einem Desktop- oder mobilen Webbrowser öffnen. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
     <!-- Warning show to the user when the app needs bluetooth connect permissions to get the best meeting experience and the user has denied them.-->
     <string name="meeting_bluetooth_connect_required_permissions_warning">Öffnen Sie die Einstellungen und erteilen Sie MEGA die Erlaubnis, über Bluetooth auf Geräte in der Nähe zuzugreifen.</string>
     <!-- Warning indicating the billing is not available and giving some indications to continue with the upgrade. -->
@@ -3541,7 +3541,7 @@
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
     <string name="message_other_platform_subscription">Sie haben ein aktives MEGA-Abonnement. Dieses wird automatisch gekündigt, nachdem der Account gelöscht wurde. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem iTunes-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserer Onlinehilfe.</string>
+    <string name="message_itunes_platform_subscription">Sie haben ein aktives MEGA-Abonnement bei Apple. Sie müssen dieses separat in Ihrem iTunes-Account kündigen, da MEGA die Kündigung nicht für Sie vornehmen kann. Weitere Informationen finden Sie in unserem Hilfecenter.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Besuchen Sie %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -3571,13 +3571,13 @@
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
     <string name="general_warning_no_picker">Dieses Gerät verfügt nicht über eine App, mit der Ordner ausgewählt werden können.</string>
     <!-- Next audios to be played in the audio playlist -->
-    <string name="media_player_audio_playlist_next">Weiter</string>
+    <string name="media_player_audio_playlist_next">Nächste</string>
     <!-- Previous audios have been already played in the audio playlist -->
-    <string name="media_player_audio_playlist_previous">Zurück</string>
+    <string name="media_player_audio_playlist_previous">Vorherige</string>
     <!-- Next videos to be played in the video playlist -->
-    <string name="media_player_video_playlist_next">Weiter</string>
+    <string name="media_player_video_playlist_next">Nächste</string>
     <!-- Previous videos have been already played in the video playlist -->
-    <string name="media_player_video_playlist_previous">Zurück</string>
+    <string name="media_player_video_playlist_previous">Vorherige</string>
     <!-- Setting option available to choose for the preferred start screen. -->
     <string name="settings_start_screen_photos_option">Fotos</string>
     <!-- Setting which allows to open unsupported file types in third-party apps if enabled -->
@@ -3631,13 +3631,13 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Passwort</string>
     <!-- Resume to paused transfers snack bar description text -->
-    <string name="resume_paused_transfers_text">Die Transfers wurden angehalten. Setzen Sie sie fort, um mit dem Download fortzufahren.</string>
+    <string name="resume_paused_transfers_text">Transfers angehalten. Auf Fortsetzen tippen, um mit dem Download fortzufahren.</string>
     <!-- Warning of the scanning transfers dialog. It warns about not closing the app because the transfers will be lost. -->
     <string name="warning_scanning_transfers">Bitte schließen Sie die App nicht.</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
     <string name="scanning_transfers">Scan läuft&#8230;</string>
     <!-- Label cancel transfers. -->
-    <string name="cancel_transfers">Transfers stornieren</string>
+    <string name="cancel_transfers">Transfers abbrechen</string>
     <!-- Warning informing what will happen if proceed on cancelling transfers. -->
     <string name="warning_cancel_transfers">Noch nicht durchgeführte Transfers werden abgebrochen.</string>
     <!-- Button which dismisses the warning and proceeds with the cancel transfers action. -->
@@ -3655,13 +3655,13 @@
     <!-- Informs about what is expected after choose the option upload and replace for a name collision if file versioning is disabled. -->
     <string name="warning_upload_and_replace">Die aktuelle Dateiversion wird durch die hochgeladene Datei ersetzt.</string>
     <!-- Upload and replace action button for a name collision. -->
-    <string name="upload_and_replace">Ersetzen</string>
+    <string name="upload_and_replace">Hochladen und ersetzen</string>
     <!-- Informs about what is expected after choose the option upload and update for a name collision if file versioning is enabled. -->
     <string name="warning_versioning_upload_and_update">Die Datei wird aktualisiert und der Versionsverlauf gespeichert:</string>
     <!-- Upload and update action button for a name collision. -->
     <string name="upload_and_update">Hochladen und aktualisieren</string>
     <!-- Don’t upload action button for a name collision. -->
-    <string name="do_not_upload">Datei überspringen</string>
+    <string name="do_not_upload">Nicht hochladen</string>
     <!-- Informs about what is expected after choose the option upload and rename for a name collision. -->
     <string name="warning_upload_and_rename">Die hochgeladene Datei wird umbenannt in:</string>
     <!-- Upload and rename action button for a name collision. -->
@@ -3669,9 +3669,9 @@
     <!-- Informs about what is expected after choose the option move and replace for a name collision if file versioning is disabled. -->
     <string name="warning_move_and_replace">Bestehende Datei im Zielordner ersetzen.</string>
     <!-- Move and replace action button for a name collision. -->
-    <string name="move_and_replace">Zieldatei ersetzen</string>
+    <string name="move_and_replace">Verschieben und ersetzen</string>
     <!-- Don’t move action button for a name collision. -->
-    <string name="do_not_move">Überspringen</string>
+    <string name="do_not_move">Nicht verschieben</string>
     <!-- Informs about what is expected after choose the option move and rename for a name collision. -->
     <string name="warning_move_and_rename">Die verschobene Datei wird umbenannt in:</string>
     <!-- Move and rename action button for a name collision. -->
@@ -3679,9 +3679,9 @@
     <!-- Informs about what is expected after choose the option copy and replace for a name collision if file versioning is disabled. -->
     <string name="warning_copy_and_replace">Bestehende Datei im Zielordner ersetzen.</string>
     <!-- Copy and replace action button for a name collision. -->
-    <string name="copy_and_replace">Zieldatei ersetzen</string>
+    <string name="copy_and_replace">Kopieren und ersetzen</string>
     <!-- Don’t copy action button for a name collision. -->
-    <string name="do_not_copy">Überspringen</string>
+    <string name="do_not_copy">Nicht kopieren</string>
     <!-- Informs about what is expected after choose the option copy and rename for a name collision. -->
     <string name="warning_copy_and_rename">Die kopierte Datei wird umbenannt in:</string>
     <!-- Copy and rename action button for a name collision. -->
@@ -3725,7 +3725,7 @@
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
-    <string name="calls_call_screen_count_down_timer_to_end_call">Die Konferenz wird nach %s beendet</string>
+    <string name="calls_call_screen_count_down_timer_to_end_call">Die Konferenz wird in %s beendet</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
     <string name="calls_call_screen_dialog_title_only_you_in_the_call">Sie sind der einzige Teilnehmer</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the chat screen -->
@@ -3737,7 +3737,7 @@
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
     <string name="calls_call_screen_button_to_stay_alone_in_call">Konferenz fortsetzen</string>
     <!-- Report issue setting name-->
-    <string name="settings_help_report_issue">Fehlfunktion melden</string>
+    <string name="settings_help_report_issue">Problem melden</string>
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">Ihr Feedback hilft uns, MEGA zu verbessern. Bitte beschreiben Sie das aufgetretene Problem möglichst genau. Je mehr Details Sie uns mitteilen, desto einfacher können wir das Problem lösen.</string>
     <!-- Hint text for the description field on the report issue screen-->
@@ -3747,7 +3747,7 @@
     <!-- Error message when there is no connectivity when reporting an issue-->
     <string name="check_internet_connection_error">Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
     <!-- Accessibility Label for the submit button on the report issue screen-->
-    <string name="settings_help_report_issue_submit_menu_action">Abschicken</string>
+    <string name="settings_help_report_issue_submit_menu_action">Absenden</string>
     <!-- Error message when submit issue failed-->
     <string name="settings_help_report_issue_error">Ein Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal. Wenn Sie den Fehlerbericht dann immer noch nicht absenden können, wenden Sie sich an %s für weitere Unterstützung.</string>
     <!-- Success message when submit issue succeeded-->
@@ -3769,7 +3769,7 @@
     <!-- Title of the gif option displayed in the chat room toolbar -->
     <string name="chat_room_toolbar_gif_option">GIF</string>
     <!-- Filter option on Photos/Timeline -->
-    <string name="photos_action_filter">Filter</string>
+    <string name="photos_action_filter">Filtern</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
     <string name="photos_filter_camera_uploads">Kamera Uploads</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -3815,7 +3815,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
     <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] Transfervolumen</string>
     <!-- Label of storage in My account section. -->
-    <string name="account_storage_label">Speicherung</string>
+    <string name="account_storage_label">Speicher</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
     <string name="account_choose_free_limited_transfer_quota">[A]Begrenztes[/A] Transfervolumen</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
@@ -4041,11 +4041,11 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Video fortsetzen?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">„%1$s“ wird bei %2$s fortgesetzt.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Fortsetzen</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
-    <string name="video_playback_position_dialog_restart_button">Neustart</string>
+    <string name="video_playback_position_dialog_restart_button">Neu starten</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
     <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]hat Sie zu einem Meeting am folgenden Datum eingeladen:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
@@ -4077,7 +4077,7 @@
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
     <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Findet monatlich statt</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
-    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">Mehr sehen</string>
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">Weitere anzeigen</string>
     <!-- Label for scheduled monthly meetings -->
     <string name="meetings_list_scheduled_meeting_monthly_label">%s jeden Monat</string>
     <!-- Label for scheduled daily meetings -->
@@ -4540,7 +4540,7 @@
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Sie können %s nicht verifizieren, da diese Person nicht in Ihrer Kontaktliste steht. Warten Sie, bis Ihre Einladung angenommen wird.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
-    <string name="meetings_list_start_scheduled_meeting_option">Start</string>
+    <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">OK</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4805,11 +4805,11 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">monatlich</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="one">Manche Monate sind kürzer als %1$d Tag. In diesen Monaten wird das Meeting auf den letzten Tag des Monats gelegt.</item>
+        <item quantity="other">Manche Monate sind kürzer als %1$d Tage. In diesen Monaten wird das Meeting auf den letzten Tag des Monats gelegt.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">Ordner kann nicht geöffnet werden</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Datei kann nicht geöffnet werden</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
@@ -4817,27 +4817,27 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Pro only</string>
+    <string name="general_pro_only">Erfordert Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">Linkzugriff</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <string name="cloud_drive_subtitle_link_access">Jeder, der über diesen Link verfügt, kann Ihre Daten einsehen und herunterladen</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Gültig bis</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Passwort setzen</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <string name="general_link_updated_copy_again">Link aktualisiert. Kopieren Sie ihn erneut.</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <string name="general_link_created_and_copied">Link erstellt und in die Zwischenablage kopiert</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Album link</string>
+    <string name="album_import_link">Albumlink</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">Zugriff auf Album nicht möglich</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">Der Link zum Album wurde entfernt oder das Album wurde gelöscht. Wenden Sie sich an die Person, die Ihnen den Link mitgeteilt hat.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">Alles klar</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Sprache</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4884,4 +4884,33 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kaufen</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">Nutzungsbedingungen</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">Jeder, der über diesen Link verfügt, kann Ihre Daten einsehen und herunterladen</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">Den Link können nur Personen öffnen, die das Passwort kennen</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Auf Duplikat anwenden</item>
+        <item quantity="other">Auf alle %1$d Duplikate anwenden</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">Info</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">Meetingbenachrichtigungen</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">Meetingverlauf verwalten</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">Meeting verlassen</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">Meetingverlauf verwalten</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">Meetingverlauf löschen</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">Meetingverlauf löschen</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">Der Nachrichtenverlauf dieses Meetings wird komplett gelöscht. Sind Sie sicher?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">Meetingbenachrichtigungen stummschalten für</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Meeting verlassen?</string>
 </resources>

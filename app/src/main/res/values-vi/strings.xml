@@ -4669,4 +4669,33 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">Điều&#160;Khoản Dịch&#160;Vụ</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">Bất&#160;kỳ ai có đường liên&#160;kết này đều có&#160;thể xem và tải&#160;xuống dữ liệu của bạn</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">Only people with the password can open the link</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Apply to the duplicate</item>
+        <item quantity="other">Apply to all %1$d duplicates</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">Thông tin</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">Âm báo cuộc họp</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">Manage meeting history</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">Rời khỏi cuộc họp</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">Manage meeting history</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">Dọn lịch&#160;sử cuộc họp</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">Dọn lịch&#160;sử cuộc họp</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">Bạn có chắc muốn dọn toàn&#160;bộ lịch&#160;sử các tin&#160;nhắn của cuộc họp này không?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">Tắt tiếng tất&#160;cả các âm&#160;báo cuộc họp trong</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
 </resources>

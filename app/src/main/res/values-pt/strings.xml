@@ -5099,4 +5099,34 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">Termos de serviço</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">Qualquer pessoa com este link pode ver e fazer o download dos dados</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">Somente quem tiver a senha poderá acessar o link</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Aplicar ao duplicado</item>
+        <item quantity="many">Aplicar a todos os %1$d de duplicados</item>
+        <item quantity="other">Aplicar a todos os %1$d duplicados</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">Informação</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">Notificações da reunião</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">Gerenciar o histórico da reunião</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">Sair da reunião</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">Gerenciar o histórico da reunião</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">Deletar o histórico da reunião</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">Deletar o histórico da reunião</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">Você tem certeza de que quer deletar o histórico de mensagens desta reunião?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">Silenciar as notificações da reunião por</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Você quer sair da reunião?</string>
 </resources>

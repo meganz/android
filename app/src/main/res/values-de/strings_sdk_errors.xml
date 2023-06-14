@@ -9,11 +9,11 @@
     <!-- Label to show that a request error occurs during a SDK operation. -->
     <string name="api_eagain">Operation fehlgeschlagen, wiederhole</string>
     <!-- Label to show that the rate limit has been reached during a SDK operation. -->
-    <string name="api_eratelimit">Zuviele Kommandos</string>
+    <string name="api_eratelimit">Zulässige Rate überschritten</string>
     <!-- Label to show that a SDK operation has failed permanently. -->
     <string name="api_efailed">Endgültig fehlgeschlagen</string>
     <!-- Error shown when terms of service are breached during download. -->
-    <string name="api_etoomany_ec_download">Verletzung unserer Nutzungsbedingungen</string>
+    <string name="api_etoomany_ec_download">Verstoß gegen Nutzungsbedingungen</string>
     <!-- Label to show that an error for multiple concurrent connections or transfers occurs during a SDK operation. -->
     <string name="api_etoomay">Zu viele gleichzeitige Verbindungen</string>
     <!-- Label to show that an error of Out of range occurs during a SDK operation. -->
@@ -39,7 +39,7 @@
     <!-- Label to show that an error related with a blocked account occurs during a SDK operation. -->
     <string name="api_eblocked">Blockiert</string>
     <!-- Label to show that an error related with an over quota occurs during a SDK operation. -->
-    <string name="api_eoverquota">Über dem Limit</string>
+    <string name="api_eoverquota">Kontingent überschritten</string>
     <!-- Label to show that an error related with a temporary problem occurs during a SDK operation. -->
     <string name="api_etempunavail">Vorübergehend nicht verfügbar</string>
     <!-- Label to show that an error related with too many connections occurs during a SDK operation. -->
@@ -49,11 +49,11 @@
     <!-- Label to show that an error related with an read error occurs during a SDK operation. -->
     <string name="api_eread">Lesefehler</string>
     <!-- Label to show that an error related with an invalid or missing application key occurs during a SDK operation. -->
-    <string name="api_eappkey">Dieses Programm ist gesperrt</string>
+    <string name="api_eappkey">Ungültiger Anwendungsschlüssel</string>
     <!-- Error shown when SSL check has failed -->
-    <string name="api_essl">SSL-Prüfung fehlgeschlagen</string>
+    <string name="api_essl">SSL-Verifizierung fehlgeschlagen</string>
     <!-- Label shown when current account does not have enough quota to complete the operation -->
-    <string name="api_egoingoverquota">Sie haben Ihr Limit überschritten</string>
+    <string name="api_egoingoverquota">Kontingent nicht ausreichend</string>
     <!-- Label to show that an error of Multi-factor authentication required occurs during a SDK operation. -->
     <string name="api_emfarequired">Zwei-Faktor-Authentifizierung erforderlich.</string>
     <!-- Label to show that an error of Access denied for users occurs during a SDK operation. -->
@@ -75,5 +75,5 @@
     <!-- Label to show that an error related with an HTTP error occurs during a SDK operation. -->
     <string name="api_error_http">HTTP-Fehler</string>
     <!-- Label to show that a transfer error happened during a SDK operation (sync a recursive folders structure). Only can happen if user syncs a folder with recursive links (link to the parent folder). -->
-    <string name="api_ecircular_ec_upload">Transfer wegen Verzeichnisrekursion fehlgeschlagen</string>
+    <string name="api_ecircular_ec_upload">Transfer wegen rekursiver Verzeichnisstruktur fehlgeschlagen</string>
 </resources>

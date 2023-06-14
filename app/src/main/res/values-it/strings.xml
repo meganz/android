@@ -1988,7 +1988,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Vuoi aprire il Google Play Store in modo da installare un\’app di autenticazione?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Google Play</string>
+    <string name="play_store_label">Google Play Store</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Hai bisogno di un’applicazione di autenticazione per attivare l’autenticazione a 2 fattori su MEGA. Puoi scaricare ed installare le app di Google Authenticator, Duo Mobile, Authy o Microsoft Authenticator per il tuo telefono o tablet.</string>
     <!-- error message when importing multiple files from chat -->
@@ -2085,7 +2085,7 @@
     <string name="settings_file_management_file_versions_title">Versioni dei file</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 versione dei file, che occupa un totale di %2$s</item>
+        <item quantity="one">%1$d versione dei file, che occupa un totale di %2$s</item>
         <item quantity="many">%1$d versioni dei file, che occupano un totale di %2$s</item>
         <item quantity="other">%1$d versioni dei file, che occupano un totale di %2$s</item>
     </plurals>
@@ -4150,7 +4150,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Riprendere il video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">“%1$s” riprenderà da %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Riprendi</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4876,9 +4876,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Il nome del meeting è obbligatorio</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter up to 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Inserisci fino a 30&#160;caratteri</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter up to 3,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Inserisci fino a 3000&#160;caratteri</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting programmato</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4942,7 +4942,7 @@
         <item quantity="other">impossibile rimuovere permanentemente %1$d oggetti</item>
     </plurals>
     <!-- The select time dialog in schedule meeting -->
-    <string name="meetings_schedule_meeting_enter_time_title_dialog">Enter time</string>
+    <string name="meetings_schedule_meeting_enter_time_title_dialog">Inserisci l\’orario</string>
     <!-- Label for the meeting invitations option on calls settings -->
     <string name="settings_calls_preferences_meeting_invitations">Inviti per il meeting</string>
     <!-- Text for the meeting invitations option on calls settings -->
@@ -4956,13 +4956,13 @@
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">Il meeting inizia ora</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_title">Share the decryption key too?</string>
+    <string name="album_share_share_link_dialog_title">Condividere anche la chiave di decriptazione?</string>
     <!-- Explanation text for the Album Link share with decryption key separated dialog -->
-    <string name="album_share_share_link_dialog_body">The decryption key has been exported and will be shared with the link.</string>
+    <string name="album_share_share_link_dialog_body">La chiave di decriptazione è stata esportata e sarà condivisa con il link.</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link only -->
-    <string name="album_share_share_link_dialog_button_link_only">Share link only</string>
+    <string name="album_share_share_link_dialog_button_link_only">Condividi solo il link</string>
     <!-- Text button for the Album Link share with decryption key separated dialog if the user wants to copy the link and the key -->
-    <string name="album_share_share_link_dialog_button_link_and_key">Share link and key</string>
+    <string name="album_share_share_link_dialog_button_link_and_key">Condividi il link e la chiave</string>
     <!-- Title for the Album Get Link(s) Page -->
     <plurals name="album_share_get_links">
         <item quantity="one">Condividi link</item>
@@ -4971,8 +4971,9 @@
     </plurals>
     <!-- Snackbar text to notify the user that the links have been copied to clipboard -->
     <plurals name="album_share_links_copied">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="one">Link copiato negli appunti</item>
+        <item quantity="many">Link copiati negli appunti</item>
+        <item quantity="other">Link copiati negli appunti</item>
     </plurals>
     <!-- Title for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_title">
@@ -4982,8 +4983,9 @@
     </plurals>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_body">
-        <item quantity="one">People you shared this link with will lose access to the album.</item>
-        <item quantity="other">People you shared these links with will lose access to the albums.</item>
+        <item quantity="one">Le persone con cui hai condiviso questo link perderanno accesso all\’album.</item>
+        <item quantity="many">Le persone con cui hai condiviso questi link perderanno accesso agli album.</item>
+        <item quantity="other">Le persone con cui hai condiviso questi link perderanno accesso agli album.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_share_remove_links_dialog_button">
@@ -4994,9 +4996,9 @@
     <!-- Input decryption key dialog title for album import -->
     <string name="album_import_input_decryption_key_title">Inserisci la chiave di decrittazione</string>
     <!-- Input decryption key dialog description for album import -->
-    <string name="album_import_input_decryption_key_description">To access the album, enter the decryption key. If you don’t have it, contact the person who shared the link with you.</string>
+    <string name="album_import_input_decryption_key_description">Per accedere all\’album, inserisci la chiave di decriptazione. Se non la hai, contatta la persona che ha condiviso il link con te.</string>
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
-    <string name="photos_timeline_filter_remember_preferences">Remember preferences</string>
+    <string name="photos_timeline_filter_remember_preferences">Ricorda queste preferenze</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
     <string name="home_side_menu_device_center_title"></string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
@@ -5017,11 +5019,12 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensilmente</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="one">Alcuni mesi non hanno %1$dgiorno. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
+        <item quantity="many">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
+        <item quantity="other">Alcuni mesi non hanno %1$d giorni. Per questi mesi, l\’evento verrà programmato per l\’ultimo giorno del mese.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_title">Cannot open folder</string>
+    <string name="dialog_taken_down_folder_title">Impossibile aprire la cartella</string>
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">Impossibile aprire il file</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
@@ -5029,27 +5032,27 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Pro only</string>
+    <string name="general_pro_only">Solo Pro</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">Link di accesso</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_subtitle_link_access">Anyone with this link can view and download your data</string>
+    <string name="cloud_drive_subtitle_link_access">Chiunque con questo link può vedere e scaricare i tuoi dati.</string>
     <!-- Text of setting expiry date to link-->
     <string name="general_expiry_date">Data di scadenza</string>
     <!-- Text of setting password to link -->
     <string name="general_set_password">Imposta una password</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <string name="general_link_updated_copy_again">Link aggiornato. Copialo di nuovo.</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <string name="general_link_created_and_copied">Link creato e copiato negli appunti</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Album link</string>
+    <string name="album_import_link">Link dell\’album</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">Impossibile accedere all\’album</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">Il link dell\’album è stato rimosso o l\’album è stato eliminato. Contatta la persona che ha condiviso il link con te.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">OK, capito</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Audio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5096,4 +5099,34 @@
     <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_terms_of_service_link">Termini di Servizio</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <string name="cloud_drive_subtitle_links_access_all_user">Chiunque con questo link può vedere e scaricare i tuoi dati.</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
+    <string name="cloud_drive_subtitle_link_access_password">Solo le persone con la password possono aprire il link</string>
+    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
+    <plurals name="general_name_collision_file_apply_for_all">
+        <item quantity="one">Applica al duplicato</item>
+        <item quantity="many">Applica a tutti i %1$d di duplicati</item>
+        <item quantity="other">Applica a tutti i %1$d duplicati</item>
+    </plurals>
+    <!-- Title of the meeting info screen -->
+    <string name="meetings_info_title">Info</string>
+    <!-- Option of the info screen to enable/disable notifications for a meeting -->
+    <string name="meetings_info_notifications_option">Notifiche del meeting</string>
+    <!-- Option of the info screen to manage meeting history -->
+    <string name="meetings_info_manage_history_option">Gestisci la cronologia del meeting</string>
+    <!-- Option of the info screen to leave the meeting -->
+    <string name="meetings_info_leave_option">Lascia il meeting</string>
+    <!-- Title of the manage history screen -->
+    <string name="meetings_manage_history_view_title">Gestisci la cronologia del meeting</string>
+    <!-- Option of the manage history screen to clear the meeting history -->
+    <string name="meetings_manage_history_clear">Pulisci la cronologia del meeting</string>
+    <!-- Confirmation dialog title to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_title">Pulisci la cronologia del meeting</string>
+    <!-- Confirmation dialog message to clear the meeting history -->
+    <string name="meetings_clear_history_confirmation_dialog_message">Vuoi davvero eliminare l\’intera cronologia dei messaggi di questo meeting?</string>
+    <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
+    <string name="meetings_mute_notifications_dialog_title">Silenzia le notifiche del meeting per</string>
+    <!-- Confirmation dialog title to leave a meeting -->
+    <string name="meetings_leave_meeting_confirmation_dialog_title">Lasciare il meeting?</string>
 </resources>
