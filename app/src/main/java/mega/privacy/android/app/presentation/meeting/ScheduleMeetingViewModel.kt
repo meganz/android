@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.meeting.mapper.OccurrenceFrequencyTypeMapper
+import mega.privacy.android.app.presentation.meeting.mapper.RecurringMeetingTypeMapper
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
-import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingType
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.RecurringMeetingType
 import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
  * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
  * @property createChatLink                             [CreateChatLink]
- * @property occurrenceFrequencyTypeMapper              [OccurrenceFrequencyTypeMapper]
+ * @property recurringMeetingTypeMapper                 [RecurringMeetingTypeMapper]
  * @property weekDayMapper                              [WeekDayMapper]
  * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property deviceGateway                              [DeviceGateway]
@@ -53,7 +53,7 @@ class ScheduleMeetingViewModel @Inject constructor(
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
     private val createChatLink: CreateChatLink,
-    private val occurrenceFrequencyTypeMapper: OccurrenceFrequencyTypeMapper,
+    private val recurringMeetingTypeMapper: RecurringMeetingTypeMapper,
     private val weekDayMapper: WeekDayMapper,
     private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val deviceGateway: DeviceGateway,
@@ -151,7 +151,7 @@ class ScheduleMeetingViewModel @Inject constructor(
         _state.update { state ->
             state.copy(
                 rulesSelected = state.rulesSelected.copy(
-                    freq = occurrenceFrequencyTypeMapper(optionSelected),
+                    freq = recurringMeetingTypeMapper(optionSelected),
                 ),
                 recurringMeetingOptionSelected = optionSelected,
             )

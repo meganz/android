@@ -4,6 +4,7 @@ import mega.privacy.android.app.presentation.meeting.ScheduleMeetingViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.meeting.RecurringMeetingType
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime

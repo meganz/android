@@ -52,7 +52,6 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.extensions.title
-import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingType
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
@@ -69,6 +68,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.RecurringMeetingType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -610,9 +610,9 @@ private fun RecurringMeetingDialog(
             buttonText = stringResource(id = R.string.general_cancel),
             radioOptions = listOf(
                 RecurringMeetingType.Never,
-                RecurringMeetingType.Daily,
-                RecurringMeetingType.Weekly,
-                RecurringMeetingType.Monthly,
+                RecurringMeetingType.EveryDay,
+                RecurringMeetingType.EveryWeek,
+                RecurringMeetingType.EveryMonth,
                 RecurringMeetingType.Custom
             ),
             initialSelectedOption = state.recurringMeetingOptionSelected,
@@ -621,9 +621,9 @@ private fun RecurringMeetingDialog(
             optionDescriptionMapper = { option ->
                 when (option) {
                     RecurringMeetingType.Custom -> stringResource(id = RecurringMeetingType.Custom.StringId)
-                    RecurringMeetingType.Monthly -> stringResource(id = RecurringMeetingType.Monthly.StringId)
-                    RecurringMeetingType.Weekly -> stringResource(id = RecurringMeetingType.Weekly.StringId)
-                    RecurringMeetingType.Daily -> stringResource(id = RecurringMeetingType.Daily.StringId)
+                    RecurringMeetingType.EveryMonth -> stringResource(id = RecurringMeetingType.EveryMonth.StringId)
+                    RecurringMeetingType.EveryWeek -> stringResource(id = RecurringMeetingType.EveryWeek.StringId)
+                    RecurringMeetingType.EveryDay -> stringResource(id = RecurringMeetingType.EveryDay.StringId)
                     else -> stringResource(id = RecurringMeetingType.Never.StringId)
                 }
             }
