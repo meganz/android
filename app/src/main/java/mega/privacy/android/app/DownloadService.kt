@@ -53,7 +53,6 @@ import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile
 import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.SDCardOperator
@@ -76,6 +75,9 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
 import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
@@ -183,6 +185,15 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @Inject
     lateinit var saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase
 
+    @Inject
+    lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
+
+    @Inject
+    lateinit var getSessionUseCase: GetSessionUseCase
+
+    @Inject
+    lateinit var monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase
+
     private var errorCount = 0
     private var alreadyDownloaded = 0
     private var isForeground = false
@@ -190,6 +201,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private var openFile = true
     private var downloadForPreview = false
     private var downloadByOpenWith = false
+    private var alreadyLoggedIn = false
     private var type: String? = ""
     private var isOverQuota = false
     private var downloadedBytesToOverQuota: Long = 0
@@ -204,7 +216,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private val storeToAdvancedDevices: MutableMap<Long, Uri> = mutableMapOf()
     private val fromMediaViewers: MutableMap<Long, Boolean> = mutableMapOf()
     private lateinit var mNotificationManager: NotificationManager
-    private var isLoggingIn = false
     private var lastUpdated: Long = 0
     private var intent: Intent? = null
 
@@ -223,6 +234,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private var monitorPausedTransfersJob: Job? = null
     private var monitorStopTransfersWorkJob: Job? = null
     private var monitorTransferEventsJob: Job? = null
+    private var monitorFetchNodesFinishJob: Job? = null
 
     @SuppressLint("NewApi")
     override fun onCreate() {
@@ -258,6 +270,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @SuppressLint("WrongConstant")
     private fun setReceivers() {
+
         monitorPausedTransfersJob = applicationScope.launch {
             monitorPausedTransfers().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
@@ -307,6 +320,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         else -> {}
                     }
                 }
+        }
+
+        monitorFetchNodesFinishJob = applicationScope.launch {
+            monitorFetchNodesFinishUseCase().conflate().collect {
+                proceedWithPendingIntentsAfterLogin()
+            }
         }
     }
 
@@ -540,34 +559,47 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         return true
     }
 
-    private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean {
-        val credentials = dbH.credentials
-        if (credentials != null) {
-            val gSession = credentials.session
-            if (!rootNodeExistsUseCase()) {
-                isLoggingIn = MegaApplication.isLoggingIn
-                if (!isLoggingIn) {
-                    isLoggingIn = true
-                    MegaApplication.isLoggingIn = isLoggingIn
-                    ChatUtil.initMegaChatApi(gSession)
-                    pendingIntents.add(intent)
-                    if (type?.contains(Constants.APP_DATA_VOICE_CLIP) == true && type?.contains(
-                            Constants.APP_DATA_BACKGROUND_TRANSFER
-                        ) == true
-                    ) {
-                        updateProgressNotification()
-                    }
-                    megaApi.fastLogin(gSession)
-                    return true
-                } else {
-                    Timber.w("Another login is processing")
-                }
+    private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean =
+        when {
+            //Already logged in, no more actions required
+            alreadyLoggedIn -> false
+            //User is not logged in, file or folder link download
+            getSessionUseCase().isNullOrEmpty() -> false
+            /*
+             A login is already in progress, but we don't have a way to know if it started
+             from this service or from other place, so we need to listen for fetch nodes finish.
+             */
+            MegaApplication.isLoggingIn -> {
                 pendingIntents.add(intent)
-                return true
+                Timber.w("Another login is processing")
+                false
+            }
+            //User is logged in, but needs to check if a fast login is required
+            else -> {
+                pendingIntents.add(intent)
+                MegaApplication.isLoggingIn = true
+                val result = runCatching {
+                    backgroundFastLoginUseCase()
+                }.onSuccess {
+                    alreadyLoggedIn = true
+                    pendingIntents.forEach { onHandleIntent(it) }
+                    pendingIntents.clear()
+                }.onFailure {
+                    Timber.e("ERROR: $it")
+                }
+                MegaApplication.isLoggingIn = false
+                result.isSuccess
             }
         }
-        return false
+
+
+    private fun proceedWithPendingIntentsAfterLogin() {
+        // Get cookies settings after login.
+        getInstance().checkEnabledCookies()
+        pendingIntents.forEach { onHandleIntent(it) }
+        pendingIntents.clear()
     }
+
 
     private fun getNodeForIntent(
         intent: Intent,
@@ -1576,81 +1608,52 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
-        if (request.type == MegaRequest.TYPE_LOGIN) {
-            if (e.errorCode == MegaError.API_OK) {
-                Timber.d("Logged in. Setting account auth token for folder links.")
-                megaApiFolder.accountAuth = megaApi.accountAuth
-                Timber.d("Fast login OK, Calling fetchNodes from CameraSyncService")
-                megaApi.fetchNodes()
-
-                // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
-            } else {
-                Timber.e("ERROR: %s", e.errorString)
-                isLoggingIn = false
-                MegaApplication.isLoggingIn = isLoggingIn
-            }
-        } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
-            if (e.errorCode == MegaError.API_OK) {
-                isLoggingIn = false
-                MegaApplication.isLoggingIn = isLoggingIn
-                for (i in pendingIntents.indices) {
-                    onHandleIntent(pendingIntents[i])
-                }
-                pendingIntents.clear()
-            } else {
-                Timber.e("ERROR: " + e.errorString)
-                isLoggingIn = false
-                MegaApplication.isLoggingIn = isLoggingIn
-            }
-        } else {
-            Timber.d("Public node received")
-            if (e.errorCode != MegaError.API_OK) {
-                Timber.e("Public node error")
-                return
-            }
-            val node = request.publicMegaNode
-            if (node == null) {
-                Timber.e("Public node is null")
-                return
-            }
-            if (currentDir == null) {
-                Timber.e("currentDir is null")
-                return
-            }
-            currentFile = if (currentDir?.isDirectory == true) {
-                File(
-                    currentDir,
-                    megaApi.escapeFsIncompatible(
-                        node.name,
-                        currentDir?.absolutePath + Constants.SEPARATOR
-                    )
+        Timber.d("Public node received")
+        if (e.errorCode != MegaError.API_OK) {
+            Timber.e("Public node error")
+            return
+        }
+        val node = request.publicMegaNode
+        if (node == null) {
+            Timber.e("Public node is null")
+            return
+        }
+        if (currentDir == null) {
+            Timber.e("currentDir is null")
+            return
+        }
+        currentFile = if (currentDir?.isDirectory == true) {
+            File(
+                currentDir,
+                megaApi.escapeFsIncompatible(
+                    node.name,
+                    currentDir?.absolutePath + Constants.SEPARATOR
                 )
-            } else {
-                currentDir
-            }
-            val appData = getSDCardAppData(intent)
-            Timber.d("Public node download launched")
-            acquireLocks()
-            if (currentDir?.isDirectory == true) {
-                Timber.d("To downloadPublic(dir)")
-                val localPath = currentDir?.absolutePath + "/"
-                currentDocument?.let {
-                    val token = transfersManagement.addScanningTransfer(
-                        MegaTransfer.TYPE_DOWNLOAD,
-                        localPath, it, it.isFolder
-                    )
-                    megaApi.startDownload(
-                        currentDocument,
-                        localPath,
-                        it.name,
-                        appData,
-                        false,
-                        token,
-                        MegaTransfer.COLLISION_CHECK_FINGERPRINT,
-                        MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
-                    )
-                }
+            )
+        } else {
+            currentDir
+        }
+        val appData = getSDCardAppData(intent)
+        Timber.d("Public node download launched")
+        acquireLocks()
+        if (currentDir?.isDirectory == true) {
+            Timber.d("To downloadPublic(dir)")
+            val localPath = currentDir?.absolutePath + "/"
+            currentDocument?.let {
+                val token = transfersManagement.addScanningTransfer(
+                    MegaTransfer.TYPE_DOWNLOAD,
+                    localPath, it, it.isFolder
+                )
+                megaApi.startDownload(
+                    currentDocument,
+                    localPath,
+                    it.name,
+                    appData,
+                    false,
+                    token,
+                    MegaTransfer.COLLISION_CHECK_FINGERPRINT,
+                    MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
+                )
             }
         }
     }
