@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -432,6 +433,10 @@ interface CameraUploadRepository {
      * @param nodeHandle    updated node handle
      * @param isSecondary   if updated node handle is secondary media
      */
+    @Deprecated(
+        message = "Replace with data flow after refactoring of CameraUploadsPreferencesActivity ",
+        replaceWith = ReplaceWith("broadcastCameraUploadFolderIconUpdate")
+    )
     suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean)
 
     /**
@@ -561,6 +566,16 @@ interface CameraUploadRepository {
      * monitor charging stopped info
      */
     fun monitorChargingStoppedInfo(): Flow<Boolean>
+
+    /**
+     * Monitor camera upload folder icon updates
+     */
+    fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate>
+
+    /**
+     * Broadcast camera upload folder icon updates
+     */
+    suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate)
 
     /**
      * rename camera uploads folder name

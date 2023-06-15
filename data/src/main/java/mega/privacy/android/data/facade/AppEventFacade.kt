@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -24,6 +25,7 @@ internal class AppEventFacade @Inject constructor(
 
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
+    private val cameraUploadFolderIconUpdate = MutableSharedFlow<CameraUploadFolderIconUpdate>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val _fileAvailableOffline = MutableSharedFlow<Long>()
     private val logout = MutableSharedFlow<Boolean>()
@@ -135,6 +137,12 @@ internal class AppEventFacade @Inject constructor(
 
     override suspend fun broadcastTransfersFinished(transfersFinishedState: TransfersFinishedState) =
         transfersFinished.emit(transfersFinishedState)
+
+    override fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate> =
+        cameraUploadFolderIconUpdate.toSharedFlow(appScope)
+
+    override suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate) =
+        cameraUploadFolderIconUpdate.emit(data)
 
     override fun monitorChatArchived(): Flow<String> = chatArchived.toSharedFlow(appScope)
 

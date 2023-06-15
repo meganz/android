@@ -62,6 +62,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -93,6 +94,7 @@ import javax.inject.Inject
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
+ * @property monitorCameraUploadFolderIconUpdateUseCase
  * @property getPrimarySyncHandleUseCase
  * @property getSecondarySyncHandleUseCase
  * @property checkCameraUpload
@@ -132,6 +134,7 @@ class ManagerViewModel @Inject constructor(
     private val sendStatisticsMediaDiscoveryUseCase: SendStatisticsMediaDiscoveryUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    monitorCameraUploadFolderIconUpdateUseCase: MonitorCameraUploadFolderIconUpdateUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val checkCameraUpload: CheckCameraUpload,
@@ -200,6 +203,11 @@ class ManagerViewModel @Inject constructor(
      * Monitor My Account Update event
      */
     val monitorMyAccountUpdateEvent = monitorMyAccountUpdateUseCase()
+
+    /**
+     * Monitor Camera Upload Folder Icon Update event
+     */
+    val monitorCameraUploadFolderIconUpdateEvent = monitorCameraUploadFolderIconUpdateUseCase()
 
     /**
      * Monitor offline file availability event

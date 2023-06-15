@@ -325,7 +325,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
-import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.BackupState
@@ -721,18 +720,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
 
-    private val receiverCUAttrChanged: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            synchronized(this) {
-                if (drawerItem === DrawerItem.PHOTOS) {
-                    cameraUploadsClicked()
-                }
-
-                //update folder icon
-                onNodesCloudDriveUpdate()
-            }
-        }
-    }
     private val contactUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == null) return
@@ -2129,14 +2116,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun registerBroadcastReceivers() {
         registerContactUpdateReceiver()
-        registerCameraUploadAttributeChangedReceiver()
-    }
-
-    private fun registerCameraUploadAttributeChangedReceiver() {
-        registerReceiver(
-            receiverCUAttrChanged,
-            IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
-        )
     }
 
     private fun registerContactUpdateReceiver() {
@@ -2395,6 +2374,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 playTransfersMenuIcon?.isVisible = false
                 cancelAllTransfersMenuItem?.isVisible = false
             }
+        }
+        collectFlow(
+            targetFlow = viewModel.monitorCameraUploadFolderIconUpdateEvent,
+            minActiveState = Lifecycle.State.CREATED
+        ) {
+            handleCameraUploadFolderIconUpdate()
         }
         collectFlow(
             targetFlow = viewModel.monitorMyAccountUpdateEvent,
@@ -3232,7 +3217,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         composite.clear()
         isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
-        unregisterReceiver(receiverCUAttrChanged)
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
         cancelSearch()
@@ -10524,6 +10508,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 outgoingSharesTab.removeBadge()
             }
         }
+    }
+
+    private fun handleCameraUploadFolderIconUpdate() {
+        if (drawerItem === DrawerItem.PHOTOS) {
+            cameraUploadsClicked()
+        }
+        onNodesCloudDriveUpdate()
     }
 
     private fun handleUpdateMyAccount(data: MyAccountUpdate) {

@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -64,6 +66,7 @@ import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
@@ -129,6 +132,15 @@ class ManagerViewModelTest {
     }
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
+    private val monitorCameraUploadFolderIconUpdateUseCase =
+        mock<MonitorCameraUploadFolderIconUpdateUseCase> {
+            onBlocking { invoke() }.thenReturn(
+                flowOf(
+                    CameraUploadFolderIconUpdate(6L, CameraUploadFolderType.Primary),
+                    CameraUploadFolderIconUpdate(9L, CameraUploadFolderType.Secondary)
+                )
+            )
+        }
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder =
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
@@ -239,6 +251,7 @@ class ManagerViewModelTest {
             savedStateHandle = savedStateHandle,
             getInboxNode = getInboxNode,
             monitorStorageStateEventUseCase = monitorStorageState,
+            monitorCameraUploadFolderIconUpdateUseCase = monitorCameraUploadFolderIconUpdateUseCase,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             checkCameraUpload = checkCameraUpload,
@@ -608,6 +621,26 @@ class ManagerViewModelTest {
             underTest.stopCameraUpload()
             testScheduler.advanceUntilIdle()
             verify(stopCameraUploadUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that monitor camera upload folder icon update events are returned`() =
+        runTest {
+            underTest.monitorCameraUploadFolderIconUpdateEvent.distinctUntilChanged().test {
+                assertThat(awaitItem()).isEqualTo(
+                    CameraUploadFolderIconUpdate(
+                        6L,
+                        CameraUploadFolderType.Primary
+                    )
+                )
+                assertThat(awaitItem()).isEqualTo(
+                    CameraUploadFolderIconUpdate(
+                        9L,
+                        CameraUploadFolderType.Secondary
+                    )
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test

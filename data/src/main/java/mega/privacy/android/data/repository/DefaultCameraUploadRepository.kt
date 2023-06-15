@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -369,9 +370,23 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.shouldClearSyncRecords()
     }
 
+    @Deprecated(
+        "Replace with data flow after refactoring of CameraUploadsPreferencesActivity ",
+        replaceWith = ReplaceWith("BroadcastCameraUploadFolderIconUpdateUseCase")
+    )
     override suspend fun sendUpdateFolderIconBroadcast(nodeHandle: Long, isSecondary: Boolean) =
         withContext(ioDispatcher) {
             cameraUploadMediaGateway.sendUpdateFolderIconBroadcast(nodeHandle, isSecondary)
+            appEventGateway.broadcastCameraUploadFolderIconUpdate(
+                CameraUploadFolderIconUpdate(
+                    nodeHandle = nodeHandle,
+                    cameraUploadFolderType = if (isSecondary) {
+                        CameraUploadFolderType.Secondary
+                    } else {
+                        CameraUploadFolderType.Primary
+                    }
+                )
+            )
         }
 
     override suspend fun sendUpdateFolderDestinationBroadcast(
@@ -575,6 +590,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) =
         appEventGateway.broadcastCameraUploadProgress(progress, pending)
+
+    override fun monitorCameraUploadFolderIconUpdate(): Flow<CameraUploadFolderIconUpdate> =
+        appEventGateway.monitorCameraUploadFolderIconUpdate()
+
+    override suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate) =
+        appEventGateway.broadcastCameraUploadFolderIconUpdate(data)
 
     override fun monitorBatteryInfo() = deviceEventGateway.monitorBatteryInfo
 
