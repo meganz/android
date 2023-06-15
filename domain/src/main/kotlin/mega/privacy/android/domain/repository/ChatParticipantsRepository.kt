@@ -29,6 +29,13 @@ interface ChatParticipantsRepository {
     suspend fun getStatus(participant: ChatParticipant): UserStatus
 
     /**
+     * Get current user status
+     *
+     * @return  [UserStatus]
+     */
+    suspend fun getCurrentStatus(): UserStatus
+
+    /**
      * Get alias
      *
      * @param participant [ChatParticipant].

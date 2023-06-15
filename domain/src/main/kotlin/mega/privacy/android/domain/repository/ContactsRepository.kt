@@ -54,6 +54,13 @@ interface ContactsRepository {
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
 
     /**
+     * Monitor updates on my chat online status.
+     *
+     * @return A flow of [OnlineStatus].
+     */
+    fun monitorMyChatOnlineStatusUpdates(): Flow<OnlineStatus>
+
+    /**
      * Monitor updates on chat connection state.
      *
      * @return A flow of [ChatConnectionState].

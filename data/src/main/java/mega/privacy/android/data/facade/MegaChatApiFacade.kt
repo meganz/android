@@ -214,8 +214,17 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.setOpenInvite(chatId, enabled, listener)
 
+    override fun getChatRooms(): List<MegaChatRoom> =
+        chatApi.chatRooms
+
     override fun getMeetingChatRooms(): List<MegaChatRoom>? =
         chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_MEETING_ROOM)
+
+    override fun getGroupChatRooms(): List<MegaChatRoom>? =
+        chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_GROUP)
+
+    override fun getIndividualChatRooms(): List<MegaChatRoom>? =
+        chatApi.getChatRoomsByType(MegaChatApi.CHAT_TYPE_INDIVIDUAL)
 
     override fun getChatRoomByUser(userHandle: Long): MegaChatRoom? =
         chatApi.getChatRoomByUser(userHandle)
@@ -250,7 +259,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatListItem(chatId: Long): MegaChatListItem? =
         chatApi.getChatListItem(chatId)
 
-    override fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem> =
+    override fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>? =
         chatApi.getChatListItems(mask, filter)
 
     override fun getChatCall(chatId: Long): MegaChatCall? =
@@ -412,6 +421,11 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun signalPresenceActivity(listener: MegaChatRequestListenerInterface) =
         chatApi.signalPresenceActivity(listener)
+
+    override fun clearChatHistory(
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.clearChatHistory(chatId, listener)
 
     override fun archiveChat(
         chatId: Long,

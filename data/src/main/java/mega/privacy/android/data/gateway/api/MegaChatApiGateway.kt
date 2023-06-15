@@ -142,11 +142,32 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Get all chat rooms
+     *
+     * @return  The list of chat rooms
+     */
+    fun getChatRooms(): List<MegaChatRoom>
+
+    /**
      * Get meeting chat rooms
      *
      * @return  The list of chat rooms
      */
     fun getMeetingChatRooms(): List<MegaChatRoom>?
+
+    /**
+     * Get group chat rooms
+     *
+     * @return  The list of chat rooms
+     */
+    fun getGroupChatRooms(): List<MegaChatRoom>?
+
+    /**
+     * Get individual chat rooms
+     *
+     * @return  The list of chat rooms
+     */
+    fun getIndividualChatRooms(): List<MegaChatRoom>?
 
     /**
      * Gets a 1to1 chat conversation if exists.
@@ -252,7 +273,7 @@ interface MegaChatApiGateway {
      * @param filter    Filters to apply to the list of chats
      * @return          Chat list items
      */
-    fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>
+    fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>?
 
     /**
      * Gets the MegaChatCall
@@ -581,6 +602,25 @@ interface MegaChatApiGateway {
      * @param listener  [MegaChatRequestListenerInterface] to track this request
      */
     fun signalPresenceActivity(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Allows a logged in operator/moderator to clear the entire history of a chat
+     *
+     * The latest message gets overridden with a management message.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_TRUNCATE_HISTORY
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     *
+     * On the onTransferFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ACCESS - If the logged in user doesn't have privileges to truncate the chat history
+     * - MegaChatError::ERROR_NOENT - If there isn't any chat with the specified chatid.
+     * - MegaChatError::ERROR_ARGS - If the chatid or user handle are invalid
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param listener [MegaChatRequestListenerInterface] to track this request
+     */
+    fun clearChatHistory(chatId: Long, listener: MegaChatRequestListenerInterface)
 
     /**
      * Allows to un/archive chats

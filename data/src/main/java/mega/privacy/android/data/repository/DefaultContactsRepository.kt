@@ -118,6 +118,9 @@ internal class DefaultContactsRepository @Inject constructor(
         .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
         .flowOn(ioDispatcher)
 
+    override fun monitorMyChatOnlineStatusUpdates() = monitorChatOnlineStatusUpdates()
+        .filter { it.userHandle == megaChatApiGateway.getMyUserHandle() }
+
     override fun monitorChatConnectionStateUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatConnectionStateUpdate>()
         .map { chatConnectionStateMapper(it.chatId, it.newState) }

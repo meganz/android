@@ -40,6 +40,14 @@ interface ChatRepository {
     suspend fun getChatRoomByUser(userHandle: Long): ChatRoom?
 
     /**
+     * Get chat list item if it exsits
+     *
+     * @param chatId    Chat Id
+     * @return          [ChatListItem]
+     */
+    suspend fun getChatListItem(chatId: Long): ChatListItem?
+
+    /**
      * Get all chat list items
      *
      * @return  Chat List items
@@ -70,11 +78,32 @@ interface ChatRepository {
     suspend fun getChatFilesFolderId(): NodeId?
 
     /**
+     * Get all chat rooms
+     *
+     * @return  List of [CombinedChatRoom]
+     */
+    suspend fun getAllChatRooms(): List<CombinedChatRoom>
+
+    /**
      * Get meeting chat rooms
      *
-     * @return  List of [ChatRoom]
+     * @return  List of [CombinedChatRoom]
      */
-    suspend fun getMeetingChatRooms(): List<CombinedChatRoom>?
+    suspend fun getMeetingChatRooms(): List<CombinedChatRoom>
+
+    /**
+     * Get non meeting chat rooms
+     *
+     * @return  List of [CombinedChatRoom]
+     */
+    suspend fun getNonMeetingChatRooms(): List<CombinedChatRoom>
+
+    /**
+     * Get Archived chat rooms
+     *
+     * @return  List of [CombinedChatRoom]
+     */
+    suspend fun getArchivedChatRooms(): List<CombinedChatRoom>
 
     /**
      * Gets combined chat room if it exists
@@ -222,6 +251,13 @@ interface ChatRepository {
      * Signal chat presence activity
      */
     suspend fun signalPresenceActivity()
+
+    /**
+     * Clear chat history
+     *
+     * @param chatId    Chat id
+     */
+    suspend fun clearChatHistory(chatId: Long)
 
     /**
      * Archive chat

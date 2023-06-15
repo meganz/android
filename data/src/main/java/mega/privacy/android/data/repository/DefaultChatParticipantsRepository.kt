@@ -129,9 +129,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
     override suspend fun getStatus(participant: ChatParticipant): UserStatus {
         if (participant.isMe) {
-            val status = userStatus[megaChatApiGateway.getOnlineStatus()]
-                ?: UserStatus.Invalid
-
+            val status = getCurrentStatus()
             if (status != UserStatus.Online) {
                 requestLastGreen(participant.handle)
             }
@@ -150,6 +148,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
         return UserStatus.Invalid
     }
+
+    override suspend fun getCurrentStatus(): UserStatus =
+        runCatching { megaChatApiGateway.getOnlineStatus().let { userStatus[it] } }.getOrNull()
+            ?: UserStatus.Invalid
 
     override suspend fun getAlias(participant: ChatParticipant): String? =
         runCatching { contactsRepository.getUserAlias(participant.handle) }.fold(

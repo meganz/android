@@ -48,6 +48,7 @@ import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
@@ -126,12 +127,17 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun getChatListItem(chatId: Long): ChatListItem? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItem(chatId)?.let(chatListItemMapper::invoke)
+        }
+
     override suspend fun getAllChatListItems(): List<ChatListItem> =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatListItems(
                 MegaChatApi.CHAT_FILTER_BY_NO_FILTER,
                 MegaChatApi.CHAT_GET_GROUP
-            ).map { chatListItemMapper(it) }
+            )?.map { chatListItemMapper(it) } ?: emptyList()
         }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =
@@ -182,13 +188,46 @@ internal class ChatRepositoryImpl @Inject constructor(
     override suspend fun getChatFilesFolderId(): NodeId? =
         localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
 
-    override suspend fun getMeetingChatRooms(): List<CombinedChatRoom>? =
+    override suspend fun getAllChatRooms(): List<CombinedChatRoom> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatRooms().mapNotNull { chatRoom ->
+                megaChatApiGateway.getChatListItem(chatRoom.chatId)?.let { chatListItem ->
+                    combinedChatRoomMapper(chatRoom, chatListItem)
+                }
+            }
+        }
+
+    override suspend fun getMeetingChatRooms(): List<CombinedChatRoom> =
         withContext(ioDispatcher) {
             megaChatApiGateway.getMeetingChatRooms()?.mapNotNull { chatRoom ->
-                val chatListItem = megaChatApiGateway.getChatListItem(chatRoom.chatId)
-                    ?: return@mapNotNull null
-                combinedChatRoomMapper(chatRoom, chatListItem)
+                megaChatApiGateway.getChatListItem(chatRoom.chatId)?.let { chatListItem ->
+                    combinedChatRoomMapper(chatRoom, chatListItem)
+                }
+            } ?: emptyList()
+        }
+
+    override suspend fun getNonMeetingChatRooms(): List<CombinedChatRoom> =
+        withContext(ioDispatcher) {
+            mutableListOf<MegaChatRoom>().apply {
+                megaChatApiGateway.getIndividualChatRooms()?.let(::addAll)
+                megaChatApiGateway.getGroupChatRooms()?.let(::addAll)
+            }.mapNotNull { chatRoom ->
+                megaChatApiGateway.getChatListItem(chatRoom.chatId)?.let { chatListItem ->
+                    combinedChatRoomMapper(chatRoom, chatListItem)
+                }
             }
+        }
+
+    override suspend fun getArchivedChatRooms(): List<CombinedChatRoom> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItems(
+                MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED,
+                MegaChatApi.CHAT_GET_ARCHIVED
+            )?.mapNotNull { item ->
+                megaChatApiGateway.getChatRoom(item.chatId)?.let { chatRoom ->
+                    combinedChatRoomMapper(chatRoom, item)
+                }
+            } ?: emptyList()
         }
 
     override suspend fun getCombinedChatRoom(chatId: Long): CombinedChatRoom? =
@@ -413,6 +452,24 @@ internal class ChatRepositoryImpl @Inject constructor(
                                 continuation.resume(Unit)
                             } else {
                                 continuation.failWithError(error, "signalPresenceActivity")
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
+    override suspend fun clearChatHistory(chatId: Long) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.clearChatHistory(
+                    chatId = chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error, "clearChatHistory")
                             }
                         }
                     )
