@@ -104,7 +104,8 @@ class UpgradeAccountFragment : Fragment() {
                             )
                         )
                     },
-                    onTOSClicked = { redirectToTOSPage() },
+                    onTOSClicked = this::redirectToTOSPage,
+                    onPricingPageClicked = this::redirectToPricingPage,
                     onChoosingMonthlyYearlyPlan = upgradeAccountViewModel::onSelectingMonthlyPlan,
                     onChoosingPlanType = {
                         with(upgradeAccountViewModel) {
@@ -201,6 +202,14 @@ class UpgradeAccountFragment : Fragment() {
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .setData(Uri.parse(Constants.TERMS_OF_SERVICE_URL))
         )
+    }
+
+    private fun redirectToPricingPage(link: String) {
+        val uriUrl = Uri.parse(link)
+        val launchBrowser = Intent(requireContext(), WebViewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setData(uriUrl)
+        startActivity(launchBrowser)
     }
 
     private fun onPurchasesUpdated(

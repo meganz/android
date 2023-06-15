@@ -59,9 +59,11 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurren
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.MegaSpannedAlignedText
+import mega.privacy.android.core.ui.controls.MegaSpannedClickableText
 import mega.privacy.android.core.ui.controls.MegaSpannedText
 import mega.privacy.android.core.ui.controls.SimpleNoTitleTopAppBar
 import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.domain.entity.AccountType
@@ -91,6 +93,7 @@ fun UpgradeAccountView(
     onBackPressed: () -> Unit = {},
     onBuyClicked: () -> Unit = {},
     onTOSClicked: () -> Unit = {},
+    onPricingPageClicked: (String) -> Unit = {},
     onChoosingMonthlyYearlyPlan: (isMonthly: Boolean) -> Unit = {},
     onChoosingPlanType: (chosenPlan: AccountType) -> Unit = {},
     hideBillingWarning: () -> Unit = {},
@@ -217,6 +220,12 @@ fun UpgradeAccountView(
                     },
                     isMonthly = isMonthly,
                     isClicked = (chosenPlan == it.accountType) && isPaymentMethodAvailable
+                )
+            }
+
+            if (state.localisedSubscriptionsList.isNotEmpty() && state.currentSubscriptionPlan == AccountType.PRO_III) {
+                PricingPageLinkText(
+                    onLinkClick = onPricingPageClicked
                 )
             }
 
@@ -677,6 +686,31 @@ private fun FeaturesOfPlans() {
             )
         }
     }
+}
+
+@Composable
+private fun PricingPageLinkText(
+    onLinkClick: (link: String) -> Unit,
+) {
+    MegaSpannedClickableText(
+        modifier = Modifier
+            .padding(16.dp)
+            .testTag("LINK_TO_PRICING_PAGE_TAG"),
+        value = stringResource(
+            id = R.string.account_upgrade_account_pricing_page_link_text
+        ),
+        styles = mapOf(
+            SpanIndicator('A') to SpanStyleWithAnnotation(
+                SpanStyle(
+                    fontWeight = FontWeight.W500,
+                    color = MaterialTheme.colors.teal_300_teal_200
+                ),
+                Constants.PRICING_PAGE_URL
+            )
+        ),
+        onAnnotationClick = onLinkClick,
+        baseStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.black_white),
+    )
 }
 
 private fun mapUIAccountType(plan: AccountType) = when (plan) {

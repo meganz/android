@@ -154,6 +154,7 @@ public class Constants {
     public static final String DISPUTE_URL = "https://mega.nz/dispute";
     public static final String TAKEDOWN_URL = "https://mega.nz/takedown";
     public static final String TERMS_OF_SERVICE_URL = "https://mega.nz/terms";
+    public static final String PRICING_PAGE_URL = "https://mega.io/pricing";
     public static final String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";

@@ -844,12 +844,6 @@
     <string name="confirmation_delete_avatar">Delete your profile picture?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Edit</string>
-    <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Set expiry date</string>
-    <!-- Title of the dialog to get link with password -->
-    <string name="title_set_password_protection">Set password protection</string>
-    <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(Pro only)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Set password</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1906,7 +1900,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Next time you log in to your account you will be asked to enter a 6-digit code provided by your authenticator app.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>Recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Please save your         <b>Recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4541,8 +4535,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Start</string>
-    <!-- Answer for confirmation dialog. -->
-    <string name="general_camelcase_ok">OK</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4573,18 +4565,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -4882,7 +4868,7 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
-    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Terms of Service</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this link can view and download your data</string>
@@ -4919,4 +4905,6 @@
     <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">Enter an album name</string>
+    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
 </resources>

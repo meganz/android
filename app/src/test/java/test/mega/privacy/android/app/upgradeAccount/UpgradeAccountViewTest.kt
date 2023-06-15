@@ -113,9 +113,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
         composeRule.onNodeWithText("Monthly").performClick()
@@ -133,9 +130,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
         composeRule.onNodeWithText("Yearly").performClick()
@@ -153,9 +147,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
 
@@ -175,9 +166,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
 
@@ -197,9 +185,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
         val text = "Buy Pro II"
@@ -216,9 +201,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
         val text = "Buy Pro Lite"
@@ -239,9 +221,7 @@ class UpgradeAccountViewTest {
                     showBillingWarning = false,
                     isPaymentMethodAvailable = true
                 ),
-                onBackPressed = {},
                 onBuyClicked = onBuyClicked,
-                onTOSClicked = {},
             )
         }
         val text =
@@ -262,9 +242,6 @@ class UpgradeAccountViewTest {
                     showBillingWarning = true,
                     isPaymentMethodAvailable = false
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
             )
         }
         composeRule.onNodeWithTag("BILLING_WARNING_TAG").assertIsDisplayed()
@@ -280,14 +257,39 @@ class UpgradeAccountViewTest {
                     showBillingWarning = true,
                     isPaymentMethodAvailable = false
                 ),
-                onBackPressed = {},
-                onBuyClicked = {},
-                onTOSClicked = {},
                 hideBillingWarning = hideBillingWarning,
             )
         }
         composeRule.onNodeWithTag("BILLING_WARNING_CLOSE_BUTTON_TAG").performClick()
         verify(hideBillingWarning).invoke()
+    }
+
+    @Test
+    fun `test that pricing page link is shown when current plan is Pro III`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_III,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+            )
+        }
+        composeRule.onNodeWithTag("LINK_TO_PRICING_PAGE_TAG").assertExists()
+    }
+
+    @Test
+    fun `test that pricing page link is not shown when current plan is not Pro III`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_II,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+            )
+        }
+        composeRule.onNodeWithTag("LINK_TO_PRICING_PAGE_TAG").assertDoesNotExist()
     }
 
 
