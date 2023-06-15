@@ -420,6 +420,61 @@ class DefaultAlbumRepositoryTest {
         }
     }
 
+    @Test
+    fun `test that add bulk photos works properly`() = runTest {
+        // given
+        val albumId = AlbumId(1L)
+        val photoIds = listOf<NodeId>()
+
+        // when
+        underTest = createUnderTest(this)
+        val success = underTest.addBulkPhotosToAlbum(albumId, photoIds)
+
+        // then
+        assertThat(success).isEqualTo(0)
+    }
+
+    @Test
+    fun `test that save album to folder works properly`() = runTest {
+        // given
+        val folderName = "Folder"
+        val photoIds = listOf<NodeId>()
+        val targetParentFolderNodeId = NodeId(1L)
+
+        whenever(megaApiGateway.getMegaNodeByHandle(any()))
+            .thenReturn(mock())
+
+        whenever(megaApiGateway.getChildNode(any(), any()))
+            .thenReturn(null)
+
+        whenever(megaApiGateway.createFolder(any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+            )
+        }
+
+        whenever(megaApiGateway.copyNode(any(), any(), any(), any())).thenAnswer {
+            (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                mock {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+            )
+        }
+
+        // when
+        underTest = createUnderTest(this)
+        val nodeIds = underTest.saveAlbumToFolder(folderName, photoIds, targetParentFolderNodeId)
+
+        // then
+        assertThat(nodeIds).isNotNull()
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,

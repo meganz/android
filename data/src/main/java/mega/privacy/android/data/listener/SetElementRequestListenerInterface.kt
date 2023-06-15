@@ -1,5 +1,6 @@
 package mega.privacy.android.data.listener
 
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -168,3 +169,31 @@ class GetPreviewElementNodeListenerInterface(
     }
 }
 
+internal class CopyPreviewNodeListenerInterface(
+    private val nodes: List<MegaNode>,
+    private val onCompletion: (List<NodeId>) -> Unit,
+) : MegaRequestListenerInterface {
+    private var numRequests = 0
+
+    private val nodeIds = mutableListOf<NodeId>()
+
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
+
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        numRequests++
+
+        if (e.errorCode == MegaError.API_OK) {
+            request.nodeHandle?.also { handle ->
+                nodeIds.add(NodeId(handle))
+            }
+        }
+
+        if (numRequests == nodes.size) {
+            onCompletion(nodeIds)
+        }
+    }
+
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
+}

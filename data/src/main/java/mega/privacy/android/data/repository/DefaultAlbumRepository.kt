@@ -22,6 +22,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.CopyPreviewNodeListenerInterface
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.DisableExportSetsListenerInterface
 import mega.privacy.android.data.listener.ExportSetsListenerInterface
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
@@ -419,8 +421,10 @@ internal class DefaultAlbumRepository @Inject constructor(
                 },
             )
 
-            megaApiGateway.stopPublicSetPreview()
+            publicNodesMap.clear()
+            publicNodesDataMap = mapOf()
 
+            megaApiGateway.stopPublicSetPreview()
             megaApiGateway.fetchPublicSet(
                 publicSetLink = albumLink.link,
                 listener = listener,
@@ -444,8 +448,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                     nodeAlbumPhotoIdMap = nodeAlbumPhotoIdMap,
                     onCompletion = { nodeAlbumPhotoIdPairs ->
                         launch {
-                            publicNodesMap.clear()
-
                             val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
                                 publicNodesMap[NodeId(node.handle)] = node
                                 photoMapper(node, albumPhotoId)
@@ -528,6 +530,125 @@ internal class DefaultAlbumRepository @Inject constructor(
     }
 
     override fun getPublicAlbumNodesData(): Map<NodeId, String> = publicNodesDataMap
+
+    override suspend fun addBulkPhotosToAlbum(
+        albumId: AlbumId,
+        photoIds: List<NodeId>,
+    ): Int = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        val success = request.megaSetElementList?.size()?.toInt() ?: 0
+                        continuation.resume(success)
+                    } else {
+                        continuation.failWithError(error, "addBulkPhotosToAlbum")
+                    }
+                },
+            )
+
+            if (photoIds.isNotEmpty()) {
+                val handleList = MegaHandleList.createInstance().apply {
+                    for (photoId in photoIds) {
+                        addMegaHandle(photoId.longValue)
+                    }
+                }
+                megaApiGateway.createSetElements(albumId.id, handleList, null, listener)
+            } else {
+                continuation.resume(0)
+            }
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun saveAlbumToFolder(
+        folderName: String,
+        photoIds: List<NodeId>,
+        targetParentFolderNodeId: NodeId
+    ): List<NodeId> = withContext(ioDispatcher) {
+        val getFinalFolderName: suspend (MegaNode) -> String = { folder ->
+            var finalFolderName = folderName
+            while (megaApiGateway.getChildNode(folder, finalFolderName) != null) {
+                finalFolderName = "$finalFolderName (1)"
+            }
+            finalFolderName
+        }
+
+        val createAlbumFolder: suspend (MegaNode, String) -> MegaNode = { folder, folderName ->
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            launch {
+                                val node = megaApiGateway.getMegaNodeByHandle(request.nodeHandle)
+                                requireNotNull(node) { "Album folder failed to create" }
+
+                                continuation.resume(node)
+                            }
+                        } else {
+                            continuation.failWithError(error, "saveAlbumToFolder")
+                        }
+                    },
+                )
+
+                megaApiGateway.createFolder(
+                    name = folderName,
+                    parent = folder,
+                    listener = listener,
+                )
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+        val savePhotoToFolder: suspend (MegaNode) -> List<NodeId> = { folder ->
+            suspendCancellableCoroutine { continuation ->
+                val nodes = photoIds.mapNotNull { nodeId ->
+                    publicNodesMap[nodeId]
+                }
+
+                val listener = CopyPreviewNodeListenerInterface(
+                    nodes = nodes,
+                    onCompletion = { nodeIds ->
+                        continuation.resume(nodeIds)
+                    },
+                )
+
+                if (nodes.isNotEmpty()) {
+                    for (node in nodes) {
+                        megaApiGateway.copyNode(
+                            nodeToCopy = node,
+                            newNodeParent = folder,
+                            newNodeName = null,
+                            listener = listener,
+                        )
+                    }
+                } else {
+                    continuation.resume(listOf())
+                }
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+        val parentNode = megaApiGateway.getMegaNodeByHandle(
+            nodeHandle = targetParentFolderNodeId.longValue
+        )
+        requireNotNull(parentNode) { "Target parent node not found" }
+
+        val finalFolderName = getFinalFolderName(parentNode)
+        val nodeParent = createAlbumFolder(parentNode, finalFolderName)
+        val nodeIds = savePhotoToFolder(nodeParent)
+
+        nodeIds
+    }
 
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()

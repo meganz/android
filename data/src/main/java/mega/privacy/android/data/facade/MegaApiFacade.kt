@@ -23,6 +23,7 @@ import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
+import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -33,6 +34,7 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
@@ -775,6 +777,13 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface) =
         megaApi.createSetElement(sid, node, "", listener)
+
+    override fun createSetElements(
+        sid: Long,
+        nodes: MegaHandleList,
+        names: MegaStringList?,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.createSetElements(sid, nodes, names, listener)
 
     override suspend fun removeSetElement(
         sid: Long,

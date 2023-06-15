@@ -56,6 +56,16 @@ interface AlbumRepository {
     suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>)
 
     /**
+     * Add bulk photos to an album
+     *
+     * @param albumId album id which we want to add the photos into
+     * @param photoIds the photos' node handles
+     *
+     * @return number of photos successfully added
+     */
+    suspend fun addBulkPhotosToAlbum(albumId: AlbumId, photoIds: List<NodeId>): Int
+
+    /**
      * Remove photos from an album
      *
      * @param albumID the id of the album which we want to remove the elements from
@@ -193,6 +203,21 @@ interface AlbumRepository {
      * @return map of MegaNode data
      */
     fun getPublicAlbumNodesData(): Map<NodeId, String>
+
+    /**
+     * Save album photos to folder
+     *
+     * @param folderName the name of folder to be created
+     * @param photoIds list of photos to be saved
+     * @param targetParentFolderNodeId parent of target folder
+     *
+     * @return list of saved photo ids
+     */
+    suspend fun saveAlbumToFolder(
+        folderName: String,
+        photoIds: List<NodeId>,
+        targetParentFolderNodeId: NodeId,
+    ): List<NodeId>
 
     /**
      * Clear all albums cache

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -17,6 +18,7 @@ import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
@@ -1302,6 +1304,39 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Request creation of multiple Elements for a Set
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PUT_SET_ELEMENTS
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getTotalBytes - Returns the id of the Set
+     * - MegaRequest::getMegaHandleList - Returns a list containing the file handles corresponding to the new Elements
+     * - MegaRequest::getMegaStringList - Returns a list containing the names corresponding to the new Elements
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getMegaSetElementList - Returns a list containing only the new Elements
+     * - MegaRequest::getMegaIntegerList - Returns a list containing error codes for all requested Elements
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set could not be found.
+     * - MegaError::API_EINTERNAL - Received answer could not be read or decrypted.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * @param sid the id of the Set that will own the new Elements
+     * @param nodes the handles of the file-nodes that will be represented by the new Elements
+     * @param names the names that should be given to the new Elements (param names must be either null or have
+     * the same size() as param nodes)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun createSetElements(
+        sid: Long,
+        nodes: MegaHandleList,
+        names: MegaStringList?,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Remove an element from a set
