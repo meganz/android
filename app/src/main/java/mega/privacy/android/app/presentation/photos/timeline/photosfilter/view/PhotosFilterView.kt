@@ -57,14 +57,17 @@ fun PhotosFilterView(
     timelineViewState: TimelineViewState = TimelineViewState(),
     onMediaTypeSelected: (FilterMediaType) -> Unit = {},
     onSourceSelected: (TimelinePhotosSource) -> Unit = {},
-    applyFilter: () -> Unit = {},
+    applyFilter: (Boolean) -> Unit = {},
     isRememberTimelinePreferencesEnabled: suspend () -> Boolean = { false },
-    onCheckboxClicked: (Boolean) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
 
     val isRememberTimelinePreferenceAppFeatureEnabled by produceState(initialValue = false) {
         value = isRememberTimelinePreferencesEnabled()
+    }
+
+    var isCheckboxChecked by remember {
+        mutableStateOf(timelineViewState.rememberFilter)
     }
 
     Column(
@@ -95,8 +98,8 @@ fun PhotosFilterView(
                     )
 
                     Checkbox(
-                        checked = timelineViewState.rememberFilter,
-                        onCheckedChange = { onCheckboxClicked(!timelineViewState.rememberFilter) },
+                        checked = isCheckboxChecked,
+                        onCheckedChange = { isCheckboxChecked = !isCheckboxChecked },
                     )
                 }
             }
@@ -110,7 +113,7 @@ fun PhotosFilterView(
                 .fillMaxWidth()
         ) {
             Button(
-                onClick = applyFilter,
+                onClick = { applyFilter(isCheckboxChecked) },
                 shape = RoundedCornerShape(4.dp),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = colorResource(id = R.color.teal_300_teal_200)
