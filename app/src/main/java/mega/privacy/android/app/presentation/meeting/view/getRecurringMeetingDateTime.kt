@@ -62,7 +62,16 @@ fun getRecurringMeetingDateTime(
         }
 
         OccurrenceFrequencyType.Daily -> {
+            val interval = scheduledMeeting.getIntervalValue()
             result = when {
+                interval > 1 ->
+                    getTextForOneOffMeeting(
+                        scheduledMeeting,
+                        startTime,
+                        endTime,
+                        false
+                    )
+
                 scheduledMeeting.isForever() -> stringResource(
                     id = R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
                     startDate,

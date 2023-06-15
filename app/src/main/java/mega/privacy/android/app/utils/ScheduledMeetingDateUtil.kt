@@ -61,21 +61,39 @@ object ScheduledMeetingDateUtil {
                     endTime
                 )
             }
-            OccurrenceFrequencyType.Daily -> result = when {
-                scheduledMeeting.isForever() -> context.getString(
-                    R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
-                    startDate,
-                    startTime,
-                    endTime
-                )
-                else -> context.getString(
-                    R.string.notification_subtitle_scheduled_meeting_recurring_daily_until,
-                    startDate,
-                    endDate,
-                    startTime,
-                    endTime
-                )
+
+            OccurrenceFrequencyType.Daily -> {
+                val interval = scheduledMeeting.getIntervalValue()
+                result = when {
+                    interval > 1 ->
+                        context.getString(
+                            when {
+                                scheduledMeeting.isToday() -> R.string.meetings_one_off_occurrence_info_today
+                                scheduledMeeting.isTomorrow() -> R.string.meetings_one_off_occurrence_info_tomorrow
+                                else -> R.string.notification_subtitle_scheduled_meeting_one_off
+                            },
+                            scheduledMeeting.getCompleteStartDate(),
+                            startTime,
+                            endTime
+                        )
+
+                    scheduledMeeting.isForever() -> context.getString(
+                        R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
+                        startDate,
+                        startTime,
+                        endTime
+                    )
+
+                    else -> context.getString(
+                        R.string.notification_subtitle_scheduled_meeting_recurring_daily_until,
+                        startDate,
+                        endDate,
+                        startTime,
+                        endTime
+                    )
+                }
             }
+
             OccurrenceFrequencyType.Weekly -> {
                 rules.weekDayList?.takeIf { it.isNotEmpty() }?.sortedBy { it.ordinal }
                     ?.let { weekDaysList ->
