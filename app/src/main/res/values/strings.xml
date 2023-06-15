@@ -4907,4 +4907,9 @@
     <string name="album_import_enter_album_name">Enter an album name</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <plurals name="cloud_drive_subtitle_links_access_user">
+        <item quantity="one">Anyone with this link can view and download your data</item>
+        <item quantity="other">Anyone with these links can view and download your data</item>
+    </plurals>
 </resources>

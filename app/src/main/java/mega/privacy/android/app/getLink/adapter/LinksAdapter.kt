@@ -34,6 +34,7 @@ class LinksAdapter : ListAdapter<LinkItem, RecyclerView.ViewHolder>(LinkItem.Dif
                     false
                 )
             )
+
             else -> LinkViewHolder(ItemLinkBinding.inflate(layoutInflater, parent, false))
         }
     }
@@ -41,7 +42,7 @@ class LinksAdapter : ListAdapter<LinkItem, RecyclerView.ViewHolder>(LinkItem.Dif
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is LinkViewHolder -> holder.bind(getItem(position) as LinkItem.Data)
-            else -> {}
+            is LinkHeaderViewHolder -> holder.bind()
         }
     }
 

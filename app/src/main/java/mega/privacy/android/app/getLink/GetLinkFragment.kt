@@ -295,7 +295,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 getString(R.string.cloud_drive_subtitle_link_access_password)
         } else {
             binding.getLinkAccessSubtitle.text =
-                getString(R.string.cloud_drive_subtitle_link_access)
+                resources.getQuantityText(R.plurals.cloud_drive_subtitle_links_access_user, 1)
         }
 
         binding.passwordProtectionArrow.isVisible = isPasswordSet.not() && viewModel.isPro()
