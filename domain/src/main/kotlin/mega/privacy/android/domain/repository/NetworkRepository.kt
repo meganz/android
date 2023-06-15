@@ -42,4 +42,14 @@ interface NetworkRepository {
      * @return [Boolean]
      */
     fun isOnWifi(): Boolean
+
+    /**
+     * Monitor chat signal presence, monitor if any signal is available
+     */
+    fun monitorChatSignalPresence(): Flow<Unit>
+
+    /**
+     * Broadcast chat signal presence if network signal is available
+     */
+    suspend fun broadcastChatSignalPresence()
 }

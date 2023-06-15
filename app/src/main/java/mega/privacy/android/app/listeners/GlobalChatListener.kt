@@ -1,9 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.app.Application
-import android.content.Intent
 import android.util.Pair
 import com.jeremyliao.liveeventbus.LiveEventBus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
@@ -11,10 +12,11 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_CONNECTION_S
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_PRIVILEGES_CHANGE
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.BroadcastChatSignalPresenceUseCase
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
 import nz.mega.sdk.MegaChatApiJava
@@ -29,6 +31,8 @@ class GlobalChatListener @Inject constructor(
     private val application: Application,
     private val chatManagement: ChatManagement,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val broadcastChatSignalPresenceUseCase: BroadcastChatSignalPresenceUseCase
 ) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
         if (item != null) {
@@ -86,9 +90,10 @@ class GlobalChatListener @Inject constructor(
         config: MegaChatPresenceConfig?,
     ) {
         if (config?.isPending == false) {
-            Timber.d("Launch local broadcast")
-            val intent = Intent(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
-            application.sendBroadcast(intent)
+            Timber.d("Broadcast signal presence to app event")
+            applicationScope.launch {
+                broadcastChatSignalPresenceUseCase()
+            }
         }
     }
 

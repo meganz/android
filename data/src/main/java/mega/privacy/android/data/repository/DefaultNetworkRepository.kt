@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.shareIn
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -37,6 +38,7 @@ internal class DefaultNetworkRepository @Inject constructor(
     private val megaApi: MegaApiGateway,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val appEventGateway: AppEventGateway,
 ) : NetworkRepository {
 
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
@@ -116,4 +118,10 @@ internal class DefaultNetworkRepository @Inject constructor(
         val capabilities = connectivityManager.getActiveNetworkCapabilities()
         return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
     }
+
+    override fun monitorChatSignalPresence(): Flow<Unit> =
+        appEventGateway.monitorChatSignalPresence()
+
+    override suspend fun broadcastChatSignalPresence() =
+        appEventGateway.broadcastChatSignalPresence()
 }

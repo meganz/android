@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -66,7 +67,6 @@ import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
-import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -80,7 +80,6 @@ import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
-import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
@@ -125,7 +124,9 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.transfer.TransferFinishType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferOverQuota
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -191,6 +192,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
 
     @Inject
     lateinit var monitorTransferOverQuota: MonitorTransferOverQuota
+
+    /**
+     * Monitor Chat Signal Presence Use Case
+     * Check if chat has signal presence
+     */
+    @Inject
+    lateinit var monitorChatSignalPresenceUseCase: MonitorChatSignalPresenceUseCase
 
     @JvmField
     var nameCollisionActivityContract: ActivityResultLauncher<ArrayList<NameCollision>>? = null
@@ -298,19 +306,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             Timber.d("BROADCAST TO MANAGE A SSL VERIFICATION ERROR")
             if (!(sslErrorDialog ?: return).isShowing) {
                 showSSLErrorDialog()
-            }
-        }
-    }
-
-    /**
-     * Broadcast to send presence after first launch of app
-     */
-    private val signalPresenceReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
-            if (delaySignalPresence && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
-                delaySignalPresence = false
-                retryConnectionsAndSignalPresence()
             }
         }
     }
@@ -431,10 +426,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             IntentFilter(BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED)
         )
 
-        registerReceiver(
-            signalPresenceReceiver,
-            IntentFilter(BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
-        )
+        collectFlow(monitorChatSignalPresenceUseCase(), Lifecycle.State.CREATED) {
+            Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
+            if (delaySignalPresence && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
+                delaySignalPresence = false
+                retryConnectionsAndSignalPresence()
+            }
+        }
 
         registerReceiver(
             accountBlockedReceiver,
@@ -603,7 +601,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     override fun onDestroy() {
         composite.clear()
         unregisterReceiver(sslErrorReceiver)
-        unregisterReceiver(signalPresenceReceiver)
         unregisterReceiver(accountBlockedReceiver)
         unregisterReceiver(businessExpiredReceiver)
         unregisterReceiver(takenDownFilesReceiver)
