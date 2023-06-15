@@ -4,12 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
@@ -50,6 +55,18 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     private val isAlbumNewLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
         intent.getBooleanExtra(ALBUM_NEW_LINK, true)
     }
+
+    private val selectImportAlbumLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        ActivityResultCallback<ActivityResult> { activityResult ->
+            val resultCode = activityResult.resultCode
+            val intent = activityResult.data
+
+            if (resultCode != RESULT_OK || intent == null) {
+                return@ActivityResultCallback
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,6 +160,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             },
                         )
                     }
+
                     AlbumScreen.AlbumImportScreen -> {
                         AlbumImportScreen(
                             onShareLink = { link ->
@@ -157,6 +175,12 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 startActivity(shareIntent)
                             },
                             onPreviewPhoto = {},
+                            onImport = {
+                                val intent = Intent(this, FileExplorerActivity::class.java).apply {
+                                    action = FileExplorerActivity.ACTION_IMPORT_ALBUM
+                                }
+                                selectImportAlbumLauncher.launch(intent)
+                            },
                             onSaveToDevice = { nodes ->
                                 checkNotificationsPermission(this)
                                 nodeSaver.saveNodes(
@@ -170,6 +194,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             onBack = ::finish,
                         )
                     }
+
                     else -> finish()
                 }
             }

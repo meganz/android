@@ -4912,4 +4912,6 @@
         <item quantity="one">Anyone with this link can view and download your data</item>
         <item quantity="other">Anyone with these links can view and download your data</item>
     </plurals>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
 </resources>

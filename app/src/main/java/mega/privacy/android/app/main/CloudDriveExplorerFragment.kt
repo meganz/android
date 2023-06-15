@@ -364,6 +364,9 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             FileExplorerActivity.IMPORT -> binding.actionText.text =
                 getString(R.string.add_to_cloud)
 
+            FileExplorerActivity.ALBUM_IMPORT -> binding.actionText.text =
+                getString(R.string.general_save_to_cloud_drive)
+
             FileExplorerActivity.SAVE -> binding.actionText.text = getString(R.string.save_action)
             FileExplorerActivity.SELECT -> {
                 binding.optionsExplorerLayout.isVisible = false

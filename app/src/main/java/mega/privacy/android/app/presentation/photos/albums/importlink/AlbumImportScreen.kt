@@ -82,6 +82,7 @@ internal fun AlbumImportScreen(
     albumImportViewModel: AlbumImportViewModel = viewModel(),
     onShareLink: (String) -> Unit,
     onPreviewPhoto: (Photo) -> Unit,
+    onImport: (List<MegaNode>) -> Unit,
     onSaveToDevice: (List<MegaNode>) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -147,6 +148,7 @@ internal fun AlbumImportScreen(
                     isLogin = state.isLogin,
                     onImport = {
                         val photos = state.selectedPhotos.ifEmpty { state.photos }
+                        onImport(albumImportViewModel.mapPhotosToNodes(photos))
                         albumImportViewModel.clearSelection()
                     },
                     onSaveToDevice = {

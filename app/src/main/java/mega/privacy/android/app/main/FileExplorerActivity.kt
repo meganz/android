@@ -739,6 +739,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     tabShown = NO_TABS
                 }
 
+                ACTION_IMPORT_ALBUM -> {
+                    mode = ALBUM_IMPORT
+                    title = getString(R.string.section_cloud_drive)
+                    setView(CLOUD_TAB, false)
+                    tabShown = NO_TABS
+                }
+
                 else -> {
                     Timber.d("action = UPLOAD")
                     mode = UPLOAD
@@ -1222,7 +1229,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 }
             }
 
-            mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT -> {
+            mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT || mode == ALBUM_IMPORT -> {
                 getString(R.string.title_share_folder_explorer)
             }
 
@@ -1818,6 +1825,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                 setResult(RESULT_OK, intent)
                 Timber.d("finish!")
+                finishAndRemoveTask()
+            }
+
+            ALBUM_IMPORT -> {
                 finishAndRemoveTask()
             }
 
@@ -2772,6 +2783,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         var ACTION_SAVE_TO_CLOUD = "ACTION_SAVE_TO_CLOUD"
 
         /**
+         * Intent action for importing an album.
+         */
+        @JvmField
+        var ACTION_IMPORT_ALBUM = "ACTION_IMPORT_ALBUM"
+
+        /**
          * Upload mode.
          */
         const val UPLOAD = 0
@@ -2815,6 +2832,11 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
          * Save mode.
          */
         const val SAVE = 9
+
+        /**
+         * Import album mode.
+         */
+        const val ALBUM_IMPORT = 10
 
         private const val NO_TABS = -1
         const val CLOUD_TAB = 0
