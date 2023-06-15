@@ -84,8 +84,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: String?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
-        cancelToken: MegaCancelToken?,
-    ): Flow<GlobalTransfer> = callbackFlow {
+    ): Flow<TransferEvent> = callbackFlow {
         val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         requireNotNull(parentNode)
         val listener = uploadListener(channel)
@@ -98,12 +97,11 @@ internal class DefaultTransfersRepository @Inject constructor(
             appData = appData,
             isSourceTemporary = isSourceTemporary,
             shouldStartFirst = shouldStartFirst,
-            cancelToken = cancelToken,
+            cancelToken = null,
             listener = listener,
         )
 
         awaitClose {
-            cancelToken?.cancel()
             megaApiGateway.removeTransferListener(listener)
         }
     }
@@ -111,23 +109,29 @@ internal class DefaultTransfersRepository @Inject constructor(
         .cancellable()
 
     private fun uploadListener(
-        channel: SendChannel<GlobalTransfer>,
+        channel: SendChannel<TransferEvent>,
     ) = OptionalMegaTransferListenerInterface(
         onTransferStart = { transfer ->
-            channel.trySend(GlobalTransfer.OnTransferStart(transfer))
+            channel.trySend(transferEventMapper(GlobalTransfer.OnTransferStart(transfer)))
         },
         onTransferFinish = { transfer, error ->
-            channel.trySend(GlobalTransfer.OnTransferFinish(transfer, error))
+            channel.trySend(transferEventMapper(GlobalTransfer.OnTransferFinish(transfer, error)))
             channel.close()
         },
         onTransferUpdate = { transfer ->
-            channel.trySend(GlobalTransfer.OnTransferUpdate(transfer))
+            channel.trySend(transferEventMapper(GlobalTransfer.OnTransferUpdate(transfer)))
         },
         onTransferTemporaryError = { transfer, error ->
-            channel.trySend(GlobalTransfer.OnTransferTemporaryError(transfer, error))
+            channel.trySend(
+                transferEventMapper(
+                    GlobalTransfer.OnTransferTemporaryError(
+                        transfer, error
+                    )
+                )
+            )
         },
         onTransferData = { transfer, buffer ->
-            channel.trySend(GlobalTransfer.OnTransferData(transfer, buffer))
+            channel.trySend(transferEventMapper(GlobalTransfer.OnTransferData(transfer, buffer)))
         },
     )
 
@@ -157,7 +161,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
 
             awaitClose {
-                cancelToken?.cancel()
+                cancelToken.cancel()
                 megaApiGateway.removeTransferListener(listener)
             }
         }

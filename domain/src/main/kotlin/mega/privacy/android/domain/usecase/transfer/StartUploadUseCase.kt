@@ -1,14 +1,17 @@
-package mega.privacy.android.app.domain.usecase
+package mega.privacy.android.domain.usecase.transfer
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
-import nz.mega.sdk.MegaCancelToken
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.repository.TransferRepository
+import javax.inject.Inject
 
 /**
  * Use Case to upload a file or folder
  */
-fun interface StartUpload {
+class StartUploadUseCase @Inject constructor(
+    private val transferRepository: TransferRepository,
+) {
 
     /**
      * Invokes the Use Case to upload a file or folder
@@ -24,12 +27,10 @@ fun interface StartUpload {
      * should be deleted or not
      * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
      * queue or not
-     * @param cancelToken The token to cancel an ongoing file or folder upload, which can be
-     * nullable
      *
-     * @return A flow of [GlobalTransfer]
+     * @return A flow of [TransferEvent]
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         localPath: String,
         parentNodeId: NodeId,
         fileName: String?,
@@ -37,6 +38,14 @@ fun interface StartUpload {
         appData: String?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
-        cancelToken: MegaCancelToken?,
-    ): Flow<GlobalTransfer>
+    ): Flow<TransferEvent> =
+        transferRepository.startUpload(
+            localPath = localPath,
+            parentNodeId = parentNodeId,
+            fileName = fileName,
+            modificationTime = modificationTime,
+            appData = appData,
+            isSourceTemporary = isSourceTemporary,
+            shouldStartFirst = shouldStartFirst,
+        )
 }

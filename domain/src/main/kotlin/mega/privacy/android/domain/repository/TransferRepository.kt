@@ -259,4 +259,31 @@ interface TransferRepository {
      * @return [TransferData]
      */
     suspend fun getTransferData(): TransferData?
+
+    /**
+     * Upload a file or folder
+     *
+     * @param localPath The local path of the file or folder
+     * @param parentNodeId The parent node id for the file or folder
+     * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
+     * if there are no changes
+     * @param modificationTime The custom modification time for the file or folder, denoted in
+     * seconds since the epoch
+     * @param appData The custom app data to save, which can be nullable
+     * @param isSourceTemporary Whether the temporary file or folder that is created for upload
+     * should be deleted or not
+     * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
+     * queue or not
+     *
+     * @return a Flow of [TransferEvent]
+     */
+    fun startUpload(
+        localPath: String,
+        parentNodeId: NodeId,
+        fileName: String?,
+        modificationTime: Long,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        shouldStartFirst: Boolean,
+    ): Flow<TransferEvent>
 }

@@ -16,12 +16,11 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
-import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.exception.MegaException
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
@@ -43,7 +42,6 @@ class DefaultTransfersRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val transferEventMapper = mock<TransferEventMapper>()
-    private val cancelToken = mock<MegaCancelToken>()
     private val appEventGateway: AppEventGateway = mock()
     private val transferMapper: TransferMapper = mock()
     private val localStorageGateway: MegaLocalStorageGateway = mock()
@@ -87,7 +85,6 @@ class DefaultTransfersRepositoryTest {
             appData = null,
             isSourceTemporary = false,
             shouldStartFirst = false,
-            cancelToken = cancelToken,
         )
 
     @Test
@@ -99,8 +96,10 @@ class DefaultTransfersRepositoryTest {
             )
         }
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+        val expected = mock<TransferEvent.TransferStartEvent>()
+        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
         startUploadFlow().test {
-            assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferStart::class.java)
+            assertThat(awaitItem()).isEqualTo(expected)
         }
     }
 
@@ -114,11 +113,12 @@ class DefaultTransfersRepositoryTest {
             )
         }
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+        val expected = mock<TransferEvent.TransferFinishEvent>()
+        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
         startUploadFlow().test {
-            assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferFinish::class.java)
+            assertThat(awaitItem()).isEqualTo(expected)
             awaitComplete()
         }
-        verify(cancelToken).cancel()
         verify(megaApiGateway).removeTransferListener(any())
     }
 
@@ -132,8 +132,10 @@ class DefaultTransfersRepositoryTest {
                 )
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferUpdateEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
             startUploadFlow().test {
-                assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferUpdate::class.java)
+                assertThat(awaitItem()).isEqualTo(expected)
             }
         }
 
@@ -148,8 +150,10 @@ class DefaultTransfersRepositoryTest {
                 )
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferTemporaryErrorEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
             startUploadFlow().test {
-                assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferTemporaryError::class.java)
+                assertThat(awaitItem()).isEqualTo(expected)
             }
         }
 
@@ -163,8 +167,10 @@ class DefaultTransfersRepositoryTest {
             )
         }
         whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+        val expected = mock<TransferEvent.TransferDataEvent>()
+        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
         startUploadFlow().test {
-            assertThat(awaitItem()).isInstanceOf(GlobalTransfer.OnTransferData::class.java)
+            assertThat(awaitItem()).isEqualTo(expected)
         }
     }
 

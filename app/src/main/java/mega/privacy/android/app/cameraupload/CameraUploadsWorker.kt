@@ -40,7 +40,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.domain.usecase.CancelTransfer
-import mega.privacy.android.app.domain.usecase.StartUpload
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
@@ -54,7 +53,6 @@ import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
-import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -70,7 +68,12 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
@@ -136,6 +139,7 @@ import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
+import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -446,7 +450,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Start Upload
      */
     @Inject
-    lateinit var startUpload: StartUpload
+    lateinit var startUploadUseCase: StartUploadUseCase
 
     /**
      * Create Camera Upload Folder
@@ -814,7 +818,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @param transfer the [MegaTransfer] to be cancelled
      */
-    private suspend fun cancelPendingTransfer(transfer: MegaTransfer) {
+    private suspend fun cancelPendingTransfer(transfer: Transfer) {
         runCatching { cancelTransferByTagUseCase(transfer.tag) }
             .onSuccess {
                 Timber.d("Transfer cancellation successful")
@@ -1272,7 +1276,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         // If the local file path exists, call the Use Case to upload the file
                         path?.let { nonNullFilePath ->
                             uploadFileAsyncList.add(async {
-                                startUpload(
+                                startUploadUseCase(
                                     localPath = nonNullFilePath,
                                     parentNodeId = parent.id,
                                     fileName = file.fileName,
@@ -1280,7 +1284,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                                     appData = Constants.APP_DATA_CU,
                                     isSourceTemporary = false,
                                     shouldStartFirst = false,
-                                    cancelToken = null,
                                 ).collect { globalTransfer ->
                                     // Handle the GlobalTransfer emitted by the Use Case
                                     onGlobalTransferUpdated(globalTransfer)
@@ -1347,18 +1350,18 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Handles the [GlobalTransfer] emitted by [StartUpload]
+     * Handles the [TransferEvent] emitted by [StartUploadUseCase]
      *
-     * @param globalTransfer The [GlobalTransfer] emitted from the Use Case
+     * @param globalTransfer The [TransferEvent] emitted from the Use Case
      */
-    private suspend fun onGlobalTransferUpdated(globalTransfer: GlobalTransfer) {
+    private suspend fun onGlobalTransferUpdated(globalTransfer: TransferEvent) {
         when (globalTransfer) {
-            is GlobalTransfer.OnTransferFinish -> onTransferFinished(globalTransfer)
-            is GlobalTransfer.OnTransferUpdate -> onTransferUpdated(globalTransfer)
-            is GlobalTransfer.OnTransferTemporaryError -> onTransferTemporaryError(globalTransfer)
+            is TransferEvent.TransferFinishEvent -> onTransferFinished(globalTransfer)
+            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(globalTransfer)
+            is TransferEvent.TransferTemporaryErrorEvent -> onTransferTemporaryError(globalTransfer)
             // No further action necessary for these Scenarios
-            is GlobalTransfer.OnTransferStart,
-            is GlobalTransfer.OnTransferData,
+            is TransferEvent.TransferStartEvent,
+            is TransferEvent.TransferDataEvent,
             -> Unit
         }
     }
@@ -1366,9 +1369,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Handle logic for when an upload has finished
      *
-     * @param globalTransfer [GlobalTransfer.OnTransferFinish]
+     * @param globalTransfer [TransferEvent.TransferFinishEvent]
      */
-    private suspend fun onTransferFinished(globalTransfer: GlobalTransfer.OnTransferFinish) {
+    private suspend fun onTransferFinished(globalTransfer: TransferEvent.TransferFinishEvent) {
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
 
@@ -1388,9 +1391,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Handle logic for when an upload has been updated
      *
-     * @param globalTransfer [GlobalTransfer.OnTransferFinish]
+     * @param globalTransfer [TransferEvent.TransferFinishEvent]
      */
-    private suspend fun onTransferUpdated(globalTransfer: GlobalTransfer.OnTransferUpdate) {
+    private suspend fun onTransferUpdated(globalTransfer: TransferEvent.TransferUpdateEvent) {
         val transfer = globalTransfer.transfer
         runCatching {
             updateProgressNotification()
@@ -1403,18 +1406,18 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Handle logic for when a temporary error has occurred during uploading
      *
-     * @param globalTransfer [GlobalTransfer.OnTransferTemporaryError]
+     * @param globalTransfer [TransferEvent.TransferTemporaryErrorEvent]
      */
-    private suspend fun onTransferTemporaryError(globalTransfer: GlobalTransfer.OnTransferTemporaryError) {
+    private suspend fun onTransferTemporaryError(globalTransfer: TransferEvent.TransferTemporaryErrorEvent) {
         val error = globalTransfer.error
 
         Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
-        if (error.errorCode == MegaError.API_EOVERQUOTA) {
-            if (error.value != 0L) Timber.w("Transfer Over Quota Error: ${error.errorCode}")
-            else Timber.w("Storage Over Quota Error: ${error.errorCode}")
-            showStorageOverQuotaNotification()
-            endService(aborted = true)
-        }
+        if (error is QuotaExceededMegaException && error.value != 0L)
+            Timber.w("Transfer Over Quota Error: ${error.errorCode}")
+        else
+            Timber.w("Storage Over Quota Error: ${error.errorCode}")
+        showStorageOverQuotaNotification()
+        endService(aborted = true)
     }
 
     /**
@@ -1841,9 +1844,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         notificationManager.cancel(notificationId)
     }
 
-    private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
-        val path = transfer.path
-        if (transfer.state == MegaTransfer.STATE_COMPLETED) {
+    private suspend fun transferFinished(transfer: Transfer, e: MegaException) {
+        val path = transfer.localPath
+        if (transfer.state == TransferState.STATE_COMPLETED) {
             val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, context)
             addCompletedTransferUseCase(legacyCompletedTransferMapper(androidCompletedTransfer))
         }
@@ -1887,7 +1890,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                         thumbDir,
                         MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
                     )
-                    if (FileUtil.isVideoFile(transfer.path)) {
+                    if (FileUtil.isVideoFile(path)) {
                         val img = record.localPath?.let { File(it) }
                         if (!preview.exists()) {
                             ImageProcessor.createVideoPreview(
@@ -1897,7 +1900,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             )
                         }
                         ImageProcessor.createThumbnail(img, thumb)
-                    } else if (MimeTypeList.typeForName(transfer.path).isImage) {
+                    } else if (MimeTypeList.typeForName(path).isImage) {
                         if (!preview.exists()) {
                             ImageProcessor.createImagePreview(src, preview)
                         }
