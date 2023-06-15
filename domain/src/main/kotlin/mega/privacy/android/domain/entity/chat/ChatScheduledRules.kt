@@ -3,6 +3,7 @@ package mega.privacy.android.domain.entity.chat
 import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.Weekday
+import java.io.Serializable
 
 /**
  * Chat scheduled rules
@@ -21,4 +22,4 @@ data class ChatScheduledRules(
     val weekDayList: List<Weekday>? = null,
     val monthDayList: List<Int>? = null,
     val monthWeekDayList: List<MonthWeekDayItem>? = emptyList(),
-)
+) : Serializable
