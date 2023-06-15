@@ -39,7 +39,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
@@ -812,7 +811,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
 
     /**
-     * Cancels a pending [MegaTransfer] through [CancelTransfer],
+     * Cancels a pending [MegaTransfer] through [CancelTransferByTagUseCase],
      * and call [resetTotalUploadsUseCase] after every cancellation to reset the total uploads if
      * there are no more pending uploads
      *

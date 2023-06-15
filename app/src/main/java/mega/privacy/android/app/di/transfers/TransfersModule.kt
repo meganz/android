@@ -9,8 +9,6 @@ import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
-import mega.privacy.android.app.domain.usecase.CancelTransfer
-import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.DefaultHasPendingUploads
 import mega.privacy.android.domain.usecase.DefaultMonitorTransfersSize
@@ -46,16 +44,6 @@ abstract class TransfersModule {
     abstract fun bindMonitorTransfersSize(useCase: DefaultMonitorTransfersSize): MonitorTransfersSize
 
     companion object {
-
-        /**
-         * Provides the [CancelTransfer] implementation
-         *
-         * @param transfersRepository [TransfersRepository]
-         * @return [CancelTransfer]
-         */
-        @Provides
-        fun provideCancelTransfer(transfersRepository: TransfersRepository): CancelTransfer =
-            CancelTransfer(transfersRepository::cancelTransfer)
 
         /**
          * Provides the [GetNumPendingUploads] implementation

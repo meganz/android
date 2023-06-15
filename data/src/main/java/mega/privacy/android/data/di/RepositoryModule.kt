@@ -44,7 +44,6 @@ import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
-import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
@@ -142,12 +141,6 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository
-
-    /**
-     * Bind transfers repository
-     */
-    @Binds
-    abstract fun bindTransfersRepository(repository: DefaultTransfersRepository): TransfersRepository
 
     /**
      * Bind domain transfers repository

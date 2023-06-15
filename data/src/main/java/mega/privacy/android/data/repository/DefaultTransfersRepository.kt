@@ -59,22 +59,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val transferDataMapper: TransferDataMapper,
-) : TransfersRepository, TransferRepository {
-
-    override suspend fun cancelTransfer(transfer: MegaTransfer) {
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener("cancelTransfer") {}
-                megaApiGateway.cancelTransfer(
-                    transfer = transfer,
-                    listener = listener
-                )
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-    }
+) : TransferRepository {
 
     override fun startUpload(
         localPath: String,
