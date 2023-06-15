@@ -83,6 +83,13 @@ val Colors.green_500_green_400: Color
     get() = if (isLight) green_500 else green_400
 
 /**
+ * Color [green_500] when light and [green_300] when dark
+ */
+val Colors.green_500_green_300: Color
+    get() = if (isLight) green_500 else green_300
+
+
+/**
  * Color [lime_green_500] when light and [lime_green_200] when dark
  */
 val Colors.lime_green_500_lime_green_200: Color

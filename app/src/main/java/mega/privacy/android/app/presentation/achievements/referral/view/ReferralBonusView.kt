@@ -32,7 +32,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
-import mega.privacy.android.core.ui.theme.extensions.green_500_green_400
+import mega.privacy.android.core.ui.theme.extensions.green_500_green_300
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.grey_500
 import mega.privacy.android.core.ui.theme.red_800
@@ -149,7 +149,7 @@ private fun ReferralListItem(
                 },
             text = Util.getSizeString(data.rewardedTransferInBytes, LocalContext.current),
             style = MaterialTheme.typography.body2,
-            color = MaterialTheme.colors.green_500_green_400
+            color = MaterialTheme.colors.green_500_green_300
         )
         Text(
             modifier = Modifier
