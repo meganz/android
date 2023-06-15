@@ -4913,4 +4913,10 @@
     <string name="meetings_mute_notifications_dialog_title">Mute meeting notifications for</string>
     <!-- Confirmation dialog title to leave a meeting -->
     <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
+    <!-- Album import rename album title -->
+    <string name="album_import_rename_album_title">Rename album</string>
+    <!-- Album import rename album description -->
+    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <!-- Album import enter album name -->
+    <string name="album_import_enter_album_name">Enter an album name</string>
 </resources>

@@ -13,4 +13,7 @@ internal data class AlbumImportState(
     val photos: List<Photo> = listOf(),
     val selectedPhotos: Set<Photo> = setOf(),
     val showErrorAccessDialog: Boolean = false,
+    val showRenameAlbumDialog: Boolean = false,
+    val isRenameAlbumValid: Boolean = false,
+    val renameAlbumErrorMessage: String? = null,
 )

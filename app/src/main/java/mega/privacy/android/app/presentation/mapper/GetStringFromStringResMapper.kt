@@ -14,5 +14,6 @@ class GetStringFromStringResMapper @Inject constructor(@ApplicationContext priva
      *
      * @param stringId StringRes to convert ot string
      */
-    operator fun invoke(@StringRes stringId: Int) = context.getString(stringId)
+    operator fun invoke(@StringRes stringId: Int, vararg args: Any) =
+        context.getString(stringId, *args)
 }

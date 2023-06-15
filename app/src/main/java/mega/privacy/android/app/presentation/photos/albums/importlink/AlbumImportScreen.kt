@@ -112,6 +112,16 @@ internal fun AlbumImportScreen(
         )
     }
 
+    if (state.showRenameAlbumDialog) {
+        RenameAlbumDialog(
+            album = state.album,
+            errorMessage = state.renameAlbumErrorMessage,
+            onClearErrorMessage = albumImportViewModel::clearRenameAlbumErrorMessage,
+            onDismiss = albumImportViewModel::closeRenameAlbumDialog,
+            onRename = albumImportViewModel::validateAlbumName,
+        )
+    }
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -560,5 +570,88 @@ private fun ErrorAccessDialog(
             )
         },
         dismissButton = {},
+    )
+}
+
+@Composable
+private fun RenameAlbumDialog(
+    modifier: Modifier = Modifier,
+    album: Album.UserAlbum?,
+    errorMessage: String?,
+    onClearErrorMessage: () -> Unit,
+    onDismiss: () -> Unit,
+    onRename: (String) -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+    var text by rememberSaveable { mutableStateOf("") }
+
+    MegaDialog(
+        modifier = modifier.padding(36.dp),
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false,
+        ),
+        onDismissRequest = onDismiss,
+        titleString = stringResource(id = R.string.album_import_rename_album_title),
+        fontWeight = FontWeight.W500,
+        body = {
+            Column(
+                content = {
+                    Text(
+                        text = stringResource(
+                            id = R.string.album_import_rename_album_description,
+                            album?.title.orEmpty(),
+                        ),
+                        color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.W400,
+                        style = MaterialTheme.typography.subtitle1,
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    GenericTextField(
+                        placeholder = "",
+                        onTextChange = {
+                            text = it
+                            onClearErrorMessage()
+                        },
+                        imeAction = ImeAction.Done,
+                        keyboardActions = KeyboardActions.Default,
+                        text = text,
+                        errorText = errorMessage,
+                    )
+                },
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.general_cancel),
+                        color = teal_300,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.button,
+                    )
+                },
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { onRename(text.trim()) },
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.context_rename),
+                        color = teal_300,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.button,
+                    )
+                },
+            )
+        },
     )
 }
