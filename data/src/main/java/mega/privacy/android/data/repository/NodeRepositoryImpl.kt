@@ -457,8 +457,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToMove.longValue)
-        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        val node = getMegaNodeByHandle(nodeToMove, true)
+        val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to move with handle $nodeToMove not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
         val result = suspendCancellableCoroutine { continuation ->
@@ -561,6 +561,12 @@ internal class NodeRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    private suspend fun getMegaNodeByHandle(nodeId: NodeId, attempFromFolderApi: Boolean = false) =
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
+            ?: takeIf { attempFromFolderApi }
+                ?.let { megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue) }
+                ?.let { megaApiFolderGateway.authorizeNode(it) }
 
     override suspend fun getNodeByHandle(handle: Long) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)
