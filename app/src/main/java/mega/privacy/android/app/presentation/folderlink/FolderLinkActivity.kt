@@ -766,7 +766,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private fun askForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val builder = DecryptAlertDialog.Builder()
-        val decryptAlertDialog = builder.setListener(this)
+        val decryptAlertDialog = builder
             .setTitle(getString(R.string.alert_decryption_key))
             .setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
             .setMessage(getString(R.string.message_decryption_key))

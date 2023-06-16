@@ -387,7 +387,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
             Timber.d("askForDecryptionKeyDialog");
 
             DecryptAlertDialog.Builder builder = new DecryptAlertDialog.Builder();
-            decryptAlertDialog = builder.setListener(this).setTitle(getString(R.string.alert_decryption_key))
+            decryptAlertDialog = builder.setTitle(getString(R.string.alert_decryption_key))
                     .setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
                     .setMessage(getString(R.string.message_decryption_key))
                     .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
