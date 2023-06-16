@@ -54,7 +54,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -100,7 +100,7 @@ import javax.inject.Inject
  * @property getExtendedAccountDetail
  * @property getPricing
  * @property getFullAccountInfoUseCase
- * @property getActiveSubscription
+ * @property getActiveSubscriptionUseCase
  * @property getFeatureFlagValueUseCase
  * @property getUnverifiedIncomingShares
  * @property getUnverifiedOutgoingShares
@@ -140,7 +140,7 @@ class ManagerViewModel @Inject constructor(
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
-    private val getActiveSubscription: GetActiveSubscription,
+    private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
@@ -602,7 +602,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Active subscription in local cache
      */
-    val activeSubscription: MegaPurchase? get() = getActiveSubscription()
+    val activeSubscription: MegaPurchase? get() = getActiveSubscriptionUseCase()
 
     /**
      * Set last used path of copy as target path for next copy

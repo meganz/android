@@ -265,7 +265,7 @@ class ManagerViewModelTest {
             getExtendedAccountDetail = mock(),
             getPricing = getPricing,
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
-            getActiveSubscription = mock(),
+            getActiveSubscriptionUseCase = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,

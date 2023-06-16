@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
@@ -41,7 +41,7 @@ internal class PaymentViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
-    private val getActiveSubscription: GetActiveSubscription,
+    private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
     @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -86,7 +86,8 @@ internal class PaymentViewModel @Inject constructor(
         }
     }
 
-    private fun isPurchasedAlready(sku: String): Boolean = getActiveSubscription()?.sku == sku
+    private fun isPurchasedAlready(sku: String): Boolean =
+        getActiveSubscriptionUseCase()?.sku == sku
 
     /**
      * Asks for pricing if needed.

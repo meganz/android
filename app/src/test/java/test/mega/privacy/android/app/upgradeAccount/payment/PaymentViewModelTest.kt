@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
@@ -39,7 +39,7 @@ internal class PaymentViewModelTest {
     private val getPricing: GetPricing = mock()
     private val getLocalPricingUseCase: GetLocalPricingUseCase = mock()
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase = mock()
-    private val getActiveSubscription: GetActiveSubscription = mock()
+    private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase = mock()
     private val context: Context = mock()
     private val savedStateHandle: SavedStateHandle = mock()
 
@@ -57,7 +57,7 @@ internal class PaymentViewModelTest {
             getPricing = getPricing,
             getLocalPricingUseCase = getLocalPricingUseCase,
             isBillingAvailableUseCase = isBillingAvailableUseCase,
-            getActiveSubscription = getActiveSubscription,
+            getActiveSubscriptionUseCase = getActiveSubscriptionUseCase,
             context = context,
             savedStateHandle = savedStateHandle
         )
