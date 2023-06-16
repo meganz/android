@@ -54,7 +54,6 @@ import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
@@ -167,9 +166,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
-
-    @Provides
-    fun provideSetupSecondaryFolder() = mock<SetupSecondaryFolder>()
 
     @Provides
     fun provideSetupDefaultSecondaryFolder() = mock<SetupDefaultSecondaryFolder>()

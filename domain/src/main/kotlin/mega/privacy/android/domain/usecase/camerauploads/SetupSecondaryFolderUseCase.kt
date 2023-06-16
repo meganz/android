@@ -1,17 +1,26 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import javax.inject.Inject
 
 /**
- * Default implementation of [SetupSecondaryFolder]
+ * Setup Secondary Folder for Camera Upload
+ *
  */
-class DefaultSetupSecondaryFolder @Inject constructor(
+class SetupSecondaryFolderUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val resetSecondaryTimeline: ResetSecondaryTimeline,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
-) : SetupSecondaryFolder {
-    override suspend fun invoke(secondaryHandle: Long) {
+) {
+
+    /**
+     * Invoke
+     *
+     * @param secondaryHandle
+     */
+    suspend operator fun invoke(secondaryHandle: Long) {
         cameraUploadRepository.setupSecondaryFolder(secondaryHandle)
             .takeIf { it != cameraUploadRepository.getInvalidHandle() }
             ?.let {
@@ -20,3 +29,4 @@ class DefaultSetupSecondaryFolder @Inject constructor(
             }
     }
 }
+

@@ -1,37 +1,48 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
+import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultSetupSecondaryFolderTest {
-    private lateinit var underTest: SetupSecondaryFolder
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class SetupSecondaryFolderUseCaseTest {
+    private lateinit var underTest: SetupSecondaryFolderUseCase
     private val invalidHandle = -1L
 
-    private val cameraUploadRepository = mock<CameraUploadRepository> {
-        onBlocking {
-            getInvalidHandle()
-        }.thenReturn(invalidHandle)
-    }
+    private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val resetSecondaryTimeline = mock<ResetSecondaryTimeline>()
     private val setSecondarySyncHandle = mock<SetSecondarySyncHandle>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
-        underTest = DefaultSetupSecondaryFolder(
+        underTest = SetupSecondaryFolderUseCase(
             cameraUploadRepository = cameraUploadRepository,
             resetSecondaryTimeline = resetSecondaryTimeline,
             setSecondarySyncHandle = setSecondarySyncHandle
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            cameraUploadRepository,
+            resetSecondaryTimeline,
+            setSecondarySyncHandle,
         )
     }
 
@@ -40,6 +51,7 @@ class DefaultSetupSecondaryFolderTest {
         runTest {
             val result = 69L
             whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(69L)
+            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
             verify(resetSecondaryTimeline).invoke()
             verify(setSecondarySyncHandle).invoke(result)
@@ -49,6 +61,7 @@ class DefaultSetupSecondaryFolderTest {
     fun `test that if setup secondary folder returns an invalid handle that secondary attributes do not update`() =
         runTest {
             whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenReturn(invalidHandle)
+            whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             underTest(any())
             verify(cameraUploadRepository).setupSecondaryFolder(any())
             verify(cameraUploadRepository).getInvalidHandle()

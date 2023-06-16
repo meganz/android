@@ -101,7 +101,6 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
@@ -126,6 +125,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintU
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -467,7 +467,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Setup Secondary Folder
      */
     @Inject
-    lateinit var setupSecondaryFolder: SetupSecondaryFolder
+    lateinit var setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase
 
     /**
      * Establish Camera Uploads Sync Handles
@@ -1661,7 +1661,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun createAndSetupSecondaryUploadFolder() {
         createCameraUploadFolder(context.getString(R.string.section_secondary_media_uploads))?.let {
             Timber.d("Secondary Folder successfully created with handle $it. Setting up Secondary Folder")
-            setupSecondaryFolder(it)
+            setupSecondaryFolderUseCase(it)
         } ?: throw Exception("Failed to create secondary upload folder")
     }
 

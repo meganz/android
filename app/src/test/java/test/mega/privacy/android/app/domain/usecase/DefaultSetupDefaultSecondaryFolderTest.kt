@@ -6,9 +6,9 @@ import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolde
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import org.junit.Before
 import org.junit.Test
@@ -34,7 +34,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
     private val getUploadFolderHandleUseCase = mock<GetUploadFolderHandleUseCase>()
     private val getDefaultNodeHandleUseCase = mock<GetDefaultNodeHandleUseCase>()
     private val isNodeInRubbishOrDeletedUseCase = mock<IsNodeInRubbishOrDeletedUseCase>()
-    private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
+    private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
 
     @Before
     fun setUp() {
@@ -43,7 +43,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             getUploadFolderHandleUseCase = getUploadFolderHandleUseCase,
             getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
-            setupSecondaryFolder = setupSecondaryFolder
+            setupSecondaryFolderUseCase = setupSecondaryFolderUseCase
         )
     }
 
@@ -56,7 +56,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
-            verifyNoInteractions(setupSecondaryFolder)
+            verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
     @Test
@@ -68,7 +68,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
-            verifyNoInteractions(setupSecondaryFolder)
+            verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
     @Test
@@ -80,7 +80,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
-            verifyNoInteractions(setupSecondaryFolder)
+            verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
     @Test
@@ -92,7 +92,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
-            verifyNoInteractions(setupSecondaryFolder)
+            verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
     @Test
@@ -104,7 +104,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(invalidHandle)
             underTest(folderName)
-            verifyNoInteractions(setupSecondaryFolder)
+            verifyNoInteractions(setupSecondaryFolderUseCase)
         }
 
     @Test
@@ -116,7 +116,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
-            verify(setupSecondaryFolder, times(1)).invoke(validHandle)
+            verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 
     @Test
@@ -128,7 +128,7 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
-            verify(setupSecondaryFolder, times(1)).invoke(validHandle)
+            verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 
     @Test
@@ -140,6 +140,6 @@ class DefaultSetupDefaultSecondaryFolderTest {
             whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(true)
             whenever(getDefaultNodeHandleUseCase(folderName)).thenReturn(validHandle)
             underTest(folderName)
-            verify(setupSecondaryFolder, times(1)).invoke(validHandle)
+            verify(setupSecondaryFolderUseCase, times(1)).invoke(validHandle)
         }
 }

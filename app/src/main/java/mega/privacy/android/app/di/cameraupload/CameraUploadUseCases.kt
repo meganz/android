@@ -54,7 +54,6 @@ import mega.privacy.android.domain.usecase.DefaultRestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultRestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.DefaultSetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.DefaultSetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.DefaultSetupSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
@@ -93,7 +92,6 @@ import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
@@ -317,12 +315,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetCameraUploadTimelines(resetCameraUploadTimelines: DefaultResetCameraUploadTimelines): ResetCameraUploadTimelines
-
-    /**
-     * Provide the [SetupSecondaryFolder] implementation
-     */
-    @Binds
-    abstract fun bindSetupSecondaryFolder(setupSecondaryFolder: DefaultSetupSecondaryFolder): SetupSecondaryFolder
 
     /**
      * Provide the [SetupDefaultSecondaryFolder] implementation

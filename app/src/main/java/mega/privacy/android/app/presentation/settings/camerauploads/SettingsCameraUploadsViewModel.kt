@@ -32,7 +32,6 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -55,6 +54,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -98,7 +98,7 @@ import javax.inject.Inject
  * @property setVideoCompressionSizeLimitUseCase Sets the maximum video file size that can be compressed
  * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolderUseCase Sets up the Primary Folder of Camera Uploads
- * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
+ * @property setupSecondaryFolderUseCase Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadUseCase Stop the camera upload
  * @property rescheduleCameraUploadUseCase Reschedule the camera upload
@@ -138,7 +138,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
-    private val setupSecondaryFolder: SetupSecondaryFolder,
+    private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
@@ -299,7 +299,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setupSecondaryCameraUploadFolder(secondaryHandle: Long) {
         viewModelScope.launch {
-            setupSecondaryFolder(secondaryHandle)
+            setupSecondaryFolderUseCase(secondaryHandle)
         }
     }
 

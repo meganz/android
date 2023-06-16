@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -49,6 +48,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
@@ -106,7 +106,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setupPrimaryFolderUseCase = mock<SetupPrimaryFolderUseCase>()
-    private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
+    private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
@@ -161,7 +161,7 @@ class SettingsCameraUploadsViewModelTest {
             setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setupPrimaryFolderUseCase = setupPrimaryFolderUseCase,
-            setupSecondaryFolder = setupSecondaryFolder,
+            setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
             rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
@@ -640,7 +640,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.setupSecondaryCameraUploadFolder(testHandle)
 
-            verify(setupSecondaryFolder, times(1)).invoke(testHandle)
+            verify(setupSecondaryFolderUseCase, times(1)).invoke(testHandle)
         }
 
     @Test
