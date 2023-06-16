@@ -316,7 +316,11 @@ internal class DefaultImageRepository @Inject constructor(
 
     override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
         withContext(ioDispatcher) {
-            getImageNode { megaApiGateway.getMegaNodeByHandle(handle) }
+            getImageNode {
+                megaApiGateway.getMegaNodeByHandle(handle)
+                    ?: megaApiFolderGateway.getMegaNodeByHandle(handle)
+                        ?.let { megaApiFolderGateway.authorizeNode(it) }
+            }
         }
 
     override suspend fun getImageNodeForPublicLink(nodeFileLink: String): ImageNode =
@@ -371,7 +375,7 @@ internal class DefaultImageRepository @Inject constructor(
             val chatRoom = megaChatApiGateway.getChatRoom(chatRoomId)
 
             if (chatRoom?.isPreview == true) {
-                megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken)
+                megaApiGateway.authorizeChatNode(node, chatRoom.authorizationToken) ?: node
             } else {
                 node
             }
