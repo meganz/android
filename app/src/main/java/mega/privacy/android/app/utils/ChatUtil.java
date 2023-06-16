@@ -114,7 +114,7 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
-import mega.privacy.android.data.model.ChatSettings;
+import mega.privacy.android.domain.entity.settings.ChatSettings;
 import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;

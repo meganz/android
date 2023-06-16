@@ -40,7 +40,7 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
-import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -53,6 +53,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -1738,11 +1739,12 @@ class SqliteDatabaseHandler @Inject constructor(
                     val sendOriginalAttachments = decrypt(cursor.getString(6))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(
-                        notificationSound,
-                        vibrationEnabled,
-                        videoQuality
-                    )
+                    chatSettings =
+                        ChatSettings(
+                            notificationSound.orEmpty(),
+                            vibrationEnabled ?: VIBRATION_ON,
+                            videoQuality
+                        )
                 }
             }
         } catch (e: Exception) {
@@ -1770,11 +1772,12 @@ class SqliteDatabaseHandler @Inject constructor(
                     val sendOriginalAttachments = decrypt(cursor.getString(4))
                     val videoQuality =
                         if (sendOriginalAttachments.toBoolean()) VideoQuality.ORIGINAL.value.toString() else VideoQuality.MEDIUM.value.toString()
-                    chatSettings = ChatSettings(
-                        notificationSound,
-                        vibrationEnabled,
-                        videoQuality
-                    )
+                    chatSettings =
+                        ChatSettings(
+                            notificationSound.orEmpty(),
+                            vibrationEnabled ?: VIBRATION_ON,
+                            videoQuality
+                        )
                 }
             }
         } catch (e: Exception) {
@@ -1814,11 +1817,12 @@ class SqliteDatabaseHandler @Inject constructor(
                     val notificationSound = decrypt(cursor.getString(2))
                     val vibrationEnabled = decrypt(cursor.getString(3))
                     val videoQuality = decrypt(cursor.getString(4))
-                    chatSettings = ChatSettings(
-                        notificationSound,
-                        vibrationEnabled,
-                        videoQuality
-                    )
+                    chatSettings =
+                        ChatSettings(
+                            notificationSound.orEmpty(),
+                            vibrationEnabled ?: VIBRATION_ON,
+                            videoQuality ?: VideoQuality.MEDIUM.value.toString()
+                        )
                 }
             }
         } catch (e: Exception) {

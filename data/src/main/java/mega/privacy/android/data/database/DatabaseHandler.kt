@@ -1,7 +1,7 @@
 package mega.privacy.android.data.database
 
 import android.database.sqlite.SQLiteDatabase
-import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo

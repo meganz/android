@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
@@ -374,4 +375,16 @@ interface ChatRepository {
      * @return The [ChatMessage] object, or NULL if not found.
      */
     suspend fun getMessageFromNodeHistory(chatId: Long, msgId: Long): ChatMessage?
+
+    /**
+     * Gets chat message notification behaviour.
+     *
+     * @param beep Push notification flag indicating if the notification should beep or not.
+     * @param defaultSound Default device sound.
+     * @return [NotificationBehaviour]
+     */
+    suspend fun getChatMessageNotificationBehaviour(
+        beep: Boolean,
+        defaultSound: String,
+    ): NotificationBehaviour
 }

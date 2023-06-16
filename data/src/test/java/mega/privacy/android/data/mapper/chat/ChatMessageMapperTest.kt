@@ -96,7 +96,7 @@ class ChatMessageMapperTest {
             rowId = megaChatMessage.rowId
         )
         assertEquals(
-            ChatMessageMapper(ChatPermissionsMapper()).invoke(megaChatMessage),
+            underTest.invoke(megaChatMessage),
             chatMessage
         )
     }

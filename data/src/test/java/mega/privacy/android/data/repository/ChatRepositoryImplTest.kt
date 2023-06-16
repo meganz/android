@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ConnectionState
@@ -67,6 +68,7 @@ class ChatRepositoryImplTest {
     private val chatConnectionStatusMapper = ChatConnectionStatusMapper()
     private val connectionStateMapper = ConnectionStateMapper()
     private val chatMessageMapper = ChatMessageMapper(ChatPermissionsMapper())
+    private val chatMessageNotificationBehaviourMapper = ChatMessageNotificationBehaviourMapper()
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
     private val userEmail = "test@email.com"
@@ -92,6 +94,7 @@ class ChatRepositoryImplTest {
             chatRoomMapper = chatRoomMapper,
             combinedChatRoomMapper = combinedChatRoomMapper,
             chatListItemMapper = chatListItemMapper,
+            chatMessageNotificationBehaviourMapper = chatMessageNotificationBehaviourMapper,
             sharingScope = sharingScope,
             ioDispatcher = testDispatcher,
             deviceEventGateway = deviceEventGateway,

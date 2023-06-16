@@ -16,7 +16,9 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.data.model.ChatSettings
+import mega.privacy.android.domain.entity.settings.ChatSettings
+import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_OFF
+import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import timber.log.Timber
 
 /**
@@ -106,7 +108,7 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
         val isVibrationEnabled =
             chatSettings?.vibrationEnabled == null || chatSettings?.vibrationEnabled.toBoolean()
         dbH.setVibrationEnabledChat(isVibrationEnabled.toString())
-        chatSettings?.vibrationEnabled = isVibrationEnabled.toString()
+        chatSettings = chatSettings?.copy(vibrationEnabled = isVibrationEnabled.toString())
         chatVibrateSwitch?.isChecked = isVibrationEnabled
         if (TextUtil.isTextEmpty(chatSettings?.notificationsSound)) {
             val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(
@@ -179,11 +181,11 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
                 if (chatSettings?.vibrationEnabled == null
                     || chatSettings?.vibrationEnabled.toBoolean()
                 ) {
-                    dbH.setVibrationEnabledChat(false.toString())
-                    chatSettings?.vibrationEnabled = false.toString()
+                    dbH.setVibrationEnabledChat(VIBRATION_OFF)
+                    chatSettings = chatSettings?.copy(vibrationEnabled = VIBRATION_OFF)
                 } else {
-                    dbH.setVibrationEnabledChat(true.toString())
-                    chatSettings!!.vibrationEnabled = true.toString()
+                    dbH.setVibrationEnabledChat(VIBRATION_ON)
+                    chatSettings = chatSettings?.copy(vibrationEnabled = VIBRATION_ON)
                 }
             KEY_CHAT_SOUND ->
                 (context as? ChatNotificationsPreferencesActivity)
@@ -212,10 +214,10 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
         }
         if (chatSettings == null) {
             chatSettings = ChatSettings()
-            chatSettings?.notificationsSound = chosenSound
+            chatSettings = chatSettings?.copy(notificationsSound = chosenSound)
             dbH.chatSettings = chatSettings
         } else {
-            chatSettings?.notificationsSound = chosenSound
+            chatSettings = chatSettings?.copy(notificationsSound = chosenSound)
             dbH.setNotificationSoundChat(chosenSound)
         }
     }

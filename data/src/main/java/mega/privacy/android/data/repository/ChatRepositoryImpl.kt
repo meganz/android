@@ -31,8 +31,8 @@ import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.notification.ChatMessageNotificationBehaviourMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
-import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.ChatRequest
@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
@@ -90,6 +91,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatConnectionStatusMapper: ChatConnectionStatusMapper,
     private val connectionStateMapper: ConnectionStateMapper,
     private val chatMessageMapper: ChatMessageMapper,
+    private val chatMessageNotificationBehaviourMapper: ChatMessageNotificationBehaviourMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val deviceEventGateway: DeviceEventGateway,
@@ -560,4 +562,15 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaChatApiGateway.getMessageFromNodeHistory(chatId, msgId)
                 ?.let { chatMessageMapper(it) }
         }
+
+    override suspend fun getChatMessageNotificationBehaviour(
+        beep: Boolean,
+        defaultSound: String,
+    ) = withContext(ioDispatcher) {
+        chatMessageNotificationBehaviourMapper(
+            localStorageGateway.getChatSettings(),
+            beep,
+            defaultSound
+        )
+    }
 }
