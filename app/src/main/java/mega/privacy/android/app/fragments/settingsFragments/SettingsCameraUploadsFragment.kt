@@ -626,8 +626,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         if (isCameraUploadsEnabled) {
             Timber.d("Camera Uploads ON")
             cameraUploadOnOff?.isChecked = true
-            megaCameraFolder?.summary = camSyncMegaPath
-            megaSecondaryFolder?.summary = megaPathSecMediaFolder
+            secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
+
+            megaCameraFolder?.let {
+                it.summary = camSyncMegaPath
+                preferenceScreen.addPreference(it)
+            }
 
             checkSecondaryMediaFolder()
         } else {
@@ -1369,8 +1373,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         dbH.setCamSyncEnabled(true)
 
         cameraUploadOnOff?.isChecked = true
-        megaCameraFolder?.let { preferenceScreen.addPreference(it) }
-        secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
 
         // Configured to prevent Camera Uploads from rapidly being switched on/off.
         // After setting the Backup, it will be re-enabled
