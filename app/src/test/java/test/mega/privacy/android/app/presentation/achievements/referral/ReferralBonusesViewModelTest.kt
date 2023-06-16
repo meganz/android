@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesViewModel
+import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
@@ -57,7 +58,7 @@ class ReferralBonusesViewModelTest {
                 awardedAchievements = listOf(
                     AwardedAchievementInvite(
                         awardId = 1,
-                        expirationInDays = expirationInDays,
+                        expirationTimestampInSeconds = expirationInDays,
                         rewardedStorageInBytes = reward100Mb,
                         rewardedTransferInBytes = reward100Mb,
                         referredEmails = emails
@@ -70,7 +71,7 @@ class ReferralBonusesViewModelTest {
         )
     }
     private val referralBonusAchievementsMapper: ReferralBonusAchievementsMapper =
-        ReferralBonusAchievementsMapper()
+        ReferralBonusAchievementsMapper(NumberOfDaysMapper())
 
     @BeforeAll
     fun setup() {
@@ -103,7 +104,7 @@ class ReferralBonusesViewModelTest {
                 assertThat(achievements.awardId).isEqualTo(1)
                 assertThat(achievements.referredName).isEqualTo(name)
                 assertThat(achievements.referredAvatarUri).isNull()
-                assertThat(achievements.expirationInDays).isEqualTo(expirationInDays)
+                assertThat(achievements.expirationTimestampInSeconds).isEqualTo(expirationInDays)
                 assertThat(achievements.rewardedStorageInBytes).isEqualTo(reward100Mb)
                 assertThat(achievements.rewardedTransferInBytes).isEqualTo(reward100Mb)
                 assertThat(achievements.referredEmails).isEqualTo(emails)

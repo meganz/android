@@ -159,13 +159,13 @@ private fun ReferralListItem(
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end, 10.dp)
                 },
-            text = if (data.expirationInDays > 0) {
+            text = if (data.expirationTimestampInSeconds > 0) {
                 stringResource(R.string.general_num_days_left, data.expirationInDays)
             } else {
                 stringResource(id = R.string.expired_label)
             },
             style = MaterialTheme.typography.body2,
-            color = if (data.expirationInDays <= 15) red_800 else grey_500
+            color = if (data.expirationTimestampInSeconds <= 15) red_800 else grey_500
         )
         Divider(
             modifier = Modifier
@@ -194,8 +194,9 @@ private fun ReferralBonusViewPreview() {
                     ReferralBonusAchievements(
                         referredAvatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
                         referredName = "Qwerty Uiop",
+                        expirationInDays = 1,
                         awardId = 1,
-                        expirationInDays = 100,
+                        expirationTimestampInSeconds = 100,
                         rewardedStorageInBytes = 51283102,
                         rewardedTransferInBytes = 12381273,
                         referredEmails = listOf("qwerty@uiop.com")

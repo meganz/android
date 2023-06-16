@@ -77,8 +77,9 @@ class ReferralBonusViewTest {
         return ReferralBonusAchievements(
             referredAvatarUri = "",
             referredName = name,
-            awardId = 1,
             expirationInDays = expirationInDays,
+            awardId = 1,
+            expirationTimestampInSeconds = 12312312,
             rewardedStorageInBytes = oneHundredMbInBytes,
             rewardedTransferInBytes = oneHundredMbInBytes,
             referredEmails = listOf(email)

@@ -88,7 +88,7 @@ class InfoAchievementsFragment : Fragment() {
             ?.let { award ->
                 awardId = award.awardId
                 Timber.d("AWARD ID: %d", award.awardId)
-                val daysLeft = award.expirationInDays
+                val daysLeft = award.expirationTimestampInSeconds
                 val start = Util.calculateDateFromTimestamp(daysLeft)
                 val end = Calendar.getInstance()
                 val startTime = start.timeInMillis

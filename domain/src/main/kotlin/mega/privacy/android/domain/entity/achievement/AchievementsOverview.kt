@@ -42,8 +42,9 @@ data class Achievement(
  *
  * @property awardId Id of the award
  * @property type Type of the achievement
- * @property expirationInDays After this moment, the storage and transfer quota granted.
- * as result of the award will not be valid anymore. For example "expirationInDays = 5" is 5 days.
+ * @property expirationTimestampInSeconds After this moment, the storage and transfer quota granted.
+ * as result of the award will not be valid anymore. For example "expirationTimestampInDays = 86400" is 1 day.
+ * 1 day = 86400 seconds
  * No timestamp conversion needed
  * @property rewardedStorageInBytes The storage rewarded by the award
  * @property rewardedTransferInBytes The transfer quota rewarded by the award
@@ -51,7 +52,7 @@ data class Achievement(
 open class AwardedAchievement(
     open val awardId: Int,
     open val type: AchievementType,
-    open val expirationInDays: Long,
+    open val expirationTimestampInSeconds: Long,
     open val rewardedStorageInBytes: Long,
     open val rewardedTransferInBytes: Long,
 )
@@ -64,20 +65,20 @@ open class AwardedAchievement(
  */
 open class AwardedAchievementInvite(
     override val awardId: Int,
-    override val expirationInDays: Long,
+    override val expirationTimestampInSeconds: Long,
     override val rewardedStorageInBytes: Long,
     override val rewardedTransferInBytes: Long,
     open val referredEmails: List<String>,
 ) : AwardedAchievement(
     awardId,
     AchievementType.MEGA_ACHIEVEMENT_INVITE,
-    expirationInDays,
+    expirationTimestampInSeconds,
     rewardedStorageInBytes,
     rewardedTransferInBytes
 ) {
     constructor(awardedAchievement: AwardedAchievement, referredEmails: List<String>) : this(
         awardId = awardedAchievement.awardId,
-        expirationInDays = awardedAchievement.expirationInDays,
+        expirationTimestampInSeconds = awardedAchievement.expirationTimestampInSeconds,
         rewardedStorageInBytes = awardedAchievement.rewardedStorageInBytes,
         rewardedTransferInBytes = awardedAchievement.rewardedTransferInBytes,
         referredEmails = referredEmails
@@ -88,19 +89,21 @@ open class AwardedAchievementInvite(
  * Extension class to include
  * @property referredAvatarUri the uri / path to the avatar file
  * @property referredName name / full name of the contact which awarded you the achievements
+ * @property expirationInDays the number of days left to an expired referral bonus
  * This class is only an extension to modify the existing [AwardedAchievementInvite]
  */
 data class ReferralBonusAchievements(
     val referredAvatarUri: String? = null,
     val referredName: String? = null,
+    val expirationInDays: Long,
     override val awardId: Int,
-    override val expirationInDays: Long,
+    override val expirationTimestampInSeconds: Long,
     override val rewardedStorageInBytes: Long,
     override val rewardedTransferInBytes: Long,
     override val referredEmails: List<String>,
 ) : AwardedAchievementInvite(
     awardId,
-    expirationInDays,
+    expirationTimestampInSeconds,
     rewardedStorageInBytes,
     rewardedTransferInBytes,
     referredEmails

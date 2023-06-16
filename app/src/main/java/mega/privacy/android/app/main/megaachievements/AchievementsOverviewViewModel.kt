@@ -84,7 +84,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.registrationAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_WELCOME
-        }?.expirationInDays?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getDaysLeft()
 
     private fun AchievementsOverview.registrationAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -99,7 +99,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.installDesktopAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
-        }?.expirationInDays?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getDaysLeft()
 
     private fun AchievementsOverview.installDesktopAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -109,7 +109,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.addPhoneAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
-        }?.expirationInDays?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getDaysLeft()
 
     private fun AchievementsOverview.addPhoneAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -119,7 +119,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.installAppAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
-        }?.expirationInDays?.getDaysLeft()
+        }?.expirationTimestampInSeconds?.getDaysLeft()
 
     private fun AchievementsOverview.installAppAwardStorage() =
         this.awardedAchievements.firstOrNull {
@@ -151,7 +151,7 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun AchievementsOverview.areAllRewardsExpired(): Boolean {
         var expiredAwardCount = 0
         this.awardedAchievements.forEach { award ->
-            if (award is AwardedAchievementInvite && award.expirationInDays.getDaysLeft() < 0) {
+            if (award is AwardedAchievementInvite && award.expirationTimestampInSeconds.getDaysLeft() < 0) {
                 expiredAwardCount++
             } else {
                 Timber.d("Type of achievement: ${award.type}")

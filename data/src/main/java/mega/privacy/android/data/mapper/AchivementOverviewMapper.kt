@@ -59,7 +59,7 @@ private fun convertAllAwards(megaAchievementsDetails: MegaAchievementsDetails): 
                 AwardedAchievement(
                     awardId = awardId,
                     type = type,
-                    expirationInDays = megaAchievementsDetails.getAwardExpirationTs(index),
+                    expirationTimestampInSeconds = megaAchievementsDetails.getAwardExpirationTs(index),
                     rewardedStorageInBytes = megaAchievementsDetails.getRewardStorageByAwardId(
                         awardId
                     ),
