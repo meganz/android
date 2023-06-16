@@ -233,7 +233,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             }
 
             binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));
-
+            binding.setIsFromFolderLink(type == FOLDER_LINK_ADAPTER);
+            
             if (type == FOLDER_LINK_ADAPTER) {
                 binding.sortByLayout.setVisibility(View.GONE);
                 setFolderLinkMediaDiscoveryVisibility(binding);

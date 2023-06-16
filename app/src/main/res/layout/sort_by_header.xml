@@ -10,6 +10,10 @@
             type="int" />
 
         <variable
+            name="isFromFolderLink"
+            type="boolean" />
+
+        <variable
             name="sortByHeaderViewModel"
             type="mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel" />
     </data>
@@ -46,36 +50,36 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:src="@drawable/ic_down"
-                app:tint="?android:attr/textColorSecondary"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/sorted_by"/>
+                app:layout_constraintStart_toEndOf="@id/sorted_by"
+                app:tint="?android:attr/textColorSecondary" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
             android:id="@+id/enter_media_discovery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_marginEnd="12dp"
-            android:onClick="@{() -> sortByHeaderViewModel.enterMediaDiscovery()}"
+            android:onClick="@{() -> sortByHeaderViewModel.enterMediaDiscovery(isFromFolderLink)}"
+            android:padding="10dp"
             android:src="@drawable/ic_media_discovery"
-            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/list_mode_switch"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorSecondary" />
 
         <ImageView
             android:id="@+id/list_mode_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_marginEnd="12dp"
             android:onClick="@{() -> sortByHeaderViewModel.switchViewType()}"
+            android:padding="10dp"
             android:src="@{sortByHeaderViewModel.isListView() ? @drawable/ic_grid_view_new : @drawable/ic_list_view_new}"
-            app:tint="?android:attr/textColorSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?android:attr/textColorSecondary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

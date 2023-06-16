@@ -626,8 +626,8 @@ class FileBrowserFragment : RotatableFragment() {
             hideMultipleSelect()
         })
 
-        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
-            .observe(this) { showMediaDiscovery(true) }
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Boolean::class.java)
+            .observe(this) { isFromFolderLink -> if (!isFromFolderLink) showMediaDiscovery(true) }
     }
 
     /**
