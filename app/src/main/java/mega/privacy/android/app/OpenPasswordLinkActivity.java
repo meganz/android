@@ -67,7 +67,6 @@ public class OpenPasswordLinkActivity extends PasscodeActivity
         Timber.d("askForPasswordDialog");
 
         new DecryptAlertDialog.Builder()
-                .setListener(this)
                 .setTitle(getString(R.string.hint_set_password_protection_dialog))
                 .setPosText(R.string.general_decryp)
                 .setNegText(R.string.general_cancel)

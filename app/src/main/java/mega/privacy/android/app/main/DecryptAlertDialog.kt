@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main
 
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
@@ -25,14 +27,6 @@ import mega.privacy.android.app.utils.Util
  * If the decryption failed, an indication of wrong passphrase would show.
  */
 class DecryptAlertDialog : DialogFragment() {
-    private var mKey: String? = null
-    private var mListener: DecryptDialogListener? = null
-    private var mTitle: String? = null
-    private var mMessage: String? = null
-    private var mPosStringId = 0
-    private var mNegStringId = 0
-    private var mErrorStringId = 0
-    private var mShownPassword = false
 
     private lateinit var binding: DialogErrorHintBinding
 
@@ -58,7 +52,6 @@ class DecryptAlertDialog : DialogFragment() {
      * Builder class to build a dialog
      */
     class Builder {
-        private var listener: DecryptDialogListener? = null
         private var title: String? = null
         private var message: String? = null
         private var posStringId = 0
@@ -66,17 +59,6 @@ class DecryptAlertDialog : DialogFragment() {
         private var errorStringId = 0
         private var key: String? = null
         private var shownPassword = false
-
-        /**
-         * Set the dialog listener.
-         *
-         * @param listener Listener can be null
-         * @return the updated instance of Builder
-         */
-        fun setListener(listener: DecryptDialogListener?): Builder {
-            this.listener = listener
-            return this
-        }
 
         /**
          * Set title of dialog
@@ -154,15 +136,23 @@ class DecryptAlertDialog : DialogFragment() {
          * @return instance of the dialog
          */
         fun build(): DecryptAlertDialog = DecryptAlertDialog().apply {
-            mListener = listener
-            mTitle = title
-            mMessage = message
-            mPosStringId = posStringId
-            mNegStringId = negStringId
-            mErrorStringId = errorStringId
-            mKey = key
-            mShownPassword = shownPassword
+            arguments = bundleOf(
+                EXTRA_KEY to key,
+                EXTRA_MESSAGE to message,
+                EXTRA_TITLE to title,
+                EXTRA_ERROR_STRING_ID to errorStringId,
+                EXTRA_SHOW_PASSWORD to shownPassword,
+                EXTRA_NEGATIVE_STRING_ID to negStringId,
+                EXTRA_POSITIVE_STRING_ID to posStringId
+            )
         }
+    }
+
+    private lateinit var listener: DecryptDialogListener
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = (activity as? DecryptDialogListener)
+            ?: throw NullPointerException("Host activity need implement DecryptDialogListener")
     }
 
     /**
@@ -170,44 +160,56 @@ class DecryptAlertDialog : DialogFragment() {
      */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = MaterialAlertDialogBuilder(
-            requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+            requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
         binding = DialogErrorHintBinding.inflate(requireActivity().layoutInflater)
+        val title = requireArguments().getString(EXTRA_TITLE)
+        val message = requireArguments().getString(EXTRA_MESSAGE)
+        val key = requireArguments().getString(EXTRA_KEY)
+        val isShowPassword = requireArguments().getBoolean(EXTRA_SHOW_PASSWORD)
+        val positiveStringId = requireArguments().getInt(EXTRA_POSITIVE_STRING_ID)
+        val negativeStringId = requireArguments().getInt(EXTRA_NEGATIVE_STRING_ID)
+        val errorStringId = requireArguments().getInt(EXTRA_ERROR_STRING_ID)
         builder
-            .setTitle(mTitle)
+            .setTitle(title)
             .setView(binding.root)
             .setOnKeyListener { _: DialogInterface?, keyCode: Int, event: KeyEvent ->
                 if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP) {
-                    mListener?.let {
+                    listener.let {
                         it.onDialogNegativeClick()
                         return@setOnKeyListener true
                     }
                 }
                 false
             }
-            .setMessage(mMessage)
-            .setPositiveButton(mPosStringId, null)
-            .setNegativeButton(mNegStringId, null)
+            .setMessage(message)
+            .setPositiveButton(positiveStringId, null)
+            .setNegativeButton(negativeStringId, null)
         binding.text.setSingleLine()
 
         val editor = binding.text
-        if (mShownPassword) {
+        if (isShowPassword) {
             editor.inputType =
                 editor.inputType or EditorInfo.TYPE_TEXT_VARIATION_PASSWORD
         }
-        binding.errorText.setText(mErrorStringId)
-        if (mKey.isNullOrEmpty()) {
+        binding.errorText.setText(errorStringId)
+        if (key.isNullOrEmpty()) {
             editor.hint = getString(R.string.password_text)
-            editor.setTextColor(getThemeColor(requireContext(),
-                android.R.attr.textColorPrimary))
+            editor.setTextColor(
+                getThemeColor(
+                    requireContext(),
+                    android.R.attr.textColorPrimary
+                )
+            )
         } else {
-            showErrorMessage()
+            showErrorMessage(key)
         }
         editor.imeOptions = EditorInfo.IME_ACTION_DONE
         editor.setImeActionLabel(getString(R.string.general_ok), EditorInfo.IME_ACTION_DONE)
         editor.setOnEditorActionListener(TextView.OnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 if (validateInput()) {
-                    mListener?.onDialogPositiveClick(mKey)
+                    listener.onDialogPositiveClick(key)
                 }
                 dismiss()
                 return@OnEditorActionListener true
@@ -229,20 +231,20 @@ class DecryptAlertDialog : DialogFragment() {
         // the dialog from dismissing automatically on clicking the buttons
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
             if (validateInput()) {
-                mListener?.onDialogPositiveClick(mKey)
+                listener.onDialogPositiveClick(binding.text.text.toString())
                 dismiss()
             }
         }
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
-            mListener?.onDialogNegativeClick()
+            listener.onDialogNegativeClick()
         }
         Util.showKeyboardDelayed(binding.text)
         return dialog
     }
 
-    private fun showErrorMessage() {
+    private fun showErrorMessage(key: String) {
         with(binding.text) {
-            setText(mKey)
+            setText(key)
             setSelectAllOnFocus(true)
             setErrorAwareInputAppearance(this, true)
         }
@@ -255,10 +257,9 @@ class DecryptAlertDialog : DialogFragment() {
     }
 
     private fun validateInput(): Boolean {
-        mKey = binding.text.text.toString()
-        if (mKey.isNullOrEmpty()) {
-            mKey = ""
-            showErrorMessage()
+        val key = binding.text.text.toString()
+        if (key.isEmpty()) {
+            showErrorMessage(key)
             return false
         }
         return true
@@ -270,5 +271,15 @@ class DecryptAlertDialog : DialogFragment() {
     override fun onResume() {
         super.onResume()
         Util.showKeyboardDelayed(binding.text)
+    }
+
+    companion object {
+        private const val EXTRA_KEY = "key"
+        private const val EXTRA_TITLE = "title"
+        private const val EXTRA_MESSAGE = "message"
+        private const val EXTRA_POSITIVE_STRING_ID = "positive_string_id"
+        private const val EXTRA_NEGATIVE_STRING_ID = "negative_string_id"
+        private const val EXTRA_ERROR_STRING_ID = "error_string_id"
+        private const val EXTRA_SHOW_PASSWORD = "show_password"
     }
 }
