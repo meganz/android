@@ -3,6 +3,7 @@
 package mega.privacy.android.app.main
 
 import com.google.android.material.R as MaterialR
+import mega.privacy.android.core.R as CoreUiR
 import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -29,7 +30,6 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
 import android.text.Editable
-import android.text.Html
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.Display
@@ -113,7 +113,6 @@ import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.OpenPasswordLinkActivity
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
@@ -140,7 +139,6 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
@@ -200,6 +198,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
@@ -335,8 +334,6 @@ import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.TransfersStatus
-import mega.privacy.android.domain.entity.contacts.ContactRequest
-import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
@@ -1473,14 +1470,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun registerViewModelObservers() {
-        viewModel.updateUserAlerts.observe(this,
-            EventObserver {
-                updateUserAlerts()
-            })
-        viewModel.updateContactsRequests.observe(this,
-            EventObserver { contactRequests: List<ContactRequest>? ->
-                updateContactRequests(contactRequests)
-            })
         collectFlows()
         viewModel.onGetNumUnreadUserAlerts().observe(
             this
@@ -1799,7 +1788,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             setChatBadge()
             Timber.d("Check if there any INCOMING pendingRequest contacts")
-            setContactTitleSection()
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
             val firstLaunch =
                 intent?.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false) == true
@@ -2389,6 +2377,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         collectFlow(targetFlow = viewModel.monitorOfflineNodeAvailabilityEvent) {
             refreshCloudOrder()
+        }
+        collectFlow(viewModel.incomingContactRequests) { pendingRequest ->
+            setContactTitleSection(pendingRequest.size)
         }
     }
 
@@ -3622,7 +3613,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun updateNavigationToolbarIcon(numUnreadUserAlerts: Int) {
-        val totalIncomingContactRequestCount = viewModel.incomingContactRequests.size
+        val totalIncomingContactRequestCount = viewModel.incomingContactRequests.value.size
         val totalNotifications = numUnreadUserAlerts + totalIncomingContactRequestCount
         if (totalNotifications == 0) {
             if (isFirstNavigationLevel) {
@@ -7916,7 +7907,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         viewModel.updateInboxSectionVisibility()
         contactsSection.isEnabled = false
         contactsSectionText.alpha = 0.38f
-        setContactTitleSection()
         notificationsSection.isEnabled = false
         notificationsSectionText.alpha = 0.38f
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
@@ -7963,7 +7953,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         viewModel.updateInboxSectionVisibility()
         contactsSection.isEnabled = true
         contactsSectionText.alpha = 1f
-        setContactTitleSection()
         notificationsSection.isEnabled = true
         notificationsSectionText.alpha = 1f
         viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
@@ -9132,10 +9121,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun updateUserAlerts() {
-        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON)
-    }
-
     fun onNodesCloudDriveUpdate() {
         Timber.d("onNodesCloudDriveUpdate")
         refreshRubbishBin()
@@ -9183,27 +9168,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("onNodesSharedUpdate")
         refreshSharesFragments()
         refreshSharesPageAdapter()
-    }
-
-    private fun updateContactRequests(requests: List<ContactRequest>?) {
-        Timber.d("onContactRequestsUpdate")
-        requests?.forEach { req ->
-            if (req.isOutgoing) {
-                Timber.d("SENT REQUEST")
-                Timber.d("STATUS: %s, Contact Handle: %d", req.status, req.handle)
-                if (req.status === ContactRequestStatus.Accepted) {
-                    viewModel.addNewContact(req.targetEmail)
-                }
-            } else {
-                Timber.d("RECEIVED REQUEST")
-                setContactTitleSection()
-                Timber.d("STATUS: %s Contact Handle: %d", req.status, req.handle)
-                if (req.status === ContactRequestStatus.Accepted) {
-                    viewModel.addNewContact(req.sourceEmail)
-                }
-            }
-        }
-        viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
     }
 
     /**
@@ -9517,12 +9481,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun setContactTitleSection() {
-        val pendingRequest = viewModel.incomingContactRequests
-        if (pendingRequest.isEmpty()) {
+    private fun setContactTitleSection(pendingRequestCount: Int) {
+        if (pendingRequestCount == 0) {
             contactsSectionText.text = getString(R.string.section_contacts)
         } else {
-            setFormattedContactTitleSection(pendingRequest.size, true)
+            contactsSectionText.text =
+                getString(R.string.section_contacts_with_notification, pendingRequestCount)
+                    .spanABTextFontColour(
+                        this,
+                        ColorUtils.getColorHexString(this, R.color.red_600_red_300)
+                    )
         }
     }
 
@@ -9570,56 +9538,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
 
-    private fun setFormattedContactTitleSection(pendingRequest: Int, enable: Boolean) {
-        var textToShow =
-            String.format(getString(R.string.section_contacts_with_notification), pendingRequest)
-        try {
-            textToShow = if (enable) {
-                textToShow.replace(
-                    "[A]",
-                    "<font color=\'" + ColorUtils.getColorHexString(
-                        this,
-                        R.color.red_600_red_300
-                    ) + "\'>"
-                )
-            } else {
-                textToShow.replace("[A]", "<font color=\'#ffcccc\'>")
-            }
-            textToShow = textToShow.replace("[/A]", "</font>")
-        } catch (e: Exception) {
-            Timber.e(e, "Formatted string: %s", textToShow)
-        }
-        val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-        contactsSectionText.text = result
-    }
-
     private fun setNotificationsTitleSection(unread: Int) {
         if (unread == 0) {
             notificationsSectionText.text =
                 getString(R.string.title_properties_chat_contact_notifications)
         } else {
-            setFormattedNotificationsTitleSection(unread, true)
+            notificationsSectionText.text =
+                getString(R.string.section_notification_with_unread, unread)
+                    .spanABTextFontColour(
+                        this,
+                        ColorUtils.getColorHexString(this, R.color.red_600_red_300)
+                    )
         }
-    }
-
-    private fun setFormattedNotificationsTitleSection(unread: Int, enable: Boolean) {
-        var textToShow = String.format(getString(R.string.section_notification_with_unread), unread)
-        try {
-            textToShow = if (enable) {
-                textToShow.replace(
-                    "[A]", "<font color=\'"
-                            + ColorUtils.getColorHexString(this, R.color.red_600_red_300)
-                            + "\'>"
-                )
-            } else {
-                textToShow.replace("[A]", "<font color=\'#ffcccc\'>")
-            }
-            textToShow = textToShow.replace("[/A]", "</font>")
-        } catch (e: Exception) {
-            Timber.e(e, "Formatted string: %s", textToShow)
-        }
-        val result = Html.fromHtml(textToShow, Html.FROM_HTML_MODE_LEGACY)
-        notificationsSectionText.text = result
     }
 
     private fun setChatBadge() {

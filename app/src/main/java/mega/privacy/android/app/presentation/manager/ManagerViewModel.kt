@@ -1,14 +1,13 @@
 package mega.privacy.android.app.presentation.manager
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -17,18 +16,15 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -42,6 +38,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
+import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -80,7 +77,6 @@ import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatu
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -214,11 +210,12 @@ class ManagerViewModel @Inject constructor(
      */
     val monitorOfflineNodeAvailabilityEvent = monitorOfflineNodeAvailabilityUseCase()
 
+    private val _incomingContactRequests = MutableStateFlow<List<ContactRequest>>(emptyList())
+
     /**
      * The latest incoming contact requests
      */
-    var incomingContactRequests = emptyList<ContactRequest>()
-        private set
+    val incomingContactRequests = _incomingContactRequests.asStateFlow()
 
     /**
      * Is network connected
@@ -302,7 +299,7 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            incomingContactRequests = getIncomingContactRequestsUseCase()
+            updateIncomingContactRequests()
         }
 
         viewModelScope.launch {
@@ -318,6 +315,24 @@ class ManagerViewModel @Inject constructor(
                     it.getOrDefault(NodeId(-1L))
                 }.collectLatest { backupsFolderNodeId ->
                     MegaNodeUtil.myBackupHandle = backupsFolderNodeId.longValue
+                }
+        }
+        viewModelScope.launch {
+            monitorContactRequestUpdates()
+                .collect {
+                    Timber.d("Contact Request Updates")
+                    updateIncomingContactRequests()
+                    updateContactRequests(it)
+                }
+        }
+        @Suppress("DEPRECATION")
+        viewModelScope.launch {
+            monitorGlobalUpdates()
+                .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
+                .collect {
+                    Timber.d("onUserAlertsUpdate")
+                    updateIncomingContactRequests()
+                    checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE_AND_TOOLBAR_ICON)
                 }
         }
     }
@@ -354,39 +369,16 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
-     * Monitor all global updates
-     */
-    @Suppress("DEPRECATION")
-    private val _updates = monitorGlobalUpdates()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    /**
-     * Monitor contact requests
-     */
-    private val _updateContactRequests = monitorContactRequestUpdates()
-        .onEach { updateIncomingContactRequests() }
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    /**
      * Cache up-to-date incoming contact requests in view model
      */
-    private fun updateIncomingContactRequests() {
-        runBlocking {
-            incomingContactRequests = getIncomingContactRequestsUseCase()
-        }
+    private suspend fun updateIncomingContactRequests() {
+        runCatching { getIncomingContactRequestsUseCase() }
+            .onSuccess { requests ->
+                _incomingContactRequests.update { requests }
+            }.onFailure {
+                Timber.e(it)
+            }
     }
-
-    /**
-     * Monitor user alerts updates and dispatch to observers
-     */
-    val updateUserAlerts: LiveData<Event<List<MegaUserAlert>>> =
-        _updates
-            .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
-            .also { Timber.d("onUserAlertsUpdate") }
-            .onEach { updateIncomingContactRequests() }
-            .mapNotNull { it.userAlerts?.toList() }
-            .map { Event(it) }
-            .asLiveData()
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
@@ -395,15 +387,6 @@ class ManagerViewModel @Inject constructor(
                 ?.run { updateInboxSectionVisibility() }
         }
     }
-
-    /**
-     * Monitor contact request updates and dispatch to observers
-     */
-    val updateContactsRequests: LiveData<Event<List<ContactRequest>>> =
-        _updateContactRequests
-            .also { Timber.d("onContactRequestsUpdate") }
-            .map { Event(it) }
-            .asLiveData()
 
     /**
      * Set a flag to know if the current navigation level is the first one
@@ -682,7 +665,7 @@ class ManagerViewModel @Inject constructor(
      *
      * @param email
      */
-    fun addNewContact(email: String?) {
+    private fun addNewContact(email: String?) {
         if (email.isNullOrEmpty()) return
         viewModelScope.launch {
             runCatching {
@@ -759,6 +742,26 @@ class ManagerViewModel @Inject constructor(
      */
     fun markHandleNodeNameCollisionResult() {
         _state.update { it.copy(nodeNameCollisionResult = null) }
+    }
+
+    private fun updateContactRequests(requests: List<ContactRequest>) {
+        Timber.d("updateContactRequests")
+        requests.forEach { req ->
+            if (req.isOutgoing) {
+                Timber.d("SENT REQUEST")
+                Timber.d("STATUS: %s, Contact Handle: %d", req.status, req.handle)
+                if (req.status === ContactRequestStatus.Accepted) {
+                    addNewContact(req.targetEmail)
+                }
+            } else {
+                Timber.d("RECEIVED REQUEST")
+                Timber.d("STATUS: %s Contact Handle: %d", req.status, req.handle)
+                if (req.status === ContactRequestStatus.Accepted) {
+                    addNewContact(req.sourceEmail)
+                }
+            }
+        }
+        checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
     }
 
     internal companion object {

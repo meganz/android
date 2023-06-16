@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -68,6 +69,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadFolderIconUpdateUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
+import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -82,7 +84,6 @@ import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfe
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUserAlert
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -218,6 +219,7 @@ class ManagerViewModelTest {
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
     private val createShareKey = mock<CreateShareKey>()
     private val deleteOldestCompletedTransfersUseCase =
         mock<DeleteOldestCompletedTransfersUseCase>()
@@ -244,7 +246,9 @@ class ManagerViewModelTest {
             monitorNodeUpdates = { monitorNodeUpdates },
             monitorContactUpdates = { monitorContactUpdates },
             monitorGlobalUpdates = { monitorGlobalUpdates },
-            monitorContactRequestUpdates = { monitorContactRequestUpdates },
+            monitorContactRequestUpdates = mock {
+                onBlocking { invoke() }.thenReturn(monitorContactRequestUpdates)
+            },
             getNumUnreadUserAlertsUseCase = getNumUnreadUserAlertsUseCase,
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscoveryUseCase = sendStatisticsMediaDiscoveryUseCase,
@@ -279,7 +283,7 @@ class ManagerViewModelTest {
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
             createShareKey = createShareKey,
-            saveContactByEmailUseCase = mock(),
+            saveContactByEmailUseCase = saveContactByEmailUseCase,
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
@@ -354,76 +358,6 @@ class ManagerViewModelTest {
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
-
-    @Test
-    fun `test that user alert updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            underTest.updateUserAlerts.test().assertNoValue()
-        }
-
-    @Test
-    fun `test that contact request updates live data is not set when no updates triggered from use case`() =
-        runTest {
-            underTest.updateContactsRequests.test().assertNoValue()
-        }
-
-    @Test
-    fun `test that user alert updates live data is set when user alert updates triggered from use case`() =
-        runTest {
-            val testObserver = underTest.updateUserAlerts.test()
-            testObserver.assertNoValue()
-            val userAlert = mock<MegaUserAlert>()
-            monitorGlobalUpdates.emit(
-                GlobalUpdate.OnUserAlertsUpdate(
-                    userAlerts = arrayListOf(userAlert)
-                )
-            )
-            testScheduler.advanceUntilIdle()
-            testObserver.assertValue { it.getContentIfNotHandled()?.size == 1 }
-        }
-
-    @Test
-    fun `test that user alert updates live data is not set when user alert updates triggered from use case with null`() =
-        runTest {
-            val testObserver = underTest.updateUserAlerts.test()
-
-            monitorGlobalUpdates.emit(
-                GlobalUpdate.OnUserAlertsUpdate(null)
-            )
-            testScheduler.advanceUntilIdle()
-
-            testObserver.assertNoValue()
-        }
-
-    @Test
-    fun `test that contact request updates live data is set when contact request updates triggered from use case`() =
-        runTest {
-            val testObserver = underTest.updateContactsRequests.test()
-            monitorContactRequestUpdates.emit(
-                listOf(
-                    ContactRequest(
-                        handle = 1L,
-                        sourceEmail = "",
-                        sourceMessage = null,
-                        targetEmail = "",
-                        creationTime = 1L,
-                        modificationTime = 1L,
-                        status = ContactRequestStatus.Unresolved,
-                        isOutgoing = false,
-                        isAutoAccepted = false,
-                    )
-                )
-            )
-            testScheduler.advanceUntilIdle()
-
-            testObserver.assertValue { it.getContentIfNotHandled()?.size == 1 }
-        }
-
-    @Test
-    fun `test that contact request updates live data is not set when contact request updates triggered from use case with null`() =
-        runTest {
-            underTest.updateContactsRequests.test().assertNoValue()
-        }
 
     @Test
     fun `test that saved initial state values are returned`() = runTest {
@@ -651,28 +585,131 @@ class ManagerViewModelTest {
         }
 
     @Test
-    fun `test that get incoming contact requests is triggered when there is contact request event`() =
+    fun `test that incomingContactRequests getting update when there is contact request event`() =
         runTest {
-            val testObserver = underTest.updateContactsRequests.test()
-            testObserver.assertNoValue()
-
-            monitorContactRequestUpdates.emit(
-                listOf(
-                    ContactRequest(
-                        handle = 1L,
-                        sourceEmail = "",
-                        sourceMessage = null,
-                        targetEmail = "",
-                        creationTime = 1L,
-                        modificationTime = 1L,
-                        status = ContactRequestStatus.Unresolved,
-                        isOutgoing = false,
-                        isAutoAccepted = false,
-                    )
+            underTest.incomingContactRequests.test {
+                assertThat(awaitItem()).isEmpty()
+            }
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "",
+                    sourceMessage = null,
+                    targetEmail = "",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Unresolved,
+                    isOutgoing = false,
+                    isAutoAccepted = false,
                 )
             )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            monitorContactRequestUpdates.emit(
+                contactRequests
+            )
             testScheduler.advanceUntilIdle()
-            verify(getIncomingContactRequestUseCase, times(2)).invoke()
+            underTest.incomingContactRequests.test {
+                assertThat(awaitItem()).isEqualTo(contactRequests)
+            }
+        }
+
+    @Test
+    fun `test that incomingContactRequests getting update when monitorGlobalUpdates emit`() =
+        runTest {
+            underTest.incomingContactRequests.test {
+                assertThat(awaitItem()).isEmpty()
+            }
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "",
+                    sourceMessage = null,
+                    targetEmail = "",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Unresolved,
+                    isOutgoing = false,
+                    isAutoAccepted = false,
+                )
+            )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            monitorGlobalUpdates.emit(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
+            testScheduler.advanceUntilIdle()
+            underTest.incomingContactRequests.test {
+                assertThat(awaitItem()).isEqualTo(contactRequests)
+            }
+        }
+
+    @Test
+    fun `test that saveContactByEmailUseCase invoke when there is incoming contact request event`() =
+        runTest {
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "sourceEmail@mega.co.nz",
+                    sourceMessage = null,
+                    targetEmail = "targetEmail@mega.co.nz",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Accepted,
+                    isOutgoing = false,
+                    isAutoAccepted = false,
+                )
+            )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            monitorContactRequestUpdates.emit(contactRequests)
+            advanceUntilIdle()
+            verify(saveContactByEmailUseCase).invoke("sourceEmail@mega.co.nz")
+        }
+
+    @Test
+    fun `test that saveContactByEmailUseCase invoke when there is isOutgoing contact request event`() =
+        runTest {
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "sourceEmail@mega.co.nz",
+                    sourceMessage = null,
+                    targetEmail = "targetEmail@mega.co.nz",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Accepted,
+                    isOutgoing = true,
+                    isAutoAccepted = false,
+                )
+            )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            monitorContactRequestUpdates.emit(contactRequests)
+            advanceUntilIdle()
+            verify(saveContactByEmailUseCase).invoke("targetEmail@mega.co.nz")
+        }
+
+    @Test
+    fun `test that numUnreadUserAlerts update when there is accepted contact request event`() =
+        runTest {
+            advanceUntilIdle()
+            assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(0)
+            val contactRequests = listOf(
+                ContactRequest(
+                    handle = 1L,
+                    sourceEmail = "",
+                    sourceMessage = null,
+                    targetEmail = "",
+                    creationTime = 1L,
+                    modificationTime = 1L,
+                    status = ContactRequestStatus.Accepted,
+                    isOutgoing = false,
+                    isAutoAccepted = false,
+                )
+            )
+            whenever(getIncomingContactRequestUseCase()).thenReturn(contactRequests)
+            whenever(getNumUnreadUserAlertsUseCase()).thenReturn(3)
+            monitorContactRequestUpdates.emit(contactRequests)
+            advanceUntilIdle()
+            assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(3)
         }
 
     @Test
