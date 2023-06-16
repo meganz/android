@@ -101,7 +101,6 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
-import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
@@ -126,6 +125,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBackupUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -461,7 +461,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Setup Primary Folder
      */
     @Inject
-    lateinit var setupPrimaryFolder: SetupPrimaryFolder
+    lateinit var setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase
 
     /**
      * Setup Secondary Folder
@@ -964,7 +964,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
     /**
-     * Checks if the Camera Uploads sync from [isCameraUploadSyncEnabled] is enabled
+     * Checks if the Camera Uploads sync from [isCameraUploadsEnabledUseCase] is enabled
      *
      * @return true if enabled, and false if otherwise
      */
@@ -1648,7 +1648,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun createAndSetupPrimaryUploadFolder() {
         createCameraUploadFolder(context.getString(R.string.section_photo_sync))?.let {
             Timber.d("Primary Folder successfully created with handle $it. Setting up Primary Folder")
-            setupPrimaryFolder(it)
+            setupPrimaryFolderUseCase(it)
         } ?: throw Exception("Failed to create primary upload folder")
     }
 

@@ -32,7 +32,6 @@ import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
@@ -55,6 +54,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -97,7 +97,7 @@ import javax.inject.Inject
  * @property setUploadVideoSyncStatusUseCase Sets the new Sync Status of Videos to be uploaded
  * @property setVideoCompressionSizeLimitUseCase Sets the maximum video file size that can be compressed
  * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
- * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
+ * @property setupPrimaryFolderUseCase Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadUseCase Stop the camera upload
@@ -137,7 +137,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setUploadVideoSyncStatusUseCase: SetUploadVideoSyncStatusUseCase,
     private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
-    private val setupPrimaryFolder: SetupPrimaryFolder,
+    private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
     private val setupSecondaryFolder: SetupSecondaryFolder,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
@@ -290,7 +290,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun setupPrimaryCameraUploadFolder(primaryHandle: Long) {
         viewModelScope.launch {
-            setupPrimaryFolder(primaryHandle)
+            setupPrimaryFolderUseCase(primaryHandle)
         }
     }
 
