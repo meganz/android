@@ -69,7 +69,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -252,35 +251,37 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getSession(): String? =
         localStorageGateway.getUserCredentials()?.session
 
-    override suspend fun retryPendingConnections(disconnect: Boolean) =
+    override suspend fun retryChatPendingConnections(disconnect: Boolean) =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaApiGateway.retryPendingConnections()
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = { _, error ->
+                        when (error.errorCode) {
+                            MegaChatError.ERROR_OK -> continuation.resumeWith(
+                                Result.success(Unit)
+                            )
+
+                            MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
+                                Result.failure(ChatNotInitializedErrorStatus())
+                            )
+
+                            else -> continuation.failWithError(
+                                error,
+                                "retryChatPendingConnections"
+                            )
+                        }
+                    }
+                )
                 megaChatApiGateway.retryPendingConnections(
                     disconnect = disconnect,
-                    listener = OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { request, error ->
-                            if (request.type == MegaChatRequest.TYPE_RETRY_PENDING_CONNECTIONS) {
-                                when (error.errorCode) {
-                                    MegaChatError.ERROR_OK -> continuation.resumeWith(
-                                        Result.success(Unit)
-                                    )
-
-                                    MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
-                                        Result.failure(ChatNotInitializedErrorStatus())
-                                    )
-
-                                    else -> continuation.failWithError(
-                                        error,
-                                        "retryPendingConnections"
-                                    )
-                                }
-                            }
-                        }
-                    )
+                    listener = listener
                 )
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(listener)
+                }
             }
         }
+
 
     override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {
@@ -850,6 +851,16 @@ internal class DefaultAccountRepository @Inject constructor(
         accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
 
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
+
+    override suspend fun reconnect() = withContext(ioDispatcher) {
+        Timber.d("Reconnect...")
+        megaApiGateway.reconnect()
+    }
+
+    override suspend fun retryPendingConnections() = withContext(ioDispatcher) {
+        Timber.d("Retrying pending connections...")
+        megaApiGateway.retryPendingConnections()
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

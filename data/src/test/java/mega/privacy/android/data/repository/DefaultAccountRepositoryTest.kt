@@ -365,7 +365,7 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.retryPendingConnections(false)
+            underTest.retryChatPendingConnections(false)
         }
 
     @Test(expected = ChatNotInitializedException::class)
@@ -388,7 +388,7 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.retryPendingConnections(false)
+            underTest.retryChatPendingConnections(false)
         }
 
     @Test(expected = MegaException::class)
@@ -411,7 +411,7 @@ class DefaultAccountRepositoryTest {
                 )
             }
 
-            underTest.retryPendingConnections(false)
+            underTest.retryChatPendingConnections(false)
         }
 
     @Test

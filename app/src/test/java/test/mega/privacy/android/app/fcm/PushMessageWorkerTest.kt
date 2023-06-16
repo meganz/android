@@ -34,7 +34,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.PushReceived
-import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import org.junit.After
@@ -63,7 +63,7 @@ class PushMessageWorkerTest {
 
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
     private val pushReceived = mock<PushReceived>()
-    private val retryPendingConnections = mock<RetryPendingConnections>()
+    private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase>()
     private val pushMessageMapper = mock<PushMessageMapper>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val getChatNotificationUseCase = mock<GetChatNotificationUseCase>()
@@ -108,7 +108,7 @@ class PushMessageWorkerTest {
             ),
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             pushReceived = pushReceived,
-            retryPendingConnections = retryPendingConnections,
+            retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             getChatNotificationUseCase = getChatNotificationUseCase,
@@ -144,14 +144,14 @@ class PushMessageWorkerTest {
         whenever(getChatNotificationUseCase.invoke(any())).thenReturn(mock())
 
         underTest.doWork()
-        verify(retryPendingConnections).invoke(false)
+        verify(retryPendingConnectionsUseCase).invoke(false)
     }
 
     @Test
     fun `test that MegaChat is initialised if rootNode exists and retryPendingConnections raises ChatNotInitializedException`() =
         runTest {
             whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
-            whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(retryPendingConnectionsUseCase(any())).thenThrow(ChatNotInitializedErrorStatus())
             whenever(getChatNotificationUseCase.invoke(any())).thenReturn(mock())
 
             underTest.doWork()
@@ -163,7 +163,7 @@ class PushMessageWorkerTest {
         runTest {
             whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
             whenever(getChatNotificationUseCase.invoke(any())).thenReturn(mock())
-            whenever(retryPendingConnections(any())).thenThrow(
+            whenever(retryPendingConnectionsUseCase(any())).thenThrow(
                 EmptyFolderException()
             )
 
@@ -176,7 +176,7 @@ class PushMessageWorkerTest {
         runTest {
             val sessionId = "good_session"
             whenever(backgroundFastLoginUseCase()).thenReturn(sessionId)
-            whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(retryPendingConnectionsUseCase(any())).thenThrow(ChatNotInitializedErrorStatus())
             whenever(initialiseMegaChatUseCase(sessionId)).thenThrow(ChatNotInitializedErrorStatus())
             whenever(getChatNotificationUseCase.invoke(any())).thenReturn(mock())
 

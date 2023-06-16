@@ -782,7 +782,7 @@ internal class MegaApiFacade @Inject constructor(
         sid: Long,
         nodes: MegaHandleList,
         names: MegaStringList?,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.createSetElements(sid, nodes, names, listener)
 
     override suspend fun removeSetElement(
@@ -1251,4 +1251,6 @@ internal class MegaApiFacade @Inject constructor(
     override fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface) {
         megaApi.removeBackup(backupId, listener)
     }
+
+    override suspend fun reconnect() = megaApi.reconnect()
 }

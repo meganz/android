@@ -90,11 +90,11 @@ interface AccountRepository {
     suspend fun getSession(): String?
 
     /**
-     * Refreshes DNS servers and retries pending connections.
+     * Refreshes DNS servers and retries chat pending connections.
      *
      * @param disconnect True if should disconnect megaChatApi, false otherwise.
      */
-    suspend fun retryPendingConnections(disconnect: Boolean)
+    suspend fun retryChatPendingConnections(disconnect: Boolean)
 
     /**
      * Get the List of SubscriptionOptions
@@ -430,4 +430,14 @@ interface AccountRepository {
      * Get user account type
      */
     suspend fun getAccountType(): AccountType
+
+    /**
+     * Reconnect and retry all transfers.
+     */
+    suspend fun reconnect()
+
+    /**
+     * Refreshes DNS servers and retries pending connections.
+     */
+    suspend fun retryPendingConnections()
 }

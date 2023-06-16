@@ -595,7 +595,12 @@ interface MegaApiGateway {
     fun fetchNodes(listener: MegaRequestListenerInterface)
 
     /**
-     * Retries all pending requests.
+     * Retry all pending requests.
+     * <p>
+     * When requests fails they wait some time before being retried. That delay grows exponentially if the request
+     * fails again. For this reason, and since this request is very lightweight, it's recommended to call it with
+     * the default parameters on every user interaction with the application. This will prevent very big delays
+     * completing requests.
      */
     fun retryPendingConnections()
 
@@ -2612,4 +2617,9 @@ interface MegaApiGateway {
      *                 - MegaRequest::getListener - Returns the MegaRequestListener to track this request
      */
     fun removeBackup(backupId: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Reconnect and retry all transfers.
+     */
+    suspend fun reconnect()
 }

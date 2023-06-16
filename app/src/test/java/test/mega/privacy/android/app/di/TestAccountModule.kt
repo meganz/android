@@ -15,7 +15,7 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
@@ -40,7 +40,7 @@ object TestAccountModule {
     private val getSessionUseCase = mock<GetSessionUseCase> {
         on { runBlocking { invoke() } }.thenReturn("")
     }
-    private val retryPendingConnections = mock<RetryPendingConnections> {
+    private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase> {
         on { runBlocking { invoke(false) } }
     }
     private val isBusinessAccountActive = mock<IsBusinessAccountActive> {
@@ -67,7 +67,7 @@ object TestAccountModule {
     fun bindGetSessionUseCase() = getSessionUseCase
 
     @Provides
-    fun bindRetryPendingConnections() = retryPendingConnections
+    fun bindRetryPendingConnections() = retryPendingConnectionsUseCase
 
     @Provides
     fun bindIsBusinessAccountActive() = isBusinessAccountActive

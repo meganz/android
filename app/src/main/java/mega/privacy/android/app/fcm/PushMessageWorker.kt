@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.PushReceived
-import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import timber.log.Timber
@@ -39,10 +39,10 @@ import timber.log.Timber
 /**
  * Worker class to manage push notifications.
  *
- * @property backgroundFastLoginUseCase Required for performing a complete login process with an existing session.
- * @property pushReceived               Required for notifying received pushes.
- * @property retryPendingConnections    Required for retrying pending connections.
- * @property pushMessageMapper          [PushMessageMapper].
+ * @property backgroundFastLoginUseCase        Required for performing a complete login process with an existing session.
+ * @property pushReceived                      Required for notifying received pushes.
+ * @property retryPendingConnectionsUseCase    Required for retrying pending connections.
+ * @property pushMessageMapper                 [PushMessageMapper].
  */
 @HiltWorker
 class PushMessageWorker @AssistedInject constructor(
@@ -50,7 +50,7 @@ class PushMessageWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val pushReceived: PushReceived,
-    private val retryPendingConnections: RetryPendingConnections,
+    private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
     private val getChatNotificationUseCase: GetChatNotificationUseCase,
@@ -75,7 +75,7 @@ class PushMessageWorker @AssistedInject constructor(
 
             if (loginResult.isSuccess) {
                 Timber.d("Fast login success.")
-                runCatching { retryPendingConnections(disconnect = false) }
+                runCatching { retryPendingConnectionsUseCase(disconnect = false) }
                     .recoverCatching { error ->
                         if (error is ChatNotInitializedErrorStatus) {
                             Timber.d("chat engine not ready. try to initialise megachat.")

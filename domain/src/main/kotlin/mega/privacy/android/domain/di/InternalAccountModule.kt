@@ -17,7 +17,6 @@ import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
@@ -53,12 +52,6 @@ internal abstract class InternalAccountModule {
     abstract fun bindIsUserLoggedIn(useCase: DefaultIsUserLoggedIn): IsUserLoggedIn
 
     companion object {
-        /**
-         * Provides the Use Case [RetryPendingConnections]
-         */
-        @Provides
-        fun provideRetryPendingConnections(accountRepository: AccountRepository): RetryPendingConnections =
-            RetryPendingConnections(accountRepository::retryPendingConnections)
 
         /**
          * Provides the Use Case [IsBusinessAccountActive]
