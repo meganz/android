@@ -25,18 +25,22 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultImageRepositoryTest {
     private lateinit var underTest: ImageRepository
 
@@ -58,6 +62,7 @@ class DefaultImageRepositoryTest {
     private val nodeFileLink = "abc"
 
     private val megaNode = mock<MegaNode>()
+    private val imageNode = mock<ImageNode>()
     private val nodeList = mock<MegaNodeList> {
         on { size() }.thenReturn(10)
         on { get(any()) }.thenReturn(megaNode)
@@ -66,7 +71,7 @@ class DefaultImageRepositoryTest {
         on { megaNodeList }.thenReturn(nodeList)
     }
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = DefaultImageRepository(
             context = context,
@@ -79,6 +84,19 @@ class DefaultImageRepositoryTest {
             fileGateway = fileGateway,
             cacheFolderGateway = cacheFolderGateway,
             imageNodeMapper = imageNodeMapper,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            megaApiGateway,
+            megaApiFolderGateway,
+            megaChatApiGateway,
+            cacheGateway,
+            fileManagementPreferencesGateway,
+            cacheFolderGateway,
+            imageNodeMapper
         )
     }
 
@@ -113,7 +131,7 @@ class DefaultImageRepositoryTest {
         }
     }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that get thumbnail from server returns doesn't successfully`() {
         runTest {
             val thumbnailName = "test"
@@ -138,19 +156,37 @@ class DefaultImageRepositoryTest {
                     error
                 )
             }
-
-            underTest.getThumbnailFromServer(1L)
+            assertThrows<MegaException> {
+                underTest.getThumbnailFromServer(1L)
+            }
         }
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `test that getImageNodeByHandle throws IllegalArgumentException if node is not found`() {
+    @Test
+    fun `test that getImageNodeByHandle throws IllegalArgumentException when node is not found`() {
         runTest {
             val handle = 1L
             whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(null)
-            underTest.getImageNodeByHandle(
+            assertThrows<IllegalArgumentException> {
+                underTest.getImageNodeByHandle(
+                    handle = handle
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `test that getImageNodeByHandle retrieves mega node for folder link when node is not found by handle`() {
+        runTest {
+            val handle = 1L
+            whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(null)
+            whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
+            whenever(megaApiFolderGateway.authorizeNode(megaNode)).thenReturn(megaNode)
+            whenever(imageNodeMapper.invoke(any(), any())).thenReturn(imageNode)
+            val result = underTest.getImageNodeByHandle(
                 handle = handle
             )
+            assertThat(result).isEqualTo(imageNode)
         }
     }
 
@@ -166,8 +202,8 @@ class DefaultImageRepositoryTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `test that getImageNodeForPublicLink throws IllegalArgumentException if key for PublicNode is invalid`() {
+    @Test
+    fun `test that getImageNodeForPublicLink throws IllegalArgumentException when key for PublicNode is invalid`() {
         runTest {
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest> {
@@ -184,12 +220,14 @@ class DefaultImageRepositoryTest {
                     error
                 )
             }
-            underTest.getImageNodeForPublicLink(nodeFileLink = nodeFileLink)
+            assertThrows<IllegalArgumentException> {
+                underTest.getImageNodeForPublicLink(nodeFileLink = nodeFileLink)
+            }
         }
     }
 
-    @Test(expected = MegaException::class)
-    fun `test that getImageNodeForPublicLink throws MegaException if api returns error`() {
+    @Test
+    fun `test that getImageNodeForPublicLink throws MegaException when api returns error`() {
         runTest {
             val api = mock<MegaApiJava>()
             val request = mock<MegaRequest>()
@@ -204,7 +242,9 @@ class DefaultImageRepositoryTest {
                     error
                 )
             }
-            underTest.getImageNodeForPublicLink(nodeFileLink = nodeFileLink)
+            assertThrows<MegaException> {
+                underTest.getImageNodeForPublicLink(nodeFileLink = nodeFileLink)
+            }
         }
     }
 
@@ -232,8 +272,8 @@ class DefaultImageRepositoryTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `test that getImageNodeForChatMessage throws IllegalArgumentException if ChatNode returned is null`() {
+    @Test
+    fun `test that getImageNodeForChatMessage throws IllegalArgumentException when ChatNode returned is null`() {
         runTest {
             whenever(megaChatApiGateway.getMessage(chatRoomId, chatMessageId)).thenReturn(null)
             whenever(
@@ -242,11 +282,12 @@ class DefaultImageRepositoryTest {
                     chatMessageId
                 )
             ).thenReturn(null)
-
-            underTest.getImageNodeForChatMessage(
-                chatRoomId = chatRoomId,
-                chatMessageId = chatMessageId
-            )
+            assertThrows<IllegalArgumentException> {
+                underTest.getImageNodeForChatMessage(
+                    chatRoomId = chatRoomId,
+                    chatMessageId = chatMessageId
+                )
+            }
         }
     }
 
