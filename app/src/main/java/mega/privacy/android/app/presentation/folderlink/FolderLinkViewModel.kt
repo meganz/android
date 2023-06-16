@@ -668,7 +668,8 @@ class FolderLinkViewModel @Inject constructor(
                 if (selectedNodes.isEmpty())
                     return@launch
                 val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
-                val selectedMegaNodes = getNodeListByIds(selectedNodeIds)
+                val selectedMegaNodes =
+                    getNodeUseCase.getAuthorizedNodes(selectedNodeIds).filterNotNull()
                 checkNameCollision(selectedMegaNodes, toHandle)
             } else {
                 val importNodeHandle =

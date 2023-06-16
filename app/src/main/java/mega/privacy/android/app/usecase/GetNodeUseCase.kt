@@ -5,6 +5,8 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -19,6 +21,7 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -45,6 +48,7 @@ class GetNodeUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: LegacyDatabaseHandler,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -395,6 +399,19 @@ class GetNodeUseCase @Inject constructor(
      */
     fun getAuthorizedNode(nodeHandle: Long): MegaNode? =
         megaApiFolder.getNodeByHandle(nodeHandle)?.let { megaApiFolder.authorizeNode(it) }
+
+    /**
+     * Get list of authorized MegaNode that can be downloaded with any instance of MegaApi
+     *
+     * @param nodeHandles       node handles
+     * @return List<MegaNode>   List of MegaNode
+     */
+    suspend fun getAuthorizedNodes(nodeHandles: List<Long>): List<MegaNode?> =
+        withContext(ioDispatcher) {
+            nodeHandles.map { handle ->
+                megaApiFolder.getNodeByHandle(handle)?.let { megaApiFolder.authorizeNode(it) }
+            }
+        }
 
     /**
      * Check if a node is available
