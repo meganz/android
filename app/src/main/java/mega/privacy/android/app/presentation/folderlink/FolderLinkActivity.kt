@@ -333,7 +333,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     showSnackbar(R.string.context_no_copied)
                     return@ActivityResultCallback
                 }
-                viewModel.checkNameCollision(nodes, toHandle)
+                val authorizedNodes = nodes.mapNotNull { megaApiFolder.authorizeNode(it) }
+                viewModel.checkNameCollision(authorizedNodes, toHandle)
 
             } else if (selectedNode != null) {
                 Timber.d("No multiple select")
