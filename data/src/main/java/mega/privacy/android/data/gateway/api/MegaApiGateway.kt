@@ -1856,8 +1856,6 @@ interface MegaApiGateway {
      * @param lastPublicHandle     Last public node handle accessed by the user in the last 24h
      * @param lastPublicHandleType Indicates the type of lastPublicHandle, valid values are:
      *                             - MegaApi::AFFILIATE_TYPE_ID = 1
-     *                             - MegaApi::AFFILIATE_TYPE_FILE_FOLDER = 2
-     *                             - MegaApi::AFFILIATE_TYPE_CHAT = 3
      *                             - MegaApi::AFFILIATE_TYPE_CONTACT = 4
      * @param lastAccessTimestamp  Timestamp of the last access
      * @param listener             MegaRequestListener to track this request

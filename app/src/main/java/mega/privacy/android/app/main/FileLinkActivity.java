@@ -503,7 +503,6 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                 if (handle != MegaApiJava.INVALID_HANDLE) {
                     dbH.setLastPublicHandle(handle);
                     dbH.setLastPublicHandleTimeStamp();
-                    dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER);
                 }
 
                 collapsingToolbar.setTitle(document.getName());

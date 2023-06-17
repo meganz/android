@@ -855,7 +855,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 if (request.nodeHandle != MegaApiJava.INVALID_HANDLE) {
                     dbH.setLastPublicHandle(request.nodeHandle)
                     dbH.setLastPublicHandleTimeStamp()
-                    dbH.lastPublicHandleType = MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER
                 }
                 val rootNode = megaApiFolder.rootNode
                 if (rootNode != null) {

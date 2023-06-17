@@ -75,7 +75,6 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
             megaLocalStorageGateway.setLastPublicHandle(nodeHandle)
             megaLocalStorageGateway.setLastPublicHandleTimeStamp()
-            megaLocalStorageGateway.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_FILE_FOLDER)
         }
     }
 

@@ -1032,7 +1032,6 @@ public class ChatActivity extends PasscodeActivity
             if (idChat != MEGACHAT_INVALID_HANDLE) {
                 dbH.setLastPublicHandle(idChat);
                 dbH.setLastPublicHandleTimeStamp();
-                dbH.setLastPublicHandleType(MegaApiJava.AFFILIATE_TYPE_CHAT);
             }
 
             MegaApplication.setOpenChatId(idChat);
