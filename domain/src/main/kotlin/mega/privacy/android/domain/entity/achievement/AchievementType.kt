@@ -28,11 +28,6 @@ enum class AchievementType(val classValue: Int) {
     MEGA_ACHIEVEMENT_MOBILE_INSTALL(5),
 
     /**
-     * Achievement when user adds phone number in Mega account
-     */
-    MEGA_ACHIEVEMENT_ADD_PHONE(9),
-
-    /**
      * Invalid Achievement
      */
     INVALID_ACHIEVEMENT(-1)

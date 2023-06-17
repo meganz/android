@@ -19,11 +19,9 @@ import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIStat
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -59,7 +57,6 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
     private val getMyAvatarFile: GetMyAvatarFile,
-    private val getAccountAchievements: GetAccountAchievements,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(MyAccountHomeUIState())
 
@@ -203,17 +200,6 @@ class MyAccountHomeViewModel @Inject constructor(
                     it.copy(
                         isBusinessStatusActive = isBusinessStatusActive,
                         businessStatus = businessStatus
-                    )
-                }
-
-                val achievements = getAccountAchievements(
-                    AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE,
-                    awardIndex = 0,
-                )
-                _uiState.update {
-                    it.copy(
-                        isAchievementsEnabled = achievements != null,
-                        bonusStorageSms = achievements?.grantedStorage ?: 0
                     )
                 }
             }.onFailure {

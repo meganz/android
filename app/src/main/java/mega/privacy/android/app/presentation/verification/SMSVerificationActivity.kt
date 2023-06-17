@@ -93,7 +93,7 @@ class SMSVerificationActivity : PasscodeActivity() {
         lifecycle.addObserver(viewModel)
         if (intent != null) {
             val isUserLocked = intent.getBooleanExtra(NAME_USER_LOCKED, false)
-            viewModel.setIsUserLocked(isUserLocked = isUserLocked, context = this)
+            viewModel.setIsUserLocked(isUserLocked = isUserLocked)
         }
         setContent {
             SMSVerificationScreen()

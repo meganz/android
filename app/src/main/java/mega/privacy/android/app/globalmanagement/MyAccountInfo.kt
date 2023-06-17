@@ -65,8 +65,6 @@ class MyAccountInfo @Inject constructor(
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
 
-    var bonusStorageSMS = "GB"
-
     var upgradeOpenedFrom = UpgradeFrom.MANAGER
 
     // Added the subscriptionMethodId parameter for subscription dialog
@@ -105,8 +103,6 @@ class MyAccountInfo @Inject constructor(
 
         numVersions = INVALID_VALUE
         previousVersionsSize = INVALID_VALUE.toLong()
-
-        bonusStorageSMS = "GB"
 
         upgradeOpenedFrom = UpgradeFrom.MANAGER
     }

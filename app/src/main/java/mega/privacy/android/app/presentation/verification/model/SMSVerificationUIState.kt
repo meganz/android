@@ -44,16 +44,6 @@ data class SMSVerificationUIState(
     val countryCallingCodes: List<String> = emptyList(),
 
     /**
-     * is achievement enabled for user
-     */
-    val isAchievementsEnabled: Boolean = false,
-
-    /**
-     * granted bonus storage if phone number is SMS verified
-     */
-    val bonusStorageSMS: String? = null,
-
-    /**
      * info text
      */
     val infoText: String = "",

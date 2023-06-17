@@ -15,10 +15,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property installAppStorage Storage by installing app
  * @property installAppAwardDaysLeft Storage awarded by installing app days left
  * @property installAppAwardStorage Storage awarded by installing app left
- * @property hasAddPhoneReward Show add phone reward section
- * @property addPhoneStorage Storage by adding phone
- * @property addPhoneAwardDaysLeft Storage awarded by adding phone days left
- * @property addPhoneAwardStorage Storage awarded by adding phone left
  * @property installDesktopStorage Storage by installing desktop
  * @property installDesktopAwardDaysLeft Storage awarded by installing desktop days left
  * @property installDesktopAwardStorage Storage awarded by installing desktop left
@@ -38,10 +34,6 @@ data class AchievementsUIState(
     val installAppStorage: Long? = null,
     val installAppAwardDaysLeft: Long? = null,
     val installAppAwardStorage: Long = 0,
-    val hasAddPhoneReward: Boolean = false,
-    val addPhoneStorage: Long? = null,
-    val addPhoneAwardDaysLeft: Long? = null,
-    val addPhoneAwardStorage: Long = 0,
     val installDesktopStorage: Long? = null,
     val installDesktopAwardDaysLeft: Long? = null,
     val installDesktopAwardStorage: Long = 0,

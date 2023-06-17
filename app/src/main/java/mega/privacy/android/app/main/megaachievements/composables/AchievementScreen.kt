@@ -49,10 +49,6 @@ internal fun AchievementScreen(
         installAppStorage = uiState.installAppStorage,
         installAppAwardDaysLeft = uiState.installAppAwardDaysLeft,
         installAppAwardStorage = uiState.installAppAwardStorage,
-        hasAddPhoneReward = uiState.hasAddPhoneReward,
-        addPhoneStorage = uiState.addPhoneStorage,
-        addPhoneAwardDaysLeft = uiState.addPhoneAwardDaysLeft,
-        addPhoneAwardStorage = uiState.addPhoneAwardStorage,
         hasRegistrationAward = uiState.hasRegistrationAward,
         registrationAwardDaysLeft = uiState.registrationAwardDaysLeft,
         registrationAwardStorage = uiState.registrationAwardStorage,
@@ -75,10 +71,6 @@ internal fun AchievementView(
     installAppStorage: Long?,
     installAppAwardDaysLeft: Long?,
     installAppAwardStorage: Long,
-    hasAddPhoneReward: Boolean,
-    addPhoneStorage: Long?,
-    addPhoneAwardDaysLeft: Long?,
-    addPhoneAwardStorage: Long,
     hasRegistrationAward: Boolean,
     registrationAwardDaysLeft: Long?,
     registrationAwardStorage: Long,
@@ -170,38 +162,6 @@ internal fun AchievementView(
                         thickness = 1.dp
                     )
 
-                    if (hasAddPhoneReward) {
-                        Row(
-                            Modifier.clickable {
-                                onShowInfoAchievementsClicked(AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE)
-                            }
-                        ) {
-                            AchievementListItem(
-                                iconId = R.drawable.il_verify_phone_drawer,
-                                titleId = R.string.title_add_phone,
-                                alphaLevel = addPhoneAwardDaysLeft?.let { if (it > 0) 1.0f else 0.5f }
-                                    ?: 1.0f,
-                                zeroFiguresTitle = if (addPhoneAwardStorage <= 0) {
-                                    addPhoneStorage?.let {
-                                        stringResource(
-                                            R.string.figures_achievements_text,
-                                            it.toUnitString(LocalContext.current)
-                                        )
-                                    }
-                                } else null,
-                                hasFiguresTitle = if (addPhoneAwardStorage > 0) {
-                                    addPhoneAwardStorage.toUnitString(LocalContext.current)
-                                } else null,
-                                daysLeft = addPhoneAwardDaysLeft,
-                            )
-                        }
-
-                        Divider(
-                            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-                            thickness = 1.dp
-                        )
-                    }
-
                     if (hasRegistrationAward) {
                         Row(
                             Modifier.clickable {
@@ -272,10 +232,6 @@ fun AchievementPreview() {
             installAppStorage = 123,
             installAppAwardDaysLeft = 0,
             installAppAwardStorage = 12,
-            hasAddPhoneReward = true,
-            addPhoneStorage = 123,
-            addPhoneAwardDaysLeft = 333,
-            addPhoneAwardStorage = 12,
             hasRegistrationAward = true,
             registrationAwardDaysLeft = 0,
             registrationAwardStorage = 12,
@@ -302,10 +258,6 @@ fun AchievementPreviewDark() {
             installAppStorage = null,
             installAppAwardDaysLeft = 33,
             installAppAwardStorage = 12,
-            hasAddPhoneReward = false,
-            addPhoneStorage = null,
-            addPhoneAwardDaysLeft = 33,
-            addPhoneAwardStorage = 12,
             hasRegistrationAward = false,
             registrationAwardDaysLeft = 333,
             registrationAwardStorage = 12,

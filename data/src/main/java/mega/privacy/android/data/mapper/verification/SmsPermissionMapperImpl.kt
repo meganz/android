@@ -11,7 +11,7 @@ import javax.inject.Inject
 internal class SmsPermissionMapperImpl @Inject constructor() : SmsPermissionMapper {
     override fun invoke(state: Int) = when (state) {
         0 -> emptyList()
-        1 -> listOf(Unblock)
+        1 -> listOf(OptInVerification)
         2 -> listOf(OptInVerification, Unblock)
         else -> throw UnknownMapperParameterException(
             SmsPermissionMapperImpl::class.simpleName,

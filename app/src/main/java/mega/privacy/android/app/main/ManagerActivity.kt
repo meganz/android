@@ -350,7 +350,6 @@ import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
 import nz.mega.sdk.MegaAccountDetails
-import nz.mega.sdk.MegaAchievementsDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -2469,10 +2468,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 askForNotificationsPermission()
             }
         }
-    }
-
-    private fun canVerifyPhoneNumber(): Boolean {
-        return canVerifyPhoneNumber
     }
 
     /**
@@ -8705,17 +8700,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
 
-            MegaRequest.TYPE_GET_ACHIEVEMENTS -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    myAccountInfo.bonusStorageSMS = Util.getSizeString(
-                        request.megaAchievementsDetails
-                            .getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE),
-                        this
-                    )
-                }
-                showAddPhoneNumberInMenu()
-            }
-
             MegaRequest.TYPE_SET_ATTR_USER -> {
                 if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
                     Timber.d("MK exported - USER_ATTR_PWD_REMINDER finished")
@@ -9723,16 +9707,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     fun showAddPhoneNumberInMenu() {
-        if (canVerifyPhoneNumber()) {
-            if (megaApi.isAchievementsEnabled) {
-                val message: String = String.format(
-                    getString(R.string.sms_add_phone_number_dialog_msg_achievement_user),
-                    myAccountInfo.bonusStorageSMS
-                )
-                addPhoneNumberLabel.text = message
-            } else {
-                addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)
-            }
+        if (canVerifyPhoneNumber) {
+            addPhoneNumberLabel.setText(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)
             navigationDrawerAddPhoneContainer.visibility = View.VISIBLE
         } else {
             navigationDrawerAddPhoneContainer.visibility = View.GONE

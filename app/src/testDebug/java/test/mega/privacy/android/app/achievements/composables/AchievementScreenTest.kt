@@ -28,10 +28,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = false,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,
@@ -57,10 +53,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = false,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,
@@ -86,10 +78,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = false,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,
@@ -115,10 +103,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = false,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,
@@ -133,64 +117,6 @@ internal class AchievementScreenTest {
     }
 
     @Test
-    fun `test that add phone reward is visible if user has it`() {
-        composeTestRule.setContent {
-            AchievementView(
-                currentStorage = 0,
-                hasReferrals = false,
-                areAllRewardsExpired = false,
-                referralsStorage = 0,
-                referralsAwardStorage = 0,
-                installAppStorage = 0,
-                installAppAwardDaysLeft = 0,
-                installAppAwardStorage = 0,
-                hasAddPhoneReward = true,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
-                hasRegistrationAward = false,
-                registrationAwardDaysLeft = 0,
-                registrationAwardStorage = 0,
-                installDesktopStorage = 0,
-                installDesktopAwardDaysLeft = 0,
-                installDesktopAwardStorage = 0,
-            )
-        }
-
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_add_phone))
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that add phone reward is not visible if user does not have it`() {
-        composeTestRule.setContent {
-            AchievementView(
-                currentStorage = 0,
-                hasReferrals = false,
-                areAllRewardsExpired = false,
-                referralsStorage = 0,
-                referralsAwardStorage = 0,
-                installAppStorage = 0,
-                installAppAwardDaysLeft = 0,
-                installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
-                hasRegistrationAward = false,
-                registrationAwardDaysLeft = 0,
-                registrationAwardStorage = 0,
-                installDesktopStorage = 0,
-                installDesktopAwardDaysLeft = 0,
-                installDesktopAwardStorage = 0,
-            )
-        }
-
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_add_phone))
-            .assertDoesNotExist()
-    }
-
-    @Test
     fun `test that registration reward is visible if user has it`() {
         composeTestRule.setContent {
             AchievementView(
@@ -202,10 +128,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = true,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,
@@ -231,10 +153,6 @@ internal class AchievementScreenTest {
                 installAppStorage = 0,
                 installAppAwardDaysLeft = 0,
                 installAppAwardStorage = 0,
-                hasAddPhoneReward = false,
-                addPhoneStorage = 0,
-                addPhoneAwardDaysLeft = 0,
-                addPhoneAwardStorage = 0,
                 hasRegistrationAward = false,
                 registrationAwardDaysLeft = 0,
                 registrationAwardStorage = 0,

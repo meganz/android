@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.verification
 
-import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.SavedStateHandle
@@ -12,13 +11,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
-import mega.privacy.android.domain.entity.achievement.AchievementType
-import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabledUseCase
-import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
@@ -36,9 +31,6 @@ class SMSVerificationViewModel @Inject constructor(
     private val setSMSVerificationShown: SetSMSVerificationShown,
     private val getCountryCallingCodes: GetCountryCallingCodes,
     private val sendSMSVerificationCode: SendSMSVerificationCode,
-    private val areAccountAchievementsEnabledUseCase: AreAccountAchievementsEnabledUseCase,
-    private val getAccountAchievements: GetAccountAchievements,
-    private val stringUtilWrapper: StringUtilWrapper,
     private val getCurrentCountryCode: GetCurrentCountryCode,
     private val formatPhoneNumber: FormatPhoneNumber,
     private val savedState: SavedStateHandle,
@@ -121,11 +113,10 @@ class SMSVerificationViewModel @Inject constructor(
      * set whether user is locked or not
      * @param isUserLocked [Boolean]
      */
-    fun setIsUserLocked(isUserLocked: Boolean, context: Context) {
+    fun setIsUserLocked(isUserLocked: Boolean) {
         Timber.d("is user locked $isUserLocked")
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUserLocked = isUserLocked)
-            getBonusStorage(context)
         }
     }
 
@@ -152,30 +143,6 @@ class SMSVerificationViewModel @Inject constructor(
         Timber.d("Current Phone Number is valid $isValid")
         _uiState.mapAndUpdate {
             it.copy(isPhoneNumberValid = isValid)
-        }
-    }
-
-    private suspend fun getBonusStorage(context: Context) {
-        if (!_uiState.value.isUserLocked) {
-            val isAchievementUser = areAccountAchievementsEnabledUseCase()
-            if (isAchievementUser) {
-                runCatching {
-                    getAccountAchievements(
-                        AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE,
-                        awardIndex = 0,
-                    )
-                }.onSuccess { achievements ->
-                    achievements?.let {
-                        val bonusStorageSMS =
-                            stringUtilWrapper.getSizeString(achievements.grantedStorage, context)
-                        _uiState.mapAndUpdate {
-                            it.copy(isAchievementsEnabled = true, bonusStorageSMS = bonusStorageSMS)
-                        }
-                    }
-                }.onFailure {
-                    Timber.e(it)
-                }
-            }
         }
     }
 

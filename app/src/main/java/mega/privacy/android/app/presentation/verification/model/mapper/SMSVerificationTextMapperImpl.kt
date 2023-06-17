@@ -15,10 +15,6 @@ class SMSVerificationTextMapperImpl @Inject constructor(
     override fun invoke(state: SMSVerificationUIState): SMSVerificationUIState {
         val infoText = when {
             state.isUserLocked -> context.getString(R.string.verify_account_helper_locked)
-            state.isAchievementsEnabled -> context.getString(
-                R.string.sms_add_phone_number_dialog_msg_achievement_user,
-                state.bonusStorageSMS ?: "GB"
-            )
             else -> context.getString(R.string.sms_add_phone_number_dialog_msg_non_achievement_user)
         }
 

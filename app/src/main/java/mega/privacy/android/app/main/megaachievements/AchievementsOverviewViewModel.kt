@@ -3,7 +3,6 @@ package mega.privacy.android.app.main.megaachievements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -13,7 +12,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.achievements.IsAddPhoneRewardEnabledUseCase
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -26,7 +24,6 @@ import javax.inject.Inject
 class AchievementsOverviewViewModel @Inject constructor(
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase,
-    private val isAddPhoneRewardEnabled: IsAddPhoneRewardEnabledUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AchievementsUIState())
@@ -50,11 +47,9 @@ class AchievementsOverviewViewModel @Inject constructor(
     private fun getAchievementsInformation() {
         viewModelScope.launch {
             runCatching {
-                val achievementsOverview = async { getAccountAchievementsOverviewUseCase() }
-                val phoneRewardEnabled = async { isAddPhoneRewardEnabled() }
-                Pair(achievementsOverview.await(), phoneRewardEnabled.await())
+                getAccountAchievementsOverviewUseCase()
             }
-                .onSuccess { (overview, isEnabled) ->
+                .onSuccess { overview ->
                     _state.value = AchievementsUIState(
                         achievementsOverview = overview,
                         currentStorage = overview.currentStorageInBytes,
@@ -65,10 +60,6 @@ class AchievementsOverviewViewModel @Inject constructor(
                         installAppStorage = overview.installAppStorage(),
                         installAppAwardDaysLeft = overview.installAppAwardDaysLeft(),
                         installAppAwardStorage = overview.installAppAwardStorage(),
-                        hasAddPhoneReward = isEnabled,
-                        addPhoneStorage = overview.addPhoneStorage(),
-                        addPhoneAwardDaysLeft = overview.addPhoneAwardDaysLeft(),
-                        addPhoneAwardStorage = overview.addPhoneAwardStorage(),
                         installDesktopStorage = overview.installDesktopStorage(),
                         installDesktopAwardDaysLeft = overview.installDesktopAwardDaysLeft(),
                         installDesktopAwardStorage = overview.installDesktopAwardStorage(),
@@ -106,16 +97,6 @@ class AchievementsOverviewViewModel @Inject constructor(
             it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
         }?.rewardedStorageInBytes ?: 0
 
-    private fun AchievementsOverview.addPhoneAwardDaysLeft() =
-        this.awardedAchievements.firstOrNull {
-            it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
-        }?.expirationTimestampInSeconds?.getDaysLeft()
-
-    private fun AchievementsOverview.addPhoneAwardStorage() =
-        this.awardedAchievements.firstOrNull {
-            it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
-        }?.rewardedStorageInBytes ?: 0
-
     private fun AchievementsOverview.installAppAwardDaysLeft() =
         this.awardedAchievements.firstOrNull {
             it.type == AchievementType.MEGA_ACHIEVEMENT_MOBILE_INSTALL
@@ -128,10 +109,6 @@ class AchievementsOverviewViewModel @Inject constructor(
 
     private fun AchievementsOverview.installDesktopStorage() = this.allAchievements.firstOrNull {
         it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
-    }?.grantStorageInBytes
-
-    private fun AchievementsOverview.addPhoneStorage() = this.allAchievements.firstOrNull {
-        it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
     }?.grantStorageInBytes
 
     private fun AchievementsOverview.installAppStorage() = this.allAchievements.firstOrNull {

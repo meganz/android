@@ -19,7 +19,6 @@ import java.io.File
  * @property accountType
  * @property isBusinessAccount
  * @property isMasterBusinessAccount
- * @property isAchievementsEnabled
  * @property isBusinessStatusActive
  * @property businessStatus
  * @property visibleContacts
@@ -36,7 +35,6 @@ import java.io.File
  * @property totalTransfer
  * @property subscriptionRenewTime
  * @property proExpirationTime
- * @property bonusStorageSms
  * @property isConnectedToNetwork
  * @property navigateToAchievements
  * @property userMessage
@@ -51,7 +49,6 @@ data class MyAccountHomeUIState(
     val accountType: AccountType? = null,
     val isBusinessAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
-    val isAchievementsEnabled: Boolean = false,
     val isBusinessStatusActive: Boolean = false,
     val businessStatus: BusinessAccountStatus? = null,
     val visibleContacts: Int? = null,
@@ -67,7 +64,6 @@ data class MyAccountHomeUIState(
     val totalTransfer: Long = 0,
     val subscriptionRenewTime: Long = 0,
     val proExpirationTime: Long = 0,
-    val bonusStorageSms: Long = 0,
     val isConnectedToNetwork: Boolean = true,
     val navigateToAchievements: StateEvent = consumed,
     val userMessage: StateEventWithContent<Int> = consumed()

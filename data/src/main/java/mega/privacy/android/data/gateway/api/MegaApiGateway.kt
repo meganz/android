@@ -2288,7 +2288,7 @@ interface MegaApiGateway {
     /**
      * Get sms allowed state
      *
-     * @return current sms allowed state: 2 = Opt-in and unblock SMS allowed.  1 = Only unblock SMS allowed.  0 = No SMS allowed
+     * @return current sms allowed state: 2 = Opt-in and unblock SMS allowed.  1 = Only opt-in SMS allowed.  0 = No SMS allowed
      */
     suspend fun getSmsAllowedState(): Int
 

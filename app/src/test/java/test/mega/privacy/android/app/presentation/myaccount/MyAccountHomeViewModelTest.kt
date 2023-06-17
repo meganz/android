@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
@@ -91,7 +90,6 @@ class MyAccountHomeViewModelTest {
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val getMyAvatarFile: GetMyAvatarFile = mock()
-    private val getAccountAchievements: GetAccountAchievements = mock()
 
     @BeforeEach
     fun setup() {
@@ -111,7 +109,6 @@ class MyAccountHomeViewModelTest {
             getCurrentUserEmail,
             getUserFullNameUseCase,
             getMyAvatarFile,
-            getAccountAchievements
         )
     }
 

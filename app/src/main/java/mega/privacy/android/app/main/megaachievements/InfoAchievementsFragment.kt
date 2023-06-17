@@ -136,45 +136,6 @@ class InfoAchievementsFragment : Fragment() {
                     )
                 )
             }
-        } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
-            icon.setImageDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.il_verify_phone_drawer
-                )
-            )
-            if (awardId == -1) {
-                Timber.d("No award for the achievement $achievementType")
-                val grantedStorage = achievements.allAchievements.first {
-                    it.type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE
-                }.grantStorageInBytes
-
-                setTitleView(
-                    grantedStorage,
-                    awardId
-                )
-                setFirstParagraphText(
-                    getString(
-                        R.string.paragraph_info_achievement_add_phone,
-                        Util.getSizeString(grantedStorage, context)
-                    )
-                )
-            } else {
-                val awardedStorage = achievements.awardedAchievements.first {
-                    it.awardId == awardId
-                }.rewardedStorageInBytes
-
-                setTitleView(
-                    awardedStorage,
-                    awardId
-                )
-                setFirstParagraphText(
-                    getString(
-                        R.string.result_paragraph_info_achievement_add_phone,
-                        Util.getSizeString(awardedStorage, context)
-                    )
-                )
-            }
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
             icon.setImageDrawable(
                 ContextCompat.getDrawable(

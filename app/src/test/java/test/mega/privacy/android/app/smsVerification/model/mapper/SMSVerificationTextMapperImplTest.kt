@@ -36,32 +36,12 @@ class SMSVerificationTextMapperImplTest {
         }
 
     @Test
-    fun `test that when achievement is enabled info text is correctly mapped`() =
+    fun `test that when user is not locked info text is correctly mapped`() =
         runTest {
             assertThat(
                 underTest(
                     SMSVerificationUIState(
                         isUserLocked = false,
-                        isAchievementsEnabled = true,
-                        bonusStorageSMS = "10 GB"
-                    )
-                ).infoText
-            ).isEqualTo(
-                context.getString(
-                    R.string.sms_add_phone_number_dialog_msg_achievement_user,
-                    "10 GB"
-                )
-            )
-        }
-
-    @Test
-    fun `test that when achievement is not enabled info text is correctly mapped`() =
-        runTest {
-            assertThat(
-                underTest(
-                    SMSVerificationUIState(
-                        isUserLocked = false,
-                        isAchievementsEnabled = false,
                     )
                 ).infoText
             ).isEqualTo(

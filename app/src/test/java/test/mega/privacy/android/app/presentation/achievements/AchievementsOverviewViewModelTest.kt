@@ -13,7 +13,6 @@ import mega.privacy.android.app.main.megaachievements.AchievementsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
-import mega.privacy.android.domain.usecase.achievements.IsAddPhoneRewardEnabledUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -27,7 +26,6 @@ class AchievementsOverviewViewModelTest {
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase =
         mock()
     private val areAchievementsEnabled: AreAchievementsEnabledUseCase = mock()
-    private val isAddPhoneRewardEnabled: IsAddPhoneRewardEnabledUseCase = mock()
     private lateinit var underTest: AchievementsOverviewViewModel
 
     private val scheduler = TestCoroutineScheduler()
@@ -50,7 +48,6 @@ class AchievementsOverviewViewModelTest {
         underTest = AchievementsOverviewViewModel(
             getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
             areAchievementsEnabled = areAchievementsEnabled,
-            isAddPhoneRewardEnabled = isAddPhoneRewardEnabled
         )
     }
 
@@ -68,32 +65,11 @@ class AchievementsOverviewViewModelTest {
     fun `test that state contains content when the achievements overview use case returns achievements`() =
         runTest {
             whenever(getAccountAchievementsOverviewUseCase()).thenReturn(fakeAchievements)
-            whenever(isAddPhoneRewardEnabled()).thenReturn(false)
             val expectedUiContent =
                 AchievementsUIState(
                     achievementsOverview = fakeAchievements,
                     areAllRewardsExpired = true,
                     currentStorage = 0,
-                )
-
-            underTest.state.test {
-                val initialState = awaitItem()
-                val contentState = awaitItem()
-                assertEquals(expectedUiContent, contentState)
-            }
-        }
-
-    @Test
-    fun `test that state add phone reward is enabled when the add phone reward enabled use case returns true`() =
-        runTest {
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(fakeAchievements)
-            whenever(isAddPhoneRewardEnabled()).thenReturn(true)
-            val expectedUiContent =
-                AchievementsUIState(
-                    achievementsOverview = fakeAchievements,
-                    areAllRewardsExpired = true,
-                    currentStorage = 0,
-                    hasAddPhoneReward = true,
                 )
 
             underTest.state.test {
@@ -107,20 +83,6 @@ class AchievementsOverviewViewModelTest {
     fun `test that state contains an error when the get achievements overview use case returns an exception`() =
         runTest {
             whenever(getAccountAchievementsOverviewUseCase()).thenThrow(RuntimeException("Error"))
-            whenever(isAddPhoneRewardEnabled()).thenReturn(true)
-
-            underTest.state.test {
-                val initialState = awaitItem()
-                val errorState = awaitItem()
-                assertEquals(AchievementsUIState(showError = true), errorState)
-            }
-        }
-
-    @Test
-    fun `test that state contains an error when the add phone reward enabled use case returns an exception`() =
-        runTest {
-            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(fakeAchievements)
-            whenever(isAddPhoneRewardEnabled()).thenThrow(RuntimeException("Error"))
 
             underTest.state.test {
                 val initialState = awaitItem()

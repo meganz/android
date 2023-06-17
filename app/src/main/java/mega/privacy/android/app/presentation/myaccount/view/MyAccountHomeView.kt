@@ -631,10 +631,7 @@ private fun AccountInfoSection(
                 modifier = Modifier.testTag(ADD_PHONE_NUMBER),
                 icon = R.drawable.ic_verify_phone_circle,
                 title = R.string.add_phone_label,
-                description = if (uiState.isAchievementsEnabled) stringResource(
-                    R.string.sms_add_phone_number_dialog_msg_achievement_user,
-                    formatSize(size = uiState.bonusStorageSms)
-                ) else stringResource(R.string.sms_add_phone_number_dialog_msg_non_achievement_user),
+                description = stringResource(R.string.sms_add_phone_number_dialog_msg_non_achievement_user),
                 isIconMode = false,
                 testTag = ADD_PHONE_NUMBER,
                 onClickListener = {

@@ -412,32 +412,10 @@ class MyAccountHomeViewTest {
     }
 
     @Test
-    fun `test that add your phone number should render with correct subtitle when achievements is enabled`() {
+    fun `test that add your phone number should render with correct subtitle`() {
         initMyAccountWithDefaults(
             MyAccountHomeUIState(
                 canVerifyPhoneNumber = true,
-                isAchievementsEnabled = true,
-            )
-        )
-
-        composeTestRule.onNodeWithTag(ADD_PHONE_NUMBER)
-            .assertIsDisplayed()
-            .assert(
-                hasText(
-                    text = fromId(R.string.sms_add_phone_number_dialog_msg_achievement_user)
-                        .split(".")
-                        .last(),
-                    substring = true
-                )
-            )
-    }
-
-    @Test
-    fun `test that add your phone number should render with correct subtitle when achievements is disabled`() {
-        initMyAccountWithDefaults(
-            MyAccountHomeUIState(
-                canVerifyPhoneNumber = true,
-                isAchievementsEnabled = false,
             )
         )
 

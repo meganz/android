@@ -21,8 +21,8 @@ class SmsPermissionMapperImplTest {
     }
 
     @Test
-    fun `test that 1 returns only unblock`() {
-        Truth.assertThat(underTest(1)).containsExactly(Unblock)
+    fun `test that 1 returns only opt-in`() {
+        Truth.assertThat(underTest(1)).containsExactly(OptInVerification)
     }
 
     @Test
