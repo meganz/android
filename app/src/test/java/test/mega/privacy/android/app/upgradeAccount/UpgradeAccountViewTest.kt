@@ -1,10 +1,12 @@
 package test.mega.privacy.android.app.upgradeAccount
 
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -292,14 +294,29 @@ class UpgradeAccountViewTest {
         composeRule.onNodeWithTag("LINK_TO_PRICING_PAGE_TAG").assertDoesNotExist()
     }
 
+    @Test
+    fun `test that empty plan cards are shown if the list for subscriptions is empty`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    localisedSubscriptionList = emptyList(),
+                    accountType = AccountType.PRO_II,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true
+                ),
+            )
+        }
+        composeRule.onAllNodesWithTag("EMPTY_CARD_TAG").assertCountEquals(4)
+    }
 
     private fun getUpgradeAccountState(
+        localisedSubscriptionList: List<LocalisedSubscription> = expectedLocalisedSubscriptionsList,
         accountType: AccountType,
         showBillingWarning: Boolean,
         isPaymentMethodAvailable: Boolean,
     ): UpgradeAccountState =
         UpgradeAccountState(
-            localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+            localisedSubscriptionsList = localisedSubscriptionList,
             currentSubscriptionPlan = accountType,
             showBillingWarning = showBillingWarning,
             currentPayment = UpgradePayment(

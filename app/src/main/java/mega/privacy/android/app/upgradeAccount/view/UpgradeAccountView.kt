@@ -1,6 +1,11 @@
 package mega.privacy.android.app.upgradeAccount.view
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,9 +15,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +43,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +83,7 @@ import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.black_yellow_700
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
 import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_800
+import mega.privacy.android.core.ui.theme.extensions.grey_100_alpha_060_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
@@ -189,62 +200,66 @@ fun UpgradeAccountView(
                 )
             }
 
-            state.localisedSubscriptionsList.forEach {
-                val isCurrentPlan = remember {
-                    derivedStateOf { state.currentSubscriptionPlan == it.accountType }
-                }
-                val isRecommended = remember {
-                    derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
-                }
-                if (isRecommended.value && !isPreselectedPlanOnce && isPaymentMethodAvailable) {
-                    chosenPlan = it.accountType
-                    onChoosingMonthlyYearlyPlan(isMonthly)
-                    onChoosingPlanType(it.accountType)
-                }
-                SubscriptionPlansInfoCard(
-                    proPlan = it.accountType,
-                    subscription = it,
-                    isCurrentPlan = isCurrentPlan.value,
-                    isRecommended = isRecommended.value,
-                    onPlanClicked = {
-                        chosenPlan =
-                            if (isPaymentMethodAvailable) it.accountType else AccountType.FREE
-                        isPreselectedPlanOnce = true
+            if (state.localisedSubscriptionsList.isEmpty()) {
+                LoadingShimmerEffect()
+            } else {
+                state.localisedSubscriptionsList.forEach {
+                    val isCurrentPlan = remember {
+                        derivedStateOf { state.currentSubscriptionPlan == it.accountType }
+                    }
+                    val isRecommended = remember {
+                        derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
+                    }
+                    if (isRecommended.value && !isPreselectedPlanOnce && isPaymentMethodAvailable) {
+                        chosenPlan = it.accountType
                         onChoosingMonthlyYearlyPlan(isMonthly)
                         onChoosingPlanType(it.accountType)
-                        if (!isPaymentMethodAvailable) {
-                            coroutineScope.launch {
-                                scrollState.animateScrollTo(0)
+                    }
+                    SubscriptionPlansInfoCard(
+                        proPlan = it.accountType,
+                        subscription = it,
+                        isCurrentPlan = isCurrentPlan.value,
+                        isRecommended = isRecommended.value,
+                        onPlanClicked = {
+                            chosenPlan =
+                                if (isPaymentMethodAvailable) it.accountType else AccountType.FREE
+                            isPreselectedPlanOnce = true
+                            onChoosingMonthlyYearlyPlan(isMonthly)
+                            onChoosingPlanType(it.accountType)
+                            if (!isPaymentMethodAvailable) {
+                                coroutineScope.launch {
+                                    scrollState.animateScrollTo(0)
+                                }
                             }
-                        }
-                    },
-                    isMonthly = isMonthly,
-                    isClicked = (chosenPlan == it.accountType) && isPaymentMethodAvailable
-                )
-            }
-
-            if (state.localisedSubscriptionsList.isNotEmpty() && state.currentSubscriptionPlan == AccountType.PRO_III) {
-                PricingPageLinkText(
-                    onLinkClick = onPricingPageClicked
-                )
-            }
-
-            FeaturesOfPlans()
-
-            Text(
-                text = stringResource(id = R.string.account_upgrade_account_terms_of_service_link),
-                style = MaterialTheme.typography.button,
-                color = MaterialTheme.colors.teal_300_teal_200,
-                modifier = Modifier
-                    .padding(
-                        start = 24.dp,
-                        top = 20.dp,
-                        bottom = 12.dp
+                        },
+                        isMonthly = isMonthly,
+                        isClicked = (chosenPlan == it.accountType) && isPaymentMethodAvailable
                     )
-                    .testTag("TOS")
-                    .clickable { onTOSClicked() },
-                fontWeight = FontWeight.Medium,
-            )
+                }
+
+                if (state.currentSubscriptionPlan == AccountType.PRO_III) {
+                    PricingPageLinkText(
+                        onLinkClick = onPricingPageClicked
+                    )
+                }
+
+                FeaturesOfPlans()
+
+                Text(
+                    text = stringResource(id = R.string.account_upgrade_account_terms_of_service_link),
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.teal_300_teal_200,
+                    modifier = Modifier
+                        .padding(
+                            start = 24.dp,
+                            top = 20.dp,
+                            bottom = 12.dp
+                        )
+                        .testTag("TOS")
+                        .clickable { onTOSClicked() },
+                    fontWeight = FontWeight.Medium,
+                )
+            }
         }
     }
 }
@@ -416,6 +431,153 @@ fun MonthlyYearlyTabs(
                 style = body2,
                 fontWeight = FontWeight.Medium,
             )
+        }
+    }
+}
+
+@Composable
+fun LoadingShimmerEffect() {
+    val gradient = listOf(
+        MaterialTheme.colors.grey_100_alpha_060_dark_grey,
+        MaterialTheme.colors.grey_020_grey_800,
+        MaterialTheme.colors.grey_100_alpha_060_dark_grey,
+    )
+
+    val transition = rememberInfiniteTransition()
+
+    val translateAnimation = transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 800,
+                easing = FastOutLinearInEasing
+            )
+        )
+    )
+    val brush = linearGradient(
+        colors = gradient,
+        start = Offset.Zero,
+        end = Offset(
+            x = translateAnimation.value,
+            y = translateAnimation.value
+        )
+    )
+    EmptySubscriptionPlansInfoCards(brush = brush)
+}
+
+@Composable
+fun EmptySubscriptionPlansInfoCards(brush: Brush) {
+    for (i in 1..4) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            elevation = 0.dp,
+            modifier = Modifier
+                .padding(
+                    start = 8.dp,
+                    top = 8.dp,
+                    end = 8.dp
+                )
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                    shape = RoundedCornerShape(12.dp),
+                )
+                .testTag("EMPTY_CARD_TAG")
+        ) {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .height(45.dp)
+                        .padding(start = 16.dp)
+                ) {
+                    Spacer(
+                        modifier = Modifier
+                            .height(20.dp)
+                            .width(100.dp)
+                            .background(brush)
+                            .align(Alignment.CenterVertically)
+                    )
+                }
+                Divider(
+                    thickness = 0.4.dp,
+                    color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                    modifier = Modifier.padding(horizontal = 1.dp)
+                )
+                Row(
+                    modifier = Modifier.padding(
+                        vertical = 16.dp,
+                        horizontal = 16.dp
+                    )
+                ) {
+                    Column(modifier = Modifier.weight(0.5f)) {
+                        Row() {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(28.dp)
+                                    .width(56.dp)
+                                    .padding(
+                                        end = 8.dp,
+                                        bottom = 8.dp
+                                    )
+                                    .background(brush)
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(28.dp)
+                                    .width(32.dp)
+                                    .padding(
+                                        end = 8.dp,
+                                        bottom = 8.dp
+                                    )
+                                    .background(brush)
+                            )
+                        }
+                        Row() {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .width(64.dp)
+                                    .padding(end = 8.dp)
+                                    .background(brush)
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .width(32.dp)
+                                    .background(brush)
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(0.5f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .height(25.dp)
+                                .width(64.dp)
+                                .padding(bottom = 5.dp)
+                                .background(brush)
+                        )
+                        Row() {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(16.dp)
+                                    .width(48.dp)
+                                    .padding(end = 2.dp)
+                                    .background(brush)
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(16.dp)
+                                    .width(24.dp)
+                                    .background(brush)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
