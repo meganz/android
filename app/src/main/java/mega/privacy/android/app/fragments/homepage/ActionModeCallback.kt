@@ -55,7 +55,13 @@ class ActionModeCallback constructor(
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 Timber.d("Public link option")
-                LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
+                if (nodesHandles.isNotEmpty()) {
+                    if (nodesHandles.size > 1) {
+                        LinksUtil.showGetLinkActivity(mainActivity, nodesHandles.toLongArray())
+                    } else {
+                        LinksUtil.showGetLinkActivity(mainActivity, nodesHandles[0])
+                    }
+                }
             }
             R.id.cab_menu_remove_link -> {
                 Timber.d("Remove public link option")
@@ -99,6 +105,8 @@ class ActionModeCallback constructor(
             mainActivity.resources.getQuantityString(R.plurals.get_links, selectedNodes.size)
 
         if (areAllNotTakenDown) {
+            control.manageLink().setVisible(true).showAsAction =
+                MenuItem.SHOW_AS_ACTION_ALWAYS
             if (selectedNodes.size == 1
                 && megaApi.checkAccessErrorExtended(
                     selectedNodes[0],
@@ -107,8 +115,6 @@ class ActionModeCallback constructor(
                 == MegaError.API_OK
             ) {
                 if (selectedNodes[0]!!.isExported) {
-                    control.manageLink().setVisible(true).showAsAction =
-                        MenuItem.SHOW_AS_ACTION_ALWAYS
                     control.removeLink().isVisible = true
                 } else {
                     control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
@@ -120,10 +126,6 @@ class ActionModeCallback constructor(
             val selectedMegaNodes = map { it.node }
             control.trash().isVisible = MegaNodeUtil.canMoveToRubbish(selectedMegaNodes)
             control.selectAll().isVisible = selectedMegaNodes.size < nodeCount
-        }
-
-        if (selectedNodes.size > 1) {
-            control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
         }
 
         if (areAllNotTakenDown) {

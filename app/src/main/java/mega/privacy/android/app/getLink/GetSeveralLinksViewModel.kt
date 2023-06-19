@@ -224,18 +224,7 @@ class GetSeveralLinksViewModel @Inject constructor(
      *
      * @return The links.
      */
-    fun getLinksString(): String {
-        var links = ""
-
-        linkItemsList.value.let { list ->
-            val linksList = list ?: return@let
-
-            for (linkItem in linksList) {
-                if (linkItem is LinkItem.Data)
-                    links += linkItem.link + "\n"
-            }
-        }
-
-        return links
-    }
+    fun getLinksString() = linkItemsList.value?.filterIsInstance<LinkItem.Data>()
+        ?.mapNotNull { it.link }
+        ?.joinToString(separator = "\n", postfix = "\n") ?: ""
 }

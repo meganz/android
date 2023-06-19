@@ -156,6 +156,11 @@ class FavouritesViewModel @Inject constructor(
         selected.update {
             if (it.contains(nodeId)) it - nodeId else it + nodeId
         }
+        itemsSelected[nodeId.longValue]?.let {
+            itemsSelected.remove(nodeId.longValue)
+        } ?: run {
+            itemsSelected[nodeId.longValue] = item
+        }
     }
 
     /**
@@ -165,6 +170,10 @@ class FavouritesViewModel @Inject constructor(
         (_state.value as? FavouriteLoadState.Success)?.favourites?.mapNotNull { it.favourite?.typedNode?.id }
             ?.toSet()?.let { allNodes ->
                 selected.update { allNodes }
+            }
+        (_state.value as? FavouriteLoadState.Success)?.favourites?.mapNotNull { it.favourite }
+            ?.forEach { favorite ->
+                itemsSelected[favorite.typedNode.id.longValue] = favorite
             }
     }
 
@@ -183,6 +192,7 @@ class FavouritesViewModel @Inject constructor(
      */
     fun clearSelections() {
         selected.update { emptySet() }
+        itemsSelected.clear()
     }
 
     /**

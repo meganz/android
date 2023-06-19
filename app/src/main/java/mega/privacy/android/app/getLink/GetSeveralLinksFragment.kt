@@ -123,8 +123,6 @@ class GetSeveralLinksFragment : Fragment() {
             )
         }
 
-        copyLinks(viewModel.getLinksString())
-
         binding.copyButton.apply {
             isEnabled = false
             setOnClickListener { copyLinks(viewModel.getLinksString()) }
@@ -143,6 +141,9 @@ class GetSeveralLinksFragment : Fragment() {
      */
     private fun showLinks(links: List<LinkItem>) {
         linksAdapter.submitList(links)
+        if (viewModel.getLinksString().isNotBlank()) {
+            copyLinks(viewModel.getLinksString())
+        }
     }
 
     /**
@@ -155,7 +156,6 @@ class GetSeveralLinksFragment : Fragment() {
             isEnabled = !isExportingNodes
             alpha = if (isExportingNodes) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
         }
-
         refreshMenuOptionsVisibility()
     }
 

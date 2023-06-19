@@ -71,7 +71,13 @@ class FavouriteActionModeCallback(
 
                 R.id.cab_menu_share_link -> {
                     Timber.d("Public link option")
-                    LinksUtil.showGetLinkActivity(mainActivity, nodeHandles.toLongArray())
+                    if (nodeHandles.isNotEmpty()) {
+                        if (nodeHandles.size > 1) {
+                            LinksUtil.showGetLinkActivity(mainActivity, nodeHandles.toLongArray())
+                        } else {
+                            LinksUtil.showGetLinkActivity(mainActivity, nodeHandles[0])
+                        }
+                    }
                 }
 
                 R.id.cab_menu_send_to_chat -> {
