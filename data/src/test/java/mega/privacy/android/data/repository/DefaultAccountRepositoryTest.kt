@@ -25,6 +25,7 @@ import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
+import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -94,6 +95,7 @@ class DefaultAccountRepositoryTest {
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
     private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
+    private val accountBlockedDetailMapper = AccountBlockedDetailMapper()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -150,7 +152,8 @@ class DefaultAccountRepositoryTest {
             cacheFolderGateway = cacheFolderGateway,
             passwordStrengthMapper = passwordStrengthMapper,
             appEventGateway = appEventGateway,
-            ephemeralCredentialsGateway = ephemeralCredentialsGateway
+            ephemeralCredentialsGateway = ephemeralCredentialsGateway,
+            accountBlockedDetailMapper = accountBlockedDetailMapper,
         )
 
     }

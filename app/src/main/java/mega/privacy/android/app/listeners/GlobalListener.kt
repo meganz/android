@@ -46,11 +46,12 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
-import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.account.BroadcastAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.notifications.BroadcastHomeBadgeCountUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -89,6 +90,7 @@ class GlobalListener @Inject constructor(
     private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
+    private val broadcastAccountBlockedUseCase: BroadcastAccountBlockedUseCase,
 ) : MegaGlobalListenerInterface {
 
     /**
@@ -255,11 +257,7 @@ class GlobalListener @Inject constructor(
 
             MegaEvent.EVENT_ACCOUNT_BLOCKED -> {
                 Timber.d("EVENT_ACCOUNT_BLOCKED: %s", event.number)
-                appContext.sendBroadcast(
-                    Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
-                        .putExtra(BroadcastConstants.EVENT_NUMBER, event.number)
-                        .putExtra(BroadcastConstants.EVENT_TEXT, event.text)
-                )
+                applicationScope.launch { broadcastAccountBlockedUseCase(event.number, event.text) }
             }
 
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()

@@ -42,6 +42,7 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -134,6 +135,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
     private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
+    private val accountBlockedDetailMapper: AccountBlockedDetailMapper
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -846,10 +848,18 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun clearEphemeral() = ephemeralCredentialsGateway.clear()
 
     override fun monitorRefreshSession() = appEventGateway.monitorRefreshSession()
+
+    override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
+
     override suspend fun getAccountType(): AccountType =
         accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
 
-    override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
+    override suspend fun broadcastAccountBlocked(type: Long, text: String) =
+        withContext(ioDispatcher) {
+            appEventGateway.broadcastAccountBlocked(accountBlockedDetailMapper(type, text))
+        }
+
+    override fun monitorAccountBlocked() = appEventGateway.monitorAccountBlocked()
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
