@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -855,12 +855,6 @@
     <string name="confirmation_delete_avatar">Îți ștergi poza de profil?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Editează</string>
-    <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Setează o dată de expirare</string>
-    <!-- Title of the dialog to get link with password -->
-    <string name="title_set_password_protection">Setează protecție prin parolă</string>
-    <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(numai Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Setează o parolă</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1951,7 +1945,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Data viitoare când te autentifici în cont ți se va cere să introduci un cod din 6 cifre furnizat de aplicația de autentificare.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Te rugăm să salvezi <b>cheia de recuperare</b> într-o locație sigură, pentru a evita problemele în cazul în care pierzi accesul la aplicație sau vrei să dezactivezi autentificarea cu doi factori.</string>
+    <string name="recommendation_2fa_enabled">Please save your         <b>Recovery key</b>         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Cod nevalid</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4715,8 +4709,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Pornește</string>
-    <!-- Answer for confirmation dialog. -->
-    <string name="general_camelcase_ok">OK</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -5026,9 +5018,9 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Economisește până la 16&#160;% cu facturarea anuală</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -5038,28 +5030,28 @@
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Planul actual</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features"></string>
+    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password"></string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Password-protected links</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link"></string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links with expiry dates</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Transfer quota sharing</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup"></string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatic backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite"></string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i"></string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii"></string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii"></string>
-    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Termenii de utilizare a serviciului</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this link can view and download your data</string>
@@ -5090,4 +5082,25 @@
     <string name="meetings_mute_notifications_dialog_title">Mute meeting notifications for</string>
     <!-- Confirmation dialog title to leave a meeting -->
     <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
+    <!-- Album import rename album title -->
+    <string name="album_import_rename_album_title">Redenumește albumul</string>
+    <!-- Album import rename album description -->
+    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <!-- Album import enter album name -->
+    <string name="album_import_enter_album_name">Enter an album name</string>
+    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <plurals name="cloud_drive_subtitle_links_access_user">
+        <item quantity="one">Anyone with this link can view and download your data</item>
+        <item quantity="other">Anyone with these links can view and download your data</item>
+    </plurals>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">Salvează în unitatea cloud</string>
+    <!-- Album import saving -->
+    <string name="album_import_saving">Saving&#8230;</string>
+    <!-- Album import success message -->
+    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <!-- Album import error message -->
+    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
 </resources>

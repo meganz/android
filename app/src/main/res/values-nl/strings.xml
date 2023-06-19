@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -844,12 +844,6 @@
     <string name="confirmation_delete_avatar">Uw profielfoto verwijderen?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Bewerken</string>
-    <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">Vervaldatum instellen</string>
-    <!-- Title of the dialog to get link with password -->
-    <string name="title_set_password_protection">Wachtwoord bescherming instellen</string>
-    <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">(allen voor Pro)</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">Wachtwoord instellen</string>
     <!-- Hint of the dialog to get link with password -->
@@ -4541,8 +4535,6 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
-    <!-- Answer for confirmation dialog. -->
-    <string name="general_camelcase_ok">OK</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_file_warning">Dit bestand is verwijderd in overeenstemming met ons [A]Verwijderingsbeleid[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
@@ -4849,9 +4841,9 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Bespaar tot 16% met jaarlijkse afschrijving</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Opslag:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Overdracht:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -4861,19 +4853,19 @@
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Huidige abonnement</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features"></string>
+    <string name="account_upgrade_account_description_title_features">Kenmerken van Pro abonnementen</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password"></string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Wachtwoord-beschermende links</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link"></string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links met verloopdatums</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Overdrachtstegoed deling</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup"></string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatische back-ups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Spoel terug tot 90 dagen met Pro Lite en tot 365 dagen met Pro I, II en II (komt binnenkort)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Plan het opruimen van vuilnisbakken tussen 7 dagen en 10 jaar</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Koop Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4882,7 +4874,7 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">Koop Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Koop Pro III</string>
-    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Algemene Voorwaarden</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <string name="cloud_drive_subtitle_links_access_all_user">Iedereen met deze link kan uw gegevens bekijken en downloaden.</string>
@@ -4913,4 +4905,25 @@
     <string name="meetings_mute_notifications_dialog_title">Vergader meldingen dempen voor</string>
     <!-- Confirmation dialog title to leave a meeting -->
     <string name="meetings_leave_meeting_confirmation_dialog_title">Vergadering verlaten?</string>
+    <!-- Album import rename album title -->
+    <string name="album_import_rename_album_title">Hernoem album</string>
+    <!-- Album import rename album description -->
+    <string name="album_import_rename_album_description">Er bestaat al een album met de naam “%1$s” in uw albums. Voer een nieuwe naam in voor het album dat u opslaat.</string>
+    <!-- Album import enter album name -->
+    <string name="album_import_enter_album_name">Voer een albumnaam in</string>
+    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pricing_page_link_text">U kunt uw huidige abonnement upgraden op onze [A]prijzen pagina.[/A]</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <plurals name="cloud_drive_subtitle_links_access_user">
+        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden.</item>
+        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden.</item>
+    </plurals>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">Opslaan op de Cloud schijf</string>
+    <!-- Album import saving -->
+    <string name="album_import_saving">Saving&#8230;</string>
+    <!-- Album import success message -->
+    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <!-- Album import error message -->
+    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
 </resources>
