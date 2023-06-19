@@ -279,28 +279,46 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Sets up a Secondary Folder with a Media Uploads folder name
      */
-    fun setupDefaultSecondaryCameraUploadFolder(secondaryFolderName: String) {
+    fun setupDefaultSecondaryCameraUploadFolder(secondaryFolderName: String) =
         viewModelScope.launch {
-            setupDefaultSecondaryFolderUseCase(secondaryFolderName)
+            runCatching {
+                setupDefaultSecondaryFolderUseCase(secondaryFolderName)
+            }.onFailure {
+                Timber.w(it)
+                setErrorState(shouldShow = true)
+            }
         }
-    }
 
     /**
      * Sets up the Primary Folder with a given folder handle
      */
-    fun setupPrimaryCameraUploadFolder(primaryHandle: Long) {
-        viewModelScope.launch {
+    fun setupPrimaryCameraUploadFolder(primaryHandle: Long) = viewModelScope.launch {
+        runCatching {
             setupPrimaryFolderUseCase(primaryHandle)
+        }.onFailure {
+            Timber.w(it)
+            setErrorState(shouldShow = true)
         }
     }
 
     /**
      * Sets up the Secondary Folder with a given folder handle
      */
-    fun setupSecondaryCameraUploadFolder(secondaryHandle: Long) {
-        viewModelScope.launch {
+    fun setupSecondaryCameraUploadFolder(secondaryHandle: Long) = viewModelScope.launch {
+        runCatching {
             setupSecondaryFolderUseCase(secondaryHandle)
+        }.onFailure {
+            Timber.w(it)
+            setErrorState(shouldShow = true)
         }
+    }
+
+    /**
+     * Sets the value of [SettingsCameraUploadsState.shouldShowError]
+     * @param shouldShow The new state value
+     */
+    fun setErrorState(shouldShow: Boolean) {
+        _state.update { it.copy(shouldShowError = shouldShow) }
     }
 
     /**

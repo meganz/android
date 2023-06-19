@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
@@ -82,7 +83,7 @@ class SettingsCameraUploadsViewModelTest {
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
-    private val getUploadVideoQuality = mock<GetUploadVideoQualityUseCase>()
+    private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
     private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
@@ -138,7 +139,7 @@ class SettingsCameraUploadsViewModelTest {
             disableMediaUploadSettings = disableMediaUploadSettings,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
-            getUploadVideoQualityUseCase = getUploadVideoQuality,
+            getUploadVideoQualityUseCase = getUploadVideoQualityUseCase,
             getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
@@ -191,6 +192,7 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.uploadOption).isNull()
             assertThat(state.videoCompressionSizeLimit).isEqualTo(0)
             assertThat(state.videoQuality).isNull()
+            assertThat(state.shouldShowError).isFalse()
         }
     }
 
@@ -417,13 +419,13 @@ class SettingsCameraUploadsViewModelTest {
             setupUnderTest()
 
             underTest.changeUploadVideoQuality(4)
-            verifyNoInteractions(setUploadVideoQualityUseCase, getUploadVideoQuality)
+            verifyNoInteractions(setUploadVideoQualityUseCase, getUploadVideoQualityUseCase)
         }
 
     private fun testUploadVideoQuality(value: Int, expectedVideoQuality: VideoQuality) = runTest {
         setupUnderTest()
 
-        whenever(getUploadVideoQuality()).thenReturn(expectedVideoQuality)
+        whenever(getUploadVideoQualityUseCase()).thenReturn(expectedVideoQuality)
 
         underTest.changeUploadVideoQuality(value)
         underTest.state.test {
@@ -714,5 +716,47 @@ class SettingsCameraUploadsViewModelTest {
             underTest.stopCameraUpload()
 
             verify(stopCameraUploadAndHeartbeatUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that shouldDisplayError is true when an exception occurs while setting up the primary folder`() =
+        runTest {
+            setupUnderTest()
+
+            whenever(setupPrimaryFolderUseCase(any())).thenThrow(RuntimeException())
+
+            underTest.state.map { it.shouldShowError }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isFalse()
+                underTest.setupPrimaryCameraUploadFolder(any())
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldDisplayError is true when an exception occurs while setting up the secondary folder`() =
+        runTest {
+            setupUnderTest()
+
+            whenever(setupSecondaryFolderUseCase(any())).thenThrow(RuntimeException())
+
+            underTest.state.map { it.shouldShowError }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isFalse()
+                underTest.setupSecondaryCameraUploadFolder(any())
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that shouldDisplayError is true when an exception occurs while setting up the default secondary folder`() =
+        runTest {
+            setupUnderTest()
+
+            whenever(setupDefaultSecondaryFolderUseCase(any())).thenThrow(RuntimeException())
+
+            underTest.state.map { it.shouldShowError }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isFalse()
+                underTest.setupDefaultSecondaryCameraUploadFolder(anyString())
+                assertThat(awaitItem()).isTrue()
+            }
         }
 }

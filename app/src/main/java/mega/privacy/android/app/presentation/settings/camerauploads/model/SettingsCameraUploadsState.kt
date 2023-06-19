@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property uploadOption Determines what content should be uploaded
  * @property videoCompressionSizeLimit The maximum video file size that can be compressed
  * @property videoQuality Determines the Video Quality of videos to be uploaded
+ * @property shouldShowError Should display an error
  */
 data class SettingsCameraUploadsState(
     @StringRes val accessMediaLocationRationaleText: Int? = null,
@@ -41,4 +42,5 @@ data class SettingsCameraUploadsState(
     val uploadOption: UploadOption? = null,
     val videoCompressionSizeLimit: Int = 0,
     val videoQuality: VideoQuality? = null,
+    val shouldShowError: Boolean = false,
 )

@@ -613,7 +613,18 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
                 handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
+                handleShouldDisplayError(it.shouldShowError)
             }
+        }
+    }
+
+    /**
+     * Display a general error message in case an error occurred while processing one of option
+     */
+    private fun handleShouldDisplayError(shouldDisplayError: Boolean) {
+        if (shouldDisplayError) {
+            snackbarCallBack?.showSnackbar(getString(R.string.general_error))
+            viewModel.setErrorState(false)
         }
     }
 
