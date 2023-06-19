@@ -63,7 +63,7 @@ class ReferralBonusesViewModel @Inject constructor(
                          * Call a mapper to map the achievement combined with contact
                          * into a new object combined, because the view would required this combined data
                          */
-                        referralBonusAchievementsMapper(achievement, contact?.contactData)
+                        referralBonusAchievementsMapper(achievement, contact)
                     }
 
                 _uiState.update { it.copy(awardedInviteAchievements = achievements) }

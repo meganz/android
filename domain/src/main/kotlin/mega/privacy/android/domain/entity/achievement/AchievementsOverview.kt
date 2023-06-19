@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.achievement
 
+import mega.privacy.android.domain.entity.contacts.ContactItem
+
 /**
  * Overview of all the existing achievements and rewards.
  *
@@ -87,14 +89,12 @@ open class AwardedAchievementInvite(
 
 /**
  * Extension class to include
- * @property referredAvatarUri the uri / path to the avatar file
- * @property referredName name / full name of the contact which awarded you the achievements
+ * @property contact the contact of the user you receive an achievements for
  * @property expirationInDays the number of days left to an expired referral bonus
  * This class is only an extension to modify the existing [AwardedAchievementInvite]
  */
 data class ReferralBonusAchievements(
-    val referredAvatarUri: String? = null,
-    val referredName: String? = null,
+    val contact: ContactItem?,
     val expirationInDays: Long,
     override val awardId: Int,
     override val expirationTimestampInSeconds: Long,

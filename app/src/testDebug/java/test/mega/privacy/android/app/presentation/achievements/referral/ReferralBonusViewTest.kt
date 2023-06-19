@@ -14,6 +14,10 @@ import mega.privacy.android.app.presentation.achievements.referral.view.Referral
 import mega.privacy.android.app.presentation.achievements.referral.view.TestTags
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,14 +36,15 @@ class ReferralBonusViewTest {
 
     @Test
     fun `test that on first load should render with correct state`() {
-        val achievements = listOf(createReferralBonusAchievements("Qwerty Uiop"))
+        val achievements = listOf(createReferralBonusAchievements("Qwerty Uiop", "Avatar URI"))
 
         composeTestRule.setContent {
             ReferralBonusView(uiState = ReferralBonusesUIState(awardedInviteAchievements = achievements))
         }
 
         achievements.forEachIndexed { index, _ ->
-            composeTestRule.onNodeWithTag(TestTags.ROUNDED_IMAGE + index).assertIsDisplayed()
+            composeTestRule.onNodeWithTag(TestTags.AVATAR_IMAGE + index).assertIsDisplayed()
+            composeTestRule.onNodeWithTag(TestTags.TEXT_AVATAR + index).assertDoesNotExist()
             composeTestRule.onNodeWithTag(TestTags.TITLE + index).assertWithText(name)
             composeTestRule.onNodeWithTag(TestTags.STORAGE + index)
                 .assertWithText(
@@ -61,8 +66,22 @@ class ReferralBonusViewTest {
     }
 
     @Test
+    fun `test that text avatar should be visible when avatar uri is null`() {
+        val achievements = listOf(createReferralBonusAchievements("Qwerty Uiop", null))
+
+        composeTestRule.setContent {
+            ReferralBonusView(uiState = ReferralBonusesUIState(awardedInviteAchievements = achievements))
+        }
+
+        achievements.forEachIndexed { index, _ ->
+            composeTestRule.onNodeWithTag(TestTags.TEXT_AVATAR + index).assertIsDisplayed()
+            composeTestRule.onNodeWithTag(TestTags.AVATAR_IMAGE + index).assertDoesNotExist()
+        }
+    }
+
+    @Test
     fun `test that title should be replaced with email when referred name is null`() {
-        val achievements = listOf(createReferralBonusAchievements(null))
+        val achievements = listOf(createReferralBonusAchievements(null, null))
 
         composeTestRule.setContent {
             ReferralBonusView(uiState = ReferralBonusesUIState(awardedInviteAchievements = achievements))
@@ -73,10 +92,21 @@ class ReferralBonusViewTest {
         }
     }
 
-    private fun createReferralBonusAchievements(name: String?): ReferralBonusAchievements {
+    private fun createReferralBonusAchievements(
+        name: String?,
+        avatar: String?,
+    ): ReferralBonusAchievements {
         return ReferralBonusAchievements(
-            referredAvatarUri = "",
-            referredName = name,
+            contact = ContactItem(
+                handle = 1L,
+                email = email,
+                contactData = ContactData(fullName = name, alias = "KG", avatarUri = avatar),
+                defaultAvatarColor = null,
+                visibility = UserVisibility.Visible,
+                timestamp = 0,
+                areCredentialsVerified = true,
+                status = UserStatus.Online
+            ),
             expirationInDays = expirationInDays,
             awardId = 1,
             expirationTimestampInSeconds = 12312312,

@@ -36,9 +36,19 @@ class ReferralBonusesViewModelTest {
     private val expirationInDays = 100L
     private val name = "Qwerty Uiop"
     private val emails = listOf("qwerty@uiop.com")
+    private val contact = ContactItem(
+        handle = 1L,
+        email = emails[0],
+        contactData = ContactData(name, "KG", null),
+        defaultAvatarColor = null,
+        visibility = UserVisibility.Visible,
+        timestamp = 0,
+        areCredentialsVerified = true,
+        status = UserStatus.Online
+    )
 
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock {
-        onBlocking { invoke(emails.get(0), false) }.thenReturn(
+        onBlocking { invoke(emails[0], false) }.thenReturn(
             ContactItem(
                 handle = 1L,
                 email = emails.get(0),
@@ -102,8 +112,7 @@ class ReferralBonusesViewModelTest {
             underTest.uiState.test {
                 val achievements = awaitItem().awardedInviteAchievements[0]
                 assertThat(achievements.awardId).isEqualTo(1)
-                assertThat(achievements.referredName).isEqualTo(name)
-                assertThat(achievements.referredAvatarUri).isNull()
+                assertThat(achievements.contact).isEqualTo(contact)
                 assertThat(achievements.expirationTimestampInSeconds).isEqualTo(expirationInDays)
                 assertThat(achievements.rewardedStorageInBytes).isEqualTo(reward100Mb)
                 assertThat(achievements.rewardedTransferInBytes).isEqualTo(reward100Mb)

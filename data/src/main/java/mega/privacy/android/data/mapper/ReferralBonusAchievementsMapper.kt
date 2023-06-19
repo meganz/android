@@ -2,7 +2,7 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
-import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -16,15 +16,14 @@ class ReferralBonusAchievementsMapper @Inject constructor(
     /**
      * Invoke
      * @param awardedAchievementInvite
-     * @param contactData
+     * @param contact
      */
     operator fun invoke(
         awardedAchievementInvite: AwardedAchievementInvite,
-        contactData: ContactData?,
+        contact: ContactItem?,
     ): ReferralBonusAchievements {
         return ReferralBonusAchievements(
-            referredAvatarUri = contactData?.avatarUri,
-            referredName = contactData?.fullName,
+            contact = contact,
             expirationInDays = numberOfDaysMapper(awardedAchievementInvite.expirationTimestampInSeconds.toMillis()),
             awardId = awardedAchievementInvite.awardId,
             expirationTimestampInSeconds = awardedAchievementInvite.expirationTimestampInSeconds,

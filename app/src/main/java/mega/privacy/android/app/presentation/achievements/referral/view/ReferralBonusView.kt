@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.achievements.referral.view
 
+import android.graphics.Color
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -16,17 +16,19 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import coil.compose.AsyncImage
+import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
+import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
+import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -37,13 +39,18 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 import mega.privacy.android.core.ui.theme.grey_500
 import mega.privacy.android.core.ui.theme.red_800
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.user.UserVisibility
 
 internal object TestTags {
     /**
      * Because this screens components are a list of items, the suffix index_ is necessary to help
      * determine the row of the tested views.
      */
-    const val ROUNDED_IMAGE = "referral_bonuses_view:image_avatar_index_"
+    const val AVATAR_IMAGE = "referral_bonuses_view:image_avatar_index_"
+    const val TEXT_AVATAR = "referral_bonuses_view:text_avatar_index_"
     const val TITLE = "referral_bonuses_view:text_title_index_"
     const val STORAGE = "referral_bonuses_view:text_storage_index_"
     const val TRANSFER = "referral_bonuses_view:text_transfer_index_"
@@ -52,7 +59,6 @@ internal object TestTags {
 
 /**
  * Referral Bonus Fragment in Jetpack Compose
- * @see [ReferralBonusesFragment]
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -79,7 +85,7 @@ fun ReferralBonusView(uiState: ReferralBonusesUIState) {
 }
 
 @Composable
-private fun ReferralListItem(
+internal fun ReferralListItem(
     modifier: Modifier,
     data: ReferralBonusAchievements,
     index: Int,
@@ -90,21 +96,34 @@ private fun ReferralListItem(
             .fillMaxWidth()
     ) {
         val (avatar, title, storage, transfer, days, divider) = createRefs()
+        val avatarSize = 40
+        val avatarUri = data.contact?.contactData?.avatarUri
+        val avatarModifier = Modifier
+            .size(avatarSize.dp)
+            .constrainAs(avatar) {
+                top.linkTo(parent.top)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start, 18.dp)
+            }
 
-        AsyncImage(
-            modifier = Modifier
-                .testTag("${TestTags.ROUNDED_IMAGE}$index")
-                .size(40.dp)
-                .clip(CircleShape)
-                .constrainAs(avatar) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start, 18.dp)
-                },
-            model = data.referredAvatarUri,
-            contentScale = ContentScale.Crop,
-            contentDescription = "Avatar"
-        )
+        if (avatarUri.isNullOrBlank()) {
+            Avatar(
+                modifier = avatarModifier.testTag("${TestTags.TEXT_AVATAR}$index"),
+                content = TextAvatarContent(
+                    avatarText = data.contact?.contactData?.fullName?.take(1).orEmpty(),
+                    backgroundColor = data.contact?.defaultAvatarColor?.toColorInt()
+                        ?: Color.TRANSPARENT,
+                    showBorder = false,
+                    textSize = (avatarSize.dp.value / 1.8).sp
+                )
+            )
+        } else {
+            Avatar(
+                modifier = avatarModifier.testTag("${TestTags.AVATAR_IMAGE}$index"),
+                content = PhotoAvatarContent(avatarUri, avatarSize.toLong(), false)
+            )
+        }
+
         Text(
             modifier = Modifier
                 .testTag("${TestTags.TITLE}$index")
@@ -118,7 +137,7 @@ private fun ReferralListItem(
                         bias = 0f
                     )
                 },
-            text = data.referredName ?: data.referredEmails[0],
+            text = data.contact?.contactData?.fullName ?: data.referredEmails[0],
             style = MaterialTheme.typography.subtitle1,
             color = MaterialTheme.colors.black_white,
             overflow = TextOverflow.Ellipsis
@@ -192,8 +211,21 @@ private fun ReferralBonusViewPreview() {
                     // The image here is free to use anywhere for preview purposes
                     // @see https://pixabay.com/service/faq/
                     ReferralBonusAchievements(
-                        referredAvatarUri = "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg",
-                        referredName = "Qwerty Uiop",
+                        contact = ContactItem(
+                            1,
+                            "qwerty@uiop.com",
+                            ContactData(
+                                "Full Name",
+                                "alias",
+                                "https://cdn.pixabay.com/photo/2023/05/05/11/07/sweet-7972193_1280.jpg"
+                            ),
+                            "#fff",
+                            UserVisibility.Visible,
+                            1231231,
+                            true,
+                            UserStatus.Online,
+                            null
+                        ),
                         expirationInDays = 1,
                         awardId = 1,
                         expirationTimestampInSeconds = 100,
