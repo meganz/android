@@ -5,7 +5,6 @@ package mega.privacy.android.app.constants
  */
 object BroadcastConstants {
     //    Broadcasts' IntentFilter
-    const val BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED = "INTENT_EVENT_ACCOUNT_BLOCKED"
     const val BROADCAST_ACTION_INTENT_MANAGE_SHARE = "BROADCAST_ACTION_INTENT_MANAGE_SHARE"
     const val BROADCAST_ACTION_INTENT_TAKEN_DOWN_FILES = "INTENT_TAKEN_DOWN_FILES"
     const val BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE = "INTENT_FILTER_CONTACT_UPDATE"
@@ -39,8 +38,6 @@ object BroadcastConstants {
     const val ACTION_UPDATE_RETENTION_TIME = "ACTION_UPDATE_RETENTION_TIME"
 
     //    Broadcasts' extras
-    const val EVENT_TEXT = "EVENT_TEXT"
-    const val EVENT_NUMBER = "EVENT_NUMBER"
     const val TYPE_SHARE = "TYPE_SHARE"
     const val NUMBER_FILES = "NUMBER_FILES"
     const val EXTRA_USER_HANDLE = "USER_HANDLE"
@@ -54,5 +51,4 @@ object BroadcastConstants {
     const val RETENTION_TIME = "RETENTION_TIME"
     const val PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID"
     const val ERROR_MESSAGE_TEXT = "ERROR_MESSAGE_TEXT"
-    const val NODE_HANDLE = "NODE_HANDLE"
 }

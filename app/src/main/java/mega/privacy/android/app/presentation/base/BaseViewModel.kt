@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.base.model.BaseState
+import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransfersFinishedUseCase
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BaseViewModel @Inject constructor(
     private val monitorTransfersFinishedUseCase: MonitorTransfersFinishedUseCase,
+    private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BaseState())
@@ -31,6 +33,12 @@ class BaseViewModel @Inject constructor(
                 _state.update { state -> state.copy(transfersFinished = it) }
             }
         }
+
+        viewModelScope.launch {
+            monitorAccountBlockedUseCase().collect {
+                _state.update { state -> state.copy(accountBlockedDetail = it) }
+            }
+        }
     }
 
     /**
@@ -38,4 +46,10 @@ class BaseViewModel @Inject constructor(
      */
     fun onTransfersFinishedConsumed() =
         _state.update { state -> state.copy(transfersFinished = null) }
+
+    /**
+     * Sets accountBlockedDetail in state as null.
+     */
+    fun onAccountBlockedConsumed() =
+        _state.update { state -> state.copy(accountBlockedDetail = null) }
 }

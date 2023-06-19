@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -440,4 +441,19 @@ interface AccountRepository {
      * Refreshes DNS servers and retries pending connections.
      */
     suspend fun retryPendingConnections()
+
+    /**
+     * Broadcasts blocked account.
+     *
+     * @param type Blocked account type.
+     * @param text Message.
+     */
+    suspend fun broadcastAccountBlocked(type: Long, text: String)
+
+    /**
+     * Monitors blocked account.
+     *
+     * @return Flow of [AccountBlockedDetail]
+     */
+    fun monitorAccountBlocked(): Flow<AccountBlockedDetail>
 }

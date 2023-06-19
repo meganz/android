@@ -10,6 +10,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -33,6 +34,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -48,6 +50,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -109,6 +112,7 @@ class LoginViewModel @Inject constructor(
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
+    private val monitorAccountBlockedUseCase: MonitorAccountBlockedUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -190,6 +194,14 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch { resetChatSettingsUseCase() }
 
         checkTemporalCredentials()
+
+        viewModelScope.launch {
+            monitorAccountBlockedUseCase()
+                .filter {
+                    it.type == AccountBlockedType.TOS_COPYRIGHT
+                            || it.type == AccountBlockedType.TOS_NON_COPYRIGHT
+                }.collectLatest { stopLogin() }
+        }
     }
 
     /**
@@ -243,6 +255,8 @@ class LoginViewModel @Inject constructor(
     fun stopLogin() {
         _state.update {
             it.copy(
+                accountSession = null,
+                password = null,
                 fetchNodesUpdate = null,
                 isFirstTime = false,
                 isAlreadyLoggedIn = false,
@@ -835,6 +849,7 @@ class LoginViewModel @Inject constructor(
             }.onFailure { Timber.e(it) }
         }
     }
+
     fun clearEphemeral() {
         viewModelScope.launch {
             runCatching { clearEphemeralCredentialsUseCase() }

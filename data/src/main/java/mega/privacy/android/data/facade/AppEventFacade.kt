@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -42,6 +43,7 @@ internal class AppEventFacade @Inject constructor(
     private val leaveChat = MutableSharedFlow<Long>()
     private val stopTransfersWork = MutableSharedFlow<Boolean>()
     private val chatSignalPresence = MutableSharedFlow<Unit>()
+    private val accountBlocked = MutableSharedFlow<AccountBlockedDetail>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
     private val _finishActivity = MutableSharedFlow<Boolean>()
@@ -175,6 +177,11 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadcastChatSignalPresence() = chatSignalPresence.emit(Unit)
 
     override fun monitorChatSignalPresence(): Flow<Unit> = chatSignalPresence.asSharedFlow()
+
+    override suspend fun broadcastAccountBlocked(accountBlockedDetail: AccountBlockedDetail) =
+        accountBlocked.emit(accountBlockedDetail)
+
+    override fun monitorAccountBlocked() = accountBlocked.asSharedFlow()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

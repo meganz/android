@@ -75,17 +75,14 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.AlertsAndWarnings.showResumeTransfersWarning
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
-import mega.privacy.android.app.utils.Constants.ACCOUNT_NOT_BLOCKED
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
 import mega.privacy.android.app.utils.Constants.BUSINESS
-import mega.privacy.android.app.utils.Constants.DISABLED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EVENT_PSA
-import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
@@ -95,15 +92,10 @@ import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TY
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
-import mega.privacy.android.app.utils.Constants.SMS_VERIFICATION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.TOS_COPYRIGHT_ACCOUNT_BLOCK
-import mega.privacy.android.app.utils.Constants.TOS_NON_COPYRIGHT_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
 import mega.privacy.android.app.utils.TextUtil
@@ -118,6 +110,8 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.LogsType
 import mega.privacy.android.domain.entity.PurchaseType
+import mega.privacy.android.domain.entity.account.AccountBlockedDetail
+import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
@@ -284,21 +278,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     protected var psaWebBrowser: PsaWebBrowser? = null
 
     /**
-     * Broadcast receiver to manage the errors shown and actions when an account is blocked.
-     */
-    private val accountBlockedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action != BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
-                return
-
-            checkWhyAmIBlocked(
-                intent.getLongExtra(BroadcastConstants.EVENT_NUMBER, INVALID_VALUE.toLong()),
-                intent.getStringExtra(BroadcastConstants.EVENT_TEXT)
-            )
-        }
-    }
-
-    /**
      * Broadcast receiver to manage a possible SSL verification error.
      */
     private val sslErrorReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -418,6 +397,10 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     }
                     viewModel.onTransfersFinishedConsumed()
                 }
+                accountBlockedDetail?.apply {
+                    checkWhyAmIBlocked(this)
+                    viewModel.onAccountBlockedConsumed()
+                }
             }
         }
 
@@ -433,11 +416,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 retryConnectionsAndSignalPresence()
             }
         }
-
-        registerReceiver(
-            accountBlockedReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
-        )
 
         registerReceiver(
             businessExpiredReceiver,
@@ -601,7 +579,6 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     override fun onDestroy() {
         composite.clear()
         unregisterReceiver(sslErrorReceiver)
-        unregisterReceiver(accountBlockedReceiver)
         unregisterReceiver(businessExpiredReceiver)
         unregisterReceiver(takenDownFilesReceiver)
         unregisterReceiver(showSnackbarReceiver)
@@ -1000,43 +977,46 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Method to show an alert or error when the account has been suspended
      * for any reason
      *
-     * @param eventNumber long that determines the event for which the account has been suspended
-     * @param stringError string shown as an alert in case there is not any specific action for the event
+     * @param accountBlockedDetail [AccountBlockedDetail]
      */
-    fun checkWhyAmIBlocked(eventNumber: Long, stringError: String?) {
+    private fun checkWhyAmIBlocked(accountBlockedDetail: AccountBlockedDetail) {
 
         val intent: Intent
-        when (eventNumber.toString()) {
-            ACCOUNT_NOT_BLOCKED -> {}
-            TOS_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
+        when (accountBlockedDetail.type) {
+            AccountBlockedType.NOT_BLOCKED -> {}
+            AccountBlockedType.TOS_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
                     getString(R.string.dialog_account_suspended_ToS_copyright_message),
                     loggingSettings
                 )
             )
-            TOS_NON_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
+
+            AccountBlockedType.TOS_NON_COPYRIGHT -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
                     getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
                     loggingSettings
                 )
             )
-            DISABLED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
+
+            AccountBlockedType.SUBUSER_DISABLED -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
                     getString(R.string.error_business_disabled),
                     loggingSettings
                 )
             )
-            REMOVED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
+
+            AccountBlockedType.SUBUSER_REMOVED -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
                     getString(R.string.error_business_removed),
                     loggingSettings
                 )
             )
-            SMS_VERIFICATION_ACCOUNT_BLOCK -> {
+
+            AccountBlockedType.VERIFICATION_SMS -> {
                 if (megaApi.smsAllowedState() == 0 || MegaApplication.isVerifySMSShowed) return
                 MegaApplication.smsVerifyShowed(true)
                 val gSession = megaApi.dumpSession()
@@ -1059,12 +1039,14 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 intent.putExtra(NAME_USER_LOCKED, true)
                 startActivity(intent)
             }
-            WEAK_PROTECTION_ACCOUNT_BLOCK -> {
+
+            AccountBlockedType.VERIFICATION_EMAIL -> {
                 if (!MegaApplication.isBlockedDueToWeakAccount && !MegaApplication.isWebOpenDueToEmailVerification) {
                     startActivity(Intent(this, WeakAccountProtectionAlertActivity::class.java))
                 }
             }
-            else -> Util.showErrorAlertDialog(stringError, false, this)
+
+            else -> Util.showErrorAlertDialog(accountBlockedDetail.text, false, this)
         }
     }
 

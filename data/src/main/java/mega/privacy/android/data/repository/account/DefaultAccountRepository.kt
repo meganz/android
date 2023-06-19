@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
@@ -133,6 +134,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
     private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
+    private val accountBlockedDetailMapper: AccountBlockedDetailMapper
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -847,10 +849,11 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun clearEphemeral() = ephemeralCredentialsGateway.clear()
 
     override fun monitorRefreshSession() = appEventGateway.monitorRefreshSession()
-    override suspend fun getAccountType(): AccountType =
-        accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
 
     override suspend fun broadcastRefreshSession() = appEventGateway.broadcastRefreshSession()
+
+    override suspend fun getAccountType(): AccountType =
+        accountTypeMapper(myAccountInfoFacade.accountTypeId) ?: AccountType.UNKNOWN
 
     override suspend fun reconnect() = withContext(ioDispatcher) {
         Timber.d("Reconnect...")
@@ -861,6 +864,13 @@ internal class DefaultAccountRepository @Inject constructor(
         Timber.d("Retrying pending connections...")
         megaApiGateway.retryPendingConnections()
     }
+
+    override suspend fun broadcastAccountBlocked(type: Long, text: String) =
+        withContext(ioDispatcher) {
+            appEventGateway.broadcastAccountBlocked(accountBlockedDetailMapper(type, text))
+        }
+
+    override fun monitorAccountBlocked() = appEventGateway.monitorAccountBlocked()
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

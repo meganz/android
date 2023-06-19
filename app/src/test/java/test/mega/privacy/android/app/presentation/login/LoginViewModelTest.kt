@@ -24,6 +24,7 @@ import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -97,6 +98,7 @@ internal class LoginViewModelTest {
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
+    private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -128,7 +130,8 @@ internal class LoginViewModelTest {
             stopCameraUploadUseCase = stopCameraUploadUseCase,
             monitorEphemeralCredentialsUseCase = monitorEphemeralCredentialsUseCase,
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
-            clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase
+            clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
+            monitorAccountBlockedUseCase = monitorAccountBlockedUseCase
         )
     }
 
