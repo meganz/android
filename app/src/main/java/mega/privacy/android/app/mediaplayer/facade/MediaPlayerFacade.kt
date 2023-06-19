@@ -254,7 +254,10 @@ class MediaPlayerFacade @Inject constructor(
     override fun playerStop() = player.stop()
 
 
-    override fun playerRelease() = player.release()
+    override fun playerRelease() {
+        player.release()
+        exoPlayer.release()
+    }
 
     override fun playerSeekTo(index: Int) = player.seekTo(index, 0)
 
