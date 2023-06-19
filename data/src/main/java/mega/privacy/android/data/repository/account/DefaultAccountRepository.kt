@@ -678,6 +678,7 @@ internal class DefaultAccountRepository @Inject constructor(
             clearCache()
             clearAppData()
             removeOldTempFolders()
+            clearSdkCache()
         }
     }
 

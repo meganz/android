@@ -114,6 +114,13 @@ interface CacheFolderGateway {
     suspend fun getCameraUploadsCacheFolder(): File
 
     /**
+     * clear sdk cache
+     *
+     * clears cache files in mega app directory
+     */
+    suspend fun clearSdkCache()
+
+    /**
      * Returns cache directory of the app
      */
     val cacheDir: File

@@ -173,7 +173,15 @@ interface FileGateway {
      * will be converted to
      * "/storage/emulated/0/Sync/someFolder"
      *
-     * @param uri The content Uri to be converted
+     * @param contentUri The content Uri to be converted
      */
     suspend fun getExternalPathByContentUri(contentUri: String): String?
+
+    /**
+     * delete files in a directory
+     *
+     * @param directory the directory from which files are deleted
+     * lists files in the directory and remove only files from the directory not folders
+     */
+    suspend fun deleteFilesInDirectory(directory: File)
 }

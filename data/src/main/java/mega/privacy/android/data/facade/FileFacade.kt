@@ -263,6 +263,12 @@ class FileFacade @Inject constructor(
             }
     }
 
+    override suspend fun deleteFilesInDirectory(directory: File) {
+        directory.listFiles()?.forEach {
+            it.delete()
+        }
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val OFFLINE_DIR = "MEGA Offline"

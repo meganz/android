@@ -163,6 +163,17 @@ internal class CacheFolderFacade @Inject constructor(
         }
     }
 
+    override suspend fun clearSdkCache() {
+        appScope.launch(ioDispatcher) {
+            Timber.d("clearSDK cache")
+            try {
+                fileGateway.deleteFilesInDirectory(context.dataDir)
+            } catch (e: IOException) {
+                Timber.e("Exception deleting sdk cache", e)
+            }
+        }
+    }
+
     override suspend fun getCameraUploadsCacheFolder(): File =
         File(cacheDir, CAMERA_UPLOADS_CACHE_FOLDER)
 
