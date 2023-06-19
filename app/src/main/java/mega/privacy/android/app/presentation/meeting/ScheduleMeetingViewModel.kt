@@ -152,6 +152,7 @@ class ScheduleMeetingViewModel @Inject constructor(
             state.copy(
                 rulesSelected = state.rulesSelected.copy(
                     freq = recurringMeetingTypeMapper(optionSelected),
+                    interval = if (optionSelected == RecurringMeetingType.EveryDay) 1 else state.rulesSelected.interval
                 ),
                 recurringMeetingOptionSelected = optionSelected,
             )

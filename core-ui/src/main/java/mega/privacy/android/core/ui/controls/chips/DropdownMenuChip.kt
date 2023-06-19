@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -93,7 +94,8 @@ fun <T> DropdownMenuChip(
                         )
                         .width(IntrinsicSize.Min)
                         .height(32.dp)
-                        .widthIn(min = 20.dp),
+                        .widthIn(min = 20.dp)
+                        .testTag(TEST_TAG_DROPDOWN_MENU_CHIP),
                     enabled = false,
                     readOnly = true,
                     singleLine = true,
@@ -135,10 +137,13 @@ fun <T> DropdownMenuChip(
                     modifier = Modifier
                 ) {
                     options?.forEach { item ->
-                        DropdownMenuItem(modifier = modifier.widthIn(min = 128.dp), onClick = {
-                            expanded = false
-                            onOptionSelected(item)
-                        }) {
+                        DropdownMenuItem(
+                            modifier = modifier
+                                .widthIn(min = 128.dp),
+                            onClick = {
+                                expanded = false
+                                onOptionSelected(item)
+                            }) {
                             Text(text = optionDescriptionMapper(item))
                         }
                     }
@@ -172,3 +177,5 @@ private fun PreviewDropdownMenuChip(
         )
     }
 }
+
+internal const val TEST_TAG_DROPDOWN_MENU_CHIP = "testTagDropdownMenuChip"

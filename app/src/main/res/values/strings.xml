@@ -4914,6 +4914,17 @@
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
+    <!-- Text of the option weekdays in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <!-- Title of occurs ever section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_every_section">Occurs every</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
+    <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
+        <item quantity="one">Daily</item>
+        <item quantity="other">Every %1$d days</item>
+    </plurals>
     <!-- Album import saving -->
     <string name="album_import_saving">Saving&#8230;</string>
     <!-- Album import success message -->

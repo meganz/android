@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -55,7 +56,7 @@ fun TextButtonChip(
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
 
         TextButton(
-            modifier = modifier,
+            modifier = modifier.testTag(TEST_TAG_TEXT_BUTTON_CHIP),
             onClick = onClick,
             shape = RoundedCornerShape(size = 8.dp),
             border = BorderStroke(
@@ -80,7 +81,8 @@ fun TextButtonChip(
                             contentDescription = "Check",
                             modifier = Modifier
                                 .width(18.dp)
-                                .height(18.dp),
+                                .height(18.dp)
+                                .testTag(TEST_TAG_TEXT_BUTTON_ICON),
                             tint = MaterialTheme.colors.onSecondary
                         )
                     }
@@ -134,5 +136,8 @@ private fun PreviewTextButtonChip(
         )
     }
 }
+
+internal const val TEST_TAG_TEXT_BUTTON_CHIP = "testTagTextButtonChip"
+internal const val TEST_TAG_TEXT_BUTTON_ICON = "testTagTextButtonIcon"
 
 

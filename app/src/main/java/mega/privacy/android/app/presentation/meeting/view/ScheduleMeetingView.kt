@@ -528,7 +528,12 @@ private fun ActionOption(
 
                     ScheduleMeetingAction.Recurrence -> subtitle = when (state.rulesSelected.freq) {
                         OccurrenceFrequencyType.Invalid -> stringResource(id = OccurrenceFrequencyType.Invalid.StringId)
-                        OccurrenceFrequencyType.Daily -> stringResource(id = OccurrenceFrequencyType.Daily.StringId)
+                        OccurrenceFrequencyType.Daily -> pluralStringResource(
+                            OccurrenceFrequencyType.Daily.StringId,
+                            state.rulesSelected.interval,
+                            state.rulesSelected.interval
+                        )
+
                         OccurrenceFrequencyType.Weekly -> stringResource(id = OccurrenceFrequencyType.Weekly.StringId)
                         OccurrenceFrequencyType.Monthly -> stringResource(id = OccurrenceFrequencyType.Monthly.StringId)
                     }

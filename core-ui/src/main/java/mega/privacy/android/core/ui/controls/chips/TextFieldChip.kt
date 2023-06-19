@@ -27,6 +27,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -81,7 +82,7 @@ fun TextFieldChip(
                             onFocusChange()
                         }
                     }
-                },
+                }.testTag(TEST_TAG_TEXT_FIELD_CHIP),
             cursorBrush = SolidColor(MaterialTheme.colors.secondary),
             singleLine = true,
             visualTransformation = VisualTransformation.None,
@@ -133,3 +134,5 @@ private fun PreviewTextFieldChip(
         )
     }
 }
+
+internal const val TEST_TAG_TEXT_FIELD_CHIP = "testTagTextFieldChip"
