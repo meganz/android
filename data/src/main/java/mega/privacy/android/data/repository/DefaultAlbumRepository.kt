@@ -422,7 +422,6 @@ internal class DefaultAlbumRepository @Inject constructor(
             )
 
             publicNodesMap.clear()
-            publicNodesDataMap = mapOf()
 
             megaApiGateway.stopPublicSetPreview()
             megaApiGateway.fetchPublicSet(
@@ -451,10 +450,6 @@ internal class DefaultAlbumRepository @Inject constructor(
                             val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
                                 publicNodesMap[NodeId(node.handle)] = node
                                 photoMapper(node, albumPhotoId)
-                            }
-
-                            publicNodesDataMap = publicNodesMap.mapValues { (_, node) ->
-                                node.serialize()
                             }
                             continuation.resume(photos)
                         }
@@ -660,7 +655,6 @@ internal class DefaultAlbumRepository @Inject constructor(
         nodeSetsMap.clear()
         albumElements.clear()
         publicNodesMap.clear()
-        publicNodesDataMap = mapOf()
         albumPhotosAddingProgressPool.clear()
         albumPhotosRemovingProgressPool.clear()
 

@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.BottomAppBar
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -22,6 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
@@ -33,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
@@ -47,6 +52,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,11 +66,13 @@ import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.grey_020
 import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.grey_alpha_038
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
@@ -82,8 +90,8 @@ internal fun AlbumImportScreen(
     albumImportViewModel: AlbumImportViewModel = viewModel(),
     onShareLink: (String) -> Unit,
     onPreviewPhoto: (Photo) -> Unit,
-    onImport: (List<MegaNode>) -> Unit,
     onSaveToDevice: (List<MegaNode>) -> Unit,
+    onNavigateFileExplorer: () -> Unit,
     onBack: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -94,6 +102,15 @@ internal fun AlbumImportScreen(
     LaunchedEffect(state.isInitialized) {
         if (!state.isInitialized) {
             albumImportViewModel.initialize()
+        }
+    }
+
+    LaunchedEffect(state.importAlbumMessage) {
+        val message = state.importAlbumMessage
+
+        if (message != null) {
+            scaffoldState.snackbarHostState.showSnackbar(message)
+            albumImportViewModel.clearImportAlbumMessage()
         }
     }
 
@@ -123,6 +140,20 @@ internal fun AlbumImportScreen(
         )
     }
 
+    if (state.showImportAlbumDialog) {
+        ImportAlbumDialog()
+    }
+
+    if (state.isRenameAlbumValid) {
+        onNavigateFileExplorer()
+        albumImportViewModel.clearRenameAlbumValid()
+    }
+
+    if (state.isImportConstraintValid) {
+        onNavigateFileExplorer()
+        albumImportViewModel.clearImportConstraintValid()
+    }
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -148,7 +179,10 @@ internal fun AlbumImportScreen(
                     isLogin = state.isLogin,
                     onImport = {
                         val photos = state.selectedPhotos.ifEmpty { state.photos }
-                        onImport(albumImportViewModel.mapPhotosToNodes(photos))
+                        albumImportViewModel.validateImportConstraint(
+                            album = state.album,
+                            photos = photos,
+                        )
                         albumImportViewModel.clearSelection()
                     },
                     onSaveToDevice = {
@@ -364,7 +398,7 @@ private fun AlbumImportBottomBar(
                                     onClick = onImport,
                                     content = {
                                         Text(
-                                            text = stringResource(id = R.string.general_import),
+                                            text = stringResource(id = R.string.general_save_to_cloud_drive),
                                             color = teal_300,
                                             fontSize = 14.sp,
                                             fontWeight = FontWeight.W500,
@@ -390,7 +424,7 @@ private fun AlbumImportBottomBar(
                             )
                         },
                     )
-                }
+                },
             )
         },
     )
@@ -651,6 +685,52 @@ private fun RenameAlbumDialog(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,
                         style = MaterialTheme.typography.button,
+                    )
+                },
+            )
+        },
+    )
+}
+
+@Composable
+private fun ImportAlbumDialog(
+    modifier: Modifier = Modifier,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+        ),
+        content = {
+            Surface(
+                modifier = modifier,
+                shape = RoundedCornerShape(4.dp),
+                elevation = 24.dp,
+                content = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        content = {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(44.dp),
+                                color = teal_300,
+                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Text(
+                                text = stringResource(id = R.string.album_import_saving),
+                                color = grey_alpha_038.takeIf { isLight } ?: white_alpha_038,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.W400,
+                                style = MaterialTheme.typography.body2,
+                            )
+                        },
                     )
                 },
             )

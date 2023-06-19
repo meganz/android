@@ -4,10 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,12 +20,14 @@ import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkS
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumImportDeeplinkScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
+import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -56,18 +56,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         intent.getBooleanExtra(ALBUM_NEW_LINK, true)
     }
 
-    private val selectImportAlbumLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-        ActivityResultCallback<ActivityResult> { activityResult ->
-            val resultCode = activityResult.resultCode
-            val intent = activityResult.data
-
-            if (resultCode != RESULT_OK || intent == null) {
-                return@ActivityResultCallback
-            }
-        }
-    )
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState != null) {
@@ -91,6 +79,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             },
                         )
                     }
+
                     AlbumScreen.AlbumCoverSelectionScreen -> {
                         AlbumCoverSelectionScreen(
                             onBackClicked = ::finish,
@@ -103,6 +92,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             },
                         )
                     }
+
                     AlbumScreen.AlbumGetLinkScreen -> {
                         AlbumGetLinkScreen(
                             isAlbumNewLink = isAlbumNewLink,
@@ -124,6 +114,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             },
                         )
                     }
+
                     AlbumScreen.AlbumGetMultipleLinksScreen -> {
                         AlbumGetMultipleLinksScreen(
                             onBack = ::finish,
@@ -143,11 +134,13 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                             },
                         )
                     }
+
                     AlbumScreen.AlbumDecryptionKeyScreen -> {
                         AlbumDecryptionKeyScreen(
                             onBack = ::finish,
                         )
                     }
+
                     AlbumScreen.AlbumImportDeeplinkScreen -> {
                         AlbumImportDeeplinkScreen(
                             onApply = {
@@ -163,6 +156,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
                     AlbumScreen.AlbumImportScreen -> {
                         AlbumImportScreen(
+                            albumImportViewModel = albumImportViewModel,
                             onShareLink = { link ->
                                 val intent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
@@ -175,14 +169,15 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 startActivity(shareIntent)
                             },
                             onPreviewPhoto = {},
-                            onImport = {
+                            onNavigateFileExplorer = {
                                 val intent = Intent(this, FileExplorerActivity::class.java).apply {
                                     action = FileExplorerActivity.ACTION_IMPORT_ALBUM
                                 }
-                                selectImportAlbumLauncher.launch(intent)
+                                selectFolderLauncher.launch(intent)
                             },
                             onSaveToDevice = { nodes ->
                                 checkNotificationsPermission(this)
+
                                 nodeSaver.saveNodes(
                                     nodes = nodes,
                                     highPriority = false,
@@ -236,6 +231,27 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         nodeSaver.destroy()
         super.onDestroy()
     }
+
+    /**
+     * End
+     */
+
+    /**
+     * Start: Import album block
+     */
+
+    private val albumImportViewModel: AlbumImportViewModel by viewModels()
+
+    private val selectFolderLauncher =
+        registerForActivityResult(StartActivityForResult()) exit@{ result ->
+            val resultCode = result.resultCode
+            val data = result.data
+
+            if (resultCode != RESULT_OK || data == null) return@exit
+
+            val folderHandle = data.getLongExtra("IMPORT_TO", 0)
+            albumImportViewModel.importAlbum(targetParentFolderNodeId = NodeId(folderHandle))
+        }
 
     /**
      * End

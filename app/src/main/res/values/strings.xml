@@ -4914,4 +4914,10 @@
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Save to Cloud drive</string>
+    <!-- Album import saving -->
+    <string name="album_import_saving">Saving&#8230;</string>
+    <!-- Album import success message -->
+    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <!-- Album import error message -->
+    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
 </resources>

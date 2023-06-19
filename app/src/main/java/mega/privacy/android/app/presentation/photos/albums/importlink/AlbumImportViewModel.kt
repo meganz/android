@@ -1,11 +1,15 @@
 package mega.privacy.android.app.presentation.photos.albums.importlink
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -18,16 +22,21 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
-import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoProvider
+import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumLink
-import mega.privacy.android.domain.entity.photos.AlbumPhotoId
+import mega.privacy.android.domain.entity.photos.AlbumPhotoIds
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentials
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,9 +47,13 @@ internal class AlbumImportViewModel @Inject constructor(
     private val hasCredentialsUseCase: HasCredentials,
     private val getUserAlbums: GetUserAlbums,
     private val getPublicAlbumUseCase: GetPublicAlbumUseCase,
-    private val legacyPublicAlbumPhotoProvider: LegacyPublicAlbumPhotoProvider,
+    private val getPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase,
+    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
+    private val downloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase,
+    private val downloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val importPublicAlbumUseCase: ImportPublicAlbumUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumImportState())
@@ -50,8 +63,12 @@ internal class AlbumImportViewModel @Inject constructor(
         get() = savedStateHandle[ALBUM_LINK]
 
     @Volatile
+    @VisibleForTesting
     var localAlbumNames: Set<String> = setOf()
-        private set
+
+    private var albumNameToImport: String = ""
+
+    private var photosToImport: Collection<Photo> = listOf()
 
     fun initialize() = viewModelScope.launch {
         validateLink(link = albumLink)
@@ -90,14 +107,22 @@ internal class AlbumImportViewModel @Inject constructor(
                 it.copy(showErrorAccessDialog = true)
             }
         }.onSuccess { albumPhotos ->
-            val (album, photoIds) = albumPhotos
-            val photos = fetchPublicPhotos(photoIds)
-            updateAlbumPhotos(link, album, photos)
+            handlePublicAlbum(link, albumPhotos)
         }
     }
 
-    private suspend fun fetchPublicPhotos(photosIds: List<AlbumPhotoId>): List<Photo> {
-        return legacyPublicAlbumPhotoProvider.getPublicPhotos(photosIds)
+    @Suppress("UNCHECKED_CAST")
+    private suspend fun handlePublicAlbum(link: String, albumPhotos: AlbumPhotoIds) {
+        val (album, albumPhotoIds) = albumPhotos
+
+        val result = coroutineScope {
+            awaitAll(
+                async { getPublicAlbumPhotoUseCase(albumPhotoIds) },
+                async { legacyPublicAlbumPhotoNodeProvider.loadNodeCache(albumPhotoIds) },
+            )
+        }
+
+        updateAlbumPhotos(link, album, result[0] as List<Photo>)
     }
 
     private suspend fun updateAlbumPhotos(
@@ -136,12 +161,10 @@ internal class AlbumImportViewModel @Inject constructor(
         photo: Photo,
         callback: (Boolean) -> Unit,
     ) = viewModelScope.launch {
-        with(legacyPublicAlbumPhotoProvider) {
-            if (isPreview) {
-                downloadPublicPreview(photo, callback)
-            } else {
-                downloadPublicThumbnail(photo, callback)
-            }
+        if (isPreview) {
+            downloadPublicAlbumPhotoPreviewUseCase(photo, callback)
+        } else {
+            downloadPublicAlbumPhotoThumbnailUseCase(photo, callback)
         }
     }
 
@@ -254,6 +277,8 @@ internal class AlbumImportViewModel @Inject constructor(
             if (constraint()) return@launch
         }
 
+        albumNameToImport = albumName
+
         state.update {
             it.copy(
                 showRenameAlbumDialog = false,
@@ -269,7 +294,95 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
+    fun clearRenameAlbumValid() {
+        state.update {
+            it.copy(isRenameAlbumValid = false)
+        }
+    }
+
+    fun validateImportConstraint(
+        album: UserAlbum?,
+        photos: Collection<Photo>,
+    ) = viewModelScope.launch {
+        albumNameToImport = album?.title.orEmpty()
+        photosToImport = photos
+
+        val checkAvailableStorage = { false }
+
+        val checkAlbumNameConflict = {
+            val isInvalid = album?.title in localAlbumNames
+
+            state.update {
+                it.copy(showRenameAlbumDialog = isInvalid)
+            }
+            isInvalid
+        }
+
+        val constraints = listOf(
+            { checkAvailableStorage() },
+            { checkAlbumNameConflict() },
+        )
+
+        for (constraint in constraints) {
+            if (constraint()) return@launch
+        }
+
+        state.update {
+            it.copy(isImportConstraintValid = true)
+        }
+    }
+
+    fun clearImportConstraintValid() {
+        state.update {
+            it.copy(isImportConstraintValid = false)
+        }
+    }
+
+    fun importAlbum(targetParentFolderNodeId: NodeId) = viewModelScope.launch {
+        state.update {
+            it.copy(showImportAlbumDialog = true)
+        }
+
+        val photoIds = withContext(defaultDispatcher) {
+            photosToImport.map { NodeId(it.id) }
+        }
+
+        runCatching {
+            importPublicAlbumUseCase(
+                albumName = albumNameToImport,
+                photoIds = photoIds,
+                targetParentFolderNodeId = targetParentFolderNodeId,
+            )
+        }.onFailure {
+            state.update {
+                it.copy(
+                    showImportAlbumDialog = false,
+                    importAlbumMessage = getStringFromStringResMapper(
+                        stringId = R.string.album_import_error_message,
+                        albumNameToImport,
+                    ),
+                )
+            }
+        }.onSuccess {
+            state.update {
+                it.copy(
+                    showImportAlbumDialog = false,
+                    importAlbumMessage = getStringFromStringResMapper(
+                        stringId = R.string.album_import_success_message,
+                        albumNameToImport,
+                    ),
+                )
+            }
+        }
+    }
+
+    fun clearImportAlbumMessage() {
+        state.update {
+            it.copy(importAlbumMessage = null)
+        }
+    }
+
     fun mapPhotosToNodes(photos: Collection<Photo>) = photos.mapNotNull { photo ->
-        legacyPublicAlbumPhotoProvider.getPublicNode(photo.id)
+        legacyPublicAlbumPhotoNodeProvider.getPublicNode(photo.id)
     }
 }

@@ -1829,6 +1829,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             }
 
             ALBUM_IMPORT -> {
+                val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
+
+                val intent = Intent()
+                intent.putExtra("IMPORT_TO", parentNode?.handle)
+                setResult(RESULT_OK, intent)
+
                 finishAndRemoveTask()
             }
 

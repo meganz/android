@@ -6,15 +6,10 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.GetPreviewElementNodeListenerInterface
-import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -26,14 +21,13 @@ import kotlin.coroutines.resume
             "this provider will be refactored too.",
 )
 @Singleton
-internal class LegacyPublicAlbumPhotoProvider @Inject constructor(
-    private val photoMapper: PhotoMapper,
+internal class LegacyPublicAlbumPhotoNodeProvider @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     private val publicNodesMap: MutableMap<NodeId, MegaNode> = mutableMapOf()
 
-    suspend fun getPublicPhotos(albumPhotoIds: List<AlbumPhotoId>): List<Photo> {
+    suspend fun loadNodeCache(albumPhotoIds: List<AlbumPhotoId>) {
         publicNodesMap.clear()
 
         return withContext(ioDispatcher) {
@@ -47,11 +41,10 @@ internal class LegacyPublicAlbumPhotoProvider @Inject constructor(
                     nodeAlbumPhotoIdMap = nodeAlbumPhotoIdMap,
                     onCompletion = { nodeAlbumPhotoIdPairs ->
                         launch {
-                            val photos = nodeAlbumPhotoIdPairs.mapNotNull { (node, albumPhotoId) ->
+                            nodeAlbumPhotoIdPairs.forEach { (node, _) ->
                                 publicNodesMap[NodeId(node.handle)] = node
-                                photoMapper(node, albumPhotoId)
                             }
-                            continuation.resume(photos)
+                            continuation.resume(Unit)
                         }
                     }
                 )
@@ -64,7 +57,7 @@ internal class LegacyPublicAlbumPhotoProvider @Inject constructor(
                         )
                     }
                 } else {
-                    continuation.resume(listOf())
+                    continuation.resume(Unit)
                 }
 
                 continuation.invokeOnCancellation {
@@ -74,61 +67,7 @@ internal class LegacyPublicAlbumPhotoProvider @Inject constructor(
         }
     }
 
-    suspend fun downloadPublicThumbnail(photo: Photo, callback: (Boolean) -> Unit) {
-        withContext(ioDispatcher) {
-            val node = publicNodesMap[NodeId(photo.id)]
-            val thumbnailFilePath = photo.thumbnailFilePath
+    fun getPublicNodes(): List<MegaNode> = publicNodesMap.map { (_, node) -> node }
 
-            if (thumbnailFilePath.isNullOrBlank()) {
-                callback(false)
-            } else if (File(thumbnailFilePath).exists()) {
-                callback(true)
-            } else if (node == null) {
-                callback(false)
-            } else {
-                megaApiGateway.getThumbnail(
-                    node = node,
-                    thumbnailFilePath = thumbnailFilePath,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { _, error ->
-                            callback(error.errorCode == MegaError.API_OK)
-                        },
-                    ),
-                )
-            }
-        }
-    }
-
-    suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit) {
-        withContext(ioDispatcher) {
-            val node = publicNodesMap[NodeId(photo.id)]
-            val previewFilePath = photo.previewFilePath
-
-            if (previewFilePath.isNullOrBlank()) {
-                callback(false)
-            } else if (File(previewFilePath).exists()) {
-                callback(true)
-            } else if (node == null) {
-                callback(false)
-            } else {
-                megaApiGateway.getPreview(
-                    node = node,
-                    previewFilePath = previewFilePath,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { _, error ->
-                            callback(error.errorCode == MegaError.API_OK)
-                        },
-                    ),
-                )
-            }
-        }
-    }
-
-    fun getPublicNodes(): List<MegaNode> {
-        return publicNodesMap.map { (_, node) -> node }
-    }
-
-    fun getPublicNode(handle: Long): MegaNode? {
-        return publicNodesMap[NodeId(handle)]
-    }
+    fun getPublicNode(handle: Long): MegaNode? = publicNodesMap[NodeId(handle)]
 }

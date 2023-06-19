@@ -16,4 +16,7 @@ internal data class AlbumImportState(
     val showRenameAlbumDialog: Boolean = false,
     val isRenameAlbumValid: Boolean = false,
     val renameAlbumErrorMessage: String? = null,
+    val isImportConstraintValid: Boolean = false,
+    val showImportAlbumDialog: Boolean = false,
+    val importAlbumMessage: String? = null,
 )
