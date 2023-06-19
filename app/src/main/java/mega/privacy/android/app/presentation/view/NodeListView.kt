@@ -1,20 +1,29 @@
 package mega.privacy.android.app.presentation.view
 
+import android.content.res.Configuration
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.fileSize
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.app.presentation.view.extension.formattedModifiedDate
 import mega.privacy.android.app.presentation.view.extension.getIcon
+import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.privacy.android.core.ui.controls.HeaderViewItem
 import mega.privacy.android.core.ui.controls.NodeListViewItem
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import java.io.File
 
@@ -101,5 +110,28 @@ fun <T : TypedNode> NodeListView(
                 imageState = imageState
             )
         }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun NodeListViewPreview(
+    @PreviewParameter(SampleFolderNodeDataProvider::class) items: List<NodeUIItem<TypedFolderNode>>,
+) {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        NodeListView(
+            nodeUIItemList = items,
+            onMenuClick = {},
+            onItemClicked = {},
+            onLongClick = {},
+            sortOrder = "",
+            onSortOrderClick = {},
+            onChangeViewTypeClick = {},
+            showSortOrder = true,
+            listState = LazyListState(),
+            getThumbnail = { _, _ -> },
+            modifier = Modifier,
+            showChangeViewType = true
+        )
     }
 }
