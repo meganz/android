@@ -192,6 +192,12 @@ val Colors.red_600_white_alpha_087: Color
     get() = if (isLight) red_600 else white_alpha_087
 
 /**
+ * Color [white] when light and [grey_700] when dark
+ */
+val Colors.white_grey_700: Color
+    get() = if (isLight) white else grey_700
+
+/**
  * Color [grey_200] when light and [grey_700] when dark
  */
 val Colors.grey_200_grey_700: Color

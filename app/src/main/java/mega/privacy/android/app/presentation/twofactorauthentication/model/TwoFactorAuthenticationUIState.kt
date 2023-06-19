@@ -15,7 +15,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Scree
  * @param authenticationState UI state for enabling the two factor authentication
  * @param isMasterKeyExported UI state to change the visibility of some related views in the activity
  * @param twoFactorAuthUrl The 2fa url that gets parsed to the available authentication App
- * @param viewType UI state to show different view state based on user flow in the process
+ * @param currentScreenType UI state to current view state based on user flow in the process
  */
 data class TwoFactorAuthenticationUIState(
     val is2FAFetchCompleted: Boolean = false,
@@ -27,7 +27,7 @@ data class TwoFactorAuthenticationUIState(
     val authenticationState: AuthenticationState? = null,
     val isMasterKeyExported: Boolean = false,
     val twoFactorAuthUrl: String = "",
-    val viewType: ScreenType = InitialisationScreen,
+    val currentScreenType: ScreenType? = InitialisationScreen,
 )
 
 

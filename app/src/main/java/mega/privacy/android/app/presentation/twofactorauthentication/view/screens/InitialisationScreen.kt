@@ -9,15 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
@@ -29,11 +30,12 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 @Composable
-fun InitialisationScreen(
-    onSetupBeginClicked: () -> Unit,
+internal fun InitialisationScreen(
+    onNextClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
     ) {
@@ -44,17 +46,17 @@ fun InitialisationScreen(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.ic_2fa),
-                contentDescription = "",
+                contentDescription = "Lock Image",
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(top = 32.dp, bottom = 32.dp)
+                    .padding(vertical = 32.dp)
             )
         }
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Text(
             text = stringResource(id = R.string.title_2fa),
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.textColorPrimary,
@@ -64,7 +66,7 @@ fun InitialisationScreen(
         Text(
             text = stringResource(id = R.string.two_factor_authentication_explain),
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.textColorSecondary,
@@ -77,14 +79,18 @@ fun InitialisationScreen(
                 .wrapContentSize(),
             textId = R.string.button_setup_2fa,
             onClick = {
-                onSetupBeginClicked()
+                onNextClicked()
             }
         )
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @CombinedThemePreviews
 @Composable
-fun PreviewInitialisationScreen() {
-    InitialisationScreen {}
+private fun PreviewInitialisationScreen() {
+    InitialisationScreen(
+        onNextClicked = {},
+        modifier = Modifier.semantics { testTagsAsResourceId = true },
+    )
 }

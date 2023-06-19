@@ -100,7 +100,10 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
             runCatching {
                 getCurrentUserEmail().let { email ->
                     _uiState.update {
-                        it.copy(userEmail = email)
+                        it.copy(
+                            userEmail = email,
+                            twoFactorAuthUrl = "otpauth://totp/MEGA:${email}?secret=${it.seed}&amp;issuer=MEGA"
+                        )
                     }
                 }
             }

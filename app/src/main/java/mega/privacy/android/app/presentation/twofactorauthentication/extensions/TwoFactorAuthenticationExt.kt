@@ -9,7 +9,6 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.SECOND
 import mega.privacy.android.app.presentation.twofactorauthentication.view.SIXTH_PIN
 import mega.privacy.android.app.presentation.twofactorauthentication.view.THIRD_PIN
 
-
 internal fun String.toSeedArray(): ArrayList<String> {
     val seedLength = 13
     var index = 0

@@ -4,6 +4,14 @@ import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 
+//The correct name format to create new extension function is {textStyle][Number][FontWeight],i.e:body1Medium
+
+/**
+ * Body 1 medium weight
+ */
+val Typography.body1Medium: TextStyle
+    get() = body1.copy(fontWeight = FontWeight.Medium)
+
 /**
  * Subtitle 2 medium weight
  */

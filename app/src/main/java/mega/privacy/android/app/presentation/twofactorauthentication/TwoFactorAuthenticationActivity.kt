@@ -48,6 +48,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
@@ -74,6 +75,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var qrCodeMapper: QRCodeMapper
 
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
@@ -149,16 +153,37 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         getFeatureFlagValueUseCase(AppFeatures.TwoFactorAuthenticationCompose)
 
     @Composable
-    fun TwoFactorAuthenticationScreen() {
+    fun TwoFactorAuthenticationScreen(isDarkMode: Boolean) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        TwoFactorAuthenticationView(uiState = uiState) {}
+        TwoFactorAuthenticationView(
+            uiState = uiState,
+            isDarkMode = isDarkMode,
+            qrCodeMapper = qrCodeMapper,
+            onBackPressedDispatcher = onBackPressedDispatcher,
+            onFinishActivity = ::finish,
+            onOpenInClicked = this::onOpenInClicked,
+            openPlayStore = this::openPlayStore,
+        )
+    }
+
+    private fun onOpenInClicked(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        if (MegaApiUtils.isIntentAvailable(
+                this@TwoFactorAuthenticationActivity,
+                intent
+            )
+        ) {
+            startActivity(intent)
+        } else {
+            //To handle in this ticket [AND-16786]
+        }
     }
 
     private fun setContentByCompose() {
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                TwoFactorAuthenticationScreen()
+                TwoFactorAuthenticationScreen(themeMode.isDarkMode())
             }
         }
     }
@@ -298,6 +323,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         lifecycleScope.launch {
             if (isTwoFactorAuthenticationComposeEnabled()) {
                 setContentByCompose()
+                viewModel.getAuthenticationCode()
             } else {
                 setLegacyContent(savedInstanceState)
             }
@@ -794,7 +820,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     }
 
     private fun observeUIState() {
-        this.collectFlow(viewModel.uiState) { state ->
+        collectFlow(viewModel.uiState) { state ->
             handleEnableMultiFactorAuthState(state)
             handleGetting2FACode(state)
             handleGettingUserEmail(state)
@@ -826,6 +852,14 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         }
     }
 
+    private fun handleGetting2FACodeWithCompose(state: TwoFactorAuthenticationUIState) {
+        if (state.is2FAFetchCompleted) {
+            state.seed?.let {
+                setContentByCompose()
+            } ?: showSnackbar(getString(R.string.qr_seed_text_error))
+        }
+    }
+
     private fun handleGetting2FACode(state: TwoFactorAuthenticationUIState) {
         if (state.is2FAFetchCompleted) {
             state.seed?.let {
@@ -835,6 +869,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             } ?: showSnackbar(getString(R.string.qr_seed_text_error))
         }
     }
+
 
     private fun handleEnableMultiFactorAuthState(state: TwoFactorAuthenticationUIState) {
         with(state) {
