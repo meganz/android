@@ -36,12 +36,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
@@ -50,7 +48,6 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.databinding.ActivityFolderLinkBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForChildren
@@ -86,7 +83,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -118,11 +114,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
      */
     @Inject
     lateinit var sortOrderIntMapper: SortOrderIntMapper
-
-    @Inject
-    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
-
-    var showMDIcon: Boolean = false
 
     /**
      * Selected node
@@ -483,10 +474,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
         super.onCreate(savedInstanceState)
 
-        showMDIcon = runBlocking {
-            getFeatureFlagUseCase(AppFeatures.FolderLinkMD)
-        }
-
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         binding = ActivityFolderLinkBinding.inflate(layoutInflater)
 
@@ -732,6 +719,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
     /**
      * Show Media discovery and launch [MediaDiscoveryFragment]
+     *
+     * @param isOpenByMDIcon
      */
     private fun showMediaDiscovery(isOpenByMDIcon: Boolean = false) {
         clearSelections()

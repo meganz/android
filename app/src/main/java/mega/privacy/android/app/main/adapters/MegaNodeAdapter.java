@@ -234,7 +234,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             binding.setOrderNameStringId(SortByHeaderViewModel.getOrderNameMap().get(orderType));
             binding.setIsFromFolderLink(type == FOLDER_LINK_ADAPTER);
-            
+
             if (type == FOLDER_LINK_ADAPTER) {
                 binding.sortByLayout.setVisibility(View.GONE);
                 setFolderLinkMediaDiscoveryVisibility(binding);
@@ -252,8 +252,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private void setFolderLinkMediaDiscoveryVisibility(SortByHeaderBinding binding) {
         boolean isInFolderLink = type == FOLDER_LINK_ADAPTER;
         boolean hasMediaFile = MegaNodeUtil.containsMediaFile(nodes);
-        boolean enableFolderLinkMD = ((FolderLinkActivity) context).getShowMDIcon();
-        binding.enterMediaDiscovery.setVisibility(enableFolderLinkMD && isInFolderLink && hasMediaFile ? View.VISIBLE : View.GONE);
+        binding.enterMediaDiscovery.setVisibility(isInFolderLink && hasMediaFile ? View.VISIBLE : View.GONE);
     }
 
     private void setMediaDiscoveryVisibility(SortByHeaderBinding binding) {

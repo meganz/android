@@ -15,14 +15,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
-     * Enables Folder link MediaDiscovery
-     */
-    FolderLinkMD(
-        " Enables Folder link MediaDiscovery",
-        false,
-    ),
-
-    /**
      * Enables the Device Center functionality by displaying "Device center" in the Dashboard
      * Side Menu
      */

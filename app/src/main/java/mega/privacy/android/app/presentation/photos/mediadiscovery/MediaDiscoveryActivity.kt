@@ -93,7 +93,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
                     onPhotoClicked = this::onClick,
                     onPhotoLongPressed = this::onLongPress,
                     onImportClicked = this::importNode,
-                    onSaveToDeviceClicked = this::saveToDevice
+                    onSaveToDeviceClicked = this::saveToDevice,
                 )
             }
         }
@@ -188,16 +188,22 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             statusDialog?.show()
 
             lifecycleScope.launch {
-                val nodes = mediaDiscoveryViewModel.getNodes()
-                if (nodes.isEmpty()) {
-                    Timber.w("No selected nodes")
-                    showSnackbar(
-                        this@MediaDiscoveryActivity,
-                        getString(R.string.context_no_copied)
-                    )
-                    return@launch
+                val selectedNodes = mediaDiscoveryViewModel.getSelectedNodes()
+                if (selectedNodes.isNotEmpty()) {
+                    // Import the selected nodes
+                    Timber.d("Is multiple select")
+                    val authorizedNodes =
+                        selectedNodes.mapNotNull { megaApiFolder.authorizeNode(it) }
+                    mediaDiscoveryViewModel.checkNameCollision(authorizedNodes, toHandle)
+                } else {
+                    // No selection, import the whole folder
+                    val node = with(megaApiFolder) {
+                        authorizeNode(rootNode)
+                    }
+                    node?.let {
+                        mediaDiscoveryViewModel.checkNameCollision(listOf(it), toHandle)
+                    }
                 }
-                mediaDiscoveryViewModel.checkNameCollision(nodes, toHandle)
             }
         }
 
