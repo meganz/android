@@ -1411,12 +1411,11 @@ class CameraUploadsWorker @AssistedInject constructor(
         val error = globalTransfer.error
 
         Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
-        if (error is QuotaExceededMegaException && error.value != 0L)
-            Timber.w("Transfer Over Quota Error: ${error.errorCode}")
-        else
-            Timber.w("Storage Over Quota Error: ${error.errorCode}")
-        showStorageOverQuotaNotification()
-        endService(aborted = true)
+        if (error is QuotaExceededMegaException) {
+            Timber.w("${if (error.value != 0L) "Transfer" else "Storage"} Over Quota Error: ${error.errorCode}")
+            showStorageOverQuotaNotification()
+            endService(aborted = true)
+        }
     }
 
     /**
