@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.OpenLinkActivity
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.constants.SettingsConstants

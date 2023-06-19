@@ -165,7 +165,7 @@
         <activity
             android:name=".main.megaachievements.AchievementsActivity" />
         <activity
-            android:name=".OpenLinkActivity"
+            android:name=".presentation.openlink.OpenLinkActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">

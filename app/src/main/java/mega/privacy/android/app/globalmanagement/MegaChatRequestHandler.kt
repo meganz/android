@@ -8,16 +8,18 @@ import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
-import mega.privacy.android.app.main.controllers.AccountController.Companion.logoutConfirmed
 import mega.privacy.android.app.main.megachat.BadgeIntentService
 import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isHMS
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -36,7 +38,6 @@ import javax.inject.Singleton
  * @property megaApi
  * @property sharingScope
  * @property chatManagement
- * @property sortOrderManagement
  * @property myAccountInfo
  * @property passcodeManagement
  * @property transfersManagement
@@ -55,6 +56,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val transfersManagement: TransfersManagement,
     private val chatRequestMapper: ChatRequestMapper,
     private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
+    private val localLogoutAppUseCase: LocalLogoutAppUseCase,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -113,19 +115,16 @@ class MegaChatRequestHandler @Inject constructor(
             val loggedState: Int = megaApi.isLoggedIn
             Timber.d("Login status on %s", loggedState)
             if (loggedState == 0) {
-                logoutConfirmed(application, sharingScope)
-                //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                 sharingScope.launch {
+                    localLogoutAppUseCase(ClearPsa { PsaManager::clearPsa })
+                    //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                     broadcastFinishActivityUseCase()
                 }
                 if (isLoggingRunning) {
                     Timber.d("Already in Login Activity, not necessary to launch it again")
                     return
                 }
-                val loginIntent = Intent(
-                    application,
-                    LoginActivity::class.java
-                ).apply {
+                val loginIntent = Intent(application, LoginActivity::class.java).apply {
                     if (MegaApplication.urlConfirmationLink != null) {
                         putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                             .putExtra(

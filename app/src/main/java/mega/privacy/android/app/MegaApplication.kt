@@ -562,6 +562,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
          * Url confirmation link
          */
         @JvmStatic
+        @Volatile
         var urlConfirmationLink: String? = null
 
         private var registeredChatListeners = false

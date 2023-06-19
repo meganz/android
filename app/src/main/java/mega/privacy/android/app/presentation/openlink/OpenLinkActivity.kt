@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.presentation.openlink
 
 import android.content.ComponentName
 import android.content.Intent
@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,8 +17,12 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.OpenPasswordLinkActivity
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -86,7 +91,6 @@ import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -127,19 +131,13 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     lateinit var chatRequestHandler: MegaChatRequestHandler
 
-    /**
-     * Clear ephemeral credentials use case
-     */
-    @Inject
-    lateinit var clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase
-
     private var urlConfirmationLink: String? = null
 
     private var isLoggedIn = false
     private var needsRefreshSession = false
 
     private var url: String? = null
-
+    private val viewModel by viewModels<OpenLinkViewModel>()
     private val binding: ActivityOpenLinkBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityOpenLinkBinding.inflate(layoutInflater)
     }
@@ -161,6 +159,8 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         isLoggedIn = dbH.credentials != null
         needsRefreshSession = megaApi.rootNode == null
 
+        collectFlows()
+
         when {
             // If is not a MEGA link, is not a supported link
             !matchRegexs(url, MEGA_REGEXS) -> {
@@ -178,6 +178,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 Timber.d("Open web session link")
                 openWebLink(url)
             }
+
             matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS) -> {
                 Timber.d("Open business invite link")
                 openWebLink(url)
@@ -427,11 +428,13 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
+
             matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
                     || matchRegexs(url, MEGA_BLOG_LINK_REGEXS) -> {
                 Timber.d("Open revert password change link: $url")
                 openWebLink(url)
             }
+
             matchRegexs(url, HANDLE_LINK_REGEXS) -> {
                 Timber.d("Handle link url")
                 startActivity(
@@ -463,12 +466,28 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setError(getString(R.string.alert_not_logged_in))
                 }
             }
+
             else -> {
                 // Browser open the link which does not require app to handle
                 Timber.d("Browser open link: $url")
                 url?.let {
                     checkIfRequiresTransferSession(it)
                 }
+            }
+        }
+    }
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
+            if (openLinkState.isLoggedOut) {
+                startActivity(
+                    Intent(this@OpenLinkActivity, LoginActivity::class.java)
+                        .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                        .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
+                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                        .setAction(ACTION_CONFIRM)
+                )
+                finish()
             }
         }
     }
@@ -559,7 +578,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             browserActivities
                 .filterNot { it.activityInfo.packageName.contains(packageName) }
                 .map {
-                    Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                    Intent(ACTION_VIEW, Uri.parse(url)).apply {
                         `package` = it.activityInfo.packageName
                     }
                 }.takeIf { it.isNotEmpty() }
@@ -584,48 +603,28 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     }
 
-    override fun onRequestStart(p0: MegaApiJava, p1: MegaRequest) {
+    override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         Timber.d("onRequestStart")
     }
 
-    override fun onRequestUpdate(p0: MegaApiJava, p1: MegaRequest) {}
+    override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
-    override fun onRequestFinish(p0: MegaApiJava, p1: MegaRequest, p2: MegaError) {
+    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
-        p1?.let { request ->
-            when (request.type) {
-                MegaRequest.TYPE_LOGOUT -> {
-                    Timber.d("END logout sdk request - wait chat logout")
-                    MegaApplication.urlConfirmationLink?.let {
-                        Timber.d("Confirmation link - show confirmation screen")
-                        lifecycleScope.launch {
-                            clearEphemeralCredentialsUseCase()
-                        }
-                        AccountController.logoutConfirmed(this, sharingScope)
-                        startActivity(
-                            Intent(this, LoginActivity::class.java)
-                                .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                                .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
-                                .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                                .setAction(ACTION_CONFIRM)
-                        )
-                        MegaApplication.urlConfirmationLink = null
-                        finish()
-                    }
+        when (request.type) {
+            MegaRequest.TYPE_LOGOUT -> viewModel.logoutConfirmed()
+
+            MegaRequest.TYPE_QUERY_SIGNUP_LINK -> {
+                Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
+                if (e.errorCode == MegaError.API_OK) {
+                    MegaApplication.urlConfirmationLink = request.link
+                    AccountController.logout(this, megaApi, sharingScope)
+                } else {
+                    setError(getString(R.string.invalid_link))
                 }
-                MegaRequest.TYPE_QUERY_SIGNUP_LINK -> {
-                    Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
-                    p2?.let { megaError ->
-                        if (megaError.errorCode == MegaError.API_OK) {
-                            MegaApplication.urlConfirmationLink = request.link
-                            AccountController.logout(this, megaApi, sharingScope)
-                        } else {
-                            setError(getString(R.string.invalid_link))
-                        }
-                    }
-                }
-                else -> {}
             }
+
+            else -> {}
         }
     }
 
@@ -642,7 +641,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         binding.containerAcceptButton.isVisible = true
     }
 
-    override fun onRequestTemporaryError(p0: MegaApiJava, p1: MegaRequest, p2: MegaError) {}
+    override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 
     override fun onPreviewLoaded(request: MegaChatRequest, alreadyExist: Boolean) {
         val chatId = request.chatHandle
@@ -680,10 +679,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             true
                         ).show(supportFragmentManager, MeetingHasEndedDialogFragment.TAG)
                     }
+
                     isFromOpenChatPreview -> {
                         Timber.d("Meeting is in progress, open join meeting")
                         goToMeetingActivity(chatId, request.text)
                     }
+
                     else -> {
                         Timber.d("It's a meeting, open chat preview")
                         Timber.d("openChatPreview")

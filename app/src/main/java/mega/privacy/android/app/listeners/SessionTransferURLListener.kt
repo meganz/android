@@ -3,7 +3,7 @@ package mega.privacy.android.app.listeners
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import mega.privacy.android.app.OpenLinkActivity
+import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
