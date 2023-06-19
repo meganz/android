@@ -6,7 +6,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
@@ -399,7 +398,9 @@ class MyAccountHomeViewTest {
             MyAccountHomeUIState(visibleContacts = randomContacts)
         )
 
-        composeTestRule.onNodeWithText("$randomContacts connections").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(testTag = "${CONTACTS}_description", useUnmergedTree = true)
+            .assertIsDisplayed()
+            .assert(hasText("$randomContacts connections"))
     }
 
     @Test

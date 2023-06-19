@@ -628,7 +628,6 @@ private fun AccountInfoSection(
 
         if (uiState.canVerifyPhoneNumber && uiState.verifiedPhoneNumber == null) {
             AccountInfoListItem(
-                modifier = Modifier.testTag(ADD_PHONE_NUMBER),
                 icon = R.drawable.ic_verify_phone_circle,
                 title = R.string.add_phone_label,
                 description = stringResource(R.string.sms_add_phone_number_dialog_msg_non_achievement_user),
@@ -640,43 +639,42 @@ private fun AccountInfoSection(
                         uiActions.isPhoneNumberDialogShown.not() -> uiActions.showPhoneNumberDialog()
                         else -> {}
                     }
-                }
+                },
             )
         }
 
         AccountInfoListItem(
-            modifier = Modifier.testTag(BACKUP_RECOVERY_KEY),
             icon = R.drawable.ic_recovery_key_circle,
             title = R.string.action_export_master_key,
             description = stringResource(id = R.string.backup_recovery_key_subtitle),
             isIconMode = false,
-            onClickListener = uiActions::onBackupRecoveryKey
+            onClickListener = uiActions::onBackupRecoveryKey,
+            testTag = BACKUP_RECOVERY_KEY
         )
 
         AccountInfoListItem(
-            modifier = Modifier.testTag(CONTACTS),
             icon = R.drawable.ic_contacts_connections,
             title = R.string.section_contacts,
             description = uiState.visibleContacts?.let {
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,
-            onClickListener = uiActions::onClickContacts
+            onClickListener = uiActions::onClickContacts,
+            testTag = CONTACTS
         )
 
         if (uiState.isBusinessAccount.not()) {
             AccountInfoListItem(
-                modifier = Modifier.testTag(ACHIEVEMENTS),
                 icon = R.drawable.ic_achievement,
                 title = R.string.achievements_title,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
-                onClickListener = uiActions::onClickAchievements
+                onClickListener = uiActions::onClickAchievements,
+                testTag = ACHIEVEMENTS
             )
         }
 
         AccountInfoListItem(
-            modifier = Modifier.testTag(LAST_SESSION),
             icon = R.drawable.ic_last_session,
             title = R.string.my_account_last_session,
             description = uiState.lastSession?.let {
@@ -695,7 +693,8 @@ private fun AccountInfoSection(
                     uiActions.showApiServerDialog()
                     lastSessionClick = 0
                 }
-            }
+            },
+            testTag = LAST_SESSION
         )
     }
 }
@@ -896,6 +895,7 @@ private fun AccountInfoListItem(
 
     ConstraintLayout(
         modifier = modifier
+            .testTag(testTag)
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable(
