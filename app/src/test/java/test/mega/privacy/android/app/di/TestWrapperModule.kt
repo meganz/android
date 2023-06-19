@@ -11,6 +11,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -59,5 +60,8 @@ object TestWrapperModule {
 
     @Provides
     fun provideStringWrapper(): StringWrapper = mock()
+
+    @Provides
+    fun provideApplicationIpAddressWrapper(): ApplicationIpAddressWrapper = mock()
 
 }

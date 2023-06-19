@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.BatteryManager
 import android.os.Build
 import android.os.StatFs
@@ -12,6 +13,8 @@ import android.provider.Settings
 import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import timber.log.Timber
+import java.net.NetworkInterface
 import java.util.Locale
 import javax.inject.Inject
 
@@ -80,5 +83,33 @@ internal class AndroidDeviceGateway @Inject constructor(
             context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val status = batteryIntent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
         return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
+    }
+
+    override suspend fun getLocalIpAddress(): String? {
+        runCatching {
+            val interfaces = NetworkInterface.getNetworkInterfaces()
+            while (interfaces.hasMoreElements()) {
+                val networkInterface = interfaces.nextElement()
+                val interfaceName = networkInterface.name
+                // Ensure get the IP from the current active network interface
+                val connectivityManager =
+                    context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val activeInterfaceName =
+                    connectivityManager.getLinkProperties(connectivityManager.activeNetwork)?.interfaceName
+                if (activeInterfaceName != null && interfaceName.compareTo(activeInterfaceName) != 0) {
+                    continue
+                }
+                val enumIpAddress = networkInterface.inetAddresses
+                while (enumIpAddress.hasMoreElements()) {
+                    val inetAddress = enumIpAddress.nextElement()
+                    if (inetAddress != null && !inetAddress.isLoopbackAddress) {
+                        return inetAddress.hostAddress
+                    }
+                }
+            }
+        }.onFailure {
+            Timber.e(it, "Error getting local IP address")
+        }
+        return null
     }
 }

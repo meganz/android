@@ -42,7 +42,6 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
-import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
 import mega.privacy.android.app.utils.Constants
@@ -109,6 +108,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
@@ -419,7 +419,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * initiate mega api connection based on IP
      */
     @Inject
-    lateinit var cameraServiceIpChangeHandler: CameraServiceIpChangeHandler
+    lateinit var handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase
 
     /**
      * CancelTransferByTagUseCase
@@ -1672,7 +1672,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
-        cameraServiceIpChangeHandler.start()
+        handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
         // Reset properties
         lastUpdated = 0

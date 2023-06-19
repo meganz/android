@@ -76,4 +76,22 @@ interface EnvironmentRepository {
      * get nano time
      */
     val nanoTime: Long
+
+    /**
+     * Get Local Ip Address
+     * @return [String]
+     */
+    suspend fun getLocalIpAddress(): String?
+
+    /**
+     * set ip address
+     * @param ipAddress [String]
+     */
+    fun setIpAddress(ipAddress: String?)
+
+    /**
+     * get ip address
+     * @return ip address [String]
+     */
+    fun getIpAddress(): String?
 }

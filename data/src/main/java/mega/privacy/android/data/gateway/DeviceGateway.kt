@@ -82,4 +82,10 @@ interface DeviceGateway {
      * @return [Boolean] whether device is charging or not
      */
     suspend fun isCharging(): Boolean
+
+    /**
+     * Get Local Ip Address
+     * @return [String]
+     */
+    suspend fun getLocalIpAddress(): String?
 }

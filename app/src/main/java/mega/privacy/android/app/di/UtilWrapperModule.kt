@@ -1,5 +1,6 @@
 package mega.privacy.android.app.di
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -9,6 +10,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
@@ -26,6 +28,7 @@ import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -121,5 +124,21 @@ abstract class UtilWrapperModule {
          */
         @Provides
         fun providesFileUtilWrapper() = object : FileUtilWrapper {}
+
+        /**
+         * Provides the [StringWrapper]
+         */
+        @Provides
+        fun provideApplicationIpAddressWrapper(application: Application) =
+            object : ApplicationIpAddressWrapper {
+                override fun setIpAddress(ipAddress: String?) {
+                    (application as MegaApplication).localIpAddress = ipAddress
+                }
+
+                override fun getIpAddress(): String? {
+                    return (application as MegaApplication).localIpAddress
+                }
+            }
+
     }
 }

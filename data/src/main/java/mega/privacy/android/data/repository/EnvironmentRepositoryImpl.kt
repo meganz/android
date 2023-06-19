@@ -11,10 +11,12 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.EnvironmentRepository
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -29,6 +31,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     private val appInfoGateway: AppInfoGateway,
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
+    private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
 ) : EnvironmentRepository {
 
     override suspend fun getDeviceInfo() =
@@ -81,4 +84,17 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     override val nanoTime: Long
         get() = deviceGateway.nanoTime
+
+    override suspend fun getLocalIpAddress() = withContext(ioDispatcher) {
+        deviceGateway.getLocalIpAddress().also {
+            Timber.d("Device local ip address $it")
+        }
+    }
+
+    override fun setIpAddress(ipAddress: String?) =
+        applicationIpAddressWrapper.setIpAddress(ipAddress)
+
+    override fun getIpAddress() = applicationIpAddressWrapper.getIpAddress().also {
+        Timber.d("Current Ip Address $it")
+    }
 }

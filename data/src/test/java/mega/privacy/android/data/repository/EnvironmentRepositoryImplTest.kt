@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
+import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
 import org.junit.Test
@@ -30,6 +31,8 @@ class EnvironmentRepositoryImplTest {
     private val appInfoGateway = mock<AppInfoGateway>()
     private val appInfoPreferencesGateway = mock<AppInfoPreferencesGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
+    private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
+
 
     @Before
     fun setUp() {
@@ -41,6 +44,7 @@ class EnvironmentRepositoryImplTest {
             appInfoGateway = appInfoGateway,
             appInfoPreferencesGateway = appInfoPreferencesGateway,
             megaLocalStorageGateway = megaLocalStorageGateway,
+            applicationIpAddressWrapper = applicationIpAddressWrapper,
         )
     }
 
