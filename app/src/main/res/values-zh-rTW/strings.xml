@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -830,15 +830,9 @@
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">您的新電子郵件地址需要驗證確認。請至您的電子信箱收信並進行驗證。</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
-    <string name="confirmation_delete_avatar">要刪除您的大頭照嗎？</string>
+    <string name="confirmation_delete_avatar">要刪除您的個人資料相片嗎？</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">編輯</string>
-    <!-- Alert Dialog to get link -->
-    <string name="title_set_expiry_date">設定到期日期</string>
-    <!-- Title of the dialog to get link with password -->
-    <string name="title_set_password_protection">設定密碼保護</string>
-    <!-- Subtitle of the dialog to get link -->
-    <string name="subtitle_set_expiry_date">（Pro方案限定）</string>
     <!-- Alert Dialog to get link with password -->
     <string name="set_password_protection_dialog">設定密碼</string>
     <!-- Hint of the dialog to get link with password -->
@@ -1285,15 +1279,15 @@
     <!--  -->
     <string name="camera_uploads_upload_videos">上傳影片</string>
     <!-- Message when an user avatar has been changed successfully -->
-    <string name="success_changing_user_avatar">已更新大頭照</string>
+    <string name="success_changing_user_avatar">已更新個人資料相片</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar_image_not_available">錯誤。所選的圖片不存在</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar">更換大頭照時發生錯誤</string>
+    <string name="error_changing_user_avatar">更換個人資料相片時發生錯誤</string>
     <!-- Message when an user avatar has been deleted successfully -->
-    <string name="success_deleting_user_avatar">已刪除大頭照</string>
+    <string name="success_deleting_user_avatar">已刪除個人資料相片</string>
     <!-- Message when an error ocurred when deleting an user avatar -->
-    <string name="error_deleting_user_avatar">刪除大頭照時發生錯誤</string>
+    <string name="error_deleting_user_avatar">刪除個人資料相片時發生錯誤</string>
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">更改名稱時發生錯誤</string>
     <!-- Message when an user attribute has been changed successfully -->
@@ -1860,7 +1854,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">請將您的<b>還原金鑰</b>儲存在一個安全地方，以避免您無法存取您的應用程式或是您想要停用雙重驗證時遇到問題。</string>
+    <string name="recommendation_2fa_enabled">為避免您忘記密碼或想要停用雙重驗證時遇到問題，請將您的<b>還原金鑰</b>儲存在一個安全地方，</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">無效的二維條碼</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2200,9 +2194,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]帳戶[/B][A]%s[/A][B]已刪除。[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B]已被移除。</string>
+    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B]已被下架。</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被移除。</string>
+    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被下架。</string>
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">爭議撤除</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
@@ -2922,9 +2916,9 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">無法更改傳輸「%1$s」的優先順序</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">各別發送解密金鑰</string>
+    <string name="option_send_decryption_key_separately">單獨發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">各別匯出連結與解密金鑰。</string>
+    <string name="explanation_send_decryption_key_separately">個別匯出連結與解密金鑰。</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">瞭解更多</string>
     <!-- Label key referring to a link decryption key -->
@@ -4355,12 +4349,10 @@
     <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀啨。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
-    <!-- Answer for confirmation dialog. -->
-    <string name="general_camelcase_ok">Ok</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]移除指導政策[/A]，此檔案已被刪除。</string>
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]移除指導政策[/A]，此檔案已被下架。</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]移除指導政策[/A]，此資料夾已被刪除。</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]移除指導政策[/A]，此資料夾已被下架。</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">加入</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -4634,9 +4626,9 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">按年計算最多可節省16%</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage"></string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]空間：[/B][A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer"></string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]傳輸：[/B][A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -4646,19 +4638,19 @@
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">目前方案</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features"></string>
+    <string name="account_upgrade_account_description_title_features">Pro方案功能</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password"></string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;受密碼保護的連結</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link"></string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;為連結設定到期日期</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer"></string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;傳輸配額共享</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup"></string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;自動備份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind"></string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Pro Lite最多可還原90天，Pro I、II和III最多可還原365天（即將推出）</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin"></string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;垃圾筒清理排程7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">購買Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4667,7 +4659,7 @@
     <string name="account_upgrade_account_buy_button_title_pro_ii">購買Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">購買Pro III</string>
-    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">服務條款</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <string name="cloud_drive_subtitle_links_access_all_user">任何擁有此連結的人都可以查看和下載您的資料</string>
@@ -4697,4 +4689,24 @@
     <string name="meetings_mute_notifications_dialog_title">會議通知靜音</string>
     <!-- Confirmation dialog title to leave a meeting -->
     <string name="meetings_leave_meeting_confirmation_dialog_title">要離開會議嗎？</string>
+    <!-- Album import rename album title -->
+    <string name="album_import_rename_album_title">重新命名相簿</string>
+    <!-- Album import rename album description -->
+    <string name="album_import_rename_album_description">您的相簿中已存在名為「%1$s」的相簿。請為您正儲存的相簿輸入一個新名稱。</string>
+    <!-- Album import enter album name -->
+    <string name="album_import_enter_album_name">輸入相簿名稱</string>
+    <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
+    <string name="account_upgrade_account_pricing_page_link_text">您可以在我們的[A]定價頁面[/A]升級您目前的訂閱方案。</string>
+    <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
+    <plurals name="cloud_drive_subtitle_links_access_user">
+        <item quantity="other">任何擁有這些連結的人都可以查看和下載您的資料</item>
+    </plurals>
+    <!-- General button text to save selected items to cloud drive -->
+    <string name="general_save_to_cloud_drive">儲存到雲端硬碟</string>
+    <!-- Album import saving -->
+    <string name="album_import_saving">Saving&#8230;</string>
+    <!-- Album import success message -->
+    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <!-- Album import error message -->
+    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
 </resources>
