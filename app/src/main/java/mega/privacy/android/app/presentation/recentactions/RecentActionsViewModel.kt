@@ -22,10 +22,10 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
@@ -34,7 +34,7 @@ import javax.inject.Inject
 /**
  * ViewModel associated to [RecentActionsFragment]
  *
- * @param getRecentActions
+ * @param getRecentActionsUseCase
  * @param getVisibleContactsUseCase
  * @param getVisibleContactsUseCase
  * @param setHideRecentActivity
@@ -43,7 +43,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
-    private val getRecentActions: GetRecentActions,
+    private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val setHideRecentActivity: SetHideRecentActivity,
     private val getNodeByHandle: GetNodeByHandle,
@@ -132,7 +132,7 @@ class RecentActionsViewModel @Inject constructor(
      */
     private suspend fun updateRecentActions() = coroutineScope {
         val getRecentActions = async(coroutineContext) {
-            getRecentActions().also { _buckets = it }
+            getRecentActionsUseCase().also { _buckets = it }
         }
         val getVisibleContacts = async(coroutineContext) { getVisibleContactsUseCase() }
 

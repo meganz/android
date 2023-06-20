@@ -27,10 +27,10 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -45,7 +45,7 @@ import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 class RecentActionsViewModelTest {
     private lateinit var underTest: RecentActionsViewModel
 
-    private val getRecentActions = mock<GetRecentActions> {
+    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
     private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
@@ -111,7 +111,7 @@ class RecentActionsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = RecentActionsViewModel(
-            getRecentActions,
+            getRecentActionsUseCase,
             getVisibleContactsUseCase,
             setHideRecentActivity,
             getNodeByHandle,
@@ -136,7 +136,7 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that recent action items is updated at initialization`() =
         runTest {
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -154,7 +154,7 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that 2 recent action items are grouped under same header if timestamp is same`() =
         runTest {
-            whenever(getRecentActions()).thenReturn(
+            whenever(getRecentActionsUseCase()).thenReturn(
                 listOf(
                     megaRecentActionBucket,
                     megaRecentActionBucket2,
@@ -177,7 +177,7 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that 2 recent action items are under two different headers if timestamp is different`() =
         runTest {
-            whenever(getRecentActions()).thenReturn(
+            whenever(getRecentActionsUseCase()).thenReturn(
                 listOf(
                     megaRecentActionBucket,
                     megaRecentActionBucket3,
@@ -207,7 +207,7 @@ class RecentActionsViewModelTest {
                 on { email }.thenReturn("aaa@aaa.com")
                 on { contactData }.thenReturn(contact)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
@@ -226,7 +226,7 @@ class RecentActionsViewModelTest {
                 on { email }.thenReturn("aaa@aaa.com")
                 on { contactData }.thenReturn(mock())
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
@@ -250,7 +250,7 @@ class RecentActionsViewModelTest {
                 accountTypeString = ""
             )
             whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -272,7 +272,7 @@ class RecentActionsViewModelTest {
                 accountTypeString = ""
             )
             whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -288,7 +288,7 @@ class RecentActionsViewModelTest {
             val parentNode = mock<MegaNode> {
                 on { name }.thenReturn(null)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -306,7 +306,7 @@ class RecentActionsViewModelTest {
                 on { name }.thenReturn(expected)
                 on { isNodeKeyDecrypted }.thenReturn(false)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -323,7 +323,7 @@ class RecentActionsViewModelTest {
             val parentNode = mock<MegaNode> {
                 on { isInShare }.thenReturn(true)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -340,7 +340,7 @@ class RecentActionsViewModelTest {
             val parentNode = mock<MegaNode> {
                 on { isOutShare }.thenReturn(true)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -357,7 +357,7 @@ class RecentActionsViewModelTest {
             val parentNode = mock<MegaNode> {
                 on { handle }.thenReturn(1L)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(any())).thenReturn(parentNode)
             whenever(isPendingShare(parentNode.handle)).thenReturn(true)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
@@ -376,7 +376,7 @@ class RecentActionsViewModelTest {
                 on { isInShare }.thenReturn(false)
                 on { isOutShare }.thenReturn(false)
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             whenever(getNodeByHandle(1)).thenReturn(parentNode)
             whenever(isPendingShare(parentNode.handle)).thenReturn(false)
             whenever(getParentMegaNode(parentNode)).thenReturn(null)
@@ -392,17 +392,19 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that recent action items is updated when receiving a node update`() =
         runTest {
-            whenever(getRecentActions()).thenReturn(emptyList())
+            whenever(getRecentActionsUseCase()).thenReturn(emptyList())
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     assertThat(awaitItem().size).isEqualTo(0)
                     advanceUntilIdle()
                     monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
-                    whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+                    whenever(getRecentActionsUseCase()).thenReturn(
+                        listOf(megaRecentActionBucket)
+                    )
                     assertThat(awaitItem().size).isEqualTo(2)
                 }
-            verify(getRecentActions, times(2)).invoke()
+            verify(getRecentActionsUseCase, times(2)).invoke()
         }
 
     @Test
@@ -437,7 +439,7 @@ class RecentActionsViewModelTest {
                 bucket = megaRecentActionBucket
             )
             val expectedSnapshotActionList = listOf(megaRecentActionBucket)
-            whenever(getRecentActions()).thenReturn(expectedSnapshotActionList)
+            whenever(getRecentActionsUseCase()).thenReturn(expectedSnapshotActionList)
             assertThat(underTest.selected).isEqualTo(null)
             assertThat(underTest.snapshotActionList).isEqualTo(null)
             advanceUntilIdle()
@@ -448,7 +450,7 @@ class RecentActionsViewModelTest {
 
     @Test
     fun `test that isKeyVerified gets updated in recent action items`() = runTest {
-        whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+        whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
         underTest.state.map { it.recentActionItems }.distinctUntilChanged().test {
             awaitItem()
             assertThat((awaitItem().filterIsInstance<RecentActionItemType.Item>()[0]).isKeyVerified)
@@ -465,7 +467,7 @@ class RecentActionsViewModelTest {
                     "Account call failed"
                 )
             }
-            whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
+            whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()

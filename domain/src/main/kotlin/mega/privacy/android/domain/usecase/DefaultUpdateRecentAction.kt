@@ -4,13 +4,14 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import javax.inject.Inject
 
 /**
  * Default get nodes from the recent action bucket
  */
 class DefaultUpdateRecentAction @Inject constructor(
-    private val getRecentActions: GetRecentActions,
+    private val getRecentActionsUseCase: GetRecentActionsUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : UpdateRecentAction {
 
@@ -19,7 +20,7 @@ class DefaultUpdateRecentAction @Inject constructor(
         cachedActionList: List<RecentActionBucket>?,
     ): RecentActionBucket? = withContext(ioDispatcher) {
 
-        val recentActions = getRecentActions()
+        val recentActions = getRecentActionsUseCase()
 
         // Update the current bucket
         recentActions.firstOrNull { currentBucket.isSameBucket(it) }?.let {

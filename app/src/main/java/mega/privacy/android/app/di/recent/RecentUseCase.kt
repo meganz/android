@@ -8,9 +8,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.DefaultIsPendingShare
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
 import mega.privacy.android.app.domain.usecase.IsPendingShare
-import mega.privacy.android.domain.usecase.DefaultGetRecentActions
 import mega.privacy.android.domain.usecase.DefaultUpdateRecentAction
-import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.UpdateRecentAction
 
 /**
@@ -45,12 +43,4 @@ abstract class RecentUseCase {
      */
     @Binds
     abstract fun bindIsPendingShare(useCase: DefaultIsPendingShare): IsPendingShare
-
-    /**
-     * Provide [GetRecentActions] implementation
-     *
-     * @param useCase
-     */
-    @Binds
-    abstract fun bindGetRecentActions(useCase: DefaultGetRecentActions): GetRecentActions
 }

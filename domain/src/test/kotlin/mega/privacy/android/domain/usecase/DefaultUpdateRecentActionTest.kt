@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RecentActionBucket
+import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -13,12 +14,12 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateRecentActionTest {
     private lateinit var underTest: UpdateRecentAction
-    private val getRecentActions = mock<GetRecentActions>()
+    private val getRecentActionsUseCase = mock<GetRecentActionsUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultUpdateRecentAction(
-            getRecentActions = getRecentActions,
+            getRecentActionsUseCase = getRecentActionsUseCase,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
     }
@@ -62,7 +63,7 @@ class DefaultUpdateRecentActionTest {
         runTest {
             val expected = createBucket(isMedia = true, isUpdate = true, 0L, 1L, "1")
             val list = listOf(expected, expected, expected)
-            whenever(getRecentActions()).thenReturn(list)
+            whenever(getRecentActionsUseCase()).thenReturn(list)
 
             assertThat(underTest.invoke(expected, null)).isEqualTo(expected)
         }
@@ -80,7 +81,7 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(expected, item1, item2)
-            whenever(getRecentActions()).thenReturn(list)
+            whenever(getRecentActionsUseCase()).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(expected)
         }
@@ -96,7 +97,7 @@ class DefaultUpdateRecentActionTest {
             val cachedActionList = listOf(current, item1, item2)
 
             val list = listOf(item1, item2)
-            whenever(getRecentActions()).thenReturn(list)
+            whenever(getRecentActionsUseCase()).thenReturn(list)
 
             assertThat(underTest.invoke(current, cachedActionList)).isEqualTo(null)
         }
