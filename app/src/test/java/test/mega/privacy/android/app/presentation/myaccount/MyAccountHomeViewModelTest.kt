@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorAccountDetail
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -68,7 +68,7 @@ class MyAccountHomeViewModelTest {
 
 
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
-    private val monitorAccountDetail: MonitorAccountDetail = mock {
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)
     }
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock {
@@ -97,7 +97,7 @@ class MyAccountHomeViewModelTest {
 
         underTest = MyAccountHomeViewModel(
             getAccountDetailsUseCase,
-            monitorAccountDetail,
+            monitorAccountDetailUseCase,
             monitorMyAvatarFile,
             monitorVerificationStatus,
             monitorConnectivityUseCase,

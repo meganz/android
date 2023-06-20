@@ -13,7 +13,7 @@ import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
-import mega.privacy.android.domain.usecase.MonitorAccountDetail
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -121,7 +121,7 @@ object TestAccountModule {
     fun provideMonitorSecurityUpgradeInApp() = mock<MonitorSecurityUpgradeInApp>()
 
     @Provides
-    fun providesMonitorAccountDetail() = mock<MonitorAccountDetail>()
+    fun providesMonitorAccountDetail() = mock<MonitorAccountDetailUseCase>()
 
     @Provides
     fun provideReferralBonusAchievementsMapper() = mock<ReferralBonusAchievementsMapper>()

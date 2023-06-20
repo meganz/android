@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorAccountDetail
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -45,7 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MyAccountHomeViewModel @Inject constructor(
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val monitorAccountDetail: MonitorAccountDetail,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -120,7 +120,7 @@ class MyAccountHomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             flow {
-                emitAll(monitorAccountDetail())
+                emitAll(monitorAccountDetailUseCase())
             }.collectLatest { accountDetail ->
                 _uiState.update {
                     it.copy(
