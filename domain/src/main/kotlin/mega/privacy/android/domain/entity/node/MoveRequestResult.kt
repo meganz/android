@@ -7,11 +7,13 @@ package mega.privacy.android.domain.entity.node
  * @property count              Number of requests.
  * @property errorCount         Number of requests which finished with an error.
  * @property oldParentHandle    Handle of the old parent.
+ * @property nodes              Nodes to move
  */
 sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
     val oldParentHandle: Long? = -1L,
+    val nodes: List<Long> = emptyList()
 ) {
     /**
      * Count of success move request
@@ -54,9 +56,11 @@ sealed class MoveRequestResult(
         count: Int,
         errorCount: Int,
         oldParentHandle: Long?,
+        nodes: List<Long> = emptyList()
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
-        oldParentHandle = oldParentHandle
+        oldParentHandle = oldParentHandle,
+        nodes = nodes
     )
 }

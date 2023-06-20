@@ -2249,6 +2249,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 handleNodesNameCollisionResult(nodeNameCollisionResult)
                 viewModel.markHandleNodeNameCollisionResult()
             }
+            if (managerState.moveRequestResult != null) {
+                handleMovementResult(managerState.moveRequestResult)
+                viewModel.markHandleMoveRequestResult()
+            }
             if (managerState.restoreNodeResult != null) {
                 handleRestoreNodeResult(managerState.restoreNodeResult)
                 viewModel.markHandleRestoreNodeResult()
@@ -2380,6 +2384,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         collectFlow(viewModel.incomingContactRequests) { pendingRequest ->
             setContactTitleSection(pendingRequest.size)
         }
+    }
+
+    private fun handleMovementResult(moveRequestResult: MoveRequestResult) {
+        showMovementResult(moveRequestResult, moveRequestResult.nodes.first())
+        showSnackbar(
+            Constants.SNACKBAR_TYPE,
+            moveRequestMessageMapper(moveRequestResult),
+            MEGACHAT_INVALID_HANDLE
+        )
     }
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
@@ -5777,7 +5790,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun askConfirmationMoveToRubbish(handleList: List<Long>?) {
         Timber.d("askConfirmationMoveToRubbish")
-        if (handleList == null || handleList.isEmpty()) {
+        if (handleList.isNullOrEmpty()) {
             Timber.w("handleList NULL or empty")
             return
         }
@@ -5793,21 +5806,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 builder.setMessage(resources.getString(R.string.confirmation_move_to_rubbish))
             }
             builder.setPositiveButton(R.string.general_move) { _: DialogInterface?, _: Int ->
-                legacyMoveNodeUseCase.moveToRubbishBin(handleList, this)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { result: MoveRequestResult.RubbishMovement ->
-                            showMovementResult(result, handleList[0])
-                            showSnackbar(
-                                Constants.SNACKBAR_TYPE,
-                                moveRequestMessageMapper(result),
-                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                            )
-                        },
-                        { throwable: Throwable -> Timber.e(throwable) })
-                    .addTo(composite)
-
+                viewModel.moveNodesToRubbishBin(handleList)
             }
         } else {
             builder.setMessage(resources.getString(R.string.confirmation_delete_from_mega))

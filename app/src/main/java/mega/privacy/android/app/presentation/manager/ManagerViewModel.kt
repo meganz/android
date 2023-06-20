@@ -66,6 +66,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -167,6 +168,7 @@ class ManagerViewModel @Inject constructor(
     private val restoreNodesUseCase: RestoreNodesUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
+    private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
 ) : ViewModel() {
 
     /**
@@ -762,6 +764,31 @@ class ManagerViewModel @Inject constructor(
             }
         }
         checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
+    }
+
+    /**
+     * Move nodes to rubbish
+     *
+     * @param nodeHandles
+     */
+    fun moveNodesToRubbishBin(nodeHandles: List<Long>) {
+        viewModelScope.launch {
+            runCatching {
+                moveNodesToRubbishUseCase(nodeHandles)
+            }.onSuccess {
+                _state.update { state -> state.copy(moveRequestResult = it) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Mark handle move request result
+     *
+     */
+    fun markHandleMoveRequestResult() {
+        _state.update { it.copy(moveRequestResult = null) }
     }
 
     internal companion object {

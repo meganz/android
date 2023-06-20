@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -235,6 +237,7 @@ class ManagerViewModelTest {
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val monitorBackupFolder = mock<MonitorBackupFolder>()
+    private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -292,6 +295,7 @@ class ManagerViewModelTest {
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             monitorBackupFolder = monitorBackupFolder,
+            moveNodesToRubbishUseCase = moveNodesToRubbishUseCase
         )
     }
 
@@ -837,6 +841,42 @@ class ManagerViewModelTest {
                 underTest.checkRestoreNodesNameCollision(listOf(node))
                 val updatedState = awaitItem()
                 assertThat(updatedState.nodeNameCollisionResult).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that moveRequestResult updated when calling moveNodesToRubbishBin successfully`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val result = mock<MoveRequestResult.RubbishMovement>()
+            whenever(
+                moveNodesToRubbishUseCase(any())
+            ).thenReturn(result)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.restoreNodeResult).isNull()
+                underTest.moveNodesToRubbishBin(listOf(1L))
+                val updatedState = awaitItem()
+                assertThat(updatedState.moveRequestResult).isEqualTo(result)
+            }
+        }
+
+    @Test
+    fun `test that moveRequestResult updated when calling markHandleMoveRequestResult`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val result = mock<MoveRequestResult.RubbishMovement>()
+            whenever(
+                moveNodesToRubbishUseCase(any())
+            ).thenReturn(result)
+
+            underTest.state.test {
+                assertThat(awaitItem().restoreNodeResult).isNull()
+                underTest.moveNodesToRubbishBin(listOf(1L))
+                assertThat(awaitItem().moveRequestResult).isEqualTo(result)
+                underTest.markHandleMoveRequestResult()
+                assertThat(awaitItem().restoreNodeResult).isNull()
             }
         }
 }

@@ -103,6 +103,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
+import mega.privacy.android.app.presentation.contact.ContactFileListActivityExtensionKt;
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.domain.entity.node.MoveRequestResult;
@@ -152,9 +153,9 @@ public class ContactFileListActivity extends PasscodeActivity
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
     @Inject
-    MoveRequestMessageMapper moveRequestMessageMapper;
+    public MoveRequestMessageMapper moveRequestMessageMapper;
 
-    private ContactFileListViewModel viewModel;
+    public ContactFileListViewModel viewModel;
 
     FrameLayout fragmentContainer;
 
@@ -491,6 +492,7 @@ public class ContactFileListActivity extends PasscodeActivity
                 showNewFolderDialog(savedInstanceState.getString(NEW_FOLDER_DIALOG_TEXT));
             }
         }
+        ContactFileListActivityExtensionKt.collectFlows(this);
     }
 
     public void showUploadPanel() {
@@ -614,16 +616,7 @@ public class ContactFileListActivity extends PasscodeActivity
             showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem));
             return;
         }
-
-        composite.add(legacyMoveNodeUseCase.moveToRubbishBin(handleList, this)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((result, throwable) -> {
-                    if (throwable == null) {
-                        showMovementResult(result, handleList.get(0));
-                        showSnackbar(SNACKBAR_TYPE, moveRequestMessageMapper.invoke(result), MEGACHAT_INVALID_HANDLE);
-                    }
-                }));
+        viewModel.moveNodesToRubbish(handleList);
     }
 
     /**
@@ -632,7 +625,7 @@ public class ContactFileListActivity extends PasscodeActivity
      * @param result Object containing the request result.
      * @param handle Handle of the node to move.
      */
-    private void showMovementResult(MoveRequestResult result, long handle) {
+    public void showMovementResult(MoveRequestResult result, long handle) {
         AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
         actionConfirmed();
 
