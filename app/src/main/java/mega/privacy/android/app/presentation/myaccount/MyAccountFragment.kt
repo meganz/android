@@ -30,7 +30,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -41,12 +40,6 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
     companion object {
         private const val CHANGE_API_SERVER_SHOWN = "CHANGE_API_SERVER_SHOWN"
     }
-
-    /**
-     * getFeatureFlagValueUseCase
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var _binding: FragmentMyAccountBinding? = null
     private val binding get() = _binding!!
