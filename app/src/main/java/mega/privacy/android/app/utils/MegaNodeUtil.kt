@@ -7,14 +7,10 @@ import android.content.Intent
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.text.Html
 import android.text.SpannableString
 import android.text.Spanned
-import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
-import android.text.style.URLSpan
-import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
 import androidx.annotation.ColorRes
@@ -541,21 +537,21 @@ object MegaNodeUtil {
     @JvmStatic
     fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
-            R.drawable.ic_folder_incoming
+            CoreUiR.drawable.ic_folder_incoming
         } else if (isCameraUploads(node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                R.drawable.ic_folder_outgoing
+                CoreUiR.drawable.ic_folder_outgoing
             } else {
                 R.drawable.ic_folder_camera_uploads_list
             }
         } else if (isMyChatFilesFolder(node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShare(node)) {
-                R.drawable.ic_folder_outgoing
+                CoreUiR.drawable.ic_folder_outgoing
             } else {
                 R.drawable.ic_folder_chat_list
             }
         } else if (isOutShare(node)) {
-            R.drawable.ic_folder_outgoing
+            CoreUiR.drawable.ic_folder_outgoing
         } else if (isRootBackupFolder(node)) {
             CoreUiR.drawable.ic_folder_list
         } else if (isDeviceBackupFolder(node)) {

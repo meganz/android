@@ -16,10 +16,10 @@ internal fun getDefaultFolderIcon(
 ) = with(folderNode) {
     when {
         isInRubbishBin -> CoreUiR.drawable.ic_folder_list
-        isIncomingShare -> R.drawable.ic_folder_incoming
+        isIncomingShare -> CoreUiR.drawable.ic_folder_incoming
         type is FolderType.MediaSyncFolder -> R.drawable.ic_folder_camera_uploads_list
         type is FolderType.ChatFilesFolder -> R.drawable.ic_folder_chat_list
-        isShared || folderNode.isPendingShare -> R.drawable.ic_folder_outgoing
+        isShared || folderNode.isPendingShare -> CoreUiR.drawable.ic_folder_outgoing
         type is FolderType.RootBackup -> R.drawable.backup
         type is FolderType.DeviceBackup -> getDeviceFolderIcon((type as FolderType.DeviceBackup).deviceType)
         type is FolderType.ChildBackup -> R.drawable.ic_folder_backup

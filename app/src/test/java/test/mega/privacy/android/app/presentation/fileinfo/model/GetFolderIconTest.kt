@@ -50,7 +50,7 @@ class GetFolderIconTest {
                 typedNode = folderNode,
                 originShares = false,
             )
-        ).isEqualTo(if (outShareOverride) R.drawable.ic_folder_outgoing else expectedResource)
+        ).isEqualTo(if (outShareOverride) CoreUiR.drawable.ic_folder_outgoing else expectedResource)
     }
 
     private class FolderMockNameResource(
@@ -83,7 +83,7 @@ class GetFolderIconTest {
             FolderMockNameResource("InRubbishBin", CoreUiR.drawable.ic_folder_list) {
                 on { isInRubbishBin }.thenReturn(true)
             },
-            FolderMockNameResource("IncomingShare", R.drawable.ic_folder_incoming) {
+            FolderMockNameResource("IncomingShare", CoreUiR.drawable.ic_folder_incoming) {
                 on { isIncomingShare }.thenReturn(true)
             },
             FolderMockNameResource("MediaSync", R.drawable.ic_folder_camera_uploads_list) {
@@ -92,10 +92,10 @@ class GetFolderIconTest {
             FolderMockNameResource("Chat", R.drawable.ic_folder_chat_list) {
                 on { type }.thenReturn(FolderType.ChatFilesFolder)
             },
-            FolderMockNameResource("Shared", R.drawable.ic_folder_outgoing) {
+            FolderMockNameResource("Shared", CoreUiR.drawable.ic_folder_outgoing) {
                 on { isShared }.thenReturn(true)
             },
-            FolderMockNameResource("PendingShare", R.drawable.ic_folder_outgoing) {
+            FolderMockNameResource("PendingShare", CoreUiR.drawable.ic_folder_outgoing) {
                 on { isPendingShare }.thenReturn(true)
             },
             FolderMockNameResource("RootBackup", R.drawable.backup) {

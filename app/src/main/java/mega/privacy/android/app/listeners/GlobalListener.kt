@@ -19,6 +19,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
@@ -351,7 +352,7 @@ class GlobalListener @Inject constructor(
                 notificationManager.createNotificationChannel(channel)
             }
             val d: Drawable = appContext.resources
-                .getDrawable(R.drawable.ic_folder_incoming, appContext.theme)
+                .getDrawable(CoreUiR.drawable.ic_folder_incoming, appContext.theme)
             val notificationBuilder: NotificationCompat.Builder =
                 NotificationCompat.Builder(appContext, notificationChannelId)
                     .setSmallIcon(R.drawable.ic_stat_notify)

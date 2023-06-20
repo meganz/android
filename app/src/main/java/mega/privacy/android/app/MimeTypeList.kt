@@ -409,7 +409,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
                     }
                 }
                 if (resId == -1) {
-                    resId = R.drawable.ic_generic_list
+                    resId = CoreUiR.drawable.ic_generic_list
                 }
             }
             return resId

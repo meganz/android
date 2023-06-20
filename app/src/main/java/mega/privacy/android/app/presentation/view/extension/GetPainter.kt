@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.FolderNode
 
 /**
@@ -18,9 +17,9 @@ internal fun FolderNode.getPainter(): Painter =
 @Composable
 internal fun FolderNode.getIcon(): Int {
     return if (isIncomingShare) {
-        R.drawable.ic_folder_incoming
+        CoreUiR.drawable.ic_folder_incoming
     } else if (isShared || isPendingShare) {
-        R.drawable.ic_folder_outgoing
+        CoreUiR.drawable.ic_folder_outgoing
     } else {
         CoreUiR.drawable.ic_folder_list
     }

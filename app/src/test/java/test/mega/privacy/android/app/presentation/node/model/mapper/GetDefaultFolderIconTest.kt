@@ -31,7 +31,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_incoming)
+        ).isEqualTo(CoreUiR.drawable.ic_folder_incoming)
     }
 
     @Test
@@ -68,7 +68,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_outgoing)
+        ).isEqualTo(CoreUiR.drawable.ic_folder_outgoing)
     }
 
     @Test
@@ -79,7 +79,7 @@ class GetDefaultFolderIconTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(R.drawable.ic_folder_outgoing)
+        ).isEqualTo(CoreUiR.drawable.ic_folder_outgoing)
     }
 
     @Test

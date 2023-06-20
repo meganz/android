@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
+import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
@@ -365,7 +366,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             accessPermission = AccessPermission.FULL,
             contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
-            iconResource = R.drawable.ic_folder_incoming,
+            iconResource = CoreUiR.drawable.ic_folder_incoming,
             sizeInBytes = 1024,
             isExported = true,
             isTakenDown = false,
@@ -400,7 +401,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             accessPermission = AccessPermission.FULL,
             contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
-            iconResource = R.drawable.ic_folder_incoming,
+            iconResource = CoreUiR.drawable.ic_folder_incoming,
             sizeInBytes = 1024,
             isExported = true,
             isTakenDown = false,
