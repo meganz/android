@@ -49,15 +49,21 @@ class ReferralBonusesViewModel @Inject constructor(
              * Get all achievements and filter only the one with the type [AwardedAchievementInvite]
              */
             runCatching {
-                val achievements = getAccountAchievementsOverviewUseCase()
+                getAccountAchievementsOverviewUseCase()
+            }.onSuccess { achievementsOverview ->
+                val achievements = achievementsOverview
                     .awardedAchievements
                     .filterIsInstance<AwardedAchievementInvite>()
                     .map { achievement ->
                         /*Get user contact information from the referred email*/
-                        val contact = getContactFromEmailUseCase(
-                            email = achievement.referredEmails[0],
-                            skipCache = false
-                        )
+                        val contact = runCatching {
+                            getContactFromEmailUseCase(
+                                email = achievement.referredEmails[0],
+                                skipCache = false
+                            )
+                        }.onFailure {
+                            Timber.e(it)
+                        }.getOrNull()
 
                         /**
                          * Call a mapper to map the achievement combined with contact
