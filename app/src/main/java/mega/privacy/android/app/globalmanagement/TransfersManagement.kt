@@ -424,31 +424,6 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     @Synchronized
-    fun checkScanningTransferOnStart(transfer: MegaTransfer) {
-        Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                data.apply {
-                    if (!isFolder || transfer.state == STATE_COMPLETED) {
-                        removeProcessedScanningTransfer()
-                    } else {
-                        transferTag = transfer.tag
-                        transferStage = transfer.stage
-                    }
-                }
-
-                break
-            }
-        }
-    }
-
-    /**
-     * If the transfer is a file, removes it from scanningTransfers because is already processed.
-     * It the transfer is a folder, updates its scanningTransferData.
-     *
-     * @param transfer  Transfer to check.
-     */
-    @Synchronized
     fun checkScanningTransferOnStart(transfer: Transfer) {
         Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
         for (data in scanningTransfers) {
@@ -460,28 +435,6 @@ class TransfersManagement @Inject constructor(
                         transferTag = transfer.tag
                         transferStage = transfer.stage.toTransferStage()
                     }
-                }
-
-                break
-            }
-        }
-    }
-
-    /**
-     * If the transfer is a folder removes it from scanningTransfers if already processed,
-     * or updates its stage if not.
-     * If the folder transfer is already processed means its stage is >= STAGE_TRANSFERRING_FILES.
-     *
-     * @param transfer  Transfer to check.
-     */
-    @Synchronized
-    fun checkScanningTransferOnUpdate(transfer: MegaTransfer) {
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                if (transfer.stage >= STAGE_TRANSFERRING_FILES || transfer.state == STATE_COMPLETED) {
-                    data.removeProcessedScanningTransfer()
-                } else {
-                    data.transferStage = transfer.stage
                 }
 
                 break
@@ -519,21 +472,6 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     @Synchronized
-    fun checkScanningTransferOnFinish(transfer: MegaTransfer) {
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                data.removeProcessedScanningTransfer()
-                break
-            }
-        }
-    }
-
-    /**
-     * If the transfer is a folder removes it from scanningTransfers as is already processed.
-     *
-     * @param transfer  Transfer to check.
-     */
-    @Synchronized
     fun checkScanningTransferOnFinish(transfer: Transfer) {
         for (data in scanningTransfers) {
             if (data.isTheSameTransfer(transfer)) {
@@ -553,20 +491,6 @@ class TransfersManagement @Inject constructor(
             scanningTransfersToken = null
             LiveEventBus.get(EVENT_SHOW_SCANNING_TRANSFERS_DIALOG, Boolean::class.java)
                 .post(false)
-        }
-    }
-
-    /**
-     * Removes a scanning transfer after has been processed.
-     *
-     * @param transfer  Transfer to remove.
-     */
-    fun scanningTransferProcessed(transfer: MegaTransfer) {
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                scanningTransfers.remove(data)
-                break
-            }
         }
     }
 
