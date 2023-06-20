@@ -41,7 +41,6 @@ import com.shockwave.pdfium.PdfiumCore;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 
 import mega.privacy.android.app.FileDocument;
 import mega.privacy.android.app.MimeTypeList;
@@ -53,7 +52,7 @@ import mega.privacy.android.app.main.adapters.MegaExplorerAdapter;
 import mega.privacy.android.app.main.adapters.MegaExplorerAdapter.ViewHolderExplorer;
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter;
-import mega.privacy.android.app.main.adapters.MultipleBucketAdapter;
+import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketAdapter;
 import mega.privacy.android.app.main.adapters.TransferViewHolder;
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter;
 import mega.privacy.android.app.main.megachat.chatAdapters.NodeAttachmentHistoryAdapter;
@@ -264,11 +263,11 @@ public class ThumbnailUtils {
                                 getRoundedBitmap(context, bitmap, dp2px(THUMB_CORNER_RADIUS_DP)));
                         ((NodeAttachmentHistoryAdapter.ViewHolderBrowserList) holder).imageView.startAnimation(fadeInAnimation);
                     }
-                } else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
-                    MultipleBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (MultipleBucketAdapter.ViewHolderMultipleBucket) holder;
+                } else if (holder instanceof RecentActionBucketAdapter.ViewHolderMultipleBucket) {
+                    RecentActionBucketAdapter.ViewHolderMultipleBucket viewHolderMultipleBucket = (RecentActionBucketAdapter.ViewHolderMultipleBucket) holder;
                     if (viewHolderMultipleBucket.getDocument() == handle) {
                         viewHolderMultipleBucket.setImageThumbnail(bitmap);
-                        if (((MultipleBucketAdapter) adapter).isMedia()) {
+                        if (((RecentActionBucketAdapter) adapter).isMedia()) {
                             viewHolderMultipleBucket.getThumbnailMedia().startAnimation(fadeInAnimation);
                         } else {
                             viewHolderMultipleBucket.getThumbnailList().startAnimation(fadeInAnimation);
@@ -911,7 +910,7 @@ public class ThumbnailUtils {
 
                 onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
             } else if (holder instanceof RecentActionsAdapter.RecentActionViewHolder
-                    || holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
+                    || holder instanceof RecentActionBucketAdapter.ViewHolderMultipleBucket) {
                 onThumbnailGeneratedList(context, megaApi, thumbFile, param.document, holder, adapter);
             }
         }
@@ -965,8 +964,8 @@ public class ThumbnailUtils {
             ((MegaNodeAdapter.ViewHolderBrowserList) holder).imageView.setImageBitmap(bitmap);
         } else if (holder instanceof VersionsFileAdapter.ViewHolderVersion) {
             ((VersionsFileAdapter.ViewHolderVersion) holder).imageView.setImageBitmap(bitmap);
-        } else if (holder instanceof MultipleBucketAdapter.ViewHolderMultipleBucket) {
-            ((MultipleBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
+        } else if (holder instanceof RecentActionBucketAdapter.ViewHolderMultipleBucket) {
+            ((RecentActionBucketAdapter.ViewHolderMultipleBucket) holder).setImageThumbnail(bitmap);
         }
 
         thumbnailCache.put(document.getHandle(), bitmap);

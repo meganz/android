@@ -48,7 +48,7 @@
     </fragment>
     <fragment
         android:id="@+id/recentBucketFragment"
-        android:name="mega.privacy.android.app.fragments.recent.RecentsBucketFragment">
+        android:name="mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment">
         <action
             android:id="@+id/action_homepage_to_fullscreen_offline"
             app:destination="@id/fullscreen_offline" />

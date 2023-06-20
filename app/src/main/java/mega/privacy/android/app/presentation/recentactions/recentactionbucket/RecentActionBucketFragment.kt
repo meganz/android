@@ -1,5 +1,6 @@
-package mega.privacy.android.app.fragments.recent
+package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
+import mega.privacy.android.core.R as CoreUiR
 import android.animation.Animator
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
@@ -28,17 +29,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
-import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
+import mega.privacy.android.app.databinding.FragmentRecentActionBucketBinding
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.main.adapters.MultipleBucketAdapter
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
@@ -73,21 +72,21 @@ import javax.inject.Inject
  * Fragment class for the Recents Bucket
  */
 @AndroidEntryPoint
-class RecentsBucketFragment : Fragment() {
+class RecentActionBucketFragment : Fragment() {
 
     @Inject
     @MegaApi
     lateinit var megaApi: MegaApiAndroid
 
-    private val viewModel by viewModels<RecentsBucketViewModel>()
+    private val viewModel by viewModels<RecentActionBucketViewModel>()
 
     private val recentActionsViewModel: RecentActionsViewModel by activityViewModels()
 
-    private lateinit var binding: FragmentRecentBucketBinding
+    private lateinit var binding: FragmentRecentActionBucketBinding
 
     private lateinit var listView: RecyclerView
 
-    private var adapter: MultipleBucketAdapter? = null
+    private var adapter: RecentActionBucketAdapter? = null
 
     private var actionMode: ActionMode? = null
 
@@ -96,7 +95,7 @@ class RecentsBucketFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentRecentBucketBinding.inflate(inflater, container, false)
+        binding = FragmentRecentActionBucketBinding.inflate(inflater, container, false)
         listView = binding.multipleBucketView
         listView.layoutManager = LinearLayoutManager(requireContext())
         listView.itemAnimator = null
@@ -130,7 +129,7 @@ class RecentsBucketFragment : Fragment() {
             if (visible && actionMode == null) {
                 callManager { activity ->
                     val actionModeCallback =
-                        RecentsBucketActionModeCallback(
+                        RecentActionBucketActionModeCallback(
                             activity,
                             viewModel,
                             viewModel.isInShare
@@ -157,13 +156,14 @@ class RecentsBucketFragment : Fragment() {
 
     private fun setupListView(nodes: List<NodeItem>) {
         if (adapter == null) {
-            adapter = MultipleBucketAdapter(
-                activity,
-                this,
-                nodes,
-                viewModel.bucket.value?.isMedia ?: false,
-                RecentsBucketDiffCallback()
-            )
+            adapter =
+                RecentActionBucketAdapter(
+                    activity,
+                    this,
+                    nodes,
+                    viewModel.bucket.value?.isMedia ?: false,
+                    RecentActionBucketDiffCallback()
+                )
             listView.adapter = adapter
 
             if (viewModel.bucket.value?.isMedia == true) {

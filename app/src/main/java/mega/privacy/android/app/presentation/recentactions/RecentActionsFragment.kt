@@ -27,14 +27,14 @@ import mega.privacy.android.app.components.TopSnappedStickyLayoutManager
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.app.databinding.FragmentRecentsBinding
+import mega.privacy.android.app.databinding.FragmentRecentActionsBinding
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForSingleNode
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -56,7 +56,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecentActionsFragment : Fragment() {
 
-    private lateinit var binding: FragmentRecentsBinding
+    private lateinit var binding: FragmentRecentActionsBinding
 
     @Inject
     @MegaApi
@@ -84,7 +84,7 @@ class RecentActionsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentRecentsBinding.inflate(inflater, container, false)
+        binding = FragmentRecentActionsBinding.inflate(inflater, container, false)
         return binding.root
     }
 

@@ -144,7 +144,7 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.offline.OfflineFragment
-import mega.privacy.android.app.fragments.recent.RecentsBucketFragment
+import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -3528,7 +3528,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         HomepageScreen.VIDEO -> titleId = R.string.sortby_type_video_first
                         HomepageScreen.RECENT_BUCKET -> {
                             getFragmentByType(
-                                RecentsBucketFragment::class.java
+                                RecentActionBucketFragment::class.java
                             )?.setupToolbar()
                         }
 

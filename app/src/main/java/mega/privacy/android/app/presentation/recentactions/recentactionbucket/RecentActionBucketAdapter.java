@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.adapters;
+package mega.privacy.android.app.presentation.recentactions.recentactionbucket;
 
 import static mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
@@ -54,16 +54,14 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
 import mega.privacy.android.app.fragments.homepage.NodeItem;
-import mega.privacy.android.app.fragments.recent.RecentsBucketDiffCallback;
-import mega.privacy.android.app.fragments.recent.RecentsBucketFragment;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import timber.log.Timber;
 
-public class MultipleBucketAdapter
-        extends ListAdapter<NodeItem, MultipleBucketAdapter.ViewHolderMultipleBucket>
+public class RecentActionBucketAdapter
+        extends ListAdapter<NodeItem, RecentActionBucketAdapter.ViewHolderMultipleBucket>
         implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, DragThumbnailGetter {
 
     Context context;
@@ -75,7 +73,7 @@ public class MultipleBucketAdapter
     List<NodeItem> nodes;
     boolean isMedia;
 
-    public MultipleBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, RecentsBucketDiffCallback diffCallback) {
+    public RecentActionBucketAdapter(Context context, Object fragment, List<NodeItem> nodes, boolean isMedia, RecentActionBucketDiffCallback diffCallback) {
         super(diffCallback);
         this.context = context;
         this.fragment = fragment;
@@ -353,7 +351,7 @@ public class MultipleBucketAdapter
     @Override
     public void onClick(View v) {
         Timber.d("onClick");
-        MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
+        RecentActionBucketAdapter.ViewHolderMultipleBucket holder = (RecentActionBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return;
 
         List<NodeItem> selectedNodes = this.nodes.stream().filter(NodeItem::getSelected).collect(Collectors.toList());
@@ -368,13 +366,13 @@ public class MultipleBucketAdapter
                 }
                 ((ManagerActivity) context).showNodeOptionsPanel(node.getNode(), RECENTS_MODE);
             } else {
-                if (fragment instanceof RecentsBucketFragment) {
-                    ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
+                if (fragment instanceof RecentActionBucketFragment) {
+                    ((RecentActionBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
                 }
             }
         } else if (id == R.id.multiple_bucket_layout) {
-            if (fragment instanceof RecentsBucketFragment) {
-                ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
+            if (fragment instanceof RecentActionBucketFragment) {
+                ((RecentActionBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
             }
         }
     }
@@ -383,14 +381,14 @@ public class MultipleBucketAdapter
     @Override
     public boolean onLongClick(View v) {
         Timber.d("onClick");
-        MultipleBucketAdapter.ViewHolderMultipleBucket holder = (MultipleBucketAdapter.ViewHolderMultipleBucket) v.getTag();
+        RecentActionBucketAdapter.ViewHolderMultipleBucket holder = (RecentActionBucketAdapter.ViewHolderMultipleBucket) v.getTag();
         if (holder == null) return false;
 
         NodeItem node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
         if (node == null) return false;
 
-        if (fragment instanceof RecentsBucketFragment) {
-            ((RecentsBucketFragment) fragment).onNodeLongClicked(
+        if (fragment instanceof RecentActionBucketFragment) {
+            ((RecentActionBucketFragment) fragment).onNodeLongClicked(
                     holder.getAdapterPosition(),
                     node
             );

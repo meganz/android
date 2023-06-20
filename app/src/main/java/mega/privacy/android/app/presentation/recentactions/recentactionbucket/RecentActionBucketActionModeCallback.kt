@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.recent
+package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
 import android.view.Menu
 import android.view.MenuItem
@@ -11,11 +11,11 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import timber.log.Timber
 
 /**
- * A action mode callback class for [RecentsBucketFragment]
+ * A action mode callback class for [RecentActionBucketFragment]
  */
-class RecentsBucketActionModeCallback constructor(
+class RecentActionBucketActionModeCallback constructor(
     private val managerActivity: ManagerActivity,
-    private val viewModel: RecentsBucketViewModel,
+    private val viewModel: RecentActionBucketViewModel,
     private val isInShareBucket: Boolean,
 ) : ActionMode.Callback {
 

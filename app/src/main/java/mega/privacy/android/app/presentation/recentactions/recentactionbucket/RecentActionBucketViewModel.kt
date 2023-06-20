@@ -1,4 +1,4 @@
-package mega.privacy.android.app.fragments.recent
+package mega.privacy.android.app.presentation.recentactions.recentactionbucket
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -26,10 +26,10 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ViewModel associated to [RecentsBucketFragment]
+ * ViewModel associated to [RecentActionBucketFragment]
  */
 @HiltViewModel
-class RecentsBucketViewModel @Inject constructor(
+class RecentActionBucketViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getParentMegaNode: GetParentMegaNode,
     private val updateRecentAction: UpdateRecentAction,
