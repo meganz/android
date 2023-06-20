@@ -2620,4 +2620,9 @@ interface MegaApiGateway {
      * Reconnect and retry all transfers.
      */
     suspend fun reconnect()
+
+    /**
+     * Create a cancel token
+     */
+    fun createCancelToken(): MegaCancelToken
 }

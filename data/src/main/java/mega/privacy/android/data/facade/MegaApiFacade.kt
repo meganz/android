@@ -1253,4 +1253,6 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override suspend fun reconnect() = megaApi.reconnect()
+
+    override fun createCancelToken(): MegaCancelToken = MegaCancelToken.createInstance()
 }
