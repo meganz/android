@@ -166,19 +166,19 @@ class MeetingListViewModel @Inject constructor(
     fun joinSchedMeeting(chatId: Long) {
         viewModelScope.launch {
             Timber.d("Answer meeting")
-            answerChatCallUseCase(
-                chatId = chatId,
-                video = false,
-                audio = true
-            )?.let { call ->
-                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                    ?.let {
-                        chatManagement.removeJoiningCallChatId(chatId)
-                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                        CallUtil.clearIncomingCallNotification(call.callId)
-                        openCurrentCall(call)
-                    }
-            }
+            runCatching {
+                answerChatCallUseCase(chatId = chatId, video = false, audio = true)
+            }.onSuccess { call ->
+                call?.apply {
+                    chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                        ?.let {
+                            chatManagement.removeJoiningCallChatId(chatId)
+                            rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                            CallUtil.clearIncomingCallNotification(callId)
+                            openCurrentCall(this)
+                        }
+                }
+            }.onFailure { Timber.w("Exception answering call: $it") }
         }
     }
 
@@ -192,16 +192,14 @@ class MeetingListViewModel @Inject constructor(
         viewModelScope.launch {
             if (schedId == null || schedId == megaChatApiGateway.getChatInvalidHandle()) {
                 Timber.d("Start meeting")
-                openOrStartCall(
-                    chatId = chatId,
-                    video = false,
-                    audio = true
-                )?.let { call ->
-                    call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                        ?.let {
-                            openCurrentCall(call)
-                        }
-                }
+                runCatching {
+                    openOrStartCall(chatId = chatId, video = false, audio = true)
+                }.onSuccess { call ->
+                    call?.apply {
+                        chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                            ?.let { openCurrentCall(this) }
+                    }
+                }.onFailure { Timber.w("Exception opening or starting call: $it") }
             } else {
                 Timber.d("Start scheduled meeting")
                 runCatching {

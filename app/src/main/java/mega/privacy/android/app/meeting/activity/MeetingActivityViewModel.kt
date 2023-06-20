@@ -752,11 +752,9 @@ class MeetingActivityViewModel @Inject constructor(
             cameraGateway.setFrontCamera()
 
             viewModelScope.launch {
-                answerChatCallUseCase(
-                    chatId = chatId,
-                    video = enableVideo,
-                    audio = enableAudio
-                ).let { call ->
+                runCatching {
+                    answerChatCallUseCase(chatId = chatId, video = enableVideo, audio = enableAudio)
+                }.onSuccess { call ->
                     chatManagement.removeJoiningCallChatId(chatId)
                     rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                     if (call == null) {
@@ -769,7 +767,7 @@ class MeetingActivityViewModel @Inject constructor(
                         result.value =
                             AnswerCallResult(chatId, call.hasLocalVideo, call.hasLocalAudio)
                     }
-                }
+                }.onFailure { Timber.w("Exception answering call: $it") }
             }
         }
 

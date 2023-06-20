@@ -375,14 +375,16 @@ class ChatViewModel @Inject constructor(
      */
     private fun startCall(video: Boolean) = viewModelScope.launch {
         Timber.d("Start call")
-        openOrStartCall(
-            chatId = _state.value.chatId, video = video, audio = true
-        )?.let { call ->
-            call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }?.let {
-                Timber.d("Call started")
-                openCurrentCall(call = call)
+        runCatching {
+            openOrStartCall(chatId = _state.value.chatId, video = video, audio = true)
+        }.onSuccess { call ->
+            call?.apply {
+                chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }?.let {
+                    Timber.d("Call started")
+                    openCurrentCall(call = this)
+                }
             }
-        }
+        }.onFailure { Timber.w("Exception opening or starting call: $it") }
     }
 
     /**
@@ -460,17 +462,17 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             Timber.d("Answer call")
-            answerChatCallUseCase(
-                chatId = chatId,
-                video = video,
-                audio = audio
-            )?.let { call ->
-                chatManagement.removeJoiningCallChatId(chatId)
-                rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                CallUtil.clearIncomingCallNotification(call.callId)
-                openCurrentCall(call)
-                _state.update { it.copy(isCallAnswered = true) }
-            }
+            runCatching {
+                answerChatCallUseCase(chatId = chatId, video = video, audio = audio)
+            }.onSuccess { call ->
+                call?.apply {
+                    chatManagement.removeJoiningCallChatId(chatId)
+                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                    CallUtil.clearIncomingCallNotification(callId)
+                    openCurrentCall(this)
+                    _state.update { it.copy(isCallAnswered = true) }
+                }
+            }.onFailure { Timber.w("Exception answering call: $it") }
         }
     }
 

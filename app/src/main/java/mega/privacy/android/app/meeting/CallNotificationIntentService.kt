@@ -312,24 +312,24 @@ class CallNotificationIntentService : Service(),
         }
 
         coroutineScope.launch {
-            answerChatCallUseCase(
-                chatId = chatId,
-                video = false,
-                audio = isTraditionalCall
-            )?.let { call ->
-                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                    ?.let { callChatId ->
-                        openMeetingInProgress(
-                            this@CallNotificationIntentService,
-                            chatIdIncomingCall,
-                            true,
-                            passcodeManagement
-                        )
-                        clearIncomingCallNotification(callChatId)
-                        stopSelf()
-                    }
+            runCatching {
+                answerChatCallUseCase(chatId = chatId, video = false, audio = isTraditionalCall)
+            }.onSuccess { call ->
+                call.apply {
+                    chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                        ?.let { callChatId ->
+                            openMeetingInProgress(
+                                this@CallNotificationIntentService,
+                                chatIdIncomingCall,
+                                true,
+                                passcodeManagement
+                            )
+                            clearIncomingCallNotification(callChatId)
+                            stopSelf()
+                        }
+                }
                 coroutineScope.cancel()
-            }
+            }.onFailure { Timber.w("Exception answering call: $it") }
         }
     }
 
