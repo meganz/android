@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper.account
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.account.AccountBlockedDetail
 import mega.privacy.android.domain.entity.account.AccountBlockedType
+import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -33,13 +34,37 @@ class AccountBlockedDetailMapperTest {
     }
 
     private fun provideParameters(): Stream<Arguments> = Stream.of(
-        Arguments.of(0L, AccountBlockedType.NOT_BLOCKED),
-        Arguments.of(100L, AccountBlockedType.NOT_BLOCKED),
-        Arguments.of(200L, AccountBlockedType.TOS_COPYRIGHT),
-        Arguments.of(300L, AccountBlockedType.TOS_NON_COPYRIGHT),
-        Arguments.of(400L, AccountBlockedType.SUBUSER_DISABLED),
-        Arguments.of(401L, AccountBlockedType.SUBUSER_REMOVED),
-        Arguments.of(500L, AccountBlockedType.VERIFICATION_SMS),
-        Arguments.of(700L, AccountBlockedType.VERIFICATION_EMAIL),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_NOT_BLOCKED.toLong(),
+            AccountBlockedType.NOT_BLOCKED
+        ),
+        Arguments.of(
+            100L,
+            AccountBlockedType.NOT_BLOCKED
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_TOS_COPYRIGHT.toLong(),
+            AccountBlockedType.TOS_COPYRIGHT
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_TOS_NON_COPYRIGHT.toLong(),
+            AccountBlockedType.TOS_NON_COPYRIGHT
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_SUBUSER_DISABLED.toLong(),
+            AccountBlockedType.SUBUSER_DISABLED
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_SUBUSER_REMOVED.toLong(),
+            AccountBlockedType.SUBUSER_REMOVED
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_VERIFICATION_SMS.toLong(),
+            AccountBlockedType.VERIFICATION_SMS
+        ),
+        Arguments.of(
+            MegaApiJava.ACCOUNT_BLOCKED_VERIFICATION_EMAIL.toLong(),
+            AccountBlockedType.VERIFICATION_EMAIL
+        ),
     )
 }
