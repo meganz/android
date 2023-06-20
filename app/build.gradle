@@ -230,6 +230,7 @@ android {
 
 dependencies {
     // Modules
+    implementation project(':core:formatter')
     implementation project(':domain')
     implementation project(':core-ui')
     implementation project(':data')

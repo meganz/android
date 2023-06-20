@@ -7,16 +7,17 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.view.extension.fileSize
 import mega.privacy.android.app.presentation.view.extension.folderInfo
-import mega.privacy.android.app.presentation.view.extension.formattedModifiedDate
 import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
+import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.controls.HeaderViewItem
 import mega.privacy.android.core.ui.controls.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -92,14 +93,17 @@ fun <T : TypedNode> NodeListView(
                     ?: MimeTypeList.typeForName(nodeUIItemList[it].node.name).iconResourceId,
                 fileSize = nodeEntity
                     .let { node -> node as? FileNode }
-                    ?.fileSize(),
+                    ?.let { formatFileSize(it.size, LocalContext.current) },
                 modifiedDate = nodeEntity
                     .let { node -> node as? FileNode }
-                    ?.formattedModifiedDate(
-                        java.util.Locale(
-                            Locale.current.language, Locale.current.region
+                    ?.let {
+                        formatModifiedDate(
+                            java.util.Locale(
+                                Locale.current.language, Locale.current.region
+                            ),
+                            it.modificationTime
                         )
-                    ),
+                    },
                 name = nodeEntity.name,
                 isTakenDown = nodeEntity.isTakenDown,
                 isFavourite = nodeEntity.isFavourite,

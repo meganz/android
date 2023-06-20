@@ -13,6 +13,7 @@ dependencyResolutionManagement {
 
 include ':app'
 include ':domain'
+include ':core:formatter'
 include ':core-ui'
 include ':screenshot'
 include ':data'

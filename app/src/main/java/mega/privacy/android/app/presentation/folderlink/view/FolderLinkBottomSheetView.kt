@@ -32,10 +32,11 @@ import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R as CoreUiR
+import androidx.compose.ui.platform.LocalContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.app.presentation.view.extension.fileSize
 import mega.privacy.android.app.presentation.view.extension.folderInfo
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -95,7 +96,7 @@ private fun BottomSheetContent(
                 it.node.folderInfo()
             } else {
                 val fileItem = it.node as FileNode
-                fileItem.fileSize()
+                formatFileSize(fileItem.size, LocalContext.current)
             }
         } ?: ""
 

@@ -1,13 +1,13 @@
-package mega.privacy.android.app.presentation.view.extension
+package mega.privacy.android.core.formatter
 
-import mega.privacy.android.domain.entity.node.FileNode
+import android.text.format.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-internal fun FileNode.formattedModifiedDate(locale: Locale): String {
+fun formatModifiedDate(locale: Locale, modificationTime: Long): String {
     val dateFormat = SimpleDateFormat(
-        android.text.format.DateFormat.getBestDateTimePattern(
+        DateFormat.getBestDateTimePattern(
             locale, "d MMM yyyy HH:mm"
         ),
         locale

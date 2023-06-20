@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility rootProject.javaVersion
+        targetCompatibility rootProject.javaVersion
+    }
+
+    lint {
+        abortOnError false
+        xmlOutput = file("build/reports/lint-results.xml")
+    }
+
+    namespace 'mega.privacy.android.core.formatter'
+}

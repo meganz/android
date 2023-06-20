@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_file_size_byte" />
+    <string name="label_file_size_kilo_byte" />
+    <string name="label_file_size_mega_byte" />
+    <string name="label_file_size_giga_byte" />
+    <string name="label_file_size_tera_byte" />
+    <string name="label_file_size_peta_byte" />
+    <string name="label_file_size_exa_byte" />
+</resources>
