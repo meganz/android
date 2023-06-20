@@ -30,6 +30,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LINK_SHARE_FILE_INFO
+import mega.privacy.android.analytics.event.link.LINK_SHARE_FOLDER_INFO
+import mega.privacy.android.analytics.event.link.LinkShare
+import mega.privacy.android.analytics.event.link.SHARE_FILE
+import mega.privacy.android.analytics.event.link.SHARE_FOLDER
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.saver.AutoPlayInfo
@@ -238,8 +244,20 @@ object MegaNodeUtil {
             if (!path.isNullOrBlank() && !node.isFolder) {
                 shareFile(context, File(path))
             } else if (node.isExported) {
+                Analytics.tracker.trackGeneralEvent(
+                    LinkShare(
+                        uniqueIdentifier = if (node.isFolder) SHARE_FOLDER else SHARE_FILE,
+                        info = if (node.isFolder) LINK_SHARE_FOLDER_INFO else LINK_SHARE_FILE_INFO
+                    )
+                )
                 startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
             } else {
+                Analytics.tracker.trackGeneralEvent(
+                    LinkShare(
+                        uniqueIdentifier = if (node.isFolder) SHARE_FOLDER else SHARE_FILE,
+                        info = if (node.isFolder) LINK_SHARE_FOLDER_INFO else LINK_SHARE_FILE_INFO
+                    )
+                )
                 MegaApplication.getInstance().megaApi.exportNode(
                     node,
                     ExportListener(context, Intent(Intent.ACTION_SEND), onExportFinishedListener)

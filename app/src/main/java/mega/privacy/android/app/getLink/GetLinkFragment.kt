@@ -142,6 +142,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         binding.resetPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
+            viewModel.onResetPasswordClicked()
             findNavController().navigate(GetLinkFragmentDirections.setPassword(true))
         }
 
@@ -270,6 +271,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.expiryDateSwitch.isChecked = true
             binding.expiryDateSetText.isVisible = true
             binding.expiryDateSetText.text = date
+            viewModel.onSetExpiryDateClicked()
         } else {
             binding.expiryDateSwitch.isChecked = false
             binding.expiryDateSetText.isVisible = false
@@ -372,6 +374,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
 
         updateSendDecryptedKeySeparatelyLayouts()
+        viewModel.onUpdateDecryptedKeyClicked(binding.decryptedKeySwitch.isChecked)
     }
 
     /**
@@ -394,6 +397,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * @param isSwitchClick True if the click was in the switch, false if it was in other part of the view.
      */
     private fun setExpiryDateClick(isSwitchClick: Boolean) {
+        viewModel.onSetExpiryDateClicked()
         checkIfShouldHidePassword()
         val node = viewModel.getNode()
         val isPro = viewModel.isPro()
@@ -469,6 +473,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * Manages the click on set password protection option.
      */
     private fun setPasswordProtectionClick() {
+        viewModel.onSetPasswordClicked()
         if (viewModel.isPro()) {
             checkIfShouldHidePassword()
             findNavController().navigate(GetLinkFragmentDirections.setPassword(false))

@@ -11,18 +11,33 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.CONFIRM_PASSWORD_FOR_FILE
+import mega.privacy.android.analytics.event.link.CONFIRM_PASSWORD_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.GET_LINK_FOR_FILE
+import mega.privacy.android.analytics.event.link.GET_LINK_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.LinkScreenInfoAnalytics
+import mega.privacy.android.analytics.event.link.RESET_PASSWORD_FOR_FILE
+import mega.privacy.android.analytics.event.link.RESET_PASSWORD_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.SEND_DECRYPTION_KEY_SEPARATE_FOR_FILE
+import mega.privacy.android.analytics.event.link.SEND_DECRYPTION_KEY_SEPARATE_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.SET_EXPIRY_DATE_FOR_FILE
+import mega.privacy.android.analytics.event.link.SET_EXPIRY_DATE_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.SET_PASSWORD_FOR_FILE
+import mega.privacy.android.analytics.event.link.SET_PASSWORD_FOR_FOLDER
+import mega.privacy.android.analytics.event.link.SHARE_FILE
+import mega.privacy.android.analytics.event.link.SHARE_FOLDER
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAccountDetails
@@ -67,9 +82,9 @@ class GetLinkViewModel @Inject constructor(
     private var isSendDecryptedKeySeparatelyEnabled = false
 
     fun getLink(): LiveData<String> = linkText
-    fun getLinkText(): String = linkText.value ?: ""
 
     fun getPassword(): LiveData<String?> = password
+
     fun getPasswordText(): String? = password.value
 
     fun getExpiryDate(): LiveData<String> = expiryDate
@@ -94,7 +109,7 @@ class GetLinkViewModel @Inject constructor(
      * @param handle MegaNode identifier.
      */
     fun initNode(handle: Long) {
-        updateLink(handle)
+        updateLink(handle = handle, isInit = true)
         resetLinkWithPassword()
     }
 
@@ -243,10 +258,14 @@ class GetLinkViewModel @Inject constructor(
      * it's already exported.
      *
      * @param handle The identifier of the MegaNode from which the link has to be managed.
+     * @param isInit called from [GetLinkViewModel.initNode]
      */
-    private fun updateLink(handle: Long?) {
+    private fun updateLink(handle: Long?, isInit: Boolean = false) {
         node = handle?.let { megaApi.getNodeByHandle(it) }
 
+        if (isInit) {
+            trackGetLink()
+        }
         if (node?.isExported == true) {
             val link = node?.publicLink
             linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
@@ -282,6 +301,7 @@ class GetLinkViewModel @Inject constructor(
      * @param link The link to share.
      */
     fun shareLink(link: String? = null, action: (Intent) -> Unit) {
+        onShareClicked()
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = Constants.TYPE_TEXT_PLAIN
         intent.putExtra(Intent.EXTRA_TEXT, link ?: node?.publicLink)
@@ -371,6 +391,7 @@ class GetLinkViewModel @Inject constructor(
                 onSuccess = { link ->
                     this.password.value = password
                     this.linkWithPassword = link
+                    onConfirmPasswordClicked()
                     updateLink()
                 },
                 onError = Timber::w
@@ -416,5 +437,112 @@ class GetLinkViewModel @Inject constructor(
      */
     fun resetLink() {
         _linkCopied.value = null
+    }
+
+    /**
+     * Track when decrypted Key clicked to true
+     */
+    fun onUpdateDecryptedKeyClicked(isChecked: Boolean) {
+        node?.let {
+            if (isChecked) {
+                Analytics.tracker.trackGeneralEvent(
+                    LinkScreenInfoAnalytics(
+                        uniqueIdentifier = if (it.isFolder) SEND_DECRYPTION_KEY_SEPARATE_FOR_FOLDER else SEND_DECRYPTION_KEY_SEPARATE_FOR_FILE,
+                        name = "send decryption key separately",
+                        info = if (it.isFolder) "Separate decryption key and link Folders" else "Separate decryption key and link File"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Track when expiry date to node is set
+     */
+    fun onSetExpiryDateClicked() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) SET_EXPIRY_DATE_FOR_FOLDER else SET_EXPIRY_DATE_FOR_FILE,
+                    name = "set an expiry date",
+                    info = if (it.isFolder) "Set link expiry date Folders" else "Set link expiry date file"
+                )
+            )
+        }
+    }
+
+    /**
+     * Track when set password to node clicked
+     */
+    fun onSetPasswordClicked() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) SET_PASSWORD_FOR_FOLDER else SET_PASSWORD_FOR_FILE,
+                    name = "set password",
+                    info = if (it.isFolder) "Set link password Folders" else "Set link password file"
+                )
+            )
+        }
+    }
+
+    /**
+     * Track when set password to node clicked
+     */
+    fun onResetPasswordClicked() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) RESET_PASSWORD_FOR_FOLDER else RESET_PASSWORD_FOR_FILE,
+                    name = "Reset password",
+                    info = if (it.isFolder) "Reset folder password" else "Reset file password"
+                )
+            )
+        }
+    }
+
+    /**
+     * Track when confirm password to node clicked
+     */
+    private fun onConfirmPasswordClicked() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) CONFIRM_PASSWORD_FOR_FOLDER else CONFIRM_PASSWORD_FOR_FILE,
+                    name = "Confirm",
+                    info = if (it.isFolder) "Confirm password for folder" else "Confirm password for file"
+                )
+            )
+        }
+    }
+
+    /**
+     * Track when getLink called
+     */
+    private fun trackGetLink() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) GET_LINK_FOR_FOLDER else GET_LINK_FOR_FILE,
+                    name = "Get link",
+                    info = if (it.isFolder) "Get link for folder" else "Get link for file"
+                )
+            )
+        }
+    }
+
+    /**
+     * Track when share button clicked
+     */
+    private fun onShareClicked() {
+        node?.let {
+            Analytics.tracker.trackGeneralEvent(
+                LinkScreenInfoAnalytics(
+                    uniqueIdentifier = if (it.isFolder) SHARE_FOLDER else SHARE_FILE,
+                    name = "Share",
+                    info = if (it.isFolder) "Share folder" else "Share file"
+                )
+            )
+        }
     }
 }

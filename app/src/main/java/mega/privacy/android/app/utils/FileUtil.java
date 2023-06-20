@@ -55,6 +55,7 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import mega.privacy.android.analytics.Analytics;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;

@@ -24,6 +24,10 @@ import androidx.navigation.ui.navigateUp
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LINK_SHARE_FILE_INFO
+import mega.privacy.android.analytics.event.link.LinkShare
+import mega.privacy.android.analytics.event.link.SHARE_FILE
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -603,13 +607,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                         Timber.w("Image Item is null")
                     imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(this, imageItem.nodeItem!!.handle)
-                    file != null -> FileUtil.shareFile(this, file)
-                    imageItem is ImageItem.PublicNode ->
+                    file != null -> {
+                        trackOnShareClicked()
+                        FileUtil.shareFile(this, file)
+                    }
+                    imageItem is ImageItem.PublicNode -> {
+                        trackOnShareClicked()
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
-                    imageItem.nodeItem?.node != null ->
+                    }
+                    imageItem.nodeItem?.node != null -> {
+                        trackOnShareClicked()
                         viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
                             if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link)
                         }
+                    }
                     else ->
                         Timber.w("Node cannot be shared")
                 }
@@ -732,4 +743,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private fun getNavController(): NavController =
         (supportFragmentManager.findFragmentById(R.id.images_nav_host_fragment) as NavHostFragment).navController
+
+    private fun trackOnShareClicked() {
+        Analytics.tracker.trackGeneralEvent(
+            LinkShare(
+                uniqueIdentifier = SHARE_FILE,
+                info = LINK_SHARE_FILE_INFO
+            )
+        )
+    }
 }
