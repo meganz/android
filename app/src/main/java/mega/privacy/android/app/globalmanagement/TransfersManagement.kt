@@ -44,11 +44,7 @@ import mega.privacy.android.domain.usecase.transfer.BroadcastStopTransfersWorkUs
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
-import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
 import timber.log.Timber
-import java.util.Collections
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -170,8 +166,7 @@ class TransfersManagement @Inject constructor(
     var hasResumeTransfersWarningAlreadyBeenShown = false
     var shouldShowNetworkWarning = false
 
-    private val scanningTransfers =
-        Collections.synchronizedCollection(ArrayList<ScanningTransferData>())
+    private val scanningTransfers = mutableListOf<ScanningTransferData>()
     private var scanningTransfersToken: MegaCancelToken? = null
     var isProcessingFolders = false
     var isProcessingTransfers = false
@@ -396,7 +391,7 @@ class TransfersManagement @Inject constructor(
     /**
      * Gets the current scanningTransfersToken if exists or a new one if not.
      */
-    fun getScanningTransfersToken(): MegaCancelToken? {
+    private fun getScanningTransfersToken(): MegaCancelToken? {
         if (scanningTransfersToken == null) {
             scanningTransfersToken = MegaCancelToken.createInstance()
         }
@@ -418,65 +413,63 @@ class TransfersManagement @Inject constructor(
     }
 
     /**
-     * If the transfer is a file, removes it from scanningTransfers because is already processed.
-     * It the transfer is a folder, updates its scanningTransferData.
+     * Checks scanning transfers.
+     *
+     * When Check is:
+     * - ON_START:
+     *  If the transfer is a file, removes it from scanningTransfers because is already processed.
+     *  It the transfer is a folder, updates its scanningTransferData.
+     *
+     * - ON_UPDATE:
+     *  If the transfer is a folder removes it from scanningTransfers if already processed,
+     *  or updates its stage if not.
+     *  If the folder transfer is already processed means its stage is >= STAGE_TRANSFERRING_FILES.
+     *
+     * - ON_FINISH:
+     *  If the transfer is a folder removes it from scanningTransfers as is already processed.
      *
      * @param transfer  Transfer to check.
      */
-    @Synchronized
-    fun checkScanningTransferOnStart(transfer: Transfer) {
-        Timber.d("checkScanningTransferOnStart ${transfer.nodeHandle}")
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                data.apply {
-                    if (!isFolder || transfer.state == TransferState.STATE_COMPLETED) {
-                        removeProcessedScanningTransfer()
-                    } else {
-                        transferTag = transfer.tag
-                        transferStage = transfer.stage.toTransferStage()
+    fun checkScanningTransfer(transfer: Transfer, check: Check) = synchronized(this) {
+        when (check) {
+            Check.ON_START -> {
+                for (data in scanningTransfers) {
+                    data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
+                        if (!isFolder || transfer.state == TransferState.STATE_COMPLETED) {
+                            removeProcessedScanningTransfer()
+                        } else {
+                            transferTag = transfer.tag
+                            transferStage = transfer.stage.toTransferStage()
+                        }
+
+                        return@synchronized
                     }
                 }
-
-                break
             }
-        }
-    }
 
-    /**
-     * If the transfer is a folder removes it from scanningTransfers if already processed,
-     * or updates its stage if not.
-     * If the folder transfer is already processed means its stage is >= STAGE_TRANSFERRING_FILES.
-     *
-     * @param transfer  Transfer to check.
-     */
-    @Synchronized
-    fun checkScanningTransferOnUpdate(transfer: Transfer) {
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                if (transfer.stage == TransferStage.STAGE_TRANSFERRING_FILES
-                    || transfer.state == TransferState.STATE_COMPLETED
-                ) {
-                    data.removeProcessedScanningTransfer()
-                } else {
-                    data.transferStage = transfer.stage.toTransferStage()
+            Check.ON_UPDATE -> {
+                for (data in scanningTransfers) {
+                    data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
+                        if (transfer.stage == TransferStage.STAGE_TRANSFERRING_FILES
+                            || transfer.state == TransferState.STATE_COMPLETED
+                        ) {
+                            removeProcessedScanningTransfer()
+                        } else {
+                            transferStage = transfer.stage.toTransferStage()
+                        }
+
+                        return@synchronized
+                    }
                 }
-
-                break
             }
-        }
-    }
 
-    /**
-     * If the transfer is a folder removes it from scanningTransfers as is already processed.
-     *
-     * @param transfer  Transfer to check.
-     */
-    @Synchronized
-    fun checkScanningTransferOnFinish(transfer: Transfer) {
-        for (data in scanningTransfers) {
-            if (data.isTheSameTransfer(transfer)) {
-                data.removeProcessedScanningTransfer()
-                break
+            Check.ON_FINISH -> {
+                for (data in scanningTransfers) {
+                    data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
+                        removeProcessedScanningTransfer()
+                        return@synchronized
+                    }
+                }
             }
         }
     }
@@ -575,5 +568,26 @@ class TransfersManagement @Inject constructor(
      */
     fun initPausedTransfers() = applicationScope.launch {
         dbH.transferQueueStatus = areTransfersPausedUseCase()
+    }
+
+    /**
+     * Enum class allowing to identify from where the check comes.
+     */
+    enum class Check {
+
+        /**
+         * Check from onTransferStart.
+         */
+        ON_START,
+
+        /**
+         * Check from onTransferUpdate.
+         */
+        ON_UPDATE,
+
+        /**
+         * Check from onTransferFinish.
+         */
+        ON_FINISH
     }
 }

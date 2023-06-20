@@ -788,7 +788,7 @@ internal class UploadService : LifecycleService() {
         if (appData.isNotEmpty()) return
 
         pendingToAddInQueue--
-        transfersManagement.checkScanningTransferOnStart(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_START)
 
         if (!isFolderTransfer) {
             uploadCount++
@@ -807,7 +807,7 @@ internal class UploadService : LifecycleService() {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
 
-        transfersManagement.checkScanningTransferOnFinish(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
 
         if (!isFolderTransfer) {
             val completedTransfer =
@@ -1088,7 +1088,7 @@ internal class UploadService : LifecycleService() {
             return
         }
 
-        transfersManagement.checkScanningTransferOnUpdate(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_UPDATE)
 
         if (!isFolderTransfer) {
             mapProgressFileTransfers[tag] = transfer

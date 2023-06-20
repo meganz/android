@@ -1348,7 +1348,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 )
             )
         }
-        transfersManagement.checkScanningTransferOnStart(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_START)
         transfersCount++
         updateProgressNotification()
     }
@@ -1361,7 +1361,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
-        transfersManagement.checkScanningTransferOnFinish(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
         val isVoiceClip = transfer.isVoiceClip()
         val isBackgroundTransfer = transfer.isBackgroundTransfer()
         if (!isVoiceClip && !isBackgroundTransfer) transfersCount--
@@ -1551,7 +1551,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             backgroundTransfers.add(transfer.tag)
             return
         }
-        transfersManagement.checkScanningTransferOnUpdate(transfer)
+        transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_UPDATE)
         if (!transfer.isFolderTransfer) {
             updateProgressNotification()
         }
