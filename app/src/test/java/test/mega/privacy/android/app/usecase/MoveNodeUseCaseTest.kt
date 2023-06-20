@@ -1,6 +1,5 @@
 package test.mega.privacy.android.app.usecase
 
-import android.content.Context
 import com.google.common.truth.Truth
 import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -19,7 +18,6 @@ import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
-import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -261,115 +259,5 @@ class MoveNodeUseCaseTest {
             val response = underTest.moveAsync(nameCollisionResult, false)
             Truth.assertThat(response).isNotNull()
             Truth.assertThat(response.errorCount).isEqualTo(1)
-        }
-
-
-    @Test
-    internal fun `test that error count is zero when all nodes are moved to rubbish bin`() =
-        runTest {
-            val deleteHandles = listOf<Long>(123456, 234567, 345678, 456789)
-            val context = mock<Context>()
-            val rubbishBinNode = mock<MegaNode> {
-                on { handle }.thenReturn(123456)
-            }
-            val node1 = mock<MegaNode> { on { handle }.thenReturn(123456) }
-            val node2 = mock<MegaNode> { on { handle }.thenReturn(234567) }
-            val node3 = mock<MegaNode> { on { handle }.thenReturn(345678) }
-            val node4 = mock<MegaNode> { on { handle }.thenReturn(456789) }
-            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-            whenever(megaApiGateway.getMegaNodeByHandle(123456)).thenReturn(node1)
-            whenever(megaApiGateway.getMegaNodeByHandle(234567)).thenReturn(node2)
-            whenever(megaApiGateway.getMegaNodeByHandle(345678)).thenReturn(node3)
-            whenever(megaApiGateway.getMegaNodeByHandle(456789)).thenReturn(node4)
-            val success = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-                on { errorString }.thenReturn("Success")
-            }
-            whenever(
-                megaApiGateway.moveNode(
-                    nodeToMove = any(),
-                    newNodeParent = any(),
-                    newNodeName = anyOrNull(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(), mock(), success
-                )
-            }
-            val response = underTest.moveToRubbishBin(deleteHandles, context).blockingGetOrNull()
-            Truth.assertThat(response).isNotNull()
-            Truth.assertThat(response?.errorCount).isEqualTo(0)
-        }
-
-    @Test
-    internal fun `test that error count is one when one node is null`() =
-        runTest {
-            val deleteHandles = listOf<Long>(123456, 234567, 345678, 456789)
-            val context = mock<Context>()
-            val rubbishBinNode = mock<MegaNode> {
-                on { handle }.thenReturn(123456)
-            }
-            val node1 = mock<MegaNode> { on { handle }.thenReturn(123456) }
-            val node2 = mock<MegaNode> { on { handle }.thenReturn(234567) }
-            val node3 = mock<MegaNode> { on { handle }.thenReturn(345678) }
-            val node4 = null
-            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-            whenever(megaApiGateway.getMegaNodeByHandle(123456)).thenReturn(node1)
-            whenever(megaApiGateway.getMegaNodeByHandle(234567)).thenReturn(node2)
-            whenever(megaApiGateway.getMegaNodeByHandle(345678)).thenReturn(node3)
-            whenever(megaApiGateway.getMegaNodeByHandle(456789)).thenReturn(node4)
-            val success = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-                on { errorString }.thenReturn("Success")
-            }
-            whenever(
-                megaApiGateway.moveNode(
-                    nodeToMove = any(),
-                    newNodeParent = any(),
-                    newNodeName = anyOrNull(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(), mock(), success
-                )
-            }
-            val response = underTest.moveToRubbishBin(deleteHandles, context).blockingGetOrNull()
-            Truth.assertThat(response).isNotNull()
-            Truth.assertThat(response?.errorCount).isEqualTo(1)
-        }
-
-    @Test
-    internal fun `test that error count is one when some exceptions are thrown while moving to rubbish bin`() =
-        runTest {
-            val deleteHandles = listOf<Long>(123456)
-            val context = mock<Context>()
-            val rubbishBinNode = mock<MegaNode> {
-                on { handle }.thenReturn(123456)
-            }
-            val node1 = mock<MegaNode> { on { handle }.thenReturn(123456) }
-
-            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-            whenever(megaApiGateway.getMegaNodeByHandle(123456)).thenReturn(node1)
-            val success = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_EINTERNAL)
-                on { errorString }.thenReturn("OverQuota")
-            }
-            whenever(
-                megaApiGateway.moveNode(
-                    nodeToMove = any(),
-                    newNodeParent = any(),
-                    newNodeName = anyOrNull(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(), mock(), success
-                )
-            }
-            val response = underTest.moveToRubbishBin(deleteHandles, context).blockingGetOrNull()
-            Truth.assertThat(response).isNotNull()
-            Truth.assertThat(response?.errorCount).isEqualTo(1)
         }
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.usecase
 
-import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.rx3.rxSingle
@@ -201,45 +200,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
                 oldParentHandle = oldParentHandle
             ).also { resetAccountDetailsIfNeeded(it) }
         }
-
-
-    /**
-     * Moves nodes to the Rubbish Bin.
-     *
-     * @param handles   List of MegaNode handles to move.
-     * @return The movement result.
-     */
-    fun moveToRubbishBin(
-        handles: List<Long>,
-        context: Context,
-    ) = rxSingle(ioDispatcher) {
-        var errorCount = 0
-        val rubbishNode = megaApiGateway.getRubbishBinNode()
-        val oldParentHandle = if (handles.size == 1) {
-            getMegaNode(handles.first())?.parentHandle
-        } else {
-            INVALID_HANDLE
-        }
-        handles.forEach { handle ->
-            val node = getMegaNode(handle = handle)
-            node?.let {
-                runCatching {
-                    moveAsync(node = node, parentNode = rubbishNode)
-                }.onSuccess {
-                    megaApiGateway.stopSharingNode(node)
-                }.onFailure {
-                    errorCount++
-                }
-            } ?: run { errorCount++ }
-        }
-
-        MoveRequestResult.RubbishMovement(
-            count = handles.size,
-            errorCount = errorCount,
-            oldParentHandle = oldParentHandle,
-        )
-
-    }
 
     /**
      * Checks if the error of the request is over quota, pre over quota or foreign node.
