@@ -38,6 +38,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
@@ -53,6 +55,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.white_grey_700
 
+
 @Composable
 internal fun SetupScreen(
     is2FAFetchCompleted: Boolean,
@@ -62,11 +65,26 @@ internal fun SetupScreen(
     seedsList: List<String>?,
     openPlayStore: () -> Unit,
     onNextClicked: () -> Unit,
+    isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     if (is2FAFetchCompleted) {
+
+        var isNoAppAvailableDialogShown by remember { mutableStateOf(false) }
+        if (isNoAppAvailableDialogShown) {
+            AlertNoAppAvailableDialog(
+                isDarkMode,
+                onConfirm = {
+                    isNoAppAvailableDialogShown = false
+                    openPlayStore()
+                },
+                onDismissRequest = {
+                    isNoAppAvailableDialogShown = false
+                }
+            )
+        }
         Column(
             modifier = modifier
                 .background(MaterialTheme.colors.white_grey_700)
@@ -89,10 +107,16 @@ internal fun SetupScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
             ) {
+
                 RaisedDefaultMegaButton(modifier = Modifier
                     .wrapContentSize(),
                     textId = R.string.open_app_button,
-                    onClick = { onOpenInClicked(qrText) })
+                    onClick = {
+                        if (isIntentAvailable(qrText))
+                            onOpenInClicked(qrText)
+                        else
+                            isNoAppAvailableDialogShown = true
+                    })
                 Spacer(modifier = Modifier.width(16.dp))
                 TextMegaButton(
                     modifier = Modifier
@@ -121,17 +145,17 @@ private fun InstructionBox(
     openPlayStore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val isAlertHelpDialogShown = remember { mutableStateOf(false) }
+    var isAlertHelpDialogShown by remember { mutableStateOf(false) }
 
-    if (isAlertHelpDialogShown.value) {
+    if (isAlertHelpDialogShown) {
         AlertHelpDialog(
             isDarkMode,
             onConfirm = {
-                isAlertHelpDialogShown.value = false
+                isAlertHelpDialogShown = false
                 openPlayStore()
             },
             onDismissRequest = {
-                isAlertHelpDialogShown.value = false
+                isAlertHelpDialogShown = false
             }
         )
     }
@@ -173,7 +197,7 @@ private fun InstructionBox(
                                 painter = painterResource(id = R.drawable.ic_question_mark),
                                 "question mark icon",
                                 modifier = Modifier.clickable {
-                                    isAlertHelpDialogShown.value = true
+                                    isAlertHelpDialogShown = true
                                 }
                             )
                         }
@@ -244,7 +268,30 @@ private fun SeedsBox(seedsList: List<String>) {
 }
 
 @Composable
-internal fun AlertHelpDialog(
+private fun AlertNoAppAvailableDialog(
+    isDarkMode: Boolean,
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit,
+) {
+    AndroidTheme(isDark = isDarkMode) {
+        val firstText = stringResource(id = R.string.intent_not_available_2fa)
+        val secondText = stringResource(id = R.string.open_play_store_2fa)
+        val text = "$firstText\n\n$secondText"
+        MegaAlertDialog(
+            title = stringResource(id = R.string.no_authentication_apps_title),
+            text = text,
+            confirmButtonText = stringResource(id = R.string.context_open_link),
+            cancelButtonText = stringResource(id = R.string.general_cancel),
+            onConfirm = onConfirm,
+            onDismiss = onDismissRequest,
+            dismissOnClickOutside = false,
+            dismissOnBackPress = true
+        )
+    }
+}
+
+@Composable
+private fun AlertHelpDialog(
     isDarkMode: Boolean,
     onConfirm: () -> Unit,
     onDismissRequest: () -> Unit,
@@ -275,6 +322,7 @@ private fun PreviewSetupView() {
             Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
         },
         seedsList = seedsList,
+        isIntentAvailable = { true },
         onNextClicked = {},
         onOpenInClicked = {},
         openPlayStore = {})

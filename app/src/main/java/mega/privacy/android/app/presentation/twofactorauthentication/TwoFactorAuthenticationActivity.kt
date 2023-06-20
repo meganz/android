@@ -161,22 +161,23 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             qrCodeMapper = qrCodeMapper,
             onBackPressedDispatcher = onBackPressedDispatcher,
             onFinishActivity = ::finish,
+            isIntentAvailable = { isIntentAvailable(uiState.twoFactorAuthUrl) },
             onOpenInClicked = this::onOpenInClicked,
             openPlayStore = this::openPlayStore,
         )
     }
 
+    private fun isIntentAvailable(url: String): Boolean {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        return MegaApiUtils.isIntentAvailable(
+            this@TwoFactorAuthenticationActivity,
+            intent
+        )
+    }
+
     private fun onOpenInClicked(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        if (MegaApiUtils.isIntentAvailable(
-                this@TwoFactorAuthenticationActivity,
-                intent
-            )
-        ) {
-            startActivity(intent)
-        } else {
-            //To handle in this ticket [AND-16786]
-        }
+        startActivity(intent)
     }
 
     private fun setContentByCompose() {
@@ -515,15 +516,14 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             }
             openButtonNoApp.setOnClickListener {
                 noAppsDialog.dismiss()
+                openPlayStore()
                 isNoAppsDialogShown = false
             }
         }
         with(noAppsDialog) {
             setCanceledOnTouchOutside(false)
             setOnDismissListener {
-                noAppsDialog.dismiss()
                 isNoAppsDialogShown = false
-                openPlayStore()
             }
             setOnShowListener {
                 isNoAppsDialogShown = true

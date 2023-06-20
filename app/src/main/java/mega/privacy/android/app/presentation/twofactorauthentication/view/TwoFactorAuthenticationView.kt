@@ -41,6 +41,7 @@ fun TwoFactorAuthenticationView(
     onBackPressedDispatcher: OnBackPressedDispatcher,
     onFinishActivity: () -> Unit,
     openPlayStore: () -> Unit,
+    isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
 ) {
 
@@ -120,6 +121,7 @@ fun TwoFactorAuthenticationView(
                         currentScreen.value = ScreenType.VerificationScreen
                     },
                     openPlayStore = openPlayStore,
+                    isIntentAvailable = isIntentAvailable,
                     onOpenInClicked = onOpenInClicked,
                     modifier = Modifier.semantics { testTagsAsResourceId = true }
                 )
