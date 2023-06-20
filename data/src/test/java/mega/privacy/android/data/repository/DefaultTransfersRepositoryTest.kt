@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -25,11 +26,19 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -37,6 +46,7 @@ import org.mockito.kotlin.whenever
  * Test class for [DefaultTransfersRepository]
  */
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultTransfersRepositoryTest {
     private lateinit var underTest: DefaultTransfersRepository
 
@@ -48,8 +58,9 @@ class DefaultTransfersRepositoryTest {
     private val workerManagerGateway = mock<WorkManagerGateway>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val transferDataMapper = mock<TransferDataMapper>()
+    private val cancelTokenProvider = mock<CancelTokenProvider>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = DefaultTransfersRepository(
             megaApiGateway = megaApiGateway,
@@ -61,71 +72,149 @@ class DefaultTransfersRepositoryTest {
             workerManagerGateway = workerManagerGateway,
             megaLocalRoomGateway = megaLocalRoomGateway,
             transferDataMapper = transferDataMapper,
+            cancelTokenProvider = cancelTokenProvider,
         )
     }
 
-    private fun mockStartUpload() = megaApiGateway.startUpload(
-        localPath = any(),
-        parentNode = any(),
-        fileName = anyOrNull(),
-        modificationTime = any(),
-        appData = anyOrNull(),
-        isSourceTemporary = any(),
-        shouldStartFirst = any(),
-        cancelToken = anyOrNull(),
-        listener = any(),
-    )
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            megaApiGateway,
+            transferEventMapper,
+            appEventGateway,
+            transferMapper,
+            localStorageGateway,
+            workerManagerGateway,
+            megaLocalRoomGateway,
+            transferDataMapper,
+            cancelTokenProvider,
+        )
+    }
 
-    private fun startUploadFlow() =
-        underTest.startUpload(
-            localPath = "test local path",
-            parentNodeId = NodeId(1L),
-            fileName = "test filename",
-            modificationTime = 123456789L,
-            appData = null,
-            isSourceTemporary = false,
-            shouldStartFirst = false,
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class UploadDownloadTests {
+
+        private fun mockStartUpload() = megaApiGateway.startUpload(
+            localPath = any(),
+            parentNode = any(),
+            fileName = anyOrNull(),
+            modificationTime = any(),
+            appData = anyOrNull(),
+            isSourceTemporary = any(),
+            shouldStartFirst = any(),
+            cancelToken = anyOrNull(),
+            listener = any(),
         )
 
-    @Test
-    fun `test that OnTransferStart is returned when the upload begins`() = runTest {
-        whenever(mockStartUpload()).thenAnswer {
-            (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferStart(
-                api = mock(),
-                transfer = mock(),
+        private fun startUploadFlow() =
+            underTest.startUpload(
+                localPath = "test local path",
+                parentNodeId = NodeId(1L),
+                fileName = "test filename",
+                modificationTime = 123456789L,
+                appData = null,
+                isSourceTemporary = false,
+                shouldStartFirst = false,
             )
-        }
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-        val expected = mock<TransferEvent.TransferStartEvent>()
-        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
-        startUploadFlow().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-        }
-    }
 
-    @Test
-    fun `test that OnTransferFinished is returned when the upload is finished`() = runTest {
-        whenever(mockStartUpload()).thenAnswer {
-            (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferFinish(
-                api = mock(),
-                transfer = mock(),
-                error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+        private fun mockStartDownload() = megaApiGateway.startDownload(
+            node = anyOrNull(),
+            localPath = anyOrNull(),
+            fileName = anyOrNull(),
+            appData = anyOrNull(),
+            cancelToken = anyOrNull(),
+            collisionCheck = anyOrNull(),
+            collisionResolution = anyOrNull(),
+            startFirst = anyOrNull(),
+            listener = any(),
+        )
+
+        private fun startDownloadFlow() =
+            underTest.startDownload(
+                nodeId = NodeId(1L),
+                localPath = "test local path",
+                appData = null,
+                shouldStartFirst = false,
             )
-        }
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-        val expected = mock<TransferEvent.TransferFinishEvent>()
-        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
-        startUploadFlow().test {
-            assertThat(awaitItem()).isEqualTo(expected)
-            awaitComplete()
-        }
-        verify(megaApiGateway).removeTransferListener(any())
-    }
 
-    @Test
-    fun `test that OnTransferUpdate is returned when the ongoing upload has been updated`() =
-        runTest {
-            whenever(mockStartUpload()).thenAnswer {
+        private fun provideParameters() = listOf(
+            Arguments.of(
+                { mockStartUpload() }, { startUploadFlow() }),
+            Arguments.of(
+                { mockStartDownload() }, { startDownloadFlow() }
+            )
+        )
+
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferStart is returned when the upload and download begins`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
+                (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferStart(
+                    api = mock(),
+                    transfer = mock(),
+                )
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferStartEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+            startFlow().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferFinished is returned when the upload and download is finished`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
+                (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferFinish(
+                    api = mock(),
+                    transfer = mock(),
+                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+                )
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferFinishEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+            startFlow().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
+            verify(megaApiGateway).removeTransferListener(any())
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferFinished is returned when the download and upload is finished`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
+                (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferFinish(
+                    api = mock(),
+                    transfer = mock(),
+                    error = mock { on { errorCode }.thenReturn(MegaError.API_OK) },
+                )
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferFinishEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+            startFlow().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
+            verify(megaApiGateway).removeTransferListener(any())
+        }
+
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferUpdate is returned when the ongoing upload has been updated`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
                 (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferUpdate(
                     api = mock(),
                     transfer = mock(),
@@ -134,15 +223,17 @@ class DefaultTransfersRepositoryTest {
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
             val expected = mock<TransferEvent.TransferUpdateEvent>()
             whenever(transferEventMapper.invoke(any())).thenReturn(expected)
-            startUploadFlow().test {
+            startFlow().test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
 
-    @Test
-    fun `test that OnTransferTemporaryError is returned when the upload experiences a temporary error`() =
-        runTest {
-            whenever(mockStartUpload()).thenAnswer {
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferTemporaryError is returned when the upload experiences a temporary error`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
                 (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferTemporaryError(
                     api = mock(),
                     transfer = mock(),
@@ -152,51 +243,56 @@ class DefaultTransfersRepositoryTest {
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
             val expected = mock<TransferEvent.TransferTemporaryErrorEvent>()
             whenever(transferEventMapper.invoke(any())).thenReturn(expected)
-            startUploadFlow().test {
+            startFlow().test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
 
-    @Test
-    fun `test that OnTransferData is returned when the upload data is being read`() = runTest {
-        whenever(mockStartUpload()).thenAnswer {
-            (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferData(
-                api = mock(),
-                transfer = mock(),
-                buffer = byteArrayOf(),
-            )
-        }
-        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
-        val expected = mock<TransferEvent.TransferDataEvent>()
-        whenever(transferEventMapper.invoke(any())).thenReturn(expected)
-        startUploadFlow().test {
-            assertThat(awaitItem()).isEqualTo(expected)
+        @ParameterizedTest
+        @MethodSource("provideParameters")
+        fun `test that OnTransferData is returned when the upload data is being read`(
+            mockStart: () -> Unit, startFlow: () -> Flow<TransferEvent>,
+        ) = runTest {
+            whenever(mockStart()).thenAnswer {
+                (it.arguments[8] as OptionalMegaTransferListenerInterface).onTransferData(
+                    api = mock(),
+                    transfer = mock(),
+                    buffer = byteArrayOf(),
+                )
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            val expected = mock<TransferEvent.TransferDataEvent>()
+            whenever(transferEventMapper.invoke(any())).thenReturn(expected)
+            startFlow().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
         }
     }
 
 
     @Test
-    fun `test that cancelTransferByTag returns success when MegaApi returns API_OK`() = runTest {
-        val transferTag = 1000
+    fun `test that cancelTransferByTag returns success when MegaApi returns API_OK`() =
+        runTest {
+            val transferTag = 1000
 
-        val megaError = mock<MegaError> {
-            on { errorCode }.thenReturn(MegaError.API_OK)
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.cancelTransferByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.cancelTransferByTag(transferTag)
         }
 
-        val megaRequest = mock<MegaRequest>()
-
-        whenever(megaApiGateway.cancelTransferByTag(any(), any())).thenAnswer {
-            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(),
-                megaRequest,
-                megaError,
-            )
-        }
-
-        underTest.cancelTransferByTag(transferTag)
-    }
-
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that cancelTransferByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
         runTest {
             val transferTag = 1000
@@ -214,8 +310,9 @@ class DefaultTransfersRepositoryTest {
                     megaError,
                 )
             }
-
-            underTest.cancelTransferByTag(transferTag)
+            assertThrows<MegaException> {
+                underTest.cancelTransferByTag(transferTag)
+            }
         }
 
     @Test
@@ -240,7 +337,7 @@ class DefaultTransfersRepositoryTest {
             underTest.moveTransferToFirstByTag(transferTag)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that moveTransferToFirstByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
         runTest {
             val transferTag = 1000
@@ -258,8 +355,9 @@ class DefaultTransfersRepositoryTest {
                     megaError,
                 )
             }
-
-            underTest.moveTransferToFirstByTag(transferTag)
+            assertThrows<MegaException> {
+                underTest.moveTransferToFirstByTag(transferTag)
+            }
         }
 
     @Test
@@ -284,7 +382,7 @@ class DefaultTransfersRepositoryTest {
             underTest.moveTransferToLastByTag(transferTag)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that moveTransferToLastByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
         runTest {
             val transferTag = 1000
@@ -302,8 +400,9 @@ class DefaultTransfersRepositoryTest {
                     megaError,
                 )
             }
-
-            underTest.moveTransferToLastByTag(transferTag)
+            assertThrows<MegaException> {
+                underTest.moveTransferToLastByTag(transferTag)
+            }
         }
 
     @Test
@@ -329,7 +428,7 @@ class DefaultTransfersRepositoryTest {
             underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
         }
 
-    @Test(expected = MegaException::class)
+    @Test
     fun `test that moveTransferBeforeByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
         runTest {
             val transferTag = 1000
@@ -349,7 +448,9 @@ class DefaultTransfersRepositoryTest {
                 )
             }
 
-            underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
+            assertThrows<MegaException> {
+                underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
+            }
         }
 
     @Test
@@ -433,4 +534,10 @@ class DefaultTransfersRepositoryTest {
             whenever(megaLocalRoomGateway.getCompletedTransfersCount()).thenReturn(0)
             assertThat(underTest.isCompletedTransfersEmpty()).isTrue()
         }
+
+    @Test
+    fun `test that startDownload gateway is called when startDownload is called`() = runTest {
+
+        //verify(megaApiGateway.startDownload())
+    }
 }

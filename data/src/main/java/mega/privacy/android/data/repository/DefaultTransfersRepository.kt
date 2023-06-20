@@ -13,7 +13,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
-import mega.privacy.android.data.extensions.transferListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -30,9 +29,9 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
+import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
-import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
@@ -59,6 +58,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val workerManagerGateway: WorkManagerGateway,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val transferDataMapper: TransferDataMapper,
+    private val cancelTokenProvider: CancelTokenProvider,
 ) : TransferRepository {
 
     override fun startUpload(
@@ -69,10 +69,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: String?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
-    ): Flow<TransferEvent> = callbackFlow {
+    ) = callbackFlow {
         val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         requireNotNull(parentNode)
-        val listener = uploadListener(channel)
+        val listener = transferListener(channel)
 
         megaApiGateway.startUpload(
             localPath = localPath,
@@ -93,7 +93,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         .flowOn(ioDispatcher)
         .cancellable()
 
-    private fun uploadListener(
+    private fun transferListener(
         channel: SendChannel<TransferEvent>,
     ) = OptionalMegaTransferListenerInterface(
         onTransferStart = { transfer ->
@@ -126,29 +126,25 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: String?,
         shouldStartFirst: Boolean,
     ) = callbackFlow {
-        runCatching {
-            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
-        }.getOrNull()?.let { megaNode ->
-            val cancelToken = MegaCancelToken.createInstance()
-            val listener = this.transferListener("Download node") {
-                transferMapper(it)
-            }
+        val listener = transferListener(channel)
+        val megaNodeResult = runCatching { megaApiGateway.getMegaNodeByHandle(nodeId.longValue) }
+        megaNodeResult.getOrNull()?.let { megaNode ->
             megaApiGateway.startDownload(
                 node = megaNode,
                 localPath = localPath,
                 fileName = megaNode.name,
                 appData = appData,
                 startFirst = shouldStartFirst,
-                cancelToken = cancelToken,
+                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
                 collisionCheck = COLLISION_CHECK_FINGERPRINT,
                 collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
                 listener = listener,
             )
-
-            awaitClose {
-                cancelToken.cancel()
-                megaApiGateway.removeTransferListener(listener)
-            }
+        } ?: run {
+            throw NodeDoesNotExistsException()
+        }
+        awaitClose {
+            megaApiGateway.removeTransferListener(listener)
         }
     }
         .flowOn(ioDispatcher)

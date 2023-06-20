@@ -241,9 +241,9 @@ interface TransferRepository {
     /**
      * Start downloading a node to desired destination and returns a flow to expose download progress
      *
-     * @param nodeId      The id of the node we want to download, it can be a folder
-     * @param localPath   Full destination path of the node, including file name if it's a file node. All nested folders must exist.
-     * @param appData     Custom app data to save in the MegaTransfer object.
+     * @param nodeId            The id of the node we want to download, it can be a folder
+     * @param localPath         Full destination path of the node, including file name if it's a file node. All nested folders must exist.
+     * @param appData           Custom app data to save in the MegaTransfer object.
      * @param shouldStartFirst  Puts the transfer on top of the download queue.
      */
     fun startDownload(
@@ -251,7 +251,7 @@ interface TransferRepository {
         localPath: String,
         appData: String?,
         shouldStartFirst: Boolean,
-    ): Flow<Transfer>
+    ): Flow<TransferEvent>
 
     /**
      * Gets information about transfer queues.
