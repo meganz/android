@@ -18,8 +18,8 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
-import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
@@ -83,12 +83,13 @@ class UpgradeAccountViewModel @Inject constructor(
                     Timber.e(it)
                 }
             monthlySubscriptions.map { monthlySubscription ->
-                val yearlySubscription =
-                    yearlySubscriptions.first { it.accountType == monthlySubscription.accountType }
-                localisedSubscriptions += localisedSubscriptionMapper(
-                    monthlySubscription = monthlySubscription,
-                    yearlySubscription = yearlySubscription
-                )
+                yearlySubscriptions.firstOrNull { it.accountType == monthlySubscription.accountType }
+                    ?.let { yearlySubscription ->
+                        localisedSubscriptions += localisedSubscriptionMapper(
+                            monthlySubscription = monthlySubscription,
+                            yearlySubscription = yearlySubscription
+                        )
+                    }
             }
             _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
         }
