@@ -81,7 +81,7 @@ class ReferralBonusesViewModelTest {
         )
     }
     private val referralBonusAchievementsMapper: ReferralBonusAchievementsMapper =
-        ReferralBonusAchievementsMapper(NumberOfDaysMapper())
+        ReferralBonusAchievementsMapper(NumberOfDaysMapper(mock()))
 
     @BeforeAll
     fun setup() {
