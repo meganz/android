@@ -40,17 +40,12 @@ object EventConstants {
     const val EVENT_SESSION_ON_LOWRES_CHANGE = "session_on_lowres_change"
     const val EVENT_REMOTE_AUDIO_LEVEL_CHANGE = "remote_audio_level_change"
     const val EVENT_SESSION_ON_HOLD_CHANGE = "session_on_hold_change"
-
     const val EVENT_PRIVILEGES_CHANGE = "privileges_in_char_change"
     const val EVENT_USER_VISIBILITY_CHANGE = "user_visibility_change"
     const val EVENT_CHAT_CONNECTION_STATUS = "chat_connection_status_change"
-
     const val EVENT_UPDATE_SCROLL = "EVENT_UPDATE_SCROLL"
     const val EVENT_PERFORM_SCROLL = "EVENT_PERFORM_SCROLL"
-
-    const val EVENT_UPDATE_VIEW_MODE = "EVENT_UPDATE_VIEW_MODE"
     const val EVENT_SHOW_MEDIA_DISCOVERY = "EVENT_SHOW_MEDIA_DISCOVERY"
-
     const val EVENT_SHOW_SCANNING_TRANSFERS_DIALOG = "EVENT_SHOW_SCANNING_TRANSFERS_DIALOG"
     const val EVENT_SCANNING_TRANSFERS_CANCELLED = "EVENT_SCANNING_TRANSFERS_CANCELLED"
 }

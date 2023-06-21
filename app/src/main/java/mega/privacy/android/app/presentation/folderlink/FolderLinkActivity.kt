@@ -46,7 +46,6 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.o
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.constants.EventConstants
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.databinding.ActivityFolderLinkBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
@@ -150,7 +149,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private lateinit var selectImportFolderLauncher: ActivityResultLauncher<Intent>
 
     private val recyclerView: RecyclerView
-        get() = if (viewModel.isList) binding.folderLinkListViewBrowser else binding.folderLinkGridViewBrowser
+        get() = if (uiState.currentViewType == ViewType.LIST) binding.folderLinkListViewBrowser else binding.folderLinkGridViewBrowser
 
     private val downloadButtonClickListener = View.OnClickListener {
         adapterList?.let {
@@ -229,7 +228,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     Timber.d("Scroll to $lastVisiblePosition position")
 
                     if (lastVisiblePosition >= 0) {
-                        if (viewModel.isList) {
+                        if (uiState.currentViewType == ViewType.LIST) {
                             mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
                         } else {
                             gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
@@ -271,7 +270,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     Timber.d("Scroll to $lastVisiblePosition position")
 
                     if (lastVisiblePosition >= 0) {
-                        if (viewModel.isList) {
+                        if (uiState.currentViewType == ViewType.LIST) {
                             mLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
                         } else {
                             gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
@@ -613,7 +612,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 })
             }
 
-            if (viewModel.isList) {
+            if (uiState.currentViewType == ViewType.LIST) {
                 folderLinkGridViewBrowser.visibility = View.GONE
                 folderLinkListViewBrowser.visibility = View.VISIBLE
             } else {
@@ -651,12 +650,10 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private fun setupObservers() {
         observeDragSupportEvents(this, recyclerView, Constants.VIEWER_FROM_FOLDER_LINK)
 
-        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-            .observe(this) { isList: Boolean -> viewModel.updateViewType(isList) }
-
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
+                    handleViewTypeUpdate(it.currentViewType)
                     when {
                         it.isInitialState -> {
                             it.shouldLogin?.let { showLogin ->
@@ -673,11 +670,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             megaApiFolder.fetchNodes(this@FolderLinkActivity)
                             // Get cookies settings after login.
                             getInstance().checkEnabledCookies()
-                        }
-
-                        (it.currentViewType == ViewType.LIST && !viewModel.isList) || (it.currentViewType == ViewType.GRID && viewModel.isList) -> {
-                            viewModel.isList = it.currentViewType === ViewType.LIST
-                            setupRecyclerViewAdapter()
                         }
 
                         it.collisions != null -> {
@@ -715,6 +707,20 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             .observe(this) { isFromFolderLink ->
                 if (isFromFolderLink) showMediaDiscovery(true)
             }
+    }
+
+    /**
+     * When receiving a View Type update from [FolderLinkViewModel], this sets up the
+     * [adapterList] if it has a different View Type from [FolderLinkViewModel], as
+     * changing the View Type will cause the scroll position to be lost
+     *
+     * @param newViewType The updated [ViewType] from [FolderLinkViewModel]
+     */
+    private fun handleViewTypeUpdate(newViewType: ViewType) {
+        val adapterViewType = adapterList?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+        if (adapterViewType != newViewType.id) {
+            setupRecyclerViewAdapter()
+        }
     }
 
     /**
@@ -784,7 +790,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         } else {
             binding.folderLinkListEmptyImage.setImageResource(R.drawable.empty_folder_portrait)
         }
-        if (!viewModel.isList) {
+        if (uiState.currentViewType == ViewType.GRID) {
             binding.folderLinkGridViewBrowser.measure(
                 RecyclerView.LayoutParams.MATCH_PARENT,
                 RecyclerView.LayoutParams.MATCH_PARENT
@@ -1046,7 +1052,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
     private fun setupRecyclerViewAdapter() {
         val adapterType =
-            if (viewModel.isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+            if (uiState.currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
 
         adapterList = MegaNodeAdapter(
             this, null, ArrayList(),
@@ -1062,7 +1068,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         }
 
         binding.apply {
-            if (viewModel.isList) {
+            if (uiState.currentViewType == ViewType.LIST) {
                 folderLinkGridViewBrowser.visibility = View.GONE
                 folderLinkListViewBrowser.visibility = View.VISIBLE
             } else {
@@ -1167,7 +1173,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             val node = adapterList.getItem(position)
             if (node.isFolder) {
                 val lastFirstVisiblePosition: Int =
-                    if (viewModel.isList)
+                    if (uiState.currentViewType == ViewType.LIST)
                         mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
                     else
                         gridLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0

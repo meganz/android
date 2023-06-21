@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_MEDIA_DISCOVERY
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.fragments.homepage.model.SortByHeaderState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
@@ -232,8 +231,6 @@ class SortByHeaderViewModel @Inject constructor(
                 ViewType.LIST -> setViewType(ViewType.GRID)
                 ViewType.GRID -> setViewType(ViewType.LIST)
             }
-            LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-                .post(isListView())
         }
     }
 

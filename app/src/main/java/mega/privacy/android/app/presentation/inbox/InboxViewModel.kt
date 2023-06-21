@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.MonitorBackupFolder
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -36,7 +35,6 @@ import javax.inject.Inject
  * @property monitorBackupFolder [MonitorBackupFolder]
  * @property monitorNodeUpdates [MonitorNodeUpdates]
  * @property monitorViewType [MonitorViewType]
- * @property setViewType [SetViewType]
  */
 @HiltViewModel
 class InboxViewModel @Inject constructor(
@@ -47,7 +45,6 @@ class InboxViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val monitorViewType: MonitorViewType,
-    private val setViewType: SetViewType,
 ) : ViewModel() {
 
     /**

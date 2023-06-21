@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
 import org.junit.Rule
 import org.junit.jupiter.api.AfterAll
@@ -50,7 +49,6 @@ internal class InboxViewModelTest {
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getParentNodeHandle = mock<GetParentNodeHandle>()
-    private val setViewType = mock<SetViewType>()
 
     private val monitorBackupFolder = FakeMonitorBackupFolder()
     private val monitorNodeUpdates = FakeMonitorUpdates()
@@ -72,7 +70,6 @@ internal class InboxViewModelTest {
             getNodeByHandle,
             getParentNodeHandle,
             monitorViewType,
-            setViewType,
         )
     }
 
@@ -90,7 +87,6 @@ internal class InboxViewModelTest {
             monitorBackupFolder = monitorBackupFolder,
             monitorNodeUpdates = monitorNodeUpdates,
             monitorViewType = monitorViewType,
-            setViewType = setViewType,
         )
     }
 

@@ -372,9 +372,7 @@ class InboxFragment : RotatableFragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect {
                     Timber.d("Node Count from ViewModel is ${it.nodes.size}")
-                    handleViewType(
-                        megaNodeAdapter?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-                    )
+                    handleViewTypeUpdate(it.currentViewType)
                     setNodes(it.nodes.toMutableList())
                     setContent()
 
@@ -419,15 +417,15 @@ class InboxFragment : RotatableFragment() {
     }
 
     /**
-     * Updates the View Type of this Fragment
+     * When receiving a View Type update from [InboxViewModel], this switches the View Type if
+     * [megaNodeAdapter] has a different View Type from [InboxViewModel], as changing the View Type
+     * will cause the scroll position to be lost
      *
-     * Changing the View Type will cause the scroll position to be lost. To avoid that, only
-     * refresh the contents when the new View Type is different from the original View Type
-     *
-     * @param viewType The new View Type received from [InboxViewModel]
+     * @param newViewType The updated [ViewType] from [InboxViewModel]
      */
-    private fun handleViewType(viewType: Int) {
-        if (viewType != state().currentViewType.id) {
+    private fun handleViewTypeUpdate(newViewType: ViewType) {
+        val adapterViewType = megaNodeAdapter?.adapterType ?: MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+        if (adapterViewType != newViewType.id) {
             switchViewType()
         }
     }

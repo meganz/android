@@ -118,11 +118,6 @@ class FolderLinkViewModel @Inject constructor(
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
 
-    /**
-     * Determine whether to show data in list or grid view
-     */
-    var isList = true
-
     init {
         checkViewType()
     }
@@ -377,18 +372,6 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Update the preferred view type
-     *
-     * @param isList    Whether the updated view type is list or grid
-     */
-    fun updateViewType(isList: Boolean) {
-        val viewType = if (isList) ViewType.LIST else ViewType.GRID
-        viewModelScope.launch {
-            setViewType(viewType)
-        }
-    }
-
-    /**
      * Fetch the nodes to show
      *
      * @param folderSubHandle   Handle of the folder to fetch the nodes for
@@ -401,10 +384,10 @@ class FolderLinkViewModel @Inject constructor(
                         it.copy(
                             isNodesFetched = true,
                             nodesList = result.childrenNodes.map { typedNode ->
-                                NodeUIItem<TypedNode>(
+                                NodeUIItem(
                                     typedNode,
                                     isSelected = false,
-                                    isInvisible = false
+                                    isInvisible = false,
                                 )
                             },
                             rootNode = result.rootNode,
@@ -442,7 +425,7 @@ class FolderLinkViewModel @Inject constructor(
     fun onItemLongClick(nodeUIItem: NodeUIItem<TypedNode>) {
         val list = _state.value.nodesList
         val index = list.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
-        val newNode = NodeUIItem<TypedNode>(nodeUIItem.node, !nodeUIItem.isSelected, false)
+        val newNode = NodeUIItem(nodeUIItem.node, !nodeUIItem.isSelected, false)
         val newNodesList = list.updateItemAt(index = index, item = newNode)
 
         val selectedNodeCount = newNodesList.count { it.isSelected }
@@ -510,10 +493,10 @@ class FolderLinkViewModel @Inject constructor(
                                 _state.update {
                                     it.copy(
                                         nodesList = children.map { typedNode ->
-                                            NodeUIItem<TypedNode>(
-                                                typedNode,
+                                            NodeUIItem(
+                                                node = typedNode,
                                                 isSelected = false,
-                                                isInvisible = false
+                                                isInvisible = false,
                                             )
                                         },
                                         parentNode = newParentNode,
@@ -617,7 +600,7 @@ class FolderLinkViewModel @Inject constructor(
                     parentNode = addNodeType(nodeUIItem.node as FolderNode) as TypedFolderNode,
                     title = nodeUIItem.name,
                     nodesList = children.map { childNode ->
-                        NodeUIItem<TypedNode>(childNode, isSelected = false, isInvisible = false)
+                        NodeUIItem(childNode, isSelected = false, isInvisible = false)
                     }
                 )
             }
