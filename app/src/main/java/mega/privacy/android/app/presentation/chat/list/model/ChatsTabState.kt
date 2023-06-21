@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.model
 
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 
 /**
@@ -16,8 +16,8 @@ import mega.privacy.android.domain.entity.chat.ChatStatus
  * @constructor Create empty Chat tab state
  */
 data class ChatsTabState constructor(
-    val chats: List<ChatItem> = emptyList(),
-    val meetings: List<ChatItem> = emptyList(),
+    val chats: List<ChatRoomItem> = emptyList(),
+    val meetings: List<ChatRoomItem> = emptyList(),
     val selectedIds: List<Long> = emptyList(),
     val currentChatStatus: ChatStatus? = null,
     val currentCallChatId: Long? = null,

@@ -10,5 +10,5 @@ fun interface GetContactEmail {
      *
      * @param handle user handle id
      */
-    suspend operator fun invoke(handle: Long)
+    suspend operator fun invoke(handle: Long): String?
 }

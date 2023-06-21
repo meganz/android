@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
+import java.time.Instant
 
 /**
  * Chat call
@@ -70,4 +71,13 @@ data class ChatCall(
     val hasLocalAudio: Boolean = false,
     val hasLocalVideo: Boolean = false,
     val hasRequestSpeak: Boolean = false,
-)
+) {
+
+    /**
+     * Get call start timestamp based on current duration
+     *
+     * @return  Timestamp in Epoch seconds
+     */
+    fun getStartTimestamp(): Long? =
+        duration?.takeIf { it > 0 }?.let { Instant.now().minusSeconds(it).epochSecond }
+}

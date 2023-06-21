@@ -1,23 +1,23 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.data.mapper.chat
 
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import javax.inject.Inject
 
 /**
- * Chat item mapper
+ * Chat room item mapper
  */
-class ChatItemMapper @Inject constructor() {
+class ChatRoomItemMapper @Inject constructor() {
 
     /**
-     * Map [CombinedChatRoom] into [ChatItem]
+     * Map [CombinedChatRoom] into [ChatRoomItem]
      *
-     * @param chatRoom
-     * @return  ChatItem
+     * @param chatRoom  [CombinedChatRoom]
+     * @return          [ChatRoomItem]
      */
-    operator fun invoke(chatRoom: CombinedChatRoom): ChatItem {
+    operator fun invoke(chatRoom: CombinedChatRoom): ChatRoomItem {
         val hasPermissions = chatRoom.ownPrivilege == ChatRoomPermission.Moderator
         val isLastMessageVoiceClip = chatRoom.lastMessageType == ChatRoomLastMessage.VoiceClip
         val highLight = chatRoom.unreadCount > 0
@@ -26,7 +26,7 @@ class ChatItemMapper @Inject constructor() {
 
         return when {
             chatRoom.isMeeting -> {
-                ChatItem.MeetingChatItem(
+                ChatRoomItem.MeetingChatRoomItem(
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
@@ -41,7 +41,7 @@ class ChatItemMapper @Inject constructor() {
             }
 
             chatRoom.isGroup -> {
-                ChatItem.GroupChatItem(
+                ChatRoomItem.GroupChatRoomItem(
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
@@ -56,7 +56,7 @@ class ChatItemMapper @Inject constructor() {
             }
 
             else -> {
-                ChatItem.IndividualChatItem(
+                ChatRoomItem.IndividualChatRoomItem(
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,

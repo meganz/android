@@ -1,7 +1,6 @@
-package mega.privacy.android.app.presentation.chat.list
+package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
-import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,37 +21,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
-import mega.privacy.android.app.presentation.chat.list.view.ChatListView
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 
-enum class ChatTab(
-    @StringRes val titleStringRes: Int,
-) {
-    CHATS(R.string.chats_label),
-    MEETINGS(R.string.chat_tab_meetings_title)
-}
-
+/**
+ * Chat tabs view
+ *
+ * @param state             [ChatsTabState]
+ * @param onTabSelected
+ * @param onItemClick
+ * @param onItemMoreClick
+ * @param onItemSelected
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChatTabsView(
     state: ChatsTabState,
     onTabSelected: (ChatTab) -> Unit = {},
     onItemClick: (Long) -> Unit = {},
-    onItemMoreClick: (ChatItem) -> Unit = {},
+    onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
     var scrollToTop by remember { mutableStateOf(false) }
-    var filteredChats by remember { mutableStateOf<List<ChatItem>?>(listOf()) }
-    var filteredMeetings by remember { mutableStateOf<List<ChatItem>?>(listOf()) }
+    var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
+    var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(
             selectedTabIndex = pagerState.currentPage,
+            backgroundColor = MaterialTheme.colors.surface,
             contentColor = MaterialTheme.colors.red_600_red_300
         ) {
             ChatTab.values().forEachIndexed { index, item ->
@@ -75,19 +76,22 @@ fun ChatTabsView(
             pageCount = ChatTab.values().size,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
-            val items = if (page == ChatTab.CHATS.ordinal) {
-                filteredChats ?: state.chats
-            } else {
-                filteredMeetings ?: state.meetings
+            Column {
+                val items = if (page == ChatTab.CHATS.ordinal) {
+                    filteredChats ?: state.chats
+                } else {
+                    filteredMeetings ?: state.meetings
+                }
+
+                ChatListView(
+                    items = items,
+                    selectedIds = state.selectedIds,
+                    scrollToTop = scrollToTop,
+                    onItemClick = onItemClick,
+                    onItemMoreClick = onItemMoreClick,
+                    onItemSelected = onItemSelected,
+                )
             }
-            ChatListView(
-                items = items,
-                selectedIds = state.selectedIds,
-                scrollToTop = scrollToTop,
-                onItemClick = onItemClick,
-                onItemMoreClick = onItemMoreClick,
-                onItemSelected = onItemSelected,
-            )
         }
 
         LaunchedEffect(state.searchQuery) {

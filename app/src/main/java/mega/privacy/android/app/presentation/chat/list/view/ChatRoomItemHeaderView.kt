@@ -15,13 +15,13 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 
 /**
- * Chat item header view
+ * Chat room item header view
  *
  * @param modifier
  * @param text      Header text
  */
 @Composable
-fun ChatItemHeaderView(
+fun ChatRoomItemHeaderView(
     modifier: Modifier = Modifier,
     text: String,
 ) {
@@ -45,6 +45,6 @@ fun ChatItemHeaderView(
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewMeetingHeaderItemView() {
-    ChatItemHeaderView(text = "Monday, 23 May")
+private fun PreviewChatRoomItemHeaderView() {
+    ChatRoomItemHeaderView(text = "Monday, 23 May")
 }

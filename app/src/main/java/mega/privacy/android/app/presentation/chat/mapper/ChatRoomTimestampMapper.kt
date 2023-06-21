@@ -10,7 +10,7 @@ import android.text.format.DateUtils.MINUTE_IN_MILLIS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.data.gateway.DeviceGateway
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -78,15 +78,15 @@ class ChatRoomTimestampMapper @Inject constructor(
     }
 
     /**
-     * Get header time formatted given two [ChatItem]
+     * Get header time formatted given two [ChatRoomItem]
      *
-     * @param currentItem   Current [ChatItem]
-     * @param previousItem  Previous [ChatItem]
+     * @param currentItem   Current [ChatRoomItem]
+     * @param previousItem  Previous [ChatRoomItem]
      * @return              Time formatted
      */
     fun getHeaderTimeFormatted(
-        currentItem: ChatItem,
-        previousItem: ChatItem?,
+        currentItem: ChatRoomItem,
+        previousItem: ChatRoomItem?,
     ): String? =
         when {
             !currentItem.isPendingMeeting() && previousItem?.isPendingMeeting() == true ->
@@ -111,8 +111,8 @@ class ChatRoomTimestampMapper @Inject constructor(
             else -> null
         }
 
-    private fun ChatItem.scheduledStartTimestamp(): Long? =
-        if (this is ChatItem.MeetingChatItem) this.scheduledStartTimestamp else null
+    private fun ChatRoomItem.scheduledStartTimestamp(): Long? =
+        if (this is ChatRoomItem.MeetingChatRoomItem) this.scheduledStartTimestamp else null
 
     private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean =
         if (timeStampA == null || timeStampB == null) {

@@ -39,19 +39,30 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
-import mega.privacy.android.domain.entity.chat.ChatItem
-import mega.privacy.android.domain.entity.chat.ChatItem.MeetingChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import kotlin.random.Random
 
+/**
+ * Chat room item view
+ *
+ * @param item                  [ChatRoomItem]
+ * @param isSelected
+ * @param isSelectionEnabled
+ * @param timestampUpdate
+ * @param onItemClick
+ * @param onItemMoreClick
+ * @param onItemSelected
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun ChatItemView(
-    item: ChatItem,
+internal fun ChatRoomItemView(
+    item: ChatRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
     timestampUpdate: Int?,
     onItemClick: (Long) -> Unit,
-    onItemMoreClick: (ChatItem) -> Unit,
+    onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -247,14 +258,14 @@ internal fun ChatItemView(
             },
             timestampUpdate = timestampUpdate,
             lastMessage = item.lastMessage,
-            isPending = item is MeetingChatItem && item.isPending,
-            scheduledTimestamp = if (item is MeetingChatItem) item.scheduledTimestampFormatted else null,
+            isPending = item is MeetingChatRoomItem && item.isPending,
+            scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
             highlight = item.highlight,
             hasOngoingCall = item.hasOngoingCall(),
             callDuration = item.getCallDuration(),
-            isRecurringDaily = item is MeetingChatItem && item.isRecurringDaily,
-            isRecurringWeekly = item is MeetingChatItem && item.isRecurringWeekly,
-            isRecurringMonthly = item is MeetingChatItem && item.isRecurringMonthly,
+            isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
+            isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
+            isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
         )
 
         BottomTextView(
@@ -272,8 +283,8 @@ internal fun ChatItemView(
                 top.linkTo(middleText.bottom, 4.dp)
             },
             timestampUpdate = timestampUpdate,
-            isRecurring = item is MeetingChatItem && item.isRecurring(),
-            isPending = item is MeetingChatItem && item.isPending,
+            isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
+            isPending = item is MeetingChatRoomItem && item.isPending,
             highlight = item.highlight,
             lastTimestamp = item.lastTimestampFormatted,
             hasOngoingCall = item.hasOngoingCall(),
@@ -443,8 +454,8 @@ private fun BottomTextView(
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewChatItemView() {
-    val meeting = MeetingChatItem(
+private fun PreviewChatRoomItemView() {
+    val meeting = MeetingChatRoomItem(
         chatId = Random.nextLong(),
         schedId = Random.nextLong(),
         title = "Photos Sprint #${Random.nextInt()}",
@@ -456,7 +467,7 @@ private fun PreviewChatItemView() {
         isRecurringMonthly = Random.nextBoolean(),
         isPublic = Random.nextBoolean(),
     )
-    ChatItemView(
+    ChatRoomItemView(
         item = meeting,
         isSelected = Random.nextBoolean(),
         isSelectionEnabled = Random.nextBoolean(),

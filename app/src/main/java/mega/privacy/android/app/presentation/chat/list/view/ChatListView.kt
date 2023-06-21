@@ -1,12 +1,9 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,19 +23,18 @@ import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.MegaEmptyView
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ChatListView(
     modifier: Modifier = Modifier,
-    items: List<ChatItem>,
+    items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     onItemClick: (Long) -> Unit = {},
-    onItemMoreClick: (ChatItem) -> Unit = {},
+    onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
 ) {
@@ -61,11 +57,11 @@ fun ChatListView(
 @Composable
 private fun ListView(
     modifier: Modifier = Modifier,
-    items: List<ChatItem>,
+    items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     onItemClick: (Long) -> Unit,
-    onItemMoreClick: (ChatItem) -> Unit,
+    onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,
 ) {
@@ -80,15 +76,15 @@ private fun ListView(
         itemsIndexed(
             items = items,
             key = { _, item -> item.chatId }
-        ) { index: Int, item: ChatItem ->
+        ) { index: Int, item: ChatRoomItem ->
             item.header?.takeIf { it.isNotBlank() }?.let { header ->
-                if (index != 0) ChatItemDivider(short = true)
-                ChatItemHeaderView(text = header)
+                if (index != 0) ChatDivider(startPadding = 16.dp)
+                ChatRoomItemHeaderView(text = header)
             } ?: run {
-                if (index != 0) ChatItemDivider(short = false)
+                if (index != 0) ChatDivider()
             }
 
-            ChatItemView(
+            ChatRoomItemView(
                 item = item,
                 isSelected = selectionEnabled && selectedIds.contains(item.chatId),
                 isSelectionEnabled = selectionEnabled,
@@ -114,20 +110,11 @@ private fun ListView(
     }
 
     LaunchedEffect(items) {
-        while (items.any(ChatItem::hasOngoingCall)) {
+        while (items.any(ChatRoomItem::hasOngoingCall)) {
             delay(1.seconds)
             tick++
         }
     }
-}
-
-@Composable
-private fun ChatItemDivider(short: Boolean) {
-    Divider(
-        modifier = Modifier.padding(start = if (short) 16.dp else 72.dp),
-        color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-        thickness = 1.dp
-    )
 }
 
 @Composable

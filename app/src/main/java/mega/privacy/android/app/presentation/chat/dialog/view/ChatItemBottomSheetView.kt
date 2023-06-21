@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -25,26 +24,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
-import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
-import mega.privacy.android.domain.entity.chat.ChatCallItem
-import mega.privacy.android.domain.entity.chat.ChatItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import kotlin.random.Random
 
+/**
+ * Chat item bottom sheet view
+ */
 @Composable
-internal fun ChatItemBottomSheet(
+internal fun ChatItemBottomSheetView(
     modifier: Modifier = Modifier,
-    item: ChatItem?,
+    item: ChatRoomItem?,
     onStartMeetingClick: () -> Unit = {},
     onOccurrencesClick: () -> Unit = {},
     onInfoClick: () -> Unit = {},
@@ -81,9 +82,9 @@ internal fun ChatItemBottomSheet(
         ) {
             val (imgAvatar, txtTitle, txtSubtitle) = createRefs()
             val subtitle = when (item) {
-                is ChatItem.IndividualChatItem -> item.peerEmail
-                is ChatItem.GroupChatItem -> stringResource(id = R.string.group_chat_label)
-                is ChatItem.MeetingChatItem -> {
+                is ChatRoomItem.IndividualChatRoomItem -> item.peerEmail
+                is ChatRoomItem.GroupChatRoomItem -> stringResource(id = R.string.group_chat_label)
+                is ChatRoomItem.MeetingChatRoomItem -> {
                     when {
                         item.isRecurring() -> stringResource(id = R.string.meetings_list_recurring_meeting_label)
                         item.isPending -> stringResource(id = R.string.meetings_list_one_off_meeting_label)
@@ -144,7 +145,7 @@ internal fun ChatItemBottomSheet(
             )
         }
 
-        ItemDivider(16.dp)
+        ChatDivider(startPadding = 16.dp)
 
         if (item.isArchived) {
             MenuItem(
@@ -155,8 +156,8 @@ internal fun ChatItemBottomSheet(
                 onClick = onUnarchiveClick
             )
         } else {
-            if (item is ChatItem.MeetingChatItem) {
-                if (item.currentCall is ChatCallItem.NotJoined) {
+            if (item is ChatRoomItem.MeetingChatRoomItem) {
+                if (item.currentCallStatus is ChatRoomItemStatus.NotJoined) {
                     MenuItem(
                         modifier = Modifier.testTag("join_meeting"),
                         res = R.drawable.join_sched_icon,
@@ -164,7 +165,7 @@ internal fun ChatItemBottomSheet(
                         description = "Join meeting",
                         onClick = onStartMeetingClick
                     )
-                } else if (item.currentCall is ChatCallItem.NotStarted) {
+                } else if (item.currentCallStatus is ChatRoomItemStatus.NotStarted) {
                     MenuItem(
                         modifier = Modifier.testTag("start_meeting"),
                         res = R.drawable.start_sched_icon,
@@ -173,7 +174,7 @@ internal fun ChatItemBottomSheet(
                         onClick = onStartMeetingClick
                     )
                 }
-                ItemDivider()
+                ChatDivider()
 
                 if (item.isRecurring()) {
                     MenuItem(
@@ -183,7 +184,7 @@ internal fun ChatItemBottomSheet(
                         description = "Occurrences",
                         onClick = onOccurrencesClick
                     )
-                    ItemDivider()
+                    ChatDivider()
                 }
             }
 
@@ -195,7 +196,7 @@ internal fun ChatItemBottomSheet(
                 onClick = onInfoClick
             )
 
-            ItemDivider()
+            ChatDivider()
 
             if (item.hasPermissions) {
                 MenuItem(
@@ -205,7 +206,7 @@ internal fun ChatItemBottomSheet(
                     description = "Clear chat history",
                     onClick = onClearChatClick
                 )
-                ItemDivider()
+                ChatDivider()
             }
 
             if (item.isMuted) {
@@ -225,7 +226,7 @@ internal fun ChatItemBottomSheet(
                     onClick = onMuteClick
                 )
             }
-            ItemDivider()
+            ChatDivider()
 
             MenuItem(
                 modifier = Modifier.testTag("archive"),
@@ -235,8 +236,8 @@ internal fun ChatItemBottomSheet(
                 onClick = onArchiveClick
             )
 
-            if (item is ChatItem.GroupChatItem) {
-                ItemDivider()
+            if (item is ChatRoomItem.GroupChatRoomItem) {
+                ChatDivider()
                 MenuItem(
                     modifier = Modifier.testTag("cancel"),
                     res = R.drawable.ic_trash,
@@ -245,8 +246,8 @@ internal fun ChatItemBottomSheet(
                     tintRed = true,
                     onClick = onCancelClick
                 )
-            } else if (item is ChatItem.MeetingChatItem) {
-                ItemDivider()
+            } else if (item is ChatRoomItem.MeetingChatRoomItem) {
+                ChatDivider()
                 MenuItem(
                     modifier = Modifier.testTag("leave"),
                     res = R.drawable.ic_log_out,
@@ -258,17 +259,6 @@ internal fun ChatItemBottomSheet(
             }
         }
     }
-}
-
-@Composable
-private fun ItemDivider(startPadding: Dp = 72.dp) {
-    Divider(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = startPadding),
-        color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
-        thickness = 1.dp
-    )
 }
 
 @Composable
@@ -318,9 +308,9 @@ private fun MenuItem(
 @Preview
 @Composable
 private fun PreviewIndividualChatItemBottomSheet() {
-    ChatItemBottomSheet(
+    ChatItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatItem.IndividualChatItem(
+        item = ChatRoomItem.IndividualChatRoomItem(
             chatId = Random.nextLong(),
             title = "Mieko Kawakami",
             peerEmail = "mieko@miekokawakami.jp",
@@ -335,9 +325,9 @@ private fun PreviewIndividualChatItemBottomSheet() {
 @Preview
 @Composable
 private fun PreviewGroupChatItemBottomSheet() {
-    ChatItemBottomSheet(
+    ChatItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatItem.GroupChatItem(
+        item = ChatRoomItem.GroupChatRoomItem(
             chatId = Random.nextLong(),
             title = "Vanuatu - Lakatoro&Lorsup (May)",
             lastMessage = "Anna: Seeya all soon!",
@@ -353,9 +343,9 @@ private fun PreviewGroupChatItemBottomSheet() {
 @Preview
 @Composable
 private fun PreviewMeetingChatItemBottomSheet() {
-    ChatItemBottomSheet(
+    ChatItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatItem.MeetingChatItem(
+        item = ChatRoomItem.MeetingChatRoomItem(
             chatId = Random.nextLong(),
             schedId = Random.nextLong(),
             title = "Photos Sprint #1",
@@ -373,9 +363,9 @@ private fun PreviewMeetingChatItemBottomSheet() {
 @Preview
 @Composable
 private fun PreviewArchivedChatItemBottomSheet() {
-    ChatItemBottomSheet(
+    ChatItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatItem.IndividualChatItem(
+        item = ChatRoomItem.IndividualChatRoomItem(
             chatId = Random.nextLong(),
             title = "Mieko Kawakami",
             peerEmail = "mieko@miekokawakami.jp",
