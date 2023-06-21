@@ -75,7 +75,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.CompleteFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.offline.IsOfflineTransferUseCase
@@ -186,7 +186,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     lateinit var saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase
 
     @Inject
-    lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
+    lateinit var completeFastLoginUseCase: CompleteFastLoginUseCase
 
     @Inject
     lateinit var getSessionUseCase: GetSessionUseCase
@@ -559,12 +559,14 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         return true
     }
 
-    private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean =
-        when {
+    private suspend fun addPendingIntentIfNotLoggedIn(intent: Intent): Boolean {
+        val accountSession = if (alreadyLoggedIn) null else getSessionUseCase()
+
+        return when {
             //Already logged in, no more actions required
             alreadyLoggedIn -> false
             //User is not logged in, file or folder link download
-            getSessionUseCase().isNullOrEmpty() -> false
+            accountSession.isNullOrEmpty() -> false
             /*
              A login is already in progress, but we don't have a way to know if it started
              from this service or from other place, so we need to listen for fetch nodes finish.
@@ -585,7 +587,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 pendingIntents.add(intent)
                 MegaApplication.isLoggingIn = true
                 val result = runCatching {
-                    backgroundFastLoginUseCase()
+                    completeFastLoginUseCase(accountSession)
                 }.onSuccess {
                     alreadyLoggedIn = true
                 }.onFailure {
@@ -595,7 +597,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 result.isSuccess
             }
         }
-
+    }
 
     private fun proceedWithPendingIntentsAfterLogin() {
         // Get cookies settings after login.
