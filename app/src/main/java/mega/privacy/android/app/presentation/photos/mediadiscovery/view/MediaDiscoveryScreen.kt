@@ -41,6 +41,7 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.view.CardListView
+import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
@@ -147,25 +148,29 @@ fun MediaDiscoveryScreen(
             )
         },
         content = {
-            MediaDiscoveryContent(
-                lazyGridState = lazyGridState,
-                uiPhotos = uiState.uiPhotoList,
-                yearsCardList = uiState.yearsCardList,
-                monthsCardList = uiState.monthsCardList,
-                daysCardList = uiState.daysCardList,
-                currentZoomLevel = uiState.currentZoomLevel,
-                selectedPhotoIds = uiState.selectedPhotoIds,
-                onPhotoDownload = photoDownloaderViewModel::downloadPublicNodePhoto,
-                onPhotoClicked = onPhotoClicked,
-                onPhotoLongPressed = onPhotoLongPressed,
-                onCardClicked = { dateCard ->
-                    viewModel.onCardClick(dateCard)
-                },
-                selectedTimeBarTab = uiState.selectedTimeBarTab,
-                onTimeBarTabSelected = { timeBarTab ->
-                    viewModel.onTimeBarTabSelected(timeBarTab = timeBarTab)
-                }
-            )
+            if (uiState.uiPhotoList.isNotEmpty()) {
+                MediaDiscoveryContent(
+                    lazyGridState = lazyGridState,
+                    uiPhotos = uiState.uiPhotoList,
+                    yearsCardList = uiState.yearsCardList,
+                    monthsCardList = uiState.monthsCardList,
+                    daysCardList = uiState.daysCardList,
+                    currentZoomLevel = uiState.currentZoomLevel,
+                    selectedPhotoIds = uiState.selectedPhotoIds,
+                    onPhotoDownload = photoDownloaderViewModel::downloadPublicNodePhoto,
+                    onPhotoClicked = onPhotoClicked,
+                    onPhotoLongPressed = onPhotoLongPressed,
+                    onCardClicked = { dateCard ->
+                        viewModel.onCardClick(dateCard)
+                    },
+                    selectedTimeBarTab = uiState.selectedTimeBarTab,
+                    onTimeBarTabSelected = { timeBarTab ->
+                        viewModel.onTimeBarTabSelected(timeBarTab = timeBarTab)
+                    }
+                )
+            } else {
+                EmptyView(uiState.currentMediaType)
+            }
         },
     )
 }
