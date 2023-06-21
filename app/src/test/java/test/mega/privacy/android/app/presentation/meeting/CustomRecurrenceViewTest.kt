@@ -4,11 +4,14 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
+import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ACCEPT_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_BACK_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_DAILY
+import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_EVERY
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
@@ -23,23 +26,31 @@ class CustomRecurrenceViewTest {
     @get:Rule
     var composeTestRule = createComposeRule()
 
+    @Test
+    fun `test that occurs every is shown`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getDailyRules(),
+                customRecurrenceState = CustomRecurrenceState(newRules = getDailyRules()),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_EVERY).assertExists()
+    }
 
     @Test
     fun `test that occurs daily is shown`() {
         initComposeRuleContent(
-            CustomRecurrenceState(
-                rules = ChatScheduledRules(
-                    freq = OccurrenceFrequencyType.Daily,
-                    interval = 1,
-                    until = 0,
-                    weekDayList = null,
-                    monthDayList = null,
-                    monthWeekDayList = emptyList()
-                ),
-                dropdownOccurrenceType = DropdownOccurrenceType.Day,
-                maxOccurrenceNumber = 99,
-                isWeekdaysSelected = false,
-                isValidRecurrence = false
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getDailyRules(),
+                customRecurrenceState = CustomRecurrenceState(newRules = getDailyRules()),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_DAILY).assertExists()
@@ -48,19 +59,16 @@ class CustomRecurrenceViewTest {
     @Test
     fun `test that occurs daily is hidden`() {
         initComposeRuleContent(
-            CustomRecurrenceState(
-                rules = ChatScheduledRules(
-                    freq = OccurrenceFrequencyType.Weekly,
-                    interval = 1,
-                    until = 0,
-                    weekDayList = null,
-                    monthDayList = null,
-                    monthWeekDayList = emptyList()
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getWeeklyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getWeeklyRules(),
+                    dropdownOccurrenceType = DropdownOccurrenceType.Week
                 ),
-                dropdownOccurrenceType = DropdownOccurrenceType.Week,
-                maxOccurrenceNumber = 99,
-                isWeekdaysSelected = false,
-                isValidRecurrence = false
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_DAILY).assertDoesNotExist()
@@ -71,10 +79,16 @@ class CustomRecurrenceViewTest {
         val mock = mock<() -> Unit>()
         composeTestRule.setContent {
             CustomRecurrenceView(
-                state = CustomRecurrenceState(),
-                onAcceptClicked = mock,
+                state = CreateScheduledMeetingState(
+                    meetingTitle = "Title meeting",
+                    rulesSelected = getDailyRules(),
+                    participantItemList = emptyList(),
+                    buttons = ScheduleMeetingAction.values().asList(),
+                    snackBar = null
+                ),
                 onScrollChange = {},
-                onBackPressed = {},
+                onRejectClicked = {},
+                onAcceptClicked = mock,
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},
@@ -91,10 +105,16 @@ class CustomRecurrenceViewTest {
         val mock = mock<() -> Unit>()
         composeTestRule.setContent {
             CustomRecurrenceView(
-                state = CustomRecurrenceState(),
-                onAcceptClicked = {},
+                state = CreateScheduledMeetingState(
+                    meetingTitle = "Title meeting",
+                    rulesSelected = ChatScheduledRules(),
+                    participantItemList = emptyList(),
+                    buttons = ScheduleMeetingAction.values().asList(),
+                    snackBar = null
+                ),
                 onScrollChange = {},
-                onBackPressed = mock,
+                onRejectClicked = mock,
+                onAcceptClicked = {},
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},
@@ -106,15 +126,35 @@ class CustomRecurrenceViewTest {
         verify(mock).invoke()
     }
 
+    private fun getDailyRules() =
+        ChatScheduledRules(
+            freq = OccurrenceFrequencyType.Daily,
+            interval = 12,
+            until = 0,
+            weekDayList = null,
+            monthDayList = null,
+            monthWeekDayList = emptyList()
+        )
+
+    private fun getWeeklyRules() =
+        ChatScheduledRules(
+            freq = OccurrenceFrequencyType.Weekly,
+            interval = 5,
+            until = 0,
+            weekDayList = null,
+            monthDayList = null,
+            monthWeekDayList = emptyList()
+        )
+
     private fun initComposeRuleContent(
-        state: CustomRecurrenceState,
+        state: CreateScheduledMeetingState,
     ) {
         composeTestRule.setContent {
             CustomRecurrenceView(
                 state = state,
-                onAcceptClicked = {},
                 onScrollChange = {},
-                onBackPressed = {},
+                onRejectClicked = {},
+                onAcceptClicked = {},
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},

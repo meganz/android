@@ -23,7 +23,7 @@ import mega.privacy.android.data.mapper.meeting.ChatSessionTermCodeMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingFlagsMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMapper
-import mega.privacy.android.data.model.ChatCallUpdate
+import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall

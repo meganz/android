@@ -707,12 +707,7 @@
             android:windowSoftInputMode="adjustNothing"/>
 
         <activity
-            android:name="mega.privacy.android.app.presentation.meeting.ScheduleMeetingActivity"
-            android:launchMode="singleTop"
-            android:windowSoftInputMode="adjustResize|stateVisible" />
-
-        <activity
-            android:name="mega.privacy.android.app.presentation.meeting.CustomRecurrenceActivity"
+            android:name="mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize|stateVisible" />
 

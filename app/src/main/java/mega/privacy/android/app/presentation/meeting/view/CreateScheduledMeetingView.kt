@@ -53,8 +53,7 @@ import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
-import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MegaSwitch
@@ -67,8 +66,7 @@ import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.entity.meeting.RecurringMeetingType
+import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -85,11 +83,11 @@ private val dateFormatter by lazy {
 }
 
 /**
- * Schedule meeting View
+ * Create scheduled meeting View
  */
 @Composable
-internal fun ScheduleMeetingView(
-    state: ScheduleMeetingState,
+internal fun CreateScheduledMeetingView(
+    state: CreateScheduledMeetingState,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
     onDiscardClicked: () -> Unit,
     onAcceptClicked: () -> Unit,
@@ -103,7 +101,7 @@ internal fun ScheduleMeetingView(
     onDiscardMeetingDialog: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
-    onSelectRecurrenceDialog: (RecurringMeetingType) -> Unit,
+    onRecurrenceDialogOptionClicked: (RecurrenceDialogOption) -> Unit,
 ) {
 
     is24hourFormat = DateFormat.is24HourFormat(LocalContext.current)
@@ -140,7 +138,7 @@ internal fun ScheduleMeetingView(
 
         RecurringMeetingDialog(
             state = state,
-            onOptionSelected = onSelectRecurrenceDialog,
+            onOptionSelected = onRecurrenceDialogOptionClicked,
             onDiscard = onDismiss
         )
 
@@ -210,11 +208,11 @@ internal fun ScheduleMeetingView(
 /**
  * Scheduled meeting date and time
  *
- * @param state [ScheduledMeetingInfoState]
+ * @param state [CreateScheduledMeetingState]
  */
 @Composable
 private fun ScheduledMeetingDateAndTime(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     isStart: Boolean,
     onDateClicked: () -> Unit,
     onTimeClicked: () -> Unit,
@@ -248,12 +246,12 @@ private fun ScheduledMeetingDateAndTime(
 /**
  * Add description to the scheduled meeting.
  *
- * @param state                 [ScheduleMeetingState]
+ * @param state                 [CreateScheduledMeetingState]
  * @param onValueChange         When description changes
  */
 @Composable
 private fun AddDescriptionButton(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     onValueChange: (String) -> Unit,
 ) {
     Column(
@@ -306,7 +304,7 @@ private fun AddDescriptionButton(
 
 @Composable
 private fun ActionButton(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     action: ScheduleMeetingAction,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
 ) {
@@ -381,7 +379,7 @@ private fun ActionButton(
 /**
  * Schedule meeting App bar view
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [CreateScheduledMeetingState]
  * @param onAcceptClicked           When on accept scheduled meeting is clicked
  * @param onDiscardClicked          When on discard is clicked
  * @param onValueChange             When title changes
@@ -389,7 +387,7 @@ private fun ActionButton(
  */
 @Composable
 private fun ScheduleMeetingAppBar(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     onAcceptClicked: () -> Unit,
     onDiscardClicked: () -> Unit,
     onValueChange: (String) -> Unit,
@@ -467,14 +465,14 @@ private fun ScheduleMeetingAppBar(
 /**
  * Show action buttons options
  *
- * @param state         [ScheduleMeetingState]
+ * @param state         [CreateScheduledMeetingState]
  * @param action        [ScheduleMeetingAction]
  * @param isChecked     True, if the option must be checked. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
  */
 @Composable
 private fun ActionOption(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     action: ScheduleMeetingAction,
     isChecked: Boolean,
     hasSwitch: Boolean,
@@ -526,17 +524,11 @@ private fun ActionOption(
                             state.numOfParticipants
                         )
 
-                    ScheduleMeetingAction.Recurrence -> subtitle = when (state.rulesSelected.freq) {
-                        OccurrenceFrequencyType.Invalid -> stringResource(id = OccurrenceFrequencyType.Invalid.StringId)
-                        OccurrenceFrequencyType.Daily -> pluralStringResource(
-                            OccurrenceFrequencyType.Daily.StringId,
-                            state.rulesSelected.interval,
-                            state.rulesSelected.interval
+                    ScheduleMeetingAction.Recurrence ->
+                        subtitle = getScheduledMeetingFrequencyText(
+                            state.rulesSelected,
+                            state.isWeekdays()
                         )
-
-                        OccurrenceFrequencyType.Weekly -> stringResource(id = OccurrenceFrequencyType.Weekly.StringId)
-                        OccurrenceFrequencyType.Monthly -> stringResource(id = OccurrenceFrequencyType.Monthly.StringId)
-                    }
 
                     else -> {}
                 }
@@ -575,13 +567,13 @@ private fun ActionOption(
 /**
  * Dialogue to discard the meeting
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [CreateScheduledMeetingState]
  * @param onKeepEditing             When continue editing the meeting.
  * @param onDiscard                 When discard the meeting.
  */
 @Composable
 private fun DiscardMeetingAlertDialog(
-    state: ScheduleMeetingState,
+    state: CreateScheduledMeetingState,
     onKeepEditing: () -> Unit,
     onDiscard: () -> Unit,
 ) {
@@ -599,37 +591,35 @@ private fun DiscardMeetingAlertDialog(
 /**
  * Dialogue to recurring meeting
  *
- * @param state                     [ScheduledMeetingInfoState]
+ * @param state                     [CreateScheduledMeetingState]
  * @param onOptionSelected          When continue editing the meeting.
  * @param onDiscard                 When discard the meeting.
  */
 @Composable
 private fun RecurringMeetingDialog(
-    state: ScheduleMeetingState,
-    onOptionSelected: (RecurringMeetingType) -> Unit,
+    state: CreateScheduledMeetingState,
+    onOptionSelected: (RecurrenceDialogOption) -> Unit,
     onDiscard: () -> Unit,
 ) {
     if (state.recurringMeetingDialog) {
         ConfirmationWithRadioButtonsDialog(
             titleText = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
             buttonText = stringResource(id = R.string.general_cancel),
-            radioOptions = listOf(
-                RecurringMeetingType.Never,
-                RecurringMeetingType.EveryDay,
-                RecurringMeetingType.EveryWeek,
-                RecurringMeetingType.EveryMonth,
-                RecurringMeetingType.Custom
-            ),
-            initialSelectedOption = state.recurringMeetingOptionSelected,
+            radioOptions = state.getRecurrenceDialogOptionList(),
+            initialSelectedOption = state.getRecurrenceDialogOptionSelected(),
             onOptionSelected = onOptionSelected,
             onDismissRequest = onDiscard,
             optionDescriptionMapper = { option ->
                 when (option) {
-                    RecurringMeetingType.Custom -> stringResource(id = RecurringMeetingType.Custom.StringId)
-                    RecurringMeetingType.EveryMonth -> stringResource(id = RecurringMeetingType.EveryMonth.StringId)
-                    RecurringMeetingType.EveryWeek -> stringResource(id = RecurringMeetingType.EveryWeek.StringId)
-                    RecurringMeetingType.EveryDay -> stringResource(id = RecurringMeetingType.EveryDay.StringId)
-                    else -> stringResource(id = RecurringMeetingType.Never.StringId)
+                    RecurrenceDialogOption.Never -> stringResource(id = RecurrenceDialogOption.Never.StringId)
+                    RecurrenceDialogOption.EveryDay -> stringResource(id = RecurrenceDialogOption.EveryDay.StringId)
+                    RecurrenceDialogOption.EveryWeek -> stringResource(id = RecurrenceDialogOption.EveryWeek.StringId)
+                    RecurrenceDialogOption.EveryMonth -> stringResource(id = RecurrenceDialogOption.EveryMonth.StringId)
+                    RecurrenceDialogOption.Custom -> stringResource(id = RecurrenceDialogOption.Custom.StringId)
+                    RecurrenceDialogOption.Customised -> getScheduledMeetingFrequencyText(
+                        rules = state.rulesSelected,
+                        state.isWeekdays()
+                    )
                 }
             }
         )
@@ -644,7 +634,7 @@ private fun RecurringMeetingDialog(
 @Composable
 fun PreviewDiscardMeetingAlertDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        DiscardMeetingAlertDialog(state = ScheduleMeetingState(
+        DiscardMeetingAlertDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
@@ -665,7 +655,7 @@ fun PreviewDiscardMeetingAlertDialog() {
 @Composable
 fun PreviewRecurringMeetingDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        RecurringMeetingDialog(state = ScheduleMeetingState(
+        RecurringMeetingDialog(state = CreateScheduledMeetingState(
             meetingTitle = "Title meeting",
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
@@ -680,15 +670,15 @@ fun PreviewRecurringMeetingDialog() {
 
 
 /**
- * Schedule meeting View Preview
+ * Create scheduled meeting View Preview
  */
 @Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewScheduleMeetingView")
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewCreateScheduledMeetingView")
 @Composable
-private fun PreviewScheduleMeetingView() {
+private fun PreviewCreateScheduledMeetingView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        ScheduleMeetingView(
-            state = ScheduleMeetingState(
+        CreateScheduledMeetingView(
+            state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",
                 rulesSelected = ChatScheduledRules(),
                 participantItemList = emptyList(),
@@ -708,7 +698,7 @@ private fun PreviewScheduleMeetingView() {
             onDiscardMeetingDialog = {},
             onDescriptionValueChange = { },
             onTitleValueChange = { },
-            onSelectRecurrenceDialog = { }
+            onRecurrenceDialogOptionClicked = { }
         )
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -64,8 +65,8 @@ fun TextFieldChip(
         handleColor = MaterialTheme.colors.secondary,
         backgroundColor = MaterialTheme.colors.secondary
     )
-    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
 
+    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         if (isDisabled) {
             focusManager.clearFocus()
         }
@@ -82,11 +83,13 @@ fun TextFieldChip(
                             onFocusChange()
                         }
                     }
-                }.testTag(TEST_TAG_TEXT_FIELD_CHIP),
+                }
+                .testTag(TEST_TAG_TEXT_FIELD_CHIP),
             cursorBrush = SolidColor(MaterialTheme.colors.secondary),
             singleLine = true,
             visualTransformation = VisualTransformation.None,
             textStyle = MaterialTheme.typography.button.copy(
+                textAlign = TextAlign.Center,
                 color =
                 if (isDisabled)
                     MaterialTheme.colors.grey_alpha_038_white_alpha_038
@@ -101,14 +104,14 @@ fun TextFieldChip(
                     modifier = modifier
                         .width(IntrinsicSize.Min)
                         .height(IntrinsicSize.Min)
-                        .widthIn(min = 45.dp)
+                        .widthIn(min = 40.dp)
                         .heightIn(min = 32.dp)
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colors.onPrimary,
                             shape = RoundedCornerShape(size = 8.dp)
                         )
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(top = 6.dp, bottom = 6.dp),
                 ) {
                     innerTextField()
                 }

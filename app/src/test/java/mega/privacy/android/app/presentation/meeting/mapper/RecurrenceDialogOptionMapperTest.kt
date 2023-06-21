@@ -5,78 +5,78 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.entity.meeting.RecurringMeetingType
+import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class RecurringMeetingTypeMapperTest {
-    private lateinit var underTest: RecurringMeetingTypeMapper
+class RecurrenceDialogOptionMapperTest {
+    private lateinit var underTest: RecurrenceDialogOptionMapper
 
     @Before
     fun setUp() {
-        underTest = RecurringMeetingTypeMapper()
+        underTest = RecurrenceDialogOptionMapper()
     }
 
     @Test
-    fun `test that RecurringMeetingType EveryDay maps to OccurrenceFrequencyType Daily`() =
+    fun `test that RecurrenceDialogOption EveryDay maps to OccurrenceFrequencyType Daily`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.EveryDay
+                    RecurrenceDialogOption.EveryDay
                 )
             ).isEqualTo(OccurrenceFrequencyType.Daily)
         }
 
     @Test
-    fun `test that RecurringMeetingType EveryWeek maps to OccurrenceFrequencyType Weekly`() =
+    fun `test that RecurrenceDialogOption EveryWeek maps to OccurrenceFrequencyType Weekly`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.EveryWeek
+                    RecurrenceDialogOption.EveryWeek
                 )
             ).isEqualTo(OccurrenceFrequencyType.Weekly)
         }
 
     @Test
-    fun `test that RecurringMeetingType EveryMonth maps to OccurrenceFrequencyType Monthly`() =
+    fun `test that RecurrenceDialogOption EveryMonth maps to OccurrenceFrequencyType Monthly`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.EveryMonth
+                    RecurrenceDialogOption.EveryMonth
                 )
             ).isEqualTo(OccurrenceFrequencyType.Monthly)
         }
 
 
     @Test
-    fun `test that RecurringMeetingType Custom maps to OccurrenceFrequencyType Invalid`() =
+    fun `test that RecurrenceDialogOption Custom maps to OccurrenceFrequencyType Invalid`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.Custom
+                    RecurrenceDialogOption.Custom
                 )
             ).isEqualTo(OccurrenceFrequencyType.Invalid)
         }
 
     @Test
-    fun `test that RecurringMeetingType Customised maps to OccurrenceFrequencyType Invalid`() =
+    fun `test that RecurrenceDialogOption Customised maps to OccurrenceFrequencyType Invalid`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.Customised
+                    RecurrenceDialogOption.Customised
                 )
             ).isEqualTo(OccurrenceFrequencyType.Invalid)
         }
 
     @Test
-    fun `test that RecurringMeetingType Never maps to OccurrenceFrequencyType Invalid`() =
+    fun `test that RecurrenceDialogOption Never maps to OccurrenceFrequencyType Invalid`() =
         runTest {
             Truth.assertThat(
                 underTest(
-                    RecurringMeetingType.Never
+                    RecurrenceDialogOption.Never
                 )
             ).isEqualTo(OccurrenceFrequencyType.Invalid)
         }

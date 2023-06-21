@@ -221,7 +221,7 @@ import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.manager.outgoingSharesState
 import mega.privacy.android.app.presentation.manager.rubbishBinState
 import mega.privacy.android.app.presentation.mapper.RestoreNodeResultMapper
-import mega.privacy.android.app.presentation.meeting.ScheduleMeetingActivity
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
@@ -6549,7 +6549,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onScheduleMeeting() {
-        val scheduleMeetingIntent = Intent(this, ScheduleMeetingActivity::class.java)
+        val scheduleMeetingIntent = Intent(this, CreateScheduledMeetingActivity::class.java)
         startActivity(scheduleMeetingIntent)
     }
 

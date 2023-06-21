@@ -32,8 +32,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
-import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
+import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
+import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.core.ui.controls.chips.DropdownMenuChip
 import mega.privacy.android.core.ui.controls.chips.TextButtonChip
 import mega.privacy.android.core.ui.controls.chips.TextFieldChip
@@ -42,17 +44,16 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 
 /**
  * Custom recurrence View
  */
 @Composable
 internal fun CustomRecurrenceView(
-    state: CustomRecurrenceState,
+    state: CreateScheduledMeetingState,
     onScrollChange: (Boolean) -> Unit,
-    onBackPressed: () -> Unit,
     onAcceptClicked: () -> Unit,
+    onRejectClicked: () -> Unit,
     onTypeClicked: (DropdownOccurrenceType) -> Unit,
     onNumberClicked: (String) -> Unit,
     onWeekdaysClicked: () -> Unit,
@@ -74,9 +75,9 @@ internal fun CustomRecurrenceView(
         },
         topBar = {
             CustomRecurrenceAppBar(
-                state = state,
+                isValidRecurrence = state.customRecurrenceState.isValidRecurrence,
                 onAcceptClicked = onAcceptClicked,
-                onBackPressed = onBackPressed,
+                onRejectClicked = onRejectClicked,
                 elevation = !firstItemVisible
             )
         }
@@ -85,21 +86,23 @@ internal fun CustomRecurrenceView(
             state = listState,
             modifier = Modifier.padding(paddingValues)
         ) {
-
             item(key = "Occurs every") {
                 OccursEverySection(
                     modifier = Modifier,
-                    state = state,
+                    interval = state.customRecurrenceState.newRules.interval,
+                    isWeekdaysSelected = state.customRecurrenceState.isWeekdaysSelected,
+                    dropdownOccurrenceType = state.customRecurrenceState.newRules.freq.DropdownType,
                     onTypeClicked = onTypeClicked,
                     onNumberClicked = onNumberClicked,
                     onFocusChanged = onFocusChanged
                 )
             }
-            if (state.dropdownOccurrenceType == DropdownOccurrenceType.Day) {
+
+            if (state.customRecurrenceState.dropdownOccurrenceType == DropdownOccurrenceType.Day) {
                 item(key = "Occurs daily") {
                     OccursDailySection(
                         modifier = Modifier,
-                        isWeekdaysSelected = state.isWeekdaysSelected,
+                        isWeekdaysSelected = state.customRecurrenceState.isWeekdaysSelected,
                         onWeekdaysClicked = onWeekdaysClicked,
                     )
                 }
@@ -111,14 +114,68 @@ internal fun CustomRecurrenceView(
 }
 
 /**
+ * Custom recurrence App bar view
+ *
+ * @param isValidRecurrence         True if it is valid. False, if it does not.
+ * @param onAcceptClicked           When on accept recurrence is clicked
+ * @param onRejectClicked           When on back pressed
+ * @param elevation                 True if it has elevation. False, if it does not.
+ */
+@Composable
+private fun CustomRecurrenceAppBar(
+    isValidRecurrence: Boolean,
+    onAcceptClicked: () -> Unit,
+    onRejectClicked: () -> Unit,
+    elevation: Boolean,
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Medium
+            )
+        },
+        navigationIcon = {
+            IconButton(modifier = Modifier.testTag(TEST_TAG_BACK_ICON), onClick = onRejectClicked) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back button",
+                    tint = MaterialTheme.colors.onPrimary
+                )
+            }
+        },
+        actions = {
+            IconButton(modifier = Modifier.testTag(TEST_TAG_ACCEPT_ICON), onClick = {
+                if (isValidRecurrence) {
+                    onAcceptClicked()
+                }
+            }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
+                    contentDescription = "Accept custom recurrence button",
+                    tint = if (isValidRecurrence) MaterialTheme.colors.secondary
+                    else MaterialTheme.colors.grey_alpha_038_white_alpha_038
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
+    )
+}
+
+/**
  * Occurs every option
  *
- * @param state [CustomRecurrenceState]
- *
+ * @param interval
+ * @param isWeekdaysSelected
+ * @param dropdownOccurrenceType
  */
 @Composable
 private fun OccursEverySection(
-    state: CustomRecurrenceState,
+    interval: Int,
+    isWeekdaysSelected: Boolean,
+    dropdownOccurrenceType: DropdownOccurrenceType?,
     onNumberClicked: (String) -> Unit,
     onTypeClicked: (DropdownOccurrenceType) -> Unit,
     onFocusChanged: () -> Unit,
@@ -126,6 +183,7 @@ private fun OccursEverySection(
 ) {
     Column(
         modifier
+            .testTag(TEST_TAG_OCCURS_EVERY)
             .fillMaxWidth()
             .padding(start = 16.dp, bottom = 23.dp, top = 17.dp, end = 16.dp)
     ) {
@@ -144,56 +202,59 @@ private fun OccursEverySection(
                 },
                 modifier = modifier
                     .padding(end = 10.dp),
-                text = if (state.rules.interval == -1) "" else state.rules.interval.toString(),
-                isDisabled = state.isWeekdaysSelected,
+                text = if (interval == -1) "" else interval.toString(),
+                isDisabled = isWeekdaysSelected,
                 onFocusChange = onFocusChanged
             )
 
-            DropdownMenuChip(
-                onDropdownExpanded = onFocusChanged,
-                options = listOf(
-                    DropdownOccurrenceType.Day,
-                    DropdownOccurrenceType.Week,
-                    DropdownOccurrenceType.Month,
-                ),
-                onOptionSelected = onTypeClicked,
-                modifier = modifier,
-                initialSelectedOption = state.dropdownOccurrenceType,
-                iconId = R.drawable.arrow_expand,
-                isDisabled = state.isWeekdaysSelected,
-                optionDescriptionMapper = { option ->
-                    val value =
-                        if (state.rules.interval == -1 || state.rules.interval == 0) 1 else state.rules.interval
-                    when (option) {
-                        DropdownOccurrenceType.Day -> pluralStringResource(
-                            DropdownOccurrenceType.Day.StringId,
-                            value,
-                            value
-                        )
+            dropdownOccurrenceType?.let { dropdown ->
+                DropdownMenuChip(
+                    onDropdownExpanded = onFocusChanged,
+                    options = listOf(
+                        DropdownOccurrenceType.Day,
+                        DropdownOccurrenceType.Week,
+                        DropdownOccurrenceType.Month,
+                    ),
+                    onOptionSelected = onTypeClicked,
+                    modifier = modifier,
+                    initialSelectedOption = dropdown,
+                    iconId = R.drawable.arrow_expand,
+                    isDisabled = isWeekdaysSelected,
+                    optionDescriptionMapper = { option ->
+                        val value =
+                            if (interval == -1 || interval == 0) 1 else interval
 
-                        DropdownOccurrenceType.Week -> pluralStringResource(
-                            DropdownOccurrenceType.Week.StringId,
-                            value,
-                            value
-                        )
+                        when (option) {
+                            DropdownOccurrenceType.Day -> pluralStringResource(
+                                DropdownOccurrenceType.Day.StringId,
+                                value,
+                                value
+                            )
 
-                        DropdownOccurrenceType.Month -> pluralStringResource(
-                            DropdownOccurrenceType.Month.StringId,
-                            value,
-                            value
-                        )
+                            DropdownOccurrenceType.Week -> pluralStringResource(
+                                DropdownOccurrenceType.Week.StringId,
+                                value,
+                                value
+                            )
+
+                            DropdownOccurrenceType.Month -> pluralStringResource(
+                                DropdownOccurrenceType.Month.StringId,
+                                value,
+                                value
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }
+
 
 /**
  * Occurs daily option
  *
  * @param isWeekdaysSelected
- *
  */
 @Composable
 private fun OccursDailySection(
@@ -219,58 +280,6 @@ private fun OccursDailySection(
 }
 
 /**
- * Custom recurrence App bar view
- *
- * @param state                     [CustomRecurrenceState]
- * @param onAcceptClicked           When on accept recurrence is clicked
- * @param onBackPressed             When on back pressed
- * @param elevation                 True if it has elevation. False, if it does not.
- */
-@Composable
-private fun CustomRecurrenceAppBar(
-    state: CustomRecurrenceState,
-    onAcceptClicked: () -> Unit,
-    onBackPressed: () -> Unit,
-    elevation: Boolean,
-) {
-
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.meetings_schedule_meeting_recurrence_label),
-                style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        navigationIcon = {
-            IconButton(modifier = Modifier.testTag(TEST_TAG_BACK_ICON), onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back button",
-                    tint = MaterialTheme.colors.onPrimary
-                )
-            }
-        },
-        actions = {
-            IconButton(modifier = Modifier.testTag(TEST_TAG_ACCEPT_ICON), onClick = {
-                if (state.isValidRecurrence) {
-                    onAcceptClicked()
-                }
-            }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
-                    contentDescription = "Accept custom recurrence button",
-                    tint = if (state.isValidRecurrence) MaterialTheme.colors.secondary
-                    else MaterialTheme.colors.grey_alpha_038_white_alpha_038
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.surface,
-        elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp
-    )
-}
-
-/**
  * Custom Recurrence View Preview
  */
 @CombinedThemePreviews
@@ -278,23 +287,16 @@ private fun CustomRecurrenceAppBar(
 private fun PreviewCustomRecurrenceView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         CustomRecurrenceView(
-            state = CustomRecurrenceState(
-                rules = ChatScheduledRules(
-                    freq = OccurrenceFrequencyType.Daily,
-                    interval = 1,
-                    until = 0,
-                    weekDayList = null,
-                    monthDayList = null,
-                    monthWeekDayList = emptyList()
-                ),
-                dropdownOccurrenceType = DropdownOccurrenceType.Day,
-                maxOccurrenceNumber = 99,
-                isWeekdaysSelected = false,
-                isValidRecurrence = false
+            state = CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = ChatScheduledRules(),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
             ),
-            onAcceptClicked = {},
             onScrollChange = {},
-            onBackPressed = {},
+            onRejectClicked = {},
+            onAcceptClicked = {},
             onTypeClicked = {},
             onNumberClicked = {},
             onWeekdaysClicked = {},
@@ -304,5 +306,6 @@ private fun PreviewCustomRecurrenceView() {
 }
 
 internal const val TEST_TAG_OCCURS_DAILY = "testTagOccursDaily"
+internal const val TEST_TAG_OCCURS_EVERY = "testTagOccursEvery"
 internal const val TEST_TAG_ACCEPT_ICON = "testTagTextAcceptIcon"
 internal const val TEST_TAG_BACK_ICON = "testTagBackIcon"

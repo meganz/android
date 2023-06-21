@@ -9,28 +9,30 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
-import mega.privacy.android.app.presentation.meeting.view.ScheduleMeetingView
+import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
+import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -48,7 +50,7 @@ import javax.inject.Inject
  * @property getThemeMode   [GetThemeMode]
  */
 @AndroidEntryPoint
-class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
+class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -56,12 +58,17 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    private val viewModel by viewModels<ScheduleMeetingViewModel>()
+    private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
 
     private var materialTimePicker: MaterialTimePicker? = null
     private var materialDatePicker: MaterialDatePicker<Long>? = null
+
+    private companion object {
+        const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
+        const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
+    }
 
     /**
      * Perform Activity initialization
@@ -69,44 +76,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (openAddContact, chatIdToOpenInfoScreen) ->
-                    chatIdToOpenInfoScreen?.let {
-                        viewModel.openInfo(null)
-                        openScheduleMeetingInfo(it)
-                    }
+        collectFlows()
 
-                    openAddContact?.let { shouldOpen ->
-                        if (shouldOpen) {
-                            viewModel.removeAddContact()
-                            Timber.d("Open Invite participants screen")
-                            addContactLauncher.launch(
-                                Intent(
-                                    this@ScheduleMeetingActivity,
-                                    AddContactActivity::class.java
-                                )
-                                    .putExtra(
-                                        Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                        Constants.CONTACT_TYPE_MEGA
-                                    )
-                                    .putStringArrayListExtra(
-                                        Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
-                                        viewModel.getEmails()
-                                    )
-                                    .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
-                                    .putExtra(
-                                        Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                        getString(R.string.add_participants_menu_item)
-                                    )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        setContent { ScheduleMeetingComposeView() }
+        setContent { MainComposeView() }
 
         addContactLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -123,38 +95,123 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             }
     }
 
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { (openAddContact, chatIdToOpenInfoScreen) ->
+            chatIdToOpenInfoScreen?.let {
+                viewModel.openInfo(null)
+                Timber.d("Open Scheduled meeting info screen")
+                openScheduledMeetingInfo(it)
+            }
+
+            openAddContact?.let { shouldOpen ->
+                if (shouldOpen) {
+                    viewModel.removeAddContact()
+                    Timber.d("Open Invite participants screen")
+                    addContactLauncher.launch(
+                        Intent(
+                            this@CreateScheduledMeetingActivity,
+                            AddContactActivity::class.java
+                        )
+                            .putExtra(
+                                Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
+                                Constants.CONTACT_TYPE_MEGA
+                            )
+                            .putStringArrayListExtra(
+                                Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
+                                viewModel.getEmails()
+                            )
+                            .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
+                            .putExtra(
+                                Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                                getString(R.string.add_participants_menu_item)
+                            )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Open compose view
+     */
     @Composable
-    private fun ScheduleMeetingComposeView() {
+    fun MainComposeView() {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
+        val navController = rememberNavController()
+
         AndroidTheme(isDark = isDark) {
-            ScheduleMeetingView(
-                state = uiState,
-                onButtonClicked = ::onActionTap,
-                onDiscardClicked = { viewModel.onDiscardMeetingTap() },
-                onAcceptClicked = { viewModel.onScheduleMeetingTap() },
-                onStartTimeClicked = { showTimePicker(true) },
-                onStartDateClicked = { showDatePicker(true) },
-                onEndTimeClicked = { showTimePicker(false) },
-                onEndDateClicked = { showDatePicker(false) },
-                onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
-                onDismiss = { viewModel.dismissDialog() },
-                onSnackbarShown = viewModel::snackbarShown,
-                onDiscardMeetingDialog = { finish() },
-                onDescriptionValueChange = { viewModel.onDescriptionChange(it) },
-                onTitleValueChange = { viewModel.onTitleChange(it) },
-                onSelectRecurrenceDialog = { viewModel.onRecurrenceOptionSelected(it) }
-            )
+            NavHost(
+                navController = navController,
+                startDestination = CREATE_SCHEDULED_MEETING_TAG
+            ) {
+                composable(CREATE_SCHEDULED_MEETING_TAG) {
+                    CreateScheduledMeetingView(
+                        state = uiState,
+                        onButtonClicked = ::onActionTap,
+                        onDiscardClicked = { viewModel.onDiscardMeetingTap() },
+                        onAcceptClicked = { viewModel.onScheduleMeetingTap() },
+                        onStartTimeClicked = { showTimePicker(true) },
+                        onStartDateClicked = { showDatePicker(true) },
+                        onEndTimeClicked = { showTimePicker(false) },
+                        onEndDateClicked = { showDatePicker(false) },
+                        onScrollChange = { scrolled ->
+                            this@CreateScheduledMeetingActivity.changeStatusBarColor(
+                                scrolled,
+                                isDark
+                            )
+                        },
+                        onDismiss = { viewModel.dismissDialog() },
+                        onSnackbarShown = viewModel::snackbarShown,
+                        onDiscardMeetingDialog = { finish() },
+                        onDescriptionValueChange = { viewModel.onDescriptionChange(it) },
+                        onTitleValueChange = { viewModel.onTitleChange(it) },
+                        onRecurrenceDialogOptionClicked = { optionSelected ->
+                            viewModel.dismissDialog()
+                            if (optionSelected == RecurrenceDialogOption.Custom) {
+                                viewModel.setInitialCustomRules()
+                                navController.navigate(CUSTOM_RECURRENCE_TAG)
+                            } else {
+                                viewModel.onDefaultRecurrenceOptionTap(optionSelected)
+                            }
+                        }
+                    )
+                }
+                composable(CUSTOM_RECURRENCE_TAG) {
+                    CustomRecurrenceView(
+                        state = uiState,
+                        onScrollChange = { scrolled ->
+                            this@CreateScheduledMeetingActivity.changeStatusBarColor(
+                                scrolled,
+                                isDark
+                            )
+                        },
+                        onAcceptClicked = {
+                            viewModel.onAcceptClicked()
+                            navController.navigate(CREATE_SCHEDULED_MEETING_TAG)
+                        },
+                        onRejectClicked = {
+                            viewModel.onRejectClicked()
+                            navController.navigate(CREATE_SCHEDULED_MEETING_TAG)
+                        },
+                        onTypeClicked = { viewModel.onOccurrenceTypeChanged(it) },
+                        onNumberClicked = { viewModel.onOccurrenceNumberChanged(it) },
+                        onWeekdaysClicked = { viewModel.onWeekdaysOptionTap() },
+                        onFocusChanged = { viewModel.onFocusChanged() }
+                    )
+                }
+            }
         }
     }
+
 
     /**
      * Open chat room
      *
      * @param chatId Chat id.
      */
-    private fun openScheduleMeetingInfo(chatId: Long) {
+    private fun openScheduledMeetingInfo(chatId: Long) {
         val intentOpenChat = Intent(this, ScheduledMeetingInfoActivity::class.java).apply {
             putExtra(Constants.CHAT_ID, chatId)
             putExtra(Constants.SCHEDULED_MEETING_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
@@ -206,9 +263,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                         )
 
                     if (isStart) {
-                        viewModel.setStartDateTime(selectedDate, true)
+                        viewModel.onStartDateTimeTap(selectedDate, true)
                     } else {
-                        viewModel.setEndDateTime(selectedDate, true)
+                        viewModel.onEndDateTimeTap(selectedDate, true)
                     }
                 }
                 show(supportFragmentManager, "DatePicker")
@@ -261,9 +318,9 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 addOnPositiveButtonClickListener {
                     val selectedTime = currentDate.withHour(hour).withMinute(minute)
                     if (isStart) {
-                        viewModel.setStartDateTime(selectedTime, false)
+                        viewModel.onStartDateTimeTap(selectedTime, false)
                     } else {
-                        viewModel.setEndDateTime(selectedTime, false)
+                        viewModel.onEndDateTimeTap(selectedTime, false)
                     }
                 }
                 show(supportFragmentManager, "TimePicker")

@@ -1,4 +1,4 @@
-package mega.privacy.android.data.model
+package mega.privacy.android.data.model.meeting
 
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCallListenerInterface

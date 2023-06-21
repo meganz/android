@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.meeting
 /**
  * Types of recurring meeting
  */
-enum class RecurringMeetingType {
+enum class RecurrenceDialogOption {
     /**
      * Occurs never
      */
