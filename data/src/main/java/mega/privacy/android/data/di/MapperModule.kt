@@ -7,8 +7,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.data.mapper.AccountDetailMapper
-import mega.privacy.android.data.mapper.AccountLevelDetailMapper
 import mega.privacy.android.data.mapper.AccountSessionDetailMapper
 import mega.privacy.android.data.mapper.AccountStorageDetailMapper
 import mega.privacy.android.data.mapper.AccountTransferDetailMapper
@@ -66,8 +64,6 @@ import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
-import mega.privacy.android.data.mapper.toAccountDetail
-import mega.privacy.android.data.mapper.toAccountLevelDetail
 import mega.privacy.android.data.mapper.toAccountSessionDetail
 import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
@@ -105,8 +101,6 @@ import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapperImpl
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.preference.StartScreen
-import nz.mega.sdk.MegaAccountDetails
-import nz.mega.sdk.MegaNode
 
 /**
  * Module for providing mapper dependencies
@@ -297,39 +291,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideSubscriptionStatusMapper(): SubscriptionStatusMapper = ::toSubscriptionStatus
 
-        /**
-         * Provide [AccountDetailMapper] mapper
-         */
-        @Provides
-        fun provideAccountDetailMapper(
-            accountStorageDetailMapper: AccountStorageDetailMapper,
-            accountSessionDetailMapper: AccountSessionDetailMapper,
-            accountTransferDetailMapper: AccountTransferDetailMapper,
-            accountLevelDetailMapper: AccountLevelDetailMapper,
-            accountTypeMapper: AccountTypeMapper,
-            subscriptionStatusMapper: SubscriptionStatusMapper,
-        ): AccountDetailMapper = {
-                details: MegaAccountDetails,
-                numDetails: Int,
-                rootNode: MegaNode?,
-                rubbishNode: MegaNode?,
-                inShares: List<MegaNode>,
-            ->
-            toAccountDetail(
-                details,
-                numDetails,
-                rootNode,
-                rubbishNode,
-                inShares,
-                accountStorageDetailMapper,
-                accountSessionDetailMapper,
-                accountTransferDetailMapper,
-                accountLevelDetailMapper,
-                accountTypeMapper,
-                subscriptionStatusMapper,
-            )
-        }
-
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
             ::toOfflineNodeInformation
@@ -406,12 +367,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideAccountStorageDetailMapper(): AccountStorageDetailMapper =
             ::toAccountStorageDetail
-
-        /**
-         * Provide account level detail mapper
-         */
-        @Provides
-        fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper = ::toAccountLevelDetail
 
         /**
          * Provide file duration mapper
