@@ -28,9 +28,9 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -74,29 +74,28 @@ class MyAccountHomeViewModel @Inject constructor(
         getVisibleContacts()
 
         viewModelScope.launch {
-            flow {
-                emitAll(monitorConnectivityUseCase())
-            }.collectLatest { isConnected ->
-                _uiState.update {
-                    it.copy(isConnectedToNetwork = isConnected)
+            monitorConnectivityUseCase()
+                .collectLatest { isConnected ->
+                    _uiState.update {
+                        it.copy(isConnectedToNetwork = isConnected)
+                    }
                 }
-            }
         }
-
         viewModelScope.launch {
-            flow {
-                emitAll(monitorUserUpdates()
-                    .catch { Timber.w("Exception monitoring user updates: $it") }
-                    .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
-            }.collectLatest {
-                when (it) {
-                    UserChanges.Email -> refreshCurrentUserEmail()
-                    UserChanges.Firstname, UserChanges.Lastname -> refreshUserName(true)
-                    else -> Unit
+            monitorUserUpdates()
+                .catch { Timber.w("Exception monitoring user updates: $it") }
+                .filter {
+                    it == UserChanges.Firstname ||
+                            it == UserChanges.Lastname ||
+                            it == UserChanges.Email
+                }.collect {
+                    when (it) {
+                        UserChanges.Email -> refreshCurrentUserEmail()
+                        UserChanges.Firstname, UserChanges.Lastname -> refreshUserName(true)
+                        else -> Unit
+                    }
                 }
-            }
         }
-
         viewModelScope.launch {
             flow {
                 emit(getMyAvatarFile(isForceRefresh = false))
@@ -108,41 +107,42 @@ class MyAccountHomeViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            monitorVerificationStatus().collectLatest { status ->
-                _uiState.update {
-                    it.copy(
-                        verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)?.phoneNumberString,
-                        canVerifyPhoneNumber = status.canRequestOptInVerification
-                    )
+            monitorVerificationStatus()
+                .collectLatest { status ->
+                    _uiState.update {
+                        it.copy(
+                            verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)?.phoneNumberString,
+                            canVerifyPhoneNumber = status.canRequestOptInVerification
+                        )
+                    }
                 }
-            }
         }
-
         viewModelScope.launch {
-            flow {
-                emitAll(monitorAccountDetailUseCase())
-            }.collectLatest { accountDetail ->
-                _uiState.update {
-                    it.copy(
-                        hasRenewableSubscription = accountDetail.levelDetail?.subscriptionStatus == SubscriptionStatus.VALID
-                                && (accountDetail.levelDetail?.subscriptionRenewTime ?: 0) > 0,
-                        hasExpireAbleSubscription = (accountDetail.levelDetail?.proExpirationTime
-                            ?: 0) > 0,
-                        lastSession = (accountDetail.sessionDetail?.mostRecentSessionTimeStamp)
-                            ?: 0,
-                        usedStorage = accountDetail.storageDetail?.usedStorage ?: 0,
-                        usedStoragePercentage = accountDetail.storageDetail?.usedPercentage ?: 0,
-                        usedTransfer = accountDetail.transferDetail?.usedTransfer ?: 0,
-                        usedTransferPercentage = accountDetail.transferDetail?.usedTransferPercentage
-                            ?: 0,
-                        totalStorage = accountDetail.storageDetail?.totalStorage ?: 0,
-                        totalTransfer = accountDetail.transferDetail?.totalTransfer ?: 0,
-                        subscriptionRenewTime = accountDetail.levelDetail?.subscriptionRenewTime
-                            ?: 0,
-                        proExpirationTime = accountDetail.levelDetail?.proExpirationTime ?: 0
-                    )
+            monitorAccountDetailUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { accountDetail ->
+                    _uiState.update {
+                        it.copy(
+                            hasRenewableSubscription = accountDetail.levelDetail?.subscriptionStatus == SubscriptionStatus.VALID
+                                    && (accountDetail.levelDetail?.subscriptionRenewTime ?: 0) > 0,
+                            hasExpireAbleSubscription = (accountDetail.levelDetail?.proExpirationTime
+                                ?: 0) > 0,
+                            lastSession = (accountDetail.sessionDetail?.mostRecentSessionTimeStamp)
+                                ?: 0,
+                            usedStorage = accountDetail.storageDetail?.usedStorage ?: 0,
+                            usedStoragePercentage = accountDetail.storageDetail?.usedPercentage
+                                ?: 0,
+                            usedTransfer = accountDetail.transferDetail?.usedTransfer ?: 0,
+                            usedTransferPercentage = accountDetail.transferDetail?.usedTransferPercentage
+                                ?: 0,
+                            totalStorage = accountDetail.storageDetail?.totalStorage ?: 0,
+                            totalTransfer = accountDetail.transferDetail?.totalTransfer ?: 0,
+                            subscriptionRenewTime = accountDetail.levelDetail?.subscriptionRenewTime
+                                ?: 0,
+                            proExpirationTime = accountDetail.levelDetail?.proExpirationTime ?: 0
+                        )
+                    }
                 }
-            }
         }
     }
 

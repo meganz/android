@@ -28,9 +28,9 @@ import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -49,6 +49,7 @@ import java.io.File
 import java.util.stream.Stream
 import kotlin.random.Random
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(InstantTaskExecutorExtension::class)
 class MyAccountHomeViewModelTest {
     private lateinit var underTest: MyAccountHomeViewModel
@@ -65,8 +66,6 @@ class MyAccountHomeViewModelTest {
         )
     private val connectivityFlow = MutableStateFlow(false)
     private val userUpdatesFlow = MutableStateFlow(UserChanges.Firstname)
-
-
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
         onBlocking { invoke() }.thenReturn(accountDetailFlow)
