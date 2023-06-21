@@ -42,7 +42,7 @@ import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -50,6 +50,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import org.jetbrains.anko.configuration
 import timber.log.Timber
 import java.io.File
@@ -65,7 +66,7 @@ class VideoPlayerFragment : Fragment() {
 
     private val viewModel: VideoPlayerViewModel by activityViewModels()
 
-    private var serviceGateway: MediaPlayerServiceGateway? = null
+    private var serviceGateway: VideoPlayerServiceGateway? = null
     private var serviceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
@@ -89,7 +90,7 @@ class VideoPlayerFragment : Fragment() {
          * Called after a successful bind with our AudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MediaPlayerServiceBinder) {
+            if (service is MediaPlayerServiceBinder && service.serviceGateway is VideoPlayerServiceGateway) {
                 serviceGateway = service.serviceGateway
                 serviceViewModelGateway = service.playerServiceViewModelGateway
 
@@ -281,7 +282,7 @@ class VideoPlayerFragment : Fragment() {
                                             )
                                         )
                                         .setPositiveButton(getString(R.string.general_ok)) { _, _ ->
-                                            serviceGateway?.stopAudioPlayer()
+                                            serviceGateway?.stopPlayer()
                                             requireActivity().finish()
                                         }
                                         .show()

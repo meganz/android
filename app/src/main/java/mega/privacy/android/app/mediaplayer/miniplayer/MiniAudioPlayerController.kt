@@ -104,7 +104,7 @@ class MiniAudioPlayerController constructor(
         audioPlayerPlaying.observeForever(audioPlayerPlayingObserver)
 
         playerView.findViewById<ImageButton>(R.id.close).setOnClickListener {
-            serviceGateway?.stopAudioPlayer()
+            serviceGateway?.stopPlayer()
         }
 
         playerView.setOnClickListener {

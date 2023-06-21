@@ -174,7 +174,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.MessageVoiceClip;
 import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.objects.GifData;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -7973,7 +7973,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * Play the voice clip
      */
     private void playVoiceClip(MessageVoiceClip m, String voiceClipPath) {
-        MediaPlayerService.pauseAudioPlayer(context);
+        AudioPlayerService.pauseAudioPlayer(context);
 
         stopAllReproductionsInProgress();
         final long mId = m.getIdMessage();

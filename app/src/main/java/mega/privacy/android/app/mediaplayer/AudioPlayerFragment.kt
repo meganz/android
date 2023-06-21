@@ -167,7 +167,7 @@ class AudioPlayerFragment : Fragment() {
                                     .setPositiveButton(
                                         getString(R.string.general_ok)
                                     ) { _, _ ->
-                                        serviceGateway?.stopAudioPlayer()
+                                        serviceGateway?.stopPlayer()
                                         requireActivity().finish()
                                     }
                                     .show()

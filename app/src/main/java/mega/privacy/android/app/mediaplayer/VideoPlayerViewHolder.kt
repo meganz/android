@@ -10,10 +10,10 @@ import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.app.mediaplayer.playlist.PlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.Metadata
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 
 /**
  * A view holder for video player, implementing the UI logic of video player.
@@ -159,7 +159,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
      */
     fun togglePlaylistEnabled(playlistItems: List<PlaylistItem>) {
         playlist.visibility =
-            if (playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE)
+            if (playlistItems.size > SINGLE_PLAYLIST_SIZE)
                 View.VISIBLE
             else
                 View.INVISIBLE

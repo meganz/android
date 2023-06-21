@@ -2,7 +2,7 @@ package mega.privacy.android.app.mediaplayer.usecase
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.domain.usecase.StopAudioService
 import javax.inject.Inject
 
@@ -13,6 +13,6 @@ class DefaultStopAudioService @Inject constructor(@ApplicationContext private va
     StopAudioService {
 
     override suspend fun invoke() {
-        MediaPlayerService.stopAudioPlayer(context)
+        AudioPlayerService.stopAudioPlayer(context)
     }
 }

@@ -12,8 +12,8 @@ import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.mediaplayer.playlist.PlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
@@ -30,7 +30,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
-    private val shuffle = binding.root.findViewById<ImageView>(com.google.android.exoplayer2.ui.R.id.exo_shuffle)
+    private val shuffle =
+        binding.root.findViewById<ImageView>(com.google.android.exoplayer2.ui.R.id.exo_shuffle)
 
     /**
      * Update the layout param of artwork of player view.
@@ -158,14 +159,16 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
      * @param playlistItems the new playlist
      */
     fun togglePlaylistEnabled(context: Context, playlistItems: List<PlaylistItem>) {
-        playlist.isEnabled = playlistItems.size > MediaPlayerService.SINGLE_PLAYLIST_SIZE
-        playlist.setColorFilter(context.getColor(
-            if (playlist.isEnabled) {
-                R.color.dark_grey_white
-            } else {
-                R.color.grey_050_grey_800
-            }
-        ))
+        playlist.isEnabled = playlistItems.size > SINGLE_PLAYLIST_SIZE
+        playlist.setColorFilter(
+            context.getColor(
+                if (playlist.isEnabled) {
+                    R.color.dark_grey_white
+                } else {
+                    R.color.grey_050_grey_800
+                }
+            )
+        )
         shuffle.isEnabled = playlist.isEnabled
     }
 

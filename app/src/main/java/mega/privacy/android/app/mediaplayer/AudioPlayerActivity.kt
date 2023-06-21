@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Bundle
@@ -34,6 +33,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
@@ -71,7 +71,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import org.jetbrains.anko.configuration
 import timber.log.Timber
 
 /**
@@ -86,6 +85,8 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var serviceBound = false
 
     private var takenDownDialog: AlertDialog? = null
+
+    private var serviceGateway: MediaPlayerServiceGateway? = null
 
     private val dragToExit by lazy {
         DragToExitSupport(
@@ -513,7 +514,6 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         super.onDestroy()
 
         if (isFinishing) {
-            serviceGateway?.mainPlayerUIClosed()
             dragToExit.showPreviousHiddenThumbnail()
         }
 
@@ -776,5 +776,18 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 showSnackbar(errorMessage)
             }
         }
+    }
+
+    /**
+     * Launch Activity and stop player
+     */
+    override fun launchActivity(intent: Intent) {
+        startActivity(intent)
+        stopPlayer()
+    }
+
+    private fun stopPlayer() {
+        serviceGateway?.stopPlayer()
+        finish()
     }
 }

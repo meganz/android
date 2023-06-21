@@ -69,8 +69,8 @@ import mega.privacy.android.app.listeners.SimpleChatRequestListener
 import mega.privacy.android.app.listeners.SimpleMegaRequestListener
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.pauseAudioPlayer
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.resumeAudioPlayerIfNotInCall
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
 import mega.privacy.android.app.meeting.AnimationTool.moveX
 import mega.privacy.android.app.meeting.AnimationTool.moveY

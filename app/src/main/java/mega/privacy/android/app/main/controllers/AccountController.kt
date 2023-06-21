@@ -33,7 +33,7 @@ import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.stopAudioPlayer
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.stopAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.clearSettings
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity

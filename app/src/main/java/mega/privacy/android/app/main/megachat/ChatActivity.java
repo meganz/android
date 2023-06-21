@@ -361,7 +361,7 @@ import mega.privacy.android.app.main.listeners.AudioFocusListener;
 import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
@@ -3240,7 +3240,7 @@ public class ChatActivity extends PasscodeActivity
      * Start recording
      */
     public void startRecording() {
-        MediaPlayerService.pauseAudioPlayer(this);
+        AudioPlayerService.pauseAudioPlayer(this);
 
         long timeStamp = System.currentTimeMillis() / 1000;
         outputFileName = "/note_voice" + getVoiceClipName(timeStamp);
@@ -8351,7 +8351,7 @@ public class ChatActivity extends PasscodeActivity
             megaApi.removeRequestListener(this);
         }
 
-        MediaPlayerService.resumeAudioPlayerIfNotInCall(this);
+        AudioPlayerService.resumeAudioPlayerIfNotInCall(this);
 
         nodeSaver.destroy();
 

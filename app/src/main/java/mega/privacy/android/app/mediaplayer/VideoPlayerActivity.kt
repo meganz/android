@@ -49,7 +49,8 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerService
+import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
@@ -117,6 +118,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     private var currentOrientation: Int = SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
+    private var serviceGateway: VideoPlayerServiceGateway? = null
+
     private val dragToExit by lazy {
         DragToExitSupport(
             context = this,
@@ -137,7 +140,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
          * Called after a successful bind with our AudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MediaPlayerServiceBinder) {
+            if (service is MediaPlayerServiceBinder && service.serviceGateway is VideoPlayerServiceGateway) {
                 serviceGateway = service.serviceGateway
                 playerServiceGateway = service.playerServiceViewModelGateway
 
@@ -636,7 +639,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         }
         nodeSaver.destroy()
         if (isFinishing) {
-            MediaPlayerService.resumeAudioPlayer(this)
+            AudioPlayerService.resumeAudioPlayer(this)
         }
         AlertDialogUtil.dismissAlertDialogIfExists(takenDownDialog)
     }
@@ -1008,5 +1011,18 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
             snackbar.show()
         }
+    }
+
+    /**
+     * Launch Activity and stop player
+     */
+    override fun launchActivity(intent: Intent) {
+        startActivity(intent)
+        stopPlayer()
+    }
+
+    private fun stopPlayer() {
+        serviceGateway?.stopPlayer()
+        finish()
     }
 }

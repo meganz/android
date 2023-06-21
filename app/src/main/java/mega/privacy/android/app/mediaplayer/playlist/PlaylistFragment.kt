@@ -395,5 +395,10 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
          * The update interval for playing position
          */
         const val UPDATE_INTERVAL_PLAYING_POSITION: Long = 500
+
+        /**
+         * The minimum size of single playlist
+         */
+        const val SINGLE_PLAYLIST_SIZE = 2
     }
 }

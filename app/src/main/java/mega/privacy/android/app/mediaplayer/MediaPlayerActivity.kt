@@ -12,7 +12,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -54,7 +53,6 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
     internal lateinit var navController: NavController
 
     internal var playerServiceGateway: PlayerServiceViewModelGateway? = null
-    internal var serviceGateway: MediaPlayerServiceGateway? = null
 
     internal val nodeAttacher by lazy { MegaAttacher(this) }
     private var currentRequestCode: Int? = null
@@ -362,19 +360,6 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
      */
     fun closeSearch() {
         searchMenuItem?.collapseActionView()
-    }
-
-    internal fun stopPlayer() {
-        serviceGateway?.stopAudioPlayer()
-        finish()
-    }
-
-    /**
-     * Launch Activity and stop player
-     */
-    override fun launchActivity(intent: Intent) {
-        startActivity(intent)
-        stopPlayer()
     }
 
     /**
