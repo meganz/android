@@ -105,8 +105,6 @@ class ActionModeCallback constructor(
             mainActivity.resources.getQuantityString(R.plurals.get_links, selectedNodes.size)
 
         if (areAllNotTakenDown) {
-            control.manageLink().setVisible(true).showAsAction =
-                MenuItem.SHOW_AS_ACTION_ALWAYS
             if (selectedNodes.size == 1
                 && megaApi.checkAccessErrorExtended(
                     selectedNodes[0],
@@ -114,10 +112,14 @@ class ActionModeCallback constructor(
                 ).errorCode
                 == MegaError.API_OK
             ) {
-                if (selectedNodes[0]!!.isExported) {
-                    control.removeLink().isVisible = true
-                } else {
-                    control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                selectedNodes[0]?.let {
+                    if (it.isExported) {
+                        control.manageLink().setVisible(true).showAsAction =
+                            MenuItem.SHOW_AS_ACTION_ALWAYS
+                        control.removeLink().isVisible = true
+                    } else {
+                        control.link.setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                    }
                 }
             }
         }
@@ -126,6 +128,10 @@ class ActionModeCallback constructor(
             val selectedMegaNodes = map { it.node }
             control.trash().isVisible = MegaNodeUtil.canMoveToRubbish(selectedMegaNodes)
             control.selectAll().isVisible = selectedMegaNodes.size < nodeCount
+        }
+
+        if (selectedNodes.size > 1) {
+            control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
         }
 
         if (areAllNotTakenDown) {

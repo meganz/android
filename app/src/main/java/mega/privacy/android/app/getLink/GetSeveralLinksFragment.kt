@@ -125,7 +125,12 @@ class GetSeveralLinksFragment : Fragment() {
 
         binding.copyButton.apply {
             isEnabled = false
-            setOnClickListener { copyLinks(viewModel.getLinksString()) }
+            setOnClickListener {
+                copyLinks(
+                    links = viewModel.getLinksString(),
+                    isForFirstTime = false
+                )
+            }
         }
     }
 
@@ -141,9 +146,6 @@ class GetSeveralLinksFragment : Fragment() {
      */
     private fun showLinks(links: List<LinkItem>) {
         linksAdapter.submitList(links)
-        if (viewModel.getLinksString().isNotBlank()) {
-            copyLinks(viewModel.getLinksString())
-        }
     }
 
     /**
@@ -156,6 +158,11 @@ class GetSeveralLinksFragment : Fragment() {
             isEnabled = !isExportingNodes
             alpha = if (isExportingNodes) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
         }
+        if (!isExportingNodes) {
+            if (viewModel.getLinksString().isNotBlank()) {
+                copyLinks(links = viewModel.getLinksString(), isForFirstTime = true)
+            }
+        }
         refreshMenuOptionsVisibility()
     }
 
@@ -164,13 +171,20 @@ class GetSeveralLinksFragment : Fragment() {
      *
      * @param links String containing all the links to copy.
      */
-    private fun copyLinks(links: String) {
+    private fun copyLinks(links: String, isForFirstTime: Boolean) {
         copyToClipboard(requireActivity(), links)
         (requireActivity() as SnackbarShower).showSnackbar(
-            requireContext().resources.getQuantityString(
-                R.plurals.links_copied_clipboard,
-                viewModel.getLinksNumber()
-            )
+            if (isForFirstTime) {
+                requireContext().resources.getQuantityString(
+                    R.plurals.general_snackbar_link_created_and_copied,
+                    viewModel.getLinksNumber()
+                )
+            } else {
+                requireContext().resources.getQuantityString(
+                    R.plurals.links_copied_clipboard,
+                    viewModel.getLinksNumber()
+                )
+            }
         )
     }
 }

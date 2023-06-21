@@ -425,7 +425,10 @@ class GetLinkViewModel @Inject constructor(
                 !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
                 else -> node?.publicLink.orEmpty()
             },
-            if (isFirstTime) context.getString(R.string.general_link_created_and_copied) else context.resources.getQuantityString(
+            if (isFirstTime) context.resources.getQuantityString(
+                R.plurals.general_snackbar_link_created_and_copied,
+                1
+            ) else context.resources.getQuantityString(
                 R.plurals.links_copied_clipboard,
                 1
             )
