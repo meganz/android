@@ -13,7 +13,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 
@@ -85,17 +84,6 @@ abstract class GetNodeModule {
             megaNodeRepository: MegaNodeRepository,
         ): MoveNodeToRubbishByHandle =
             MoveNodeToRubbishByHandle(megaNodeRepository::moveNodeToRubbishBinByHandle)
-
-        /**
-         * Provides [DeleteNodeByHandle] implementation
-         * @param megaNodeRepository [MegaNodeRepository]
-         * @return [DeleteNodeByHandle]
-         */
-        @Provides
-        fun provideDeleteNodeByHandle(
-            megaNodeRepository: MegaNodeRepository,
-        ): DeleteNodeByHandle =
-            DeleteNodeByHandle(megaNodeRepository::deleteNodeByHandle)
 
         /**
          * Provides [CreateShareKey] implementation

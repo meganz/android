@@ -97,23 +97,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
-    @Throws(IllegalArgumentException::class)
-    override suspend fun deleteNodeByHandle(nodeToDelete: NodeId) = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToDelete.longValue)
-            ?: throw IllegalArgumentException("Node to delete with handle $nodeToDelete not found")
-        if (!megaApiGateway.isInRubbish(node)) {
-            throw IllegalArgumentException("Node needs to be in the rubbish bin before deleting it")
-        }
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("deleteNodeByHandle") {}
-            megaApiGateway.deleteNode(
-                node = node,
-                listener = listener
-            )
-            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
-        }
-    }
-
     @Throws(MegaException::class)
     override suspend fun getRootFolderVersionInfo(): FolderVersionInfo =
         withContext(ioDispatcher) {

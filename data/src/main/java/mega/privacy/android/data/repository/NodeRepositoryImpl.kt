@@ -562,9 +562,9 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    private suspend fun getMegaNodeByHandle(nodeId: NodeId, attempFromFolderApi: Boolean = false) =
+    private suspend fun getMegaNodeByHandle(nodeId: NodeId, attemptFromFolderApi: Boolean = false) =
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)
-            ?: takeIf { attempFromFolderApi }
+            ?: takeIf { attemptFromFolderApi }
                 ?.let { megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue) }
                 ?.let { megaApiFolderGateway.authorizeNode(it) }
 
@@ -614,4 +614,21 @@ internal class NodeRepositoryImpl @Inject constructor(
                 convertToUnTypedNode(megaNode)
             }
         }
+
+    @Throws(IllegalArgumentException::class)
+    override suspend fun deleteNodeByHandle(nodeToDelete: NodeId) = withContext(ioDispatcher) {
+        val node = getMegaNodeByHandle(nodeToDelete, true)
+            ?: throw IllegalArgumentException("Node to delete with handle $nodeToDelete not found")
+        if (!megaApiGateway.isInRubbish(node)) {
+            throw IllegalArgumentException("Node needs to be in the rubbish bin before deleting it")
+        }
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("deleteNodeByHandle") {}
+            megaApiGateway.deleteNode(
+                node = node,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

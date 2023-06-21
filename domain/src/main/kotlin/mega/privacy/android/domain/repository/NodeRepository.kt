@@ -443,4 +443,10 @@ interface NodeRepository {
      */
     suspend fun getParentNodeFromMegaApiFolder(parentHandle: Long): UnTypedNode?
 
+    /**
+     * Deletes a MegaNode referenced by its handle [NodeId] ONLY if it's already in the rubbish bin
+     * @param nodeToDelete the node's handle [NodeId] that we want to delete
+     * @throws IllegalArgumentException if the node does not exist or is not in the rubbish bin
+     */
+    suspend fun deleteNodeByHandle(nodeToDelete: NodeId)
 }

@@ -63,7 +63,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
@@ -99,7 +99,7 @@ class FileInfoViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
-    private val deleteNodeByHandle: DeleteNodeByHandle,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle,
     private val getPreview: GetPreview,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -820,7 +820,7 @@ class FileInfoViewModel @Inject constructor(
     private fun deleteNode() {
         performBlockSettingProgress(FileInfoJobInProgressState.Deleting) {
             runCatching {
-                deleteNodeByHandle(typedNode.id)
+                deleteNodeByHandleUseCase(typedNode.id)
             }
         }
     }

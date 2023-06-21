@@ -66,7 +66,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
@@ -115,7 +115,7 @@ internal class FileInfoViewModelTest {
     private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
-    private val deleteNodeByHandle: DeleteNodeByHandle = mock()
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase = mock()
     private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
     private val node: MegaNode = mock()
     private val getPreview: GetPreview = mock()
@@ -175,7 +175,7 @@ internal class FileInfoViewModelTest {
             moveNodeUseCase = moveNodeUseCase,
             copyNodeUseCase = copyNodeUseCase,
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
-            deleteNodeByHandle = deleteNodeByHandle,
+            deleteNodeByHandleUseCase = deleteNodeByHandleUseCase,
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
             getPreview = getPreview,
             getFolderTreeInfo = getFolderTreeInfo,
@@ -1020,7 +1020,7 @@ internal class FileInfoViewModelTest {
     private suspend fun mockDeleteSuccess() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
         underTest.setNode(node.handle)
-        whenever(deleteNodeByHandle.invoke(nodeId)).thenReturn(Unit)
+        whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenReturn(Unit)
     }
 
     private suspend fun mockDeleteVersionsSuccess() {
@@ -1043,7 +1043,7 @@ internal class FileInfoViewModelTest {
     private suspend fun mockDeleteFailure() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
         underTest.setNode(node.handle)
-        whenever(deleteNodeByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
+        whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
     private suspend fun testProgressIsSetWhileCopyingAndUnset() =
