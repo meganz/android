@@ -12,7 +12,17 @@ import android.os.SystemClock
 import android.provider.Settings
 import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import mega.privacy.android.data.extensions.registerReceiverAsFlow
+import mega.privacy.android.domain.entity.BatteryInfo
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import java.net.NetworkInterface
 import java.util.Locale
@@ -25,6 +35,7 @@ import javax.inject.Inject
  */
 internal class AndroidDeviceGateway @Inject constructor(
     @ApplicationContext private val context: Context,
+    @ApplicationScope private val appScope: CoroutineScope,
 ) : DeviceGateway {
 
     override fun getManufacturerName(): String = Build.MANUFACTURER
@@ -112,4 +123,32 @@ internal class AndroidDeviceGateway @Inject constructor(
         }
         return null
     }
+
+    override val monitorBatteryInfo =
+        context.registerReceiverAsFlow(
+            flags = ContextCompat.RECEIVER_EXPORTED,
+            Intent.ACTION_BATTERY_CHANGED,
+        ).map {
+            val level = it.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val status: Int = it.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val isCharging =
+                status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS
+            return@map BatteryInfo(level = level, isCharging = isCharging)
+        }.catch {
+            Timber.e(it, "MonitorBatteryInfo Exception")
+        }.toSharedFlow(appScope)
+
+    override val monitorChargingStoppedState =
+        context.registerReceiverAsFlow(
+            flags = ContextCompat.RECEIVER_EXPORTED,
+            Intent.ACTION_POWER_DISCONNECTED,
+        ).map {
+            true
+        }.catch {
+            Timber.e(it, "MonitorChargingStoppedState Exception")
+        }.toSharedFlow(appScope)
 }
+
+private fun <T> Flow<T>.toSharedFlow(
+    scope: CoroutineScope,
+) = shareIn(scope, started = SharingStarted.WhileSubscribed())

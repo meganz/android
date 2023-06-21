@@ -1,5 +1,8 @@
 package mega.privacy.android.data.gateway
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.BatteryInfo
+
 /**
  * Device gateway
  *
@@ -88,4 +91,14 @@ interface DeviceGateway {
      * @return [String]
      */
     suspend fun getLocalIpAddress(): String?
+
+    /**
+     * monitor battery info
+     */
+    val monitorBatteryInfo: Flow<BatteryInfo>
+
+    /**
+     * monitor charging state
+     */
+    val monitorChargingStoppedState: Flow<Boolean>
 }

@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -62,7 +61,6 @@ class ChatRepositoryImplTest {
     private val combinedChatRoomMapper = mock<CombinedChatRoomMapper>()
     private val chatListItemMapper = mock<ChatListItemMapper>()
     private val sharingScope = mock<CoroutineScope>()
-    private val deviceEventGateway = mock<DeviceEventGateway>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val chatConnectionStatusMapper = ChatConnectionStatusMapper()
@@ -97,7 +95,6 @@ class ChatRepositoryImplTest {
             chatMessageNotificationBehaviourMapper = chatMessageNotificationBehaviourMapper,
             sharingScope = sharingScope,
             ioDispatcher = testDispatcher,
-            deviceEventGateway = deviceEventGateway,
             megaChatPeerListMapper = megaChatPeerListMapper,
             connectionStateMapper = connectionStateMapper,
             chatConnectionStatusMapper = chatConnectionStatusMapper,

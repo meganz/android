@@ -14,7 +14,6 @@ import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
-import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -76,7 +75,6 @@ import kotlin.coroutines.Continuation
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher [CoroutineDispatcher]
  * @property appEventGateway [AppEventGateway]
- * @property deviceEventGateway [DeviceEventGateway]
  * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
@@ -96,7 +94,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val heartbeatStatusIntMapper: HeartbeatStatusIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
-    private val deviceEventGateway: DeviceEventGateway,
     private val workerGateway: WorkerGateway,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
@@ -597,9 +594,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun broadcastCameraUploadFolderIconUpdate(data: CameraUploadFolderIconUpdate) =
         appEventGateway.broadcastCameraUploadFolderIconUpdate(data)
 
-    override fun monitorBatteryInfo() = deviceEventGateway.monitorBatteryInfo
+    override fun monitorBatteryInfo() = deviceGateway.monitorBatteryInfo
 
-    override fun monitorChargingStoppedInfo() = deviceEventGateway.monitorChargingStoppedState
+    override fun monitorChargingStoppedInfo() = deviceGateway.monitorChargingStoppedState
 
     override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =
         withContext(ioDispatcher) {

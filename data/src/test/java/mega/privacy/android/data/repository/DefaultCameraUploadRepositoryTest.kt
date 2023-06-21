@@ -123,7 +123,7 @@ class DefaultCameraUploadRepositoryTest {
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
-            deviceEventGateway = mock(),
+            deviceGateway = deviceGateway,
             videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
             syncStatusIntMapper = ::syncStatusToInt,
@@ -132,7 +132,6 @@ class DefaultCameraUploadRepositoryTest {
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,
             uploadOptionIntMapper = uploadOptionIntMapper,
-            deviceGateway = deviceGateway,
             context = mock(),
         )
     }

@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -49,7 +48,6 @@ import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
@@ -75,7 +73,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatListItemMapper                 [ChatListItemMapper]
  * @property sharingScope                       [CoroutineScope]
  * @property ioDispatcher                       [CoroutineDispatcher]
- * @property deviceEventGateway                 [DeviceEventGateway]
  * @property megaChatPeerListMapper             [MegaChatPeerListMapper]
  * @property appEventGateway                    [AppEventGateway]
  */
@@ -94,7 +91,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatMessageNotificationBehaviourMapper: ChatMessageNotificationBehaviourMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val deviceEventGateway: DeviceEventGateway,
     private val appEventGateway: AppEventGateway,
 ) : ChatRepository {
 

@@ -11,7 +11,6 @@ import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
-import mega.privacy.android.data.facade.DeviceEventFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
@@ -37,7 +36,6 @@ import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DefaultStreamingGateway
-import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
@@ -196,13 +194,6 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindAppEventGateway(implementation: AppEventFacade): AppEventGateway
-
-    /**
-     * Provide default implementation of [DeviceEventGateway]
-     */
-    @Binds
-    @Singleton
-    abstract fun bindDeviceEventGateway(implementation: DeviceEventFacade): DeviceEventGateway
 
 
     /**
