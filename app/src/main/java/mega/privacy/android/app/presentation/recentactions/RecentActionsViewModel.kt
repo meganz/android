@@ -12,34 +12,37 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsState
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * ViewModel associated to [RecentActionsFragment]
  *
- * @param getRecentActionsUseCase
- * @param getVisibleContactsUseCase
- * @param getVisibleContactsUseCase
- * @param setHideRecentActivity
+ * @property getRecentActionsUseCase
+ * @property getVisibleContactsUseCase
+ * @property setHideRecentActivity
+ * @property getNodeByHandle
+ * @property getNodeByIdUseCase
+ * @property getAccountDetailsUseCase
+ * @property areCredentialsVerified
+ * @param monitorHideRecentActivity
  * @param monitorNodeUpdates
- * @param areCredentialsVerified
  */
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
@@ -47,12 +50,11 @@ class RecentActionsViewModel @Inject constructor(
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val setHideRecentActivity: SetHideRecentActivity,
     private val getNodeByHandle: GetNodeByHandle,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val isPendingShare: IsPendingShare,
-    private val getParentMegaNode: GetParentMegaNode,
+    private val areCredentialsVerified: AreCredentialsVerified,
     monitorHideRecentActivity: MonitorHideRecentActivity,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val areCredentialsVerified: AreCredentialsVerified,
 ) : ViewModel() {
 
     private var _buckets = listOf<RecentActionBucket>()
@@ -131,10 +133,10 @@ class RecentActionsViewModel @Inject constructor(
      * Update the recent actions list by combination
      */
     private suspend fun updateRecentActions() = coroutineScope {
-        val getRecentActions = async(coroutineContext) {
+        val getRecentActions = async {
             getRecentActionsUseCase().also { _buckets = it }
         }
-        val getVisibleContacts = async(coroutineContext) { getVisibleContactsUseCase() }
+        val getVisibleContacts = async { getVisibleContactsUseCase() }
 
         val formattedList =
             formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
@@ -143,7 +145,7 @@ class RecentActionsViewModel @Inject constructor(
     }
 
     /**
-     * Format a list of [RecentActionItemType] from a [MegaRecentActionBucket]
+     * Format a list of [RecentActionItemType] from a [RecentActionBucket]
      *
      * @param buckets
      * @return a list of [RecentActionItemType]
@@ -176,7 +178,7 @@ class RecentActionsViewModel @Inject constructor(
                 .getOrDefault(false)
             val isNodeKeyVerified =
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified
-            val parentNode = getNodeByHandle(bucket.parentHandle)
+            val parentNode = getNodeByIdUseCase(NodeId(bucket.parentHandle))
             val sharesType = getParentSharesType(parentNode)
             recentItemList.add(
                 RecentActionItemType.Item(
@@ -208,16 +210,19 @@ class RecentActionsViewModel @Inject constructor(
      *
      * @param node
      */
-    private suspend fun getParentSharesType(node: MegaNode?): RecentActionsSharesType {
-        return when {
-            node == null -> RecentActionsSharesType.NONE
-            node.isInShare -> RecentActionsSharesType.INCOMING_SHARES
-            node.isOutShare -> RecentActionsSharesType.OUTGOING_SHARES
-            isPendingShare(node.handle) -> RecentActionsSharesType.PENDING_OUTGOING_SHARES
-            else -> {
-                val parentNode = getParentMegaNode(node)
-                getParentSharesType(parentNode)
+    private suspend fun getParentSharesType(node: TypedNode?): RecentActionsSharesType {
+        return if (node is FolderNode) {
+            when {
+                node.isIncomingShare -> RecentActionsSharesType.INCOMING_SHARES
+                node.isShared -> RecentActionsSharesType.OUTGOING_SHARES
+                node.isPendingShare -> RecentActionsSharesType.PENDING_OUTGOING_SHARES
+                else -> {
+                    val parentNode = getNodeByIdUseCase(node.parentId)
+                    getParentSharesType(parentNode)
+                }
             }
+        } else {
+            RecentActionsSharesType.NONE
         }
     }
 }

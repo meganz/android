@@ -5,9 +5,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetRecentActionNodes
-import mega.privacy.android.app.domain.usecase.DefaultIsPendingShare
 import mega.privacy.android.app.domain.usecase.GetRecentActionNodes
-import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.domain.usecase.DefaultUpdateRecentAction
 import mega.privacy.android.domain.usecase.UpdateRecentAction
 
@@ -35,12 +33,4 @@ abstract class RecentUseCase {
      */
     @Binds
     abstract fun bindGetNodes(useCase: DefaultGetRecentActionNodes): GetRecentActionNodes
-
-    /**
-     * Provide [IsPendingShare] implementation
-     *
-     * @param useCase
-     */
-    @Binds
-    abstract fun bindIsPendingShare(useCase: DefaultIsPendingShare): IsPendingShare
 }

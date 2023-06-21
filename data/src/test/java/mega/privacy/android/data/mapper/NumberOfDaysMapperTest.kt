@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import java.util.Calendar
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -22,13 +23,9 @@ internal class NumberOfDaysMapperTest {
     @Test
     fun `test that number of days mapper is invoked should return correct days`() {
         for (i in 0 until 20) {
-            val dayDiff = Random.nextInt(from = 1, until = 100)
+            val dayDiff = Random.nextLong(from = 1, until = 100)
             val currentTimeInMillis = Calendar.getInstance().timeInMillis
-            val testDateTimeStamp = Calendar.getInstance().apply {
-                timeInMillis = currentTimeInMillis
-                add(Calendar.DATE, dayDiff)
-            }.timeInMillis
-
+            val testDateTimeStamp = currentTimeInMillis + TimeUnit.DAYS.toMillis(dayDiff)
             assertThat(underTest(testDateTimeStamp, currentTimeInMillis)).isEqualTo(dayDiff)
         }
     }

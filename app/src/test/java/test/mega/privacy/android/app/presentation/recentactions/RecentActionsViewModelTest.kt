@@ -12,8 +12,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetParentMegaNode
-import mega.privacy.android.app.domain.usecase.IsPendingShare
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
@@ -24,16 +22,18 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
-import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -48,6 +48,10 @@ class RecentActionsViewModelTest {
     private val getRecentActionsUseCase = mock<GetRecentActionsUseCase> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
+    private val getNodeByIdUseCase = mock<GetNodeByIdUseCase> {
+        onBlocking { invoke(NodeId(anyLong())) }.thenReturn(null)
+    }
+
     private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
@@ -57,13 +61,12 @@ class RecentActionsViewModelTest {
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
         onBlocking { invoke(any()) }.thenReturn(mock())
     }
-    private val isPendingShare = mock<IsPendingShare> {
-        onBlocking { invoke(any()) }.thenReturn(false)
-    }
-    private val getParentMegaNode = mock<GetParentMegaNode> {
-        onBlocking { invoke(any()) }.thenReturn(null)
-    }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
+
+    private val areCredentialsVerified = mock<AreCredentialsVerified> {
+        onBlocking { invoke(any()) }.thenReturn(true)
+    }
+
     private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
         flow {
             emit(false)
@@ -103,24 +106,19 @@ class RecentActionsViewModelTest {
         on { this.isUpdate }.thenReturn(false)
     }
 
-    private val areCredentialsVerified = mock<AreCredentialsVerified> {
-        onBlocking { invoke(any()) }.thenReturn(true)
-    }
-
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = RecentActionsViewModel(
-            getRecentActionsUseCase,
-            getVisibleContactsUseCase,
-            setHideRecentActivity,
-            getNodeByHandle,
-            getAccountDetailsUseCase,
-            isPendingShare,
-            getParentMegaNode,
-            monitorHideRecentActivity,
-            monitorNodeUpdates,
-            areCredentialsVerified,
+            getRecentActionsUseCase = getRecentActionsUseCase,
+            getVisibleContactsUseCase = getVisibleContactsUseCase,
+            setHideRecentActivity = setHideRecentActivity,
+            getNodeByHandle = getNodeByHandle,
+            getNodeByIdUseCase = getNodeByIdUseCase,
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
+            monitorHideRecentActivity = monitorHideRecentActivity,
+            monitorNodeUpdates = monitorNodeUpdates,
+            areCredentialsVerified = areCredentialsVerified,
         )
     }
 
@@ -285,11 +283,12 @@ class RecentActionsViewModelTest {
     fun `test that the recent action parent folder name item is set to empty string if not retrieved from the parent node`() =
         runTest {
             val expected = ""
-            val parentNode = mock<MegaNode> {
-                on { name }.thenReturn(null)
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -302,12 +301,14 @@ class RecentActionsViewModelTest {
     fun `test that the recent action parent folder name item is set if retrieved from the parent node`() =
         runTest {
             val expected = "Cloud drive"
-            val parentNode = mock<MegaNode> {
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
                 on { name }.thenReturn(expected)
                 on { isNodeKeyDecrypted }.thenReturn(false)
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -320,11 +321,13 @@ class RecentActionsViewModelTest {
     fun `test that the recent action shares type item is set to INCOMING_SHARES if parent root node is in incoming shares`() =
         runTest {
             val expected = RecentActionsSharesType.INCOMING_SHARES
-            val parentNode = mock<MegaNode> {
-                on { isInShare }.thenReturn(true)
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isIncomingShare }.thenReturn(true)
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -337,11 +340,13 @@ class RecentActionsViewModelTest {
     fun `test that the recent action shares type item is set to OUTGOING_SHARES if parent root node is in outgoing shares`() =
         runTest {
             val expected = RecentActionsSharesType.OUTGOING_SHARES
-            val parentNode = mock<MegaNode> {
-                on { isOutShare }.thenReturn(true)
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isShared }.thenReturn(true)
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -354,12 +359,13 @@ class RecentActionsViewModelTest {
     fun `test that the recent action shares type item is set to PENDING_OUTGOING_SHARES if parent root node is in pending shares`() =
         runTest {
             val expected = RecentActionsSharesType.PENDING_OUTGOING_SHARES
-            val parentNode = mock<MegaNode> {
-                on { handle }.thenReturn(1L)
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isPendingShare }.thenReturn(true)
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(any())).thenReturn(parentNode)
-            whenever(isPendingShare(parentNode.handle)).thenReturn(true)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
@@ -372,14 +378,15 @@ class RecentActionsViewModelTest {
     fun `test that the recent action shares type item is set to NONE if parent root node is not shared`() =
         runTest {
             val expected = RecentActionsSharesType.NONE
-            val parentNode = mock<MegaNode> {
-                on { isInShare }.thenReturn(false)
-                on { isOutShare }.thenReturn(false)
+            val parentNode = mock<TypedFolderNode> {
+                on { parentId }.thenReturn(NodeId(1L))
+                on { isIncomingShare }.thenReturn(false)
+                on { isShared }.thenReturn(false)
+                on { isPendingShare }.thenReturn(false)
             }
             whenever(getRecentActionsUseCase()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getNodeByHandle(1)).thenReturn(parentNode)
-            whenever(isPendingShare(parentNode.handle)).thenReturn(false)
-            whenever(getParentMegaNode(parentNode)).thenReturn(null)
+            whenever(getNodeByIdUseCase(NodeId(321L))).thenReturn(parentNode)
+            whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
                     awaitItem()
