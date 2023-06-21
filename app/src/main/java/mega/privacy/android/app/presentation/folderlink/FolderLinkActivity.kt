@@ -151,6 +151,9 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private val recyclerView: RecyclerView
         get() = if (uiState.currentViewType == ViewType.LIST) binding.folderLinkListViewBrowser else binding.folderLinkGridViewBrowser
 
+    override val isOnFileManagementManagerSection: Boolean
+        get() = true
+
     private val downloadButtonClickListener = View.OnClickListener {
         adapterList?.let {
             if (it.isMultipleSelect) {

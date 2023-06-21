@@ -574,6 +574,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 Timber.w("Another login is processing")
                 false
             }
+            //User is logged in and fast login is not required
+            rootNodeExistsUseCase() -> {
+                alreadyLoggedIn = true
+                false
+            }
+
             //User is logged in, but needs to check if a fast login is required
             else -> {
                 pendingIntents.add(intent)
@@ -582,8 +588,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     backgroundFastLoginUseCase()
                 }.onSuccess {
                     alreadyLoggedIn = true
-                    pendingIntents.forEach { onHandleIntent(it) }
-                    pendingIntents.clear()
                 }.onFailure {
                     Timber.e("ERROR: $it")
                 }

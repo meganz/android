@@ -121,6 +121,9 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         selectImportFolderResult
     )
 
+    override val isOnFileManagementManagerSection: Boolean
+        get() = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)
@@ -134,7 +137,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             }
         }
 
-        setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout))
+        setTransfersWidgetLayout(binding.transfersWidgetLayout)
         intent?.let { viewModel.handleIntent(it) }
         setupObservers()
         viewModel.checkLoginRequired()
