@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +48,7 @@ import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_050_white_alpha_050
 import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.domain.entity.photos.Photo
 
@@ -99,6 +101,7 @@ fun MediaDiscoveryScreen(
                 screenTitle = screenTitle,
                 currentZoomLevel = uiState.currentZoomLevel,
                 selectedTimeBarTab = uiState.selectedTimeBarTab,
+                uiPhotos = uiState.uiPhotoList,
                 numSelectedPhotos = uiState.selectedPhotoIds.size,
                 showMoreMenu = showMoreMenu,
                 showImportMenu = uiState.hasDbCredentials,
@@ -180,6 +183,7 @@ private fun MDHeader(
     screenTitle: String? = null,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     selectedTimeBarTab: TimeBarTab,
+    uiPhotos: List<UIPhoto>,
     numSelectedPhotos: Int,
     showMoreMenu: Boolean,
     showImportMenu: Boolean,
@@ -233,32 +237,34 @@ private fun MDHeader(
         actions = {
             if (selectedTimeBarTab == TimeBarTab.All) {
                 if (numSelectedPhotos == 0) {
-                    IconButton(onClick = onZoomOutClicked) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_zoom_out),
-                            contentDescription = null,
-                            tint = blackWhiteIconTint().takeIf {
-                                isZoomOutValid(
-                                    currentZoomLevel
+                    if (uiPhotos.isNotEmpty()) {
+                        IconButton(onClick = onZoomOutClicked) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_zoom_out),
+                                contentDescription = null,
+                                tint = blackWhiteIconTint().takeIf {
+                                    isZoomOutValid(
+                                        currentZoomLevel
+                                    )
+                                } ?: blackWhiteIconTint().copy(
+                                    alpha = 0.5f
                                 )
-                            } ?: blackWhiteIconTint().copy(
-                                alpha = 0.5f
                             )
-                        )
-                    }
+                        }
 
-                    IconButton(onClick = onZoomInClicked) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_zoom_in),
-                            contentDescription = null,
-                            tint = blackWhiteIconTint().takeIf {
-                                isZoomInValid(
-                                    currentZoomLevel
+                        IconButton(onClick = onZoomInClicked) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_zoom_in),
+                                contentDescription = null,
+                                tint = blackWhiteIconTint().takeIf {
+                                    isZoomInValid(
+                                        currentZoomLevel
+                                    )
+                                } ?: blackWhiteIconTint().copy(
+                                    alpha = 0.5f
                                 )
-                            } ?: blackWhiteIconTint().copy(
-                                alpha = 0.5f
                             )
-                        )
+                        }
                     }
                 } else {
                     IconButton(onClick = onSaveToDeviceClicked) {
@@ -309,8 +315,16 @@ private fun MDHeader(
                     DropdownMenuItem(onClick = onSaveToDeviceClicked) {
                         Text(text = stringResource(id = R.string.general_save_to_device))
                     }
-                    DropdownMenuItem(onClick = onSortByClicked) {
-                        Text(text = stringResource(id = R.string.action_sort_by))
+                    DropdownMenuItem(
+                        onClick = onSortByClicked,
+                        enabled = uiPhotos.isNotEmpty()
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.action_sort_by),
+                            modifier = if (uiPhotos.isEmpty())
+                                Modifier.alpha(0.5f)
+                            else Modifier.alpha(1.0f),
+                        )
                     }
                     DropdownMenuItem(onClick = onFilterClicked) {
                         Text(text = stringResource(id = R.string.photos_action_filter))
@@ -324,6 +338,9 @@ private fun MDHeader(
 
 @Composable
 private fun tealIconTint() = MaterialTheme.colors.teal_300_teal_200
+
+@Composable
+private fun greyColor() = MaterialTheme.colors.grey_alpha_050_white_alpha_050
 
 @Composable
 private fun blackWhiteIconTint() = MaterialTheme.colors.black_white
