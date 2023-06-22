@@ -369,6 +369,10 @@ object CameraUploadSyncManager {
      *
      * @see MegaApiJava
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in R.string.section_photo_sync as backupName",
+        replaceWith = ReplaceWith("UpdatePrimaryFolderBackupNameUseCase")
+    )
     fun updatePrimaryBackupName() {
         if (!CameraUploadUtil.isPrimaryEnabled()) {
             Timber.d("Primary Folder is disabled. Unable to update Primary Folder backup name")
