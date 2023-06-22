@@ -1051,7 +1051,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * @return Boolean value
      */
     private fun shouldShowMediaPermissionsRationale() =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            shouldShowRequestPermissionRationale(READ_MEDIA_IMAGES) && shouldShowRequestPermissionRationale(
+                READ_MEDIA_VIDEO
+            ) || shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             shouldShowRequestPermissionRationale(READ_MEDIA_IMAGES) && shouldShowRequestPermissionRationale(
                 READ_MEDIA_VIDEO
             )
@@ -1499,6 +1503,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 localSecondaryFolder?.isEnabled = true
                 megaSecondaryFolder?.isEnabled = true
             }
+
             MegaApiJava.BACKUP_TYPE_MEDIA_UPLOADS -> {
                 secondaryMediaFolderOn?.isEnabled = true
                 localSecondaryFolder?.isEnabled = true

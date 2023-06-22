@@ -706,7 +706,16 @@ class CameraUploadsWorker @AssistedInject constructor(
 
             val isNotEnoughQuota = isNotEnoughQuota()
             val hasMediaPermissions =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    permissionsGateway.hasPermissions(
+                        Manifest.permission.POST_NOTIFICATIONS,
+                        Manifest.permission.READ_MEDIA_IMAGES,
+                        Manifest.permission.READ_MEDIA_VIDEO,
+                    ) || permissionsGateway.hasPermissions(
+                        Manifest.permission.POST_NOTIFICATIONS,
+                        Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                    )
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     permissionsGateway.hasPermissions(
                         Manifest.permission.POST_NOTIFICATIONS,
                         Manifest.permission.READ_MEDIA_IMAGES,

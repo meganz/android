@@ -4,6 +4,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -193,7 +194,9 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @return Boolean value
      */
     private fun areMediaPermissionsGranted(permissions: Map<String, Boolean>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true || permissions[READ_MEDIA_VISUAL_USER_SELECTED] == true
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissions[READ_MEDIA_IMAGES] == true && permissions[READ_MEDIA_VIDEO] == true
         } else {
             permissions[READ_EXTERNAL_STORAGE] == true
