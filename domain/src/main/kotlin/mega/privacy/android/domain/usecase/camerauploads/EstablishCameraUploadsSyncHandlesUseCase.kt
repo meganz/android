@@ -34,9 +34,9 @@ class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
      * Invocation function
      */
     suspend operator fun invoke() {
-        getCameraUploadsSyncHandlesUseCase()?.let {
-            processSyncHandle(handle = it.first, CameraUploadFolderType.Primary)
-            processSyncHandle(handle = it.second, CameraUploadFolderType.Secondary)
+        getCameraUploadsSyncHandlesUseCase()?.let { (primaryHandle, secondaryHandle) ->
+            processSyncHandle(handle = primaryHandle, CameraUploadFolderType.Primary)
+            processSyncHandle(handle = secondaryHandle, CameraUploadFolderType.Secondary)
         } ?: run {
             // When there are no handles received from the API, invalidate both Primary and
             // Secondary Sync Handles

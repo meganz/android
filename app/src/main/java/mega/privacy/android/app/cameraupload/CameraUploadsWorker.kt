@@ -109,7 +109,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUse
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
-import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
@@ -209,12 +208,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     @Inject
     lateinit var isSecondaryFolderEnabled: IsSecondaryFolderEnabled
-
-    /**
-     * HasPreferencesUseCase
-     */
-    @Inject
-    lateinit var hasPreferencesUseCase: HasPreferencesUseCase
 
     /**
      * IsCameraUploadsEnabledUseCase
@@ -837,26 +830,18 @@ class CameraUploadsWorker @AssistedInject constructor(
                 resetTotalUploadsUseCase()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-
     }
 
     /**
      * Function that starts the Camera Uploads functionality
      */
     private suspend fun startWorker() {
-        runCatching {
-            val state = canRunCameraUploads()
-            if (state == StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS) {
-                Timber.d("Calling startWorker() successful. Starting Camera Uploads")
-                hideFolderPathNotifications()
-                startCameraUploads()
-            } else {
-                Timber.w("Calling startWorker() failed. Proceed to handle error")
-                handleFailedStartCameraUploadsState(state)
-            }
-        }.onFailure { exception ->
-            Timber.e("Calling startWorker() failed with exception $exception")
-            endService(aborted = true)
+        if (canRunCameraUploads()) {
+            Timber.d("Calling startWorker() successful. Starting Camera Uploads")
+            hideFolderPathNotifications()
+            startCameraUploads()
+        } else {
+            Timber.w("Calling startWorker() failed. Proceed to handle error")
         }
     }
 
@@ -864,111 +849,64 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Instructs [notificationManager] to hide the Primary and/or Secondary Folder
      * notifications if they exist
      */
-    private suspend fun hideFolderPathNotifications() {
-        if (isPrimaryFolderValid()) notificationManager.cancel(FOLDER_REMINDER_PRIMARY)
-        if (isSecondaryFolderEnabled() && hasSecondaryFolder()) {
-            notificationManager.cancel(FOLDER_REMINDER_SECONDARY)
-        }
+    private fun hideFolderPathNotifications() {
+        notificationManager.cancel(FOLDER_REMINDER_PRIMARY)
+        notificationManager.cancel(FOLDER_REMINDER_SECONDARY)
     }
 
     /**
-     * Checks if Camera Uploads can run by evaluating the following conditions in order:
+     * Checks if Camera Uploads can run by checking multiple conditions
      *
-     * 1. The Preferences exist - [preferencesExist],
-     * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
-     * 3. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
-     * 4. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
-     * 5. The Primary Folder exists and is valid - [isPrimaryFolderValid],
-     * 6. The Secondary Folder exists when Secondary uploads are enabled - [isSecondaryFolderEnabled] and [hasSecondaryFolder]
-     * 7. The user Camera Uploads attribute exists - [missingAttributesChecked],
-     * 8. The Primary Folder exists - [areFoldersEstablished],
-     * 9. The Secondary Folder exists if Enable Secondary Media Uploads is enabled - [areFoldersEstablished]
-     *
-     * If all conditions are met, [StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS] is returned.
-     * Otherwise, a specific [StartCameraUploadsState] is returned depending on what condition has failed
-     *
-     * @return A specific [StartCameraUploadsState]
+     * @return true if all conditions have been met, and false if otherwise
      */
-    private suspend fun canRunCameraUploads(): StartCameraUploadsState =
-        when {
-            !preferencesExist() -> StartCameraUploadsState.MISSING_PREFERENCES
-            !cameraUploadsSyncEnabled() -> StartCameraUploadsState.DISABLED_SYNC
-            !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
-            !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
-            !isPrimaryFolderValid() -> StartCameraUploadsState.INVALID_PRIMARY_FOLDER
-            isSecondaryFolderEnabled() && !hasSecondaryFolder() -> StartCameraUploadsState.MISSING_SECONDARY_FOLDER
-            !missingAttributesChecked -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
-            !areFoldersEstablished() -> StartCameraUploadsState.UNESTABLISHED_FOLDERS
-            else -> StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS
+    private suspend fun canRunCameraUploads(): Boolean =
+        isCameraUploadsSyncEnabled()
+                && isWifiConstraintSatisfied()
+                && isDeviceAboveMinimumBatteryLevel()
+                && isPrimaryFolderValid()
+                && isSecondaryFolderConfigured()
+                && areCameraUploadsSyncHandlesEstablished()
+                && areFoldersCheckedAndEstablished()
+
+
+    private fun isDeviceAboveMinimumBatteryLevel() = deviceAboveMinimumBatteryLevel.also {
+        Timber.d("Device Battery level above $it")
+    }
+
+    private suspend fun areCameraUploadsSyncHandlesEstablished(): Boolean {
+        establishCameraUploadsSyncHandlesUseCase()
+        return true
+    }
+
+    private suspend fun areFoldersCheckedAndEstablished(): Boolean {
+        return if (areFoldersEstablished()) {
+            true
+        } else {
+            runCatching { establishFolders() }.isSuccess.also {
+                Timber.d("Establish Folder $it")
+            }
         }
+    }
 
-    /**
-     * When Camera Uploads cannot be enabled, the function executes specific actions depending
-     * on the [StartCameraUploadsState] that was passed
-     *
-     * @param state The failing [StartCameraUploadsState]
-     */
-    private suspend fun handleFailedStartCameraUploadsState(state: StartCameraUploadsState) {
-        Timber.w("Start Camera Uploads Error state: $state")
-        when (state) {
-            StartCameraUploadsState.MISSING_PREFERENCES,
-            StartCameraUploadsState.DISABLED_SYNC,
-            StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL,
-            StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
-            -> {
-                Timber.e("Stop Camera Uploads due to $state")
-                endService(aborted = true)
-            }
 
-            StartCameraUploadsState.INVALID_PRIMARY_FOLDER -> {
-                Timber.e("Primary Folder is invalid. Stop Camera Uploads")
-                handlePrimaryFolderDisabled()
-                endService(aborted = true)
-            }
-
-            StartCameraUploadsState.MISSING_SECONDARY_FOLDER -> {
-                Timber.e("Secondary Folder is disabled. Stop Camera Uploads")
-                handleSecondaryFolderDisabled()
-                endService(aborted = true)
-            }
-
-            StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
-                Timber.w("Handle the missing Camera Uploads user attribute")
-                runCatching {
-                    establishCameraUploadsSyncHandlesUseCase()
-                    missingAttributesChecked = true
+    private suspend fun isSecondaryFolderConfigured(): Boolean {
+        if (isSecondaryFolderEnabled()) {
+            return hasSecondaryFolder().also {
+                if (!it) {
+                    Timber.e("Local Secondary Folder is disabled.")
+                    handleSecondaryFolderDisabled()
                 }
-                    .onSuccess { startWorker() }
-                    .onFailure { endService() }
             }
-
-            StartCameraUploadsState.UNESTABLISHED_FOLDERS -> {
-                Timber.w("Primary and/or Secondary Folders do not exist. Establish the folders")
-                runCatching { establishFolders() }
-                    .onSuccess { startWorker() }
-                    .onFailure { endService(aborted = true) }
-            }
-
-            else -> Unit
         }
+        return true
     }
-
-    /**
-     * Checks if the Preferences from [hasPreferencesUseCase] exist
-     *
-     * @return true if it exists, and false if otherwise
-     */
-    private suspend fun preferencesExist(): Boolean =
-        hasPreferencesUseCase().also {
-            if (!it) Timber.w("Preferences not defined, so not enabled")
-        }
 
     /**
      * Checks if the Camera Uploads sync from [isCameraUploadsEnabledUseCase] is enabled
      *
      * @return true if enabled, and false if otherwise
      */
-    private suspend fun cameraUploadsSyncEnabled(): Boolean =
+    private suspend fun isCameraUploadsSyncEnabled(): Boolean =
         isCameraUploadsEnabledUseCase().also {
             if (!it) Timber.w("Camera Upload sync disabled")
         }
@@ -990,7 +928,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun isPrimaryFolderValid(): Boolean =
         isPrimaryFolderPathValidUseCase(getPrimaryFolderPathUseCase()).also {
-            if (!it) Timber.w("The Primary Folder does not exist or is invalid")
+            if (!it) {
+                Timber.w("The Primary Folder does not exist or is invalid")
+                handlePrimaryFolderDisabled()
+            }
         }
 
     /**
@@ -1583,7 +1524,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
             endService(aborted = true)
-
         }
     }
 
