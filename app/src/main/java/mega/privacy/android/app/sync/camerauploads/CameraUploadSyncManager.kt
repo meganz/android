@@ -396,6 +396,10 @@ object CameraUploadSyncManager {
      *
      * @see MegaApiJava
      */
+    @Deprecated(
+        message = "Replace all usages with use case and pass in R.string.section_secondary_media_uploads as backupName",
+        replaceWith = ReplaceWith("UpdateSecondaryFolderBackupNameUseCase")
+    )
     fun updateSecondaryBackupName() {
         if (!CameraUploadUtil.isSecondaryEnabled()) {
             Timber.d("Secondary Folder is disabled. Unable to update Secondary Folder backup name")
