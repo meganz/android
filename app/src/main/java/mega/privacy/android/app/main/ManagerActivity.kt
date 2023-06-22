@@ -168,6 +168,7 @@ import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
+import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
@@ -613,6 +614,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var searchMenuItem: MenuItem? = null
     private var doNotDisturbMenuItem: MenuItem? = null
+    private var archivedMenuItem: MenuItem? = null
     private var clearRubbishBinMenuItem: MenuItem? = null
     private var cancelAllTransfersMenuItem: MenuItem? = null
     private var playTransfersMenuIcon: MenuItem? = null
@@ -4853,6 +4855,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         })
         val enableSelectMenuItem = menu.findItem(R.id.action_enable_select)
         doNotDisturbMenuItem = menu.findItem(R.id.action_menu_do_not_disturb)
+        archivedMenuItem = menu.findItem(R.id.action_menu_archived)
         clearRubbishBinMenuItem = menu.findItem(R.id.action_menu_clear_rubbish_bin)
         cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers)
         clearCompletedTransfers = menu.findItem(R.id.action_menu_clear_completed_transfers)
@@ -4956,6 +4959,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     doNotDisturbMenuItem?.isVisible = true
                     openLinkMenuItem?.isVisible = true
+                    archivedMenuItem?.isVisible = true
                     if (recentChatsFragment?.isVisible == true) {
                         searchMenuItem?.isVisible = true
                     }
@@ -5184,6 +5188,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 true
             }
 
+            R.id.action_menu_archived -> {
+                startActivity(Intent(this, ArchivedChatsActivity::class.java))
+                true
+            }
+
             R.id.action_select -> {
                 when (drawerItem) {
                     DrawerItem.CLOUD_DRIVE -> if (isCloudAdded) {
@@ -5297,6 +5306,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         searchViewModel.setTextSubmitted(false)
         if (searchMenuItem != null) {
             doNotDisturbMenuItem?.isVisible = false
+            archivedMenuItem?.isVisible = false
             cancelAllTransfersMenuItem?.isVisible = false
             clearCompletedTransfers?.isVisible = false
             pauseTransfersMenuIcon?.isVisible = false

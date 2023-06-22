@@ -715,6 +715,10 @@
             android:name="mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity"
             android:windowSoftInputMode="adjustNothing"/>
 
+        <activity
+            android:name="mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity"
+            android:launchMode="singleTop" />
+
     </application>
 
 </manifest>

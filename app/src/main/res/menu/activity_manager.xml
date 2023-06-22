@@ -87,6 +87,13 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_menu_archived"
+        android:orderInCategory="145"
+        android:title="@string/archived_chats_title_section"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_menu_clear_rubbish_bin"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="150"
