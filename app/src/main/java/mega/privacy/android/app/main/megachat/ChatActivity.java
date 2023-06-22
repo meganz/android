@@ -8902,7 +8902,9 @@ public class ChatActivity extends PasscodeActivity
     protected void onPause() {
         super.onPause();
 
-        currentMessagePlaying = adapter.getVoiceClipPlaying();
+        if (adapter != null) {
+            currentMessagePlaying = adapter.getVoiceClipPlaying();
+        }
 
         if (rtcAudioManager != null)
             rtcAudioManager.unregisterProximitySensor();
