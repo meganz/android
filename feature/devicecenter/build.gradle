@@ -10,7 +10,7 @@ apply from: "$project.rootDir/tools/sdk.gradle"
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion rootProject.buildTools
 
     buildFeatures {
         compose true

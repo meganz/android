@@ -6,7 +6,7 @@ plugins {
 android {
     namespace 'mega.privacy.android.core.ui.test'
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
+    buildToolsVersion rootProject.buildTools
 
     buildFeatures {
         compose true

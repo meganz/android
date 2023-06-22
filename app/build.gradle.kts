@@ -27,8 +27,8 @@ jacoco {
 android {
     val compileSdkVersion: Int by rootProject.extra
     compileSdk = compileSdkVersion
-    val buildTools by rootProject.extra(findProperty("buildToolsVersion"))
-    buildToolsVersion = buildTools as String
+    val buildTools: String by rootProject.extra
+    buildToolsVersion = buildTools
 
     buildFeatures {
         dataBinding = true
