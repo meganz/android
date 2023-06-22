@@ -5,16 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.repository.AccountRepository
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,32 +20,14 @@ class DefaultMonitorUserUpdatesTest {
 
     private val currentUserId = UserId(1L)
 
-    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(
-            UserAccount(
-                userId = currentUserId,
-                email = "",
-                fullName = "name",
-                isBusinessAccount = false,
-                isMasterBusinessAccount = false,
-                accountTypeIdentifier = null,
-                accountTypeString = ""
-            )
-        )
+    private val accountRepository = mock<AccountRepository> {
+        onBlocking { getLoggedInUserId() }.thenReturn(currentUserId)
     }
-
-    private val isUserLoggedIn = mock<IsUserLoggedIn> {
-        onBlocking { invoke() }.thenReturn(true)
-    }
-
-    private val accountRepository = mock<AccountRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultMonitorUserUpdates(
-            getAccountDetailsUseCase = getAccountDetailsUseCase,
+        underTest = MonitorUserUpdates(
             accountRepository = accountRepository,
-            isUserLoggedIn = isUserLoggedIn
         )
     }
 
@@ -133,18 +112,6 @@ class DefaultMonitorUserUpdatesTest {
                 assertThat(awaitItem()).isEqualTo(it)
             }
             cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test when user is logged off user info is not returned`() {
-        isUserLoggedIn.stub {
-            onBlocking { invoke() }.thenReturn(false)
-        }
-        runTest {
-            underTest().test {
-                awaitComplete()
-            }
         }
     }
 }

@@ -9,13 +9,11 @@ import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
-import mega.privacy.android.domain.usecase.DefaultMonitorUserUpdates
 import mega.privacy.android.domain.usecase.DeleteContactLink
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
-import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
@@ -31,12 +29,6 @@ import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 @Module
 @DisableInstallInCheck
 internal abstract class InternalAccountModule {
-
-    /**
-     * Binds the Use Case [MonitorUserUpdates] to its implementation [DefaultMonitorUserUpdates]
-     */
-    @Binds
-    abstract fun bindMonitorUserUpdates(implementation: DefaultMonitorUserUpdates): MonitorUserUpdates
 
     /**
      * Binds the Use Case [GetAccountAchievements] to its implementation [DefaultGetAccountAchievements]

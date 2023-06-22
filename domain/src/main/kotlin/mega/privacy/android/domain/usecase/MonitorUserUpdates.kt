@@ -1,16 +1,34 @@
 package mega.privacy.android.domain.usecase
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.repository.AccountRepository
+import javax.inject.Inject
 
 /**
- * Monitor global user updates for the current logged in user
+ * Default implementation of [MonitorUserUpdates]
+ *
+ * @property accountRepository
+ * @constructor Create empty Default monitor user updates
  */
-fun interface MonitorUserUpdates {
-    /**
-     * Invoke
-     *
-     * @return a flow of changes
-     */
-    operator fun invoke(): Flow<UserChanges>
+@OptIn(FlowPreview::class)
+class MonitorUserUpdates @Inject constructor(
+    private val accountRepository: AccountRepository,
+) {
+    operator fun invoke(): Flow<UserChanges> {
+        return flow {
+            emitAll(
+                accountRepository.monitorUserUpdates()
+                    .flatMapConcat { it.changes.entries.asFlow() }
+                    .filter { it.key == accountRepository.getLoggedInUserId() }
+                    .flatMapConcat { it.value.asFlow() }
+            )
+        }
+    }
 }

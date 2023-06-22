@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 
@@ -456,4 +457,11 @@ interface AccountRepository {
      * @return Flow of [AccountBlockedDetail]
      */
     fun monitorAccountBlocked(): Flow<AccountBlockedDetail>
+
+    /**
+     * Get logged in user id
+     *
+     * @return a user handle Long value or null
+     */
+    suspend fun getLoggedInUserId(): UserId?
 }

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
@@ -43,6 +42,7 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.account.AccountBlockedDetailMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -872,6 +872,10 @@ internal class DefaultAccountRepository @Inject constructor(
         }
 
     override fun monitorAccountBlocked() = appEventGateway.monitorAccountBlocked()
+
+    override suspend fun getLoggedInUserId() = withContext(ioDispatcher) {
+        megaApiGateway.myUser?.handle?.let { UserId(it) }
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
