@@ -5,33 +5,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.listeners.GetAchievementsListener
+import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.databinding.FragmentInviteFriendsBinding
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaAchievementsDetails
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * InviteFriendsFragment
  */
 @AndroidEntryPoint
-class InviteFriendsFragment : Fragment(), GetAchievementsListener.DataCallback {
-    private var titleCard: TextView? = null
+class InviteFriendsFragment : Fragment() {
+    private var _binding: FragmentInviteFriendsBinding? = null
+    private val binding: FragmentInviteFriendsBinding
+        get() = _binding!!
 
-    /**
-     * Deprecated getAchievementsListener
-     */
-    @Inject
-    lateinit var getAchievementsListener: GetAchievementsListener
+    private val viewModel by viewModels<InviteFriendsViewModel>()
 
     /**
      * onCreateView
@@ -40,18 +36,18 @@ class InviteFriendsFragment : Fragment(), GetAchievementsListener.DataCallback {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
-        val v = inflater.inflate(R.layout.fragment_invite_friends, container, false)
-        v.findViewById<Button>(R.id.invite_contacts_button)
-            .setOnClickListener(onInviteButtonClick())
-        titleCard = v.findViewById(R.id.title_card_invite_fragment)
+    ): View {
+        _binding = FragmentInviteFriendsBinding.inflate(layoutInflater)
+
+        binding.inviteContactsButton.setOnClickListener(onInviteButtonClick())
 
         if (Util.isDarkMode(requireContext())) {
             val backgroundColor = getColorForElevation(requireContext(), 1f)
-            v.findViewById<View>(R.id.invite_contacts_layout).setBackgroundColor(backgroundColor)
-            v.findViewById<View>(R.id.how_it_works_layout).setBackgroundColor(backgroundColor)
+            binding.inviteContactsLayout.setBackgroundColor(backgroundColor)
+            binding.howItWorksLayout.setBackgroundColor(backgroundColor)
         }
-        return v
+
+        return binding.root
     }
 
     /**
@@ -62,8 +58,17 @@ class InviteFriendsFragment : Fragment(), GetAchievementsListener.DataCallback {
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.title =
             getString(R.string.title_referral_bonuses)
 
-        // The root view has been created, fill it with the data when data ready
-        getAchievementsListener.setDataCallback(this)
+        viewLifecycleOwner.collectFlow(viewModel.uiState) { state ->
+            updateUI(state.grantStorageInBytes)
+        }
+    }
+
+    /**
+     * onDestroyView
+     */
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 
     /**
@@ -82,18 +87,10 @@ class InviteFriendsFragment : Fragment(), GetAchievementsListener.DataCallback {
         requireActivity().startActivityForResult(intent, Constants.REQUEST_CODE_GET_CONTACTS)
     }
 
-    private fun updateUI() {
-        val details = getAchievementsListener.achievementsDetails
-        if (details == null || context == null) return
-        val referralsStorageValue =
-            details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE)
-        titleCard?.text = getString(
+    private fun updateUI(storage: Long) {
+        binding.titleCardInviteFragment.text = getString(
             R.string.figures_achievements_text_referrals,
-            Util.getSizeString(referralsStorageValue, requireContext())
+            Util.getSizeString(storage, requireContext())
         )
-    }
-
-    override fun onAchievementsReceived() {
-        updateUI()
     }
 }
