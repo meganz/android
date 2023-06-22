@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 
@@ -48,13 +47,6 @@ abstract class InternalNodeModule {
         @Provides
         fun provideIsNodeInInbox(nodeRepository: NodeRepository): IsNodeInInbox =
             IsNodeInInbox(nodeRepository::isNodeInInbox)
-
-        /**
-         * provides [GetNodeVersionsByHandle]
-         */
-        @Provides
-        fun provideGetNodeVersionsByHandle(nodeRepository: NodeRepository): GetNodeVersionsByHandle =
-            GetNodeVersionsByHandle(nodeRepository::getNodeHistoryVersions)
 
         /**
          * Provides [GetUnverifiedIncomingShares] implementation

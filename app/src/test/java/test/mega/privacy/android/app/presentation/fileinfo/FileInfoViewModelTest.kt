@@ -69,7 +69,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
-import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -126,7 +126,7 @@ internal class FileInfoViewModelTest {
     private val monitorChildrenUpdates: MonitorChildrenUpdates = mock()
     private val monitorContactUpdates: MonitorContactUpdates = mock()
     private val megaNodeRepository: MegaNodeRepository = mock()
-    private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
+    private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
@@ -184,7 +184,7 @@ internal class FileInfoViewModelTest {
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             monitorChildrenUpdates = monitorChildrenUpdates,
             monitorContactUpdates = monitorContactUpdates,
-            getNodeVersionsByHandle = getNodeVersionsByHandle,
+            getNodeVersionsByHandleUseCase = getNodeVersionsByHandleUseCase,
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
@@ -215,7 +215,7 @@ internal class FileInfoViewModelTest {
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
         whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(typedFileNode)
         whenever(megaNodeRepository.getNodeByHandle(node.handle)).thenReturn(node)
-        whenever(getNodeVersionsByHandle(nodeId)).thenReturn(null)
+        whenever(getNodeVersionsByHandleUseCase(nodeId)).thenReturn(null)
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorOnlineStatusUpdates.invoke()).thenReturn(emptyFlow())

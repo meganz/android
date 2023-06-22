@@ -66,7 +66,7 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
-import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -109,7 +109,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorChildrenUpdates: MonitorChildrenUpdates,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val monitorOnlineStatusUpdates: MonitorOnlineStatusUseCase,
-    private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
+    private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase,
     private val getOutShares: GetOutShares,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getNodeLocationInfo: GetNodeLocationInfo,
@@ -178,7 +178,7 @@ class FileInfoViewModel @Inject constructor(
                     setNode(parent.id.longValue)
                     return@launch
                 }
-                versions = getNodeVersionsByHandle(typedNode.id)
+                versions = getNodeVersionsByHandleUseCase(typedNode.id)
             }
             updateCurrentNodeStatus()
             //monitor future changes of the node
