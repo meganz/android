@@ -1036,6 +1036,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             false
         )
         checkUploadNodes()
+        startUploadAndCompression()
     }
 
     private suspend fun checkUploadNodes() {
@@ -1059,24 +1060,25 @@ class CameraUploadsWorker @AssistedInject constructor(
             secondaryUploadNode?.id,
             tempRoot
         )
-        gatherSyncRecordsForUpload()
     }
 
-    private suspend fun gatherSyncRecordsForUpload() {
-        val finalList = getPendingSyncRecords()
-        if (finalList.isEmpty()) {
-            if (compressedVideoPending()) {
-                Timber.d("Pending upload list is empty, now check view compression status.")
-                startVideoCompression()
-            } else {
-                Timber.d("Nothing to upload.")
-                endService()
-                deleteCameraUploadsTemporaryRootDirectoryUseCase()
-            }
-        } else {
-            Timber.d("Start to upload %d files.", finalList.size)
-            startParallelUpload(finalList, false)
+    private suspend fun startUploadAndCompression() {
+        val finalList = getPendingSyncRecords().also {
+            Timber.d("Total File to upload ${it.size}")
         }
+        if (finalList.isNotEmpty()) {
+            startParallelUpload(finalList, isCompressedVideo = false)
+        }
+        if (compressedVideoPending()) {
+            startVideoCompression()
+            val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
+            if (compressedList.isNotEmpty()) {
+                Timber.d("Start to upload ${compressedList.size} compressed videos.")
+                startParallelUpload(compressedList, isCompressedVideo = true)
+            }
+        }
+        onQueueComplete()
+        deleteCameraUploadsTemporaryRootDirectoryUseCase()
     }
 
     private fun showNotEnoughStorageNotification() {
@@ -1244,14 +1246,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             copyFileAsyncList.joinAll()
         }
         uploadFileAsyncList.joinAll()
-
-        if (compressedVideoPending() && isCompressorAvailable().not()) {
-            Timber.d("Got pending videos, will start compress.")
-            startVideoCompression()
-        } else {
-            Timber.d("No pending videos, finish.")
-            onQueueComplete()
-        }
     }
 
     private suspend fun startHeartbeat(finalList: List<SyncRecord>) {
@@ -1458,7 +1452,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                     }
                 })
         }
-        endService()
     }
 
     /**
@@ -1517,6 +1510,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 MegaApplication.getInstance().checkEnabledCookies()
                 Timber.d("Start process")
                 startWorker()
+                endService()
             } else {
                 Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop process")
                 endService(aborted = true)
@@ -1905,8 +1899,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         broadcastCameraUploadProgress(progress, pending)
     }
 
-    private fun isCompressorAvailable() = (videoCompressionJob?.isActive ?: false)
-
     private suspend fun startVideoCompression() = coroutineScope {
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
@@ -1914,16 +1906,15 @@ class CameraUploadsWorker @AssistedInject constructor(
             cameraUploadState.totalUploaded = 0
             cameraUploadState.totalToUpload = 0
             totalVideoSize = getTotalVideoSizeInMB(fullList)
-            Timber.d(
-                "Total videos count are %d, %d mb to Conversion",
-                fullList.size,
-                totalVideoSize
-            )
+            Timber.d("Total videos count are ${fullList.size}, $totalVideoSize MB to Conversion")
             if (shouldStartVideoCompression(totalVideoSize)) {
                 videoCompressionJob = launch {
                     Timber.d("Starting compressor")
-                    runCatching {
-                        compressVideos(tempRoot, fullList).collect {
+                    compressVideos(tempRoot, fullList)
+                        .catch {
+                            Timber.d("Video Compression fails $it")
+                        }
+                        .collect {
                             when (it) {
                                 is VideoCompressionState.Failed -> {
                                     onCompressFailed(fullList.first { record -> record.id == it.id })
@@ -1958,18 +1949,12 @@ class CameraUploadsWorker @AssistedInject constructor(
                                 }
                             }
                         }
-                    }.onFailure {
-                        Timber.d("Video Compression Callback Exception $it")
-                        endService(aborted = true)
-                    }
                 }
                 videoCompressionJob?.join()
                 videoCompressionJob = null
-                onCompressFinished()
             } else {
                 Timber.d("Compression queue bigger than setting, show notification to user.")
                 showVideoCompressionErrorNotification()
-                endService(aborted = true)
             }
         }
     }
@@ -2067,28 +2052,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    /**
-     * Compression finished
-     */
-    private suspend fun onCompressFinished() {
-        Timber.d("Video Compression Finished")
-        Timber.d("Preparing to upload compressed video.")
-        val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
-        if (compressedList.isNotEmpty()) {
-            Timber.d("Start to upload ${compressedList.size} compressed videos.")
-            startParallelUpload(compressedList, true)
-        } else {
-            onQueueComplete()
-        }
-    }
-
-    private suspend fun updateProgressNotification() = withContext(ioDispatcher) {
+    private suspend fun updateProgressNotification() {
         // refresh UI every 1 seconds to avoid too much workload on main thread
         val now = System.currentTimeMillis()
         lastUpdated = if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS) {
             now
         } else {
-            return@withContext
+            return
         }
 
         @Suppress("DEPRECATION") val pendingTransfers = megaApi.numPendingUploads
