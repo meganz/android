@@ -312,8 +312,16 @@ private fun MDHeader(
                             Text(text = stringResource(id = R.string.general_import))
                         }
                     }
-                    DropdownMenuItem(onClick = onSaveToDeviceClicked) {
-                        Text(text = stringResource(id = R.string.general_save_to_device))
+                    DropdownMenuItem(
+                        onClick = onSaveToDeviceClicked,
+                        enabled = uiPhotos.isNotEmpty()
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.general_save_to_device),
+                            modifier = if (uiPhotos.isEmpty())
+                                Modifier.alpha(0.5f)
+                            else Modifier.alpha(1.0f),
+                        )
                     }
                     DropdownMenuItem(
                         onClick = onSortByClicked,
