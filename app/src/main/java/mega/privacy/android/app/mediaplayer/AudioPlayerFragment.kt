@@ -69,24 +69,11 @@ class AudioPlayerFragment : Fragment() {
             }
         }
     }
+
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
-            if (isResumed) {
-                playerViewHolder?.updateLoadingAnimation(state)
-            }
+            playerViewHolder?.updateLoadingAnimation(state)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        context?.bindService(
-            Intent(
-                requireContext(),
-                AudioPlayerService::class.java
-            ).putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
-            connection,
-            BIND_AUTO_CREATE
-        )
     }
 
     override fun onCreateView(
@@ -101,6 +88,15 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        context?.bindService(
+            Intent(
+                requireContext(),
+                AudioPlayerService::class.java
+            ).putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
+            connection,
+            BIND_AUTO_CREATE
+        )
 
         observeFlow()
         delayHideToolbar()
@@ -126,11 +122,7 @@ class AudioPlayerFragment : Fragment() {
         playbackPositionDialog?.run {
             if (isShowing) dismiss()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
+        playerViewHolder = null
         serviceGateway?.removeListener(playerListener)
         serviceGateway = null
         context?.unbindService(connection)
@@ -139,7 +131,7 @@ class AudioPlayerFragment : Fragment() {
     private fun observeFlow() {
         if (view != null) {
             serviceGateway?.metadataUpdate()?.let {
-                collectFlow(it) { metadata ->
+                viewLifecycleOwner.collectFlow(it) { metadata ->
                     playerViewHolder?.displayMetadata(metadata)
                 }
             }
@@ -147,13 +139,13 @@ class AudioPlayerFragment : Fragment() {
             serviceViewModelGateway?.let {
                 if (!playlistObserved) {
                     playlistObserved = true
-                    collectFlow(it.playlistUpdate()) { info ->
+                    viewLifecycleOwner.collectFlow(it.playlistUpdate()) { info ->
                         Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
 
                         playerViewHolder?.togglePlaylistEnabled(requireContext(), info.first)
                     }
 
-                    collectFlow(it.retryUpdate()) { isRetry ->
+                    viewLifecycleOwner.collectFlow(it.retryUpdate()) { isRetry ->
                         when {
                             !isRetry && retryFailedDialog == null -> {
                                 retryFailedDialog = MaterialAlertDialogBuilder(requireContext())

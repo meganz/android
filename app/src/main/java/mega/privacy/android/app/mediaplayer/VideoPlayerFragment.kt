@@ -102,9 +102,7 @@ class VideoPlayerFragment : Fragment() {
 
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
-            if (isResumed) {
-                updateLoadingAnimation(state)
-            }
+            updateLoadingAnimation(state)
             // The subtitle button is enable after the video is in buffering state
             playerViewHolder?.subtitleButtonEnable(state >= Player.STATE_BUFFERING)
         }
@@ -128,18 +126,6 @@ class VideoPlayerFragment : Fragment() {
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        context?.bindService(
-            Intent(
-                requireContext(),
-                VideoPlayerService::class.java
-            ).putExtra(Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
-            connection,
-            Context.BIND_AUTO_CREATE
-        )
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -153,6 +139,15 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        context?.bindService(
+            Intent(
+                requireContext(),
+                VideoPlayerService::class.java
+            ).putExtra(Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
+            connection,
+            Context.BIND_AUTO_CREATE
+        )
 
         observeFlow()
     }
@@ -187,11 +182,7 @@ class VideoPlayerFragment : Fragment() {
         playbackPositionDialog?.run {
             if (isShowing) dismiss()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
+        playerViewHolder = null
         serviceGateway?.removeListener(playerListener)
         serviceGateway = null
         context?.unbindService(connection)
@@ -200,7 +191,7 @@ class VideoPlayerFragment : Fragment() {
     private fun observeFlow() {
         if (view != null) {
             serviceGateway?.let { gateway ->
-                collectFlow(gateway.metadataUpdate()) { metadata ->
+                viewLifecycleOwner.collectFlow(gateway.metadataUpdate()) { metadata ->
                     playerViewHolder?.displayMetadata(metadata)
                     (activity as? VideoPlayerActivity)?.setToolbarTitle(
                         if (context?.configuration?.orientation == ORIENTATION_LANDSCAPE) {
@@ -211,7 +202,7 @@ class VideoPlayerFragment : Fragment() {
                     )
                 }
 
-                collectFlow(gateway.playbackPositionStateUpdate()) { state ->
+                viewLifecycleOwner.collectFlow(gateway.playbackPositionStateUpdate()) { state ->
                     if (state.showPlaybackDialog) {
                         playbackPositionDialog =
                             MaterialAlertDialogBuilder(requireContext())
@@ -262,12 +253,12 @@ class VideoPlayerFragment : Fragment() {
             serviceViewModelGateway?.let {
                 if (!playlistObserved) {
                     playlistObserved = true
-                    collectFlow(it.playlistUpdate()) { info ->
+                    viewLifecycleOwner.collectFlow(it.playlistUpdate()) { info ->
                         Timber.d("MediaPlayerService observed playlist ${info.first.size} items")
                         playerViewHolder?.togglePlaylistEnabled(info.first)
                     }
 
-                    collectFlow(it.retryUpdate()) { isRetry ->
+                    viewLifecycleOwner.collectFlow(it.retryUpdate()) { isRetry ->
                         when {
                             !isRetry && retryFailedDialog == null -> {
                                 retryFailedDialog =
@@ -295,14 +286,14 @@ class VideoPlayerFragment : Fragment() {
                         }
                     }
 
-                    collectFlow(it.mediaPlaybackUpdate()) { isPaused ->
+                    viewLifecycleOwner.collectFlow(it.mediaPlaybackUpdate()) { isPaused ->
                         // The keepScreenOn is true when the video is playing, otherwise it's false.
                         videoPlayerView?.keepScreenOn = !isPaused
                     }
                 }
             }
 
-            collectFlow(viewModel.state) { state ->
+            viewLifecycleOwner.collectFlow(viewModel.state) { state ->
                 playerViewHolder?.updateSubtitleButtonUI(state.isSubtitleShown)
                 serviceGateway?.setPlayWhenReady(!state.isSubtitleDialogShown)
                 if (!state.isSubtitleDialogShown) {
