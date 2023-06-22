@@ -46,7 +46,6 @@ import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.MegaException
@@ -60,9 +59,9 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.ResetTotalDownloads
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
@@ -72,6 +71,7 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -126,7 +126,7 @@ class ImageViewerViewModel @Inject constructor(
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val removeNodeUseCase: RemoveNodeUseCase,
+    private val deleteNodeByHandleUseCase: DeleteNodeByHandleUseCase,
     private val checkNameCollision: CheckNameCollision,
     private val getNodeByHandle: GetNodeByHandle,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
@@ -818,10 +818,14 @@ class ImageViewerViewModel @Inject constructor(
     }
 
     fun removeNode(nodeHandle: Long) {
-        removeNodeUseCase.remove(nodeHandle)
-            .subscribeAndComplete(false) {
-                snackBarMessage.value = context.getString(R.string.context_correctly_removed)
-            }
+        viewModelScope.launch {
+            runCatching { deleteNodeByHandleUseCase(NodeId(nodeHandle)) }
+                .onSuccess {
+                    snackBarMessage.value = context.getString(R.string.context_correctly_removed)
+                }.onFailure {
+                    Timber.d(it)
+                }
+        }
     }
 
     fun stopImageLoading(itemId: Long) {

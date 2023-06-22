@@ -66,6 +66,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
@@ -169,6 +170,7 @@ class ManagerViewModel @Inject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
+    private val deleteNodesUseCase: DeleteNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -775,6 +777,23 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 moveNodesToRubbishUseCase(nodeHandles)
+            }.onSuccess {
+                _state.update { state -> state.copy(moveRequestResult = it) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Delete nodes
+     *
+     * @param nodeHandles
+     */
+    fun deleteNodes(nodeHandles: List<Long>) {
+        viewModelScope.launch {
+            runCatching {
+                deleteNodesUseCase(nodeHandles.map { NodeId(it) })
             }.onSuccess {
                 _state.update { state -> state.copy(moveRequestResult = it) }
             }.onFailure {

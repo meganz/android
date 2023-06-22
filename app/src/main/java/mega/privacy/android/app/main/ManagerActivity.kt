@@ -144,7 +144,6 @@ import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.offline.OfflineFragment
-import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -232,6 +231,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
+import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchFragment
@@ -276,10 +276,8 @@ import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
-import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -423,9 +421,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var legacyMoveNodeUseCase: LegacyMoveNodeUseCase
-
-    @Inject
-    lateinit var removeNodeUseCase: RemoveNodeUseCase
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
@@ -2387,7 +2382,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun handleMovementResult(moveRequestResult: MoveRequestResult) {
-        showMovementResult(moveRequestResult, moveRequestResult.nodes.first())
+        if (moveRequestResult !is MoveRequestResult.DeleteMovement) {
+            showMovementResult(moveRequestResult, moveRequestResult.nodes.first())
+        }
         showSnackbar(
             Constants.SNACKBAR_TYPE,
             moveRequestMessageMapper(moveRequestResult),
@@ -5811,19 +5808,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else {
             builder.setMessage(resources.getString(R.string.confirmation_delete_from_mega))
             builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete) { _: DialogInterface?, _: Int ->
-                removeNodeUseCase.remove(handleList)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { result: RemoveRequestResult ->
-                            showRestorationOrRemovalResult(
-                                result.getResultText(context = this@ManagerActivity)
-                            )
-                        },
-                        { throwable: Throwable -> Timber.e(throwable) }
-                    )
-                    .addTo(composite)
-
+                viewModel.deleteNodes(handleList)
             }
         }
         builder.setNegativeButton(R.string.general_cancel, null)

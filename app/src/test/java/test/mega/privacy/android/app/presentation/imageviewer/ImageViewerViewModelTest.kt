@@ -98,7 +98,7 @@ internal class ImageViewerViewModelTest {
             areTransfersPausedUseCase = mock(),
             copyNodeUseCase = copyNodeUseCase,
             moveNodeUseCase = moveNodeUseCase,
-            removeNodeUseCase = mock(),
+            deleteNodeByHandleUseCase = mock(),
             checkNameCollision = checkNameCollision,
             getNodeByHandle = getNodeByHandle,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,

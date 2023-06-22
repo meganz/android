@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
@@ -238,6 +239,7 @@ class ManagerViewModelTest {
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val monitorBackupFolder = mock<MonitorBackupFolder>()
     private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
+    private val deleteNodesUseCase = mock<DeleteNodesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -295,7 +297,8 @@ class ManagerViewModelTest {
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             monitorBackupFolder = monitorBackupFolder,
-            moveNodesToRubbishUseCase = moveNodesToRubbishUseCase
+            moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
+            deleteNodesUseCase = deleteNodesUseCase,
         )
     }
 
@@ -855,7 +858,7 @@ class ManagerViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.restoreNodeResult).isNull()
+                assertThat(state.moveRequestResult).isNull()
                 underTest.moveNodesToRubbishBin(listOf(1L))
                 val updatedState = awaitItem()
                 assertThat(updatedState.moveRequestResult).isEqualTo(result)
@@ -872,11 +875,29 @@ class ManagerViewModelTest {
             ).thenReturn(result)
 
             underTest.state.test {
-                assertThat(awaitItem().restoreNodeResult).isNull()
+                assertThat(awaitItem().moveRequestResult).isNull()
                 underTest.moveNodesToRubbishBin(listOf(1L))
                 assertThat(awaitItem().moveRequestResult).isEqualTo(result)
                 underTest.markHandleMoveRequestResult()
-                assertThat(awaitItem().restoreNodeResult).isNull()
+                assertThat(awaitItem().moveRequestResult).isNull()
+            }
+        }
+
+    @Test
+    fun `test that moveRequestResult updated when calling deleteNodesUseCase successfully`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val result = mock<MoveRequestResult.DeleteMovement>()
+            whenever(
+                deleteNodesUseCase(any())
+            ).thenReturn(result)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.moveRequestResult).isNull()
+                underTest.deleteNodes(listOf(1L))
+                val updatedState = awaitItem()
+                assertThat(updatedState.moveRequestResult).isEqualTo(result)
             }
         }
 }
