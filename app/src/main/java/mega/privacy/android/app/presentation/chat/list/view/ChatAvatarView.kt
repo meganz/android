@@ -35,7 +35,7 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 
 /**
- * Avatar view for a ChatItem
+ * Avatar view for a [ChatRoomItem]
  *
  * @param modifier
  * @param avatars
