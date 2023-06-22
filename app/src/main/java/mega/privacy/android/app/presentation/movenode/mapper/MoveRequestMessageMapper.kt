@@ -112,5 +112,39 @@ class MoveRequestMessageMapper @Inject constructor(
                     }
                 }
             }
+
+            is MoveRequestResult.DeleteMovement -> {
+                when {
+                    request.isSuccess -> {
+                        context.resources.getQuantityString(
+                            R.plurals.rubbish_bin_remove_items_snackbar_success,
+                            request.count,
+                            request.count,
+                        )
+                    }
+
+                    request.isAllRequestError -> {
+                        context.resources.getQuantityString(
+                            R.plurals.rubbish_bin_remove_items_snackbar_fail,
+                            request.errorCount,
+                            request.errorCount
+                        )
+                    }
+
+                    else -> "${
+                        context.resources.getQuantityString(
+                            R.plurals.rubbish_bin_remove_items_snackbar_success_concat,
+                            request.count,
+                            request.count
+                        )
+                    }${
+                        context.resources.getQuantityString(
+                            R.plurals.rubbish_bin_remove_items_snackbar_fail_concat,
+                            request.errorCount,
+                            request.errorCount
+                        )
+                    }"
+                }
+            }
         }
 }

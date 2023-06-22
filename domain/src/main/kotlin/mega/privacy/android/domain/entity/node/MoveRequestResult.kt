@@ -13,7 +13,7 @@ sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
     val oldParentHandle: Long? = -1L,
-    val nodes: List<Long> = emptyList()
+    val nodes: List<Long> = emptyList(),
 ) {
     /**
      * Count of success move request
@@ -56,11 +56,24 @@ sealed class MoveRequestResult(
         count: Int,
         errorCount: Int,
         oldParentHandle: Long?,
-        nodes: List<Long> = emptyList()
+        nodes: List<Long> = emptyList(),
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
         oldParentHandle = oldParentHandle,
         nodes = nodes
+    )
+
+    /**
+     * Result of a delete permanently
+     */
+    class DeleteMovement(
+        count: Int,
+        errorCount: Int,
+        nodes: List<Long>,
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+        nodes = nodes,
     )
 }
