@@ -8,13 +8,11 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.InitialiseLogging
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 
 /**
  * Logger initializer
@@ -62,13 +60,8 @@ class LoggerInitializer : Initializer<Unit> {
         val entryPoint =
             EntryPointAccessors.fromApplication(context, LoggerInitializerEntryPoint::class.java)
 
-        // we need init log successfully before call other parts
-        if (BuildConfig.DEBUG) {
-            runBlocking {
-                entryPoint.enableLogAllToConsole().invoke()
-            }
-        }
         entryPoint.appScope().launch {
+            entryPoint.enableLogAllToConsole().invoke()
             val permanentEnabled =
                 entryPoint.getFeatureFlagValue().invoke(AppFeatures.PermanentLogging)
             entryPoint.initialiseLogging().invoke(permanentEnabled)
