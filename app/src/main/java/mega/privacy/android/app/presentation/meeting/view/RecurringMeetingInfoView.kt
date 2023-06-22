@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
@@ -288,7 +289,7 @@ private fun OccurrenceItemView(
 private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         state.schedTitle?.let {
-            MeetingAvatarView(
+            ChatAvatarView(
                 avatarUri = null,
                 avatarPlaceholder = it,
                 avatarColor = null,
@@ -297,7 +298,7 @@ private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
         }
     } else if (state.isSingleMeeting()) {
         state.firstParticipant?.let { participant ->
-            MeetingAvatarView(
+            ChatAvatarView(
                 avatarUri = participant.data.avatarUri,
                 avatarPlaceholder = participant.getAvatarFirstLetter(),
                 avatarColor = participant.defaultAvatarColor,
@@ -309,7 +310,7 @@ private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
         Box(
             Modifier.fillMaxSize()
         ) {
-            MeetingAvatarView(
+            ChatAvatarView(
                 avatarUri = state.secondParticipant.data.avatarUri,
                 avatarPlaceholder = state.secondParticipant.getAvatarFirstLetter(),
                 avatarColor = state.secondParticipant.defaultAvatarColor,
@@ -319,7 +320,7 @@ private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
                     .align(Alignment.BottomEnd)
                     .border(1.dp, Color.White, CircleShape)
             )
-            MeetingAvatarView(
+            ChatAvatarView(
                 avatarUri = state.firstParticipant.data.avatarUri,
                 avatarPlaceholder = state.firstParticipant.getAvatarFirstLetter(),
                 avatarColor = state.firstParticipant.defaultAvatarColor,

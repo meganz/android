@@ -56,7 +56,6 @@ import mega.privacy.android.app.listeners.TruncateHistoryListener;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
-import mega.privacy.android.app.main.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
@@ -152,8 +151,6 @@ public class ChatController {
         Timber.d("Chat ID: %s", chatItem.getChatId());
         if (context instanceof ManagerActivity) {
             megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ManagerActivity) context);
-        } else if (context instanceof ArchivedChatsActivity) {
-            megaChatApi.archiveChat(chatItem.getChatId(), !chatItem.isArchived(), (ArchivedChatsActivity) context);
         }
     }
 
@@ -170,10 +167,6 @@ public class ChatController {
     public void archiveChats(ArrayList<MegaChatListItem> chats) {
         Timber.d("Chat ID: %s", chats.size());
         if (context instanceof ManagerActivity) {
-            for (int i = 0; i < chats.size(); i++) {
-                megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(), null);
-            }
-        } else if (context instanceof ArchivedChatsActivity) {
             for (int i = 0; i < chats.size(); i++) {
                 megaChatApi.archiveChat(chats.get(i).getChatId(), !chats.get(i).isArchived(), null);
             }

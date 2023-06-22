@@ -290,7 +290,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 inviteTitle.setClickable(true);
                 moreContactsTitle.setVisibility(View.GONE);
 
-                adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
+//                adapter = new ContactsHorizontalAdapter((Activity) context, this, megaContacts);
                 contactsList.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
                 contactsList.setAdapter(adapter);
             } else {

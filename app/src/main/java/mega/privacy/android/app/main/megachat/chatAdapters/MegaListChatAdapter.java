@@ -80,10 +80,8 @@ import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener;
 import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
-import mega.privacy.android.app.main.megachat.ArchivedChatsActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity;
 import mega.privacy.android.app.main.megachat.ChatExplorerFragment;
-import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -484,7 +482,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 
             ((ViewHolderNormalChatList) holder).imageButtonThreeDots = v.findViewById(R.id.recent_chat_list_three_dots);
 
-            if ((context instanceof ManagerActivity) || (context instanceof ArchivedChatsActivity)) {
+            if ((context instanceof ManagerActivity)) {
                 ((ViewHolderNormalChatList) holder).imageButtonThreeDots.setVisibility(View.VISIBLE);
                 ((ViewHolderNormalChatList) holder).imageButtonThreeDots.setOnClickListener(this);
             } else {
@@ -628,7 +626,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    hideMultipleSelect();
                     notifyItemChanged(positionToflip);
                 }
 
@@ -676,7 +673,6 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    hideMultipleSelect();
                     if (delete) {
                         notifyItemChanged(pos);
                     }
@@ -688,15 +684,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
             });
             view.imageView.startAnimation(flipAnimation);
         } else {
-            hideMultipleSelect();
             notifyItemChanged(pos);
-        }
-    }
-
-    private void hideMultipleSelect() {
-        if (selectedItems.size() <= 0
-                && (context instanceof ManagerActivity || context instanceof ArchivedChatsActivity)) {
-            ((RecentChatsFragment) fragment).hideMultipleSelect();
         }
     }
 
@@ -817,29 +805,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 
         int id = v.getId();
-        if (id == R.id.recent_chat_list_three_dots) {
-            int currentPosition = holder.getBindingAdapterPosition();
-            Timber.d("Current position: %s", currentPosition);
-            if (isInvalidPosition(currentPosition)) {
-                return;
-            }
-
-            MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
-            if (context instanceof ManagerActivity) {
-
-                if (multipleSelect) {
-                    ((RecentChatsFragment) fragment).itemClick(currentPosition);
-                } else {
-                    ((ManagerActivity) context).showChatPanel(c);
-                }
-            } else if (context instanceof ArchivedChatsActivity) {
-                if (multipleSelect) {
-                    ((RecentChatsFragment) fragment).itemClick(currentPosition);
-                } else {
-                    ((ArchivedChatsActivity) context).showChatPanel(c);
-                }
-            }
-        } else if (id == R.id.recent_chat_list_item_layout) {
+        if (id == R.id.recent_chat_list_item_layout) {
             Timber.d("Click layout!");
             int currentPosition = holder.getBindingAdapterPosition();
             Timber.d("Current position: %s", currentPosition);
@@ -847,32 +813,15 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 return;
             }
 
-            if (context instanceof ManagerActivity) {
-                ((RecentChatsFragment) fragment).itemClick(currentPosition);
-            } else if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivity) {
+            if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivity) {
                 ((ChatExplorerFragment) fragment).itemClick(currentPosition);
-            } else if (context instanceof ArchivedChatsActivity) {
-                ((RecentChatsFragment) fragment).itemClick(currentPosition);
             }
-        } else if (id == R.id.archived_chat_option_text) {
-            Timber.d("Show archived chats");
-
-            Intent archivedChatsIntent = new Intent(context, ArchivedChatsActivity.class);
-            context.startActivity(archivedChatsIntent);
         }
     }
 
     @Override
     public boolean onLongClick(View view) {
         Timber.d("OnLongCLick");
-        ViewHolderChatList holder = (ViewHolderChatList) view.getTag();
-        int currentPosition = holder.getBindingAdapterPosition();
-
-        if (context instanceof ManagerActivity || context instanceof ArchivedChatsActivity) {
-            ((RecentChatsFragment) fragment).activateActionMode();
-            ((RecentChatsFragment) fragment).itemClick(currentPosition);
-        }
-
         return true;
     }
 

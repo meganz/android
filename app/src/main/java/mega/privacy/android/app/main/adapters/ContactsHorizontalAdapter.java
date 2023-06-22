@@ -35,7 +35,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.main.listeners.UserAvatarListener;
-import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaContactRequest;
@@ -45,21 +44,18 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
 
     private Activity context;
 
-    private RecentChatsFragment recentChatsFragment;
-
     private List<MegaContactGetter.MegaContact> contacts;
 
     private MegaApiAndroid megaApi;
 
     private AlertDialog sendInvitationDialog;
 
-    public ContactsHorizontalAdapter(Activity context, RecentChatsFragment recentChatsFragment, List<MegaContactGetter.MegaContact> data) {
+    public ContactsHorizontalAdapter(Activity context, List<MegaContactGetter.MegaContact> data) {
         this.context = context;
         this.contacts = data;
         if (megaApi == null) {
             megaApi = ((MegaApplication) context.getApplication()).getMegaApi();
         }
-        this.recentChatsFragment = recentChatsFragment;
     }
 
     @NonNull
@@ -107,7 +103,6 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             switch (which) {
                 case DialogInterface.BUTTON_POSITIVE:
                     contacts.remove(contact);
-                    recentChatsFragment.onContactsCountChange(contacts);
                     notifyDataSetChanged();
 
                     String email = holder.contactMail;

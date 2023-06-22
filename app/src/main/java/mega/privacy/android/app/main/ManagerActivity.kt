@@ -171,11 +171,10 @@ import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
-import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.chats.ChatTabsFragment
+import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
@@ -772,9 +771,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param chatIdReceived The chat ID of a call.
      */
     private fun updateVisibleCallElements(chatIdReceived: Long) {
-        if (recentChatsFragment != null && recentChatsFragment?.isVisible == true) {
-            recentChatsFragment?.refreshNode(megaChatApi.getChatListItem(chatIdReceived))
-        }
         if (Util.isScreenInPortrait(this@ManagerActivity)) {
             setCallWidget()
         } else {
@@ -1777,11 +1773,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     )
                 )
             }
-            if (drawerItem === DrawerItem.CHAT) {
-                if (recentChatsFragment != null && recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.onlineStatusUpdate(megaChatApi.onlineStatus)
-                }
-            }
             setChatBadge()
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
@@ -2260,9 +2251,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.setShouldAlertUserAboutSecurityUpgrade(false)
             }
             if (managerState.isPushNotificationSettingsUpdatedEvent) {
-                if (recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.notifyPushChanged()
-                }
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
             enabledFeatures = managerState.enabledFlags
@@ -3150,10 +3138,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
-                if (recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.setChats()
-                    recentChatsFragment?.setStatus()
-                }
                 MegaApplication.setRecentChatVisible(true)
             }
 
@@ -3263,13 +3247,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
         ft.replace(R.id.fragment_container, fragment, fragmentTag)
         ft.commitNowAllowingStateLoss()
-        // refresh manually
-        if (fragment is ChatTabsFragment) {
-            if (recentChatsFragment?.isVisible == true) {
-                recentChatsFragment?.refreshMegaContactsList()
-                recentChatsFragment?.setCustomisedActionBar()
-            }
-        }
     }
 
     fun refreshFragment(fragmentTag: String) {
@@ -4556,9 +4533,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.CHAT -> {
                 chatTabsFragment = chatsFragment
-                if (recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.checkScroll()
-                }
             }
 
             DrawerItem.TRANSFERS -> {
@@ -4756,13 +4730,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     layoutCallMenuItem,
                     chronometerMenuItem
                 )
-                if (drawerItem === DrawerItem.CHAT) {
-                    if (recentChatsFragment?.isVisible == true) {
-                        recentChatsFragment?.closeSearch()
-                        recentChatsFragment?.setCustomisedActionBar()
-                        supportInvalidateOptionsMenu()
-                    }
-                } else if (drawerItem === DrawerItem.HOMEPAGE) {
+                if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
                         if (!searchViewModel.state.value.textSubmitted) {
                             setFullscreenOfflineFragmentSearchQuery(null)
@@ -4813,12 +4781,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             override fun onQueryTextChange(newText: String): Boolean {
                 Timber.d("onQueryTextChange")
-                if (drawerItem === DrawerItem.CHAT) {
-                    searchViewModel.setSearchQuery(newText)
-                    if (chatsFragment != null) {
-                        chatsFragment?.setSearchQuery(newText)
-                    }
-                } else if (drawerItem === DrawerItem.HOMEPAGE) {
+                if (drawerItem === DrawerItem.HOMEPAGE) {
                     if (homepageScreen === HomepageScreen.FULLSCREEN_OFFLINE) {
                         if (searchViewModel.state.value.textSubmitted) {
                             searchViewModel.setTextSubmitted(false)
@@ -4960,9 +4923,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     doNotDisturbMenuItem?.isVisible = true
                     openLinkMenuItem?.isVisible = true
                     archivedMenuItem?.isVisible = true
-                    if (recentChatsFragment?.isVisible == true) {
-                        searchMenuItem?.isVisible = true
-                    }
                 }
 
                 DrawerItem.NOTIFICATIONS -> {}
@@ -5213,10 +5173,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                     DrawerItem.HOMEPAGE -> if (fullscreenOfflineFragment != null) {
                         fullscreenOfflineFragment?.selectAll()
-                    }
-
-                    DrawerItem.CHAT -> if (recentChatsFragment?.isVisible == true) {
-                        recentChatsFragment?.selectAll()
                     }
 
                     DrawerItem.INBOX -> if (getInboxFragment() != null) {
@@ -6776,10 +6732,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun confirmLeaveChats(chats: List<MegaChatListItem>) {
-        if (recentChatsFragment?.isVisible == true) {
-            recentChatsFragment?.clearSelections()
-            recentChatsFragment?.hideMultipleSelect()
-        }
         for (chat in chats) {
             megaChatApi.leaveChat(chat.chatId, RemoveFromChatRoomListener(this))
         }
@@ -9395,9 +9347,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.w("Item NULL")
             return
         }
-        if (recentChatsFragment != null) {
-            recentChatsFragment?.listItemUpdate(item)
-        }
         if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_UNREAD_COUNT)) {
             Timber.d("Change unread count: %s", item.unreadCount)
             setChatBadge()
@@ -9415,31 +9364,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (userHandle == megaChatApi.myUserHandle) {
             Timber.d("My own status update")
             setContactStatus()
-            if (drawerItem === DrawerItem.CHAT) {
-                if (recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.onlineStatusUpdate(currentStatus)
-                }
-            }
         } else {
             Timber.d("Status update for the user: %s", userHandle)
-            if (recentChatsFragment?.isVisible == true) {
-                Timber.d("Update Recent chats view")
-                recentChatsFragment?.contactStatusUpdate(userHandle, currentStatus)
-            }
         }
     }
 
     private fun onChatConnectionStateUpdate(chatId: Long, newState: Int) {
         Timber.d("Chat ID: %d, New state: %d", chatId, newState)
-        if (newState == MegaChatApi.CHAT_CONNECTION_ONLINE && chatId == -1L) {
-            Timber.d("Online Connection: %s", chatId)
-            if (recentChatsFragment?.isVisible == true) {
-                recentChatsFragment?.setChats()
-                if (drawerItem === DrawerItem.CHAT) {
-                    recentChatsFragment?.setStatus()
-                }
-            }
-        }
     }
 
     fun copyError() {
@@ -10020,14 +9951,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         get() = (supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment).also {
             chatTabsFragment = it
         }
-    private val recentChatsFragment: RecentChatsFragment?
-        get() = if (chatsFragment != null) {
-            chatsFragment?.getRecentChatsFragment()
-        } else {
-            null
-        }
     val isMeetingTabShown: Boolean
-        get() = chatsFragment?.getRecentChatsFragment()?.isVisible != true
+        get() = chatsFragment?.isMeetingTabShown() == true
 
     private fun getPermissionsFragment(): PermissionsFragment? {
         return (supportFragmentManager.findFragmentByTag(FragmentTag.PERMISSIONS.tag) as? PermissionsFragment).also {
