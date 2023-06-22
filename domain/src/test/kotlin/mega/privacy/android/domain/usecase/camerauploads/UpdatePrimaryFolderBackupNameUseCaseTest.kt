@@ -16,7 +16,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -32,6 +31,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
     private lateinit var underTest: UpdatePrimaryFolderBackupNameUseCase
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val updateBackupUseCase = mock<UpdateBackupUseCase>()
 
     private val testBackup = Backup(
@@ -50,6 +50,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
     fun setUp() {
         underTest = UpdatePrimaryFolderBackupNameUseCase(
             cameraUploadRepository = cameraUploadRepository,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             updateBackupUseCase = updateBackupUseCase,
         )
     }
@@ -61,10 +62,8 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
     fun `test that the primary folder backup name is updated`() = runTest {
         val testBackupName = "test backup name"
 
-        cameraUploadRepository.stub {
-            onBlocking { isCameraUploadsEnabled() }.thenReturn(true)
-            onBlocking { getCuBackUp() }.thenReturn(testBackup)
-        }
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
+        whenever(cameraUploadRepository.getCuBackUp()).thenReturn(testBackup)
         whenever(
             updateBackupUseCase(
                 backupId = any(),
@@ -91,11 +90,11 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
         backupName: String,
         isPrimaryFolderBackupSet: Boolean,
     ) = runTest {
-        cameraUploadRepository.stub {
-            onBlocking { isCameraUploadsEnabled() }.thenReturn(isCameraUploadsEnabled)
-            onBlocking { getCuBackUp() }.thenReturn(if (isPrimaryFolderBackupSet) testBackup else null)
-        }
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
+        whenever(cameraUploadRepository.getCuBackUp()).thenReturn(if (isPrimaryFolderBackupSet) testBackup else null)
+
         underTest(backupName)
+
         verifyNoInteractions(updateBackupUseCase)
     }
 

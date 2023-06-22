@@ -8,10 +8,12 @@ import javax.inject.Inject
  * Use Case that updates the Backup name of the Primary Folder
  *
  * @property cameraUploadRepository [CameraUploadRepository]
+ * @property isCameraUploadsEnabledUseCase [IsCameraUploadsEnabledUseCase]
  * @property updateBackupUseCase [UpdateBackupUseCase]
  */
 class UpdatePrimaryFolderBackupNameUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val updateBackupUseCase: UpdateBackupUseCase,
 ) {
     /**
@@ -20,7 +22,7 @@ class UpdatePrimaryFolderBackupNameUseCase @Inject constructor(
      * @param backupName The new Backup name
      */
     suspend operator fun invoke(backupName: String) {
-        if (cameraUploadRepository.isCameraUploadsEnabled() && backupName.isNotBlank()) {
+        if (isCameraUploadsEnabledUseCase() && backupName.isNotBlank()) {
             cameraUploadRepository.getCuBackUp()?.let { backup ->
                 updateBackupUseCase(
                     backupId = backup.backupId,
