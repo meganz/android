@@ -14,13 +14,11 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.testpassword.view.TestPasswordComposeView
@@ -29,7 +27,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -44,12 +41,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
-    /**
-     * Application Scope
-     */
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
 
     /**
      * Application Theme Mode
@@ -163,7 +154,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
 
     private fun logoutOrFinish(isLogout: Boolean) {
         if (isLogout) {
-            logout(this, megaApi, sharingScope)
+            viewModel.logout()
         } else {
             finish()
         }

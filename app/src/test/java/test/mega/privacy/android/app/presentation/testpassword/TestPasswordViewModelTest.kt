@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,6 +44,7 @@ internal class TestPasswordViewModelTest {
     private val skipPasswordReminderUseCase = mock<SkipPasswordReminderUseCase>()
     private val blockPasswordReminderUseCase = mock<BlockPasswordReminderUseCase>()
     private val notifyPasswordCheckedUseCase = mock<NotifyPasswordCheckedUseCase>()
+    private val logoutUseCase = mock<LogoutUseCase>()
 
     @BeforeEach
     fun setup() {
@@ -62,7 +65,8 @@ internal class TestPasswordViewModelTest {
             isCurrentPasswordUseCase = isCurrentPasswordUseCase,
             skipPasswordReminderUseCase = skipPasswordReminderUseCase,
             blockPasswordReminderUseCase = blockPasswordReminderUseCase,
-            notifyPasswordCheckedUseCase = notifyPasswordCheckedUseCase
+            notifyPasswordCheckedUseCase = notifyPasswordCheckedUseCase,
+            logoutUseCase = logoutUseCase,
         )
     }
 

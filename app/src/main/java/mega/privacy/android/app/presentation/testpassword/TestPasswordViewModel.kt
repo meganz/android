@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_TEST_PASSWORD_MODE
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.WRONG_PASSWORD_COUNTER
@@ -22,6 +24,8 @@ import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
 import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -36,6 +40,7 @@ class TestPasswordViewModel @Inject constructor(
     private val skipPasswordReminderUseCase: SkipPasswordReminderUseCase,
     private val blockPasswordReminderUseCase: BlockPasswordReminderUseCase,
     private val notifyPasswordCheckedUseCase: NotifyPasswordCheckedUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TestPasswordUIState())
 
@@ -222,6 +227,21 @@ class TestPasswordViewModel @Inject constructor(
     fun resetPasswordAttemptsState() {
         viewModelScope.launch {
             _uiState.update { it.copy(isUserExhaustedPasswordAttempts = consumed) }
+        }
+    }
+
+    /**
+     * Logout
+     *
+     * logs out the user from mega application and navigates to login activity
+     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
+     */
+    fun logout() = viewModelScope.launch {
+        MegaApplication.isLoggingOut = true
+        runCatching {
+            logoutUseCase()
+        }.onFailure {
+            Timber.d("Error on logout $it")
         }
     }
 }
