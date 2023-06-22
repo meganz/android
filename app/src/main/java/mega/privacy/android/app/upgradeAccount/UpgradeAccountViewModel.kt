@@ -6,19 +6,24 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
@@ -50,6 +55,7 @@ class UpgradeAccountViewModel @Inject constructor(
     private val isBillingAvailableUseCase: IsBillingAvailableUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         UpgradeAccountState(
@@ -125,6 +131,22 @@ class UpgradeAccountViewModel @Inject constructor(
                     showBillingWarning = !isBillingAvailable
                 )
             }
+        }
+        viewModelScope.launch {
+            monitorAccountDetailUseCase().catch { Timber.e(it) }
+                .collectLatest { accountDetail ->
+                    val userSubscription =
+                        when (accountDetail.levelDetail?.accountSubscriptionCycle) {
+                            AccountSubscriptionCycle.MONTHLY -> UserSubscription.MONTHLY_SUBSCRIBED
+                            AccountSubscriptionCycle.YEARLY -> UserSubscription.YEARLY_SUBSCRIBED
+                            else -> UserSubscription.NOT_SUBSCRIBED
+                        }
+                    _state.update {
+                        it.copy(
+                            userSubscription = userSubscription
+                        )
+                    }
+                }
         }
     }
 

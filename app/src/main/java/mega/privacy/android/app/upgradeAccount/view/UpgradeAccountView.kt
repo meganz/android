@@ -64,6 +64,7 @@ import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
@@ -111,10 +112,13 @@ fun UpgradeAccountView(
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
-    var isMonthly by rememberSaveable { mutableStateOf(false) }
+    val userSubscription = state.userSubscription
+    var isMonthly by rememberSaveable { mutableStateOf(userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) }
     var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
+    var isClickedCurrentPlan by rememberSaveable { mutableStateOf(false) }
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = state.isPaymentMethodAvailable
+    var hideFloatButton by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             SimpleNoTitleTopAppBar(
@@ -124,7 +128,7 @@ fun UpgradeAccountView(
         },
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            if (chosenPlan != AccountType.FREE) {
+            if (!hideFloatButton && chosenPlan != AccountType.FREE) {
                 FloatingActionButton(
                     onClick = onBuyClicked,
                     content = {
@@ -175,6 +179,8 @@ fun UpgradeAccountView(
             ) {
                 isMonthly = it
                 onChoosingMonthlyYearlyPlan(it)
+                hideFloatButton =
+                    isClickedCurrentPlan && ((isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))
             }
             Box(
                 modifier = Modifier
@@ -204,12 +210,18 @@ fun UpgradeAccountView(
                 LoadingShimmerEffect()
             } else {
                 state.localisedSubscriptionsList.forEach {
-                    val isCurrentPlan = remember {
+                    val isCurrentPlan by remember {
                         derivedStateOf { state.currentSubscriptionPlan == it.accountType }
                     }
                     val isRecommended = remember {
                         derivedStateOf { (((state.currentSubscriptionPlan == AccountType.FREE || state.currentSubscriptionPlan == AccountType.PRO_LITE) && it.accountType == AccountType.PRO_I) || (state.currentSubscriptionPlan == AccountType.PRO_I && it.accountType == AccountType.PRO_II) || (state.currentSubscriptionPlan == AccountType.PRO_II && it.accountType == AccountType.PRO_III)) }
                     }
+                    val showCurrentPlanLabel =
+                        isCurrentPlan && ((userSubscription == UserSubscription.NOT_SUBSCRIBED) || (isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))
+                    val disableCardClick =
+                        isCurrentPlan && ((isMonthly && userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) || (!isMonthly && userSubscription == UserSubscription.YEARLY_SUBSCRIBED))
+                    val isClicked =
+                        (chosenPlan == it.accountType) && isPaymentMethodAvailable && !disableCardClick
                     if (isRecommended.value && !isPreselectedPlanOnce && isPaymentMethodAvailable) {
                         chosenPlan = it.accountType
                         onChoosingMonthlyYearlyPlan(isMonthly)
@@ -218,14 +230,17 @@ fun UpgradeAccountView(
                     SubscriptionPlansInfoCard(
                         proPlan = it.accountType,
                         subscription = it,
-                        isCurrentPlan = isCurrentPlan.value,
                         isRecommended = isRecommended.value,
                         onPlanClicked = {
-                            chosenPlan =
-                                if (isPaymentMethodAvailable) it.accountType else AccountType.FREE
-                            isPreselectedPlanOnce = true
-                            onChoosingMonthlyYearlyPlan(isMonthly)
-                            onChoosingPlanType(it.accountType)
+                            if (!isPaymentMethodAvailable) chosenPlan = AccountType.FREE
+                            if (!disableCardClick && isPaymentMethodAvailable) {
+                                chosenPlan = it.accountType
+                                isPreselectedPlanOnce = true
+                                onChoosingMonthlyYearlyPlan(isMonthly)
+                                onChoosingPlanType(it.accountType)
+                                isClickedCurrentPlan = isCurrentPlan
+                                hideFloatButton = false
+                            }
                             if (!isPaymentMethodAvailable) {
                                 coroutineScope.launch {
                                     scrollState.animateScrollTo(0)
@@ -233,7 +248,8 @@ fun UpgradeAccountView(
                             }
                         },
                         isMonthly = isMonthly,
-                        isClicked = (chosenPlan == it.accountType) && isPaymentMethodAvailable
+                        isClicked = isClicked,
+                        showCurrentPlanLabel = showCurrentPlanLabel,
                     )
                 }
 
@@ -511,7 +527,7 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
                     )
                 ) {
                     Column(modifier = Modifier.weight(0.5f)) {
-                        Row() {
+                        Row {
                             Spacer(
                                 modifier = Modifier
                                     .height(28.dp)
@@ -533,7 +549,7 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
                                     .background(brush)
                             )
                         }
-                        Row() {
+                        Row {
                             Spacer(
                                 modifier = Modifier
                                     .height(20.dp)
@@ -560,7 +576,7 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
                                 .padding(bottom = 5.dp)
                                 .background(brush)
                         )
-                        Row() {
+                        Row {
                             Spacer(
                                 modifier = Modifier
                                     .height(16.dp)
@@ -586,11 +602,11 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
 fun SubscriptionPlansInfoCard(
     proPlan: AccountType,
     subscription: LocalisedSubscription,
-    isCurrentPlan: Boolean,
     isRecommended: Boolean,
     onPlanClicked: () -> Unit,
     isMonthly: Boolean,
     isClicked: Boolean,
+    showCurrentPlanLabel: Boolean,
 ) {
     val storageValueString =
         stringResource(
@@ -657,7 +673,7 @@ fun SubscriptionPlansInfoCard(
                     ),
                     fontWeight = FontWeight.Medium,
                 )
-                if (isCurrentPlan) {
+                if (showCurrentPlanLabel) {
                     Text(
                         text = stringResource(id = R.string.account_upgrade_account_pro_plan_info_current_plan_label),
                         style = subtitle2,

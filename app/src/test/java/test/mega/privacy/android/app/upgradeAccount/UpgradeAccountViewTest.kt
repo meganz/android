@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
@@ -309,11 +310,54 @@ class UpgradeAccountViewTest {
         composeRule.onAllNodesWithTag("EMPTY_CARD_TAG").assertCountEquals(4)
     }
 
+    @Test
+    fun `test that Buy button is hidden if isClickedCurrentPlan is true, user's subscription is monthly and user switched from yearly tab to monthly tab`() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_LITE,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true,
+                    userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
+                ),
+            )
+        }
+        val testTag =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.prolite_account)
+        composeRule.onNodeWithText("Yearly").performClick()
+        composeRule.onNodeWithTag(testTag, useUnmergedTree = true).performClick()
+        composeRule.onNodeWithText("Monthly").performClick()
+        composeRule.onNodeWithTag("BUY_BUTTON_TAG").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that Current plan tag is shown only for monthly recurring current plan `() {
+        composeRule.setContent {
+            UpgradeAccountView(
+                getUpgradeAccountState(
+                    accountType = AccountType.PRO_I,
+                    showBillingWarning = false,
+                    isPaymentMethodAvailable = true,
+                    userSubscription = UserSubscription.MONTHLY_SUBSCRIBED
+                ),
+            )
+        }
+        val text = "Current plan"
+        val testTag =
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.pro1_account)
+        composeRule.onNode(hasTestTag("Monthly check"), useUnmergedTree = true).assertExists()
+        composeRule.onNode(hasTestTag(testTag), useUnmergedTree = true)
+            .assert(hasAnyChild(hasTestTag(text)))
+        composeRule.onNodeWithText("Yearly").performClick()
+        composeRule.onNodeWithTag("Current plan").assertDoesNotExist()
+    }
+
     private fun getUpgradeAccountState(
         localisedSubscriptionList: List<LocalisedSubscription> = expectedLocalisedSubscriptionsList,
         accountType: AccountType,
         showBillingWarning: Boolean,
         isPaymentMethodAvailable: Boolean,
+        userSubscription: UserSubscription = UserSubscription.NOT_SUBSCRIBED,
     ): UpgradeAccountState =
         UpgradeAccountState(
             localisedSubscriptionsList = localisedSubscriptionList,
@@ -323,6 +367,7 @@ class UpgradeAccountViewTest {
                 upgradeType = Constants.INVALID_VALUE,
                 currentPayment = null
             ),
-            isPaymentMethodAvailable = isPaymentMethodAvailable
+            isPaymentMethodAvailable = isPaymentMethodAvailable,
+            userSubscription = userSubscription
         )
 }

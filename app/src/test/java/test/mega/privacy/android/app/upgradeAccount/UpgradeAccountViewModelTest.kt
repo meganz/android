@@ -4,29 +4,35 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountViewModel
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
+import mega.privacy.android.app.upgradeAccount.model.UserSubscription
 import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.SubscriptionStatus
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetCurrentSubscriptionPlanUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.billing.GetMonthlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
@@ -44,6 +50,7 @@ import org.mockito.kotlin.whenever
 class UpgradeAccountViewModelTest {
     private lateinit var underTest: UpgradeAccountViewModel
 
+    private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
     private val getYearlySubscriptionsUseCase = mock<GetYearlySubscriptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
@@ -60,6 +67,9 @@ class UpgradeAccountViewModelTest {
             formattedSizeMapper,
         )
     private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
+        onBlocking { invoke() }.thenReturn(accountDetailFlow)
+    }
     private val expectedInitialCurrentPlan = AccountType.FREE
     private val expectedCurrentPlan = AccountType.PRO_I
     private val expectedShowBuyNewSubscriptionDialog = true
@@ -68,6 +78,18 @@ class UpgradeAccountViewModelTest {
         UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.GOOGLE_WALLET)
     private val expectedCurrentPaymentUpdated =
         UpgradePayment(Constants.PRO_II, PaymentMethod.GOOGLE_WALLET)
+    private val expectedAccountDetail = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = AccountType.PRO_I,
+            subscriptionStatus = SubscriptionStatus.VALID,
+            subscriptionRenewTime = 1873874783274L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            proExpirationTime = 378672463728467L,
+        )
+    )
 
     @Before
     fun setUp() {
@@ -84,6 +106,7 @@ class UpgradeAccountViewModelTest {
             isBillingAvailableUseCase = isBillingAvailableUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getPaymentMethodUseCase = getPaymentMethodUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
     }
 
@@ -252,6 +275,34 @@ class UpgradeAccountViewModelTest {
                 val state = awaitItem()
                 assertThat(state.isPaymentMethodAvailable).isTrue()
             }
+        }
+
+    @Test
+    fun `test that userSubscription return correct value if monitorAccountDetailUseCase return not null`() =
+        runTest {
+            accountDetailFlow.emit(expectedAccountDetail)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.userSubscription).isEqualTo(UserSubscription.MONTHLY_SUBSCRIBED)
+            }
+
+        }
+
+    @Test
+    fun `test that userSubscription return correct value if monitorAccountDetailUseCase return null`() =
+        runTest {
+            accountDetailFlow.emit(AccountDetail())
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.userSubscription).isEqualTo(UserSubscription.NOT_SUBSCRIBED)
+            }
+
         }
 
     private val subscriptionProIMonthly = Subscription(
