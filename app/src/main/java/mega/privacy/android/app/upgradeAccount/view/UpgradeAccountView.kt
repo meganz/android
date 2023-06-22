@@ -69,15 +69,14 @@ import mega.privacy.android.app.upgradeAccount.model.mapper.FormattedSizeMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.app.upgradeAccount.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.MegaSpannedAlignedText
-import mega.privacy.android.core.ui.controls.MegaSpannedClickableText
-import mega.privacy.android.core.ui.controls.MegaSpannedText
-import mega.privacy.android.core.ui.controls.SimpleNoTitleTopAppBar
+import mega.privacy.android.core.ui.controls.appbar.SimpleNoTitleTopAppBar
+import mega.privacy.android.core.ui.controls.text.MegaSpannedAlignedText
+import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -94,9 +93,10 @@ import mega.privacy.android.core.ui.theme.extensions.yellow_100_yellow_700_alpha
 import mega.privacy.android.core.ui.theme.subtitle1
 import mega.privacy.android.core.ui.theme.subtitle2
 import mega.privacy.android.core.ui.theme.teal_100
-import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.core.ui.theme.transparent
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
+import mega.privacy.android.domain.entity.account.CurrencyAmount
 import java.util.Locale
 
 @Composable

@@ -36,8 +36,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.model.LocalisedSubscription
 import mega.privacy.android.app.upgradeAccount.model.UIAccountType
 import mega.privacy.android.app.upgradeAccount.model.UpgradeAccountState
-import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.core.ui.controls.SimpleTopAppBar
+import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.Typography
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_300
@@ -49,6 +48,7 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.yellow_100
 import mega.privacy.android.core.ui.theme.yellow_700
 import mega.privacy.android.core.ui.theme.yellow_700_alpha_015
+import mega.privacy.android.domain.entity.AccountType
 import java.util.Locale
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

@@ -35,8 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
-import mega.privacy.android.core.ui.controls.LabelledSwitch
-import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.controls.controlssliders.LabelledSwitch
+import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button

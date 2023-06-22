@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.divider
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider

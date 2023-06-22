@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.text
 
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme

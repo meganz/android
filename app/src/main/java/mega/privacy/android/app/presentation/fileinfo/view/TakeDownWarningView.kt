@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
-import mega.privacy.android.core.ui.controls.MegaSpannedClickableText
+import mega.privacy.android.core.ui.controls.text.MegaSpannedClickableText
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.model.SpanStyleWithAnnotation
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews

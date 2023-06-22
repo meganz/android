@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import mega.privacy.android.core.R as CoreUiR
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
@@ -36,7 +37,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.consumed
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
@@ -45,7 +45,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.SNACKBAR_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.core.ui.controls.LoadingDialog
+import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black

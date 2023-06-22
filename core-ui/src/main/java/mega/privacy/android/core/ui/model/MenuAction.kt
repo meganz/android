@@ -9,7 +9,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.core.ui.controls.MenuActions
+import mega.privacy.android.core.ui.controls.menus.MenuActions
 
 
 /**

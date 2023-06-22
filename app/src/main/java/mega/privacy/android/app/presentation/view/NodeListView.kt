@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -9,7 +8,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -18,8 +16,8 @@ import mega.privacy.android.app.presentation.view.extension.getIcon
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.core.ui.controls.HeaderViewItem
-import mega.privacy.android.core.ui.controls.NodeListViewItem
+import mega.privacy.android.core.ui.controls.lists.HeaderViewItem
+import mega.privacy.android.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.node.FileNode

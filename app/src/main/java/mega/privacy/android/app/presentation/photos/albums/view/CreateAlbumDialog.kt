@@ -45,7 +45,7 @@ import mega.privacy.android.analytics.event.content.CreateNewAlbumDialogInfo
 import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
-import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.caption
 import mega.privacy.android.core.ui.theme.grey_300

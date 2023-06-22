@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.lists
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012

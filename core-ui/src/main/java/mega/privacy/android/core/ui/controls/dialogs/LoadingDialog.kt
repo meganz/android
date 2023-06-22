@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.dialogs
 
 import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -60,7 +60,11 @@ fun LoadingDialog(
 
                 Row(
                     modifier = Modifier
-                        .conditional(title.isNullOrBlank().not()) {
+                        .conditional(
+                            title
+                                .isNullOrBlank()
+                                .not()
+                        ) {
                             padding(top = 32.dp)
                         }
                         .fillMaxWidth(),

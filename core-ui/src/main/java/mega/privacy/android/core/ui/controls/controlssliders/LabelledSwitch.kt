@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.controlssliders
 
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -70,7 +71,7 @@ private fun PreviewLabelledSwitch(
 ) {
     var checked by remember { mutableStateOf(initialValue) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        LabelledSwitch(label = stringResource(if (checked) androidx.compose.ui.R.string.on else androidx.compose.ui.R.string.off),
+        LabelledSwitch(label = stringResource(if (checked) R.string.on else R.string.off),
             checked = checked,
             onCheckChanged = { checked = !checked })
     }

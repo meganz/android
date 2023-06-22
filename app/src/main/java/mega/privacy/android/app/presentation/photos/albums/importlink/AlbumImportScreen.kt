@@ -60,8 +60,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.grey_020

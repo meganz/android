@@ -7,8 +7,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.ui.controls.MenuActions
-import mega.privacy.android.core.ui.controls.TAG_MENU_ACTIONS_SHOW_MORE
+import mega.privacy.android.core.ui.controls.menus.MenuActions
+import mega.privacy.android.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 import org.junit.Rule

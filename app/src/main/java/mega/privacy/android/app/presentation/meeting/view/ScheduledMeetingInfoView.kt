@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,7 +61,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.presentation.contact.view.ContactStatus
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
@@ -72,9 +72,9 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.CustomDivider
-import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.divider.CustomDivider
+import mega.privacy.android.core.ui.controls.text.MarqueeText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012

@@ -59,7 +59,7 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.core.ui.controls.MegaSwitch
+import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054

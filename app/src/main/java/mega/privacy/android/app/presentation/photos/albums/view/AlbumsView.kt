@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import mega.privacy.android.core.R as CoreUiR
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Typeface
@@ -72,15 +73,14 @@ import mega.privacy.android.analytics.event.content.DeleteAlbumConfirmButtonInfo
 import mega.privacy.android.analytics.event.content.DeleteAlbumsConfirmationDialogInfo
 import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.analytics.event.content.RemoveLinksConfirmationDialogInfo
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption

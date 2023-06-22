@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import mega.privacy.android.core.ui.controls.MegaDialog
+import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
 
 /**
  * Logout Dialog

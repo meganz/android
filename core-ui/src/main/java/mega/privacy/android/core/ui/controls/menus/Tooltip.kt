@@ -1,6 +1,6 @@
 @file:Suppress("INVISIBLE_REFERENCE", "INVISIBLE_MEMBER")
 
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.menus
 
 
 import androidx.compose.animation.core.MutableTransitionState

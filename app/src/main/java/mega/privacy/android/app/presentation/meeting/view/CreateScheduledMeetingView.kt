@@ -52,13 +52,13 @@ import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.extensions.title
-import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
+import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.ui.controls.CustomDivider
-import mega.privacy.android.core.ui.controls.MegaSwitch
+import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme

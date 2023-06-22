@@ -34,14 +34,14 @@ import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
-import mega.privacy.android.core.ui.controls.dpToSp
-import mega.privacy.android.core.ui.controls.intToDp
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.core.ui.utils.dpToSp
+import mega.privacy.android.core.ui.utils.intToDp
 
 @Composable
 internal fun NotificationItemView(

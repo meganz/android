@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.controls
+package mega.privacy.android.core.ui.controls.menus
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.google.android.material.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 
@@ -95,7 +96,7 @@ private fun DropDown(
     }
     IconButtonWithTooltip(
         iconPainter = painter,
-        description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
+        description = stringResource(id = R.string.abc_action_menu_overflow_description),
         tint = tint,
         onClick = { showMoreMenu = !showMoreMenu },
         modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE)

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.view
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -29,12 +30,11 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
 import mega.privacy.android.app.presentation.view.extension.getPainter
-import mega.privacy.android.core.ui.controls.ThumbnailView
+import mega.privacy.android.core.ui.controls.images.ThumbnailView
+import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -104,12 +104,14 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     }
             )
             Image(
-                modifier = Modifier.constrainAs(takenDownImage) {
-                    end.linkTo(menuImage.start)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    visibility = if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
-                }
+                modifier = Modifier
+                    .constrainAs(takenDownImage) {
+                        end.linkTo(menuImage.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        visibility =
+                            if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
+                    }
                     .height(16.dp)
                     .width(16.dp),
                 painter = painterResource(id = R.drawable.ic_taken_down),
@@ -181,13 +183,14 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         }
                 )
                 Image(
-                    modifier = Modifier.constrainAs(takenDownImage) {
-                        end.linkTo(menuImage.start)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        visibility =
-                            if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
-                    }
+                    modifier = Modifier
+                        .constrainAs(takenDownImage) {
+                            end.linkTo(menuImage.start)
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                            visibility =
+                                if (nodeUIItem.isTakenDown) Visibility.Visible else Visibility.Gone
+                        }
                         .height(16.dp)
                         .width(16.dp),
                     painter = painterResource(id = R.drawable.ic_taken_down),

@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.startconversation.model
 
+import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.core.ui.controls.SearchWidgetState
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.startconversation.StartConversationViewModel]

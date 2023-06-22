@@ -1,4 +1,4 @@
-package mega.privacy.android.core.ui.extensions
+package mega.privacy.android.core.ui.utils
 
 import androidx.compose.runtime.Composable
 

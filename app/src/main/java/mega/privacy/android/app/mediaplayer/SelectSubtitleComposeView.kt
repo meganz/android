@@ -59,8 +59,8 @@ import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
 import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
-import mega.privacy.android.core.ui.controls.SearchAppBar
-import mega.privacy.android.core.ui.controls.SearchWidgetState
+import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
+import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
@@ -202,13 +202,17 @@ internal fun SelectSubtitleView(
                             contentAlignment = Alignment.Center,
                             content = {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(44.dp).testTag(PROGRESS_TEST_TAG),
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .testTag(PROGRESS_TEST_TAG),
                                     color = teal_300,
                                 )
                             },
                         )
                         isEmpty || items.isEmpty() -> SubtitleEmptyView(
-                            modifier = Modifier.fillMaxSize().testTag(EMPTY_LIST_TEST_TAG),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag(EMPTY_LIST_TEST_TAG),
                             isSearchMode = searchState == SearchWidgetState.EXPANDED
                         )
                         else -> SubtitleFileInfoListView(
