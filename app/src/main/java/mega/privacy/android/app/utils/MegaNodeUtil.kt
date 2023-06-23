@@ -246,7 +246,9 @@ object MegaNodeUtil {
                         info = if (node.isFolder) LINK_SHARE_FOLDER_INFO else LINK_SHARE_FILE_INFO
                     )
                 )
-                startShareIntent(context, Intent(Intent.ACTION_SEND), node.publicLink)
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
+                startShareIntent(context, intent, node.publicLink)
             } else {
                 Analytics.tracker.trackGeneralEvent(
                     LinkShare(
@@ -254,9 +256,11 @@ object MegaNodeUtil {
                         info = if (node.isFolder) LINK_SHARE_FOLDER_INFO else LINK_SHARE_FILE_INFO
                     )
                 )
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.putExtra(Intent.EXTRA_SUBJECT, node.name)
                 MegaApplication.getInstance().megaApi.exportNode(
                     node,
-                    ExportListener(context, Intent(Intent.ACTION_SEND), onExportFinishedListener)
+                    ExportListener(context, intent, onExportFinishedListener)
                 )
             }
         }
