@@ -4564,9 +4564,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Ghi&#160;nhớ các tùy&#160;chỉnh</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title"></string>
+    <string name="home_side_menu_device_center_title">Device centre</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Mỗi ngày</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4630,9 +4630,9 @@
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Khuyên dùng</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -4711,4 +4711,20 @@
     <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
     <!-- Album import error message -->
     <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <!-- Text of the option weekdays in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <!-- Title of occurs ever section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_every_section">Diễn&#160;ra mỗi</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
+    <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
+        <item quantity="one">Daily</item>
+        <item quantity="other">Every %1$d days</item>
+    </plurals>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <plurals name="general_snackbar_link_created_and_copied">
+        <item quantity="one">Link created and copied to your clipboard</item>
+        <item quantity="other">Links created and copied to your clipboard</item>
+    </plurals>
 </resources>

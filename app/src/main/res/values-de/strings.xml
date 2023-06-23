@@ -1900,7 +1900,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Beim nächsten Login werden Sie nach einem sechsstelligen Code gefragt, den Sie von Ihrer Authentifizierungs-App erhalten.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your         <b>Recovery key</b>         in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Bitte speichern Sie Ihren         <b>Rettungsschlüssel</b>         an einem sicheren Ort, um Probleme zu vermeiden, falls Sie nicht mehr auf Ihre App zugreifen können oder wenn Sie die Zwei-Faktor-Authentifizierung deaktivieren möchten.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Code ungültig</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4778,9 +4778,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Einstellungen merken</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title"></string>
+    <string name="home_side_menu_device_center_title">Device centre</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Täglich</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4841,31 +4841,31 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Sparen Sie bis zu 16% bei jährlicher Abrechnung</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Speicher:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Empfohlen</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Aktiv</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <string name="account_upgrade_account_description_title_features">Leistungsmerkmale der Pro-Pakete</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Passwortgeschützte Links</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links mit Ablaufdatum</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Teilen des Transfervolumens</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatische Backups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Rewind up to 90 days on Pro Lite and up to 365 days on Pro I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Rewind – bis zu 90 Tage für Pro Lite und bis zu 365 Tage für Pro I, II und III (demnächst)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Planmäßige Leerung des Papierkorbs – Intervall 7 Tage bis 10 Jahre</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Pro Lite kaufen</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4908,22 +4908,38 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">Album umbenennen</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">Sie haben bereits ein Album namens „%1$s“. Geben Sie einen neuen Namen für das zu speichernde Album ein.</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">Albumnamen eingeben</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">Sie können Ihr aktuelles Abonnement auf unserer [A]Preisseite[/A] upgraden.</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Anyone with this link can view and download your data</item>
-        <item quantity="other">Anyone with these links can view and download your data</item>
+        <item quantity="one">Jeder, der über diesen Link verfügt, kann Ihre Daten einsehen und herunterladen</item>
+        <item quantity="other">Jeder, der über diese Links verfügt, kann Ihre Daten einsehen und herunterladen</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">In Cloud Drive speichern</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">Daten werden gespeichert&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">„%1$s“ im Cloud Drive gespeichert</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">„%1$s“ kann nicht im Cloud Drive gespeichert werden. Versuchen Sie es später erneut. Wenn das Problem weiterhin besteht, wenden Sie sich an die Person, die Ihnen den Link mitgeteilt hat.</string>
+    <!-- Text of the option weekdays in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_weekdays_button">Unter der Woche</string>
+    <!-- Title of occurs ever section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_every_section">Wiederholungsintervall:</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Unter der Woche täglich</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
+    <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
+        <item quantity="one">Täglich</item>
+        <item quantity="other">Alle %1$d Tage</item>
+    </plurals>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <plurals name="general_snackbar_link_created_and_copied">
+        <item quantity="one">Link erstellt und in die Zwischenablage kopiert</item>
+        <item quantity="other">Links erstellt und in die Zwischenablage kopiert</item>
+    </plurals>
 </resources>
