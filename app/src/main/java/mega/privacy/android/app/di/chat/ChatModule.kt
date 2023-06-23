@@ -9,21 +9,16 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
-import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetMeetings
-import mega.privacy.android.domain.usecase.GetMeetingsImpl
 import mega.privacy.android.domain.usecase.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
-import mega.privacy.android.domain.usecase.MeetingRoomMapper
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.QueryChatLink
@@ -58,18 +53,6 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindGetChatParticipants(useCase: DefaultGetChatParticipants): GetChatParticipants
-
-    /**
-     * Get chat meetings
-     */
-    @Binds
-    abstract fun bindGetMeetings(useCase: GetMeetingsImpl): GetMeetings
-
-    /**
-     * Meeting item room mapper
-     */
-    @Binds
-    abstract fun bindMeetingRoomMapper(implementation: DefaultMeetingRoomMapper): MeetingRoomMapper
 
     /**
      * Open call or start call and open it
@@ -252,12 +235,5 @@ abstract class ChatModule {
         @Provides
         fun provideSignalChatPresenceActivity(chatRepository: ChatRepository): SignalChatPresenceActivity =
             SignalChatPresenceActivity(chatRepository::signalPresenceActivity)
-
-        /**
-         * Provides the Use case [ArchiveChat]
-         */
-        @Provides
-        fun provideArchiveChat(chatRepository: ChatRepository): ArchiveChat =
-            ArchiveChat(chatRepository::archiveChat)
     }
 }

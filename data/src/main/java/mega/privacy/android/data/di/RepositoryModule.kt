@@ -18,7 +18,6 @@ import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
 import mega.privacy.android.data.repository.DefaultFeatureFlagRepository
 import mega.privacy.android.data.repository.DefaultGalleryFilesRepository
-import mega.privacy.android.data.repository.DefaultGetMeetingsRepository
 import mega.privacy.android.data.repository.DefaultGlobalStatesRepository
 import mega.privacy.android.data.repository.DefaultImageRepository
 import mega.privacy.android.data.repository.DefaultLoginRepository
@@ -67,7 +66,6 @@ import mega.privacy.android.domain.repository.FeatureFlagRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
-import mega.privacy.android.domain.repository.GetMeetingsRepository
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
@@ -203,9 +201,6 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindBillingRepository(repository: DefaultBillingRepository): BillingRepository
-
-    @Binds
-    abstract fun bindGetMeetingsRepository(repository: DefaultGetMeetingsRepository): GetMeetingsRepository
 
     @Binds
     abstract fun bindChatParticipantsRepository(repository: DefaultChatParticipantsRepository): ChatParticipantsRepository

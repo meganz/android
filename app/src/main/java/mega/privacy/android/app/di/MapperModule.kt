@@ -15,10 +15,6 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
 import mega.privacy.android.app.presentation.manager.model.mapper.InitialScreenMapper
 import mega.privacy.android.app.presentation.manager.model.mapper.InitialScreenMapperImpl
-import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
-import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
-import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
-import mega.privacy.android.app.presentation.meeting.mapper.toScheduledTimeFormatted
 
 /**
  * Module for providing mapper dependencies
@@ -50,19 +46,6 @@ class MapperModule {
      */
     @Provides
     fun provideHeaderMapper(): HeaderMapper = ::toHeader
-
-    /**
-     * Provide meeting last timestamp mapper
-     */
-    @Provides
-    fun provideMeetingLastTimestampMapper(): MeetingLastTimestampMapper = ::toLastTimeFormatted
-
-    /**
-     * Provide scheduled meeting timestamp mapper
-     */
-    @Provides
-    fun provideScheduledMeetingTimestampMapper(): ScheduledMeetingTimestampMapper =
-        ::toScheduledTimeFormatted
 
     /**
      * Provide initial screen mapper

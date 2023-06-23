@@ -5153,6 +5153,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 true
             }
 
+            R.id.action_menu_archived -> {
+                startActivity(Intent(this, ArchivedChatsActivity::class.java))
+                true
+            }
+
             R.id.action_select -> {
                 when (drawerItem) {
                     DrawerItem.CLOUD_DRIVE -> if (isCloudAdded) {

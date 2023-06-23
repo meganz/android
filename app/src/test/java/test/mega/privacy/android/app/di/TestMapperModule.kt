@@ -12,10 +12,6 @@ import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
-import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
-import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
-import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
-import mega.privacy.android.app.presentation.meeting.mapper.toScheduledTimeFormatted
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import org.mockito.kotlin.mock
@@ -46,12 +42,4 @@ object TestMapperModule {
 
     @Provides
     fun provideHeaderMapper(): HeaderMapper = ::toHeader
-
-    @Provides
-    fun provideMeetingLastTimestampMapper(): MeetingLastTimestampMapper =
-        ::toLastTimeFormatted
-
-    @Provides
-    fun provideScheduledMeetingTimestampMapper(): ScheduledMeetingTimestampMapper =
-        ::toScheduledTimeFormatted
 }
