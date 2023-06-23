@@ -146,6 +146,9 @@ class GetSeveralLinksFragment : Fragment() {
      */
     private fun showLinks(links: List<LinkItem>) {
         linksAdapter.submitList(links)
+        if (viewModel.getLinksString().isNotBlank()) {
+            copyLinks(links = viewModel.getLinksString(), isForFirstTime = true)
+        }
     }
 
     /**
@@ -157,11 +160,6 @@ class GetSeveralLinksFragment : Fragment() {
         binding.copyButton.apply {
             isEnabled = !isExportingNodes
             alpha = if (isExportingNodes) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
-        }
-        if (!isExportingNodes) {
-            if (viewModel.getLinksString().isNotBlank()) {
-                copyLinks(links = viewModel.getLinksString(), isForFirstTime = true)
-            }
         }
         refreshMenuOptionsVisibility()
     }
