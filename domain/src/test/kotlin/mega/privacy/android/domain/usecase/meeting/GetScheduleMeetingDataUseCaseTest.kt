@@ -59,7 +59,10 @@ internal class GetScheduleMeetingDataUseCaseTest {
     fun `test that getChatRoom is called accordingly`() =
         runTest {
             val chatId = 123L
-            whenever(getChatRoom(chatId)).thenReturn(ChatRoom(chatId))
+            val chat = mock<ChatRoom> {
+                on { chatId }.thenReturn(chatId)
+            }
+            whenever(getChatRoom(chatId)).thenReturn(chat)
             whenever(getScheduledMeetingByChat(chatId)).thenReturn(
                 listOf(
                     ChatScheduledMeeting(

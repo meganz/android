@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.chat
 
+import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageCode
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
-import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatMessageMapperTest {
@@ -95,9 +95,6 @@ class ChatMessageMapperTest {
             termCode = ChatMessageTermCode.ENDED,
             rowId = megaChatMessage.rowId
         )
-        assertEquals(
-            underTest.invoke(megaChatMessage),
-            chatMessage
-        )
+        Truth.assertThat(underTest.invoke(megaChatMessage)).isEqualTo(chatMessage)
     }
 }

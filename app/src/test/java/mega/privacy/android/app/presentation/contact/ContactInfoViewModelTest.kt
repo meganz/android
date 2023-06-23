@@ -124,11 +124,11 @@ class ContactInfoViewModelTest {
         status = UserStatus.Online,
         lastSeen = 0,
     )
-    private val chatRoom = ChatRoom(
-        chatId = 123456L,
-        changes = null,
-        title = "Chat title",
-    )
+    private val chatRoom = mock<ChatRoom> {
+        on { chatId }.thenReturn(123456L)
+        on { changes }.thenReturn(null)
+        on { title }.thenReturn("Chat title")
+    }
 
     private val connectivityFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
 

@@ -3,7 +3,7 @@ package mega.privacy.android.domain.entity.chat
 /**
  * Chat room changes.
  */
-enum class ChatRoomChanges {
+enum class ChatRoomChange {
     /**
      * Chat room status has changed
      */

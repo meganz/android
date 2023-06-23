@@ -84,10 +84,10 @@ class GetChatNotificationUseCaseTest {
             timezone = null,
             isStartReminder = false
         )
-        val chatRoom = ChatRoom(
-            chatId = pushMessage.chatRoomHandle,
-            title = "Updated Test title"
-        )
+        val chatRoom = mock<ChatRoom>{
+            on { chatId }.thenReturn(pushMessage.chatRoomHandle)
+            on { title }.thenReturn("Updated Test title")
+        }
         whenever(getChatRoomUseCase.invoke(any())).thenReturn(chatRoom)
 
         val result = underTest.invoke(pushMessage).second

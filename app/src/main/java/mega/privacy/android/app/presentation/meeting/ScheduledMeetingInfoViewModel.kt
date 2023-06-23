@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
-import mega.privacy.android.domain.entity.chat.ChatRoomChanges
+import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -291,52 +291,53 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun getChatRoomUpdates(chatId: Long) =
         viewModelScope.launch {
             monitorChatRoomUpdates(chatId).collectLatest { chat ->
-                when (chat.changes) {
-                    ChatRoomChanges.OwnPrivilege -> {
-                        Timber.d("Changes in own privilege")
-                        _state.update {
-                            it.copy(isHost = chat.ownPrivilege == ChatRoomPermission.Moderator)
+                _state.update { state ->
+                    with(state) {
+                        val isHost = if (chat.hasChanged(ChatRoomChange.OwnPrivilege)) {
+                            Timber.d("Changes in own privilege")
+                            chat.ownPrivilege == ChatRoomPermission.Moderator
+                        } else {
+                            isHost
                         }
-                    }
-
-                    ChatRoomChanges.OpenInvite -> {
-                        Timber.d("Changes in open invite")
-                        _state.update {
-                            it.copy(
-                                isOpenInvite = chat.isOpenInvite || chat.ownPrivilege == ChatRoomPermission.Moderator,
-                                enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite
+                        val isOpenInvite = if (chat.hasChanged(ChatRoomChange.OpenInvite)) {
+                            Timber.d("Changes in open invite")
+                            chat.isOpenInvite || isHost
+                        } else {
+                            isOpenInvite
+                        }
+                        val title = if (chat.hasChanged(ChatRoomChange.Title)) {
+                            Timber.d("Changes in chat title")
+                            chat.title
+                        } else {
+                            chatTitle
+                        }
+                        val isPublic = if (chat.hasChanged(ChatRoomChange.ChatMode)) {
+                            Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
+                            chat.isPublic
+                        } else {
+                            isPublic
+                        }
+                        val retentionTime = if (chat.hasChanged(ChatRoomChange.RetentionTime)) {
+                            Timber.d("Changes in retention time")
+                            getInstance().sendBroadcast(
+                                Intent(ACTION_UPDATE_RETENTION_TIME)
+                                    .putExtra(RETENTION_TIME, chat.retentionTime)
                             )
+
+                            if (chat.retentionTime != Constants.DISABLED_RETENTION_TIME) chat.retentionTime
+                            else null
+                        } else {
+                            retentionTimeSeconds
                         }
-                    }
-
-                    ChatRoomChanges.Title -> {
-                        Timber.d("Changes in chat title")
-                        _state.update {
-                            it.copy(chatTitle = chat.title)
-                        }
-                    }
-
-                    ChatRoomChanges.ChatMode -> {
-                        Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
-                        _state.update {
-                            it.copy(isPublic = chat.isPublic)
-                        }
-                    }
-
-                    ChatRoomChanges.RetentionTime -> {
-                        Timber.d("Changes in retention time")
-                        updateRetentionTimeSeconds(chat.retentionTime)
-
-                        val intentRetentionTime =
-                            Intent(ACTION_UPDATE_RETENTION_TIME)
-                        intentRetentionTime.putExtra(
-                            RETENTION_TIME,
-                            chat.retentionTime
+                        copy(
+                            isHost = isHost,
+                            isOpenInvite = isOpenInvite,
+                            enabledAllowNonHostAddParticipantsOption = chat.isOpenInvite,
+                            chatTitle = title,
+                            isPublic = isPublic,
+                            retentionTimeSeconds = retentionTime
                         )
-                        getInstance().sendBroadcast(intentRetentionTime)
                     }
-
-                    else -> {}
                 }
             }
         }

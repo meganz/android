@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * Chat room item.
  *
  * @property chatId             Handle identifying the chat.
- * @property changes            Changes [ChatRoomChanges].
+ * @property changes            Changes [ChatRoomChange].
  * @property title              Title of the chat.
  * @property hasCustomTitle     Title of the chat.
  * @property ownPrivilege       Own privilege level in this chatroom [ChatRoomPermission].
@@ -37,7 +37,7 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  */
 data class CombinedChatRoom constructor(
     val chatId: Long,
-    val changes: ChatRoomChanges? = null,
+    val changes: List<ChatRoomChange>? = null,
     val title: String = "",
     val hasCustomTitle: Boolean = false,
     val ownPrivilege: ChatRoomPermission = ChatRoomPermission.Standard,

@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import test.mega.privacy.android.app.fromId
 import test.mega.privacy.android.app.onNodeWithText
 
@@ -52,11 +53,11 @@ class ContactInfoViewTest {
         status = UserStatus.Online,
         lastSeen = 0,
     )
-    private val chatRoom = ChatRoom(
-        chatId = 123456L,
-        changes = null,
-        title = "Chat title",
-    )
+    private val chatRoom = mock<ChatRoom> {
+        on { chatId }.thenReturn(123456L)
+        on { changes }.thenReturn(null)
+        on { title }.thenReturn("Chat title")
+    }
 
     private val contactState = ContactInfoState(
         error = null,
