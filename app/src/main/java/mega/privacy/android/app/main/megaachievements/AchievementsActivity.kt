@@ -1,24 +1,18 @@
 package mega.privacy.android.app.main.megaachievements
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
@@ -44,8 +38,6 @@ class AchievementsActivity : PasscodeActivity() {
     private val binding: ActivityAchievementsBinding by lazy(LazyThreadSafetyMode.NONE) {
         ActivityAchievementsBinding.inflate(layoutInflater)
     }
-
-    private var successDialog: AlertDialog? = null
 
     /**
      * On create
@@ -101,7 +93,7 @@ class AchievementsActivity : PasscodeActivity() {
      *
      */
     @JvmOverloads
-    fun showFragment(fragmentName: Int, type: Int = INVALID_TYPE) {
+    fun showFragment(fragmentName: Int, arguments: Bundle?, type: Int = INVALID_TYPE) {
         Timber.d("showFragment: %d type: %d", fragmentName, type)
         val ft = supportFragmentManager.beginTransaction()
         var fragment: Fragment? = null
@@ -114,42 +106,32 @@ class AchievementsActivity : PasscodeActivity() {
                 fragment = AchievementsFragment()
                 tag = "achievementsFragment"
             }
+
             Constants.INVITE_FRIENDS_FRAGMENT -> {
-                fragment = InviteFriendsFragment()
+                fragment = InviteFriendsFragment().apply {
+                    this.arguments = arguments
+                }
                 tag = "inviteFriendsFragment"
                 ft.addToBackStack(tag)
             }
+
             Constants.BONUSES_FRAGMENT -> {
                 fragment = ReferralBonusesFragment()
                 tag = "referralBonusesFragment"
                 ft.addToBackStack(tag)
             }
+
             Constants.INFO_ACHIEVEMENTS_FRAGMENT -> {
                 fragment = InfoAchievementsFragment()
                 fragment.setArguments(bundleOf("achievementType" to type))
                 tag = "infoAchievementsFragment"
                 ft.addToBackStack(tag)
             }
+
             else -> {}
         }
         fragment?.let {
             ft.replace(R.id.fragment_container_achievements, it, tag).commit()
-        }
-    }
-
-    private fun showInviteConfirmationDialog(contentText: String) {
-        Timber.d("showInviteConfirmationDialog")
-        val builder = MaterialAlertDialogBuilder(this).apply {
-            val dialogLayout =
-                layoutInflater.inflate(R.layout.dialog_invite_friends_achievement, null)
-            val content = dialogLayout.findViewById<TextView>(R.id.invite_content)
-            content.text = contentText
-            val closeButton = dialogLayout.findViewById<Button>(R.id.close_btn)
-            closeButton.setOnClickListener { successDialog?.dismiss() }
-            setView(dialogLayout)
-        }
-        successDialog = builder.create().also {
-            it.show()
         }
     }
 
@@ -159,20 +141,6 @@ class AchievementsActivity : PasscodeActivity() {
      */
     fun showSnackbar(s: String) {
         showSnackbar(binding.fragmentContainerAchievements, s)
-    }
-
-    @Deprecated("Deprecated in Java")
-    @Suppress("DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        if (requestCode == Constants.REQUEST_CODE_GET_CONTACTS && resultCode == RESULT_OK && intent != null) {
-            val sentNumber = intent.getIntExtra(InviteContactActivity.KEY_SENT_NUMBER, 1)
-            if (sentNumber > 1) {
-                showInviteConfirmationDialog(getString(R.string.invite_sent_text_multi))
-            } else {
-                showInviteConfirmationDialog(getString(R.string.invite_sent_text))
-            }
-        }
     }
 
     companion object {

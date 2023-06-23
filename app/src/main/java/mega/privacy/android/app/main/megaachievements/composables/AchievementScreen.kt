@@ -25,8 +25,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.megaachievements.AchievementsOverviewViewModel
-import mega.privacy.android.app.utils.Constants.BONUSES_FRAGMENT
-import mega.privacy.android.app.utils.Constants.INVITE_FRIENDS_FRAGMENT
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -37,7 +35,7 @@ internal fun AchievementScreen(
     viewModel: AchievementsOverviewViewModel,
     onInviteFriendsClicked: () -> Unit,
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit,
-    onReferBonusesClicked: (fragmentName: Int) -> Unit,
+    onReferBonusesClicked: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     AchievementView(
@@ -79,7 +77,7 @@ internal fun AchievementView(
     installDesktopAwardStorage: Long,
     onInviteFriendsClicked: () -> Unit = {},
     onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit = {},
-    onReferBonusesClicked: (fragmentName: Int) -> Unit = {},
+    onReferBonusesClicked: () -> Unit = {},
 ) {
     Scaffold(
         backgroundColor = MaterialTheme.colors.grey_020_dark_grey,
@@ -104,7 +102,7 @@ internal fun AchievementView(
 
                     Row(
                         Modifier.clickable {
-                            onReferBonusesClicked(if (hasReferrals) BONUSES_FRAGMENT else INVITE_FRIENDS_FRAGMENT)
+                            if (hasReferrals) onReferBonusesClicked() else onInviteFriendsClicked()
                         }
                     ) {
                         AchievementListItem(

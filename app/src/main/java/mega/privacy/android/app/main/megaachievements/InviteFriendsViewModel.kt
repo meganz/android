@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.megaachievements
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class InviteFriendsViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(InviteFriendsUIState())
@@ -45,6 +47,17 @@ class InviteFriendsViewModel @Inject constructor(
     private fun getInviteReferralStorageValue() {
         viewModelScope.launch {
             /**
+             * Check if the previous fragment passes the value of Referral Storage Bonus from invites
+             * Will skip getAccountAchievementsOverviewUseCase calls when a value is present
+             * This is added to remove unnecessary and redundant use case calls when not needed.
+             */
+            val savedReferral = savedStateHandle.get<Long?>(REFERRAL_STORAGE_BONUS)
+            if (savedReferral != null && savedReferral > 0) {
+                _uiState.update { it.copy(grantStorageInBytes = savedReferral) }
+                return@launch
+            }
+
+            /**
              * Get all achievements and filter only the one with the type [AwardedAchievementInvite]
              */
             runCatching {
@@ -58,5 +71,12 @@ class InviteFriendsViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    companion object {
+        /**
+         * Arguments flag to check if the previous fragment passes the value of Referral Storage Bonus from invites
+         */
+        const val REFERRAL_STORAGE_BONUS = "referral_storage_bonus"
     }
 }
