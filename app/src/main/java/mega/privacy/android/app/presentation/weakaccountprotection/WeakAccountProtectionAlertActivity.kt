@@ -1,4 +1,4 @@
-package mega.privacy.android.app
+package mega.privacy.android.app.presentation.weakaccountprotection
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,21 +6,19 @@ import android.text.Html
 import android.text.Spanned
 import android.view.View
 import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.MegaApplication.Companion.isBlockedDueToWeakAccount
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.ActivityWeakAccountProtectionAlertBinding
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener
-import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Weak account protection activity
@@ -28,12 +26,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class WeakAccountProtectionAlertActivity : PasscodeActivity(), View.OnClickListener {
 
-    /**
-     * Application scope
-     */
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
+    private val viewModel by viewModels<WeakAccountProtectionViewModel>()
 
     private lateinit var activityWeakAccountProtectionAlertBinding: ActivityWeakAccountProtectionAlertBinding
 
@@ -132,7 +125,7 @@ class WeakAccountProtectionAlertActivity : PasscodeActivity(), View.OnClickListe
                 }
             }
 
-            R.id.logout_button -> logout(this, megaApi, sharingScope)
+            R.id.logout_button -> viewModel.logout()
         }
     }
 

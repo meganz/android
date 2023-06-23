@@ -62,6 +62,7 @@ import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
+import mega.privacy.android.app.presentation.weakaccountprotection.WeakAccountProtectionAlertActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl

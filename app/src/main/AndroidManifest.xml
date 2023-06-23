@@ -459,7 +459,7 @@
             android:label="@string/settings_about_cookie_settings"
             android:launchMode="singleTop" />
         <activity
-            android:name=".WeakAccountProtectionAlertActivity"
+            android:name=".presentation.weakaccountprotection.WeakAccountProtectionAlertActivity"
             android:launchMode="singleTop" />
         <activity
             android:name=".activities.ManageChatHistoryActivity"
