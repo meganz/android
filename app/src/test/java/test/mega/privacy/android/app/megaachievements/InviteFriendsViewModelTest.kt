@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.megaachievements.InviteFriendsViewModel
-import mega.privacy.android.app.main.megaachievements.InviteFriendsViewModel.Companion.REFERRAL_STORAGE_BONUS
+import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
+import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel.Companion.REFERRAL_STORAGE_BONUS
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview

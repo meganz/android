@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.invites.view
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -45,6 +45,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.InviteContactActivity
+import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
+import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
