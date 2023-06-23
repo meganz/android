@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.openlink
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,11 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,6 +26,7 @@ import javax.inject.Inject
 class OpenLinkViewModel @Inject constructor(
     private val localLogoutAppUseCase: LocalLogoutAppUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
+    private val logoutUseCase: LogoutUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -54,6 +58,22 @@ class OpenLinkViewModel @Inject constructor(
                     Timber.d("Logout confirmation failed : ${it.message}")
                 }
             }
+        }
+    }
+
+    /**
+     * Logout
+     *
+     * logs out the user from mega application and navigates to login activity
+     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
+     */
+    fun logout() = viewModelScope.launch {
+        MegaApplication.isLoggingOut = true
+        runCatching {
+            logoutUseCase()
+        }.onFailure {
+            MegaApplication.isLoggingOut = false
+            Timber.d("Error on logout $it")
         }
     }
 

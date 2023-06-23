@@ -15,7 +15,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.OpenPasswordLinkActivity
@@ -30,7 +29,6 @@ import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
 import mega.privacy.android.app.main.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
@@ -89,7 +87,6 @@ import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -109,12 +106,6 @@ import javax.inject.Inject
 class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     LoadPreviewListener.OnPreviewLoadedCallback {
 
-    /**
-     * SharingScope injection
-     */
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
 
     /**
      * QuerySignupLinkUseCase injection
@@ -210,7 +201,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 Timber.d("Confirmation url")
                 urlConfirmationLink = url
                 MegaApplication.urlConfirmationLink = urlConfirmationLink
-                AccountController.logout(this, megaApi, sharingScope)
+                viewModel.logout()
             }
             // Folder Download link
             matchRegexs(url, FOLDER_LINK_REGEXS) -> {
@@ -618,7 +609,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
                 if (e.errorCode == MegaError.API_OK) {
                     MegaApplication.urlConfirmationLink = request.link
-                    AccountController.logout(this, megaApi, sharingScope)
+                    viewModel.logout()
                 } else {
                     setError(getString(R.string.invalid_link))
                 }
