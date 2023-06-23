@@ -1070,7 +1070,7 @@
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">%1$d participantes foram convidados, mas %2$d participantes não foram convidados.</string>
     <!-- chat message when a participant was added to a group chat -->
-    <string name="message_add_participant">[A]%1$s[/A][B] se uniu ao chat de grupo convidado por [/B][C]%2$s[/C]</string>
+    <string name="message_add_participant">[A]%1$s[/A][B] entrou no chat de grupo a convite de [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
     <string name="message_remove_participant">[A]%1$s[/A][B] foi removido do chat de grupo por [/B][C]%2$s[/C]</string>
     <!-- Message shown when a participant change the title of a group chat. -->
@@ -2636,7 +2636,7 @@
     <!-- Title of the layout to return to a call -->
     <string name="call_in_progress_layout">Pressione para voltar à chamada</string>
     <!-- chat message when a participant invites himself to a public chat using a chat link. Please keep the placeholder because is to show the participant’s name in runtime. -->
-    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] se uniu ao chat de grupo.[/B]</string>
+    <string name="message_joined_public_chat_autoinvitation">[A]%1$s[/A][B] entrou no chat de grupo.[/B]</string>
     <!-- Warning that appears prior to remove a chat link on the group info screen. -->
     <string name="context_remove_chat_link_warning_text">Se o link for eliminado, este chat já não poderá ser acessado usando-o.</string>
     <!-- Description text of the dialog to generate a public chat link -->
@@ -4992,9 +4992,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Salvar as preferências</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title"></string>
+    <string name="home_side_menu_device_center_title">Central de dispositivos</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title"></string>
+    <string name="device_center_list_of_devices_toolbar_title">Central de dispositivos</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Todo dia</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5060,9 +5060,9 @@
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transferência:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/mês[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price"></string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/ano[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Recomendado</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -5138,9 +5138,27 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Salvar na Nuvem de arquivos</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">Salvando&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">“%1$s” foi salvo na Nuvem de arquivos</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">Não foi possível salvar “%1$s” na sua Nuvem de arquivos. Tente novamente mais tarde e, se o problema persistir, entre em contato com a pessoa que compartilhou o link com você.</string>
+    <!-- Text of the option weekdays in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_weekdays_button">Dias de semana</string>
+    <!-- Title of occurs ever section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_every_section">Acontece a cada</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Todos os dias de semana</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
+    <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
+        <item quantity="one">Todo dia</item>
+        <item quantity="many">A cada %1$d de dias</item>
+        <item quantity="other">A cada %1$d dias</item>
+    </plurals>
+    <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
+    <plurals name="general_snackbar_link_created_and_copied">
+        <item quantity="one">Link criado e copiado para a área de transferência</item>
+        <item quantity="many">Links criados e copiados para a área de transferência</item>
+        <item quantity="other">Links criados e copiados para a área de transferência</item>
+    </plurals>
 </resources>
