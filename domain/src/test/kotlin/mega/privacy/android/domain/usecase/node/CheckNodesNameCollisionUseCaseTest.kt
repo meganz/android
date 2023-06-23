@@ -5,10 +5,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -73,7 +73,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         val nodes =
             mapOf(1L to 100L, 2L to 101L, 3L to 102L)
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
-        whenever(getNodeByHandleUseCase(any())).thenReturn(null)
+        whenever(getNodeByHandleUseCase(any(), any())).thenReturn(null)
         Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)
         )
@@ -84,7 +84,7 @@ internal class CheckNodesNameCollisionUseCaseTest {
         val nodes =
             mapOf(1L to 100L, 2L to 101L, 3L to 102L)
         whenever(repository.getInvalidHandle()).thenReturn(INVALID_NODE_HANDLE)
-        whenever(getNodeByHandleUseCase(any())).thenReturn(mock<FileNode>())
+        whenever(getNodeByHandleUseCase(any(), any())).thenReturn(mock<FileNode>())
         whenever(isNodeInRubbish(any())).thenReturn(true)
         Truth.assertThat(underTest(nodes, NodeNameCollisionType.RESTORE)).isEqualTo(
             NodeNameCollisionResult(nodes, emptyMap(), NodeNameCollisionType.RESTORE)

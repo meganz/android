@@ -81,7 +81,7 @@ internal class RestoreNodesUseCaseTest {
             val fileNode = mock<FileNode> {
                 on { name }.thenReturn("name")
             }
-            whenever(getNodeByHandleUseCase(moveFirstNode.second)).thenReturn(fileNode)
+            whenever(getNodeByHandleUseCase(moveFirstNode.second, true)).thenReturn(fileNode)
             whenever(isNodeInRubbish(any())).thenReturn(false)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), NodeId(moveFirstNode.second)))
                 .thenReturn(NodeId(moveFirstNode.first))

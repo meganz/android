@@ -397,7 +397,7 @@ interface NodeRepository {
      *
      * @param handle
      */
-    suspend fun getNodeByHandle(handle: Long): UnTypedNode?
+    suspend fun getNodeByHandle(handle: Long, attemptFromFolderApi: Boolean = false): UnTypedNode?
 
     /**
      * Get nodes by handles

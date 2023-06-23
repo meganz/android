@@ -47,7 +47,8 @@ sealed class MoveRequestResult(
         count: Int,
         errorCount: Int,
         oldParentHandle: Long? = null,
-    ) : MoveRequestResult(count, errorCount, oldParentHandle)
+        nodes: List<Long> = emptyList(),
+    ) : MoveRequestResult(count, errorCount, oldParentHandle, nodes)
 
     /**
      * Result of a movement to the Rubbish Bin.

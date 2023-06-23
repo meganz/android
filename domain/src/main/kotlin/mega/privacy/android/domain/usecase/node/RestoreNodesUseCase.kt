@@ -50,7 +50,7 @@ class RestoreNodesUseCase @Inject constructor(
             results.size == 1 -> SingleNodeRestoreResult(
                 successCount = successCount,
                 destinationFolderName = takeIf { successCount > 0 }
-                    ?.let { getNodeByHandleUseCase(nodes.values.first())?.name }
+                    ?.let { getNodeByHandleUseCase(nodes.values.first(), true)?.name }
             )
 
             else -> MultipleNodesRestoreResult(

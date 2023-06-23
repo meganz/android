@@ -15,6 +15,6 @@ class GetNodeByHandleUseCase @Inject constructor(
      *
      * @param handle
      */
-    suspend operator fun invoke(handle: Long) =
-        nodeRepository.getNodeByHandle(handle)
+    suspend operator fun invoke(handle: Long, attemptFromFolderApi: Boolean = false) =
+        nodeRepository.getNodeByHandle(handle, attemptFromFolderApi)
 }

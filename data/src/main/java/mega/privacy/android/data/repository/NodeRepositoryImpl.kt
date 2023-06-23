@@ -568,10 +568,11 @@ internal class NodeRepositoryImpl @Inject constructor(
                 ?.let { megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue) }
                 ?.let { megaApiFolderGateway.authorizeNode(it) }
 
-    override suspend fun getNodeByHandle(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)
-            ?.let { nodeMapper(it) }
-    }
+    override suspend fun getNodeByHandle(handle: Long, attemptFromFolderApi: Boolean) =
+        withContext(ioDispatcher) {
+            getMegaNodeByHandle(NodeId(handle), attemptFromFolderApi)
+                ?.let { nodeMapper(it) }
+        }
 
     override suspend fun getNodesByHandles(handles: List<Long>): List<UnTypedNode> =
         handles.mapNotNull { handle ->
