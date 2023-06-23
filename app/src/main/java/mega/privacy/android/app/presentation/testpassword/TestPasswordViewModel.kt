@@ -241,6 +241,7 @@ class TestPasswordViewModel @Inject constructor(
         runCatching {
             logoutUseCase()
         }.onFailure {
+            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

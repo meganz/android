@@ -14,25 +14,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
 import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CHANGE_PASSWORD_2FA
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -45,9 +42,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ChangePasswordActivity : PasscodeActivity() {
-    @ApplicationScope
-    @Inject
-    internal lateinit var sharingScope: CoroutineScope
 
     /**
      * Application Theme Mode
@@ -146,7 +140,7 @@ class ChangePasswordActivity : PasscodeActivity() {
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         if (intent != null && intent.getBooleanExtra(KEY_IS_LOGOUT, false)) {
-            AccountController.logout(this, megaApi, sharingScope)
+            viewModel.logout()
         } else {
             navigateAfterPasswordChanged()
         }

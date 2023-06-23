@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -35,6 +38,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val resetPasswordUseCase: ResetPasswordUseCase,
     private val getRootFolder: GetRootFolder,
     private val multiFactorAuthSetting: FetchMultiFactorAuthSettingUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private var mJob: Job? = null
 
@@ -324,6 +328,22 @@ internal class ChangePasswordViewModel @Inject constructor(
      */
     fun onResetPasswordValidation() {
         _uiState.update { it.copy(isSaveValidationSuccessful = false) }
+    }
+
+    /**
+     * Logout
+     *
+     * logs out the user from mega application and navigates to login activity
+     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
+     */
+    fun logout() = viewModelScope.launch {
+        MegaApplication.isLoggingOut = true
+        runCatching {
+            logoutUseCase()
+        }.onFailure {
+            MegaApplication.isLoggingOut = false
+            Timber.d("Error on logout $it")
+        }
     }
 
     companion object {

@@ -24,6 +24,7 @@ import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPasswordUseCase
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
@@ -50,6 +51,7 @@ internal class ChangePasswordViewModelTest {
     private val resetPasswordUseCase = mock<ResetPasswordUseCase>()
     private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSettingUseCase>()
     private val getRootFolder = mock<GetRootFolder>()
+    private val logoutUseCase = mock<LogoutUseCase>()
 
     @Before
     fun setup() {
@@ -63,7 +65,8 @@ internal class ChangePasswordViewModelTest {
             changePasswordUseCase = changePasswordUseCase,
             resetPasswordUseCase = resetPasswordUseCase,
             getRootFolder = getRootFolder,
-            multiFactorAuthSetting = multiFactorAuthSetting
+            multiFactorAuthSetting = multiFactorAuthSetting,
+            logoutUseCase = logoutUseCase,
         )
     }
 
