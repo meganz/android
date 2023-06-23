@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import androidx.annotation.VisibleForTesting
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -31,7 +32,9 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.RemoveSetElementListenerInterface
 import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.UserSetMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
@@ -72,6 +75,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val isNodeInRubbish: IsNodeInRubbish,
     private val albumStringResourceGateway: AlbumStringResourceGateway,
     private val photoMapper: PhotoMapper,
+    private val imageNodeMapper: ImageNodeMapper,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
@@ -90,7 +94,8 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
 
-    private val publicNodesMap: MutableMap<NodeId, MegaNode> = mutableMapOf()
+    @VisibleForTesting
+    val publicNodesMap: MutableMap<NodeId, MegaNode> = mutableMapOf()
 
     @Volatile
     private var publicNodesDataMap: Map<NodeId, String> = mapOf()
@@ -643,6 +648,22 @@ internal class DefaultAlbumRepository @Inject constructor(
         val nodeIds = savePhotoToFolder(nodeParent)
 
         nodeIds
+    }
+
+    override suspend fun getPublicPhotoImageNode(nodeId: NodeId): ImageNode {
+        return withContext(ioDispatcher) {
+            val node = publicNodesMap[nodeId] ?: throw IllegalArgumentException("Node not found")
+            imageNodeMapper(node, megaApiGateway::hasVersion)
+        }
+    }
+
+    override suspend fun getPublicPhoto(nodeId: NodeId): Photo? {
+        return publicNodesMap[nodeId]?.let {
+            photoMapper(
+                node = it,
+                albumPhotoId = null,
+            )
+        }
     }
 
     override fun clearCache() {

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumIdLink
@@ -218,6 +219,22 @@ interface AlbumRepository {
         photoIds: List<NodeId>,
         targetParentFolderNodeId: NodeId,
     ): List<NodeId>
+
+    /**
+     * Get ImageNode given public photo handle
+     *
+     * @param nodeId Node id of public photo
+     * @return Image node
+     */
+    suspend fun getPublicPhotoImageNode(nodeId: NodeId): ImageNode
+
+    /**
+     * Get Photo given public photo handle
+     *
+     * @param nodeId Node id of public photo
+     * @return photo
+     */
+    suspend fun getPublicPhoto(nodeId: NodeId): Photo?
 
     /**
      * Clear all albums cache

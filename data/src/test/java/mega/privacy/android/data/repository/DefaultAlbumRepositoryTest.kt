@@ -11,6 +11,7 @@ import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.UserSetMapper
+import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.model.GlobalUpdate.OnSetElementsUpdate
 import mega.privacy.android.data.model.GlobalUpdate.OnSetsUpdate
 import mega.privacy.android.domain.entity.node.NodeId
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
@@ -46,6 +48,7 @@ class DefaultAlbumRepositoryTest {
     private val userSetMapper: UserSetMapper = ::createUserSet
     private val albumStringResourceGateway = mock<AlbumStringResourceGateway>()
     private val photoMapper = mock<PhotoMapper>()
+    private val imageNodeMapper = mock<ImageNodeMapper>()
 
     private val testName = "Album1"
 
@@ -475,6 +478,45 @@ class DefaultAlbumRepositoryTest {
         assertThat(nodeIds).isNotNull()
     }
 
+    @Test
+    fun `test that get public photo image node works properly`() = runTest {
+        // given
+        val nodeId = NodeId(1L)
+        val node = mock<MegaNode>()
+
+        underTest = createUnderTest(this)
+        (underTest as DefaultAlbumRepository).publicNodesMap[nodeId] = node
+
+        whenever(imageNodeMapper(node) { false })
+            .thenReturn(mock())
+
+        // then
+        try {
+            underTest.getPublicPhotoImageNode(nodeId)
+        } catch (e: Exception) {
+            fail("$e")
+        }
+    }
+
+    @Test
+    fun `test that get public photo works properly`() = runTest {
+        // given
+        val nodeId = NodeId(1L)
+        val node = mock<MegaNode>()
+
+        underTest = createUnderTest(this)
+        (underTest as DefaultAlbumRepository).publicNodesMap[nodeId] = node
+
+        whenever(photoMapper(node, null))
+            .thenReturn(mock<Photo.Image>())
+
+        // when
+        val photo = underTest.getPublicPhoto(nodeId)
+
+        // then
+        assertThat(photo).isNotNull()
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,
@@ -482,6 +524,7 @@ class DefaultAlbumRepositoryTest {
         isNodeInRubbish = { false },
         albumStringResourceGateway = albumStringResourceGateway,
         photoMapper = photoMapper,
+        imageNodeMapper = imageNodeMapper,
         ioDispatcher = UnconfinedTestDispatcher(),
         appScope = coroutineScope,
     )
