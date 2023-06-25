@@ -232,7 +232,13 @@ fun UpgradeAccountView(
                         subscription = it,
                         isRecommended = isRecommended.value,
                         onPlanClicked = {
-                            if (!isPaymentMethodAvailable) chosenPlan = AccountType.FREE
+                            if (!isPaymentMethodAvailable) {
+                                chosenPlan = AccountType.FREE
+                                onChoosingPlanType(it.accountType)
+                                coroutineScope.launch {
+                                    scrollState.animateScrollTo(0)
+                                }
+                            }
                             if (!disableCardClick && isPaymentMethodAvailable) {
                                 chosenPlan = it.accountType
                                 isPreselectedPlanOnce = true
@@ -240,11 +246,6 @@ fun UpgradeAccountView(
                                 onChoosingPlanType(it.accountType)
                                 isClickedCurrentPlan = isCurrentPlan
                                 hideFloatButton = false
-                            }
-                            if (!isPaymentMethodAvailable) {
-                                coroutineScope.launch {
-                                    scrollState.animateScrollTo(0)
-                                }
                             }
                         },
                         isMonthly = isMonthly,

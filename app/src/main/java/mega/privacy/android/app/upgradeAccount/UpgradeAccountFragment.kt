@@ -92,9 +92,27 @@ class UpgradeAccountFragment : Fragment() {
                 value = getFeatureFlagUseCase(AppFeatures.PlansPageUpdate)
             }
             if (useNewPlansPageUI) {
+                LegacyUpgradeAccountView(
+                    state = uiState,
+                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
+                    onPlanClicked = ::onPlanClicked,
+                    onCustomLabelClicked = {
+                        uiState.currentSubscriptionPlan?.let {
+                            onCustomLabelClick(it)
+                        }
+                    },
+                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+                    onDialogPositiveButtonClicked = ::onDialogPositiveButtonClicked,
+                    onDialogDismissButtonClicked = {
+                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
+                            showBuyNewSubscriptionDialog = false
+                        )
+                    },
+                )
+            } else {
                 UpgradeAccountView(
                     state = uiState,
-                    onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
+                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
                     onBuyClicked = {
                         billingViewModel.startPurchase(
                             upgradeAccountActivity,
@@ -119,24 +137,6 @@ class UpgradeAccountFragment : Fragment() {
                     },
                     hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
                 )
-            } else {
-                LegacyUpgradeAccountView(
-                    state = uiState,
-                    onBackPressed = { upgradeAccountActivity.onBackPressedDispatcher.onBackPressed() },
-                    onPlanClicked = { onUpgradeClick(it) },
-                    onCustomLabelClicked = {
-                        uiState.currentSubscriptionPlan?.let {
-                            onCustomLabelClick(it)
-                        }
-                    },
-                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
-                    onDialogPositiveButtonClicked = { onDialogPositiveButtonClicked(it) },
-                    onDialogDismissButtonClicked = {
-                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
-                            showBuyNewSubscriptionDialog = false
-                        )
-                    },
-                )
             }
         }
     }
@@ -155,7 +155,7 @@ class UpgradeAccountFragment : Fragment() {
      *
      * @param accountType Selected payment plan.
      */
-    private fun onUpgradeClick(accountType: AccountType) {
+    private fun onPlanClicked(accountType: AccountType) {
         with(upgradeAccountViewModel) {
             if (!isBillingAvailable()) {
                 Timber.w("Billing not available")
