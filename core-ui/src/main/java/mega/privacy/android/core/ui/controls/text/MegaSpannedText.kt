@@ -1,6 +1,7 @@
 package mega.privacy.android.core.ui.controls.text
 
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -90,10 +91,10 @@ fun MegaSpannedAlignedText(
 @Composable
 fun MegaSpannedClickableText(
     value: String,
-    baseStyle: TextStyle,
     styles: Map<SpanIndicator, SpanStyleWithAnnotation>,
     onAnnotationClick: (annotation: String) -> Unit,
     modifier: Modifier = Modifier,
+    baseStyle: TextStyle = LocalTextStyle.current,
 ) {
     val annotatedLinkString = spannedTextWithAnnotation(value, styles)
     ClickableText(
@@ -222,7 +223,6 @@ fun MegaSpannedClickableTextPreview() {
     var counter by remember { mutableStateOf(1) }
     MegaSpannedClickableText(
         value = "Click [A]here[/A] to increase the counter: [B]$counter[/B]\n and [R]here[/R] to reset",
-        baseStyle = MaterialTheme.typography.subtitle1,
         styles = hashMapOf(
             SpanIndicator('A') to SpanStyleWithAnnotation(
                 SpanStyle(
@@ -244,6 +244,7 @@ fun MegaSpannedClickableTextPreview() {
             } else {
                 counter += 1
             }
-        }
+        },
+        baseStyle = MaterialTheme.typography.subtitle1
     )
 }
