@@ -23,11 +23,11 @@ import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSettingUseCase
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -51,7 +51,7 @@ class SettingsViewModelTest {
     private val isChatLoggedInValue = MutableStateFlow(true)
     private val isChatLoggedIn =
         mock<IsChatLoggedIn> { on { invoke() }.thenReturn(isChatLoggedInValue) }
-    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
+    private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase> {
         on { invoke() }.thenReturn(
             emptyFlow()
         )
@@ -83,8 +83,8 @@ class SettingsViewModelTest {
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             fetchMultiFactorAuthSettingUseCase = fetchMultiFactorAuthSettingUseCase,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            monitorHideRecentActivity = monitorHideRecentActivity,
             setHideRecentActivity = setHideRecentActivity,
+            monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             setMediaDiscoveryView = setMediaDiscoveryView,
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
@@ -220,7 +220,7 @@ class SettingsViewModelTest {
     fun `test that hideRecentActivityChecked is set with return value of monitorHideRecentActivity`() =
         runTest {
             whenever(fetchMultiFactorAuthSettingUseCase()).thenReturn(false)
-            whenever(monitorHideRecentActivity()).thenReturn(
+            whenever(monitorHideRecentActivityUseCase()).thenReturn(
                 flow {
                     emit(true)
                     emit(false)

@@ -22,7 +22,6 @@ import mega.privacy.android.domain.usecase.GetSupportEmail
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
@@ -59,8 +58,6 @@ object TestSettingsModule {
         mock<IsMultiFactorAuthAvailable> { on { invoke() }.thenReturn(true) }
     val fetchAutoAcceptQRLinks =
         mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
-    val monitorHideRecentActivity =
-        mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
     val monitorMediaDiscoveryView =
         mock<MonitorMediaDiscoveryView> { on { invoke() }.thenReturn(emptyFlow()) }
     val getChatImageQuality = mock<GetChatImageQuality> { on { invoke() }.thenReturn(emptyFlow()) }
@@ -98,9 +95,6 @@ object TestSettingsModule {
 
     @Provides
     fun provideGetStartScreen(): MonitorStartScreenPreference = monitorStartScreenPreference
-
-    @Provides
-    fun provideMonitorHideRecentActivity(): MonitorHideRecentActivity = monitorHideRecentActivity
 
     @Provides
     fun provideMonitorMediaDiscoveryView(): MonitorMediaDiscoveryView = monitorMediaDiscoveryView

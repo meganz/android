@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultCanDeleteAccount
 import mega.privacy.android.domain.usecase.DefaultIsChatLoggedIn
 import mega.privacy.android.domain.usecase.DefaultMonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.DefaultMonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.DefaultMonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
@@ -22,7 +21,6 @@ import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
@@ -57,9 +55,6 @@ abstract class SettingsUseCases {
 
     @Binds
     abstract fun bindMonitorAutoAcceptQRLinks(implementation: DefaultMonitorAutoAcceptQRLinks): MonitorAutoAcceptQRLinks
-
-    @Binds
-    abstract fun bindMonitorHideRecentActivity(implementation: DefaultMonitorHideRecentActivity): MonitorHideRecentActivity
 
     /**
      * Provide MonitorMediaDiscoveryView implementation

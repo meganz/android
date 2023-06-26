@@ -27,10 +27,10 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyLong
@@ -67,7 +67,7 @@ class RecentActionsViewModelTest {
         onBlocking { invoke(any()) }.thenReturn(true)
     }
 
-    private val monitorHideRecentActivity = mock<MonitorHideRecentActivity> {
+    private val monitorHideRecentActivityUseCase = mock<MonitorHideRecentActivityUseCase> {
         flow {
             emit(false)
         }
@@ -116,7 +116,7 @@ class RecentActionsViewModelTest {
             getNodeByHandle = getNodeByHandle,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
-            monitorHideRecentActivity = monitorHideRecentActivity,
+            monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
             monitorNodeUpdates = monitorNodeUpdates,
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         )
@@ -417,7 +417,7 @@ class RecentActionsViewModelTest {
     @Test
     fun `test that hide recent activity is set with value of monitor hide recent activity`() =
         runTest {
-            whenever(monitorHideRecentActivity()).thenReturn(
+            whenever(monitorHideRecentActivityUseCase()).thenReturn(
                 flow {
                     emit(true)
                     emit(false)

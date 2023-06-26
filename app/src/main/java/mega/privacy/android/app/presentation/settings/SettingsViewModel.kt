@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
@@ -44,6 +43,7 @@ import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,8 +59,8 @@ class SettingsViewModel @Inject constructor(
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
     private val startScreen: MonitorStartScreenPreference,
-    private val monitorHideRecentActivity: MonitorHideRecentActivity,
     private val setHideRecentActivity: SetHideRecentActivity,
+    private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
@@ -155,7 +155,7 @@ class SettingsViewModel @Inject constructor(
                     .map { screen ->
                         { state: SettingsState -> state.copy(startScreen = screen.id) }
                     },
-                monitorHideRecentActivity()
+                monitorHideRecentActivityUseCase()
                     .map { hide ->
                         { state: SettingsState -> state.copy(hideRecentActivityChecked = hide) }
                     },
