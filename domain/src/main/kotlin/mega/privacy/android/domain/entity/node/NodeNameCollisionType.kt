@@ -5,5 +5,13 @@ package mega.privacy.android.domain.entity.node
  *
  */
 enum class NodeNameCollisionType {
-    RESTORE
+    /**
+     * Restore node from rubbish bin
+     */
+    RESTORE,
+
+    /**
+     * Move node
+     */
+    MOVE
 }

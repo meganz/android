@@ -168,7 +168,6 @@ import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
-import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
@@ -191,6 +190,7 @@ import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
+import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -275,7 +275,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -419,9 +418,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var filePrepareUseCase: FilePrepareUseCase
-
-    @Inject
-    lateinit var legacyMoveNodeUseCase: LegacyMoveNodeUseCase
 
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
@@ -2375,27 +2371,33 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun handleMovementResult(moveRequestResult: MoveRequestResult) {
-        if (moveRequestResult !is MoveRequestResult.DeleteMovement) {
-            showMovementResult(moveRequestResult, moveRequestResult.nodes.first())
+    private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {
+        if (moveRequestResult.isSuccess) {
+            val data = moveRequestResult.getOrThrow()
+            if (data !is MoveRequestResult.DeleteMovement) {
+                showMovementResult(data, data.nodes.first())
+            }
+            showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                moveRequestMessageMapper(data),
+                MEGACHAT_INVALID_HANDLE
+            )
+        } else {
+            manageCopyMoveException(moveRequestResult.exceptionOrNull())
         }
-        showSnackbar(
-            Constants.SNACKBAR_TYPE,
-            moveRequestMessageMapper(moveRequestResult),
-            MEGACHAT_INVALID_HANDLE
-        )
     }
 
     private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
-        if (result.type == NodeNameCollisionType.RESTORE) {
-            if (result.conflictNodes.isNotEmpty()) {
-                nameCollisionActivityContract
-                    ?.launch(ArrayList(result.conflictNodes.values.map {
-                        NameCollision.Movement.getMovementCollision(it)
-                    }))
-            }
-            if (result.noConflictNodes.isNotEmpty()) {
-                viewModel.restoreNodes(result.noConflictNodes)
+        if (result.conflictNodes.isNotEmpty()) {
+            nameCollisionActivityContract
+                ?.launch(ArrayList(result.conflictNodes.values.map {
+                    NameCollision.Movement.getMovementCollision(it)
+                }))
+        }
+        if (result.noConflictNodes.isNotEmpty()) {
+            when (result.type) {
+                NodeNameCollisionType.RESTORE -> viewModel.restoreNodes(result.noConflictNodes)
+                NodeNameCollisionType.MOVE -> viewModel.moveNodes(result.noConflictNodes)
             }
         }
     }
@@ -7428,45 +7430,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 val moveHandles = intent.getLongArrayExtra("MOVE_HANDLES") ?: LongArray(0)
                 val toHandle = intent.getLongExtra("MOVE_TO", 0)
-                checkNameCollisionUseCase.checkHandleList(
-                    moveHandles,
-                    toHandle,
-                    NameCollisionType.MOVE,
-                )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
-                            if (collisions.isNotEmpty()) {
-                                dismissAlertDialogIfExists(statusDialog)
-                                nameCollisionActivityContract?.launch(collisions)
-                            }
-                            if (handlesWithoutCollision.isNotEmpty()) {
-                                legacyMoveNodeUseCase.move(handlesWithoutCollision, toHandle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { moveResult: MoveRequestResult.GeneralMovement?, moveThrowable: Throwable? ->
-                                        if (!manageCopyMoveException(moveThrowable)) {
-                                            viewModel.setMoveTargetPath(toHandle)
-                                            moveResult?.let { result ->
-                                                showMovementResult(
-                                                    result,
-                                                    handlesWithoutCollision[0]
-                                                )
-                                                showSnackbar(
-                                                    Constants.SNACKBAR_TYPE,
-                                                    moveRequestMessageMapper(result),
-                                                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                                )
-                                            }
-                                        }
-                                    }
-                                    .addTo(composite)
-                            }
-                        },
-                        { throwable: Throwable -> Timber.e(throwable) }
-                    )
-                    .addTo(composite)
+                if (moveHandles.isNotEmpty()) {
+                    viewModel.checkMoveNodesNameCollision(moveHandles.toList(), toHandle)
+                }
             }
 
             requestCode == Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY && resultCode == Activity.RESULT_OK -> {

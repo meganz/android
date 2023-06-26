@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.photos.mediadiscovery.SendStatisticsMediaDiscoveryUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
@@ -171,6 +172,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorBackupFolder: MonitorBackupFolder,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
+    private val moveNodesUseCase: MoveNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -741,6 +743,45 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
+     * Check move nodes name collision
+     *
+     * @param nodes
+     * @param targetNode
+     */
+    fun checkMoveNodesNameCollision(nodes: List<Long>, targetNode: Long) {
+        viewModelScope.launch {
+            runCatching {
+                checkNodesNameCollisionUseCase(
+                    nodes.associateWith { targetNode },
+                    NodeNameCollisionType.MOVE
+                )
+            }.onSuccess { result ->
+                _state.update { it.copy(nodeNameCollisionResult = result) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Move nodes
+     *
+     * @param nodes
+     */
+    fun moveNodes(nodes: Map<Long, Long>) {
+        viewModelScope.launch {
+            val result = runCatching {
+                moveNodesUseCase(nodes)
+            }.onSuccess {
+                setMoveTargetPath(nodes.values.first())
+            }.onFailure {
+                Timber.e(it)
+            }
+            _state.update { state -> state.copy(moveRequestResult = result) }
+        }
+    }
+
+    /**
      * Mark handle node name collision result
      *
      */
@@ -775,13 +816,12 @@ class ManagerViewModel @Inject constructor(
      */
     fun moveNodesToRubbishBin(nodeHandles: List<Long>) {
         viewModelScope.launch {
-            runCatching {
+            val result = runCatching {
                 moveNodesToRubbishUseCase(nodeHandles)
-            }.onSuccess {
-                _state.update { state -> state.copy(moveRequestResult = it) }
             }.onFailure {
                 Timber.e(it)
             }
+            _state.update { state -> state.copy(moveRequestResult = result) }
         }
     }
 
@@ -792,13 +832,12 @@ class ManagerViewModel @Inject constructor(
      */
     fun deleteNodes(nodeHandles: List<Long>) {
         viewModelScope.launch {
-            runCatching {
+            val result = runCatching {
                 deleteNodesUseCase(nodeHandles.map { NodeId(it) })
-            }.onSuccess {
-                _state.update { state -> state.copy(moveRequestResult = it) }
             }.onFailure {
                 Timber.e(it)
             }
+            _state.update { state -> state.copy(moveRequestResult = result) }
         }
     }
 

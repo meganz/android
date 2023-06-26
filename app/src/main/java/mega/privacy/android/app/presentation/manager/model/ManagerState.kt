@@ -50,5 +50,5 @@ data class ManagerState(
     val cancelTransfersResult: Result<Unit>? = null,
     val restoreNodeResult: Result<RestoreNodeResult>? = null,
     val nodeNameCollisionResult: NodeNameCollisionResult? = null,
-    val moveRequestResult: MoveRequestResult? = null
+    val moveRequestResult: Result<MoveRequestResult>? = null
 )
