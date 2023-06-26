@@ -28,6 +28,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.joinAll
@@ -1121,121 +1122,58 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         startHeartbeat(finalList)
 
-        for (file in finalList) {
-            val isSecondary = file.isSecondary
+        for (record in finalList) {
+            val isSecondary = record.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
-            if (file.type == SyncRecordType.TYPE_PHOTO && !file.isCopyOnly) {
-                if (!areLocationTagsEnabledUseCase()) {
-                    var shouldContinue = false
-                    flow<String> {
-                        createTempFileAndRemoveCoordinatesUseCase(
-                            tempRoot,
-                            file
-                        )
-                    }.retryWhen { cause, attempt ->
-                        if (cause is NotEnoughStorageException) {
-                            if (attempt >= 60) {
-                                @Suppress("DEPRECATION")
-                                if (megaApi.numPendingUploads == 0) {
-                                    showNotEnoughStorageNotification()
-                                    Timber.w("Stop service due to out of space issue")
-                                    endService(aborted = true)
-                                } else {
-                                    // we will not be retying again and skip the current record
-                                    Timber.d("Stop retrying for $file")
-                                    shouldContinue = true
-                                    return@retryWhen false
-                                }
-                            }
-                            Timber.d("Waiting for disk space to process for $file")
-                            // total delay (1 second times 60 attempts) = 60 seconds
-                            delay(TimeUnit.SECONDS.toMillis(1))
-                            return@retryWhen true
-                        } else {
-                            // not storage exception, no need to retry
-                            return@retryWhen false
-                        }
-                    }.catch {
-                        Timber.e("Temporary File creation exception$it")
-                        if (it is FileNotFoundException) {
-                            file.localPath?.let { newPath ->
-                                deleteSyncRecord(newPath, isSecondary = isSecondary)
-                            }
-                        }
-                        shouldContinue = true
-                    }.collect()
-                    if (shouldContinue) continue
-                } else {
-                    // Set as don't remove GPS
-                    file.newPath = file.localPath
-                }
-            }
-
-            var path: String?
-            if (isCompressedVideo || file.type == SyncRecordType.TYPE_PHOTO
-                || file.type == SyncRecordType.TYPE_VIDEO && shouldCompressVideo()
-            ) {
-                path = file.newPath
-                val temp = path?.let { File(it) }
-                if ((temp != null) && !temp.exists()) {
-                    path = file.localPath
-                }
-            } else {
-                path = file.localPath
-            }
-
-            if (file.isCopyOnly) {
-                Timber.d("Copy from node, file timestamp is: %s", file.timestamp)
-                file.nodeHandle?.let { nodeHandle ->
+            val shouldBeSkipped = createTemporaryFileIfNeeded(record, isSecondary)
+            if (shouldBeSkipped) continue
+            if (record.isCopyOnly) {
+                Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
+                record.nodeHandle?.let { nodeHandle ->
                     getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
                         cameraUploadState.totalToUpload++
                         copyFileAsyncList.add(async {
                             handleCopyNode(
                                 nodeToCopy = nodeToCopy,
                                 newNodeParent = parent,
-                                newNodeName = file.fileName.orEmpty(),
+                                newNodeName = record.fileName.orEmpty(),
                             )
                         })
                     }
                 }
             } else {
-                val toUpload = path?.let { File(it) }
-                if ((toUpload != null) && toUpload.exists()) {
+                val fileToUpload = getFileToUpload(record, isCompressedVideo)
+                fileToUpload?.let {
                     // compare size
-                    val node = checkExistBySize(parent, toUpload.length())
+                    val node = checkExistBySize(parent, it.length())
                     if (node != null && node.fingerprint == null) {
                         Timber.d(
-                            "Node with handle: %d already exists, delete record from database.",
-                            node.id.longValue
+                            "Node with handle: ${node.id.longValue} already exists, delete record from database."
                         )
-                        path?.let {
-                            deleteSyncRecord(it, isSecondary)
-                        }
+                        deleteSyncRecord(it.path, isSecondary)
                     } else {
                         cameraUploadState.totalToUpload++
-                        val lastModified = getLastModifiedTime(file)
+                        val lastModified = getLastModifiedTime(record)
 
                         // If the local file path exists, call the Use Case to upload the file
-                        path?.let { nonNullFilePath ->
-                            uploadFileAsyncList.add(async {
-                                startUploadUseCase(
-                                    localPath = nonNullFilePath,
-                                    parentNodeId = parent.id,
-                                    fileName = file.fileName,
-                                    modificationTime = lastModified / 1000,
-                                    appData = Constants.APP_DATA_CU,
-                                    isSourceTemporary = false,
-                                    shouldStartFirst = false,
-                                ).collect { globalTransfer ->
-                                    // Handle the GlobalTransfer emitted by the Use Case
-                                    onGlobalTransferUpdated(globalTransfer)
-                                }
-                            })
-                        }
+                        uploadFileAsyncList.add(async {
+                            startUploadUseCase(
+                                localPath = it.path,
+                                parentNodeId = parent.id,
+                                fileName = record.fileName,
+                                modificationTime = lastModified / 1000,
+                                appData = Constants.APP_DATA_CU,
+                                isSourceTemporary = false,
+                                shouldStartFirst = false,
+                            ).conflate().collect { globalTransfer ->
+                                // Handle the GlobalTransfer emitted by the Use Case
+                                onGlobalTransferUpdated(globalTransfer)
+                            }
+                        })
                     }
-                } else {
+                } ?: run {
                     Timber.d("Local file is unavailable, delete record from database.")
-                    path?.let {
+                    record.localPath?.let {
                         deleteSyncRecord(it, isSecondary)
                     }
                 }
@@ -1246,6 +1184,76 @@ class CameraUploadsWorker @AssistedInject constructor(
             copyFileAsyncList.joinAll()
         }
         uploadFileAsyncList.joinAll()
+    }
+
+    private suspend fun getFileToUpload(record: SyncRecord, isCompressedVideo: Boolean): File? {
+        return if (isCompressedVideo || record.type == SyncRecordType.TYPE_PHOTO
+            || record.type == SyncRecordType.TYPE_VIDEO && shouldCompressVideo()
+        ) {
+            record.newPath?.let { File(it).takeIf { newFile -> newFile.exists() } }
+                ?: record.localPath?.let { File(it).takeIf { localFile -> localFile.exists() } }
+        } else {
+            record.localPath?.let { File(it).takeIf { localFile -> localFile.exists() } }
+        }
+    }
+
+    /**
+     * create Temporary File and Remove Coordinates based on the settings
+     * @param record [SyncRecord]
+     * @param isSecondary [Boolean]
+     *
+     * @return [Boolean] indicates whether given [SyncRecord] should  be uploaded or not
+     */
+    private suspend fun createTemporaryFileIfNeeded(
+        record: SyncRecord,
+        isSecondary: Boolean,
+    ): Boolean {
+        var shouldBeSkipped = false
+        if (record.type == SyncRecordType.TYPE_PHOTO && !record.isCopyOnly) {
+            if (!areLocationTagsEnabledUseCase()) {
+                flow<String> {
+                    createTempFileAndRemoveCoordinatesUseCase(
+                        tempRoot,
+                        record
+                    )
+                }.retryWhen { cause, attempt ->
+                    if (cause is NotEnoughStorageException) {
+                        if (attempt >= 60) {
+                            @Suppress("DEPRECATION")
+                            if (megaApi.numPendingUploads == 0) {
+                                showNotEnoughStorageNotification()
+                                Timber.w("Stop service due to out of space issue")
+                                endService(aborted = true)
+                            } else {
+                                // we will not be retying again and skip the current record
+                                Timber.d("Stop retrying for $record")
+                                shouldBeSkipped = true
+                                return@retryWhen false
+                            }
+                        }
+                        Timber.d("Waiting for disk space to process for $record")
+                        // total delay (1 second times 60 attempts) = 60 seconds
+                        delay(TimeUnit.SECONDS.toMillis(1))
+                        return@retryWhen true
+                    } else {
+                        // not storage exception, no need to retry
+                        return@retryWhen false
+                    }
+                }.catch {
+                    Timber.e("Temporary File creation exception $it")
+                    if (it is FileNotFoundException) {
+                        record.localPath?.let { newPath ->
+                            deleteSyncRecord(newPath, isSecondary = isSecondary)
+                        }
+                    }
+                    shouldBeSkipped = true
+                }.collect()
+            } else {
+                // Set as don't remove GPS
+                record.newPath = record.localPath
+            }
+        }
+        return shouldBeSkipped
     }
 
     private suspend fun startHeartbeat(finalList: List<SyncRecord>) {
