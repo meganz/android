@@ -49,6 +49,7 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showTransfersSnackBar
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_LINK
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -196,11 +197,17 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             childrenHandles: LongArray,
             currentNodeHandle: Long? = null,
             showSlideshow: Boolean = false,
+            fromFolderLink: Boolean = false,
         ): Intent =
             Intent(context, ImageViewerActivity::class.java).apply {
                 putExtra(NODE_HANDLES, childrenHandles)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
                 putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
+                if (fromFolderLink)
+                    putExtra(
+                        Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                        Constants.FOLDER_LINK_ADAPTER //FolderLink type
+                    )
             }
 
         /**
@@ -355,6 +362,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         )
     }
 
+    private val adapterType by lazy {
+        intent.getIntExtra(
+            Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+            FROM_IMAGE_VIEWER
+        )
+    }
+
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
@@ -445,26 +459,35 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             when {
                 isTimeline ->
                     viewModel.retrieveImagesFromTimeline(nodeHandle)
+
                 parentNodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveImagesFromParent(parentNodeHandle, childOrder, nodeHandle)
+
                 childrenHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenHandles!!, nodeHandle)
+
                 childrenOfflineHandles?.isNotEmpty() == true ->
                     viewModel.retrieveImages(childrenOfflineHandles!!, nodeHandle, isOffline = true)
+
                 nodeOfflineHandle != INVALID_HANDLE && nodeOfflineHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeOfflineHandle, isOffline = true)
+
                 chatRoomId != INVALID_HANDLE && chatMessagesId?.isNotEmpty() == true ->
                     viewModel.retrieveChatImages(chatRoomId, chatMessagesId!!, nodeHandle)
+
                 !nodeFileLink.isNullOrBlank() ->
                     viewModel.retrieveSingleImage(nodeFileLink!!)
+
                 nodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveSingleImage(nodeHandle)
+
                 imageFileUri != null ->
                     viewModel.retrieveFileImage(
                         imageFileUri!!,
                         showNearbyFiles,
                         imageFileUri.hashCode().toLong()
                     )
+
                 else ->
                     error("Invalid params")
             }
@@ -584,6 +607,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 onBackPressedDispatcher.onBackPressed()
                 true
             }
+
             R.id.action_slideshow -> {
                 lifecycleScope.launch {
                     val enabled = getFeatureFlagUseCase(AppFeatures.SlideShowCompose)
@@ -594,10 +618,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
                 true
             }
+
             R.id.action_forward, R.id.action_send_to_chat -> {
                 viewModel.getCurrentImageItem()?.nodeItem?.node?.let(::attachNode)
                 true
             }
+
             R.id.action_share -> {
                 val imageItem = viewModel.getCurrentImageItem()
                 val file =
@@ -605,27 +631,33 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 when {
                     imageItem == null ->
                         Timber.w("Image Item is null")
+
                     imageItem is ImageItem.OfflineNode ->
                         OfflineUtils.shareOfflineNode(this, imageItem.nodeItem!!.handle)
+
                     file != null -> {
                         trackOnShareClicked()
                         FileUtil.shareFile(this, file)
                     }
+
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
                         MegaNodeUtil.shareLink(this, imageItem.nodePublicLink)
                     }
+
                     imageItem.nodeItem?.node != null -> {
                         trackOnShareClicked()
                         viewModel.exportNode(imageItem.nodeItem!!.node!!).observe(this) { link ->
                             if (!link.isNullOrBlank()) MegaNodeUtil.shareLink(this, link)
                         }
                     }
+
                     else ->
                         Timber.w("Node cannot be shared")
                 }
                 true
             }
+
             R.id.action_download -> {
                 viewModel.getCurrentImageItem()?.nodeItem?.let { nodeItem ->
                     viewModel.executeTransfer {
@@ -638,12 +670,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
                 true
             }
+
             R.id.action_get_link -> {
                 viewModel.getCurrentImageItem()?.nodeItem?.handle?.let { nodeHandle ->
                     LinksUtil.showGetLinkActivity(this, nodeHandle)
                 }
                 true
             }
+
             R.id.action_more -> {
                 bottomSheet = viewModel.getCurrentImageItem()?.id?.let { itemId ->
                     ImageBottomSheetDialogFragment.newInstance(itemId)
@@ -651,6 +685,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
 
@@ -682,7 +717,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
             putExtra(
                 INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                 megaApi.getNodeByHandle(nodeHandle)?.parentHandle ?: INVALID_HANDLE
@@ -725,8 +760,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         when {
             nodeSaver?.handleActivityResult(this, requestCode, resultCode, intent) == true ->
                 return
+
             nodeAttacher?.handleActivityResult(requestCode, resultCode, intent, this) == true ->
                 return
+
             else ->
                 super.onActivityResult(requestCode, resultCode, intent)
         }

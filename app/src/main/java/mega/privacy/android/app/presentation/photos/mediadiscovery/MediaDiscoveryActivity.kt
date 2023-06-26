@@ -260,6 +260,7 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             this,
             mediaDiscoveryViewModel.getAllPhotoIds().toLongArray(),
             photo.id,
+            fromFolderLink = true,
         ).run {
             startActivity(this)
         }

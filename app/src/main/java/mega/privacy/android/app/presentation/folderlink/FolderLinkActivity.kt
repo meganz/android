@@ -1211,7 +1211,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     val intent = getIntentForChildren(
                         this,
                         children,
-                        node.handle
+                        node.handle,
+                        fromFolderLink = true,
                     )
                     putThumbnailLocation(
                         intent,
