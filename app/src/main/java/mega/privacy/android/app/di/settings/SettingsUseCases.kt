@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
@@ -139,10 +138,6 @@ abstract class SettingsUseCases {
         @Provides
         fun provideSetCallsSoundNotifications(settingsRepository: SettingsRepository): SetCallsSoundNotifications =
             SetCallsSoundNotifications(settingsRepository::setCallsSoundNotifications)
-
-        @Provides
-        fun provideSetHideRecentActivity(settingsRepository: SettingsRepository): SetHideRecentActivity =
-            SetHideRecentActivity(settingsRepository::setHideRecentActivity)
 
         /**
          * Provide SetMediaDiscoveryView implementation

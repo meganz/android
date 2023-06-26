@@ -24,10 +24,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,7 +36,7 @@ import javax.inject.Inject
  *
  * @property getRecentActionsUseCase
  * @property getVisibleContactsUseCase
- * @property setHideRecentActivity
+ * @property setHideRecentActivityUseCase
  * @property getNodeByHandle
  * @property getNodeByIdUseCase
  * @property getAccountDetailsUseCase
@@ -48,7 +48,7 @@ import javax.inject.Inject
 class RecentActionsViewModel @Inject constructor(
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val setHideRecentActivity: SetHideRecentActivity,
+    private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -110,7 +110,7 @@ class RecentActionsViewModel @Inject constructor(
      * Disable hide recent actions activity setting
      */
     fun disableHideRecentActivitySetting() = viewModelScope.launch {
-        setHideRecentActivity(false)
+        setHideRecentActivityUseCase(false)
     }
 
     /**

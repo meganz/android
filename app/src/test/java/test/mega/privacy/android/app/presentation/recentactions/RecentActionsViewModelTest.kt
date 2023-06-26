@@ -27,10 +27,10 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyLong
@@ -61,7 +61,7 @@ class RecentActionsViewModelTest {
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
         onBlocking { invoke(any()) }.thenReturn(mock())
     }
-    private val setHideRecentActivity = mock<SetHideRecentActivity>()
+    private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
 
     private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase> {
         onBlocking { invoke(any()) }.thenReturn(true)
@@ -112,7 +112,7 @@ class RecentActionsViewModelTest {
         underTest = RecentActionsViewModel(
             getRecentActionsUseCase = getRecentActionsUseCase,
             getVisibleContactsUseCase = getVisibleContactsUseCase,
-            setHideRecentActivity = setHideRecentActivity,
+            setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             getNodeByHandle = getNodeByHandle,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
@@ -436,7 +436,7 @@ class RecentActionsViewModelTest {
         runTest {
             underTest.disableHideRecentActivitySetting()
             advanceUntilIdle()
-            verify(setHideRecentActivity).invoke(false)
+            verify(setHideRecentActivityUseCase).invoke(false)
         }
 
     @Test

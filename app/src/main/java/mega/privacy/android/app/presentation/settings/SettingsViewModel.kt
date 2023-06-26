@@ -37,13 +37,13 @@ import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,8 +59,8 @@ class SettingsViewModel @Inject constructor(
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
     private val startScreen: MonitorStartScreenPreference,
-    private val setHideRecentActivity: SetHideRecentActivity,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
+    private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
@@ -265,7 +265,7 @@ class SettingsViewModel @Inject constructor(
      * @param hide true if hide recent activity
      */
     fun hideRecentActivity(hide: Boolean) = viewModelScope.launch {
-        setHideRecentActivity(hide)
+        setHideRecentActivityUseCase(hide)
     }
 
     /**

@@ -24,10 +24,10 @@ import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
+import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -56,7 +56,7 @@ class SettingsViewModelTest {
             emptyFlow()
         )
     }
-    private val setHideRecentActivity = mock<SetHideRecentActivity>()
+    private val setHideRecentActivityUseCase = mock<SetHideRecentActivityUseCase>()
     private val monitorMediaDiscoveryView = mock<MonitorMediaDiscoveryView> {
         on { invoke() }.thenReturn(
             emptyFlow()
@@ -83,8 +83,8 @@ class SettingsViewModelTest {
             monitorAutoAcceptQRLinks = monitorAutoAcceptQRLinks,
             fetchMultiFactorAuthSettingUseCase = fetchMultiFactorAuthSettingUseCase,
             startScreen = mock { on { invoke() }.thenReturn(emptyFlow()) },
-            setHideRecentActivity = setHideRecentActivity,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,
+            setHideRecentActivityUseCase = setHideRecentActivityUseCase,
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             setMediaDiscoveryView = setMediaDiscoveryView,
             toggleAutoAcceptQRLinks = toggleAutoAcceptQRLinks,
@@ -265,7 +265,7 @@ class SettingsViewModelTest {
             val expected = false
             underTest.hideRecentActivity(expected)
             advanceUntilIdle()
-            verify(setHideRecentActivity).invoke(expected)
+            verify(setHideRecentActivityUseCase).invoke(expected)
         }
 
     @Test

@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
-import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
@@ -98,9 +97,6 @@ object TestSettingsModule {
 
     @Provides
     fun provideMonitorMediaDiscoveryView(): MonitorMediaDiscoveryView = monitorMediaDiscoveryView
-
-    @Provides
-    fun provideSetHideRecentActivity(): SetHideRecentActivity = mock()
 
     @Provides
     fun provideSetMediaDiscoveryView(): SetMediaDiscoveryView = mock()
