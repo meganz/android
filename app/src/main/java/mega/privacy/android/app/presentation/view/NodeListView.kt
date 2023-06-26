@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.view
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -38,6 +40,7 @@ import java.io.File
  * @param onChangeViewTypeClick
  * @param getThumbnail
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun <T : TypedNode> NodeListView(
     nodeUIItemList: List<NodeUIItem<T>>,
@@ -80,7 +83,11 @@ fun <T : TypedNode> NodeListView(
                 }
             }
             NodeListViewItem(
-                modifier = modifier,
+                modifier = modifier
+                    .combinedClickable(
+                        onClick = { onItemClicked(nodeUIItemList[it]) },
+                        onLongClick = { onLongClick(nodeUIItemList[it]) }
+                    ),
                 isSelected = nodeUIItemList[it].isSelected,
                 folderInfo = nodeEntity
                     .let { node -> node as? FolderNode }
@@ -103,12 +110,11 @@ fun <T : TypedNode> NodeListView(
                         )
                     },
                 name = nodeEntity.name,
+                showMenuButton = true,
                 isTakenDown = nodeEntity.isTakenDown,
                 isFavourite = nodeEntity.isFavourite,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,
                 onMenuClick = { onMenuClick(nodeUIItemList[it]) },
-                onItemClicked = { onItemClicked(nodeUIItemList[it]) },
-                onLongClick = { onLongClick(nodeUIItemList[it]) },
                 imageState = imageState
             )
         }

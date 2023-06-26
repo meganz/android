@@ -1,11 +1,9 @@
 package mega.privacy.android.core.ui.controls.lists
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,13 +27,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
@@ -60,7 +58,6 @@ import java.io.File
  * @param onMenuClick three dots click
  * @param imageState Thumbnail state
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeListViewItem(
     modifier: Modifier,
@@ -70,20 +67,15 @@ fun NodeListViewItem(
     fileSize: String?,
     modifiedDate: String?,
     name: String,
+    showMenuButton: Boolean,
     isTakenDown: Boolean,
     isFavourite: Boolean,
     isSharedWithPublicLink: Boolean,
-    onMenuClick: () -> Unit,
-    onItemClicked: () -> Unit,
-    onLongClick: () -> Unit,
+    onMenuClick: () -> Unit = {},
     imageState: State<File?>,
 ) {
     Column(
         modifier = modifier
-            .combinedClickable(
-                onClick = { onItemClicked() },
-                onLongClick = { onLongClick() }
-            )
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
@@ -130,17 +122,19 @@ fun NodeListViewItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val (nodeInfo, threeDots) = createRefs()
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
-                        contentDescription = "3 dots",
-                        modifier = Modifier
-                            .constrainAs(threeDots) {
-                                end.linkTo(parent.end)
-                                top.linkTo(parent.top)
-                                bottom.linkTo(parent.bottom)
-                            }
-                            .clickable { onMenuClick() }
-                    )
+                    if (showMenuButton) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
+                            contentDescription = "3 dots",
+                            modifier = Modifier
+                                .constrainAs(threeDots) {
+                                    end.linkTo(parent.end)
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(parent.bottom)
+                                }
+                                .clickable { onMenuClick() }
+                        )
+                    }
                     Row(modifier = Modifier
                         .constrainAs(nodeInfo) {
                             top.linkTo(parent.top)
@@ -249,8 +243,7 @@ const val EXPORTED_TEST_TAG = "exported Tag"
 const val TAKEN_TEST_TAG = "taken Tag"
 
 
-@Preview
-@Preview(uiMode = UI_MODE_NIGHT_YES)
+@CombinedThemePreviews
 @Composable
 private fun FilePreview() {
     val imageState = remember {
@@ -265,19 +258,16 @@ private fun FilePreview() {
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",
+            showMenuButton = true,
             isFavourite = false,
             isSharedWithPublicLink = false,
             isTakenDown = false,
-            onMenuClick = {},
-            onItemClicked = {},
-            onLongClick = {},
             imageState = imageState
         )
     }
 }
 
-@Preview
-@Preview(uiMode = UI_MODE_NIGHT_YES)
+@CombinedThemePreviews
 @Composable
 private fun FolderPreview() {
     val imageState = remember {
@@ -292,12 +282,10 @@ private fun FolderPreview() {
             fileSize = "1.2 MB",
             modifiedDate = "Dec 29, 2022",
             name = "documentation.pdf",
+            showMenuButton = true,
             isFavourite = false,
             isSharedWithPublicLink = false,
             isTakenDown = false,
-            onMenuClick = {},
-            onItemClicked = {},
-            onLongClick = {},
             imageState = imageState
         )
     }
