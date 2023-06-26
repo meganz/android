@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.achievement
 
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import java.io.Serializable
 
 /**
  * Overview of all the existing achievements and rewards.
@@ -19,7 +20,7 @@ data class AchievementsOverview(
     val currentStorageInBytes: Long,
     val achievedStorageFromReferralsInBytes: Long,
     val achievedTransferFromReferralsInBytes: Long,
-)
+) : Serializable
 
 /**
  * Represents an achievement that a user can unlock.

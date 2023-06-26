@@ -33,9 +33,9 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 @Composable
 internal fun AchievementScreen(
     viewModel: AchievementsOverviewViewModel,
-    onInviteFriendsClicked: () -> Unit,
-    onShowInfoAchievementsClicked: (achievementType: AchievementType) -> Unit,
-    onReferBonusesClicked: () -> Unit,
+    onNavigateToInviteFriends: () -> Unit,
+    onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
+    onNavigateToReferralBonuses: () -> Unit,
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     AchievementView(
@@ -53,9 +53,9 @@ internal fun AchievementScreen(
         installDesktopStorage = uiState.installDesktopStorage,
         installDesktopAwardDaysLeft = uiState.installDesktopAwardDaysLeft,
         installDesktopAwardStorage = uiState.installDesktopAwardStorage,
-        onInviteFriendsClicked = onInviteFriendsClicked,
-        onShowInfoAchievementsClicked = onShowInfoAchievementsClicked,
-        onReferBonusesClicked = onReferBonusesClicked,
+        onInviteFriendsClicked = onNavigateToInviteFriends,
+        onShowInfoAchievementsClicked = onNavigateToInfoAchievements,
+        onReferBonusesClicked = onNavigateToReferralBonuses,
     )
 }
 

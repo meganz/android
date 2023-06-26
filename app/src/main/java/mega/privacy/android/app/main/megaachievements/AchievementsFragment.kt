@@ -61,9 +61,9 @@ class AchievementsFragment : Fragment() {
             AndroidTheme(isDark = themeMode.isDarkMode()) {
                 AchievementScreen(
                     viewModel = viewModel,
-                    onInviteFriendsClicked = ::navigateToInviteFriends,
-                    onShowInfoAchievementsClicked = ::navigateToInfoAchievements,
-                    onReferBonusesClicked = ::navigateToReferralBonuses,
+                    onNavigateToInviteFriends = ::navigateToInviteFriends,
+                    onNavigateToInfoAchievements = ::navigateToInfoAchievements,
+                    onNavigateToReferralBonuses = ::navigateToReferralBonuses,
                 )
             }
         }
@@ -81,7 +81,7 @@ class AchievementsFragment : Fragment() {
         achievementActivity.showFragment(
             INFO_ACHIEVEMENTS_FRAGMENT,
             null,
-            achievementType.classValue
+            achievementType
         )
 
     private fun navigateToReferralBonuses() =

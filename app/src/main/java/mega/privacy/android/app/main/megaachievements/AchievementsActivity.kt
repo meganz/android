@@ -13,10 +13,13 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
+import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_OVERVIEW
+import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_TYPE
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsFragment
 import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.achievement.AchievementType
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -94,8 +97,12 @@ class AchievementsActivity : PasscodeActivity() {
      *
      */
     @JvmOverloads
-    fun showFragment(fragmentName: Int, arguments: Bundle?, type: Int = INVALID_TYPE) {
-        Timber.d("showFragment: %d type: %d", fragmentName, type)
+    fun showFragment(
+        fragmentName: Int,
+        arguments: Bundle?,
+        type: AchievementType = AchievementType.INVALID_ACHIEVEMENT,
+    ) {
+        Timber.d("showFragment: $fragmentName type: ${type.name}")
         val ft = supportFragmentManager.beginTransaction()
         var fragment: Fragment? = null
         var tag = ""
@@ -123,8 +130,12 @@ class AchievementsActivity : PasscodeActivity() {
             }
 
             Constants.INFO_ACHIEVEMENTS_FRAGMENT -> {
-                fragment = InfoAchievementsFragment()
-                fragment.setArguments(bundleOf("achievementType" to type))
+                fragment = InfoAchievementsFragment().apply {
+                    this.arguments = bundleOf(
+                        ACHIEVEMENTS_OVERVIEW to viewModel.state.value.achievementsOverview,
+                        ACHIEVEMENTS_TYPE to type
+                    )
+                }
                 tag = "infoAchievementsFragment"
                 ft.addToBackStack(tag)
             }
@@ -146,6 +157,5 @@ class AchievementsActivity : PasscodeActivity() {
 
     companion object {
         private const val TAG_ACHIEVEMENTS = "achievementsFragment"
-        private const val INVALID_TYPE = -1
     }
 }

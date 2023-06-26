@@ -3,6 +3,7 @@ package mega.privacy.android.app.data.extensions
 import android.content.Context
 import mega.privacy.android.app.R
 import java.text.DecimalFormat
+import java.util.concurrent.TimeUnit
 
 /**
  * Kilobyte unit of Bytes
@@ -144,3 +145,5 @@ fun Long.toUnitString(context: Context): String {
         }
     }
 }
+
+internal fun Long.toMillis() = TimeUnit.SECONDS.toMillis(this)
