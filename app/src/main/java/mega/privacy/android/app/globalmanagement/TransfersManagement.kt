@@ -133,7 +133,7 @@ class TransfersManagement @Inject constructor(
             val channel = NotificationChannel(
                 notificationChannelId,
                 notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 setShowBadge(true)
                 setSound(null, null)

@@ -5,7 +5,6 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.net.wifi.WifiManager
@@ -18,20 +17,19 @@ import android.os.PowerManager
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.components.saver.AutoPlayInfo
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CLEAR_OFFLINE_SETTING
@@ -71,7 +69,6 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -105,12 +102,13 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 /**
  * Background service to download files
  */
 @AndroidEntryPoint
-internal class DownloadService : Service(), MegaRequestListenerInterface {
+internal class DownloadService : LifecycleService(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var crashReporter: CrashReporter
@@ -144,10 +142,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @Inject
     lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
-
-    @Inject
-    @ApplicationScope
-    lateinit var applicationScope: CoroutineScope
 
     @Inject
     lateinit var monitorPausedTransfers: MonitorPausedTransfers
@@ -219,7 +213,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private var lastUpdated: Long = 0
     private var intent: Intent? = null
 
-    private val rxSubscriptions = CompositeDisposable()
     private val uiHandler = Handler(Looper.getMainLooper())
 
     // the flag to determine the rating dialog is showed for this download action
@@ -231,17 +224,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      */
     private var autoPlayInfo: AutoPlayInfo? = null
 
-    private var monitorPausedTransfersJob: Job? = null
-    private var monitorStopTransfersWorkJob: Job? = null
-    private var monitorTransferEventsJob: Job? = null
-    private var monitorFetchNodesFinishJob: Job? = null
+    private val intentFlow = MutableSharedFlow<Intent>()
 
     @SuppressLint("NewApi")
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
         initialiseService()
-
     }
 
     private fun initialiseService() {
@@ -271,24 +260,22 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @SuppressLint("WrongConstant")
     private fun setReceivers() {
 
-        monitorPausedTransfersJob = applicationScope.launch {
+        lifecycleScope.launch {
             monitorPausedTransfers().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
-                Handler(Looper.getMainLooper()).postDelayed(
-                    { applicationScope.launch { updateProgressNotification(true) } },
-                    TransfersManagement.WAIT_TIME_BEFORE_UPDATE
-                )
+                delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
+                updateProgressNotification(true)
             }
         }
 
-        monitorStopTransfersWorkJob = applicationScope.launch {
+        lifecycleScope.launch {
             monitorStopTransfersWorkUseCase().conflate().collect {
                 @Suppress("DEPRECATION")
                 if (megaApi.numPendingDownloads == 0) stopForeground()
             }
         }
 
-        monitorTransferEventsJob = applicationScope.launch {
+        lifecycleScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
                     it.transfer.type == TransferType.TYPE_DOWNLOAD
@@ -322,9 +309,19 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 }
         }
 
-        monitorFetchNodesFinishJob = applicationScope.launch {
+        lifecycleScope.launch {
             monitorFetchNodesFinishUseCase().conflate().collect {
                 proceedWithPendingIntentsAfterLogin()
+            }
+        }
+
+        lifecycleScope.launch {
+            intentFlow.collect { intent ->
+                runCatching {
+                    onHandleIntent(intent)
+                }.onFailure {
+                    Timber.e(it)
+                }
             }
         }
     }
@@ -378,67 +375,66 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (fs.size > 1 && fs[1] != null) {
             FileUtil.purgeDirectory(fs[1])
         }
-        rxSubscriptions.clear()
         stopForeground()
-        monitorPausedTransfersJob?.cancel()
-        monitorStopTransfersWorkJob?.cancel()
-        monitorTransferEventsJob?.cancel()
         super.onDestroy()
     }
 
-    private fun cancelDownloadTransfers() {
-        applicationScope.launch {
-            runCatching {
-                cancelAllDownloadTransfersUseCase()
-                cancel()
-            }.onFailure {
-                Timber.e(it)
-            }
+    private suspend fun cancelDownloadTransfers() {
+        runCatching {
+            cancelAllDownloadTransfersUseCase()
+            cancel()
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         Timber.d("onStartCommand")
         canceled = false
-        if (intent.action == ACTION_CANCEL) {
-            Timber.d("Cancel intent")
-            canceled = true
-            cancelDownloadTransfers()
-            stopForeground()
-            return START_NOT_STICKY
+        when {
+            intent?.action == ACTION_CANCEL -> {
+                Timber.d("Cancel intent")
+                lifecycleScope.launch {
+                    canceled = true
+                    cancelDownloadTransfers()
+                    stopForeground()
+                }
+            }
+
+            intent != null -> {
+                lifecycleScope.launch {
+                    intentFlow.emit(intent)
+                }
+            }
+
+            else -> stopForeground()
         }
-        Single.just(intent)
-            .observeOn(Schedulers.single())
-            .subscribe({ intent: Intent -> onHandleIntent(intent) }) { t: Throwable? ->
-                Timber.e(
-                    t
-                )
-            }.addTo(rxSubscriptions)
         return START_NOT_STICKY
     }
 
-    private fun onHandleIntent(intent: Intent) {
+    private suspend fun onHandleIntent(intent: Intent) = withContext(ioDispatcher) {
         Timber.d("onHandleIntent")
-        this.intent = intent
+        this@DownloadService.intent = intent
         if (intent.action != null && intent.action == Constants.ACTION_RESTART_SERVICE) {
-            applicationScope.launch {
-                getTransferDataUseCase()?.let { transferData ->
-                    val uploadsInProgress = transferData.numDownloads
-                    for (i in 0 until uploadsInProgress) {
-                        val transfer =
-                            megaApi.getTransferByTag(transferData.downloadTags[i]) ?: continue
-                        if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
-                            transfersCount++
-                        }
+            transfersCount = 0
+            getTransferDataUseCase()?.let { transferData ->
+                val uploadsInProgress = transferData.numDownloads
+                for (i in 0 until uploadsInProgress) {
+                    coroutineContext.ensureActive()
+                    val transfer =
+                        megaApi.getTransferByTag(transferData.downloadTags[i]) ?: continue
+                    if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
+                        transfersCount++
                     }
-                    if (transfersCount > 0) {
-                        updateProgressNotification()
-                    } else {
-                        stopForeground()
-                    }
-                } ?: stopForeground()
-            }
-            return
+                }
+                if (transfersCount > 0) {
+                    updateProgressNotification()
+                } else {
+                    stopForeground()
+                }
+            } ?: stopForeground()
+            return@withContext
         }
 
         isDownloadForOffline = intent.getBooleanExtra(EXTRA_DOWNLOAD_FOR_OFFLINE, false)
@@ -448,12 +444,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         downloadByOpenWith = intent.getBooleanExtra(EXTRA_DOWNLOAD_BY_OPEN_WITH, false)
         type = intent.getStringExtra(Constants.EXTRA_TRANSFER_TYPE)
 
-        // we don't need to create ioDispatcher here, in already run in Background Thread by rx java setup
-        runBlocking {
-            val isScheduleDownload = processIntent(intent)
-            if (!isScheduleDownload && getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
-                cancel()
-            }
+        val isScheduleDownload = processIntent(intent)
+        if (!isScheduleDownload && getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
+            cancel()
         }
     }
 
@@ -486,10 +479,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (currentDocument?.let { checkCurrentFile(it) } != true) {
             Timber.d("checkCurrentFile == false")
             alreadyDownloaded++
-            applicationScope.launch {
-                if (getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
-                    onQueueComplete(node.handle)
-                }
+            if (getNumPendingDownloadsNonBackgroundUseCase() <= 0) {
+                onQueueComplete(node.handle)
             }
             return true
         }
@@ -599,10 +590,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
-    private fun proceedWithPendingIntentsAfterLogin() {
+    private suspend fun proceedWithPendingIntentsAfterLogin() {
         // Get cookies settings after login.
         getInstance().checkEnabledCookies()
-        pendingIntents.forEach { onHandleIntent(it) }
+        pendingIntents.forEach { intent -> intentFlow.emit(intent) }
         pendingIntents.clear()
     }
 
@@ -675,8 +666,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private suspend fun onQueueComplete(handle: Long) {
         Timber.d("onQueueComplete")
         releaseLocks()
+        coroutineContext.ensureActive()
         showCompleteNotification(handle)
-        stopForeground()
         val pendingDownloads = getNumPendingDownloadsNonBackgroundUseCase()
         Timber.d("onQueueComplete: total of files before reset %s", pendingDownloads)
         if (pendingDownloads <= 0) {
@@ -711,10 +702,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             } else {
                 null
             }?.let { transfersFinishState ->
-                applicationScope.launch {
-                    broadcastOfflineNodeAvailability(handle)
-                    broadcastTransfersFinishedUseCase(transfersFinishState)
-                }
+                broadcastOfflineNodeAvailability(handle)
+                broadcastTransfersFinishedUseCase(transfersFinishState)
             }
 
             megaApi.resetTotalDownloads()
@@ -723,6 +712,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             errorCount = 0
             alreadyDownloaded = 0
         }
+        stopForeground()
     }
 
     private fun releaseLocks() {
@@ -1182,6 +1172,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      */
     @SuppressLint("NewApi")
     private suspend fun updateProgressNotification(pausedTransfers: Boolean = false) {
+        // make sure app running to avoid DeadSystemException when show notification
+        coroutineContext.ensureActive()
         val pendingTransfers = getNumPendingDownloadsNonBackgroundUseCase()
         val totalTransfers = megaApi.totalDownloads - backgroundTransfers.size
         val totalSizePendingTransfer = megaApi.totalDownloadBytes
@@ -1253,14 +1245,16 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                channel.setShowBadge(true)
-                channel.setSound(null, null)
-                mNotificationManager.createNotificationChannel(channel)
+                if (mNotificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID) == null) {
+                    val channel = NotificationChannel(
+                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
+                        NotificationManager.IMPORTANCE_HIGH
+                    )
+                    channel.setShowBadge(true)
+                    channel.setSound(null, null)
+                    mNotificationManager.createNotificationChannel(channel)
+                }
                 val mBuilderCompat = NotificationCompat.Builder(
                     applicationContext,
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
@@ -1327,19 +1321,20 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     }
 
     override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
         return null
     }
 
-    private suspend fun doOnTransferStart(transfer: Transfer) {
+    private suspend fun doOnTransferStart(transfer: Transfer) = withContext(ioDispatcher) {
         Timber.d(
             "Download start: %d, totalDownloads: %d",
             transfer.nodeHandle,
             megaApi.totalDownloads
         )
-        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return
+        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return@withContext
         if (transfer.isBackgroundTransfer()) {
             backgroundTransfers.add(transfer.tag)
-            return
+            return@withContext
         }
         val appData = transfer.appData
         if (appData.contains(Constants.APP_DATA_SD_CARD)) {
@@ -1347,8 +1342,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 SDTransfer(
                     transfer.tag,
                     transfer.fileName,
-                    Util.getSizeString(transfer.totalBytes, this),
-                    java.lang.Long.toString(transfer.nodeHandle),
+                    Util.getSizeString(transfer.totalBytes, this@DownloadService),
+                    transfer.nodeHandle.toString(),
                     transfer.localPath,
                     appData
                 )
@@ -1359,11 +1354,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         updateProgressNotification()
     }
 
-    private suspend fun doOnTransferFinish(transfer: Transfer, error: MegaException) {
+    private suspend fun doOnTransferFinish(
+        transfer: Transfer,
+        error: MegaException,
+    ) = withContext(ioDispatcher) {
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.type)
-        if (transfer.isStreamingTransfer) {
-            return
-        }
+        if (transfer.isStreamingTransfer) return@withContext
         if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
@@ -1375,7 +1371,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         val targetPath = SDCardUtils.getSDCardTargetPath(transfer.appData)
         if (!transfer.isFolderTransfer) {
             if (!isVoiceClip && !isBackgroundTransfer) {
-                val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
+                val completedTransfer =
+                    AndroidCompletedTransfer(transfer, error, this@DownloadService)
                 if (!TextUtil.isTextEmpty(targetPath)) {
                     completedTransfer.path = targetPath
                 }
@@ -1400,7 +1397,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     transfer.nodeHandle,
                     Constants.ERROR_VOICE_CLIP_TRANSFER
                 )
-                val localFile = buildVoiceClipFile(this, transfer.fileName)
+                val localFile = buildVoiceClipFile(this@DownloadService, transfer.fileName)
                 if (FileUtil.isFileAvailable(localFile)) {
                     Timber.d("Delete own voiceclip : exists")
                     localFile?.delete()
@@ -1424,7 +1421,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 if (targetPath != null) {
                     val source = File(path)
                     try {
-                        val sdCardOperator = SDCardOperator(this)
+                        val sdCardOperator = SDCardOperator(this@DownloadService)
                         sdCardOperator.moveDownloadedFileToDestinationPath(
                             source,
                             targetPath,
@@ -1443,7 +1440,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         if (!videoNode.hasThumbnail()) {
                             Timber.d("The video has not thumb")
                             ThumbnailUtils.createThumbnailVideo(
-                                this,
+                                this@DownloadService,
                                 path,
                                 megaApi,
                                 transfer.nodeHandle
@@ -1456,7 +1453,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     Timber.d("NOT video!")
                 }
                 if (!TextUtil.isTextEmpty(path)) {
-                    FileUtil.sendBroadcastToUpdateGallery(this, File(path))
+                    FileUtil.sendBroadcastToUpdateGallery(this@DownloadService, File(path))
                 }
                 storeToAdvancedDevices[transfer.nodeHandle]?.let { transfersUri ->
                     Timber.d("Now copy the file to the SD Card")
@@ -1478,7 +1475,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         transfer.nodeHandle,
                         Constants.ERROR_VOICE_CLIP_TRANSFER
                     )
-                    val localFile = buildVoiceClipFile(this, transfer.fileName)
+                    val localFile = buildVoiceClipFile(this@DownloadService, transfer.fileName)
                     if (FileUtil.isFileAvailable(localFile)) {
                         Timber.d("Delete own voice clip : exists")
                         localFile?.delete()
@@ -1497,7 +1494,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 }
             }
         }
-        if (isVoiceClip || isBackgroundTransfer) return
+        if (isVoiceClip || isBackgroundTransfer) return@withContext
         if (getNumPendingDownloadsNonBackgroundUseCase() <= 0 && transfersCount == 0) {
             onQueueComplete(transfer.nodeHandle)
         }
@@ -1543,19 +1540,19 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
-    private suspend fun doOnTransferUpdate(transfer: Transfer) {
+    private suspend fun doOnTransferUpdate(transfer: Transfer) = withContext(ioDispatcher) {
         if (canceled) {
             Timber.d("Transfer cancel: %s", transfer.nodeHandle)
             releaseLocks()
             runCatching { cancelTransferByTagUseCase(transfer.tag) }
                 .onFailure { Timber.w("Exception canceling transfer: $it") }
             cancel()
-            return
+            return@withContext
         }
-        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return
+        if (transfer.isStreamingTransfer || transfer.isVoiceClip()) return@withContext
         if (transfer.isBackgroundTransfer()) {
             backgroundTransfers.add(transfer.tag)
-            return
+            return@withContext
         }
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_UPDATE)
         if (!transfer.isFolderTransfer) {
@@ -1566,12 +1563,15 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
-    private fun doOnTransferTemporaryError(transfer: Transfer, e: MegaException) {
+    private suspend fun doOnTransferTemporaryError(
+        transfer: Transfer,
+        e: MegaException,
+    ) = withContext(ioDispatcher) {
         Timber.w(
             "Download Temporary Error - Node Handle: ${transfer.nodeHandle} Error: ${e.errorCode} ${e.errorString}"
         )
         if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
-            return
+            return@withContext
         }
         if (e.errorCode == MegaError.API_EOVERQUOTA) {
             if (e.value != 0L) {
@@ -1589,14 +1589,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      *
      * @param isCurrentOverQuota true if the overquota is currently received, false otherwise
      */
-    private fun checkTransferOverQuota(isCurrentOverQuota: Boolean) {
+    private suspend fun checkTransferOverQuota(isCurrentOverQuota: Boolean) {
         if (activityLifecycleHandler.isActivityVisible) {
             if (transfersManagement.shouldShowTransferOverQuotaWarning()) {
                 transfersManagement.isCurrentTransferOverQuota = isCurrentOverQuota
                 transfersManagement.setTransferOverQuotaTimestamp()
-                applicationScope.launch {
-                    broadcastTransferOverQuota()
-                }
+                broadcastTransferOverQuota()
             }
         } else if (!transfersManagement.isTransferOverQuotaNotificationShown) {
             transfersManagement.isTransferOverQuotaNotificationShown = true
