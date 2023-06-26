@@ -150,8 +150,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                     CreateScheduledMeetingView(
                         state = uiState,
                         onButtonClicked = ::onActionTap,
-                        onDiscardClicked = { viewModel.onDiscardMeetingTap() },
-                        onAcceptClicked = { viewModel.onScheduleMeetingTap() },
+                        onDiscardClicked = viewModel::onDiscardMeetingTap,
+                        onAcceptClicked = viewModel::onScheduleMeetingTap,
                         onStartTimeClicked = { showTimePicker(true) },
                         onStartDateClicked = { showDatePicker(true) },
                         onEndTimeClicked = { showTimePicker(false) },
@@ -162,11 +162,11 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                                 isDark
                             )
                         },
-                        onDismiss = { viewModel.dismissDialog() },
+                        onDismiss = viewModel::dismissDialog,
                         onSnackbarShown = viewModel::snackbarShown,
-                        onDiscardMeetingDialog = { finish() },
-                        onDescriptionValueChange = { viewModel.onDescriptionChange(it) },
-                        onTitleValueChange = { viewModel.onTitleChange(it) },
+                        onDiscardMeetingDialog = ::finish,
+                        onDescriptionValueChange = viewModel::onDescriptionChange,
+                        onTitleValueChange = viewModel::onTitleChange,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
                             if (optionSelected == RecurrenceDialogOption.Custom) {
@@ -195,10 +195,11 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                             viewModel.onRejectClicked()
                             navController.navigate(CREATE_SCHEDULED_MEETING_TAG)
                         },
-                        onTypeClicked = { viewModel.onOccurrenceTypeChanged(it) },
-                        onNumberClicked = { viewModel.onOccurrenceNumberChanged(it) },
-                        onWeekdaysClicked = { viewModel.onWeekdaysOptionTap() },
-                        onFocusChanged = { viewModel.onFocusChanged() }
+                        onTypeClicked = viewModel::onOccurrenceTypeChanged,
+                        onNumberClicked = viewModel::onOccurrenceNumberChanged,
+                        onWeekdaysClicked = viewModel::onWeekdaysOptionTap,
+                        onFocusChanged = viewModel::onFocusChanged,
+                        onWeekdayClicked = viewModel::onWeekdayTap
                     )
                 }
             }

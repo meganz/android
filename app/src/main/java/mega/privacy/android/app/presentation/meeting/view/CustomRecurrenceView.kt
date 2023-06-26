@@ -35,15 +35,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
+import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.core.ui.controls.chips.DropdownMenuChip
 import mega.privacy.android.core.ui.controls.chips.TextButtonChip
+import mega.privacy.android.core.ui.controls.chips.TextButtonWithIconChip
 import mega.privacy.android.core.ui.controls.chips.TextFieldChip
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
+import mega.privacy.android.domain.entity.meeting.Weekday
 
 /**
  * Custom recurrence View
@@ -56,6 +59,7 @@ internal fun CustomRecurrenceView(
     onRejectClicked: () -> Unit,
     onTypeClicked: (DropdownOccurrenceType) -> Unit,
     onNumberClicked: (String) -> Unit,
+    onWeekdayClicked: (Weekday) -> Unit,
     onWeekdaysClicked: () -> Unit,
     onFocusChanged: () -> Unit,
 ) {
@@ -104,6 +108,18 @@ internal fun CustomRecurrenceView(
                         modifier = Modifier,
                         isWeekdaysSelected = state.customRecurrenceState.isWeekdaysSelected,
                         onWeekdaysClicked = onWeekdaysClicked,
+                    )
+                }
+            }
+
+            if (state.customRecurrenceState.dropdownOccurrenceType == DropdownOccurrenceType.Week) {
+                item(key = "Occurs weekly") {
+                    OccursWeeklySection(
+                        modifier = Modifier,
+                        weekList = state.weekList,
+                        customRecurrenceList = state.customRecurrenceState.newRules.weekDayList
+                            ?: emptyList(),
+                        onWeekdayClicked = onWeekdayClicked,
                     )
                 }
             }
@@ -250,7 +266,6 @@ private fun OccursEverySection(
     }
 }
 
-
 /**
  * Occurs daily option
  *
@@ -268,14 +283,52 @@ private fun OccursDailySection(
             .fillMaxWidth()
             .padding(start = 16.dp, bottom = 23.dp, top = 0.dp, end = 16.dp)
     ) {
-
-        TextButtonChip(
+        TextButtonWithIconChip(
             onClick = onWeekdaysClicked,
             text = stringResource(id = R.string.meetings_custom_recurrence_weekdays_button).lowercase(),
             modifier = modifier,
             isChecked = isWeekdaysSelected,
             iconId = R.drawable.icon_check
         )
+    }
+}
+
+/**
+ * Occurs weekly option
+ * @param weekList              [Weekday] list
+ * @param customRecurrenceList  [Weekday] list
+ */
+@Composable
+private fun OccursWeeklySection(
+    weekList: List<Weekday>,
+    customRecurrenceList: List<Weekday>,
+    onWeekdayClicked: (Weekday) -> Unit,
+    modifier: Modifier,
+) {
+    Column(
+        modifier
+            .testTag(TEST_TAG_OCCURS_WEEKLY)
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = 23.dp, end = 16.dp)
+    ) {
+        Text(
+            modifier = modifier
+                .padding(top = 9.dp, bottom = 23.dp),
+            text = stringResource(id = R.string.meetings_custom_recurrence_occurs_on_section),
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.onPrimary
+        )
+
+        Row {
+            weekList.forEach {
+                TextButtonChip(
+                    onClick = { onWeekdayClicked(it) },
+                    text = stringResource(id = it.StringId),
+                    modifier = modifier.padding(end = 16.dp),
+                    isChecked = customRecurrenceList.contains(it)
+                )
+            }
+        }
     }
 }
 
@@ -290,21 +343,25 @@ private fun PreviewCustomRecurrenceView() {
             state = CreateScheduledMeetingState(
                 meetingTitle = "Title meeting",
                 rulesSelected = ChatScheduledRules(),
+                customRecurrenceState = CustomRecurrenceState(),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
                 snackBar = null
             ),
+
             onScrollChange = {},
             onRejectClicked = {},
             onAcceptClicked = {},
             onTypeClicked = {},
             onNumberClicked = {},
             onWeekdaysClicked = {},
-            onFocusChanged = {}
+            onFocusChanged = {},
+            onWeekdayClicked = {}
         )
     }
 }
 
+internal const val TEST_TAG_OCCURS_WEEKLY = "testTagOccursWeekly"
 internal const val TEST_TAG_OCCURS_DAILY = "testTagOccursDaily"
 internal const val TEST_TAG_OCCURS_EVERY = "testTagOccursEvery"
 internal const val TEST_TAG_ACCEPT_ICON = "testTagTextAcceptIcon"

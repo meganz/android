@@ -1,12 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.extensions.meeting.DialogOption
-import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.Weekday
@@ -43,6 +41,8 @@ import java.time.temporal.ChronoUnit
  * @property customRecurrenceState                      [CustomRecurrenceState]
  * @property showMonthlyRecurrenceWarning               True, if the text on the monthly recurrence warning should be displayed. False, if not.
  * @property isCreatingMeeting                          True, if the meeting is being created. False, if not.
+ * @property weekList                                   List of [Weekday] in the week.
+ * @property currentDay                                 [Weekday]
  */
 data class CreateScheduledMeetingState constructor(
     val openAddContact: Boolean? = null,
@@ -70,6 +70,17 @@ data class CreateScheduledMeetingState constructor(
     val scheduledMeetingEnabled: Boolean = false,
     val showMonthlyRecurrenceWarning: Boolean = false,
     val isCreatingMeeting: Boolean = false,
+    val weekList: List<Weekday> =
+        listOf(
+            Weekday.Monday,
+            Weekday.Tuesday,
+            Weekday.Wednesday,
+            Weekday.Thursday,
+            Weekday.Friday,
+            Weekday.Saturday,
+            Weekday.Sunday
+        ),
+    val currentDay: Weekday = Weekday.Monday,
 ) {
     /**
      * Check if it's valid title
@@ -108,41 +119,17 @@ data class CreateScheduledMeetingState constructor(
         }
 
     /**
-     * Get dropdown type selected
-     *
-     * @return  [DropdownOccurrenceType]
-     */
-    fun getDropdownTypeSelected(): DropdownOccurrenceType =
-        customRecurrenceState.newRules.freq.DropdownType
-
-    /**
      * Check if is week days selected
      *
      * @return True if weekdays are selected. False, if not.
      */
     fun isWeekdays(): Boolean =
-        rulesSelected.freq == OccurrenceFrequencyType.Daily && rulesSelected.weekDayList == getWeekdaysList()
+        (rulesSelected.freq == OccurrenceFrequencyType.Daily || rulesSelected.freq == OccurrenceFrequencyType.Weekly) && rulesSelected.weekDayList == getWeekdaysList()
 
     /**
-     * Check if is week days selected in new rules
+     * Get Weekdays list
      *
-     * @return True if weekdays are selected. False, if not.
-     */
-    fun isWeekdaysOptionSelected(): Boolean =
-        customRecurrenceState.newRules.freq == OccurrenceFrequencyType.Daily && customRecurrenceState.newRules.weekDayList == getWeekdaysList()
-
-    /**
-     * Check if is a custom recurrence valid
-     *
-     * @return True if it's valid. False, if not.
-     */
-    fun isValidRecurrence(): Boolean =
-        customRecurrenceState.newRules != rulesSelected && (!isWeekdaysOptionSelected() || customRecurrenceState.newRules.interval == 1)
-
-    /**
-     * Get weekdays list
-     *
-     * @return List of [Weekday]
+     * @return list of [Weekday]
      */
     fun getWeekdaysList(): List<Weekday> =
         listOf(
@@ -158,13 +145,15 @@ data class CreateScheduledMeetingState constructor(
      *
      * @return True if it's custom recurrence
      */
-    private fun isCustomRecurrenceDialogOption(): Boolean =
-        when (rulesSelected.freq) {
+    private fun isCustomRecurrenceDialogOption(): Boolean {
+        val weekDayList = rulesSelected.weekDayList
+        return when (rulesSelected.freq) {
             OccurrenceFrequencyType.Invalid -> false
-            OccurrenceFrequencyType.Daily -> rulesSelected.interval > 1 || rulesSelected.weekDayList != null
-            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1
+            OccurrenceFrequencyType.Daily -> rulesSelected.interval > 1 || weekDayList != null
+            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1 || (weekDayList != null && (weekDayList.size > 1 || weekDayList[0] != currentDay))
             OccurrenceFrequencyType.Monthly -> rulesSelected.interval > 1
         }
+    }
 
     /**
      * Get the selected option

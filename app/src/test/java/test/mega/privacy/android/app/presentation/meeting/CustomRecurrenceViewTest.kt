@@ -12,9 +12,11 @@ import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ACCEPT_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_BACK_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_DAILY
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_EVERY
+import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_WEEKLY
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.Weekday
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,6 +77,42 @@ class CustomRecurrenceViewTest {
     }
 
     @Test
+    fun `test that occurs weekly is shown`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getWeeklyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getWeeklyRules(),
+                    dropdownOccurrenceType = DropdownOccurrenceType.Week
+                ),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_WEEKLY).assertExists()
+    }
+
+    @Test
+    fun `test that occurs weekly is hidden`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getDailyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getDailyRules(),
+                    dropdownOccurrenceType = DropdownOccurrenceType.Day
+                ),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_WEEKLY).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that on click event is fired when accept icon is clicked`() {
         val mock = mock<() -> Unit>()
         composeTestRule.setContent {
@@ -92,7 +130,8 @@ class CustomRecurrenceViewTest {
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},
-                onFocusChanged = {}
+                onFocusChanged = {},
+                onWeekdayClicked = {}
             )
         }
 
@@ -118,7 +157,8 @@ class CustomRecurrenceViewTest {
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},
-                onFocusChanged = {}
+                onFocusChanged = {},
+                onWeekdayClicked = {}
             )
         }
 
@@ -139,12 +179,17 @@ class CustomRecurrenceViewTest {
     private fun getWeeklyRules() =
         ChatScheduledRules(
             freq = OccurrenceFrequencyType.Weekly,
-            interval = 5,
+            interval = 2,
             until = 0,
-            weekDayList = null,
+            weekDayList = getWeeklyList(),
             monthDayList = null,
             monthWeekDayList = emptyList()
         )
+
+    private fun getWeeklyList() = mutableListOf<Weekday>().apply {
+        add(Weekday.Monday)
+        add(Weekday.Friday)
+    }
 
     private fun initComposeRuleContent(
         state: CreateScheduledMeetingState,
@@ -158,7 +203,8 @@ class CustomRecurrenceViewTest {
                 onTypeClicked = {},
                 onNumberClicked = {},
                 onWeekdaysClicked = {},
-                onFocusChanged = {}
+                onFocusChanged = {},
+                onWeekdayClicked = {}
             )
         }
     }

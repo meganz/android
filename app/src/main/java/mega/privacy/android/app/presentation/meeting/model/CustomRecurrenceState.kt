@@ -17,4 +17,3 @@ data class CustomRecurrenceState constructor(
     val isWeekdaysSelected: Boolean = false,
     val isValidRecurrence: Boolean = true,
 )
-

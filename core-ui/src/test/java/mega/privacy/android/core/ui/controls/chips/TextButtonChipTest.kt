@@ -1,5 +1,6 @@
 package mega.privacy.android.core.ui.controls.chips
 
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -16,11 +17,12 @@ class TextButtonChipTest {
     var composeTestRule = createComposeRule()
 
     @Test
-    fun `test that text field chip is shown checked`() {
+    fun `test that text button chip is shown checked`() {
         composeTestRule.setContent {
             TextButtonChip(
                 onClick = { },
-                text = "weekdays",
+                text = "M",
+                modifier = Modifier,
                 isChecked = true,
             )
         }
@@ -28,11 +30,12 @@ class TextButtonChipTest {
     }
 
     @Test
-    fun `test that text field chip is not shown checked`() {
+    fun `test that text button chip is not shown checked`() {
         composeTestRule.setContent {
             TextButtonChip(
                 onClick = { },
-                text = "weekdays",
+                text = "M",
+                modifier = Modifier,
                 isChecked = false,
             )
         }
@@ -40,30 +43,17 @@ class TextButtonChipTest {
     }
 
     @Test
-    fun `test that on click event is fired when accept icon is clicked`() {
+    fun `test that on click event is fired when text button chip is clicked`() {
         val mock = mock<() -> Unit>()
         composeTestRule.setContent {
             TextButtonChip(
                 onClick = mock,
-                text = "weekdays",
+                text = "M",
                 isChecked = false,
             )
         }
 
         composeTestRule.onNodeWithTag(TEST_TAG_TEXT_BUTTON_CHIP).performClick()
         verify(mock).invoke()
-    }
-
-    @Test
-    fun `test that icon is not shown`() {
-        composeTestRule.setContent {
-            TextButtonChip(
-                onClick = {},
-                text = "weekdays",
-                isChecked = false,
-                iconId = null
-            )
-        }
-        composeTestRule.onNodeWithTag(TEST_TAG_TEXT_BUTTON_ICON).assertDoesNotExist()
     }
 }

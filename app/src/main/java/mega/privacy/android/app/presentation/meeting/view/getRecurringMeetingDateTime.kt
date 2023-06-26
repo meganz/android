@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.extensions.isForever
 import mega.privacy.android.app.presentation.extensions.isToday
 import mega.privacy.android.app.presentation.extensions.isTomorrow
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
@@ -58,7 +59,6 @@ fun getRecurringMeetingDateTime(
                 endTime,
                 highLightTime || highLightDate
             )
-
         }
 
         OccurrenceFrequencyType.Daily -> {
@@ -122,14 +122,7 @@ fun getRecurringMeetingDateTime(
 
                         else -> {
                             val lastWeekDay = getWeekDay(weekDaysList.last(), false)
-                            val weekDaysListString = StringBuilder().apply {
-                                weekDaysList.forEachIndexed { index, weekday ->
-                                    if (index != weekDaysList.size - 1) {
-                                        append(getWeekDay(weekday, index == 0))
-                                        if (index != weekDaysList.size - 2) append(", ")
-                                    }
-                                }
-                            }.toString()
+                            val weekDaysListString = weekDaysListString(weekDaysList)
                             result = when {
                                 scheduledMeeting.isForever() -> pluralStringResource(
                                     R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever,
@@ -187,7 +180,7 @@ fun getRecurringMeetingDateTime(
                 }
             }
 
-            rules.monthWeekDayList?.takeIf { it.isNotEmpty() }?.let { monthWeekDayList ->
+            rules.monthWeekDayList.takeIf { it.isNotEmpty() }?.let { monthWeekDayList ->
                 val monthWeekDayItem = monthWeekDayList.first()
                 val weekOfMonth = monthWeekDayItem.weekOfMonth
 
@@ -1001,6 +994,90 @@ fun getRecurringMeetingDateTime(
 
     return formatAnnotatedString(result, highLightTime, highLightDate)
 }
+
+/**
+ * Get the appropriate frequency string for a scheduled meeting.
+ *
+ * @param rules             [ChatScheduledRules]
+ * @param isWeekdays        True, if it's weekdays. False, if not.
+ * @param currentDay        [Weekday]
+ */
+@Composable
+fun getScheduledMeetingFrequencyText(
+    rules: ChatScheduledRules,
+    isWeekdays: Boolean,
+    currentDay: Weekday?,
+): String = when (rules.freq) {
+    OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
+    OccurrenceFrequencyType.Daily ->
+        if (isWeekdays) {
+            stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
+        } else {
+            pluralStringResource(
+                id = R.plurals.meetings_schedule_meeting_recurrence_every_number_of_days_label,
+                count = rules.interval,
+                rules.interval
+            )
+        }
+
+    OccurrenceFrequencyType.Weekly -> {
+        val weekdays = rules.weekDayList
+        if (weekdays.isNullOrEmpty()) {
+            stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
+        } else {
+            weekdays.let {
+                when (it.size) {
+                    1 -> {
+                        val interval = rules.interval
+                        if (currentDay == it[0] && interval == 1) {
+                            stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
+                        } else {
+                            val weekDay = getWeekDay(it.first(), true)
+                            pluralStringResource(
+                                id = R.plurals.meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label,
+                                count = rules.interval,
+                                weekDay, rules.interval
+                            )
+                        }
+                    }
+
+                    else -> {
+                        if (isWeekdays) {
+                            stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
+                        } else {
+                            val lastWeekDay = getWeekDay(weekdays.last(), false)
+                            val weekDaysListString = weekDaysListString(weekdays)
+                            pluralStringResource(
+                                id = R.plurals.meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label,
+                                count = rules.interval,
+                                weekDaysListString, lastWeekDay, rules.interval
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    OccurrenceFrequencyType.Monthly -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
+}
+
+/**
+ * Get week days list string
+ *
+ * @param weekdays  [Weekday] list
+ * @return Weekdays list formatted
+ */
+@Composable
+private fun weekDaysListString(weekdays: List<Weekday>) = StringBuilder().apply {
+    weekdays.forEachIndexed { index, weekday ->
+        if (index != weekdays.size - 1) {
+            append(getWeekDay(weekday, index == 0))
+            if (index != weekdays.size - 2) append(", ")
+        }
+    }
+}.toString()
+
 
 private fun formatAnnotatedString(
     dateTime: String,
