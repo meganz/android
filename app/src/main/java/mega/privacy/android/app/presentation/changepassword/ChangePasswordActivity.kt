@@ -18,9 +18,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.VerifyTwoFactorActivity
-import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
-import mega.privacy.android.app.main.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_VERIFY_TYPE
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity

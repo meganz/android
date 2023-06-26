@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.verifytwofactor
 
 import android.app.Activity
 import android.content.ClipboardManager
@@ -8,10 +8,10 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -19,7 +19,7 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
@@ -56,6 +56,8 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     private var onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {}
     }
+
+    private val viewModel by viewModels<VerifyTwoFactorViewModel>()
 
     /**
      * @see KEY_VERIFY_TYPE
@@ -498,7 +500,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                         false
                     )
                 ) {
-                    AccountController.logout(this, megaApi, lifecycleScope)
+                    viewModel.logout()
                 } else {
                     //Intent to MyAccount
                     val resetPassIntent = Intent(this, ManagerActivity::class.java)

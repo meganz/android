@@ -417,7 +417,7 @@
         <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity" />
         <activity
-            android:name=".main.VerifyTwoFactorActivity" />
+            android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity" />
         <activity
             android:name=".BusinessExpiredAlertActivity" />
         <activity android:name=".presentation.verification.SMSVerificationActivity" />

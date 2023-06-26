@@ -11,6 +11,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_NEXT
 import android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -23,13 +24,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -103,6 +102,7 @@ class PasscodeLockActivity : BaseActivity() {
     private var fingerprintSkipped = false
     private var forgetPasscode = false
     private var passwordAlreadyTyped = false
+    private val viewModel by viewModels<PasscodeLockViewModel>()
 
     /**
      * Handle events when a Back Press is detected
@@ -119,6 +119,7 @@ class PasscodeLockActivity : BaseActivity() {
                             return
                         }
                     }
+
                     RESET_MODE -> passcodeManagement.showPasscodeScreen = false
                     else -> finishActivity()
                 }
@@ -259,7 +260,7 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun logout() {
         resetAttempts()
-        AccountController.logout(this, megaApi, lifecycleScope)
+        viewModel.logout()
     }
 
     /**
@@ -651,16 +652,19 @@ class PasscodeLockActivity : BaseActivity() {
                 hideKeyboardView(this, currentFocus, 0)
                 logout()
             }
+
             attempts >= MIN_ATTEMPTS_TO_SHOW_WARNING -> {
                 binding.failedAttemptsErrorText.isVisible = true
                 binding.logoutButton.isVisible = true
                 binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
+
             attempts > 0 -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = true
                 binding.forgetPasscodeButton.isVisible = !forgetPasscode
             }
+
             else -> {
                 binding.failedAttemptsErrorText.isVisible = false
                 binding.logoutButton.isVisible = false
@@ -680,6 +684,7 @@ class PasscodeLockActivity : BaseActivity() {
                         && binding.passThirdInput.length() == 1
                         && binding.passFourthInput.length() == 1
             }
+
             PIN_6 -> {
                 return binding.passFirstInput.length() == 1
                         && binding.passSecondInput.length() == 1
@@ -688,6 +693,7 @@ class PasscodeLockActivity : BaseActivity() {
                         && binding.passFifthInput.length() == 1
                         && binding.passSixthInput.length() == 1
             }
+
             PIN_ALPHANUMERIC -> {
                 return binding.passwordInput.text.isNotEmpty()
             }
@@ -808,6 +814,7 @@ class PasscodeLockActivity : BaseActivity() {
                             passcodeManagement.needsOpenAgain = true
                             finish()
                         }
+
                         else -> {
                             fingerprintSkipped = true
                             initPasscodeScreen()
