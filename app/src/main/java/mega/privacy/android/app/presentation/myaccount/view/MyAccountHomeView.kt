@@ -85,9 +85,12 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR_SIZ
 import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CLICKS_TO_CHANGE_API_SERVER
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTACTS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTAINER_LEFT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EMAIL_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_LEFT_MARGIN
+import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_RIGHT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_TOP_PADDING
 import mega.privacy.android.app.presentation.myaccount.view.Constants.IMAGE_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
@@ -139,6 +142,9 @@ internal object Constants {
     val TOOLBAR_HEIGHT = 56.dp
     val HEADER_TOP_PADDING = 24.dp
     val ACCOUNT_TYPE_TOP_PADDING = 48.dp
+    val CONTAINER_LEFT_MARGIN = 17.dp
+    val HEADER_LEFT_MARGIN = 18.dp
+    val HEADER_RIGHT_MARGIN = 40.dp
 
     // Test Tags
     const val IMAGE_AVATAR = "image_avatar"
@@ -323,7 +329,7 @@ internal fun MyAccountHeader(
             .constrainAs(avatarIv) {
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start, 17.dp)
+                start.linkTo(parent.start, CONTAINER_LEFT_MARGIN)
             }
         avatar
             ?.takeIf { BitmapFactory.decodeFile(it.absolutePath, BitmapFactory.Options()) != null }
@@ -370,10 +376,11 @@ internal fun MyAccountHeader(
                     linkTo(
                         start = avatarIv.end,
                         end = parent.end,
-                        startMargin = 18.dp,
-                        endMargin = 40.dp,
+                        startMargin = HEADER_LEFT_MARGIN,
+                        endMargin = HEADER_RIGHT_MARGIN,
                         bias = 0f
                     )
+                    width = Dimension.preferredWrapContent
                 },
             text = name.orEmpty(),
             style = MaterialTheme.typography.subtitle1.copy(
@@ -381,7 +388,7 @@ internal fun MyAccountHeader(
                 fontSize = 20.sp
             ),
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+            maxLines = 2,
         )
 
         Icon(
@@ -407,10 +414,11 @@ internal fun MyAccountHeader(
                         linkTo(
                             start = avatarIv.end,
                             end = parent.end,
-                            startMargin = 18.dp,
-                            endMargin = 40.dp,
+                            startMargin = HEADER_LEFT_MARGIN,
+                            endMargin = HEADER_RIGHT_MARGIN,
                             bias = 0f
                         )
+                        width = Dimension.fillToConstraints
                     },
                 text = email,
                 style = MaterialTheme.typography.body2,
@@ -429,10 +437,11 @@ internal fun MyAccountHeader(
                         linkTo(
                             start = avatarIv.end,
                             end = parent.end,
-                            startMargin = 18.dp,
-                            endMargin = 40.dp,
+                            startMargin = HEADER_LEFT_MARGIN,
+                            endMargin = HEADER_RIGHT_MARGIN,
                             bias = 0f
                         )
+                        width = Dimension.fillToConstraints
                     },
                 text = verifiedPhoneNumber,
                 style = MaterialTheme.typography.body2,
@@ -1002,7 +1011,7 @@ internal fun MyAccountHomePreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MyAccountHomeView(
             uiState = MyAccountHomeUIState(
-                name = "Qwerty Uiop",
+                name = "QWERTY UIOP",
                 email = "qwerty@uiop.com",
                 verifiedPhoneNumber = "+6282141058000",
                 avatarColor = R.color.dark_grey,

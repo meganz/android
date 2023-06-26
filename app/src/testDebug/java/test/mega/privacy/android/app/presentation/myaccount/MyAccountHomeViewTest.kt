@@ -3,13 +3,18 @@ package test.mega.privacy.android.app.presentation.myaccount
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.width
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions
@@ -18,11 +23,15 @@ import mega.privacy.android.app.presentation.myaccount.view.AccountTypeSection
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACCOUNT_TYPE_SECTION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ACHIEVEMENTS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.ADD_PHONE_NUMBER
+import mega.privacy.android.app.presentation.myaccount.view.Constants.AVATAR_SIZE
 import mega.privacy.android.app.presentation.myaccount.view.Constants.BACKUP_RECOVERY_KEY
 import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTACTS
+import mega.privacy.android.app.presentation.myaccount.view.Constants.CONTAINER_LEFT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EMAIL_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER
 import mega.privacy.android.app.presentation.myaccount.view.Constants.EXPIRED_BUSINESS_BANNER_TEXT
+import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_LEFT_MARGIN
+import mega.privacy.android.app.presentation.myaccount.view.Constants.HEADER_RIGHT_MARGIN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.IMAGE_AVATAR
 import mega.privacy.android.app.presentation.myaccount.view.Constants.LAST_SESSION
 import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
@@ -489,6 +498,27 @@ class MyAccountHomeViewTest {
         )
 
         composeTestRule.onNodeWithTag(PAYMENT_ALERT_INFO).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that name text should not exceed bounds when name is too long`() {
+        val sampleText =
+            "JAKJSAKLSJAKLSJAKLSJAKLJBRIJBNDUQWBDYUIWBDIBNDJKSBDSHJKBDDBWI*EBWUIBNJASBDJSBDIBQBAJSBJAKSAJSHJAKSHJAKHSJKAHSJHJKAHSJKAHS"
+        val maxScreenWidth = 720.dp
+
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(name = sampleText)
+        )
+
+        val maxWidth = composeTestRule.onNodeWithTag(NAME_TEXT)
+            .assertIsDisplayed()
+            .assertTextEquals(sampleText)
+            .getBoundsInRoot()
+            .width
+
+
+        assertThat(maxWidth)
+            .isAtMost(maxScreenWidth - CONTAINER_LEFT_MARGIN - AVATAR_SIZE.dp - HEADER_LEFT_MARGIN - HEADER_RIGHT_MARGIN)
     }
 
     private fun verifyAccountTypeSectionColor(
