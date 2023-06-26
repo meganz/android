@@ -13,11 +13,11 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -26,7 +26,7 @@ import javax.inject.Inject
  * View model for [AuthenticityCredentialsActivity].
  *
  * @property getContactCredentials  [GetContactCredentials]
- * @property areCredentialsVerified [AreCredentialsVerified]
+ * @property areCredentialsVerifiedUseCase [AreCredentialsVerifiedUseCase]
  * @property getMyCredentials       [GetMyCredentials]
  * @property verifyCredentials      [VerifyCredentials]
  * @property resetCredentials       [ResetCredentials]
@@ -35,7 +35,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthenticityCredentialsViewModel @Inject constructor(
     private val getContactCredentials: GetContactCredentials,
-    private val areCredentialsVerified: AreCredentialsVerified,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getMyCredentials: GetMyCredentials,
     private val verifyCredentials: VerifyCredentials,
     private val resetCredentials: ResetCredentials,
@@ -64,7 +64,7 @@ class AuthenticityCredentialsViewModel @Inject constructor(
             _state.update { it.copy(contactCredentials = getContactCredentials(userEmail)) }
         }
         viewModelScope.launch {
-            runCatching { areCredentialsVerified(userEmail) }
+            runCatching { areCredentialsVerifiedUseCase(userEmail) }
                 .onSuccess { areCredentialsVerified ->
                     _state.update { it.copy(areCredentialsVerified = areCredentialsVerified) }
                 }.onFailure {

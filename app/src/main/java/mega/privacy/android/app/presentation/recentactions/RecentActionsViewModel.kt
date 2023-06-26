@@ -21,12 +21,12 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * @property getNodeByHandle
  * @property getNodeByIdUseCase
  * @property getAccountDetailsUseCase
- * @property areCredentialsVerified
+ * @param areCredentialsVerifiedUseCase
  * @param monitorHideRecentActivity
  * @param monitorNodeUpdates
  */
@@ -52,7 +52,7 @@ class RecentActionsViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
-    private val areCredentialsVerified: AreCredentialsVerified,
+    private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     monitorHideRecentActivity: MonitorHideRecentActivity,
     monitorNodeUpdates: MonitorNodeUpdates,
 ) : ViewModel() {
@@ -173,9 +173,10 @@ class RecentActionsViewModel @Inject constructor(
                 visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
 
             val currentUserIsOwner = isCurrentUserOwner(bucket)
-            val areCredentialsVerified = runCatching { areCredentialsVerified(bucket.userEmail) }
-                .onFailure { Timber.e(it) }
-                .getOrDefault(false)
+            val areCredentialsVerified =
+                runCatching { areCredentialsVerifiedUseCase(bucket.userEmail) }
+                    .onFailure { Timber.e(it) }
+                    .getOrDefault(false)
             val isNodeKeyVerified =
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified
             val parentNode = getNodeByIdUseCase(NodeId(bucket.parentHandle))

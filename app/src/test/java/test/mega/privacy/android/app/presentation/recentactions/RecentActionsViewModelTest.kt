@@ -24,12 +24,12 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
 import org.junit.Before
 import org.junit.Test
@@ -63,7 +63,7 @@ class RecentActionsViewModelTest {
     }
     private val setHideRecentActivity = mock<SetHideRecentActivity>()
 
-    private val areCredentialsVerified = mock<AreCredentialsVerified> {
+    private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase> {
         onBlocking { invoke(any()) }.thenReturn(true)
     }
 
@@ -118,7 +118,7 @@ class RecentActionsViewModelTest {
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             monitorHideRecentActivity = monitorHideRecentActivity,
             monitorNodeUpdates = monitorNodeUpdates,
-            areCredentialsVerified = areCredentialsVerified,
+            areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         )
     }
 

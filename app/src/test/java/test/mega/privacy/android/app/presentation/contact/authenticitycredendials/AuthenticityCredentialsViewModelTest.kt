@@ -17,12 +17,12 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsViewModel
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
+import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -80,7 +80,7 @@ class AuthenticityCredentialsViewModelTest {
         onBlocking { invoke(userEmail) }.thenReturn(contactCredentials)
     }
 
-    private val areCredentialsVerified = mock<AreCredentialsVerified> {
+    private val areCredentialsVerifiedUseCase = mock<AreCredentialsVerifiedUseCase> {
         onBlocking { invoke(userEmail) }.thenReturn(false)
     }
 
@@ -104,7 +104,7 @@ class AuthenticityCredentialsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = AuthenticityCredentialsViewModel(
             getContactCredentials = getContactCredentials,
-            areCredentialsVerified = areCredentialsVerified,
+            areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
             getMyCredentials = getMyCredentials,
             verifyCredentials = verifyCredentials,
             resetCredentials = resetCredentials,
@@ -154,7 +154,7 @@ class AuthenticityCredentialsViewModelTest {
 
     @Test
     fun `test that when request data contact credentials are verified`() = runTest {
-        whenever(areCredentialsVerified(userEmail)).thenReturn(true)
+        whenever(areCredentialsVerifiedUseCase(userEmail)).thenReturn(true)
 
         underTest.state.map { it.areCredentialsVerified }.distinctUntilChanged()
             .test {

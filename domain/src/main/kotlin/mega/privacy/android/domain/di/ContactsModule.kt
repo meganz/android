@@ -8,7 +8,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -67,10 +66,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetContactCredentials(contactsRepository: ContactsRepository): GetContactCredentials =
             GetContactCredentials(contactsRepository::getContactCredentials)
-
-        @Provides
-        fun provideAreCredentialsVerified(contactsRepository: ContactsRepository): AreCredentialsVerified =
-            AreCredentialsVerified(contactsRepository::areCredentialsVerified)
 
         @Provides
         fun provideVerifyCredentials(contactsRepository: ContactsRepository): VerifyCredentials =
