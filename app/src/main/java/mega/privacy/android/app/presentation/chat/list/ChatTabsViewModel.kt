@@ -14,18 +14,20 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
+import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.ChatCall
-import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -226,8 +228,8 @@ class ChatTabsViewModel @Inject constructor(
     /**
      * Update snackBar
      */
-    fun updateSnackBar(text: Int?) {
-        state.update { it.copy(snackBar = text) }
+    fun updateSnackBar(snackBarItem: SnackBarItem?) {
+        state.update { it.copy(snackBar = snackBarItem) }
     }
 
     /**
@@ -237,11 +239,23 @@ class ChatTabsViewModel @Inject constructor(
      */
     fun archiveChat(chatId: Long) {
         viewModelScope.launch {
-            runCatching {
-                archiveChatUseCase(chatId, true)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
+            val chatTitle = state.value.findChatItem(chatId)?.title
+            runCatching { archiveChatUseCase(chatId, true) }
+                .onSuccess {
+                    val snackBarItem = SnackBarItem(
+                        stringRes = R.string.success_archive_chat,
+                        stringArg = chatTitle
+                    )
+                    updateSnackBar(snackBarItem)
+                }
+                .onFailure {
+                    Timber.e(it)
+                    val snackBarItem = SnackBarItem(
+                        stringRes = R.string.error_archive_chat,
+                        stringArg = chatTitle
+                    )
+                    updateSnackBar(snackBarItem)
+                }
         }
     }
 

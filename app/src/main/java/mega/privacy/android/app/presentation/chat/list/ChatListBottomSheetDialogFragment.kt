@@ -20,6 +20,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatItemBottomSheetView
+import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
@@ -155,7 +156,12 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             if (checkMandatoryCallPermissions(requireActivity())) {
                 viewModel.startMeetingCall(chatId)
             } else {
-                viewModel.updateSnackBar(R.string.allow_acces_calls_subtitle_microphone)
+                viewModel.updateSnackBar(
+                    SnackBarItem(
+                        type = Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
+                        stringRes = R.string.allow_acces_calls_subtitle_microphone,
+                    )
+                )
             }
             dismissAllowingStateLoss()
         }

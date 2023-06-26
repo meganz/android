@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.mapper.ChatRoomTimestampMapper
+import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.usecase.chat.GetLastMessageUseCase
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
@@ -67,11 +69,32 @@ class ArchivedChatsViewModel @Inject constructor(
      */
     fun unarchiveChat(chatId: Long) {
         viewModelScope.launch {
-            runCatching {
-                archiveChatUseCase(chatId, false)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }
+            val chatTitle = state.value.items.firstOrNull { it.chatId == chatId }?.title
+            runCatching { archiveChatUseCase(chatId, false) }
+                .onSuccess {
+                    val snackBarItem = SnackBarItem(
+                        stringRes = R.string.success_unarchive_chat,
+                        stringArg = chatTitle
+                    )
+                    state.update { it.copy(snackBar = snackBarItem) }
+                }
+                .onFailure { exception ->
+                    Timber.e(exception)
+                    val snackBarItem = SnackBarItem(
+                        stringRes = R.string.error_unarchive_chat,
+                        stringArg = chatTitle
+                    )
+                    state.update { it.copy(snackBar = snackBarItem) }
+                }
+        }
+    }
+
+    /**
+     * Dismiss SnackBar
+     */
+    fun dismissSnackBar() {
+        state.update {
+            it.copy(snackBar = null)
         }
     }
 }

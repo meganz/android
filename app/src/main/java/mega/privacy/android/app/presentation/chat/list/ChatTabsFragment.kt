@@ -27,6 +27,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.chat.ChatScreenInfo
 import mega.privacy.android.analytics.event.chat.ChatsTabInfo
 import mega.privacy.android.analytics.event.chat.MeetingsTabInfo
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -123,11 +124,11 @@ class ChatTabsFragment : Fragment() {
                 launchChatCallScreen(state.currentCallChatId)
             }
 
-            state.snackBar?.let { stringResId ->
-                (requireActivity() as ManagerActivity).showSnackbar(
-                    Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
+            state.snackBar?.let { snackBar ->
+                (activity as? BaseActivity?)?.showSnackbar(
+                    snackBar.type,
                     view,
-                    getString(stringResId),
+                    snackBar.getMessage(resources),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
                 viewModel.updateSnackBar(null)
@@ -257,7 +258,7 @@ class ChatTabsFragment : Fragment() {
 
             override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
                 val currentState = viewModel.getState().value
-                val currentItems = if (currentTab == ChatTab.CHATS) {
+                val currentItems = if (!isMeetingTabShown()) {
                     currentState.chats
                 } else {
                     currentState.meetings
@@ -282,7 +283,7 @@ class ChatTabsFragment : Fragment() {
             override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean =
                 when (item.itemId) {
                     R.id.menu_chat_select_all -> {
-                        val allItems = if (currentTab == ChatTab.CHATS) {
+                        val allItems = if (!isMeetingTabShown()) {
                             viewModel.getState().value.chats.map(ChatRoomItem::chatId)
                         } else {
                             viewModel.getState().value.meetings.map(ChatRoomItem::chatId)

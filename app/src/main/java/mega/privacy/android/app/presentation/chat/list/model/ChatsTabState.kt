@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.model
 
+import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 
@@ -22,5 +23,5 @@ data class ChatsTabState constructor(
     val currentChatStatus: ChatStatus? = null,
     val currentCallChatId: Long? = null,
     val searchQuery: String? = null,
-    val snackBar: Int? = null,
+    val snackBar: SnackBarItem? = null,
 )

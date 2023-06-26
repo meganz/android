@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
@@ -137,14 +138,12 @@ class GetChatsUseCase @Inject constructor(
                     emit(values.toList())
                 }
 
-                if (currentItem is MeetingChatRoomItem) {
-                    val meetingItem = updatedItem.updateMeetingFields(meetingTimeMapper)
-                    if (updatedItem != meetingItem) {
-                        mutex.withLock {
-                            put(currentItem.chatId, meetingItem)
-                        }
-                        emit(values.toList())
+                val meetingItem = updatedItem.updateMeetingFields(meetingTimeMapper)
+                if (updatedItem != meetingItem) {
+                    mutex.withLock {
+                        put(currentItem.chatId, meetingItem)
                     }
+                    emit(values.toList())
                 }
             }
         }
@@ -166,7 +165,7 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun ChatRoomItem.updateMeetingFields(
         meetingTimeMapper: (Long, Long) -> String,
     ): ChatRoomItem =
-        if (this is MeetingChatRoomItem) {
+        if (chatRoomType != ChatRoomType.ARCHIVED_CHATS && this is MeetingChatRoomItem) {
             runCatching { getScheduleMeetingDataUseCase(chatId, meetingTimeMapper) }.getOrNull()
                 ?.let { schedMeetingData ->
                     copyChatRoomItem(
@@ -183,45 +182,49 @@ class GetChatsUseCase @Inject constructor(
         } else this
 
     private fun MutableMap<Long, ChatRoomItem>.monitorMutedChats(mutex: Mutex): Flow<List<ChatRoomItem>> =
-        pushesRepository.monitorPushNotificationSettings().mapNotNull {
-            var listUpdated = false
-            values.toList().forEach { item ->
-                val itemMuted = isChatMuted(item.chatId)
-                if (item.isMuted != itemMuted) {
-                    listUpdated = true
-                    mutex.withLock {
-                        get(item.chatId)?.let { currentItem ->
-                            val newItem = currentItem.copyChatRoomItem(
-                                isMuted = itemMuted,
-                            )
+        if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
+            pushesRepository.monitorPushNotificationSettings().mapNotNull {
+                var listUpdated = false
+                values.toList().forEach { item ->
+                    val itemMuted = isChatMuted(item.chatId)
+                    if (item.isMuted != itemMuted) {
+                        listUpdated = true
+                        mutex.withLock {
+                            get(item.chatId)?.let { currentItem ->
+                                val newItem = currentItem.copyChatRoomItem(
+                                    isMuted = itemMuted,
+                                )
 
-                            put(item.chatId, newItem)
-                        }
-                    }
-                }
-            }
-            values.toList().takeIf { listUpdated }
-        }
-
-    private fun MutableMap<Long, ChatRoomItem>.monitorChatCalls(mutex: Mutex): Flow<List<ChatRoomItem>> =
-        monitorChatCallUpdates()
-            .filter { containsKey(it.chatId) }
-            .mapNotNull { chatCall ->
-                chatCall.let(chatRoomItemStatusMapper::invoke).let { chatCallItem ->
-                    mutex.withLock {
-                        get(chatCall.chatId)?.let { currentItem ->
-                            val updatedItem = currentItem.copyChatRoomItem(
-                                currentCall = chatCallItem
-                            )
-
-                            if (currentItem != updatedItem) {
-                                put(chatCall.chatId, updatedItem)
+                                put(item.chatId, newItem)
                             }
                         }
                     }
-                    values.toList()
                 }
+                values.toList().takeIf { listUpdated }
             }
+        } else emptyFlow()
+
+    private fun MutableMap<Long, ChatRoomItem>.monitorChatCalls(mutex: Mutex): Flow<List<ChatRoomItem>> =
+        if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
+            monitorChatCallUpdates()
+                .filter { containsKey(it.chatId) }
+                .mapNotNull { chatCall ->
+                    chatCall.let(chatRoomItemStatusMapper::invoke).let { chatCallItem ->
+                        mutex.withLock {
+                            get(chatCall.chatId)?.let { currentItem ->
+                                val updatedItem = currentItem.copyChatRoomItem(
+                                    currentCall = chatCallItem
+                                )
+
+                                if (currentItem != updatedItem) {
+                                    put(chatCall.chatId, updatedItem)
+                                }
+                            }
+                        }
+                        values.toList()
+                    }
+                }
+        } else emptyFlow()
 
     private fun MutableMap<Long, ChatRoomItem>.monitorChatUpdates(
         mutex: Mutex,
@@ -237,11 +240,16 @@ class GetChatsUseCase @Inject constructor(
             ) {
                 mutex.withLock { remove(chatListItem.chatId) }
                 return@mapNotNull values.toList()
-            }
+            } else if (chatRoomType == ChatRoomType.ARCHIVED_CHATS)
+                return@mapNotNull values.toList()
 
             delay(500) // Required to wait for new SDK values
 
             chatRepository.getCombinedChatRoom(chatListItem.chatId)
+                ?.takeIf {
+                    it.isMeeting && chatRoomType == ChatRoomType.MEETINGS
+                            || !it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS
+                }
                 ?.let(chatRoomItemMapper::invoke)
                 ?.updateChatFields(getLastMessage, lastTimeMapper)
                 ?.updateMeetingFields(meetingTimeMapper)
@@ -258,24 +266,26 @@ class GetChatsUseCase @Inject constructor(
     private fun MutableMap<Long, ChatRoomItem>.monitorChatOnlineStatusUpdates(
         mutex: Mutex,
     ): Flow<List<ChatRoomItem>> =
-        contactsRepository.monitorChatOnlineStatusUpdates().mapNotNull { update ->
-            values.firstOrNull { item ->
-                item is IndividualChatRoomItem && item.peerHandle == update.userHandle
-            }?.chatId?.let { chatId ->
-                mutex.withLock {
-                    get(chatId)?.let { currentItem ->
-                        val updatedItem = currentItem.copyChatRoomItem(
-                            userStatus = update.status,
-                        )
+        if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
+            contactsRepository.monitorChatOnlineStatusUpdates().mapNotNull { update ->
+                values.firstOrNull { item ->
+                    item is IndividualChatRoomItem && item.peerHandle == update.userHandle
+                }?.chatId?.let { chatId ->
+                    mutex.withLock {
+                        get(chatId)?.let { currentItem ->
+                            val updatedItem = currentItem.copyChatRoomItem(
+                                userStatus = update.status,
+                            )
 
-                        if (currentItem != updatedItem) {
-                            put(updatedItem.chatId, updatedItem)
+                            if (currentItem != updatedItem) {
+                                put(updatedItem.chatId, updatedItem)
+                            }
                         }
                     }
+                    values.toList()
                 }
-                values.toList()
             }
-        }
+        } else emptyFlow()
 
     private fun List<ChatRoomItem>.sorted(): List<ChatRoomItem> =
         if (chatRoomType == ChatRoomType.MEETINGS) {

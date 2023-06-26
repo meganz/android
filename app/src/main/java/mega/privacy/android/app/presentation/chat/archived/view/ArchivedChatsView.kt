@@ -3,9 +3,12 @@ package mega.privacy.android.app.presentation.chat.archived.view
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -16,14 +19,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
 import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 
 /**
@@ -41,7 +48,9 @@ fun ArchivedChatsView(
     onItemClick: (Long) -> Unit = {},
     onItemUnarchived: (Long) -> Unit = {},
     onBackPressed: () -> Unit = {},
+    onSnackBarDismiss: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -68,6 +77,15 @@ fun ArchivedChatsView(
     ) {
         Scaffold(
             scaffoldState = scaffoldState,
+            snackbarHost = { snackBarHostState ->
+                SnackbarHost(hostState = snackBarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier.testTag(Constants.SNACKBAR_TEST_TAG),
+                        snackbarData = data,
+                        backgroundColor = MaterialTheme.colors.black_white
+                    )
+                }
+            },
             topBar = {
                 SearchAppBar(
                     searchWidgetState = searchState,
@@ -105,6 +123,15 @@ fun ArchivedChatsView(
             }
         } ?: run {
             filteredChats = null
+        }
+    }
+
+    LaunchedEffect(state.snackBar) {
+        state.snackBar?.let { snackBar ->
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = snackBar.getMessage(context.resources)
+            )
+            onSnackBarDismiss()
         }
     }
 

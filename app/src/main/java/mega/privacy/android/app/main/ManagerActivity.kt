@@ -342,6 +342,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
@@ -464,6 +465,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var restoreNodeResultMapper: RestoreNodeResultMapper
+
+    @Inject
+    lateinit var hasArchivedChatsUseCase: HasArchivedChatsUseCase
 
     private val subscriptions = CompositeDisposable()
 
@@ -4920,9 +4924,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CHAT -> if (searchExpand) {
                     openSearchView()
                 } else {
+                    checkArchivedChats()
                     doNotDisturbMenuItem?.isVisible = true
                     openLinkMenuItem?.isVisible = true
-                    archivedMenuItem?.isVisible = true
                 }
 
                 DrawerItem.NOTIFICATIONS -> {}
@@ -5145,11 +5149,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         )
                     }
                 }
-                true
-            }
-
-            R.id.action_menu_archived -> {
-                startActivity(Intent(this, ArchivedChatsActivity::class.java))
                 true
             }
 
@@ -10373,6 +10372,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     invalidateOptionsMenu()
                 }
             }
+        }
+    }
+
+    /**
+     * Check for existing archived chat rooms and show the menu item accordingly
+     */
+    private fun checkArchivedChats() {
+        lifecycleScope.launch {
+            runCatching { hasArchivedChatsUseCase() }
+                .onSuccess { archivedMenuItem?.isVisible = it }
+                .onFailure { Timber.e(it) }
         }
     }
 

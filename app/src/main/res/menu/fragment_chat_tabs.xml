@@ -8,5 +8,6 @@
         android:orderInCategory="10"
         android:title="@string/action_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always" />
 </menu>

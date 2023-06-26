@@ -42,7 +42,8 @@ class ArchivedChatsActivity : AppCompatActivity() {
                     state = state,
                     onItemClick = ::onItemClick,
                     onItemUnarchived = viewModel::unarchiveChat,
-                    onBackPressed = { finish() }
+                    onBackPressed = { finish() },
+                    onSnackBarDismiss = viewModel::dismissSnackBar,
                 )
             }
         }
