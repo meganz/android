@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.node.Node
 
 /**
  * Data class as entity for chat messages.
@@ -37,6 +38,11 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property isManagementMessage Whether the message is a management message.
  *                               Management messages are intended to record in the history any change related
  *                               to the management of the chatroom, such as a title change or an addition of a peer.
+ * @property handleOfAction The handle of the user relative to the action. Only valid for management messages:
+ *                           - ChatMessageType.ALTER_PARTICIPANTS: handle of the user who is added/removed
+ *                           - ChatMessageType.PRIV_CHANGE: handle of the user whose privilege is changed
+ *                           - ChatMessageType.REVOKE_ATTACHMENT: handle of the node which access has been revoked
+ *                           - ChatMessageType.SCHED_MEETING: scheduled meeting handle of the updated scheduled meeting
  * @property privilege [ChatRoomPermission] Return the privilege of the user relative to the action.
  * @property code [ChatMessageCode]
  * @property usersCount Number of user that have been attached to the message
@@ -46,6 +52,10 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  *                     Only valid for messages with ChatMessageType.CONTACT_ATTACHMENT
  * @property userEmails Emails of the users that has been attached.
  *                      Only valid for messages with ChatMessageType.CONTACT_ATTACHMENT
+ * @property handleList List of handles. It can be used for different purposes.
+ *                       - ChatMessageType.CALL_ENDED
+ *                         It will be empty if termCode is not ChatMessageTermCode.ENDED either ChatMessageTermCode.FAILED
+ * @property nodeList List with all [Node] attached to the message.
  * @property duration Call duration in seconds.
  *                    Only valid for messages with ChatMessageType.CALL_ENDED
  * @property retentionTime Retention time in seconds.
@@ -53,6 +63,8 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
  * @property termCode [ChatMessageTermCode]
  *                    Only valid for messages with ChatMessageType.CALL_ENDED
  * @property rowId Id for messages in manual sending status / queue
+ * @property changes
+ * @property containsMeta [ContainsMeta]
  */
 data class ChatMessage(
     val status: ChatMessageStatus,
@@ -69,14 +81,28 @@ data class ChatMessage(
     val isEditable: Boolean,
     val isDeletable: Boolean,
     val isManagementMessage: Boolean,
+    val handleOfAction: Long,
     val privilege: ChatRoomPermission,
     val code: ChatMessageCode,
     val usersCount: Long,
     val userHandles: List<Long>,
     val userNames: List<String>,
     val userEmails: List<String>,
+    val nodeList: List<Node>,
+    val handleList: List<Long>,
     val duration: Int,
     val retentionTime: Long,
     val termCode: ChatMessageTermCode,
     val rowId: Long,
-)
+    val changes: List<ChatMessageChange>,
+    val containsMeta: ContainsMeta?,
+) {
+
+    /**
+     * Checks if the message has changed with the received change.
+     *
+     * @param chatMessageChange [ChatMessageChange]
+     * @return True if the message has changed with the specified change, false otherwise.
+     */
+    fun hasChanged(chatMessageChange: ChatMessageChange) = changes.contains(chatMessageChange)
+}
