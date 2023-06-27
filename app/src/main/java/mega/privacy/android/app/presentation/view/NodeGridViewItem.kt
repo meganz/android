@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -77,7 +78,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     onClick = { onItemClicked(nodeUIItem) },
                     onLongClick = { onLongClick(nodeUIItem) }
                 )
-                .padding(start = 16.dp, end = 8.dp),
+                .padding(start = 8.dp),
         ) {
             val (menuImage, txtTitle, thumbImage, takenDownImage) = createRefs()
             Image(
@@ -98,7 +99,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     .height(24.dp)
                     .width(24.dp)
                     .constrainAs(thumbImage) {
-                        end.linkTo(menuImage.start)
+                        start.linkTo(parent.start)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                     }
@@ -128,7 +129,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                         bottom.linkTo(parent.bottom)
                         width = Dimension.fillToConstraints
                     },
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle2,
                 maxLines = 1,
                 color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary
             )
@@ -153,11 +154,12 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     modifier = Modifier
                         .height(172.dp)
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp)),
+                        .clip(RoundedCornerShape(topStart = 5.dp, topEnd = 5.dp))
+                        .padding(1.dp),
                     contentDescription = "File",
                     imageFile = imageState.value,
                     defaultImage = MimeTypeList.typeForName(nodeUIItem.name).iconResourceId,
-                    contentScale = ContentScale.FillHeight,
+                    contentScale = ContentScale.Fit,
                 )
                 if (nodeUIItem.isSelected) {
                     Image(
@@ -167,9 +169,13 @@ internal fun <T : TypedNode> NodeGridViewItem(
                     )
                 }
             }
+            Divider(
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
+                modifier = Modifier.height(1.dp)
+            )
             ConstraintLayout(
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp)
+                    .padding(8.dp)
                     .fillMaxWidth()
             ) {
                 val (menuImage, txtTitle, takenDownImage) = createRefs()
@@ -205,7 +211,7 @@ internal fun <T : TypedNode> NodeGridViewItem(
                             end.linkTo(takenDownImage.start)
                             width = Dimension.fillToConstraints
                         },
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle2,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary

@@ -248,10 +248,10 @@ internal fun FolderLinkView(
             )
         } else {
             Column {
-                NodesView<TypedNode>(
+                NodesView(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp),
+                        .padding(horizontal = 2.dp),
                     nodeUIItems = state.nodesList,
                     onMenuClick = { onMoreOptionClick(it) },
                     onItemClicked = onItemClicked,

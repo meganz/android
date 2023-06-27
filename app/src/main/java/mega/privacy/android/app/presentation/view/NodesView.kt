@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -49,8 +51,10 @@ fun <T : TypedNode> NodesView(
     showSortOrder: Boolean = true,
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
+    val orientation = LocalConfiguration.current.orientation
+    val span = if (orientation == Configuration.ORIENTATION_PORTRAIT) spanCount else 4
     if (isListView) {
-        NodeListView<T>(
+        NodeListView(
             modifier = modifier,
             nodeUIItemList = nodeUIItems,
             onMenuClick = onMenuClick,
@@ -70,8 +74,8 @@ fun <T : TypedNode> NodesView(
             getThumbnail = getThumbnail,
         )
     } else {
-        val newList = rememberNodeListForGrid<T>(nodeUIItems = nodeUIItems, spanCount = spanCount)
-        NodeGridView<T>(
+        val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
+        NodeGridView(
             modifier = modifier,
             nodeUIItems = newList,
             onMenuClick = onMenuClick,
@@ -83,7 +87,7 @@ fun <T : TypedNode> NodesView(
                 }
             },
             onLongClick = onLongClick,
-            spanCount = spanCount,
+            spanCount = span,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
@@ -117,7 +121,7 @@ private fun <T : TypedNode> rememberNodeListForGrid(
     nodeUIItems: List<NodeUIItem<T>>,
     spanCount: Int,
 ) =
-    remember(key1 = nodeUIItems.count { it.isSelected } + nodeUIItems.size) {
+    remember(key1 = nodeUIItems.count { it.isSelected } + nodeUIItems.size + spanCount) {
         val folderCount = nodeUIItems.count {
             it.node is FolderNode
         }

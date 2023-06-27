@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -45,8 +44,7 @@ fun <T : TypedNode> NodeGridView(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
         modifier = modifier,
-        contentPadding = PaddingValues(4.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         if (showSortOrder || showChangeViewType) {
             item(
@@ -79,7 +77,7 @@ fun <T : TypedNode> NodeGridView(
                     value = file
                 }
             }
-            NodeGridViewItem<T>(
+            NodeGridViewItem(
                 modifier = modifier,
                 nodeUIItem = nodeUIItems[it],
                 onMenuClick = onMenuClick,
