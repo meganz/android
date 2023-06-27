@@ -2,7 +2,9 @@ package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
  * Mega local room gateway
@@ -111,4 +113,30 @@ interface MegaLocalRoomGateway {
      * Get the completed transfers count
      */
     suspend fun getCompletedTransfersCount(): Int
+
+    /**
+     * Get active transfer by tag
+     */
+    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
+
+    /**
+     * Get active transfers by type
+     * @return a flow of all active transfers list
+     */
+    fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
+
+    /**
+     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     */
+    suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
+
+    /**
+     * Delete all active transfer, use it with caution
+     */
+    suspend fun deleteAllActiveTransfers()
+
+    /**
+     * Delete an active transfer by its tag
+     */
+    suspend fun deleteActiveTransferByTag(tag: Int)
 }

@@ -3,13 +3,18 @@ package mega.privacy.android.data.facade
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.EncryptData
+import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
 internal class MegaLocalRoomFacade @Inject constructor(
@@ -17,7 +22,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
     private val completedTransferDao: CompletedTransferDao,
+    private val activeTransferDao: ActiveTransferDao,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
+    private val activeTransferMapper: ActiveTransferMapper,
+    private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val encryptData: EncryptData,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
@@ -63,7 +71,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     }
 
     override suspend fun getContactByHandle(handle: Long): Contact? =
-        contactDao.getContactByHandle(encryptData(handle.toString()))?.let { contactModelMapper(it) }
+        contactDao.getContactByHandle(encryptData(handle.toString()))
+            ?.let { contactModelMapper(it) }
 
     override suspend fun getContactByEmail(email: String?): Contact? =
         contactDao.getContactByEmail(encryptData(email))?.let { contactModelMapper(it) }
@@ -88,4 +97,20 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun getCompletedTransfersCount() =
         completedTransferDao.getCompletedTransfersCount()
+
+    override suspend fun getActiveTransferByTag(tag: Int) =
+        activeTransferDao.getActiveTransferByTag(tag)?.let { activeTransferMapper(it) }
+
+    override fun getActiveTransfersByType(transferType: TransferType) =
+        activeTransferDao.getActiveTransfersByType(transferType).map { activeTransferEntities ->
+            activeTransferEntities.map { activeTransferMapper(it) }
+        }
+
+    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
+        activeTransferDao.insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
+
+    override suspend fun deleteAllActiveTransfers() = activeTransferDao.deleteAllActiveTransfers()
+
+    override suspend fun deleteActiveTransferByTag(tag: Int) =
+        activeTransferDao.deleteActiveTransferByTag(tag)
 }

@@ -18,9 +18,11 @@ import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -34,7 +36,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -535,9 +539,67 @@ class DefaultTransfersRepositoryTest {
             assertThat(underTest.isCompletedTransfersEmpty()).isTrue()
         }
 
-    @Test
-    fun `test that startDownload gateway is called when startDownload is called`() = runTest {
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class ActiveTransfersTest {
+        @Test
+        fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
+            runTest {
+                val expected = mock<ActiveTransfer>()
+                whenever(megaLocalRoomGateway.getActiveTransferByTag(1)).thenReturn(expected)
+                val actual = underTest.getActiveTransferByTag(1)
+                assertThat(actual).isEqualTo(expected)
+            }
 
-        //verify(megaApiGateway.startDownload())
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that getActiveTransfersByType gateway result is returned when getActiveTransfersByType is called`(
+            transferType: TransferType,
+        ) =
+            runTest {
+                val expected = mock<Flow<List<ActiveTransfer>>>()
+                whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
+                    .thenReturn(expected)
+                val actual = underTest.getActiveTransfersByType(transferType)
+                assertThat(actual).isEqualTo(expected)
+            }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that getActiveTransfersByType gateway first result is returned when getCurrentActiveTransfersByType is called`(
+            transferType: TransferType,
+        ) =
+            runTest {
+                val expected = mock<List<ActiveTransfer>>()
+                val result = flowOf(expected)
+                whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
+                    .thenReturn(result)
+                val actual = underTest.getCurrentActiveTransfersByType(transferType)
+                assertThat(actual).isEqualTo(expected)
+            }
+
+        @Test
+        fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
+            runTest {
+                val activeTransfer = mock<ActiveTransfer>()
+                underTest.insertOrUpdateActiveTransfer(activeTransfer)
+                verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
+            }
+
+        @Test
+        fun `test that deleteAllActiveTransfers gateway is called when deleteAllActiveTransfers is called`() =
+            runTest {
+                underTest.deleteAllActiveTransfers()
+                verify(megaLocalRoomGateway).deleteAllActiveTransfers()
+            }
+
+        @ParameterizedTest
+        @ValueSource(ints = [1, 55, 102])
+        fun `test that deleteActiveTransferByTag gateway is called when deleteActiveTransferByTag is called`(
+            tag: Int,
+        ) = runTest {
+            underTest.deleteActiveTransferByTag(tag)
+            verify(megaLocalRoomGateway).deleteActiveTransferByTag(tag)
+        }
     }
 }

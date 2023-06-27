@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -25,9 +26,11 @@ import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -353,5 +356,30 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun resetTotalUploads() = withContext(ioDispatcher) {
         megaApiGateway.resetTotalUploads()
+    }
+
+    override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.getActiveTransferByTag(tag)
+    }
+
+    override fun getActiveTransfersByType(transferType: TransferType) =
+        megaLocalRoomGateway.getActiveTransfersByType(transferType)
+
+    override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getActiveTransfersByType(transferType).first()
+        }
+
+    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
+        }
+
+    override suspend fun deleteAllActiveTransfers() = withContext(ioDispatcher) {
+        megaLocalRoomGateway.deleteAllActiveTransfers()
+    }
+
+    override suspend fun deleteActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.deleteActiveTransferByTag(tag)
     }
 }

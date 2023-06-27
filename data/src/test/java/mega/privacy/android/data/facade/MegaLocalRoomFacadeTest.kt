@@ -6,11 +6,14 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.EncryptData
+import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import org.junit.jupiter.api.BeforeAll
@@ -33,6 +36,9 @@ internal class MegaLocalRoomFacadeTest {
     private val completedTransferDao = mock<CompletedTransferDao>()
     private val completedTransferModelMapper = mock<CompletedTransferModelMapper>()
     private val encryptData = mock<EncryptData>()
+    private val activeTransferDao = mock<ActiveTransferDao>()
+    private val activeTransferMapper = mock<ActiveTransferMapper>()
+    private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -41,7 +47,10 @@ internal class MegaLocalRoomFacadeTest {
             contactEntityMapper,
             contactModelMapper,
             completedTransferDao,
+            activeTransferDao,
             completedTransferModelMapper,
+            activeTransferMapper,
+            activeTransferEntityMapper,
             encryptData,
         )
     }
@@ -55,6 +64,9 @@ internal class MegaLocalRoomFacadeTest {
             completedTransferDao,
             completedTransferModelMapper,
             encryptData,
+            activeTransferDao,
+            activeTransferMapper,
+            activeTransferEntityMapper,
         )
     }
 

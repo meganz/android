@@ -4,8 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.ContactEntity
 
@@ -13,6 +15,7 @@ import mega.privacy.android.data.database.entity.ContactEntity
     entities = [
         ContactEntity::class,
         CompletedTransferEntity::class,
+        ActiveTransferEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -22,12 +25,14 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun completedTransferDao(): CompletedTransferDao
 
+    abstract fun activeTransfersDao(): ActiveTransferDao
+
     companion object {
-        val MIGRATION_67_68 = object : Migration(67, 68) {
+        private val MIGRATION_67_68 = object : Migration(67, 68) {
             override fun migrate(database: SupportSQLiteDatabase) {
             }
         }
-        val MIGRATION_68_69 = object : Migration(68, 69) {
+        private val MIGRATION_68_69 = object : Migration(68, 69) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Migrate column completedtransfers.transferoffline from BOOLEAN to TEXT type
                 database.beginTransaction()
@@ -42,5 +47,10 @@ internal abstract class MegaDatabase : RoomDatabase() {
                 }
             }
         }
+        private val MIGRATION_69_70 = object : Migration(69, 70) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+            }
+        }
+        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69, MIGRATION_69_70)
     }
 }

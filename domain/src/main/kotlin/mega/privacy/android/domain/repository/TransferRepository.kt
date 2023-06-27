@@ -2,10 +2,12 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 
 /**
@@ -286,4 +288,36 @@ interface TransferRepository {
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
+
+    /**
+     * Get active transfer by tag
+     */
+    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
+
+    /**
+     * Get active transfers by type
+     * @return a flow of all active transfers list
+     */
+    fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
+
+    /**
+     * Get current active transfers by type
+     * @return all active transfers list
+     */
+    suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
+
+    /**
+     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     */
+    suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
+
+    /**
+     * Delete all active transfer, use it with caution
+     */
+    suspend fun deleteAllActiveTransfers()
+
+    /**
+     * Delete an active transfer by its tag
+     */
+    suspend fun deleteActiveTransferByTag(tag: Int)
 }
