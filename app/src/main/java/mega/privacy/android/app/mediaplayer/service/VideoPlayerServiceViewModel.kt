@@ -989,7 +989,7 @@ class VideoPlayerServiceViewModel @Inject constructor(
 
 
     private fun postPlayingThumbnail() =
-        playlistItems.firstOrNull { (nodeHandle) ->
+        playlistItems.toList().firstOrNull { (nodeHandle) ->
             nodeHandle == playingHandle
         }?.thumbnail?.let {
             playingThumbnail.postValue(it)
