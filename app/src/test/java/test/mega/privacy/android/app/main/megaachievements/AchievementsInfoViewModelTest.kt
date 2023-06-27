@@ -76,9 +76,10 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_WELCOME
             val expectedDaysLeft = Random.nextInt(from = 1, until = 1000)
             val startTime = Calendar.getInstance()
-            val endTime = Calendar.getInstance().apply {
-                add(Calendar.DATE, expectedDaysLeft)
-            }
+            // adding 1000ms = 1 seconds because there's a several milliseconds different
+            // when generating end time and start time
+            val endTime =
+                startTime.timeInMillis + TimeUnit.DAYS.toMillis(expectedDaysLeft.toLong()) + 1000
 
             whenever(deviceGateway.now).thenReturn(startTime.timeInMillis)
 
@@ -90,9 +91,7 @@ class AchievementsInfoViewModelTest {
                         AwardedAchievement(
                             awardId = expectedAwardId,
                             type = expectedAchievementType,
-                            // adding 1000ms = 1 seconds because there's a several milliseconds different
-                            // when generating end time and start time
-                            expirationTimestampInSeconds = TimeUnit.MILLISECONDS.toSeconds(endTime.timeInMillis + 1000),
+                            expirationTimestampInSeconds = TimeUnit.MILLISECONDS.toSeconds(endTime),
                             rewardedStorageInBytes = 0,
                             rewardedTransferInBytes = 0
                         )
