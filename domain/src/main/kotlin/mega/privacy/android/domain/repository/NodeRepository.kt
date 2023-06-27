@@ -72,6 +72,13 @@ interface NodeRepository {
     suspend fun isNodeInInbox(handle: Long): Boolean
 
     /**
+     * check whether the node is in cloud drive or not
+     *
+     * @return Boolean
+     */
+    suspend fun isNodeInCloudDrive(handle: Long): Boolean
+
+    /**
      * Get the current backup folder node id
      */
     suspend fun getBackupFolderId(): NodeId

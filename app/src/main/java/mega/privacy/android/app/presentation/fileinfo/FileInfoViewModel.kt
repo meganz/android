@@ -51,7 +51,6 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -71,6 +70,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -93,7 +93,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase,
-    private val isNodeInInbox: IsNodeInInbox,
+    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
     private val moveNodeUseCase: MoveNodeUseCase,
@@ -676,7 +676,7 @@ class FileInfoViewModel @Inject constructor(
                 typedNode = typedNode,
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
-                isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
+                isNodeInInbox = isNodeInInboxUseCase(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
                 isAvailableOffline = isAvailableOfflineUseCase(typedNode),

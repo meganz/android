@@ -135,18 +135,35 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun isNodeInRubbish(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) } ?: false
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInRubbish(it) }
+            ?: run {
+                Timber.w("isNodeInRubbish returns false because the node with handle $handle was not found")
+                false
+            }
     }
 
     override suspend fun isNodeInInbox(handle: Long) = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInInbox(it) } ?: false
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInInbox(it) }
+            ?: run {
+                Timber.w("isNodeInInbox returns false because the node with handle $handle was not found")
+                false
+            }
+    }
+
+    override suspend fun isNodeInCloudDrive(handle: Long) = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(handle)?.let { megaApiGateway.isInCloudDrive(it) }
+            ?: run {
+                Timber.w("isNodeInCloudDrive returns false because the node with handle $handle was not found")
+                false
+            }
     }
 
     override suspend fun getBackupFolderId(): NodeId =
         withContext(ioDispatcher) {
             val backupsFolderAttributeIdentifier = MegaApiJava.USER_ATTR_MY_BACKUPS_FOLDER
             suspendCancellableCoroutine { continuation ->
-                megaApiGateway.getUserAttribute(backupsFolderAttributeIdentifier,
+                megaApiGateway.getUserAttribute(
+                    backupsFolderAttributeIdentifier,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { request, error ->
                             if (request.paramType == backupsFolderAttributeIdentifier) {

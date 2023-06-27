@@ -15,7 +15,7 @@ import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragme
 import mega.privacy.android.app.presentation.versions.dialog.model.VersionsBottomSheetDialogState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.IsNodeInInbox
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import javax.inject.Inject
 
@@ -24,14 +24,14 @@ import javax.inject.Inject
  *
  * @property getNodeAccessPermission Retrieves the Node Access Permission
  * @property getNodeByHandle Retrieves the Node from the given Handle
- * @property isNodeInInbox Checks whether the Node is a Backup Node or not
+ * @property isNodeInInboxUseCase Checks whether the Node is a Backup Node or not
  * @property savedStateHandle The Saved State Handle to retrieve the parameters sent
  */
 @HiltViewModel
 class VersionsBottomSheetDialogViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val getNodeByHandle: GetNodeByHandle,
-    private val isNodeInInbox: IsNodeInInbox,
+    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
     private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -54,7 +54,7 @@ class VersionsBottomSheetDialogViewModel @Inject constructor(
             nodeHandle?.let { nonNullHandle ->
                 // Async-Await is used here in order to prevent the hidden options from being
                 // blackened and taking up space in the popup Dialog
-                val isNodeInBackups = async { isNodeInInbox(nodeHandle) }
+                val isNodeInBackups = async { isNodeInInboxUseCase(nodeHandle) }
                 val node = async { getNodeByHandle(nonNullHandle) }
                 val accessPermission = async { getNodeAccessPermission(NodeId(nonNullHandle)) }
 

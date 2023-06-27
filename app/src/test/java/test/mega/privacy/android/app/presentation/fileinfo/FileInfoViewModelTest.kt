@@ -54,7 +54,6 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -74,6 +73,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -109,7 +109,7 @@ internal class FileInfoViewModelTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase = mock()
-    private val isNodeInInbox: IsNodeInInbox = mock()
+    private val isNodeInInboxUseCase: IsNodeInInboxUseCase = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
     private val moveNodeUseCase: MoveNodeUseCase = mock()
@@ -169,7 +169,7 @@ internal class FileInfoViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getFileHistoryNumVersionsUseCase = getFileHistoryNumVersionsUseCase,
-            isNodeInInbox = isNodeInInbox,
+            isNodeInInboxUseCase = isNodeInInboxUseCase,
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
             moveNodeUseCase = moveNodeUseCase,
@@ -209,7 +209,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
-        whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
+        whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
@@ -253,7 +253,7 @@ internal class FileInfoViewModelTest {
     fun `test that viewModel state's isNodeInInbox property reflects the value of the isNodeInInbox use case after updating the node`() =
         runTest {
             suspend fun verify(isNodeInInbox: Boolean) {
-                whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(isNodeInInbox)
+                whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(isNodeInInbox)
                 underTest.setNode(node.handle)
                 Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
             }

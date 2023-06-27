@@ -556,6 +556,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun isInInbox(node: MegaNode): Boolean = megaApi.isInInbox(node)
 
+    override suspend fun isInCloudDrive(node: MegaNode): Boolean = megaApi.isInCloud(node)
+
     override suspend fun getChildren(parentNodes: MegaNodeList, order: Int): List<MegaNode> =
         megaApi.getChildren(parentNodes, order)
 

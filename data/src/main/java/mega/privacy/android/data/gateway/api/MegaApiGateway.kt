@@ -873,6 +873,14 @@ interface MegaApiGateway {
     suspend fun isInInbox(node: MegaNode): Boolean
 
     /**
+     * Check is megaNode in Cloud drive
+     *
+     * @param node MegaNode
+     * @return True in, else not in
+     */
+    suspend fun isInCloudDrive(node: MegaNode): Boolean
+
+    /**
      * Move a transfer to the top of the transfer queue
      *
      * @param transfer Transfer to move

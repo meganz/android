@@ -9,17 +9,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.versions.model.VersionsFileState
-import mega.privacy.android.domain.usecase.IsNodeInInbox
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import javax.inject.Inject
 
 /**
  * [ViewModel] class for [mega.privacy.android.app.main.VersionsFileActivity]
  *
- * @property isNodeInInbox Checks whether the Node is a Backup Node or not
+ * @property isNodeInInboxUseCase Checks whether the Node is a Backup Node or not
  */
 @HiltViewModel
 class VersionsFileViewModel @Inject constructor(
-    private val isNodeInInbox: IsNodeInInbox,
+    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(VersionsFileState())
@@ -36,7 +36,7 @@ class VersionsFileViewModel @Inject constructor(
      */
     fun init(nodeHandle: Long?) = viewModelScope.launch {
         nodeHandle?.let { nonNullHandle ->
-            val isNodeInBackups = isNodeInInbox(nonNullHandle)
+            val isNodeInBackups = isNodeInInboxUseCase(nonNullHandle)
             _state.update { it.copy(isNodeInBackups = isNodeInBackups) }
         }
     }

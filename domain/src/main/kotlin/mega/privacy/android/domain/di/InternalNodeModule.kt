@@ -9,7 +9,6 @@ import mega.privacy.android.domain.usecase.DefaultGetFolderTreeInfo
 import mega.privacy.android.domain.usecase.DefaultMonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.DefaultMonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
-import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -41,12 +40,6 @@ abstract class InternalNodeModule {
     abstract fun bindMonitorFolderChildrenUpdates(implementation: DefaultMonitorChildrenUpdates): MonitorChildrenUpdates
 
     companion object {
-        /**
-         * provides [IsNodeInInbox]
-         */
-        @Provides
-        fun provideIsNodeInInbox(nodeRepository: NodeRepository): IsNodeInInbox =
-            IsNodeInInbox(nodeRepository::isNodeInInbox)
 
         /**
          * Provides [GetUnverifiedIncomingShares] implementation

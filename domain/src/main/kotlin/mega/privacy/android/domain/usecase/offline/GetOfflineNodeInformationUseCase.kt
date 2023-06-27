@@ -6,11 +6,11 @@ import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetParentNodeUseCase
-import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import java.io.File
+import mega.privacy.android.domain.usecase.node.GetNestedParentFoldersUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
+import mega.privacy.android.domain.usecase.node.joinAsPath
 import javax.inject.Inject
 
 /**
@@ -25,26 +25,26 @@ import javax.inject.Inject
  * @see [IsAvailableOfflineUseCase] to know if the node is available offline or not
  */
 class GetOfflineNodeInformationUseCase @Inject constructor(
-    private val nodeRepository: NodeRepository,
-    private val getParentNodeUseCase: GetParentNodeUseCase,
-    private val isNodeInInbox: IsNodeInInbox,
+    private val getNestedParentFoldersUseCase: GetNestedParentFoldersUseCase,
+    private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
+    private val isNodeInInboxUseCase: IsNodeInInboxUseCase,
 ) {
     /**
      * Invoke the use case
      */
     suspend operator fun invoke(node: Node): OfflineNodeInformation {
-        var parents = nestedParentFolders(node)
+        var parents = getNestedParentFoldersUseCase(node)
         val isIncomingShareId = (
                 node.takeIf { it.isIncomingShare }
                     ?: parents.firstOrNull()?.takeIf { it.isIncomingShare }
                 )?.id
-        val isInInbox = isNodeInInbox(node.id.longValue)
-        if (isInInbox) {
-            parents = parents.drop(1) //we don't need the root backup parent (Vault)
+        val isInInbox = isNodeInInboxUseCase(node.id.longValue)
+        val isInCloudDrive = isNodeInCloudDriveUseCase(node.id.longValue)
+        if (parents.isNotEmpty() && (isInCloudDrive || isInInbox)) {
+            //we don't need the root backup parent (Vault) or root drive parent
+            parents = parents.drop(1)
         }
-        val path = joinPaths(
-            *parents.map { it.name }.toTypedArray(),
-        )
+        val path = parents.joinAsPath()
 
         return when {
             isInInbox -> {
@@ -74,36 +74,5 @@ class GetOfflineNodeInformationUseCase @Inject constructor(
                     isFolder = node is FolderNode,
                 )
         }
-
     }
-
-    /**
-     * returns an array with all nested parent folders of this node, from deepest to less deep.
-     */
-    private suspend fun nestedParentFolders(node: Node): List<Node> {
-        val driveRootNode = nodeRepository.getRootNode()
-        val nodes = ArrayList<Node>()
-        var nodeToCheck = node
-        while (true) {
-            nodeToCheck = getParentNodeUseCase(nodeToCheck.id) ?: break
-            if (nodeToCheck.id == driveRootNode?.id) {
-                break
-            }
-            nodes.add(nodeToCheck)
-        }
-        return nodes.reversed()
-    }
-
-    private fun joinPaths(vararg paths: String?) =
-        paths
-            .filterNotNull()
-            .filterNot { it == File.separator }
-            .takeIf { it.isNotEmpty() }
-            ?.joinToString(
-                separator = File.separator,
-                prefix = File.separator,
-                postfix = File.separator,
-            ) {
-                it.removePrefix(File.separator).removeSuffix(File.separator)
-            } ?: File.separator
 }

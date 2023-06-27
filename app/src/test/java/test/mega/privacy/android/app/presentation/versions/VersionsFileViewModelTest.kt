@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
-import mega.privacy.android.domain.usecase.IsNodeInInbox
+import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -35,7 +35,7 @@ class VersionsFileViewModelTest {
 
     private lateinit var underTest: VersionsFileViewModel
 
-    private val isNodeInInbox = mock<IsNodeInInbox>()
+    private val isNodeInInboxUseCase = mock<IsNodeInInboxUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -45,9 +45,9 @@ class VersionsFileViewModelTest {
     @BeforeEach
     fun reset() {
         underTest = VersionsFileViewModel(
-            isNodeInInbox = isNodeInInbox,
+            isNodeInInboxUseCase = isNodeInInboxUseCase,
         )
-        reset(isNodeInInbox)
+        reset(isNodeInInboxUseCase)
     }
 
     @AfterAll
@@ -71,14 +71,14 @@ class VersionsFileViewModelTest {
                 assertThat(awaitItem().isNodeInBackups).isFalse()
             }
 
-            verifyNoInteractions(isNodeInInbox)
+            verifyNoInteractions(isNodeInInboxUseCase)
         }
 
     @ParameterizedTest(name = "is node in backups: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that the node can be a backup node when initialized`(isNodeInBackups: Boolean) =
         runTest {
-            whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
+            whenever(isNodeInInboxUseCase(any())).thenReturn(isNodeInBackups)
 
             underTest.init(123456L)
             underTest.state.test {
@@ -89,7 +89,7 @@ class VersionsFileViewModelTest {
     @Test
     fun `test that the action bar delete button is hidden when there are no versions selected`() =
         runTest {
-            whenever(isNodeInInbox(any())).thenReturn(false)
+            whenever(isNodeInInboxUseCase(any())).thenReturn(false)
             underTest.init(123456L)
             val expected = underTest.showDeleteVersionsButton(
                 selectedVersions = 0,
@@ -105,7 +105,7 @@ class VersionsFileViewModelTest {
         isCurrentVersionSelected: Boolean,
         showDeleteVersionsButton: Boolean,
     ) = runTest {
-        whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
+        whenever(isNodeInInboxUseCase(any())).thenReturn(isNodeInBackups)
 
         underTest.init(123456L)
         val expected = underTest.showDeleteVersionsButton(
@@ -133,7 +133,7 @@ class VersionsFileViewModelTest {
     @Test
     fun `test that the action bar revert button is hidden when there are no versions selected`() =
         runTest {
-            whenever(isNodeInInbox(any())).thenReturn(false)
+            whenever(isNodeInInboxUseCase(any())).thenReturn(false)
             underTest.init(123456L)
             val expected = underTest.showRevertVersionButton(
                 selectedVersions = 0,
@@ -149,7 +149,7 @@ class VersionsFileViewModelTest {
         isCurrentVersionSelected: Boolean,
         showRevertVersionButton: Boolean,
     ) = runTest {
-        whenever(isNodeInInbox(any())).thenReturn(isNodeInBackups)
+        whenever(isNodeInInboxUseCase(any())).thenReturn(isNodeInBackups)
 
         underTest.init(123456L)
         val expected = underTest.showRevertVersionButton(
@@ -177,7 +177,7 @@ class VersionsFileViewModelTest {
     @Test
     fun `test that the action bar revert button is hidden when there are more than one version selected`() =
         runTest {
-            whenever(isNodeInInbox(any())).thenReturn(false)
+            whenever(isNodeInInboxUseCase(any())).thenReturn(false)
 
             underTest.init(123456L)
             val expected = underTest.showRevertVersionButton(
