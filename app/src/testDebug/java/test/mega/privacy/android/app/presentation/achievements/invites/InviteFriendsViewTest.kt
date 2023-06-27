@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.invites
 
 import android.app.Activity
 import android.content.ComponentName

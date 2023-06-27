@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.info.util
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementType
 
 /**
  * Map AchievementsType to Achievements Info's attributes in AchievementsInfoFragment
- * @see AchievementsInfoFragment
  */
 fun AchievementType?.toAchievementsInfoAttribute(isAwarded: Boolean): AchievementInfoAttribute {
     return when (this) {
@@ -39,7 +38,6 @@ fun AchievementType?.toAchievementsInfoAttribute(isAwarded: Boolean): Achievemen
 
 /**
  * AchievementInfoAttribute to hold the icon and text in AchievementsInfoFragment
- * @see AchievementsInfoFragment
  * @property name
  * @property iconResourceId
  * @property subtitleTextResourceId

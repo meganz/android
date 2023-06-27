@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.info
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -9,9 +9,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.Achievement

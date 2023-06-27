@@ -8,8 +8,8 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.megaachievements.AchievementsOverviewViewModel
-import mega.privacy.android.app.main.megaachievements.AchievementsUIState
+import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
+import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase

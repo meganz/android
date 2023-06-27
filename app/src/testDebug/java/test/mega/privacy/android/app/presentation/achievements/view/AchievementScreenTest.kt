@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.achievements.composables
+package test.mega.privacy.android.app.presentation.achievements.view
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertIsDisplayed
@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.megaachievements.composables.AchievementView
+import mega.privacy.android.app.presentation.achievements.view.AchievementView
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

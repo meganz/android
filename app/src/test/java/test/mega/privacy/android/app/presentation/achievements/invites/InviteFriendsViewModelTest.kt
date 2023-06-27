@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.invites
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test

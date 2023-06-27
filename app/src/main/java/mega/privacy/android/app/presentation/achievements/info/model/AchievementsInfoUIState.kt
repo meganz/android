@@ -1,10 +1,9 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.info.model
 
 import mega.privacy.android.domain.entity.achievement.AchievementType
 
 /**
  * UI State for AchievementsInfoFragment
- * @see AchievementsInfoFragment
  * @param awardId the award id of the received achievements
  * @param achievementType the type of Achievements
  * @param achievementRemainingDays remaining days on the achievements bonus

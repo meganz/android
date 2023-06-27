@@ -164,7 +164,7 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".main.megaachievements.AchievementsActivity" />
+            android:name=".presentation.achievements.AchievementsActivity" />
         <activity
             android:name=".presentation.openlink.OpenLinkActivity"
             android:exported="true"

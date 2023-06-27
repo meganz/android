@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,8 +11,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.megaachievements.composables.AchievementScreen
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel.Companion.REFERRAL_STORAGE_BONUS
+import mega.privacy.android.app.presentation.achievements.view.AchievementScreen
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INFO_ACHIEVEMENTS_FRAGMENT

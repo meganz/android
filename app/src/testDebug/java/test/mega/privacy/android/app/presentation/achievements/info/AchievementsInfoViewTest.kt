@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.main.megaachievements
+package test.mega.privacy.android.app.presentation.achievements.info
 
 import android.content.Context
 import androidx.compose.ui.Modifier
@@ -13,12 +13,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoUIState
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoView
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewTestTags.CHECK_ICON
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewTestTags.SUBTITLE
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewTestTags.TITLE
-import mega.privacy.android.app.main.megaachievements.toAchievementsInfoAttribute
+import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
+import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoView
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.CHECK_ICON
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.SUBTITLE
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.TITLE
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_600

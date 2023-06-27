@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements.composables
+package mega.privacy.android.app.presentation.achievements.view
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements.composables
+package mega.privacy.android.app.presentation.achievements.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -24,7 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toStorageString
 import mega.privacy.android.app.data.extensions.toUnitString
-import mega.privacy.android.app.main.megaachievements.AchievementsOverviewViewModel
+import mega.privacy.android.app.presentation.achievements.AchievementsOverviewViewModel
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012

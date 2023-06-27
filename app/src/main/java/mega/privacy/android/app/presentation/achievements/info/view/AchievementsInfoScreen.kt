@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.info.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
+import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
+import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200

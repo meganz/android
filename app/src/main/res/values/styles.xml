@@ -326,45 +326,6 @@
 
     <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton" />
 
-    <style name="achievements_subtitle">
-        <item name="android:fontFamily">sans-serif</item>
-        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignParentTop">true</item>
-        <item name="android:layout_marginRight">24dp</item>
-        <item name="android:layout_marginBottom">4dp</item>
-        <item name="android:singleLine">false</item>
-        <item name="android:ellipsize">end</item>
-    </style>
-
-    <style name="how_it_works">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:text">@string/title_achievement_invite_friends</item>
-        <item name="android:layout_marginTop">24dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1.Variant</item>
-        <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:textColor">@color/dark_blue_500_200</item>
-    </style>
-
-    <style name="how_works_first_p">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">24dp</item>
-        <item name="android:layout_marginBottom">16dp</item>
-        <item name="android:layout_marginLeft">24dp</item>
-        <item name="android:layout_marginRight">24dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.Mega.Body2.Secondary.Variant
-        </item>
-    </style>
-
-    <style name="how_works_second_p" parent="how_works_first_p">
-        <item name="android:layout_marginTop">16dp</item>
-        <item name="android:layout_marginBottom">24dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.Mega.Caption.Italic</item>
-    </style>
-
     <style name="ThemeOverlay.ColorControlSecondary" parent="">
         <item name="android:colorControlNormal">?android:attr/textColorSecondary</item>
         <item name="colorControlNormal">?android:attr/textColorSecondary</item>

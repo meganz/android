@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -13,9 +13,11 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoFragment
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
+import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsFragment
+import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
 import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util

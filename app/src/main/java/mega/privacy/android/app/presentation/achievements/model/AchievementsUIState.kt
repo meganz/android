@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.megaachievements
+package mega.privacy.android.app.presentation.achievements.model
 
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 
