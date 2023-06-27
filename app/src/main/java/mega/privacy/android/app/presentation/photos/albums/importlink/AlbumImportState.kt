@@ -19,4 +19,6 @@ internal data class AlbumImportState(
     val isImportConstraintValid: Boolean = false,
     val showImportAlbumDialog: Boolean = false,
     val importAlbumMessage: String? = null,
+    val isAvailableStorageCollected: Boolean = false,
+    val showStorageExceededDialog: Boolean = false,
 )

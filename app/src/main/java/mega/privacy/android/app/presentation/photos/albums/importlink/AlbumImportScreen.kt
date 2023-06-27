@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.photos.albums.importlink
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -92,6 +94,7 @@ internal fun AlbumImportScreen(
     onPreviewPhoto: (Photo) -> Unit,
     onSaveToDevice: (List<MegaNode>) -> Unit,
     onNavigateFileExplorer: () -> Unit,
+    onUpgradeAccount: () -> Unit,
     onBack: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -140,6 +143,16 @@ internal fun AlbumImportScreen(
         )
     }
 
+    if (state.showStorageExceededDialog) {
+        StorageExceededDialog(
+            onDismiss = albumImportViewModel::closeStorageExceededDialog,
+            onUpgradeAccount = {
+                onUpgradeAccount()
+                albumImportViewModel.closeStorageExceededDialog()
+            },
+        )
+    }
+
     if (state.showImportAlbumDialog) {
         ImportAlbumDialog()
     }
@@ -174,7 +187,7 @@ internal fun AlbumImportScreen(
             )
         },
         bottomBar = {
-            if (state.isLocalAlbumsLoaded && state.album != null && state.photos.isNotEmpty()) {
+            if (state.isLocalAlbumsLoaded && state.isAvailableStorageCollected && state.album != null && state.photos.isNotEmpty()) {
                 AlbumImportBottomBar(
                     isLogin = state.isLogin,
                     onImport = {
@@ -210,6 +223,7 @@ internal fun AlbumImportScreen(
             AlbumImportContent(
                 modifier = Modifier.padding(innerPaddings),
                 isLocalAlbumsLoaded = state.isLocalAlbumsLoaded,
+                isAvailableStorageCollected = state.isAvailableStorageCollected,
                 album = state.album,
                 photos = state.photos,
                 selectedPhotos = state.selectedPhotos,
@@ -434,6 +448,7 @@ private fun AlbumImportBottomBar(
 private fun AlbumImportContent(
     modifier: Modifier = Modifier,
     isLocalAlbumsLoaded: Boolean,
+    isAvailableStorageCollected: Boolean,
     album: Album.UserAlbum?,
     photos: List<Photo>,
     selectedPhotos: Set<Photo>,
@@ -452,7 +467,7 @@ private fun AlbumImportContent(
                 .formatColorTag(context, 'B', R.color.grey_300_grey_600)
                 .toSpannedHtmlText(),
         )
-    } else if (isLocalAlbumsLoaded && album != null) {
+    } else if (isLocalAlbumsLoaded && isAvailableStorageCollected && album != null) {
         AlbumImportList(
             modifier = modifier,
             photos = photos,
@@ -731,6 +746,77 @@ private fun ImportAlbumDialog(
                                 style = MaterialTheme.typography.body2,
                             )
                         },
+                    )
+                },
+            )
+        },
+    )
+}
+
+@Composable
+private fun StorageExceededDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    onUpgradeAccount: () -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    MegaDialog(
+        modifier = modifier,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = false,
+        ),
+        onDismissRequest = onDismiss,
+        titleString = stringResource(id = R.string.album_import_storage_exceeded_title),
+        fontWeight = FontWeight.W400,
+        body = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+                content = {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_storage_full),
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                    )
+                },
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = stringResource(id = R.string.album_import_storage_exceeded_description),
+                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W400,
+                style = MaterialTheme.typography.subtitle2,
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.general_cancel),
+                        color = teal_300,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.button,
+                    )
+                },
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onUpgradeAccount,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.my_account_upgrade_pro),
+                        color = teal_300,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        style = MaterialTheme.typography.button,
                     )
                 },
             )

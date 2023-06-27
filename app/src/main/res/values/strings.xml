@@ -4970,4 +4970,8 @@
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
     <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
 </resources>

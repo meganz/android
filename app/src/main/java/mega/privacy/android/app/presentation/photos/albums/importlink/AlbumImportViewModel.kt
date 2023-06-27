@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,6 +24,7 @@ import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.AlbumLink
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentials
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -52,6 +55,7 @@ internal class AlbumImportViewModel @Inject constructor(
     private val downloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase,
     private val downloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val importPublicAlbumUseCase: ImportPublicAlbumUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
@@ -66,6 +70,10 @@ internal class AlbumImportViewModel @Inject constructor(
     @VisibleForTesting
     var localAlbumNames: Set<String> = setOf()
 
+    @Volatile
+    @VisibleForTesting
+    var availableStorage: Long = 0
+
     private var albumNameToImport: String = ""
 
     private var photosToImport: Collection<Photo> = listOf()
@@ -74,7 +82,10 @@ internal class AlbumImportViewModel @Inject constructor(
         validateLink(link = albumLink)
 
         val isLogin = hasCredentialsUseCase()
-        if (isLogin) loadUserAlbums()
+        if (isLogin) {
+            loadUserAlbums()
+            monitorAccountDetail()
+        }
 
         state.update {
             it.copy(
@@ -115,14 +126,20 @@ internal class AlbumImportViewModel @Inject constructor(
     private suspend fun handlePublicAlbum(link: String, albumPhotos: AlbumPhotoIds) {
         val (album, albumPhotoIds) = albumPhotos
 
-        val result = coroutineScope {
-            awaitAll(
-                async { getPublicAlbumPhotoUseCase(albumPhotoIds) },
-                async { legacyPublicAlbumPhotoNodeProvider.loadNodeCache(albumPhotoIds) },
-            )
+        runCatching {
+            coroutineScope {
+                awaitAll(
+                    async { getPublicAlbumPhotoUseCase(albumPhotoIds) },
+                    async { legacyPublicAlbumPhotoNodeProvider.loadNodeCache(albumPhotoIds) },
+                )
+            }
+        }.onFailure {
+            state.update {
+                it.copy(showErrorAccessDialog = true)
+            }
+        }.onSuccess { result ->
+            updateAlbumPhotos(link, album, result[0] as List<Photo>)
         }
-
-        updateAlbumPhotos(link, album, result[0] as List<Photo>)
     }
 
     private suspend fun updateAlbumPhotos(
@@ -307,7 +324,14 @@ internal class AlbumImportViewModel @Inject constructor(
         albumNameToImport = album?.title.orEmpty()
         photosToImport = photos
 
-        val checkAvailableStorage = { false }
+        val checkAvailableStorage = {
+            val isInvalid = photos.sumOf { it.size } > availableStorage
+
+            state.update {
+                it.copy(showStorageExceededDialog = isInvalid)
+            }
+            isInvalid
+        }
 
         val checkAlbumNameConflict = {
             val isInvalid = album?.title in localAlbumNames
@@ -379,6 +403,24 @@ internal class AlbumImportViewModel @Inject constructor(
     fun clearImportAlbumMessage() {
         state.update {
             it.copy(importAlbumMessage = null)
+        }
+    }
+
+    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
+        .onEach(::handleAccountDetail)
+        .launchIn(viewModelScope)
+
+    private fun handleAccountDetail(accountDetail: AccountDetail) {
+        availableStorage = accountDetail.storageDetail?.availableSpace ?: 0L
+
+        state.update {
+            it.copy(isAvailableStorageCollected = true)
+        }
+    }
+
+    fun closeStorageExceededDialog() {
+        state.update {
+            it.copy(showStorageExceededDialog = false)
         }
     }
 

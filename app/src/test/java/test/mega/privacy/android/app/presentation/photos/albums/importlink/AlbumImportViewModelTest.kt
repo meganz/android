@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentials
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -53,6 +54,8 @@ class AlbumImportViewModelTest {
 
     private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase = mock()
 
+    private val mockMonitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+
     private val mockGetProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase = mock()
 
     private val mockGetStringFromStringResMapper: GetStringFromStringResMapper = mock()
@@ -72,6 +75,7 @@ class AlbumImportViewModelTest {
             legacyPublicAlbumPhotoNodeProvider = mockLegacyPublicAlbumPhotoNodeProvider,
             downloadPublicAlbumPhotoPreviewUseCase = mockDownloadPublicAlbumPhotoPreviewUseCase,
             downloadPublicAlbumPhotoThumbnailUseCase = mockDownloadPublicAlbumPhotoThumbnailUseCase,
+            monitorAccountDetailUseCase = mockMonitorAccountDetailUseCase,
             getProscribedAlbumNamesUseCase = mockGetProscribedAlbumNamesUseCase,
             getStringFromStringResMapper = mockGetStringFromStringResMapper,
             importPublicAlbumUseCase = mockImportPublicAlbumUseCase,
@@ -332,6 +336,48 @@ class AlbumImportViewModelTest {
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.importAlbumMessage).isNull()
+        }
+    }
+
+    @Test
+    fun `test that exceeds storage should show storage exceeds dialog`() = runTest {
+        // given
+        val album = mock<UserAlbum>()
+        val photos = listOf<Photo>(
+            mock<Photo.Image> {
+                on { size }.thenReturn(100L)
+            },
+            mock<Photo.Image> {
+                on { size }.thenReturn(200L)
+            },
+            mock<Photo.Image> {
+                on { size }.thenReturn(300L)
+            }
+        )
+
+        underTest.availableStorage = 500L
+
+        // when
+        underTest.validateImportConstraint(album, photos)
+
+        // then
+        underTest.stateFlow.test {
+            repeat(1) { awaitItem() }
+
+            val state = awaitItem()
+            assertThat(state.showStorageExceededDialog).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that close storage exceeded dialog works properly`() = runTest {
+        // when
+        underTest.closeStorageExceededDialog()
+
+        // then
+        underTest.stateFlow.test {
+            val state = awaitItem()
+            assertThat(state.showStorageExceededDialog).isFalse()
         }
     }
 }

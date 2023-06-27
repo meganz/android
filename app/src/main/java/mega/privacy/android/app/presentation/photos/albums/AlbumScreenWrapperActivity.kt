@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImpor
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
+import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -185,6 +186,10 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                     fromMediaViewer = false,
                                     needSerialize = true,
                                 )
+                            },
+                            onUpgradeAccount = {
+                                val intent = Intent(this, UpgradeAccountActivity::class.java)
+                                startActivity(intent)
                             },
                             onBack = ::finish,
                         )
