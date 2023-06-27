@@ -40,7 +40,6 @@ import java.io.File
  * @param onChangeViewTypeClick
  * @param getThumbnail
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun <T : TypedNode> NodeListView(
     nodeUIItemList: List<NodeUIItem<T>>,
@@ -83,11 +82,6 @@ fun <T : TypedNode> NodeListView(
                 }
             }
             NodeListViewItem(
-                modifier = modifier
-                    .combinedClickable(
-                        onClick = { onItemClicked(nodeUIItemList[it]) },
-                        onLongClick = { onLongClick(nodeUIItemList[it]) }
-                    ),
                 isSelected = nodeUIItemList[it].isSelected,
                 folderInfo = nodeEntity
                     .let { node -> node as? FolderNode }
@@ -114,8 +108,10 @@ fun <T : TypedNode> NodeListView(
                 isTakenDown = nodeEntity.isTakenDown,
                 isFavourite = nodeEntity.isFavourite,
                 isSharedWithPublicLink = nodeEntity.exportedData != null,
+                imageState = imageState,
+                onClick = { onItemClicked(nodeUIItemList[it]) },
+                onLongClick = { onLongClick(nodeUIItemList[it]) },
                 onMenuClick = { onMenuClick(nodeUIItemList[it]) },
-                imageState = imageState
             )
         }
     }

@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
@@ -58,9 +60,10 @@ import java.io.File
  * @param onMenuClick three dots click
  * @param imageState Thumbnail state
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NodeListViewItem(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     isSelected: Boolean,
     folderInfo: String?,
     @DrawableRes icon: Int,
@@ -71,11 +74,25 @@ fun NodeListViewItem(
     isTakenDown: Boolean,
     isFavourite: Boolean,
     isSharedWithPublicLink: Boolean,
-    onMenuClick: () -> Unit = {},
     imageState: State<File?>,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+    isEnabled: Boolean = true,
+    onMenuClick: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier
+        modifier = if (isEnabled) {
+            modifier
+                .alpha(1f)
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
+                )
+        } else {
+            modifier
+                .alpha(0.5f)
+                .clickable(enabled = false) { }
+        }
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
@@ -262,6 +279,7 @@ private fun FilePreview() {
             isFavourite = false,
             isSharedWithPublicLink = false,
             isTakenDown = false,
+            onClick = {},
             imageState = imageState
         )
     }
@@ -286,6 +304,7 @@ private fun FolderPreview() {
             isFavourite = false,
             isSharedWithPublicLink = false,
             isTakenDown = false,
+            onClick = {},
             imageState = imageState
         )
     }

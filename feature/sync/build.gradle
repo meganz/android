@@ -64,6 +64,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation project(':core:formatter')
     implementation(project(":core-ui"))
 
     implementation lib.kotlin.ktx

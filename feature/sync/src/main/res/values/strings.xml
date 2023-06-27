@@ -3,4 +3,9 @@
     <string name="start_screen_setting" />
     <string name="general_select" />
     <string name="sync_button_label">Sync</string>
+    <string name="file_browser_empty_folder" />
+    <plurals name="num_files_with_parameter" />
+    <plurals name="num_folders_with_parameter" />
+    <plurals name="num_folders_num_files" />
+    <plurals name="num_folders_num_files_2" />
 </resources>
