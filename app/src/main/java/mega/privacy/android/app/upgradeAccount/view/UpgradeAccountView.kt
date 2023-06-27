@@ -33,6 +33,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -112,6 +113,7 @@ fun UpgradeAccountView(
 ) {
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
     val userSubscription = state.userSubscription
     var isMonthly by rememberSaveable { mutableStateOf(userSubscription == UserSubscription.MONTHLY_SUBSCRIBED) }
     var chosenPlan by rememberSaveable { mutableStateOf(AccountType.FREE) }
@@ -119,7 +121,10 @@ fun UpgradeAccountView(
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = state.isPaymentMethodAvailable
     var hideFloatButton by rememberSaveable { mutableStateOf(false) }
+    val snackbarMessage =
+        stringResource(id = R.string.account_upgrade_account_snackbar_recurring_plan_already_exist)
     Scaffold(
+        scaffoldState = scaffoldState,
         topBar = {
             SimpleNoTitleTopAppBar(
                 elevation = state.showBillingWarning,
@@ -239,13 +244,21 @@ fun UpgradeAccountView(
                                     scrollState.animateScrollTo(0)
                                 }
                             }
-                            if (!disableCardClick && isPaymentMethodAvailable) {
-                                chosenPlan = it.accountType
-                                isPreselectedPlanOnce = true
-                                onChoosingMonthlyYearlyPlan(isMonthly)
-                                onChoosingPlanType(it.accountType)
-                                isClickedCurrentPlan = isCurrentPlan
-                                hideFloatButton = false
+                            if (isPaymentMethodAvailable) {
+                                if (disableCardClick) {
+                                    coroutineScope.launch {
+                                        scaffoldState.snackbarHostState.showSnackbar(
+                                            message = snackbarMessage
+                                        )
+                                    }
+                                } else {
+                                    chosenPlan = it.accountType
+                                    isPreselectedPlanOnce = true
+                                    onChoosingMonthlyYearlyPlan(isMonthly)
+                                    onChoosingPlanType(it.accountType)
+                                    isClickedCurrentPlan = isCurrentPlan
+                                    hideFloatButton = false
+                                }
                             }
                         },
                         isMonthly = isMonthly,
