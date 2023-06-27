@@ -20,8 +20,8 @@ import mega.privacy.android.data.mapper.meeting.ChatSessionMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingFlagsMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMapper
-import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
@@ -274,11 +274,13 @@ internal class CallRepositoryImpl @Inject constructor(
             fetchScheduledMeetingOccurrencesByChat(
                 chatId,
                 now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
-            ).firstOrNull { occurr ->
-                !occurr.isCancelled && occurr.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
-                        && (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                        || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
-            }
+            )
+                .sortedBy(ChatScheduledMeetingOccurr::startDateTime)
+                .firstOrNull { occurr ->
+                    !occurr.isCancelled
+                            && (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
+                            || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
+                }
         }
 
     override suspend fun createChatroomAndSchedMeeting(

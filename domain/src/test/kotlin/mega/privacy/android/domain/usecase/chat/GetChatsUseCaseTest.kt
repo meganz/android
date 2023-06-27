@@ -24,6 +24,8 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -53,6 +55,8 @@ internal class GetChatsUseCaseTest {
     private val monitorChatCallUpdates = mock<MonitorChatCallUpdates>()
     private val getUserOnlineStatusByHandleUseCase = mock<GetUserOnlineStatusByHandleUseCase>()
     private val getUserEmail = mock<GetContactEmail>()
+    private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates>()
+    private val monitorScheduledMeetingOccurrencesUpdates = mock<MonitorScheduledMeetingOccurrencesUpdates>()
 
     private val lastMessage: suspend (Long) -> String = { "test" }
     private val lastTimeMapper: (Long) -> String = { "test" }
@@ -97,7 +101,9 @@ internal class GetChatsUseCaseTest {
             getChatCall,
             monitorChatCallUpdates,
             getUserOnlineStatusByHandleUseCase,
-            getUserEmail
+            getUserEmail,
+            monitorScheduledMeetingUpdates,
+            monitorScheduledMeetingOccurrencesUpdates,
         )
 
         runBlocking {
@@ -115,6 +121,8 @@ internal class GetChatsUseCaseTest {
             whenever(monitorChatCallUpdates.invoke()).thenReturn(emptyFlow())
             whenever(chatRepository.monitorChatListItemUpdates()).thenReturn(emptyFlow())
             whenever(contactsRepository.monitorChatOnlineStatusUpdates()).thenReturn(emptyFlow())
+            whenever(monitorScheduledMeetingUpdates()).thenReturn(emptyFlow())
+            whenever(monitorScheduledMeetingOccurrencesUpdates()).thenReturn(emptyFlow())
         }
     }
 

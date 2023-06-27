@@ -19,8 +19,11 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingData
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.PushesRepository
@@ -30,6 +33,8 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.GetScheduleMeetingDataUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import javax.inject.Inject
 
 /**
@@ -48,6 +53,8 @@ class GetChatsUseCase @Inject constructor(
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val getUserEmail: GetContactEmail,
+    private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
+    private val monitorScheduledMeetingOccurrencesUpdates: MonitorScheduledMeetingOccurrencesUpdates,
 ) {
 
     /**
@@ -104,6 +111,7 @@ class GetChatsUseCase @Inject constructor(
                     chats.monitorMutedChats(mutex, chatRoomType),
                     chats.monitorChatCalls(mutex, chatRoomType),
                     chats.monitorChatOnlineStatusUpdates(mutex, chatRoomType),
+                    chats.monitorSchedMeetingUpdates(mutex, chatRoomType, meetingTimeMapper),
                     chats.monitorChatUpdates(
                         mutex,
                         chatRoomType,
@@ -180,19 +188,18 @@ class GetChatsUseCase @Inject constructor(
         meetingTimeMapper: (Long, Long) -> String,
     ): ChatRoomItem =
         if (chatRoomType == ChatRoomType.MEETINGS && this is MeetingChatRoomItem) {
-            runCatching { getScheduleMeetingDataUseCase(chatId, meetingTimeMapper) }.getOrNull()
-                ?.let { schedMeetingData ->
-                    copyChatRoomItem(
-                        schedId = schedMeetingData.schedId,
-                        scheduledStartTimestamp = schedMeetingData.scheduledStartTimestamp,
-                        scheduledEndTimestamp = schedMeetingData.scheduledEndTimestamp,
-                        scheduledTimestampFormatted = schedMeetingData.scheduledTimestampFormatted,
-                        isRecurringDaily = schedMeetingData.isRecurringDaily,
-                        isRecurringWeekly = schedMeetingData.isRecurringWeekly,
-                        isRecurringMonthly = schedMeetingData.isRecurringMonthly,
-                        isPending = schedMeetingData.isPending,
-                    )
-                } ?: this
+            getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedMeetingData ->
+                copyChatRoomItem(
+                    schedId = schedMeetingData.schedId,
+                    scheduledStartTimestamp = schedMeetingData.scheduledStartTimestamp,
+                    scheduledEndTimestamp = schedMeetingData.scheduledEndTimestamp,
+                    scheduledTimestampFormatted = schedMeetingData.scheduledTimestampFormatted,
+                    isRecurringDaily = schedMeetingData.isRecurringDaily,
+                    isRecurringWeekly = schedMeetingData.isRecurringWeekly,
+                    isRecurringMonthly = schedMeetingData.isRecurringMonthly,
+                    isPending = schedMeetingData.isPending,
+                )
+            } ?: this
         } else this
 
     private fun MutableMap<Long, ChatRoomItem>.monitorMutedChats(
@@ -238,6 +245,44 @@ class GetChatsUseCase @Inject constructor(
 
                                 if (currentItem != updatedItem) {
                                     put(chatCall.chatId, updatedItem)
+                                }
+                            }
+                        }
+                        values.toList()
+                    }
+                }
+        } else emptyFlow()
+
+    private fun MutableMap<Long, ChatRoomItem>.monitorSchedMeetingUpdates(
+        mutex: Mutex,
+        chatRoomType: ChatRoomType,
+        meetingTimeMapper: (Long, Long) -> String,
+    ): Flow<List<ChatRoomItem>> =
+        if (chatRoomType == ChatRoomType.MEETINGS) {
+            merge(monitorScheduledMeetingUpdates(), monitorScheduledMeetingOccurrencesUpdates())
+                .mapNotNull { update ->
+                    when (update) {
+                        is ResultOccurrenceUpdate -> update.chatId
+                        is ChatScheduledMeeting -> update.chatId
+                        else -> null
+                    }
+                }
+                .filter(::containsKey)
+                .mapNotNull { chatId ->
+                    getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedData ->
+                        mutex.withLock {
+                            get(chatId)?.let { currentItem ->
+                                val newItem = currentItem.copyChatRoomItem(
+                                    schedId = schedData.schedId,
+                                    scheduledStartTimestamp = schedData.scheduledStartTimestamp,
+                                    scheduledEndTimestamp = schedData.scheduledEndTimestamp,
+                                    isRecurringDaily = schedData.isRecurringDaily,
+                                    isRecurringWeekly = schedData.isRecurringWeekly,
+                                    isRecurringMonthly = schedData.isRecurringMonthly,
+                                    isPending = schedData.isPending,
+                                )
+                                if (currentItem != newItem) {
+                                    put(currentItem.chatId, newItem)
                                 }
                             }
                         }
@@ -383,4 +428,10 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun getCurrentCall(chatId: Long): ChatRoomItemStatus =
         runCatching { getChatCall(chatId)?.let(chatRoomItemStatusMapper::invoke) }.getOrNull()
             ?: ChatRoomItemStatus.NotStarted
+
+    private suspend fun getMeetingScheduleData(
+        chatId: Long,
+        meetingTimeMapper: (Long, Long) -> String,
+    ): ScheduledMeetingData? =
+        runCatching { getScheduleMeetingDataUseCase(chatId, meetingTimeMapper) }.getOrNull()
 }

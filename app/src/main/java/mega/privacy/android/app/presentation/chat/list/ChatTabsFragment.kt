@@ -252,7 +252,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun onScrollInProgress(scrolling: Boolean) {
-        LiveEventBus.get<Boolean>(Constants.EVENT_FAB_CHANGE, Boolean::class.java).post(!scrolling)
+        LiveEventBus.get<Boolean>(Constants.EVENT_FAB_CHANGE).post(!scrolling)
     }
 
     private fun buildActionMode(): ActionMode.Callback =
@@ -281,7 +281,10 @@ class ChatTabsFragment : Fragment() {
                     findItem(R.id.menu_chat_select_all)?.isVisible =
                         selectedItems.size != currentItems.size
                     findItem(R.id.menu_chat_leave)?.isVisible =
-                        selectedItems.all { it is ChatRoomItem.GroupChatRoomItem && it.isActive }
+                        selectedItems.all {
+                            it is ChatRoomItem.GroupChatRoomItem
+                                    || it is ChatRoomItem.MeetingChatRoomItem
+                        }
                 }
                 return true
             }

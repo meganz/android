@@ -236,7 +236,7 @@ internal fun ChatItemBottomSheetView(
                 onClick = onArchiveClick
             )
 
-            if (item is ChatRoomItem.GroupChatRoomItem) {
+            if (item is ChatRoomItem.MeetingChatRoomItem) {
                 ChatDivider()
                 MenuItem(
                     modifier = Modifier.testTag("cancel"),
@@ -246,7 +246,7 @@ internal fun ChatItemBottomSheetView(
                     tintRed = true,
                     onClick = onCancelClick
                 )
-            } else if (item is ChatRoomItem.MeetingChatRoomItem) {
+            } else if (item is ChatRoomItem.GroupChatRoomItem) {
                 ChatDivider()
                 MenuItem(
                     modifier = Modifier.testTag("leave"),

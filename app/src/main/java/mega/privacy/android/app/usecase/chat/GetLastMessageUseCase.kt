@@ -189,10 +189,10 @@ class GetLastMessageUseCase @Inject constructor(
     private fun MegaChatCall.getChatCallStatusMessage(isMeeting: Boolean): String =
         when (status) {
             CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                if (isRinging) {
-                    context.getString(R.string.notification_subtitle_incoming)
-                } else if (isMeeting) {
+                if (isMeeting) {
                     context.getString(R.string.meetings_list_ongoing_call_message)
+                } else if (isRinging) {
+                    context.getString(R.string.notification_subtitle_incoming)
                 } else {
                     context.getString(R.string.ongoing_call_messages)
                 }
