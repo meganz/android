@@ -60,10 +60,26 @@ internal class GetChatsUseCaseTest {
     private val headerTimeMapper: (ChatRoomItem, ChatRoomItem?) -> String = { _, _ -> "test" }
 
     private val chatRooms = listOf(
-        CombinedChatRoom(chatId = Random.nextLong(), lastTimestamp = Random.nextLong()),
-        CombinedChatRoom(chatId = Random.nextLong(), lastTimestamp = Random.nextLong()),
-        CombinedChatRoom(chatId = Random.nextLong(), lastTimestamp = Random.nextLong()),
-        CombinedChatRoom(chatId = Random.nextLong(), lastTimestamp = Random.nextLong()),
+        CombinedChatRoom(
+            chatId = 1L,
+            lastTimestamp = Random.nextLong(),
+            isActive = true
+        ),
+        CombinedChatRoom(
+            chatId = 2L,
+            lastTimestamp = Random.nextLong(),
+            isActive = true
+        ),
+        CombinedChatRoom(
+            chatId = 3L,
+            lastTimestamp = Random.nextLong(),
+            isActive = true
+        ),
+        CombinedChatRoom(
+            chatId = 4L,
+            lastTimestamp = Random.nextLong(),
+            isActive = true
+        ),
     )
 
     @Before

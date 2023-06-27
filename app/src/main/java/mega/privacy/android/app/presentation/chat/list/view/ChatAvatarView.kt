@@ -29,13 +29,16 @@ import coil.request.ImageRequest
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
+import timber.log.Timber
 
 /**
- * Avatar view for a [ChatRoomItem]
+ * Avatar view for a list of [ChatAvatarItem]
  *
  * @param modifier
  * @param avatars
@@ -72,7 +75,8 @@ fun ChatAvatarView(
                     avatarColor = avatars.last().color,
                     modifier = Modifier
                         .size(26.dp)
-                        .align(Alignment.BottomEnd),
+                        .align(Alignment.BottomEnd)
+                        .border(1.dp, MaterialTheme.colors.white_black, CircleShape),
                 )
                 ChatAvatarView(
                     avatarUri = avatars.first().uri,
@@ -80,7 +84,8 @@ fun ChatAvatarView(
                     avatarColor = avatars.first().color,
                     modifier = Modifier
                         .size(26.dp)
-                        .align(Alignment.TopStart),
+                        .align(Alignment.TopStart)
+                        .border(1.dp, MaterialTheme.colors.white_black, CircleShape),
                 )
             }
         }
@@ -105,6 +110,7 @@ fun ChatAvatarView(
     avatarTimestamp: Long? = null,
 ) {
     val color = avatarColor?.let(::Color) ?: MaterialTheme.colors.grey_alpha_012_white_alpha_012
+    var loadingError by remember { mutableStateOf(false) }
     when {
         avatarUri.isNullOrBlank() && avatarPlaceholder.isNullOrBlank() && avatarColor == null -> {
             AvatarPlaceholderView(
@@ -122,7 +128,7 @@ fun ChatAvatarView(
             )
         }
 
-        avatarUri.isNullOrBlank() -> {
+        loadingError || avatarUri.isNullOrBlank() -> {
             AvatarPlaceholderView(
                 char = avatarPlaceholder?.let(::getAvatarFirstLetter) ?: "U",
                 backgroundColor = color,
@@ -134,12 +140,12 @@ fun ChatAvatarView(
 
         else -> {
             AvatarImageView(
-                avatarUri = avatarUri,
-                placeholderColor = color,
-                avatarTimestamp = avatarTimestamp,
                 modifier = modifier
                     .fillMaxSize()
                     .clip(CircleShape),
+                avatarUri = avatarUri,
+                avatarTimestamp = avatarTimestamp,
+                onLoadingError = { loadingError = true }
             )
         }
     }
@@ -184,23 +190,22 @@ private fun AvatarPlaceholderView(
 private fun AvatarImageView(
     modifier: Modifier = Modifier,
     avatarUri: String,
-    placeholderColor: Color,
     avatarTimestamp: Long? = null,
+    onLoadingError: () -> Unit,
 ) {
-    var showPlaceHolder by remember { mutableStateOf(true) }
     AsyncImage(
-        modifier = modifier.placeholder(
-            visible = showPlaceHolder,
-            color = placeholderColor,
-            shape = CircleShape,
-            highlight = PlaceholderHighlight.fade(Color.White),
-        ),
+        modifier = modifier,
+        contentDescription = "User avatar",
         model = ImageRequest.Builder(LocalContext.current)
             .setParameter("timestamp", avatarTimestamp)
+            .error(R.drawable.ic_avatar_placeholder)
+            .crossfade(true)
             .data(avatarUri)
             .build(),
-        contentDescription = "User avatar",
-        onSuccess = { showPlaceHolder = false }
+        onError = { error ->
+            Timber.w(error.result.throwable, "AvatarImageView")
+            onLoadingError()
+        }
     )
 }
 

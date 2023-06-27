@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity.chat
 
+import java.time.Duration
+import java.time.Instant
+
 /**
  * Chat Room Item Status
  *
@@ -27,4 +30,17 @@ sealed class ChatRoomItemStatus constructor(
      * @property callStartTimestamp     Call start timestamp
      */
     class Joined(callStartTimestamp: Long?) : ChatRoomItemStatus(callStartTimestamp)
+
+    /**
+     * Get call duration based on current Status
+     *
+     * @return  Call duration in seconds
+     */
+    fun getDuration(): Long? =
+        callStartTimestamp?.let { timesTamp ->
+            Duration.between(
+                Instant.ofEpochSecond(timesTamp),
+                Instant.now()
+            ).seconds
+        }
 }

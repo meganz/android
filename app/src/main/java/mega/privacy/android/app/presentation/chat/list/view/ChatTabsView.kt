@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 
@@ -43,6 +44,7 @@ fun ChatTabsView(
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
+    onScrollInProgress: (Boolean) -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
@@ -60,6 +62,7 @@ fun ChatTabsView(
                 Tab(
                     text = { Text(text = stringResource(id = item.titleStringRes)) },
                     selected = pagerState.currentPage == index,
+                    unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                     onClick = {
                         if (pagerState.currentPage != index) {
                             coroutineScope.launch { pagerState.animateScrollToPage(index) }
@@ -90,6 +93,7 @@ fun ChatTabsView(
                     onItemClick = onItemClick,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
+                    onScrollInProgress = onScrollInProgress,
                 )
             }
         }

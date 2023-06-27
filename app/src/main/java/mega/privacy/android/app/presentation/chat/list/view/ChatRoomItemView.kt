@@ -17,6 +17,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,6 +39,7 @@ import androidx.constraintlayout.compose.Visibility
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
@@ -41,7 +47,9 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
+import java.util.concurrent.TimeUnit
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Chat room item view
@@ -49,7 +57,6 @@ import kotlin.random.Random
  * @param item                  [ChatRoomItem]
  * @param isSelected
  * @param isSelectionEnabled
- * @param timestampUpdate
  * @param onItemClick
  * @param onItemMoreClick
  * @param onItemSelected
@@ -60,12 +67,15 @@ internal fun ChatRoomItemView(
     item: ChatRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
-    timestampUpdate: Int?,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
+    val hasOngoingCall = item.hasOngoingCall()
+    val isLoading = item.lastTimestampFormatted.isNullOrBlank()
+    var callDuration by remember { mutableStateOf<Long>(0) }
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,12 +147,19 @@ internal fun ChatRoomItemView(
             color = MaterialTheme.colors.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.constrainAs(titleText) {
-                linkTo(avatarImage.end, parent.end, 16.dp, 56.dp, 72.dp, 0.dp, 0f)
-                top.linkTo(parent.top)
-                bottom.linkTo(middleText.top)
-                width = Dimension.preferredWrapContent
-            },
+            modifier = Modifier
+                .constrainAs(titleText) {
+                    linkTo(avatarImage.end, parent.end, 16.dp, 56.dp, 72.dp, 0.dp, 0f)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(middleText.top)
+                    width = Dimension.preferredWrapContent
+                }
+                .placeholder(
+                    color = Color.LightGray,
+                    shape = RoundedCornerShape(4.dp),
+                    highlight = PlaceholderHighlight.fade(Color.White),
+                    visible = isLoading,
+                ),
         )
 
         val userStatus = item.getIndividualUserStatus()
@@ -211,7 +228,7 @@ internal fun ChatRoomItemView(
                     start.linkTo(recurringIcon.end, 2.dp, 4.dp)
                     top.linkTo(titleText.top)
                     bottom.linkTo(titleText.bottom)
-                    visibility = if (item.hasOngoingCall())
+                    visibility = if (hasOngoingCall)
                         Visibility.Visible
                     else
                         Visibility.Gone
@@ -256,13 +273,12 @@ internal fun ChatRoomItemView(
                 bottom.linkTo(bottomText.top, 5.dp)
                 width = Dimension.preferredWrapContent
             },
-            timestampUpdate = timestampUpdate,
+            isLoading = isLoading,
             lastMessage = item.lastMessage,
             isPending = item is MeetingChatRoomItem && item.isPending,
             scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
             highlight = item.highlight,
-            hasOngoingCall = item.hasOngoingCall(),
-            callDuration = item.getCallDuration(),
+            callDuration = callDuration,
             isRecurringDaily = item is MeetingChatRoomItem && item.isRecurringDaily,
             isRecurringWeekly = item is MeetingChatRoomItem && item.isRecurringWeekly,
             isRecurringMonthly = item is MeetingChatRoomItem && item.isRecurringMonthly,
@@ -282,13 +298,12 @@ internal fun ChatRoomItemView(
                 bottom.linkTo(parent.bottom)
                 top.linkTo(middleText.bottom, 4.dp)
             },
-            timestampUpdate = timestampUpdate,
+            isLoading = isLoading,
             isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
             isPending = item is MeetingChatRoomItem && item.isPending,
             highlight = item.highlight,
             lastTimestamp = item.lastTimestampFormatted,
-            hasOngoingCall = item.hasOngoingCall(),
-            callDuration = item.getCallDuration(),
+            callDuration = callDuration,
             lastMessage = item.lastMessage,
         )
 
@@ -323,6 +338,15 @@ internal fun ChatRoomItemView(
             },
         )
 
+        LaunchedEffect(hasOngoingCall) {
+            callDuration = item.currentCallStatus?.getDuration() ?: 0
+            while (hasOngoingCall) {
+                delay(1.seconds)
+                callDuration++
+            }
+            callDuration = 0
+        }
+
         createVerticalChain(
             titleText,
             middleText,
@@ -335,13 +359,12 @@ internal fun ChatRoomItemView(
 @Composable
 private fun MiddleTextView(
     modifier: Modifier,
-    timestampUpdate: Int?,
+    isLoading: Boolean,
     lastMessage: String?,
     isPending: Boolean,
     scheduledTimestamp: String?,
     highlight: Boolean,
-    hasOngoingCall: Boolean,
-    callDuration: String?,
+    callDuration: Long,
     isRecurringDaily: Boolean,
     isRecurringWeekly: Boolean,
     isRecurringMonthly: Boolean,
@@ -367,8 +390,8 @@ private fun MiddleTextView(
                 else -> scheduledTimestamp
             }
 
-        timestampUpdate != null && !isPending && hasOngoingCall ->
-            "$lastMessage · $callDuration"
+        !isPending && callDuration != 0L ->
+            "$lastMessage · ${callDuration.formatCallTime()}"
 
         else ->
             lastMessage
@@ -386,25 +409,26 @@ private fun MiddleTextView(
         style = MaterialTheme.typography.subtitle2,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier.placeholder(
-            color = Color.LightGray,
-            shape = RoundedCornerShape(4.dp),
-            highlight = PlaceholderHighlight.fade(Color.White),
-            visible = textMessage.isNullOrBlank(),
-        ),
+        modifier = modifier
+            .padding(vertical = if (isLoading) 2.dp else 0.dp)
+            .placeholder(
+                color = Color.LightGray,
+                shape = RoundedCornerShape(4.dp),
+                highlight = PlaceholderHighlight.fade(Color.White),
+                visible = isLoading,
+            ),
     )
 }
 
 @Composable
 private fun BottomTextView(
     modifier: Modifier,
-    timestampUpdate: Int?,
+    isLoading: Boolean,
     isRecurring: Boolean,
     isPending: Boolean,
     highlight: Boolean,
     lastTimestamp: String?,
-    hasOngoingCall: Boolean,
-    callDuration: String?,
+    callDuration: Long,
     lastMessage: String?,
 ) {
     val textColor: Color
@@ -430,27 +454,30 @@ private fun BottomTextView(
         }
     }
 
-    if (timestampUpdate != null && isPending && !textMessage.isNullOrBlank() && hasOngoingCall) {
-        textMessage = "$textMessage · $callDuration"
-    }
+    if (isPending && !textMessage.isNullOrBlank() && callDuration != 0L)
+        textMessage = "$textMessage · ${callDuration.formatCallTime()}"
 
-    val showPlaceholder = textMessage.isNullOrBlank()
     Text(
         text = textMessage ?: stringResource(R.string.error_message_unrecognizable),
         color = textColor,
         style = MaterialTheme.typography.caption,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier
-            .padding(top = if (showPlaceholder) 4.dp else 0.dp)
-            .placeholder(
-                color = Color.LightGray,
-                shape = RoundedCornerShape(4.dp),
-                highlight = PlaceholderHighlight.fade(Color.White),
-                visible = showPlaceholder,
-            ),
+        modifier = modifier.placeholder(
+            color = Color.LightGray,
+            shape = RoundedCornerShape(4.dp),
+            highlight = PlaceholderHighlight.fade(Color.White),
+            visible = isLoading,
+        ),
     )
 }
+
+private fun Long.formatCallTime() =
+    String.format(
+        "%02d:%02d",
+        TimeUnit.SECONDS.toMinutes(this) % 60,
+        TimeUnit.SECONDS.toSeconds(this) % 60
+    )
 
 @CombinedThemePreviews
 @Composable
@@ -471,7 +498,6 @@ private fun PreviewChatRoomItemView() {
         item = meeting,
         isSelected = Random.nextBoolean(),
         isSelectionEnabled = Random.nextBoolean(),
-        timestampUpdate = 0,
         onItemClick = {},
         onItemMoreClick = {},
     ) {}

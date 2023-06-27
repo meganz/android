@@ -70,8 +70,6 @@ class GetChatsUseCase @Inject constructor(
         ARCHIVED_CHATS
     }
 
-    lateinit var chatRoomType: ChatRoomType
-
     /**
      * Retrieve a flow of updated [ChatRoomItem]
      *
@@ -89,27 +87,39 @@ class GetChatsUseCase @Inject constructor(
         headerTimeMapper: (ChatRoomItem, ChatRoomItem?) -> String?,
     ): Flow<List<ChatRoomItem>> =
         flow {
-            this@GetChatsUseCase.chatRoomType = chatRoomType
-
             val mutex = Mutex()
             val chats = mutableMapOf<Long, ChatRoomItem>()
 
-            emit(chats.addChatRooms())
+            emit(chats.addChatRooms(chatRoomType))
 
             emitAll(
                 merge(
-                    chats.updateFields(mutex, lastMessage, lastTimeMapper, meetingTimeMapper),
-                    chats.monitorMutedChats(mutex),
-                    chats.monitorChatCalls(mutex),
-                    chats.monitorChatOnlineStatusUpdates(mutex),
-                    chats.monitorChatUpdates(mutex, lastMessage, lastTimeMapper, meetingTimeMapper),
+                    chats.updateFields(
+                        mutex,
+                        chatRoomType,
+                        lastMessage,
+                        lastTimeMapper,
+                        meetingTimeMapper
+                    ),
+                    chats.monitorMutedChats(mutex, chatRoomType),
+                    chats.monitorChatCalls(mutex, chatRoomType),
+                    chats.monitorChatOnlineStatusUpdates(mutex, chatRoomType),
+                    chats.monitorChatUpdates(
+                        mutex,
+                        chatRoomType,
+                        lastMessage,
+                        lastTimeMapper,
+                        meetingTimeMapper
+                    ),
                 ).mapLatest {
-                    it.sorted().addHeaders(headerTimeMapper)
+                    it.sorted(chatRoomType).addHeaders(chatRoomType, headerTimeMapper)
                 }
             )
         }
 
-    private suspend fun MutableMap<Long, ChatRoomItem>.addChatRooms(): List<ChatRoomItem> =
+    private suspend fun MutableMap<Long, ChatRoomItem>.addChatRooms(
+        chatRoomType: ChatRoomType,
+    ): List<ChatRoomItem> =
         when (chatRoomType) {
             ChatRoomType.MEETINGS -> chatRepository.getMeetingChatRooms()
             ChatRoomType.NON_MEETINGS -> chatRepository.getNonMeetingChatRooms()
@@ -117,13 +127,16 @@ class GetChatsUseCase @Inject constructor(
         }
             .sortedByDescending(CombinedChatRoom::lastTimestamp)
             .forEach { chatRoom ->
-                if (chatRoomType == ChatRoomType.ARCHIVED_CHATS || !chatRoom.isArchived) {
+                if (chatRoomType == ChatRoomType.ARCHIVED_CHATS
+                    || (!chatRoom.isArchived && chatRoom.isActive)
+                ) {
                     put(chatRoom.chatId, chatRoomItemMapper(chatRoom))
                 }
             }.let { values.toList() }
 
     private fun MutableMap<Long, ChatRoomItem>.updateFields(
         mutex: Mutex,
+        chatRoomType: ChatRoomType,
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
@@ -138,7 +151,7 @@ class GetChatsUseCase @Inject constructor(
                     emit(values.toList())
                 }
 
-                val meetingItem = updatedItem.updateMeetingFields(meetingTimeMapper)
+                val meetingItem = updatedItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
                 if (updatedItem != meetingItem) {
                     mutex.withLock {
                         put(currentItem.chatId, meetingItem)
@@ -163,9 +176,10 @@ class GetChatsUseCase @Inject constructor(
     )
 
     private suspend fun ChatRoomItem.updateMeetingFields(
+        chatRoomType: ChatRoomType,
         meetingTimeMapper: (Long, Long) -> String,
     ): ChatRoomItem =
-        if (chatRoomType != ChatRoomType.ARCHIVED_CHATS && this is MeetingChatRoomItem) {
+        if (chatRoomType == ChatRoomType.MEETINGS && this is MeetingChatRoomItem) {
             runCatching { getScheduleMeetingDataUseCase(chatId, meetingTimeMapper) }.getOrNull()
                 ?.let { schedMeetingData ->
                     copyChatRoomItem(
@@ -181,7 +195,10 @@ class GetChatsUseCase @Inject constructor(
                 } ?: this
         } else this
 
-    private fun MutableMap<Long, ChatRoomItem>.monitorMutedChats(mutex: Mutex): Flow<List<ChatRoomItem>> =
+    private fun MutableMap<Long, ChatRoomItem>.monitorMutedChats(
+        mutex: Mutex,
+        chatRoomType: ChatRoomType,
+    ): Flow<List<ChatRoomItem>> =
         if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
             pushesRepository.monitorPushNotificationSettings().mapNotNull {
                 var listUpdated = false
@@ -204,7 +221,10 @@ class GetChatsUseCase @Inject constructor(
             }
         } else emptyFlow()
 
-    private fun MutableMap<Long, ChatRoomItem>.monitorChatCalls(mutex: Mutex): Flow<List<ChatRoomItem>> =
+    private fun MutableMap<Long, ChatRoomItem>.monitorChatCalls(
+        mutex: Mutex,
+        chatRoomType: ChatRoomType,
+    ): Flow<List<ChatRoomItem>> =
         if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
             monitorChatCallUpdates()
                 .filter { containsKey(it.chatId) }
@@ -228,31 +248,31 @@ class GetChatsUseCase @Inject constructor(
 
     private fun MutableMap<Long, ChatRoomItem>.monitorChatUpdates(
         mutex: Mutex,
+        chatRoomType: ChatRoomType,
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
     ): Flow<List<ChatRoomItem>> =
         chatRepository.monitorChatListItemUpdates().mapNotNull { chatListItem ->
             if (((chatRoomType == ChatRoomType.ARCHIVED_CHATS && !chatListItem.isArchived) ||
-                        chatListItem.isArchived) || chatListItem.isDeleted ||
-                chatListItem.changes == ChatListItemChanges.Deleted ||
+                        chatListItem.isArchived) || chatListItem.isDeleted || !chatListItem.isActive
+                || chatListItem.changes == ChatListItemChanges.Deleted ||
                 chatListItem.changes == ChatListItemChanges.Closed
             ) {
                 mutex.withLock { remove(chatListItem.chatId) }
                 return@mapNotNull values.toList()
-            } else if (chatRoomType == ChatRoomType.ARCHIVED_CHATS)
-                return@mapNotNull values.toList()
+            }
 
             delay(500) // Required to wait for new SDK values
 
             chatRepository.getCombinedChatRoom(chatListItem.chatId)
                 ?.takeIf {
-                    it.isMeeting && chatRoomType == ChatRoomType.MEETINGS
-                            || !it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS
+                    (it.isMeeting && chatRoomType == ChatRoomType.MEETINGS)
+                            || (!it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS)
                 }
-                ?.let(chatRoomItemMapper::invoke)
+                ?.let { chatRoomItemMapper.invoke(it) }
                 ?.updateChatFields(getLastMessage, lastTimeMapper)
-                ?.updateMeetingFields(meetingTimeMapper)
+                ?.updateMeetingFields(chatRoomType, meetingTimeMapper)
                 ?.let { newItem ->
                     mutex.withLock {
                         if (newItem != get(chatListItem.chatId)) {
@@ -265,6 +285,7 @@ class GetChatsUseCase @Inject constructor(
 
     private fun MutableMap<Long, ChatRoomItem>.monitorChatOnlineStatusUpdates(
         mutex: Mutex,
+        chatRoomType: ChatRoomType,
     ): Flow<List<ChatRoomItem>> =
         if (chatRoomType != ChatRoomType.ARCHIVED_CHATS) {
             contactsRepository.monitorChatOnlineStatusUpdates().mapNotNull { update ->
@@ -287,7 +308,7 @@ class GetChatsUseCase @Inject constructor(
             }
         } else emptyFlow()
 
-    private fun List<ChatRoomItem>.sorted(): List<ChatRoomItem> =
+    private fun List<ChatRoomItem>.sorted(chatRoomType: ChatRoomType): List<ChatRoomItem> =
         if (chatRoomType == ChatRoomType.MEETINGS) {
             sortedWith { firstItem, secondItem ->
                 when {
@@ -320,6 +341,7 @@ class GetChatsUseCase @Inject constructor(
         }
 
     private fun List<ChatRoomItem>.addHeaders(
+        chatRoomType: ChatRoomType,
         headerTimeMapper: (ChatRoomItem, ChatRoomItem?) -> String?,
     ): List<ChatRoomItem> =
         if (chatRoomType == ChatRoomType.MEETINGS) {

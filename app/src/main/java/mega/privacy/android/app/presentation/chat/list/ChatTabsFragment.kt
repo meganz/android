@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.chat.ChatScreenInfo
@@ -85,6 +86,7 @@ class ChatTabsFragment : Fragment() {
                         onItemClick = ::onItemClick,
                         onItemMoreClick = ::onItemMoreClick,
                         onItemSelected = ::onItemSelected,
+                        onScrollInProgress = ::onScrollInProgress,
                     )
                 }
             }
@@ -247,6 +249,10 @@ class ChatTabsFragment : Fragment() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
         )
+    }
+
+    private fun onScrollInProgress(scrolling: Boolean) {
+        LiveEventBus.get<Boolean>(Constants.EVENT_FAB_CHANGE, Boolean::class.java).post(!scrolling)
     }
 
     private fun buildActionMode(): ActionMode.Callback =

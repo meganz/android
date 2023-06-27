@@ -6,7 +6,7 @@ import android.text.format.DateUtils.FORMAT_12HOUR
 import android.text.format.DateUtils.FORMAT_24HOUR
 import android.text.format.DateUtils.FORMAT_SHOW_TIME
 import android.text.format.DateUtils.FORMAT_SHOW_WEEKDAY
-import android.text.format.DateUtils.MINUTE_IN_MILLIS
+import android.text.format.DateUtils.HOUR_IN_MILLIS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.data.gateway.DeviceGateway
@@ -41,23 +41,27 @@ class ChatRoomTimestampMapper @Inject constructor(
     fun getLastTimeFormatted(
         timeStamp: Long,
     ): String {
-        val timestampInstant = Instant.ofEpochSecond(timeStamp)
         val nowInstant = Instant.now()
-        val differenceInDays = Duration.between(timestampInstant, nowInstant).toDays().absoluteValue
+        val timestampInstant = Instant.ofEpochSecond(timeStamp)
 
-        return if (differenceInDays <= 7) {
-            DateUtils.getRelativeTimeSpanString(
-                timestampInstant.toEpochMilli(),
-                nowInstant.toEpochMilli(),
-                MINUTE_IN_MILLIS,
-                FORMAT_SHOW_WEEKDAY or FORMAT_SHOW_TIME
-                        or if (is24HourFormat) FORMAT_24HOUR else FORMAT_12HOUR
-            ).toString()
-        } else {
-            DateTimeFormatter
-                .ofPattern(dateFormat)
-                .withZone(ZoneId.systemDefault())
-                .format(timestampInstant)
+        return when {
+            DateUtils.isToday(timestampInstant.toEpochMilli()) ->
+                "${context.getString(R.string.label_today)} ${timestampInstant.getFormattedHour()}"
+
+            Duration.between(timestampInstant, nowInstant).toDays().absoluteValue <= 7 ->
+                DateUtils.getRelativeTimeSpanString(
+                    timestampInstant.toEpochMilli(),
+                    nowInstant.toEpochMilli(),
+                    HOUR_IN_MILLIS,
+                    FORMAT_SHOW_WEEKDAY or FORMAT_SHOW_TIME
+                            or if (is24HourFormat) FORMAT_24HOUR else FORMAT_12HOUR
+                ).toString()
+
+            else ->
+                DateTimeFormatter
+                    .ofPattern(dateFormat)
+                    .withZone(ZoneId.systemDefault())
+                    .format(timestampInstant)
         }
     }
 

@@ -1,9 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.contacts.UserStatus
-import java.time.Duration
-import java.time.Instant
-import java.util.concurrent.TimeUnit
 
 /**
  * Chat room item
@@ -260,29 +257,6 @@ sealed class ChatRoomItem(
         is GroupChatRoomItem -> avatars
         is MeetingChatRoomItem -> avatars
     }
-
-    /**
-     * Get call duration for the current chat
-     *
-     * @return  Formatted call duration
-     */
-    fun getCallDuration(): String? =
-        when (currentCallStatus) {
-            is ChatRoomItemStatus.Joined -> (currentCallStatus as ChatRoomItemStatus.Joined).callStartTimestamp
-            is ChatRoomItemStatus.NotJoined -> (currentCallStatus as ChatRoomItemStatus.NotJoined).callStartTimestamp
-            else -> null
-        }?.let { timestamp ->
-            Duration.between(
-                Instant.ofEpochSecond(timestamp),
-                Instant.now()
-            ).seconds
-        }?.let { duration ->
-            String.format(
-                "%02d:%02d",
-                TimeUnit.SECONDS.toMinutes(duration) % 60,
-                TimeUnit.SECONDS.toSeconds(duration) % 60
-            )
-        }
 
     /**
      * Returns a copy of this chat room item with the provided parameters.

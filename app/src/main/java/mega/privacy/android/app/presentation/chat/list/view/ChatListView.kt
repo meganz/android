@@ -19,13 +19,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.MegaEmptyView
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import java.util.Locale
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun ChatListView(
@@ -37,6 +36,7 @@ fun ChatListView(
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
+    onScrollInProgress: (Boolean) -> Unit = {},
 ) {
     if (items.isEmpty()) {
         EmptyView(modifier = modifier)
@@ -50,6 +50,7 @@ fun ChatListView(
             onItemMoreClick = onItemMoreClick,
             onItemSelected = onItemSelected,
             onFirstItemVisible = onFirstItemVisible,
+            onScrollInProgress = onScrollInProgress,
         )
     }
 }
@@ -64,10 +65,10 @@ private fun ListView(
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,
+    onScrollInProgress: (Boolean) -> Unit,
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
-    var tick by remember { mutableStateOf(0) }
 
     LazyColumn(
         state = listState,
@@ -88,7 +89,6 @@ private fun ListView(
                 item = item,
                 isSelected = selectionEnabled && selectedIds.contains(item.chatId),
                 isSelectionEnabled = selectionEnabled,
-                timestampUpdate = tick.takeIf { item.hasOngoingCall() },
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
                 onItemSelected = onItemSelected,
@@ -97,8 +97,10 @@ private fun ListView(
     }
 
     LaunchedEffect(listState) {
+        snapshotFlow { listState.isScrollInProgress }
+            .collectLatest(onScrollInProgress)
         snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { onFirstItemVisible(it == 0) }
+            .collectLatest { onFirstItemVisible(it == 0) }
     }
 
     LaunchedEffect(scrollToTop) {
@@ -107,13 +109,6 @@ private fun ListView(
 
     LaunchedEffect(selectedIds) {
         selectionEnabled = selectedIds.isNotEmpty()
-    }
-
-    LaunchedEffect(items) {
-        while (items.any(ChatRoomItem::hasOngoingCall)) {
-            delay(1.seconds)
-            tick++
-        }
     }
 }
 
