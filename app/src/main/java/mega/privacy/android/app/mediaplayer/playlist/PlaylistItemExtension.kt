@@ -2,7 +2,7 @@ package mega.privacy.android.app.mediaplayer.playlist
 
 import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_PREVIOUS
+import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_PREVIOUS
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
@@ -74,6 +74,7 @@ fun PlaylistItem.getHeaderName(
             } else {
                 R.string.media_player_video_playlist_previous
             }
+
             else -> {
                 if (paused) {
                     R.string.audio_player_now_playing_paused

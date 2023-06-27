@@ -50,6 +50,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
@@ -140,9 +141,10 @@ class VideoPlayerActivity : MediaPlayerActivity() {
          * Called after a successful bind with our AudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MediaPlayerServiceBinder && service.serviceGateway is VideoPlayerServiceGateway) {
-                serviceGateway = service.serviceGateway
-                playerServiceGateway = service.playerServiceViewModelGateway
+            if (service is MediaPlayerServiceBinder) {
+                serviceGateway = service.serviceGateway as? VideoPlayerServiceGateway
+                playerServiceGateway =
+                    service.playerServiceViewModelGateway as? VideoPlayerServiceViewModelGateway
 
                 refreshMenuOptionsVisibility()
 
@@ -152,26 +154,28 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                     )
                 }
 
-                collectFlow(service.serviceGateway.videoSizeUpdate()) { (width, height) ->
-                    val rotationMode = Settings.System.getInt(
-                        contentResolver,
-                        ACCELEROMETER_ROTATION,
-                        SCREEN_BRIGHTNESS_MODE_MANUAL
-                    )
+                serviceGateway?.let {
+                    collectFlow(it.videoSizeUpdate()) { (width, height) ->
+                        val rotationMode = Settings.System.getInt(
+                            contentResolver,
+                            ACCELEROMETER_ROTATION,
+                            SCREEN_BRIGHTNESS_MODE_MANUAL
+                        )
 
-                    currentOrientation =
-                        if (width > height) {
-                            SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                        } else {
-                            SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                        }
+                        currentOrientation =
+                            if (width > height) {
+                                SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                            } else {
+                                SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                            }
 
-                    requestedOrientation =
-                        if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                            SCREEN_ORIENTATION_SENSOR
-                        } else {
-                            currentOrientation
-                        }
+                        requestedOrientation =
+                            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                                SCREEN_ORIENTATION_SENSOR
+                            } else {
+                                currentOrientation
+                            }
+                    }
                 }
 
                 collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { errorCode ->

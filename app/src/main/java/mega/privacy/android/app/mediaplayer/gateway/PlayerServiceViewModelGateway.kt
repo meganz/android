@@ -2,13 +2,9 @@ package mega.privacy.android.app.mediaplayer.gateway
 
 import android.content.Intent
 import androidx.lifecycle.LiveData
-import com.google.android.exoplayer2.source.ShuffleOrder
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
-import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
-import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
-import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import java.io.File
 
 /**
@@ -81,20 +77,6 @@ interface PlayerServiceViewModelGateway {
     fun getPlaylistItems(): List<PlaylistItem>
 
     /**
-     * Is the audio player
-     *
-     * @return true is audio player, otherwise is false
-     */
-    fun isAudioPlayer(): Boolean
-
-    /**
-     * Set the current player whether is audio player
-     *
-     * @param isAudioPlayer true is audio player, otherwise is false
-     */
-    fun setAudioPlayer(isAudioPlayer: Boolean)
-
-    /**
      * Update when media playback is changed
      *
      * @return Flow<Boolean>
@@ -128,21 +110,6 @@ interface PlayerServiceViewModelGateway {
      * @return Flow<Boolean>
      */
     fun actionModeUpdate(): Flow<Boolean>
-
-    /**
-     * Toggle backgroundPlayEnabled
-     *
-     * @param isEnable true is enable, otherwise is disable
-     * @return backgroundPlayEnabled after toggled
-     */
-    fun toggleBackgroundPlay(isEnable: Boolean): Boolean
-
-    /**
-     * Get background play if is enable
-     *
-     * @return true is enabled, otherwise is false.
-     */
-    fun backgroundPlayEnabled(): Boolean
 
     /**
      * Remove the selected items
@@ -213,62 +180,6 @@ interface PlayerServiceViewModelGateway {
     fun isPaused(): Boolean
 
     /**
-     * Judge the shuffle if is enabled
-     *
-     * @return true is enabled, otherwise is false.
-     */
-    fun shuffleEnabled(): Boolean
-
-    /**
-     * Get the shuffle order
-     *
-     * @return ShuffleOrder
-     */
-    fun getShuffleOrder(): ShuffleOrder
-
-    /**
-     * Get audio repeat Mode
-     *
-     * @return RepeatToggleMode
-     */
-    fun audioRepeatToggleMode(): RepeatToggleMode
-
-    /**
-     * Get video repeat Mode
-     *
-     * @return RepeatToggleMode
-     */
-    fun videoRepeatToggleMode(): RepeatToggleMode
-
-    /**
-     * Set repeat mode for audio
-     *
-     * @param repeatToggleMode RepeatToggleMode
-     */
-    fun setAudioRepeatMode(repeatToggleMode: RepeatToggleMode)
-
-    /**
-     * Set repeat mode for video
-     *
-     * @param repeatToggleMode RepeatToggleMode
-     */
-    fun setVideoRepeatMode(repeatToggleMode: RepeatToggleMode)
-
-    /**
-     * Set shuffle enable
-     *
-     * @param enabled true is enabled, otherwise is false
-     */
-    fun setShuffleEnabled(enabled: Boolean)
-
-    /**
-     * Generate the new shuffle order
-     *
-     * @return new shuffle order
-     */
-    fun newShuffleOrder(): ShuffleOrder
-
-    /**
      * Set paused
      * @param paused the paused state
      */
@@ -336,44 +247,4 @@ interface PlayerServiceViewModelGateway {
      * Reset retry state
      */
     fun resetRetryState()
-
-    /**
-     * Track the playback information
-     *
-     * @param getCurrentPlaybackInformation get current playback information
-     */
-    suspend fun trackPlayback(getCurrentPlaybackInformation: () -> PlaybackInformation)
-
-    /**
-     * Save the playback times
-     */
-    suspend fun savePlaybackTimes()
-
-    /**
-     * Delete playback information
-     *
-     * @param mediaId the media id of deleted item
-     */
-    suspend fun deletePlaybackInformation(mediaId: Long)
-
-    /**
-     * Monitor playback times
-     *
-     * @param mediaId the media id of target media item
-     * @param seekToPosition the callback for seek to playback position history. If the current item contains the playback history,
-     * then invoke the callback and the playback position history is parameter
-     */
-    suspend fun monitorPlaybackTimes(mediaId: Long?, seekToPosition: (positionInMs: Long?) -> Unit)
-
-    /**
-     * Get the subtitle file info that is same name as playing media item
-     *
-     * @return SubtitleFileInfo
-     */
-    suspend fun getMatchedSubtitleFileInfoForPlayingItem(): SubtitleFileInfo?
-
-    /**
-     * Send VideoPlayerActivatedEvent
-     */
-    fun sendVideoPlayerActivatedEvent()
 }

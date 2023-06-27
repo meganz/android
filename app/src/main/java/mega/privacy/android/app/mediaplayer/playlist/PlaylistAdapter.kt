@@ -14,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ListAdapter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemPlaylistBinding
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_PLAYING
 
 /**
  * RecyclerView adapter for playlist screen.
@@ -141,5 +140,20 @@ class PlaylistAdapter(
          * Animation duration
          */
         const val ANIMATION_DURATION = 250L
+
+        /**
+         * The previous type of media item
+         */
+        const val TYPE_PREVIOUS = 1
+
+        /**
+         * The playing type playing media item
+         */
+        const val TYPE_PLAYING = 2
+
+        /**
+         * The next type next media item
+         */
+        const val TYPE_NEXT = 3
     }
 }

@@ -33,14 +33,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
+import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
-import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
@@ -68,7 +67,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      * ServiceViewModelGateway
      */
     @Inject
-    lateinit var viewModelGateway: PlayerServiceViewModelGateway
+    lateinit var viewModelGateway: AudioPlayerServiceViewModelGateway
 
     /**
      * CrashReporter
@@ -137,7 +136,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     override fun onCreate() {
         super.onCreate()
-        viewModelGateway.setAudioPlayer(true)
         audioManager = (getSystemService(AUDIO_SERVICE) as AudioManager)
         audioFocusRequest = getRequest(audioFocusListener, AUDIOFOCUS_DEFAULT)
         createPlayer()
@@ -381,7 +379,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
     override fun setPlayWhenReady(playWhenReady: Boolean) {
         if (!playWhenReady) {
             mediaPlayerGateway.setPlayWhenReady(false)
-        } else if (CallUtil.participatingInACall()) {
+        } else if (participatingInACall()) {
             LiveEventBus.get(Constants.EVENT_NOT_ALLOW_PLAY, Boolean::class.java)
                 .post(true)
         } else {

@@ -69,7 +69,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MAN
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
@@ -108,11 +108,11 @@ class SettingsFragment :
             }
         }
 
-    private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
+    private var playerServiceViewModelGateway: AudioPlayerServiceViewModelGateway? = null
     private val mediaServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             playerServiceViewModelGateway =
-                (service as? MediaPlayerServiceBinder)?.playerServiceViewModelGateway
+                (service as? MediaPlayerServiceBinder)?.playerServiceViewModelGateway as? AudioPlayerServiceViewModelGateway
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {

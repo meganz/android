@@ -9,7 +9,7 @@
 
         <import type="mega.privacy.android.app.MimeTypeList" />
 
-        <import type="mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel" />
+        <import type="mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter" />
 
         <variable
             name="item"
@@ -90,7 +90,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="24dp"
                 android:background="@drawable/media_playlist_paused"
-                android:visibility="@{item.type == MediaPlayerServiceViewModel.TYPE_PLAYING &amp;&amp; paused ? View.VISIBLE : View.GONE}"
+                android:visibility="@{item.type == PlaylistAdapter.TYPE_PLAYING &amp;&amp; paused ? View.VISIBLE : View.GONE}"
                 tools:visibility="visible" />
 
             <ImageView
@@ -146,7 +146,7 @@
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:src="@drawable/ic_reorder"
-                android:visibility="@{(item.type == MediaPlayerServiceViewModel.TYPE_PREVIOUS || item.type == MediaPlayerServiceViewModel.TYPE_PLAYING) ? View.GONE : View.VISIBLE}"
+                android:visibility="@{(item.type == PlaylistAdapter.TYPE_PREVIOUS || item.type == PlaylistAdapter.TYPE_PLAYING) ? View.GONE : View.VISIBLE}"
                 app:tint="?android:attr/textColorSecondary" />
         </FrameLayout>
 

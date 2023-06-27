@@ -88,7 +88,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 playerServiceViewModelGateway = service.playerServiceViewModelGateway
 
                 playerServiceViewModelGateway?.run {
-                    if (isAudioPlayer()) {
+                    if (isAudioPlayer) {
                         setupPlayerView()
                     } else {
                         binding.playerView.isVisible = false
@@ -97,7 +97,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                     if (getPlaylistItems().isNotEmpty()) {
                         adapter?.submitList(getPlaylistItems())
                     }
-                    if (isAudioPlayer() && !isPaused()) {
+                    if (isAudioPlayer && !isPaused()) {
                         positionUpdateHandler.post(positionUpdateRunnable)
                     }
                     tryObservePlaylist()
@@ -263,7 +263,7 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                         if (it.second != -1) {
                             listLayoutManager.scrollToPositionWithOffset(it.second, 0)
                         }
-                        if (!isVideoPlayer() && it.first.isNotEmpty()) {
+                        if (isAudioPlayer && it.first.isNotEmpty()) {
                             // Trigger the visibility update of the pause icon of the
                             // playing (paused) audio.
                             adapter?.notifyItemChanged(it.second)
@@ -374,15 +374,13 @@ class PlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListener {
                 }
                 (requireActivity() as MediaPlayerActivity).closeSearch()
 
-                if (isVideoPlayer()) {
+                if (!isAudioPlayer) {
                     (requireActivity() as MediaPlayerActivity).onBackPressedDispatcher.onBackPressed()
                 }
                 return
             }
         }
     }
-
-    private fun isVideoPlayer() = playerServiceViewModelGateway?.isAudioPlayer() == false
 
     override fun onDragStarted(holder: PlaylistViewHolder) {
         if (!isActionMode) {

@@ -41,8 +41,8 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.presentation.extensions.serializable
@@ -67,7 +67,7 @@ class VideoPlayerFragment : Fragment() {
     private val viewModel: VideoPlayerViewModel by activityViewModels()
 
     private var serviceGateway: VideoPlayerServiceGateway? = null
-    private var serviceViewModelGateway: PlayerServiceViewModelGateway? = null
+    private var serviceViewModelGateway: VideoPlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
 
@@ -90,9 +90,10 @@ class VideoPlayerFragment : Fragment() {
          * Called after a successful bind with our AudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MediaPlayerServiceBinder && service.serviceGateway is VideoPlayerServiceGateway) {
-                serviceGateway = service.serviceGateway
-                serviceViewModelGateway = service.playerServiceViewModelGateway
+            if (service is MediaPlayerServiceBinder) {
+                serviceGateway = service.serviceGateway as? VideoPlayerServiceGateway
+                serviceViewModelGateway =
+                    service.playerServiceViewModelGateway as? VideoPlayerServiceViewModelGateway
 
                 setupPlayer()
                 observeFlow()

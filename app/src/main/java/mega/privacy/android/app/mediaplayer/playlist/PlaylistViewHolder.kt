@@ -2,7 +2,7 @@ package mega.privacy.android.app.mediaplayer.playlist
 
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.databinding.ItemPlaylistBinding
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_NEXT
+import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.TYPE_NEXT
 
 /**
  * ViewHolder for playlist item.

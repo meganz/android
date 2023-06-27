@@ -537,9 +537,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             actionView?.let { searchView ->
                 if (searchView is SearchView) {
                     searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                        override fun onQueryTextSubmit(query: String): Boolean {
-                            return true
-                        }
+                        override fun onQueryTextSubmit(query: String): Boolean = true
 
                         override fun onQueryTextChange(newText: String): Boolean {
                             playerServiceGateway?.searchQueryUpdate(newText)
@@ -550,9 +548,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                 }
             }
             setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                    return true
-                }
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean = true
 
                 override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
                     playerServiceGateway?.searchQueryUpdate(null)

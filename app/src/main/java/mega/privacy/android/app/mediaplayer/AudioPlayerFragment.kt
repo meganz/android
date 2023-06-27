@@ -20,8 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
+import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
@@ -38,7 +38,7 @@ class AudioPlayerFragment : Fragment() {
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
-    private var serviceViewModelGateway: PlayerServiceViewModelGateway? = null
+    private var serviceViewModelGateway: AudioPlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
 
@@ -62,7 +62,8 @@ class AudioPlayerFragment : Fragment() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
                 serviceGateway = service.serviceGateway
-                serviceViewModelGateway = service.playerServiceViewModelGateway
+                serviceViewModelGateway =
+                    service.playerServiceViewModelGateway as? AudioPlayerServiceViewModelGateway
 
                 setupPlayer()
                 observeFlow()

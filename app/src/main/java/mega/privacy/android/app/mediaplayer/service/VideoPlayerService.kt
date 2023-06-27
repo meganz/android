@@ -22,8 +22,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlaybackPositionState
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
@@ -32,7 +32,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -53,7 +52,7 @@ class VideoPlayerService : LifecycleService(), LifecycleEventObserver, VideoPlay
      * ServiceViewModelGateway
      */
     @Inject
-    lateinit var viewModelGateway: PlayerServiceViewModelGateway
+    lateinit var viewModelGateway: VideoPlayerServiceViewModelGateway
 
     private val binder by lazy { MediaPlayerServiceBinder(this, viewModelGateway) }
 
@@ -80,7 +79,6 @@ class VideoPlayerService : LifecycleService(), LifecycleEventObserver, VideoPlay
 
     override fun onCreate() {
         super.onCreate()
-        viewModelGateway.setAudioPlayer(false)
         createPlayer()
         pauseAudioPlayer(this)
         observeData()
