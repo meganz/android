@@ -13,8 +13,8 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_TYPE
+import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
+import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsFragment
 import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
 import mega.privacy.android.app.utils.Constants
@@ -130,7 +130,7 @@ class AchievementsActivity : PasscodeActivity() {
             }
 
             Constants.INFO_ACHIEVEMENTS_FRAGMENT -> {
-                fragment = InfoAchievementsFragment().apply {
+                fragment = AchievementsInfoFragment().apply {
                     this.arguments = bundleOf(
                         ACHIEVEMENTS_OVERVIEW to viewModel.state.value.achievementsOverview,
                         ACHIEVEMENTS_TYPE to type

@@ -16,11 +16,11 @@ import java.io.Serializable
 import javax.inject.Inject
 
 /**
- * View Model for InfoAchievementsFragment
- * @see InfoAchievementsFragment
+ * View Model for AchievementsInfoFragment
+ * @see AchievementsInfoFragment
  */
 @HiltViewModel
-class InfoAchievementsViewModel @Inject constructor(
+class AchievementsInfoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val numberOfDaysMapper: NumberOfDaysMapper,
 ) : ViewModel() {
@@ -28,11 +28,11 @@ class InfoAchievementsViewModel @Inject constructor(
         savedStateHandle.get<Serializable>(ACHIEVEMENTS_OVERVIEW) as? AchievementsOverview
     private val achievementType =
         savedStateHandle.get<Serializable>(ACHIEVEMENTS_TYPE) as? AchievementType
-    private val _uiState = MutableStateFlow(InfoAchievementsUIState())
+    private val _uiState = MutableStateFlow(AchievementsInfoUIState())
 
     /**
-     * Flow of [InfoAchievementsFragment] UI State
-     * @see InfoAchievementsUIState
+     * Flow of [AchievementsInfoFragment] UI State
+     * @see AchievementsInfoUIState
      */
     val uiState = _uiState.asStateFlow()
 
@@ -60,10 +60,16 @@ class InfoAchievementsViewModel @Inject constructor(
             ?.awardedAchievements
             ?.firstOrNull { it.type == achievementType }
             ?.let { award ->
+                val remainingDays =
+                    numberOfDaysMapper(award.expirationTimestampInSeconds.toMillis())
+
                 _uiState.update {
                     it.copy(
                         awardId = award.awardId,
-                        achievementRemainingDays = numberOfDaysMapper(award.expirationTimestampInSeconds.toMillis()),
+                        achievementRemainingDays = remainingDays,
+                        isAchievementExpired = remainingDays < 1,
+                        isAchievementAlmostExpired = remainingDays <= 15,
+                        isAchievementAwarded = award.awardId != -1,
                     )
                 }
             }
@@ -76,7 +82,7 @@ class InfoAchievementsViewModel @Inject constructor(
      */
     private fun updateAwardedStorage() = viewModelScope.launch {
         val awardedStorage =
-            if (uiState.value.awardId == -1 && achievementType != AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
+            if (uiState.value.isAchievementAwarded.not() && achievementType != AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
                 achievementsOverview?.allAchievements?.first {
                     it.type == achievementType
                 }?.grantStorageInBytes

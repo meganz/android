@@ -5,10 +5,13 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.test.platform.app.InstrumentationRegistry
 
 internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
@@ -22,6 +25,9 @@ internal fun SemanticsNodeInteractionsProvider.onNodeWithPlural(
 internal fun fromId(@StringRes id: Int) =
     InstrumentationRegistry.getInstrumentation().targetContext.getString(id)
 
+internal fun fromId(@StringRes id: Int, vararg args: Any) =
+    InstrumentationRegistry.getInstrumentation().targetContext.getString(id, *args)
+
 internal fun fromPluralId(@PluralsRes id: Int, quantity: Int) =
     InstrumentationRegistry.getInstrumentation().targetContext.resources
         .getQuantityString(id, quantity, quantity)
@@ -31,5 +37,20 @@ internal fun hasBackgroundColor(color: Color): SemanticsMatcher = SemanticsMatch
 ) {
     return@SemanticsMatcher it.layoutInfo.getModifierInfo().any {
         it.modifier == Modifier.background(color)
+    }
+}
+
+internal fun hasTextColor(color: Color): SemanticsMatcher = SemanticsMatcher(
+    "${SemanticsProperties.Text.name} has a text color of '$color'"
+) { semanticsNode ->
+    val textLayoutResults = mutableListOf<TextLayoutResult>()
+    semanticsNode.config.getOrNull(SemanticsActions.GetTextLayoutResult)
+        ?.action
+        ?.invoke(textLayoutResults)
+
+    return@SemanticsMatcher if (textLayoutResults.isNotEmpty()) {
+        textLayoutResults.first().layoutInput.style.color == color
+    } else {
+        false
     }
 }

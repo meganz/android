@@ -9,9 +9,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel
-import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.main.megaachievements.InfoAchievementsViewModel.Companion.ACHIEVEMENTS_TYPE
+import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel
+import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
+import mega.privacy.android.app.main.megaachievements.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.Achievement
@@ -32,8 +32,8 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class InfoAchievementsViewModelTest {
-    private lateinit var underTest: InfoAchievementsViewModel
+class AchievementsInfoViewModelTest {
+    private lateinit var underTest: AchievementsInfoViewModel
     private val savedStateHandle = SavedStateHandle()
     private val deviceGateway = mock<DeviceGateway>()
 
@@ -53,7 +53,7 @@ class InfoAchievementsViewModelTest {
     }
 
     private fun initTestClass() {
-        underTest = InfoAchievementsViewModel(savedStateHandle, NumberOfDaysMapper(deviceGateway))
+        underTest = AchievementsInfoViewModel(savedStateHandle, NumberOfDaysMapper(deviceGateway))
     }
 
     @Test
