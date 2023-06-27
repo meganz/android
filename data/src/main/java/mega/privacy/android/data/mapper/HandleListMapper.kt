@@ -8,13 +8,9 @@ import javax.inject.Inject
  * Handle List mapper
  */
 internal class HandleListMapper @Inject constructor() {
-    operator fun invoke(handleList: MegaHandleList): List<Long> = mutableListOf<Long>().apply {
-        if (handleList.size() > 0) {
-            for (i in 0 until handleList.size()) {
-                if (handleList[i] != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                    add(handleList[i])
-                }
-            }
-        }
+
+    operator fun invoke(handleList: MegaHandleList) = with(handleList) {
+        (0 until size()).filter { it != MegaChatApiJava.MEGACHAT_INVALID_HANDLE }
+            .map { get(it) }
     }
 }
