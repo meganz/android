@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import org.junit.After
@@ -46,6 +47,7 @@ class SMSVerificationViewModelTest {
     private val getCurrentCountryCode: GetCurrentCountryCode = mock()
     private val savedState: SavedStateHandle = mock()
     private val formatPhoneNumber: FormatPhoneNumber = mock()
+    private val logoutUseCase: LogoutUseCase = mock()
 
     private val countryCallingCodes = listOf("BD:880,", "AU:61,", "NZ:64,", "IN:91,")
     private val countryCode = "NZ"
@@ -81,6 +83,7 @@ class SMSVerificationViewModelTest {
             savedState = savedState,
             smsVerificationTextMapper = smsVerificationTextMapper,
             smsVerificationTextErrorMapper = smsVerificationTextErrorMapper,
+            logoutUseCase = logoutUseCase,
         )
     }
 

@@ -9,11 +9,9 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.verification.view.SMSVerificationView
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -115,15 +113,11 @@ class SMSVerificationActivity : PasscodeActivity() {
                 onPhoneNumberChange = viewModel::setPhoneNumber,
                 onNotNowClicked = ::finish,
                 onNextClicked = viewModel::validatePhoneNumber,
-                onLogout = ::logout,
+                onLogout = viewModel::logout,
                 onConsumeSMSCodeSentFinishedEvent = viewModel::onConsumeSMSCodeSentFinishedEvent,
                 onSMSCodeSent = ::launchSMSCode
             )
         }
-    }
-
-    private fun logout() {
-        AccountController.logout(this, megaApi, lifecycleScope)
     }
 
     companion object {

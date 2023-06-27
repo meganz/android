@@ -11,12 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import timber.log.Timber
@@ -36,6 +39,7 @@ class SMSVerificationViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
     private val smsVerificationTextMapper: SMSVerificationTextMapper,
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private companion object {
@@ -233,6 +237,22 @@ class SMSVerificationViewModel @Inject constructor(
                 setIsPhoneNumberValid(phoneNumber != null)
                 phoneNumber?.let { onSendSMSVerificationCode(it) }
             }
+        }
+    }
+
+    /**
+     * Logout
+     *
+     * logs out the user from mega application and navigates to login activity
+     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
+     */
+    fun logout() = viewModelScope.launch {
+        MegaApplication.isLoggingOut = true
+        runCatching {
+            logoutUseCase()
+        }.onFailure {
+            MegaApplication.isLoggingOut = false
+            Timber.d("Error on logout $it")
         }
     }
 
