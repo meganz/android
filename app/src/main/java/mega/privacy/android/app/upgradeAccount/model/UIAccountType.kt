@@ -16,14 +16,14 @@ import mega.privacy.android.core.ui.theme.red_600
  *  @param textValue                  Int     string Int
  *  @param colorValue                 Color   color value for Light Theme
  *  @param colorValueDark             Color   color value for Dark Theme
- *  @param textBuyAccountTypeValue    Int     string Int for Buy button
+ *  @param textBuyButtonValue         Int     string Int for Buy button
  */
 enum class UIAccountType(
     val iconValue: Int,
     val textValue: Int,
     val colorValue: Color,
     val colorValueDark: Color,
-    val textBuyAccountTypeValue: Int,
+    val textBuyButtonValue: Int,
 ) {
     /**
      * FREE

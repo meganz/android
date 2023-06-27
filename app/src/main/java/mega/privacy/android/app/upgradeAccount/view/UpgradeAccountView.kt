@@ -100,8 +100,22 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import java.util.Locale
 
+internal const val TOS_TAG = "upgrade_account_screen:link_terms_of_service"
+internal const val BILLING_WARNING_TAG = "upgrade_account_screen:box_warning_unavailable_payments"
+internal const val BILLING_WARNING_CLOSE_BUTTON_TAG =
+    "upgrade_account_screen:button_close_billing_warning"
+internal const val MONTHLY_TAB_TAG = "upgrade_account_screen:tab_monthly"
+internal const val YEARLY_TAB_TAG = "upgrade_account_screen:tab_yearly"
+internal const val MONTHLY_CHECK_ICON_TAG = "upgrade_account_screen:image_monthly_check"
+internal const val YEARLY_CHECK_ICON_TAG = "upgrade_account_screen:image_yearly_check"
+internal const val EMPTY_CARD_TAG = "upgrade_account_screen:card_empty_loading_plans"
+internal const val CURRENT_PLAN_TAG = "upgrade_account_screen:label_current_plan"
+internal const val RECOMMENDED_PLAN_TAG = "upgrade_account_screen:label_recommended_plan"
+internal const val PRICING_PAGE_LINK_TAG = "upgrade_account_screen:text_pricing_page_link"
+
 @Composable
 fun UpgradeAccountView(
+    modifier: Modifier = Modifier,
     state: UpgradeAccountState,
     onBackPressed: () -> Unit = {},
     onBuyClicked: () -> Unit = {},
@@ -134,19 +148,19 @@ fun UpgradeAccountView(
         floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
             if (!hideFloatButton && chosenPlan != AccountType.FREE) {
+                val uiAccountType = mapUIAccountType(chosenPlan)
                 FloatingActionButton(
                     onClick = onBuyClicked,
                     content = {
-                        val uiAccountType = mapUIAccountType(chosenPlan)
                         Text(
-                            text = stringResource(id = uiAccountType.textBuyAccountTypeValue),
+                            text = stringResource(id = uiAccountType.textBuyButtonValue),
                             style = MaterialTheme.typography.button,
                             color = MaterialTheme.colors.primary,
                             fontWeight = FontWeight.Medium,
                         )
                     },
                     backgroundColor = MaterialTheme.colors.teal_300_teal_200,
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(
                             start = 16.dp,
                             end = 16.dp,
@@ -154,7 +168,7 @@ fun UpgradeAccountView(
                         )
                         .fillMaxWidth()
                         .height(36.dp)
-                        .testTag("BUY_BUTTON_TAG"),
+                        .testTag("upgrade_account_screen:button_buy_pro_plan_${uiAccountType.ordinal}"),
                     shape = RoundedCornerShape(4.dp),
                 )
             }
@@ -285,7 +299,7 @@ fun UpgradeAccountView(
                             top = 20.dp,
                             bottom = 12.dp
                         )
-                        .testTag("TOS")
+                        .testTag(TOS_TAG)
                         .clickable { onTOSClicked() },
                     fontWeight = FontWeight.Medium,
                 )
@@ -302,7 +316,7 @@ fun BillingWarning(hideBillingWarning: () -> Unit) {
             .background(
                 color = MaterialTheme.colors.yellow_100_yellow_700_alpha_015
             )
-            .testTag("BILLING_WARNING_TAG")
+            .testTag(BILLING_WARNING_TAG)
     ) {
         Row(
             modifier = Modifier
@@ -335,7 +349,7 @@ fun BillingWarning(hideBillingWarning: () -> Unit) {
             ) {
                 IconButton(
                     onClick = hideBillingWarning,
-                    modifier = Modifier.testTag("BILLING_WARNING_CLOSE_BUTTON_TAG")
+                    modifier = Modifier.testTag(BILLING_WARNING_CLOSE_BUTTON_TAG)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_remove_billing_warning),
@@ -382,7 +396,9 @@ fun MonthlyYearlyTabs(
                 hoveredElevation = 0.dp,
                 focusedElevation = 0.dp
             ),
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .testTag(MONTHLY_TAB_TAG),
             shape = RoundedCornerShape(8.dp),
             contentPadding = if (isMonthly)
                 PaddingValues(
@@ -399,7 +415,7 @@ fun MonthlyYearlyTabs(
                     contentDescription = "Check icon for monthly/yearly tabs, when selected",
                     modifier = Modifier
                         .padding(end = 11.dp)
-                        .testTag("Monthly check"),
+                        .testTag(MONTHLY_CHECK_ICON_TAG),
                 )
             }
             Text(
@@ -432,7 +448,9 @@ fun MonthlyYearlyTabs(
                 hoveredElevation = 0.dp,
                 focusedElevation = 0.dp
             ),
-            modifier = Modifier.padding(end = 8.dp),
+            modifier = Modifier
+                .padding(end = 8.dp)
+                .testTag(YEARLY_TAB_TAG),
             shape = RoundedCornerShape(8.dp),
             contentPadding =
             if (isMonthly)
@@ -450,7 +468,7 @@ fun MonthlyYearlyTabs(
                     contentDescription = "Check icon for monthly/yearly tabs, when selected",
                     modifier = Modifier
                         .padding(end = 11.dp)
-                        .testTag("Yearly check"),
+                        .testTag(YEARLY_CHECK_ICON_TAG),
                 )
             }
             Text(
@@ -513,7 +531,7 @@ fun EmptySubscriptionPlansInfoCards(brush: Brush) {
                     color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     shape = RoundedCornerShape(12.dp),
                 )
-                .testTag("EMPTY_CARD_TAG")
+                .testTag(EMPTY_CARD_TAG)
         ) {
             Column {
                 Row(
@@ -673,7 +691,7 @@ fun SubscriptionPlansInfoCard(
                 shape = RoundedCornerShape(12.dp),
             )
             .clickable { onPlanClicked() }
-            .testTag(stringResource(uiAccountType.textValue))) {
+            .testTag("upgrade_account_screen:card_pro_plan_${uiAccountType.ordinal}")) {
         Column {
             Row {
                 Text(
@@ -704,7 +722,7 @@ fun SubscriptionPlansInfoCard(
                             .padding(
                                 horizontal = 8.dp, vertical = 4.dp
                             )
-                            .testTag("Current plan")
+                            .testTag(CURRENT_PLAN_TAG)
                     )
                 }
                 if (isRecommended) {
@@ -724,7 +742,7 @@ fun SubscriptionPlansInfoCard(
                             .padding(
                                 horizontal = 8.dp, vertical = 4.dp
                             )
-                            .testTag("Recommended")
+                            .testTag(RECOMMENDED_PLAN_TAG)
                     )
                 }
             }
@@ -887,7 +905,7 @@ private fun PricingPageLinkText(
     MegaSpannedClickableText(
         modifier = Modifier
             .padding(16.dp)
-            .testTag("LINK_TO_PRICING_PAGE_TAG"),
+            .testTag(PRICING_PAGE_LINK_TAG),
         value = stringResource(
             id = R.string.account_upgrade_account_pricing_page_link_text
         ),

@@ -8,7 +8,11 @@ import android.view.ViewGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,6 +86,7 @@ class UpgradeAccountFragment : Fragment() {
     }
 
 
+    @OptIn(ExperimentalComposeUiApi::class)
     @Composable
     fun UpgradeAccountBody() {
         val uiState by upgradeAccountViewModel.state.collectAsStateWithLifecycle()
@@ -111,6 +116,9 @@ class UpgradeAccountFragment : Fragment() {
                 )
             } else {
                 UpgradeAccountView(
+                    modifier = Modifier.semantics {
+                        testTagsAsResourceId = true
+                    },
                     state = uiState,
                     onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
                     onBuyClicked = {
