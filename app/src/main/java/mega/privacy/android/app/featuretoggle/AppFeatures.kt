@@ -29,7 +29,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     RememberTimelinePreferences(
         "Remember the Timeline filter preferences",
-        false
+        true,
     ),
 
     /**
