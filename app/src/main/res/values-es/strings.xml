@@ -1898,7 +1898,7 @@
     <!-- Text of the dialog to enable the rich links previews on chat -->
     <string name="text_enable_rich_links">Mejora tu experiencia con MEGA&#160;Chat. El contenido del enlace se recuperará sin cifrado de conocimiento cero.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
-    <string name="error_password">Por favor ingresa una contraseña más segura</string>
+    <string name="error_password">Introduce una contraseña más segura</string>
     <!-- title of the notification for an acceptance of a contact request -->
     <string name="title_acceptance_contact_request_notification">Nuevo contacto</string>
     <!-- Notification title to show the number of incoming contact request, contact requests -->
@@ -1946,7 +1946,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La próxima vez que inicies sesión en tu cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Guarda tu <b>Clave de recuperación</b>en un lugar seguro en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores.</string>
+    <string name="recommendation_2fa_enabled">Guarda tu <b>clave de recuperación</b>en un lugar seguro en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Código no valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4038,7 +4038,7 @@
     <!-- Snackbar for screenshot saved successfully when video is playing in video player -->
     <string name="media_player_video_snackbar_screenshot_saved">Imagen guardada en la galería de tu dispositivo</string>
     <!-- Album creation dialog title -->
-    <string name="photos_album_creation_dialog_title">Introduce el nombre del álbum</string>
+    <string name="photos_album_creation_dialog_title">Introducir el nombre del álbum</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">Nuevo álbum</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
@@ -5070,17 +5070,17 @@
     <!-- Title of description of features, which are available for users, if they buy plan. -->
     <string name="account_upgrade_account_description_title_features">Características de los planes Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Enlaces con protección por contraseña</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Enlaces con protección por contraseña</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Enlaces con fecha de caducidad</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Enlaces con fecha de caducidad</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Posibilidad de compartir cuota de transferencia</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Posibilidad de compartir cuota de transferencia</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Backups automáticos</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backups automáticos</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Rebobinado hasta 90 días en Pro Lite y hasta 365 días en Pro I, II y III (próximamente)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5161,4 +5161,32 @@
         <item quantity="many">Enlaces creados y copiados en el portapapeles</item>
         <item quantity="other">Enlaces creados y copiados en el portapapeles</item>
     </plurals>
+    <!-- Title of occurs on section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
+    <string name="meetings_custom_recurrence_monday_option">L</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
+    <string name="meetings_custom_recurrence_tuesday_option">J</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Wednesday -->
+    <string name="meetings_custom_recurrence_wednesday_option">M</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Thursday -->
+    <string name="meetings_custom_recurrence_thursday_option">J</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
+    <string name="meetings_custom_recurrence_friday_option">V</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
+    <string name="meetings_custom_recurrence_saturday_option">D</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
+    <string name="meetings_custom_recurrence_sunday_option">D</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
+        <item quantity="one">%1$s, every week</item>
+        <item quantity="other">%1$s, every %2$d weeks</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
+        <item quantity="one">%1$s and %2$s, every week</item>
+        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+    </plurals>
+    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
 </resources>

@@ -1900,7 +1900,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">De volgende keer dat u inlogt in uw account wordt u gevraagd een 6-cijferige code in te voeren die gegeven is door uw authenticatie applicatie.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Bewaar uw <b>Herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
+    <string name="recommendation_2fa_enabled">Bewaar uw <b>herstelsleutel</b> op een veilige locatie om problemen te voorkomen als u toegang tot uw applicatie verliest of als u twee-staps authenticatie wilt uitschakelen.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Ongeldige code</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4855,17 +4855,17 @@
     <!-- Title of description of features, which are available for users, if they buy plan. -->
     <string name="account_upgrade_account_description_title_features">Kenmerken van Pro abonnementen</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Wachtwoord-beschermende links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Wachtwoord-beschermende links</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Links met verloopdatums</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links met verloopdatums</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Overdrachtstegoed deling</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Overdrachtstegoed deling</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Automatische back-ups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatische back-ups</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Spoel terug tot 90 dagen met Pro Lite en tot 365 dagen met Pro I, II en II (komt binnenkort)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Plan het opruimen van vuilnisbakken tussen 7 dagen en 10 jaar</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Plan het opruimen van vuilnisbakken tussen 7 dagen en 10 jaar</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Koop Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4942,4 +4942,32 @@
         <item quantity="one">Link gecreëerd en gekopieerd naar uw klembord</item>
         <item quantity="other">Links gecreëerd en gekopieerd naar uw klembord</item>
     </plurals>
+    <!-- Title of occurs on section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_section">Gebeurt op</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
+    <string name="meetings_custom_recurrence_monday_option">Ma</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
+    <string name="meetings_custom_recurrence_tuesday_option">Di</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Wednesday -->
+    <string name="meetings_custom_recurrence_wednesday_option">Wo</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Thursday -->
+    <string name="meetings_custom_recurrence_thursday_option">Di</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
+    <string name="meetings_custom_recurrence_friday_option">Vr</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
+    <string name="meetings_custom_recurrence_saturday_option">Za</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
+    <string name="meetings_custom_recurrence_sunday_option">Za</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
+        <item quantity="one">%1$s, every week</item>
+        <item quantity="other">%1$s, every %2$d weeks</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
+        <item quantity="one">%1$s and %2$s, every week</item>
+        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+    </plurals>
+    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
 </resources>

@@ -5206,9 +5206,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Запомнить настройки</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">Центр устройств</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">Центр устройств</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Каждый день</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5275,9 +5275,9 @@
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Передачи:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/месяц[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/год[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Рекомендуемый</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -5285,17 +5285,17 @@
     <!-- Title of description of features, which are available for users, if they buy plan. -->
     <string name="account_upgrade_account_description_title_features">Особенности планов Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;&#160;Защищённые паролем ссылки</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Защищённые паролем ссылки</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;&#160;Ссылки со сроком действия</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Ссылки со сроком действия</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;&#160;Обмен квотой передач</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Обмен квотой передач</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;&#160;Автоматическое резервное копирование</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Автоматическое резервное копирование</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;&#160;Перемотка на период до 90 дней на Pro Lite и до 365 дней на Pro I, II и III (скоро)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;&#160;Срок очистки корзины от 7 дней до 10 лет</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Срок очистки корзины от 7 дней до 10 лет</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">Купить Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5380,4 +5380,32 @@
         <item quantity="many">Ссылки созданы и скопированы в буфер обмена</item>
         <item quantity="other">Ссылки созданы и скопированы в буфер обмена</item>
     </plurals>
+    <!-- Title of occurs on section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_section">Повторяется в</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
+    <string name="meetings_custom_recurrence_monday_option">ПН</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
+    <string name="meetings_custom_recurrence_tuesday_option">ВТ</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Wednesday -->
+    <string name="meetings_custom_recurrence_wednesday_option">СР</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Thursday -->
+    <string name="meetings_custom_recurrence_thursday_option">ЧТ</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Friday -->
+    <string name="meetings_custom_recurrence_friday_option">ПТ</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Saturday -->
+    <string name="meetings_custom_recurrence_saturday_option">СБ</string>
+    <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Sunday -->
+    <string name="meetings_custom_recurrence_sunday_option">ВС</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
+        <item quantity="one">%1$s, every week</item>
+        <item quantity="other">%1$s, every %2$d weeks</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
+    <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
+        <item quantity="one">%1$s and %2$s, every week</item>
+        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+    </plurals>
+    <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
 </resources>
