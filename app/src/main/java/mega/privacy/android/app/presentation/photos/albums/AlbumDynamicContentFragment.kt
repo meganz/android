@@ -311,6 +311,7 @@ class AlbumDynamicContentFragment : Fragment() {
     override fun onPause() {
         ackPhotosAddingProgressCompleted()
         ackPhotosRemovingProgressCompleted()
+        albumsViewModel.setSnackBarMessage("")
         super.onPause()
     }
 
