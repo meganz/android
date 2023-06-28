@@ -42,7 +42,8 @@ import java.time.temporal.ChronoUnit
  * @property showMonthlyRecurrenceWarning               True, if the text on the monthly recurrence warning should be displayed. False, if not.
  * @property isCreatingMeeting                          True, if the meeting is being created. False, if not.
  * @property weekList                                   List of [Weekday] in the week.
- * @property currentDay                                 [Weekday]
+ * @property currentWeekDay                             [Weekday]
+ * @property currentDayOfMonth                          Current month day
  */
 data class CreateScheduledMeetingState constructor(
     val openAddContact: Boolean? = null,
@@ -80,7 +81,8 @@ data class CreateScheduledMeetingState constructor(
             Weekday.Saturday,
             Weekday.Sunday
         ),
-    val currentDay: Weekday = Weekday.Monday,
+    val currentWeekDay: Weekday = Weekday.Monday,
+    val currentDayOfMonth: Int = 1,
 ) {
     /**
      * Check if it's valid title
@@ -147,11 +149,13 @@ data class CreateScheduledMeetingState constructor(
      */
     private fun isCustomRecurrenceDialogOption(): Boolean {
         val weekDayList = rulesSelected.weekDayList
+        val monthDayList = rulesSelected.monthDayList
+        val monthWeekDayList = rulesSelected.monthWeekDayList
         return when (rulesSelected.freq) {
             OccurrenceFrequencyType.Invalid -> false
             OccurrenceFrequencyType.Daily -> rulesSelected.interval > 1 || weekDayList != null
-            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1 || (weekDayList != null && (weekDayList.size > 1 || weekDayList[0] != currentDay))
-            OccurrenceFrequencyType.Monthly -> rulesSelected.interval > 1
+            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1 || (weekDayList != null && (weekDayList.size > 1 || weekDayList.first() != currentWeekDay))
+            OccurrenceFrequencyType.Monthly -> rulesSelected.interval > 1 || (monthDayList != null && (monthDayList.size > 1 || monthDayList.first() != currentDayOfMonth)) || monthWeekDayList.isNotEmpty()
         }
     }
 

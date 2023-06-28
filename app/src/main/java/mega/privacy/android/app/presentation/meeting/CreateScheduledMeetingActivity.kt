@@ -195,17 +195,20 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                             viewModel.onRejectClicked()
                             navController.navigate(CREATE_SCHEDULED_MEETING_TAG)
                         },
-                        onTypeClicked = viewModel::onOccurrenceTypeChanged,
-                        onNumberClicked = viewModel::onOccurrenceNumberChanged,
+                        onFrequencyTypeChanged = viewModel::onFrequencyTypeChanged,
+                        onIntervalChanged = viewModel::onIntervalChanged,
+                        onMonthDayChanged = viewModel::onMonthDayChanged,
                         onWeekdaysClicked = viewModel::onWeekdaysOptionTap,
                         onFocusChanged = viewModel::onFocusChanged,
-                        onWeekdayClicked = viewModel::onWeekdayTap
+                        onDayClicked = viewModel::onDayClicked,
+                        onMonthlyRadioButtonClicked = viewModel::onMonthlyRadioButtonClicked,
+                        onMonthWeekDayChanged = viewModel::onMonthWeekDayChanged,
+                        onWeekOfMonthChanged = viewModel::onWeekOfMonthChanged
                     )
                 }
             }
         }
     }
-
 
     /**
      * Open chat room

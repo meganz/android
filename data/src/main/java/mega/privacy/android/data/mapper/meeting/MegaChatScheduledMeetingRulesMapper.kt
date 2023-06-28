@@ -11,11 +11,13 @@ import javax.inject.Inject
  * @property megaOccurrenceFrequencyTypeMapper      [MegaOccurrenceFrequencyTypeMapper]
  * @property megaIntegerWeekDaysListMapper          [MegaIntegerWeekDaysListMapper]
  * @property megaIntegerListMapper                  [MegaIntegerListMapper]
+ * @property megaMonthWeekDayListMapper             [MegaMonthWeekDayListMapper]
  */
 internal class MegaChatScheduledMeetingRulesMapper @Inject constructor(
     private val megaOccurrenceFrequencyTypeMapper: MegaOccurrenceFrequencyTypeMapper,
     private val megaIntegerWeekDaysListMapper: MegaIntegerWeekDaysListMapper,
     private val megaIntegerListMapper: MegaIntegerListMapper,
+    private val megaMonthWeekDayListMapper: MegaMonthWeekDayListMapper,
 ) {
     operator fun invoke(chatScheduledRules: ChatScheduledRules?): MegaChatScheduledRules? =
         chatScheduledRules?.let { rules ->
@@ -27,7 +29,7 @@ internal class MegaChatScheduledMeetingRulesMapper @Inject constructor(
                 rules.until,
                 megaIntegerWeekDaysListMapper(rules.weekDayList),
                 megaIntegerListMapper(rules.monthDayList),
-                null
+                megaMonthWeekDayListMapper(rules.monthWeekDayList)
             )
         }
 }

@@ -528,7 +528,8 @@ private fun ActionOption(
                         subtitle = getScheduledMeetingFrequencyText(
                             state.rulesSelected,
                             state.isWeekdays(),
-                            state.currentDay
+                            state.currentWeekDay,
+                            state.currentDayOfMonth
                         )
                     }
 
@@ -621,7 +622,9 @@ private fun RecurringMeetingDialog(
                     RecurrenceDialogOption.Customised -> getScheduledMeetingFrequencyText(
                         rules = state.rulesSelected,
                         state.isWeekdays(),
-                        state.currentDay
+                        state.currentWeekDay,
+                        state.currentDayOfMonth,
+                        true
                     )
                 }
             }

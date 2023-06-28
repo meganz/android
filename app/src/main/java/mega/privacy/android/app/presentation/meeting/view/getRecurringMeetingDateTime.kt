@@ -95,7 +95,7 @@ fun getRecurringMeetingDateTime(
                     val interval = scheduledMeeting.getIntervalValue()
                     when (weekDaysList.size) {
                         1 -> {
-                            val weekDay = getWeekDay(weekDaysList.first(), true)
+                            val weekDay = getShortenedWeekDay(weekDaysList.first(), true)
                             result = when {
                                 scheduledMeeting.isForever() -> pluralStringResource(
                                     R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever,
@@ -121,7 +121,7 @@ fun getRecurringMeetingDateTime(
                         }
 
                         else -> {
-                            val lastWeekDay = getWeekDay(weekDaysList.last(), false)
+                            val lastWeekDay = getShortenedWeekDay(weekDaysList.last(), false)
                             val weekDaysListString = weekDaysListString(weekDaysList)
                             result = when {
                                 scheduledMeeting.isForever() -> pluralStringResource(
@@ -183,7 +183,6 @@ fun getRecurringMeetingDateTime(
             rules.monthWeekDayList.takeIf { it.isNotEmpty() }?.let { monthWeekDayList ->
                 val monthWeekDayItem = monthWeekDayList.first()
                 val weekOfMonth = monthWeekDayItem.weekOfMonth
-
                 when (monthWeekDayItem.weekDaysList.first()) {
                     Weekday.Monday -> {
                         when (weekOfMonth) {
@@ -1001,19 +1000,21 @@ fun getRecurringMeetingDateTime(
  * @param rules             [ChatScheduledRules]
  * @param isWeekdays        True, if it's weekdays. False, if not.
  * @param currentDay        [Weekday]
+ * @param isDayShortened    True, if the abbreviated day name should be used. False, if not.
  */
 @Composable
 fun getScheduledMeetingFrequencyText(
     rules: ChatScheduledRules,
     isWeekdays: Boolean,
-    currentDay: Weekday?,
+    currentDay: Weekday? = null,
+    currentDayOfMonth: Int? = null,
+    isDayShortened: Boolean = false,
 ): String = when (rules.freq) {
     OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
     OccurrenceFrequencyType.Daily ->
-        if (isWeekdays) {
-            stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
-        } else {
-            pluralStringResource(
+        when {
+            isWeekdays -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
+            else -> pluralStringResource(
                 id = R.plurals.meetings_schedule_meeting_recurrence_every_number_of_days_label,
                 count = rules.interval,
                 rules.interval
@@ -1029,28 +1030,25 @@ fun getScheduledMeetingFrequencyText(
                 when (it.size) {
                     1 -> {
                         val interval = rules.interval
-                        if (currentDay == it[0] && interval == 1) {
-                            stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
-                        } else {
-                            val weekDay = getWeekDay(it.first(), true)
-                            pluralStringResource(
+                        when {
+                            currentDay == it.first() && interval == 1 -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_weekly_label)
+                            else -> pluralStringResource(
                                 id = R.plurals.meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label,
                                 count = rules.interval,
-                                weekDay, rules.interval
+                                getShortenedWeekDay(it.first(), true), rules.interval
                             )
                         }
                     }
 
                     else -> {
-                        if (isWeekdays) {
-                            stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
-                        } else {
-                            val lastWeekDay = getWeekDay(weekdays.last(), false)
-                            val weekDaysListString = weekDaysListString(weekdays)
-                            pluralStringResource(
+                        when {
+                            isWeekdays -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_every_weekday_label)
+                            else -> pluralStringResource(
                                 id = R.plurals.meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label,
                                 count = rules.interval,
-                                weekDaysListString, lastWeekDay, rules.interval
+                                weekDaysListString(weekdays),
+                                getShortenedWeekDay(weekdays.last(), false),
+                                rules.interval
                             )
                         }
                     }
@@ -1059,7 +1057,76 @@ fun getScheduledMeetingFrequencyText(
         }
     }
 
-    OccurrenceFrequencyType.Monthly -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
+    OccurrenceFrequencyType.Monthly -> {
+        val interval = rules.interval
+        val monthDayList = rules.monthDayList
+        val monthWeekDayList = rules.monthWeekDayList
+
+        if (monthDayList.isNullOrEmpty() && monthWeekDayList.isEmpty()) {
+            stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
+        } else if (!monthDayList.isNullOrEmpty()) {
+            val dayOfTheMonth = monthDayList.first()
+
+            when {
+                interval == 1 && dayOfTheMonth == currentDayOfMonth -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
+                else -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label,
+                    count = rules.interval,
+                    rules.interval,
+                    dayOfTheMonth
+                )
+            }
+        } else if (monthWeekDayList.isNotEmpty()) {
+            val monthWeekDayItem = monthWeekDayList.first()
+            val weekOfMonth = monthWeekDayItem.weekOfMonth
+            val weekDaysList = monthWeekDayItem.weekDaysList
+            val weekDay = weekDaysList.first()
+
+            val weekDaysListString = if (isDayShortened) getShortenedWeekDay(
+                day = weekDay,
+                isForSentenceStart = false
+            ) else getWeekDay(day = weekDay)
+
+            when (weekOfMonth) {
+                WeekOfMonth.First -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label,
+                    count = rules.interval,
+                    weekDaysListString,
+                    rules.interval,
+                )
+
+                WeekOfMonth.Second -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label,
+                    count = rules.interval,
+                    weekDaysListString,
+                    rules.interval,
+                )
+
+                WeekOfMonth.Third -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label,
+                    count = rules.interval,
+                    weekDaysListString,
+                    rules.interval,
+                )
+
+                WeekOfMonth.Fourth -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label,
+                    count = rules.interval,
+                    weekDaysListString,
+                    rules.interval,
+                )
+
+                WeekOfMonth.Fifth -> pluralStringResource(
+                    id = R.plurals.meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label,
+                    count = rules.interval,
+                    weekDaysListString,
+                    rules.interval,
+                )
+            }
+        } else {
+            stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
+        }
+    }
 }
 
 /**
@@ -1072,7 +1139,7 @@ fun getScheduledMeetingFrequencyText(
 private fun weekDaysListString(weekdays: List<Weekday>) = StringBuilder().apply {
     weekdays.forEachIndexed { index, weekday ->
         if (index != weekdays.size - 1) {
-            append(getWeekDay(weekday, index == 0))
+            append(getShortenedWeekDay(weekday, index == 0))
             if (index != weekdays.size - 2) append(", ")
         }
     }
@@ -1171,14 +1238,14 @@ private fun getTextForOneOffMeeting(
     )
 
 /**
- * Get the string corresponding to the day of the week
+ * Get the string corresponding to the day of the week shortened
  *
  * @param day [Weekday]
  * @param isForSentenceStart True if the weekday string is to be used at the beginning of the sentence, or False otherwise (in the middle of the sentence).
  * @return String of day of the week
  */
 @Composable
-private fun getWeekDay(day: Weekday, isForSentenceStart: Boolean): String = when (day) {
+private fun getShortenedWeekDay(day: Weekday, isForSentenceStart: Boolean): String = when (day) {
     Weekday.Monday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_mon else R.string.notification_scheduled_meeting_week_day_sentence_middle_mon)
     Weekday.Tuesday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_tue else R.string.notification_scheduled_meeting_week_day_sentence_middle_tue)
     Weekday.Wednesday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_wed else R.string.notification_scheduled_meeting_week_day_sentence_middle_wed)
@@ -1186,4 +1253,21 @@ private fun getWeekDay(day: Weekday, isForSentenceStart: Boolean): String = when
     Weekday.Friday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_fri else R.string.notification_scheduled_meeting_week_day_sentence_middle_fri)
     Weekday.Saturday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_sat else R.string.notification_scheduled_meeting_week_day_sentence_middle_sat)
     Weekday.Sunday -> stringResource(id = if (isForSentenceStart) R.string.notification_scheduled_meeting_week_day_sentence_start_sun else R.string.notification_scheduled_meeting_week_day_sentence_middle_sun)
+}
+
+/**
+ * Get the string corresponding to the day of the week
+ *
+ * @param day [Weekday]
+ * @return String of day of the week
+ */
+@Composable
+private fun getWeekDay(day: Weekday): String = when (day) {
+    Weekday.Monday -> stringResource(id = R.string.meetings_custom_recurrence_monday_monthly_section_sentence_middle)
+    Weekday.Tuesday -> stringResource(id = R.string.meetings_custom_recurrence_tuesday_monthly_section_sentence_middle)
+    Weekday.Wednesday -> stringResource(id = R.string.meetings_custom_recurrence_wednesday_monthly_section_sentence_middle)
+    Weekday.Thursday -> stringResource(id = R.string.meetings_custom_recurrence_thursday_monthly_section_sentence_middle)
+    Weekday.Friday -> stringResource(id = R.string.meetings_custom_recurrence_friday_monthly_section_sentence_middle)
+    Weekday.Saturday -> stringResource(id = R.string.meetings_custom_recurrence_saturday_monthly_section_sentence_middle)
+    Weekday.Sunday -> stringResource(id = R.string.meetings_custom_recurrence_sunday_monthly_section_sentence_middle)
 }

@@ -12,9 +12,9 @@ import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ACCEPT_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_BACK_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_DAILY
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_EVERY
+import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_MONTHLY
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_WEEKLY
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
-import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.Weekday
 import org.junit.Rule
@@ -66,7 +66,6 @@ class CustomRecurrenceViewTest {
                 rulesSelected = getWeeklyRules(),
                 customRecurrenceState = CustomRecurrenceState(
                     newRules = getWeeklyRules(),
-                    dropdownOccurrenceType = DropdownOccurrenceType.Week
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
@@ -84,7 +83,6 @@ class CustomRecurrenceViewTest {
                 rulesSelected = getWeeklyRules(),
                 customRecurrenceState = CustomRecurrenceState(
                     newRules = getWeeklyRules(),
-                    dropdownOccurrenceType = DropdownOccurrenceType.Week
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
@@ -102,7 +100,6 @@ class CustomRecurrenceViewTest {
                 rulesSelected = getDailyRules(),
                 customRecurrenceState = CustomRecurrenceState(
                     newRules = getDailyRules(),
-                    dropdownOccurrenceType = DropdownOccurrenceType.Day
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
@@ -110,6 +107,40 @@ class CustomRecurrenceViewTest {
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_WEEKLY).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that occurs monthly is shown`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getMonthlyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getMonthlyRules(),
+                ),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_MONTHLY).assertExists()
+    }
+
+    @Test
+    fun `test that occurs monthly is hidden`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getDailyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getDailyRules(),
+                ),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_MONTHLY).assertDoesNotExist()
     }
 
     @Test
@@ -125,13 +156,17 @@ class CustomRecurrenceViewTest {
                     snackBar = null
                 ),
                 onScrollChange = {},
-                onRejectClicked = {},
                 onAcceptClicked = mock,
-                onTypeClicked = {},
-                onNumberClicked = {},
+                onRejectClicked = {},
+                onIntervalChanged = {},
+                onFrequencyTypeChanged = {},
+                onDayClicked = {},
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
-                onWeekdayClicked = {}
+                onMonthlyRadioButtonClicked = {},
+                onMonthDayChanged = {},
+                onMonthWeekDayChanged = {},
+                onWeekOfMonthChanged = {}
             )
         }
 
@@ -152,13 +187,17 @@ class CustomRecurrenceViewTest {
                     snackBar = null
                 ),
                 onScrollChange = {},
-                onRejectClicked = mock,
                 onAcceptClicked = {},
-                onTypeClicked = {},
-                onNumberClicked = {},
+                onRejectClicked = mock,
+                onIntervalChanged = {},
+                onFrequencyTypeChanged = {},
+                onDayClicked = {},
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
-                onWeekdayClicked = {}
+                onMonthlyRadioButtonClicked = {},
+                onMonthDayChanged = {},
+                onMonthWeekDayChanged = {},
+                onWeekOfMonthChanged = {}
             )
         }
 
@@ -186,6 +225,16 @@ class CustomRecurrenceViewTest {
             monthWeekDayList = emptyList()
         )
 
+    private fun getMonthlyRules() =
+        ChatScheduledRules(
+            freq = OccurrenceFrequencyType.Monthly,
+            interval = 1,
+            until = 0,
+            weekDayList = null,
+            monthDayList = null,
+            monthWeekDayList = emptyList()
+        )
+
     private fun getWeeklyList() = mutableListOf<Weekday>().apply {
         add(Weekday.Monday)
         add(Weekday.Friday)
@@ -198,13 +247,17 @@ class CustomRecurrenceViewTest {
             CustomRecurrenceView(
                 state = state,
                 onScrollChange = {},
-                onRejectClicked = {},
                 onAcceptClicked = {},
-                onTypeClicked = {},
-                onNumberClicked = {},
+                onRejectClicked = {},
+                onIntervalChanged = {},
+                onFrequencyTypeChanged = {},
+                onDayClicked = {},
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
-                onWeekdayClicked = {}
+                onMonthlyRadioButtonClicked = {},
+                onMonthDayChanged = {},
+                onMonthWeekDayChanged = {},
+                onWeekOfMonthChanged = {}
             )
         }
     }
