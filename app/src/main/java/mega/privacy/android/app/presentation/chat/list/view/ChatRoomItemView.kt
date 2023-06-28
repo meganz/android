@@ -31,21 +31,27 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
+import androidx.core.graphics.toColorInt
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.GroupChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
@@ -144,96 +150,99 @@ internal fun ChatRoomItemView(
         Text(
             text = item.title,
             style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.onSurface,
+            color = MaterialTheme.colors.textColorPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .constrainAs(titleText) {
-                    linkTo(avatarImage.end, parent.end, 16.dp, 56.dp, 72.dp, 0.dp, 0f)
+                    linkTo(avatarImage.end, parent.end, 16.dp, 74.dp, 72.dp, 0.dp, 0f)
                     top.linkTo(parent.top)
                     bottom.linkTo(middleText.top)
                     width = Dimension.preferredWrapContent
                 }
                 .placeholder(
-                    color = Color.LightGray,
+                    color = MaterialTheme.colors.grey_200_grey_700,
                     shape = RoundedCornerShape(4.dp),
-                    highlight = PlaceholderHighlight.fade(Color.White),
+                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
                     visible = isLoading,
                 ),
         )
 
-        val userStatus = item.getIndividualUserStatus()
-        ChatUserStatusView(
-            userStatus = userStatus,
-            modifier = Modifier.constrainAs(statusIcon) {
-                start.linkTo(titleText.end, 4.dp)
-                top.linkTo(titleText.top)
-                bottom.linkTo(titleText.bottom)
-                visibility = if (userStatus != null) Visibility.Visible else Visibility.Gone
-            },
-        )
-
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_key_02),
-            contentDescription = "Private chat icon",
-            tint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .size(16.dp)
-                .constrainAs(privateIcon) {
-                    start.linkTo(statusIcon.end, 4.dp, 4.dp)
+        if (!isLoading) {
+            val userStatus = if (item is IndividualChatRoomItem) item.userStatus else null
+            ChatUserStatusView(
+                userStatus = userStatus,
+                modifier = Modifier.constrainAs(statusIcon) {
+                    start.linkTo(titleText.end, 4.dp)
                     top.linkTo(titleText.top)
                     bottom.linkTo(titleText.bottom)
-                    visibility = if (item.isPublicChat()) Visibility.Gone else Visibility.Visible
+                    visibility = if (userStatus != null) Visibility.Visible else Visibility.Gone
                 },
-        )
+            )
 
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_bell_off),
-            contentDescription = "Mute chat icon",
-            tint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .size(16.dp)
-                .constrainAs(muteIcon) {
-                    start.linkTo(privateIcon.end, 2.dp, 4.dp)
-                    top.linkTo(titleText.top)
-                    bottom.linkTo(titleText.bottom)
-                    visibility = if (item.isMuted) Visibility.Visible else Visibility.Gone
-                },
-        )
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_key_02),
+                contentDescription = "Private chat icon",
+                tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                modifier = Modifier
+                    .size(16.dp)
+                    .constrainAs(privateIcon) {
+                        start.linkTo(statusIcon.end, 4.dp, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                        visibility =
+                            if (item.isPublicChat()) Visibility.Gone else Visibility.Visible
+                    },
+            )
 
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotate_cw),
-            contentDescription = "Recurring meeting icon",
-            tint = MaterialTheme.colors.onSurface,
-            modifier = Modifier
-                .size(16.dp)
-                .constrainAs(recurringIcon) {
-                    start.linkTo(muteIcon.end, 2.dp, 4.dp)
-                    top.linkTo(titleText.top)
-                    bottom.linkTo(titleText.bottom)
-                    visibility = if (item.isRecurringMeeting())
-                        Visibility.Visible
-                    else
-                        Visibility.Gone
-                },
-        )
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_bell_off),
+                contentDescription = "Mute chat icon",
+                tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                modifier = Modifier
+                    .size(16.dp)
+                    .constrainAs(muteIcon) {
+                        start.linkTo(privateIcon.end, 2.dp, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                        visibility = if (item.isMuted) Visibility.Visible else Visibility.Gone
+                    },
+            )
 
-        Icon(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_ongoing_call),
-            contentDescription = "Ongoing call icon",
-            tint = MaterialTheme.colors.secondary,
-            modifier = Modifier
-                .size(14.dp)
-                .constrainAs(callIcon) {
-                    start.linkTo(recurringIcon.end, 2.dp, 4.dp)
-                    top.linkTo(titleText.top)
-                    bottom.linkTo(titleText.bottom)
-                    visibility = if (hasOngoingCall)
-                        Visibility.Visible
-                    else
-                        Visibility.Gone
-                },
-        )
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_rotate_cw),
+                contentDescription = "Recurring meeting icon",
+                tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+                modifier = Modifier
+                    .size(16.dp)
+                    .constrainAs(recurringIcon) {
+                        start.linkTo(muteIcon.end, 2.dp, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                        visibility = if (item.isRecurringMeeting())
+                            Visibility.Visible
+                        else
+                            Visibility.Gone
+                    },
+            )
+
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_ongoing_call),
+                contentDescription = "Ongoing call icon",
+                tint = MaterialTheme.colors.secondary,
+                modifier = Modifier
+                    .size(14.dp)
+                    .constrainAs(callIcon) {
+                        start.linkTo(recurringIcon.end, 2.dp, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                        visibility = if (hasOngoingCall)
+                            Visibility.Visible
+                        else
+                            Visibility.Gone
+                    },
+            )
+        }
 
         Icon(
             imageVector = ImageVector.vectorResource(
@@ -243,7 +252,7 @@ internal fun ChatRoomItemView(
                     R.drawable.ic_chat_location
             ),
             contentDescription = "Last message location icon",
-            tint = MaterialTheme.colors.onSurface,
+            tint = MaterialTheme.colors.textColorSecondary,
             modifier = Modifier
                 .size(16.dp)
                 .constrainAs(lastMessageIcon) {
@@ -251,7 +260,7 @@ internal fun ChatRoomItemView(
                     top.linkTo(titleText.bottom)
                     bottom.linkTo(bottomText.top)
                     visibility =
-                        if (item.isLastMessageVoiceClip || item.isLastMessageGeolocation)
+                        if (!isLoading && (item.isLastMessageVoiceClip || item.isLastMessageGeolocation))
                             Visibility.Visible
                         else
                             Visibility.Gone
@@ -259,21 +268,28 @@ internal fun ChatRoomItemView(
         )
 
         MiddleTextView(
-            modifier = Modifier.constrainAs(middleText) {
-                linkTo(
-                    start = lastMessageIcon.end,
-                    end = unreadCountIcon.start,
-                    startMargin = 2.dp,
-                    endMargin = 8.dp,
-                    startGoneMargin = 72.dp,
-                    endGoneMargin = 6.dp,
-                    bias = 0f
-                )
-                top.linkTo(titleText.bottom)
-                bottom.linkTo(bottomText.top, 5.dp)
-                width = Dimension.preferredWrapContent
-            },
-            isLoading = isLoading,
+            modifier = Modifier
+                .constrainAs(middleText) {
+                    linkTo(
+                        start = lastMessageIcon.end,
+                        end = unreadCountIcon.start,
+                        startMargin = 2.dp,
+                        endMargin = 8.dp,
+                        startGoneMargin = 72.dp,
+                        endGoneMargin = 6.dp,
+                        bias = 0f
+                    )
+                    top.linkTo(titleText.bottom)
+                    bottom.linkTo(bottomText.top, 5.dp)
+                    width = Dimension.preferredWrapContent
+                }
+                .padding(vertical = if (isLoading) 2.dp else 0.dp)
+                .placeholder(
+                    color = MaterialTheme.colors.grey_200_grey_700,
+                    shape = RoundedCornerShape(4.dp),
+                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                    visible = isLoading,
+                ),
             lastMessage = item.lastMessage,
             isPending = item is MeetingChatRoomItem && item.isPending,
             scheduledTimestamp = if (item is MeetingChatRoomItem) item.scheduledTimestampFormatted else null,
@@ -285,20 +301,26 @@ internal fun ChatRoomItemView(
         )
 
         BottomTextView(
-            modifier = Modifier.constrainAs(bottomText) {
-                linkTo(
-                    start = parent.start,
-                    end = unreadCountIcon.start,
-                    startMargin = 72.dp,
-                    endMargin = 8.dp,
-                    startGoneMargin = 72.dp,
-                    endGoneMargin = 6.dp,
-                    bias = 0f
-                )
-                bottom.linkTo(parent.bottom)
-                top.linkTo(middleText.bottom, 4.dp)
-            },
-            isLoading = isLoading,
+            modifier = Modifier
+                .constrainAs(bottomText) {
+                    linkTo(
+                        start = parent.start,
+                        end = unreadCountIcon.start,
+                        startMargin = 72.dp,
+                        endMargin = 8.dp,
+                        startGoneMargin = 72.dp,
+                        endGoneMargin = 6.dp,
+                        bias = 0f
+                    )
+                    bottom.linkTo(parent.bottom)
+                    top.linkTo(middleText.bottom, 4.dp)
+                }
+                .placeholder(
+                    color = MaterialTheme.colors.grey_200_grey_700,
+                    shape = RoundedCornerShape(4.dp),
+                    highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
+                    visible = isLoading,
+                ),
             isRecurring = item is MeetingChatRoomItem && item.isRecurring(),
             isPending = item is MeetingChatRoomItem && item.isPending,
             highlight = item.highlight,
@@ -321,7 +343,7 @@ internal fun ChatRoomItemView(
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_more),
                 contentDescription = "See more Icon",
-                tint = MaterialTheme.colors.onSurface,
+                tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
             )
         }
 
@@ -359,7 +381,6 @@ internal fun ChatRoomItemView(
 @Composable
 private fun MiddleTextView(
     modifier: Modifier,
-    isLoading: Boolean,
     lastMessage: String?,
     isPending: Boolean,
     scheduledTimestamp: String?,
@@ -410,20 +431,12 @@ private fun MiddleTextView(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
         modifier = modifier
-            .padding(vertical = if (isLoading) 2.dp else 0.dp)
-            .placeholder(
-                color = Color.LightGray,
-                shape = RoundedCornerShape(4.dp),
-                highlight = PlaceholderHighlight.fade(Color.White),
-                visible = isLoading,
-            ),
     )
 }
 
 @Composable
 private fun BottomTextView(
     modifier: Modifier,
-    isLoading: Boolean,
     isRecurring: Boolean,
     isPending: Boolean,
     highlight: Boolean,
@@ -463,12 +476,7 @@ private fun BottomTextView(
         style = MaterialTheme.typography.caption,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = modifier.placeholder(
-            color = Color.LightGray,
-            shape = RoundedCornerShape(4.dp),
-            highlight = PlaceholderHighlight.fade(Color.White),
-            visible = isLoading,
-        ),
+        modifier = modifier,
     )
 }
 
@@ -479,26 +487,129 @@ private fun Long.formatCallTime() =
         TimeUnit.SECONDS.toSeconds(this) % 60
     )
 
-@CombinedThemePreviews
+@Preview
 @Composable
-private fun PreviewChatRoomItemView() {
-    val meeting = MeetingChatRoomItem(
-        chatId = Random.nextLong(),
-        schedId = Random.nextLong(),
-        title = "Photos Sprint #${Random.nextInt()}",
+fun PreviewIndividualChatRoomItem() {
+    val unreadCount = Random.nextInt(5)
+    val item = IndividualChatRoomItem(
+        chatId = 1L,
+        title = "Mieko Kawakami",
+        peerEmail = "mieko@miekokawakami.jp",
+        lastMessage = "Call ended",
+        lastTimestampFormatted = "Monday 14:25",
+        unreadCount = unreadCount,
+        highlight = unreadCount > 0,
+        avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
+        isMuted = Random.nextBoolean(),
+    )
+    ChatRoomItemView(
+        item = item,
+        isSelected = false,
+        isSelectionEnabled = false,
+        onItemClick = {},
+        onItemMoreClick = {},
+        onItemSelected = {},
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewGroupChatRoomItem() {
+    val unreadCount = Random.nextInt(110)
+    val meeting = GroupChatRoomItem(
+        chatId = 1L,
+        title = "Recipe test #14",
         lastMessage = "Anna: Seeya all soon!",
-        avatars = listOf(ChatAvatarItem("A"), ChatAvatarItem("J")),
+        avatars = listOf(
+            ChatAvatarItem("A", color = "#FEBC00".toColorInt()),
+            ChatAvatarItem("J", color = "#B965C1".toColorInt())
+        ),
         lastTimestampFormatted = "1 May 2022 17:53",
         unreadCount = Random.nextInt(150),
+        highlight = unreadCount > 0,
         isMuted = Random.nextBoolean(),
-        isRecurringMonthly = Random.nextBoolean(),
         isPublic = Random.nextBoolean(),
     )
     ChatRoomItemView(
         item = meeting,
-        isSelected = Random.nextBoolean(),
-        isSelectionEnabled = Random.nextBoolean(),
+        isSelected = false,
+        isSelectionEnabled = false,
         onItemClick = {},
         onItemMoreClick = {},
-    ) {}
+        onItemSelected = {},
+    )
 }
+
+@Preview
+@Composable
+private fun PreviewMeetingChatRoomItem() {
+    val meeting = MeetingChatRoomItem(
+        chatId = 1L,
+        schedId = 1L,
+        title = "Photos Meeting #1325",
+        lastMessage = "Anna: Seeya all soon!",
+        avatars = listOf(
+            ChatAvatarItem("C", color = "#009372".toColorInt()),
+            ChatAvatarItem("L", color = "#FF8F00".toColorInt())
+        ),
+        lastTimestampFormatted = "1 May 2022 17:53",
+        scheduledStartTimestamp = 100L,
+        scheduledEndTimestamp = 200L,
+        scheduledTimestampFormatted = "10:00pm - 11:00pm",
+        unreadCount = 0,
+        isPending = true,
+        isRecurringWeekly = true,
+        isMuted = Random.nextBoolean(),
+        isPublic = Random.nextBoolean(),
+        header = "Monday, 23 May"
+    )
+    ChatRoomItemView(
+        item = meeting,
+        isSelected = false,
+        isSelectionEnabled = false,
+        onItemClick = {},
+        onItemMoreClick = {},
+        onItemSelected = {},
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewSelectedState() {
+    val item = IndividualChatRoomItem(
+        chatId = 1L,
+        title = "Lise MeitnerHubertWolf...",
+        peerEmail = "lise@meitnerHubertwolf.com",
+        lastMessage = "Great to have you in our team!",
+        lastTimestampFormatted = "Today 08:15",
+        avatar = ChatAvatarItem("M", color = "#FEBC00".toColorInt()),
+        isMuted = Random.nextBoolean(),
+    )
+    ChatRoomItemView(
+        item = item,
+        isSelected = true,
+        isSelectionEnabled = true,
+        onItemClick = {},
+        onItemMoreClick = {},
+        onItemSelected = {},
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewLoadingState() {
+    val item = GroupChatRoomItem(
+        chatId = 1L,
+        title = "Photos Meeting #1325",
+        isPublic = true,
+    )
+    ChatRoomItemView(
+        item = item,
+        isSelected = false,
+        isSelectionEnabled = false,
+        onItemClick = {},
+        onItemMoreClick = {},
+        onItemSelected = {},
+    )
+}
+

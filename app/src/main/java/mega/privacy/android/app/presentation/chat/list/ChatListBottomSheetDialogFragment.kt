@@ -19,7 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
-import mega.privacy.android.app.presentation.chat.dialog.view.ChatItemBottomSheetView
+import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
@@ -72,7 +72,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
             AndroidTheme(isDark = mode.isDarkMode()) {
-                ChatItemBottomSheetView(
+                ChatRoomItemBottomSheetView(
                     item = item,
                     onStartMeetingClick = ::onStartMeetingClick,
                     onOccurrencesClick = ::onOccurrencesClick,

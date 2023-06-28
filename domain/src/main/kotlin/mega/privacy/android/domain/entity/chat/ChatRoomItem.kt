@@ -232,14 +232,6 @@ sealed class ChatRoomItem(
         this is MeetingChatRoomItem && this.isRecurring()
 
     /**
-     * Get Individual chat user status
-     *
-     * @return  [UserStatus]
-     */
-    fun getIndividualUserStatus(): UserStatus? =
-        if (this is IndividualChatRoomItem) userStatus else null
-
-    /**
      * Check if chat has ongoing call
      *
      * @return  True if has an ongoing call, false otherwise.

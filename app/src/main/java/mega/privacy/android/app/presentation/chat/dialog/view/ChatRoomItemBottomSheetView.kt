@@ -31,19 +31,23 @@ import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.chat.list.view.ChatDivider
+import mega.privacy.android.app.presentation.chat.list.view.ChatUserStatusView
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.ChatRoomItem.IndividualChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItemStatus
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import kotlin.random.Random
 
 /**
- * Chat item bottom sheet view
+ * Chat Room Item bottom sheet view
  */
 @Composable
-internal fun ChatItemBottomSheetView(
+internal fun ChatRoomItemBottomSheetView(
     modifier: Modifier = Modifier,
     item: ChatRoomItem?,
     onStartMeetingClick: () -> Unit = {},
@@ -80,9 +84,9 @@ internal fun ChatItemBottomSheetView(
                 .padding(horizontal = 16.dp)
                 .height(71.dp)
         ) {
-            val (imgAvatar, txtTitle, txtSubtitle) = createRefs()
+            val (avatarImage, titleText, subtitleText, statusIcon) = createRefs()
             val subtitle = when (item) {
-                is ChatRoomItem.IndividualChatRoomItem -> item.peerEmail
+                is IndividualChatRoomItem -> item.peerEmail
                 is ChatRoomItem.GroupChatRoomItem -> stringResource(id = R.string.group_chat_label)
                 is ChatRoomItem.MeetingChatRoomItem -> {
                     when {
@@ -97,7 +101,7 @@ internal fun ChatItemBottomSheetView(
                 avatars = item.getChatAvatars(),
                 modifier = Modifier
                     .size(40.dp)
-                    .constrainAs(imgAvatar) {
+                    .constrainAs(avatarImage) {
                         start.linkTo(parent.start)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
@@ -107,18 +111,28 @@ internal fun ChatItemBottomSheetView(
             Text(
                 text = item.title,
                 style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.onSurface,
+                color = MaterialTheme.colors.textColorPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(txtTitle) {
-                        linkTo(imgAvatar.end, parent.end, 16.dp, 16.dp, 0.dp, 0.dp, 0f)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(txtSubtitle.top)
-                        width = Dimension.preferredWrapContent
-                    }
+                modifier = Modifier.constrainAs(titleText) {
+                    linkTo(avatarImage.end, parent.end, 16.dp, 32.dp, 0.dp, 0.dp, 0f)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(subtitleText.top)
+                    width = Dimension.preferredWrapContent
+                }
             )
+
+            val userStatus = if (item is IndividualChatRoomItem) item.userStatus else null
+            if (userStatus != null) {
+                ChatUserStatusView(
+                    userStatus = userStatus,
+                    modifier = Modifier.constrainAs(statusIcon) {
+                        start.linkTo(titleText.end, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                    },
+                )
+            }
 
             if (!subtitle.isNullOrBlank()) {
                 Text(
@@ -127,20 +141,18 @@ internal fun ChatItemBottomSheetView(
                     style = MaterialTheme.typography.subtitle2,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .constrainAs(txtSubtitle) {
-                            linkTo(imgAvatar.end, parent.end, 16.dp, 16.dp, 0.dp, 0.dp, 0f)
-                            top.linkTo(txtTitle.bottom)
-                            bottom.linkTo(parent.bottom)
-                            width = Dimension.preferredWrapContent
-                        }
+                    modifier = Modifier.constrainAs(subtitleText) {
+                        linkTo(avatarImage.end, parent.end, 16.dp, 16.dp, 0.dp, 0.dp, 0f)
+                        top.linkTo(titleText.bottom)
+                        bottom.linkTo(parent.bottom)
+                        width = Dimension.preferredWrapContent
+                    }
                 )
             }
 
             createVerticalChain(
-                txtTitle,
-                txtSubtitle,
+                titleText,
+                subtitleText,
                 chainStyle = ChainStyle.Packed
             )
         }
@@ -282,7 +294,7 @@ private fun MenuItem(
             iconColor = MaterialTheme.colors.red_600_red_300
             textColor = MaterialTheme.colors.red_600_red_300
         } else {
-            iconColor = MaterialTheme.colors.textColorSecondary
+            iconColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054
             textColor = MaterialTheme.colors.textColorPrimary
         }
         Icon(
@@ -307,16 +319,18 @@ private fun MenuItem(
 
 @Preview
 @Composable
-private fun PreviewIndividualChatItemBottomSheet() {
-    ChatItemBottomSheetView(
+private fun PreviewIndividualChatRoomItemBottomSheetView() {
+    ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatRoomItem.IndividualChatRoomItem(
+        item = IndividualChatRoomItem(
             chatId = Random.nextLong(),
             title = "Mieko Kawakami",
             peerEmail = "mieko@miekokawakami.jp",
+            userStatus = UserStatus.Online,
             avatar = ChatAvatarItem("M"),
             lastTimestampFormatted = "1 May 2022 17:53",
             unreadCount = Random.nextInt(150),
+            hasPermissions = true,
             isMuted = Random.nextBoolean(),
         ),
     )
@@ -324,8 +338,8 @@ private fun PreviewIndividualChatItemBottomSheet() {
 
 @Preview
 @Composable
-private fun PreviewGroupChatItemBottomSheet() {
-    ChatItemBottomSheetView(
+private fun PreviewGroupChatRoomItemBottomSheetView() {
+    ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
         item = ChatRoomItem.GroupChatRoomItem(
             chatId = Random.nextLong(),
@@ -342,8 +356,8 @@ private fun PreviewGroupChatItemBottomSheet() {
 
 @Preview
 @Composable
-private fun PreviewMeetingChatItemBottomSheet() {
-    ChatItemBottomSheetView(
+private fun PreviewMeetingChatRoomItemBottomSheetView() {
+    ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
         item = ChatRoomItem.MeetingChatRoomItem(
             chatId = Random.nextLong(),
@@ -362,10 +376,10 @@ private fun PreviewMeetingChatItemBottomSheet() {
 
 @Preview
 @Composable
-private fun PreviewArchivedChatItemBottomSheet() {
-    ChatItemBottomSheetView(
+private fun PreviewArchivedChatRoomItemBottomSheetView() {
+    ChatRoomItemBottomSheetView(
         modifier = Modifier.background(Color.White),
-        item = ChatRoomItem.IndividualChatRoomItem(
+        item = IndividualChatRoomItem(
             chatId = Random.nextLong(),
             title = "Mieko Kawakami",
             peerEmail = "mieko@miekokawakami.jp",

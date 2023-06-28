@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 /**
  * Chat room item header view
@@ -34,7 +35,7 @@ fun ChatRoomItemHeaderView(
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colors.onPrimary,
+            color = MaterialTheme.colors.textColorPrimary,
             style = MaterialTheme.typography.body2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
