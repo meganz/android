@@ -1,5 +1,6 @@
 package mega.privacy.android.data.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
@@ -19,6 +20,9 @@ import mega.privacy.android.data.database.entity.ContactEntity
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
+    autoMigrations = [
+        AutoMigration(69, 70)
+    ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun contactDao(): ContactDao
@@ -47,10 +51,6 @@ internal abstract class MegaDatabase : RoomDatabase() {
                 }
             }
         }
-        private val MIGRATION_69_70 = object : Migration(69, 70) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-            }
-        }
-        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69, MIGRATION_69_70)
+        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69)
     }
 }

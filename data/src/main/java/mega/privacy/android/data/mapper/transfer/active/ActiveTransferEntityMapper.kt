@@ -10,7 +10,8 @@ internal class ActiveTransferEntityMapper @Inject constructor() {
             tag = tag,
             transferType = transferType,
             totalBytes = totalBytes,
-            transferredBytes = transferredBytes
+            transferredBytes = transferredBytes,
+            isFinished = isFinished,
         )
     }
 }

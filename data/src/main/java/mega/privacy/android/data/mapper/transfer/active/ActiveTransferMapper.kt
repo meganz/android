@@ -12,7 +12,8 @@ internal class ActiveTransferMapper @Inject constructor() {
                 tag = tag,
                 transferType = transferType,
                 totalBytes = totalBytes,
-                transferredBytes = transferredBytes
+                transferredBytes = transferredBytes,
+                isFinished = isFinished
             )
         }
 }

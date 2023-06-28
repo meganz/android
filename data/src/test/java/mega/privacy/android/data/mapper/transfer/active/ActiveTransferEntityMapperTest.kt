@@ -27,8 +27,8 @@ class ActiveTransferEntityMapperTest {
     @EnumSource(TransferType::class)
     fun `test that mapper returns model correctly when invoke function`(transferType: TransferType) =
         runTest {
-            val model = ActiveTransfer(TAG, transferType, TOTAL, TRANSFERRED)
-            val expected = ActiveTransferEntity(TAG, transferType, TOTAL, TRANSFERRED)
+            val model = ActiveTransfer(TAG, transferType, TOTAL, TRANSFERRED, true)
+            val expected = ActiveTransferEntity(TAG, transferType, TOTAL, TRANSFERRED, true)
             Truth.assertThat(underTest(model)).isEqualTo(expected)
         }
 

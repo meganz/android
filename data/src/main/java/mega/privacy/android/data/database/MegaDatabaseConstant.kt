@@ -24,4 +24,9 @@ object MegaDatabaseConstant {
      * Table Completed Transfers
      */
     const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
+
+    /**
+     * Table Active Transfers
+     */
+    const val TABLE_ACTIVE_TRANSFERS = "active_transfers"
 }

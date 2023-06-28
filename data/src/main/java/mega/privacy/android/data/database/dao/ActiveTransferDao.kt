@@ -11,19 +11,19 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 @Dao
 internal interface ActiveTransferDao {
 
-    @Query("SELECT * FROM ActiveTransferEntity WHERE tag = :tag")
+    @Query("SELECT * FROM active_transfers WHERE tag = :tag")
     suspend fun getActiveTransferByTag(tag: Int): ActiveTransferEntity?
 
-    @Query("SELECT * FROM ActiveTransferEntity WHERE transferType = :transferType")
+    @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
     fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransferEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
 
-    @Query("DELETE FROM ActiveTransferEntity")
+    @Query("DELETE FROM active_transfers")
     suspend fun deleteAllActiveTransfers()
 
-    @Query("DELETE FROM ActiveTransferEntity WHERE tag = :tag")
+    @Query("DELETE FROM active_transfers WHERE tag = :tag")
     suspend fun deleteActiveTransferByTag(tag: Int)
 
 }

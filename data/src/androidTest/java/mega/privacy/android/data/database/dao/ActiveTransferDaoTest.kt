@@ -27,7 +27,8 @@ class ActiveTransferDaoTest {
             tag = tag,
             transferType = if (tag.rem(2) == 0) TransferType.TYPE_DOWNLOAD else TransferType.TYPE_UPLOAD,
             totalBytes = 1024,
-            transferredBytes = 512
+            transferredBytes = 512,
+            isFinished = true,
         )
     }
 
