@@ -30,13 +30,13 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
+import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -717,14 +717,16 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
          * onDestroyActionMode
          */
         override fun onDestroyActionMode(actionMode: ActionMode) {
-            clearSelections()
-            megaNodeAdapter?.isMultipleSelect = false
-            if (requireActivity() is ManagerActivity) {
-                managerActivity?.showFabButton()
-                managerActivity?.hideTabs(false, currentTab)
-                managerActivity?.showHideBottomNavigationView(false)
+            if (isAdded) {
+                clearSelections()
+                megaNodeAdapter?.isMultipleSelect = false
+                if (requireActivity() is ManagerActivity) {
+                    managerActivity?.showFabButton()
+                    managerActivity?.hideTabs(false, currentTab)
+                    managerActivity?.showHideBottomNavigationView(false)
+                }
+                checkScroll()
             }
-            checkScroll()
         }
 
         /**

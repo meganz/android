@@ -108,12 +108,13 @@ class LinksFragment : MegaNodeBaseFragment() {
             }
 
             // click on a folder
-            state().nodes[actualPosition].isFolder ->
+            state().nodes.getOrNull(actualPosition)?.isFolder == true ->
                 navigateToFolder(state().nodes[actualPosition])
 
             // click on a file
-            else ->
-                openFile(state().nodes[actualPosition], Constants.LINKS_ADAPTER, actualPosition)
+            else -> state().nodes.getOrNull(actualPosition)?.let {
+                openFile(it, Constants.LINKS_ADAPTER, actualPosition)
+            }
         }
     }
 
