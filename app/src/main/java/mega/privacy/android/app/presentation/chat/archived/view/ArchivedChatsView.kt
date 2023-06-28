@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.chat.archived.model.ArchivedChatsState
-import mega.privacy.android.app.presentation.chat.dialog.view.ChatItemBottomSheetView
+import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.chat.list.view.ChatListView
 import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
 import mega.privacy.android.core.ui.model.SearchWidgetState
@@ -66,7 +66,7 @@ fun ArchivedChatsView(
         sheetContent = {
             val item = sheetItem
             if (item != null) {
-                ChatItemBottomSheetView(
+                ChatRoomItemBottomSheetView(
                     item = item,
                     onUnarchiveClick = { onItemUnarchived(item.chatId).also { hideSheet() } }
                 )

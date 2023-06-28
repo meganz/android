@@ -224,6 +224,7 @@ class ChatTabsFragment : Fragment() {
         if (currentTab == ChatTab.CHATS) {
             Analytics.tracker.trackTabSelected(ChatsTabInfo)
         } else {
+            viewModel.requestMeetings()
             Analytics.tracker.trackTabSelected(MeetingsTabInfo)
         }
     }

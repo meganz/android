@@ -32,6 +32,7 @@ import com.google.accompanist.placeholder.placeholder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
@@ -121,9 +122,9 @@ fun ChatAvatarView(
                     .clip(CircleShape)
                     .placeholder(
                         visible = true,
-                        color = Color.LightGray,
+                        color = MaterialTheme.colors.grey_200_grey_700,
                         shape = CircleShape,
-                        highlight = PlaceholderHighlight.fade(Color.White),
+                        highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
                     ),
             )
         }

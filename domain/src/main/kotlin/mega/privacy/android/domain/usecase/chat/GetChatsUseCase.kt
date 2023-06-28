@@ -151,20 +151,22 @@ class GetChatsUseCase @Inject constructor(
     ): Flow<List<ChatRoomItem>> =
         flow {
             values.toList().forEach { currentItem ->
-                val updatedItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
-                if (currentItem != updatedItem) {
+                val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
+                if (currentItem != newItem) {
                     mutex.withLock {
-                        put(currentItem.chatId, updatedItem)
+                        put(currentItem.chatId, newItem)
                     }
                     emit(values.toList())
                 }
 
-                val meetingItem = updatedItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
-                if (updatedItem != meetingItem) {
-                    mutex.withLock {
-                        put(currentItem.chatId, meetingItem)
+                if (currentItem is MeetingChatRoomItem) {
+                    val meetingItem = newItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
+                    if (newItem != meetingItem) {
+                        mutex.withLock {
+                            put(currentItem.chatId, meetingItem)
+                        }
+                        emit(values.toList())
                     }
-                    emit(values.toList())
                 }
             }
         }
@@ -179,8 +181,8 @@ class GetChatsUseCase @Inject constructor(
         lastTimestampFormatted = runCatching { lastTimeMapper(lastTimestamp) }.getOrNull(),
         currentCall = getCurrentCall(chatId),
         avatarItems = getParticipantsAvatar(chatId),
-        userStatus = this.getUserOnlineStatus(),
-        peerEmail = this.getUserEmail(),
+        userStatus = getUserOnlineStatus(),
+        peerEmail = getUserEmail(),
     )
 
     private suspend fun ChatRoomItem.updateMeetingFields(
@@ -315,7 +317,7 @@ class GetChatsUseCase @Inject constructor(
                     (it.isMeeting && chatRoomType == ChatRoomType.MEETINGS)
                             || (!it.isMeeting && chatRoomType == ChatRoomType.NON_MEETINGS)
                 }
-                ?.let { chatRoomItemMapper.invoke(it) }
+                ?.let(chatRoomItemMapper::invoke)
                 ?.updateChatFields(getLastMessage, lastTimeMapper)
                 ?.updateMeetingFields(chatRoomType, meetingTimeMapper)
                 ?.let { newItem ->

@@ -81,20 +81,20 @@ class ChatTabsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
+    private var meetingsRequested = false
 
     fun getState(): StateFlow<ChatsTabState> = state
 
     init {
         signalChatPresence()
-        getChats()
-        getMeetings()
+        requestChats()
         retrieveChatStatus()
     }
 
     /**
-     * Retrieve Chats
+     * Request Chat Rooms
      */
-    private fun getChats() =
+    private fun requestChats() {
         viewModelScope.launch {
             getChatsUseCase(
                 chatRoomType = ChatRoomType.NON_MEETINGS,
@@ -111,27 +111,32 @@ class ChatTabsViewModel @Inject constructor(
                     }
                 }
         }
+    }
 
     /**
-     * Retrieve Meetings
+     * Request Meeting Rooms
      */
-    private fun getMeetings() =
-        viewModelScope.launch {
-            getChatsUseCase(
-                chatRoomType = ChatRoomType.MEETINGS,
-                lastMessage = getLastMessageUseCase::invoke,
-                lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
-                meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
-                headerTimeMapper = chatRoomTimestampMapper::getHeaderTimeFormatted,
-            )
-                .conflate()
-                .catch { Timber.e(it) }
-                .collect { items ->
-                    state.update {
-                        it.copy(meetings = items)
+    fun requestMeetings() {
+        if (!meetingsRequested) {
+            meetingsRequested = true
+            viewModelScope.launch {
+                getChatsUseCase(
+                    chatRoomType = ChatRoomType.MEETINGS,
+                    lastMessage = getLastMessageUseCase::invoke,
+                    lastTimeMapper = chatRoomTimestampMapper::getLastTimeFormatted,
+                    meetingTimeMapper = chatRoomTimestampMapper::getMeetingTimeFormatted,
+                    headerTimeMapper = chatRoomTimestampMapper::getHeaderTimeFormatted,
+                )
+                    .conflate()
+                    .catch { Timber.e(it) }
+                    .collect { items ->
+                        state.update {
+                            it.copy(meetings = items)
+                        }
                     }
-                }
+            }
         }
+    }
 
     /**
      * Get chat item updates given a Chat Id

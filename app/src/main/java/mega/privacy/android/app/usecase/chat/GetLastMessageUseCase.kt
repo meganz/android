@@ -4,9 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -16,8 +14,7 @@ import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaChatApiAndroid
-import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage.TYPE_ALTER_PARTICIPANTS
@@ -57,7 +54,6 @@ class GetLastMessageUseCase @Inject constructor(
     }
 
     private val chatController: ChatController by lazy { ChatController(context) }
-    private val chatManagement: ChatManagement by lazy { MegaApplication.getChatManagement() }
 
     /**
      * Get a formatted String with the last message given the chatId
@@ -72,10 +68,8 @@ class GetLastMessageUseCase @Inject constructor(
             val chatMessage by lazy { megaChatApi.getMessage(chatId, chatListItem.lastMessageId) }
             val isMeeting by lazy { chatRoom?.isMeeting == true }
 
-            if (megaChatApi.hasCallInChatRoom(chatId)) {
-                megaChatApi.getChatCall(chatId)?.let { chatCall ->
-                    return@withContext chatCall.getChatCallStatusMessage(isMeeting)
-                }
+            getChatCallStatusMessage(chatId, isMeeting)?.let { callStatusMessage ->
+                return@withContext callStatusMessage
             }
 
             return@withContext when (chatListItem.lastMessageType) {
@@ -168,6 +162,19 @@ class GetLastMessageUseCase @Inject constructor(
             }
         }
 
+    private fun getChatCallStatusMessage(chatId: Long, isMeeting: Boolean): String? =
+        if (megaChatApi.hasCallInChatRoom(chatId)) {
+            megaChatApi.getChatCall(chatId)
+                ?.takeIf { it.status == CALL_STATUS_USER_NO_PRESENT || it.status == CALL_STATUS_IN_PROGRESS }
+                ?.let { call ->
+                    when {
+                        isMeeting -> context.getString(R.string.meetings_list_ongoing_call_message)
+                        call.isRinging -> context.getString(R.string.notification_subtitle_incoming)
+                        else -> context.getString(R.string.ongoing_call_messages)
+                    }
+                }
+        } else null
+
     private fun MegaChatListItem.getSenderName(includeMyName: Boolean = false): String =
         if (isMine()) {
             if (includeMyName) {
@@ -185,32 +192,6 @@ class GetLastMessageUseCase @Inject constructor(
 
     private fun MegaChatListItem.isMine(): Boolean =
         lastMessageSender == megaChatApi.myUserHandle
-
-    private fun MegaChatCall.getChatCallStatusMessage(isMeeting: Boolean): String =
-        when (status) {
-            CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                if (isMeeting) {
-                    context.getString(R.string.meetings_list_ongoing_call_message)
-                } else if (isRinging) {
-                    context.getString(R.string.notification_subtitle_incoming)
-                } else {
-                    context.getString(R.string.ongoing_call_messages)
-                }
-            }
-
-            else -> {
-                if (isMeeting) {
-                    context.getString(R.string.meetings_list_ongoing_call_message)
-                } else {
-                    val requestSent = chatManagement.isRequestSent(callId)
-                    if (requestSent) {
-                        context.getString(R.string.outgoing_call_starting)
-                    } else {
-                        context.getString(R.string.call_started_messages)
-                    }
-                }
-            }
-        }
 
     private fun String.cleanHtmlText(): String =
         Util.toCDATA(this)
