@@ -31,6 +31,7 @@ import mega.privacy.android.app.meeting.fragments.MakeModeratorFragment
 import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
 import mega.privacy.android.app.utils.PasscodeUtil
@@ -179,11 +180,12 @@ class MeetingActivity : BaseActivity() {
         initActionBar()
         initNavigation()
         setStatusBarTranslucent()
+        collectFlows()
 
         collectFlow(meetingViewModel.finishMeetingActivity) { shouldFinish ->
             if (shouldFinish) {
                 if (meetingViewModel.amIAGuest()) {
-                    meetingViewModel.logOutTheGuest(this@MeetingActivity)
+                    meetingViewModel.logout()
                 } else {
                     finish()
                 }
@@ -196,6 +198,18 @@ class MeetingActivity : BaseActivity() {
                 passcodeManagement.showPasscodeScreen = true
                 MegaApplication.getInstance().openCallService(chatId)
                 startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
+            }
+        }
+    }
+
+    private fun collectFlows() {
+        collectFlow(meetingViewModel.state) { state: MeetingState ->
+            if (state.shouldLaunchLeftMeetingActivity) {
+                startActivity(
+                    Intent(this, LeftMeetingActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                )
+                finish()
             }
         }
     }
@@ -463,12 +477,14 @@ class MeetingActivity : BaseActivity() {
                 }
                 false
             }
+
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
                 if (rtcAudioManagerGateway.isAnIncomingCallRinging) {
                     rtcAudioManagerGateway.muteOrUnMute(true)
                 }
                 false
             }
+
             else -> super.dispatchKeyEvent(event)
         }
     }

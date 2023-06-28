@@ -32,10 +32,10 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_AUDIO_OUTPUT_CHAN
 import mega.privacy.android.app.constants.EventConstants.EVENT_CHAT_TITLE_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_LINK_RECOVERED
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_CREATED
+import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.InviteToChatRoomListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
 import mega.privacy.android.app.meeting.gateway.CameraGateway
@@ -54,6 +54,8 @@ import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_M
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
@@ -85,6 +87,8 @@ class MeetingActivityViewModel @Inject constructor(
     private val cameraGateway: CameraGateway,
     private val checkChatLink: CheckChatLink,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
@@ -246,6 +250,7 @@ class MeetingActivityViewModel @Inject constructor(
                                 true -> context.getString(
                                     R.string.general_mic_unmute
                                 )
+
                                 false -> context.getString(
                                     R.string.general_mic_mute
                                 )
@@ -288,16 +293,27 @@ class MeetingActivityViewModel @Inject constructor(
     fun amIAGuest(): Boolean = meetingActivityRepository.amIAGuest()
 
     /**
-     * Log out the Ephemeral Account PlusPlus
+     * Logout
      *
-     * @param meetingActivity Context
+     * logs out the user from mega application and navigates to login activity
+     * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
+     * we are setting isLoggingRunning true hence it will not be navigated to login page
      */
-    fun logOutTheGuest(meetingActivity: Context) {
-        AccountController.logout(
-            meetingActivity,
-            MegaApplication.getInstance().megaApi,
-            viewModelScope
-        )
+    fun logout() = viewModelScope.launch {
+        MegaApplication.isLoggingOut = true
+        runCatching {
+            logoutUseCase()
+        }.onSuccess {
+            //We need to observe finish activity only when logout is success
+            //We are waiting for the logout process in MegaChatRequestHandler to finish with this monitor flow and then triggers navigating to LeftMeetingActivity
+            //if we navigate earlier MegaChatRequestHandler.isLoggingRunning will be false and app will navigate to default LoginActivity
+            monitorFinishActivityUseCase().collect { logoutFinished ->
+                _state.update { it.copy(shouldLaunchLeftMeetingActivity = logoutFinished) }
+            }
+        }.onFailure {
+            MegaApplication.isLoggingOut = false
+            Timber.d("Error on logout $it")
+        }
     }
 
     /**
@@ -354,6 +370,7 @@ class MeetingActivityViewModel @Inject constructor(
                             }
                         })
                     )
+
                     else -> {
                         showDefaultAvatar()
                     }
@@ -534,6 +551,7 @@ class MeetingActivityViewModel @Inject constructor(
                 Timber.d("Trying to switch to EARPIECE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.EARPIECE)
             }
+
             else -> {
                 Timber.d("Trying to switch to SPEAKER_PHONE")
                 meetingActivityRepository.switchSpeaker(AppRTCAudioManager.AudioDevice.SPEAKER_PHONE)
@@ -619,6 +637,7 @@ class MeetingActivityViewModel @Inject constructor(
             true -> context.getString(
                 R.string.general_camera_enable
             )
+
             false -> context.getString(
                 R.string.general_camera_disable
             )
