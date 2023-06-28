@@ -97,24 +97,6 @@ class UpgradeAccountFragment : Fragment() {
                 value = getFeatureFlagUseCase(AppFeatures.PlansPageUpdate)
             }
             if (useNewPlansPageUI) {
-                LegacyUpgradeAccountView(
-                    state = uiState,
-                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
-                    onPlanClicked = ::onPlanClicked,
-                    onCustomLabelClicked = {
-                        uiState.currentSubscriptionPlan?.let {
-                            onCustomLabelClick(it)
-                        }
-                    },
-                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
-                    onDialogPositiveButtonClicked = ::onDialogPositiveButtonClicked,
-                    onDialogDismissButtonClicked = {
-                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
-                            showBuyNewSubscriptionDialog = false
-                        )
-                    },
-                )
-            } else {
                 UpgradeAccountView(
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
@@ -144,6 +126,24 @@ class UpgradeAccountFragment : Fragment() {
                         }
                     },
                     hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+                )
+            } else {
+                LegacyUpgradeAccountView(
+                    state = uiState,
+                    onBackPressed = upgradeAccountActivity.onBackPressedDispatcher::onBackPressed,
+                    onPlanClicked = ::onPlanClicked,
+                    onCustomLabelClicked = {
+                        uiState.currentSubscriptionPlan?.let {
+                            onCustomLabelClick(it)
+                        }
+                    },
+                    hideBillingWarning = { upgradeAccountViewModel.setBillingWarningVisibility(false) },
+                    onDialogPositiveButtonClicked = ::onDialogPositiveButtonClicked,
+                    onDialogDismissButtonClicked = {
+                        upgradeAccountViewModel.setShowBuyNewSubscriptionDialog(
+                            showBuyNewSubscriptionDialog = false
+                        )
+                    },
                 )
             }
         }
