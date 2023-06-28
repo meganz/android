@@ -20,7 +20,6 @@ import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirect
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
-import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
@@ -174,9 +173,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideRenameSecondaryFolder() = mock<RenameSecondaryFolder>()
-
-    @Provides
-    fun provideDisableCameraUploadSettings() = mock<DisableCameraUploadSettings>()
 
     @Provides
     fun provideDisableMediaUploadSettings() = mock<DisableMediaUploadSettings>()

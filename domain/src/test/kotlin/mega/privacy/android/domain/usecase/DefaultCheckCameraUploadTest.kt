@@ -3,10 +3,10 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -22,7 +22,7 @@ internal class DefaultCheckCameraUploadTest {
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val clearSyncRecords = mock<ClearSyncRecords>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
-    private val disableCameraUploadSettings = mock<DisableCameraUploadSettings>()
+    private val disableCameraUploadsSettingsUseCase = mock<DisableCameraUploadsSettingsUseCase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
 
     @Before
@@ -35,7 +35,7 @@ internal class DefaultCheckCameraUploadTest {
             clearCacheDirectory = clearCacheDirectory,
             clearSyncRecords = clearSyncRecords,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
-            disableCameraUploadSettings = disableCameraUploadSettings,
+            disableCameraUploadsSettingsUseCase = disableCameraUploadsSettingsUseCase,
             disableMediaUploadSettings = disableMediaUploadSettings,
         )
     }
@@ -80,7 +80,7 @@ internal class DefaultCheckCameraUploadTest {
             whenever(isNodeInRubbish(primaryHandle))
                 .thenReturn(false)
             underTest(true, primaryHandle, secondaryHandle)
-            verify(backupTimeStampsAndFolderHandle, times(1)).invoke()
+            verify(backupTimeStampsAndFolderHandle).invoke()
         }
 
     @Test
@@ -95,7 +95,7 @@ internal class DefaultCheckCameraUploadTest {
             whenever(isNodeInRubbish(primaryHandle))
                 .thenReturn(true)
             underTest(true, primaryHandle, secondaryHandle)
-            verify(backupTimeStampsAndFolderHandle, times(1)).invoke()
+            verify(backupTimeStampsAndFolderHandle).invoke()
         }
 
     @Test
@@ -112,8 +112,8 @@ internal class DefaultCheckCameraUploadTest {
             val expected = underTest(true, primaryHandle, secondaryHandle)
             assertThat(true).isEqualTo(expected.shouldStopProcess)
             assertThat(false).isEqualTo(expected.shouldSendEvent)
-            verify(resetMediaUploadTimeStamps, times(1)).invoke()
-            verify(disableMediaUploadSettings, times(1)).invoke()
+            verify(resetMediaUploadTimeStamps).invoke()
+            verify(disableMediaUploadSettings).invoke()
         }
 
     @Test
@@ -130,9 +130,9 @@ internal class DefaultCheckCameraUploadTest {
             val expected = underTest(true, primaryHandle, secondaryHandle)
             assertThat(true).isEqualTo(expected.shouldStopProcess)
             assertThat(true).isEqualTo(expected.shouldSendEvent)
-            verify(resetCameraUploadTimeStamps, times(1)).invoke(false)
-            verify(clearCacheDirectory, times(1)).invoke()
-            verify(disableCameraUploadSettings, times(1)).invoke()
-            verify(clearSyncRecords, times(1)).invoke()
+            verify(resetCameraUploadTimeStamps).invoke(false)
+            verify(clearCacheDirectory).invoke()
+            verify(disableCameraUploadsSettingsUseCase).invoke()
+            verify(clearSyncRecords).invoke()
         }
 }

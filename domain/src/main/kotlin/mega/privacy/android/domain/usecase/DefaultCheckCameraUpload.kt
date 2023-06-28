@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.CameraUploadState
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
 import javax.inject.Inject
 
 /**
@@ -14,7 +15,7 @@ class DefaultCheckCameraUpload @Inject constructor(
     private val clearCacheDirectory: ClearCacheDirectory,
     private val clearSyncRecords: ClearSyncRecords,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
-    private val disableCameraUploadSettings: DisableCameraUploadSettings,
+    private val disableCameraUploadsSettingsUseCase: DisableCameraUploadsSettingsUseCase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
 ) :
     CheckCameraUpload {
@@ -41,7 +42,7 @@ class DefaultCheckCameraUpload @Inject constructor(
                 backupTimeStampsAndFolderHandle()
                 resetCameraUploadTimeStamps(false)
                 clearCacheDirectory()
-                disableCameraUploadSettings()
+                disableCameraUploadsSettingsUseCase()
                 clearSyncRecords()
                 result = result.copy(shouldSendEvent = true)
             }

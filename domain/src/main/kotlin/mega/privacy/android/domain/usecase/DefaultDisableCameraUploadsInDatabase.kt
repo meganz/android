@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase
 
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
 import javax.inject.Inject
 
 /**
@@ -7,13 +8,13 @@ import javax.inject.Inject
  */
 class DefaultDisableCameraUploadsInDatabase @Inject constructor(
     private val clearSyncRecords: ClearSyncRecords,
-    private val disableCameraUploadSettings: DisableCameraUploadSettings,
+    private val disableCameraUploadsSettingsUseCase: DisableCameraUploadsSettingsUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
 ) : DisableCameraUploadsInDatabase {
 
     override suspend fun invoke() {
         resetCameraUploadTimeStamps(clearCamSyncRecords = true)
         clearSyncRecords()
-        disableCameraUploadSettings()
+        disableCameraUploadsSettingsUseCase()
     }
 }

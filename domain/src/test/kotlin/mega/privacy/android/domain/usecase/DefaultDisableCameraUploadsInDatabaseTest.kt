@@ -2,11 +2,11 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 
 /**
  * Test class for [DisableCameraUploadsInDatabase]
@@ -16,14 +16,14 @@ class DefaultDisableCameraUploadsInDatabaseTest {
     private lateinit var underTest: DisableCameraUploadsInDatabase
 
     private val clearSyncRecords = mock<ClearSyncRecords>()
-    private val disableCameraUploadSettings = mock<DisableCameraUploadSettings>()
+    private val disableCameraUploadsSettingsUseCase = mock<DisableCameraUploadsSettingsUseCase>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
 
     @Before
     fun setUp() {
         underTest = DefaultDisableCameraUploadsInDatabase(
             clearSyncRecords = clearSyncRecords,
-            disableCameraUploadSettings = disableCameraUploadSettings,
+            disableCameraUploadsSettingsUseCase = disableCameraUploadsSettingsUseCase,
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
         )
     }
@@ -36,13 +36,13 @@ class DefaultDisableCameraUploadsInDatabaseTest {
             with(
                 inOrder(
                     clearSyncRecords,
-                    disableCameraUploadSettings,
+                    disableCameraUploadsSettingsUseCase,
                     resetCameraUploadTimeStamps
                 )
             ) {
-                verify(resetCameraUploadTimeStamps, times(1)).invoke(clearCamSyncRecords = true)
-                verify(clearSyncRecords, times(1)).invoke()
-                verify(disableCameraUploadSettings, times(1)).invoke()
+                verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
+                verify(clearSyncRecords).invoke()
+                verify(disableCameraUploadsSettingsUseCase).invoke()
             }
         }
 }

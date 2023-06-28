@@ -34,7 +34,6 @@ import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateCameraUploadTemporaryRootDirectory
-import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
@@ -57,7 +56,6 @@ import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
-import mega.privacy.android.domain.usecase.DisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
@@ -403,12 +401,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsNotEnoughQuota(isNotEnoughQuota: DefaultIsNotEnoughQuota): IsNotEnoughQuota
-
-    /**
-     * Provide the [DisableCameraUploadSettings] implementation
-     */
-    @Binds
-    abstract fun bindDisableCameraUploadSettings(disableCameraUploadSettings: DefaultDisableCameraUploadSettings): DisableCameraUploadSettings
 
     /**
      * Provide the [DisableCameraUploadsInDatabase] implementation
