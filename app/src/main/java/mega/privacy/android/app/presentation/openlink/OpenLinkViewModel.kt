@@ -43,7 +43,7 @@ class OpenLinkViewModel @Inject constructor(
      * logout confirmed
      * once logout is confirmed methods clears user related app data
      */
-    fun logoutConfirmed() {
+    private fun logoutConfirmed() {
         Timber.d("END logout sdk request - wait chat logout")
         MegaApplication.urlConfirmationLink?.let {
             Timber.d("Confirmation link - show confirmation screen")
@@ -71,6 +71,8 @@ class OpenLinkViewModel @Inject constructor(
         MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
+        }.onSuccess {
+            logoutConfirmed()
         }.onFailure {
             MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
