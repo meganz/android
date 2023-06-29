@@ -603,8 +603,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
         when (request.type) {
-            MegaRequest.TYPE_LOGOUT -> viewModel.logoutConfirmed()
-
             MegaRequest.TYPE_QUERY_SIGNUP_LINK -> {
                 Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK")
                 if (e.errorCode == MegaError.API_OK) {
