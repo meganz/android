@@ -486,7 +486,7 @@ internal class UploadService : LifecycleService() {
      *
      * @param showSnackbar True if should show finish snackbar, false otherwise.
      */
-    private fun onQueueComplete(showSnackbar: Boolean) {
+    private suspend fun onQueueComplete(showSnackbar: Boolean) {
         Timber.d("onQueueComplete")
         releaseLocks()
         if (isOverQuota != Constants.NOT_OVERQUOTA_STATE) {
@@ -497,9 +497,7 @@ internal class UploadService : LifecycleService() {
                 sendUploadFinishBroadcast()
             }
         }
-        applicationScope.launch {
-            resetTotalUploadsUseCase()
-        }
+        resetTotalUploadsUseCase()
         resetUploadNumbers()
         Timber.d("Stopping service!")
         stopForeground()
@@ -574,7 +572,7 @@ internal class UploadService : LifecycleService() {
     private fun getTransferredByte(map: HashMap<Int, Transfer>?): Long =
         map?.values?.sumOf { it.transferredBytes } ?: 0
 
-    private fun sendUploadFinishBroadcast() = applicationScope.launch {
+    private suspend fun sendUploadFinishBroadcast() {
         broadcastTransfersFinishedUseCase(
             TransfersFinishedState(
                 type = TransferFinishType.UPLOAD,
@@ -831,10 +829,8 @@ internal class UploadService : LifecycleService() {
             }
         }
         if (appData.isNotEmpty()) {
-            applicationScope.launch {
-                if (getNumberOfPendingUploadsUseCase() == 0) {
-                    onQueueComplete(false)
-                }
+            if (getNumberOfPendingUploadsUseCase() == 0) {
+                onQueueComplete(false)
             }
             return
         }
@@ -1071,7 +1067,7 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun doOnTransferUpdate(transfer: Transfer) = with(transfer) {
+    private suspend fun doOnTransferUpdate(transfer: Transfer) = with(transfer) {
         Timber.d("onTransferUpdate")
 
         if (appData.isNotEmpty()) return
@@ -1079,10 +1075,8 @@ internal class UploadService : LifecycleService() {
         if (canceled) {
             Timber.d("Transfer cancel: $fileName")
             releaseLocks()
-            applicationScope.launch {
-                runCatching { cancelTransferByTagUseCase(tag) }
-                    .onFailure { Timber.w("Exception canceling transfer: $it") }
-            }
+            runCatching { cancelTransferByTagUseCase(tag) }
+                .onFailure { Timber.w("Exception canceling transfer: $it") }
             cancel()
             Timber.d("After cancel")
             return
