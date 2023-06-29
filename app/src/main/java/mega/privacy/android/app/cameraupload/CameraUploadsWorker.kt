@@ -1718,10 +1718,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @param aborted true if the Camera Uploads has been stopped prematurely
      */
     private suspend fun sendStatusToBackupCenter(aborted: Boolean) {
-        if (aborted)
-            sendTransfersInterruptedInfoToBackupCenter()
-        else
-            sendTransfersUpToDateInfoToBackupCenter()
+        if (monitorConnectivityUseCase().value) {
+            if (aborted)
+                sendTransfersInterruptedInfoToBackupCenter()
+            else
+                sendTransfersUpToDateInfoToBackupCenter()
+        }
     }
 
     /**
