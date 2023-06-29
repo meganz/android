@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticatio
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -93,10 +94,10 @@ import javax.inject.Inject
  * @property sendStatisticsMediaDiscoveryUseCase
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
- * @property monitorCameraUploadFolderIconUpdateUseCase
+ * @param monitorCameraUploadFolderIconUpdateUseCase
  * @property getPrimarySyncHandleUseCase
  * @property getSecondarySyncHandleUseCase
- * @property checkCameraUpload
+ * @property areCameraUploadsFoldersInRubbishBinUseCase
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
  * @property broadcastUploadPauseState
@@ -136,7 +137,7 @@ class ManagerViewModel @Inject constructor(
     monitorCameraUploadFolderIconUpdateUseCase: MonitorCameraUploadFolderIconUpdateUseCase,
     private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
-    private val checkCameraUpload: CheckCameraUpload,
+    private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
@@ -531,7 +532,12 @@ class ManagerViewModel @Inject constructor(
                     return@launch
                 }
             }
-            val result = checkCameraUpload(shouldDisable, primaryHandle, secondaryHandle)
+            val result =
+                areCameraUploadsFoldersInRubbishBinUseCase(
+                    shouldDisable,
+                    primaryHandle,
+                    secondaryHandle
+                )
             _state.update {
                 it.copy(
                     shouldStopCameraUpload = result.shouldStopProcess,

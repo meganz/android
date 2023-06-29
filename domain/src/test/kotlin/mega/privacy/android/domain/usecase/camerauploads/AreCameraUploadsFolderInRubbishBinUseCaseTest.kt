@@ -1,19 +1,30 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
+import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 
 @ExperimentalCoroutinesApi
-internal class DefaultCheckCameraUploadTest {
-    lateinit var underTest: CheckCameraUpload
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+internal class AreCameraUploadsFolderInRubbishBinUseCaseTest {
+    lateinit var underTest: AreCameraUploadsFoldersInRubbishBinUseCase
 
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val isNodeInRubbish = mock<IsNodeInRubbish>()
@@ -25,9 +36,9 @@ internal class DefaultCheckCameraUploadTest {
     private val disableCameraUploadsSettingsUseCase = mock<DisableCameraUploadsSettingsUseCase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
-        underTest = DefaultCheckCameraUpload(
+        underTest = AreCameraUploadsFoldersInRubbishBinUseCase(
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             isNodeInRubbish = isNodeInRubbish,
             backupTimeStampsAndFolderHandle = backupTimeStampsAndFolderHandle,
@@ -37,6 +48,21 @@ internal class DefaultCheckCameraUploadTest {
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             disableCameraUploadsSettingsUseCase = disableCameraUploadsSettingsUseCase,
             disableMediaUploadSettings = disableMediaUploadSettings,
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            isSecondaryFolderEnabled,
+            isNodeInRubbish,
+            backupTimeStampsAndFolderHandle,
+            resetCameraUploadTimeStamps,
+            clearCacheDirectory,
+            clearSyncRecords,
+            resetMediaUploadTimeStamps,
+            disableCameraUploadsSettingsUseCase,
+            disableMediaUploadSettings,
         )
     }
 

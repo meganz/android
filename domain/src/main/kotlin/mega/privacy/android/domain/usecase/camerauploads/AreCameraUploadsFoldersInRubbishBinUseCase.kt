@@ -1,13 +1,20 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.CameraUploadState
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsSettingsUseCase
+import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.ClearCacheDirectory
+import mega.privacy.android.domain.usecase.ClearSyncRecords
+import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
+import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
+import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import javax.inject.Inject
 
 /**
- * Default implementation of [CheckCameraUpload]
+ * Check Camera Upload
  */
-class DefaultCheckCameraUpload @Inject constructor(
+class AreCameraUploadsFoldersInRubbishBinUseCase @Inject constructor(
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val backupTimeStampsAndFolderHandle: BackupTimeStampsAndFolderHandle,
@@ -17,9 +24,16 @@ class DefaultCheckCameraUpload @Inject constructor(
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val disableCameraUploadsSettingsUseCase: DisableCameraUploadsSettingsUseCase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
-) :
-    CheckCameraUpload {
-    override suspend fun invoke(
+) {
+
+    /**
+     * Invoke
+     * @param shouldDisable whether to disable camera upload job or not
+     * @param primaryHandle Primary Folder Handle
+     * @param secondaryHandle Secondary Folder Handle
+     * @return [CameraUploadState]
+     */
+    suspend operator fun invoke(
         shouldDisable: Boolean,
         primaryHandle: Long,
         secondaryHandle: Long,
