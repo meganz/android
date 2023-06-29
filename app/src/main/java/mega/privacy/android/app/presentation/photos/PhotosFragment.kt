@@ -452,12 +452,24 @@ class PhotosFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_zoom_in -> { // +
-                timelineViewModel.zoomIn()
+                with(timelineViewModel) {
+                    zoomIn()
+                    handleAndUpdatePhotosUIState(
+                        state.value.photos,
+                        state.value.currentShowingPhotos
+                    )
+                }
                 true
             }
 
             R.id.action_zoom_out -> { // -
-                timelineViewModel.zoomOut()
+                with(timelineViewModel) {
+                    zoomOut()
+                    handleAndUpdatePhotosUIState(
+                        state.value.photos,
+                        state.value.currentShowingPhotos
+                    )
+                }
                 true
             }
 

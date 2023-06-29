@@ -196,7 +196,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun handlePhotoItems(sortedPhotos: List<Photo>, sourcePhotos: List<Photo>? = null) {
+    internal fun handlePhotoItems(sortedPhotos: List<Photo>, sourcePhotos: List<Photo>? = null) {
         val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
         val yearsCardList = createYearsCardList(dayPhotos = dayPhotos)
         val monthsCardList = createMonthsCardList(dayPhotos = dayPhotos)
