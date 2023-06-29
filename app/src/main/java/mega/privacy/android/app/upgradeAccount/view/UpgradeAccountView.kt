@@ -47,6 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -135,8 +136,7 @@ fun UpgradeAccountView(
     var isPreselectedPlanOnce by rememberSaveable { mutableStateOf(false) }
     val isPaymentMethodAvailable = state.isPaymentMethodAvailable
     var hideFloatButton by rememberSaveable { mutableStateOf(false) }
-    val snackbarMessage =
-        stringResource(id = R.string.account_upgrade_account_snackbar_recurring_plan_already_exist)
+    val context = LocalContext.current
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -262,7 +262,7 @@ fun UpgradeAccountView(
                                 if (disableCardClick) {
                                     coroutineScope.launch {
                                         scaffoldState.snackbarHostState.showSnackbar(
-                                            message = snackbarMessage
+                                            message = context.getString(R.string.account_upgrade_account_snackbar_recurring_plan_already_exist)
                                         )
                                     }
                                 } else {
