@@ -11,11 +11,13 @@ import mega.privacy.android.app.utils.Constants
  * @property type
  * @property stringRes
  * @property stringArg
+ * @property intArg
  */
 data class SnackBarItem(
     val type: Int = Constants.SNACKBAR_TYPE,
     @StringRes var stringRes: Int,
     val stringArg: String? = null,
+    val intArg: Int? = null,
 ) {
 
     /**
@@ -24,5 +26,5 @@ data class SnackBarItem(
      * @param resources     [Resources]
      */
     fun getMessage(resources: Resources): String =
-        resources.getString(stringRes, stringArg)
+        resources.getString(stringRes, stringArg ?: intArg)
 }
