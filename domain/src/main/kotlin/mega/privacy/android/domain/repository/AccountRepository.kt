@@ -464,4 +464,24 @@ interface AccountRepository {
      * @return a user handle Long value or null
      */
     suspend fun getLoggedInUserId(): UserId?
+
+    /**
+     * Get the alias of the given user if any
+     *
+     * @param handle User identifier.
+     * @return User alias.
+     */
+    suspend fun getUserAlias(handle: Long): String?
+
+    /**
+     * Returns the known alias given to the user
+     *
+     * Returns NULL if data is not cached yet or it's not possible to get
+     *
+     * You take the ownership of returned value
+     *
+     * @param userHandle Handle of the user whose alias is requested.
+     * @return The alias from user
+     */
+    suspend fun getUserAliasFromCache(userHandle: Long): String?
 }

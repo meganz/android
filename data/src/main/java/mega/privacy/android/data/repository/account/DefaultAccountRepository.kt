@@ -877,6 +877,20 @@ internal class DefaultAccountRepository @Inject constructor(
         megaApiGateway.myUser?.handle?.let { UserId(it) }
     }
 
+    override suspend fun getUserAlias(handle: Long): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener =
+                continuation.getRequestListener("getUserAlias") { request -> request.name }
+            megaApiGateway.getUserAlias(userHandle = handle, listener = listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun getUserAliasFromCache(userHandle: Long): String? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getUserAliasFromCache(userHandle)
+        }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
