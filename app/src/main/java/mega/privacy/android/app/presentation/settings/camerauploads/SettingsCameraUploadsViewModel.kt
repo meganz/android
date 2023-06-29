@@ -26,7 +26,6 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -34,6 +33,7 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -72,7 +72,7 @@ import javax.inject.Inject
  * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
  * @property checkEnableCameraUploadsStatus Checks the Camera Uploads status before enabling
  * @property clearCacheDirectory Clears all the contents of the internal cache directory
- * @property disableCameraUploadsInDatabase Disables Camera Uploads by manipulating values in the database
+ * @property disableCameraUploadsUseCase Disables Camera Uploads by manipulating values in the database
  * @property disableMediaUploadSettings Disables Media Uploads by manipulating a certain value in the database
  * @property getPrimaryFolderPathUseCase Retrieves the Primary Folder path
  * @property getUploadOptionUseCase Retrieves the upload option of Camera Uploads
@@ -112,7 +112,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val clearCacheDirectory: ClearCacheDirectory,
-    private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
+    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
@@ -360,11 +360,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Call [disableCameraUploadsInDatabase] to disable Camera Uploads by manipulating
+     * Call [disableCameraUploadsUseCase] to disable Camera Uploads by manipulating
      * values in the database
      */
-    fun disableCameraUploadsInDB() = viewModelScope.launch {
-        disableCameraUploadsInDatabase()
+    fun disableCameraUploads() = viewModelScope.launch {
+        disableCameraUploadsUseCase()
     }
 
     /**

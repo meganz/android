@@ -84,7 +84,6 @@ import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUse
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
-import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -104,6 +103,7 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
@@ -491,7 +491,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Disable Camera Uploads in Database
      */
     @Inject
-    lateinit var disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase
+    lateinit var disableCameraUploadsUseCase: DisableCameraUploadsUseCase
 
     /**
      * Compress Videos
@@ -1479,7 +1479,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             R.string.camera_notif_primary_local_unavailable,
             FOLDER_REMINDER_PRIMARY
         )
-        disableCameraUploadsInDatabase()
+        disableCameraUploadsUseCase()
         setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment

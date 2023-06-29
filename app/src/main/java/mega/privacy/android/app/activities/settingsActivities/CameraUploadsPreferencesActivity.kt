@@ -62,7 +62,7 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                 when (intent.action) {
                     ACTION_UPDATE_DISABLE_CU_SETTING -> {
                         Timber.d("Disable Camera Uploads Event Received")
-                        it.disableCameraUpload()
+                        it.disableCameraUploads()
                     }
                     ACTION_UPDATE_DISABLE_CU_UI_SETTING -> {
                         Timber.d("Disable Camera Uploads UI Event Received")

@@ -1152,7 +1152,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         }
         if (cuEnabled) {
             Timber.d("Disable CU.")
-            disableCameraUpload()
+            disableCameraUploads()
         } else {
             // Check if the necessary permissions to enable Camera Uploads have been granted.
             // The permissions are adaptive depending on the Android SDK version
@@ -1181,11 +1181,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
     /**
      * This method is to do the setting process and UI related process.
-     * It also cancels all CameraUpload and Heartbeat workers.
+     * It also cancels all Camera Uploads and Heartbeat workers.
      */
-    fun disableCameraUpload() {
+    fun disableCameraUploads() {
         viewModel.stopCameraUpload()
-        viewModel.disableCameraUploadsInDB()
+        viewModel.disableCameraUploads()
         disableCameraUploadUIProcess()
     }
 

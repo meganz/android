@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
-import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
@@ -27,6 +26,7 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -61,7 +61,6 @@ import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -79,7 +78,7 @@ class SettingsCameraUploadsViewModelTest {
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
-    private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
+    private val disableCameraUploadsUseCase = mock<DisableCameraUploadsUseCase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
@@ -135,7 +134,7 @@ class SettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
-            disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
+            disableCameraUploadsUseCase = disableCameraUploadsUseCase,
             disableMediaUploadSettings = disableMediaUploadSettings,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
@@ -453,7 +452,7 @@ class SettingsCameraUploadsViewModelTest {
         setupUnderTest()
 
         underTest.changeUploadVideoQuality(value)
-        verify(setUploadVideoSyncStatusUseCase, times(1)).invoke(expectedVideoSyncStatus)
+        verify(setUploadVideoSyncStatusUseCase).invoke(expectedVideoSyncStatus)
     }
 
     @Test
@@ -507,7 +506,7 @@ class SettingsCameraUploadsViewModelTest {
 
         underTest.keepUploadFileNames(keepFileNames)
 
-        verify(setUploadFileNamesKeptUseCase, times(1)).invoke(keepFileNames)
+        verify(setUploadFileNamesKeptUseCase).invoke(keepFileNames)
         underTest.state.test {
             assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(keepFileNames)
         }
@@ -596,7 +595,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.restorePrimaryTimestampsAndSyncRecordProcess()
 
-            verify(restorePrimaryTimestamps, times(1)).invoke()
+            verify(restorePrimaryTimestamps).invoke()
         }
 
     @Test
@@ -606,7 +605,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.restoreSecondaryTimestampsAndSyncRecordProcess()
 
-            verify(restoreSecondaryTimestamps, times(1)).invoke()
+            verify(restoreSecondaryTimestamps).invoke()
         }
 
     @Test
@@ -618,7 +617,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.setupDefaultSecondaryCameraUploadFolder(testName)
 
-            verify(setupDefaultSecondaryFolderUseCase, times(1)).invoke(testName)
+            verify(setupDefaultSecondaryFolderUseCase).invoke(testName)
         }
 
     @Test
@@ -630,7 +629,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.setupPrimaryCameraUploadFolder(testHandle)
 
-            verify(setupPrimaryFolderUseCase, times(1)).invoke(testHandle)
+            verify(setupPrimaryFolderUseCase).invoke(testHandle)
         }
 
     @Test
@@ -642,7 +641,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.setupSecondaryCameraUploadFolder(testHandle)
 
-            verify(setupSecondaryFolderUseCase, times(1)).invoke(testHandle)
+            verify(setupSecondaryFolderUseCase).invoke(testHandle)
         }
 
     @Test
@@ -653,8 +652,8 @@ class SettingsCameraUploadsViewModelTest {
             underTest.resetTimestampsAndCacheDirectory()
 
             with(inOrder(clearCacheDirectory, resetCameraUploadTimeStamps)) {
-                verify(resetCameraUploadTimeStamps, times(1)).invoke(clearCamSyncRecords = true)
-                verify(clearCacheDirectory, times(1)).invoke()
+                verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
+                verify(clearCacheDirectory).invoke()
             }
         }
 
@@ -663,9 +662,9 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            underTest.disableCameraUploadsInDB()
+            underTest.disableCameraUploads()
 
-            verify(disableCameraUploadsInDatabase, times(1)).invoke()
+            verify(disableCameraUploadsUseCase).invoke()
         }
 
     @Test
@@ -674,8 +673,8 @@ class SettingsCameraUploadsViewModelTest {
 
         underTest.disableMediaUploads()
 
-        verify(resetMediaUploadTimeStamps, times(1)).invoke()
-        verify(disableMediaUploadSettings, times(1)).invoke()
+        verify(resetMediaUploadTimeStamps).invoke()
+        verify(disableMediaUploadSettings).invoke()
     }
 
     @Test
@@ -685,7 +684,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.startCameraUpload()
 
-            verify(startCameraUploadUseCase, times(1)).invoke()
+            verify(startCameraUploadUseCase).invoke()
         }
 
     @Test
@@ -695,7 +694,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.stopCameraUpload()
 
-            verify(stopCameraUploadUseCase, times(1)).invoke()
+            verify(stopCameraUploadUseCase).invoke()
         }
 
     @Test
@@ -705,7 +704,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.rescheduleCameraUpload()
 
-            verify(rescheduleCameraUploadUseCase, times(1)).invoke()
+            verify(rescheduleCameraUploadUseCase).invoke()
         }
 
     @Test
@@ -715,7 +714,7 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.stopCameraUpload()
 
-            verify(stopCameraUploadAndHeartbeatUseCase, times(1)).invoke()
+            verify(stopCameraUploadAndHeartbeatUseCase).invoke()
         }
 
     @Test
