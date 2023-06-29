@@ -74,7 +74,6 @@ class MoveNodeUseCaseTest {
             megaApiFolderGateway = megaApiFolderGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             moveNodeToRubbishByHandle = moveNodeToRubbishByHandle,
-            accountRepository = accountRepository
         )
     }
 

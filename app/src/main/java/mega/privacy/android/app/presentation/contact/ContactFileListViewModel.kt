@@ -9,9 +9,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,6 +26,8 @@ class ContactFileListViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
+    private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val moveNodesUseCase: MoveNodesUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ContactFileListUiState())
 
@@ -51,13 +56,12 @@ class ContactFileListViewModel @Inject constructor(
      */
     fun moveNodesToRubbish(nodeHandles: List<Long>) {
         viewModelScope.launch {
-            runCatching {
+            val result = runCatching {
                 moveNodesToRubbishUseCase(nodeHandles)
-            }.onSuccess {
-                _state.update { state -> state.copy(moveRequestResult = it) }
             }.onFailure {
                 Timber.e(it)
             }
+            _state.update { state -> state.copy(moveRequestResult = result) }
         }
     }
 
@@ -67,5 +71,50 @@ class ContactFileListViewModel @Inject constructor(
      */
     fun markHandleMoveRequestResult() {
         _state.update { it.copy(moveRequestResult = null) }
+    }
+
+    /**
+     * Check move nodes name collision
+     *
+     * @param nodes
+     * @param targetNode
+     */
+    fun checkMoveNodesNameCollision(nodes: List<Long>, targetNode: Long) {
+        viewModelScope.launch {
+            runCatching {
+                checkNodesNameCollisionUseCase(
+                    nodes.associateWith { targetNode },
+                    NodeNameCollisionType.MOVE
+                )
+            }.onSuccess { result ->
+                _state.update { it.copy(nodeNameCollisionResult = result) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Mark handle node name collision result
+     *
+     */
+    fun markHandleNodeNameCollisionResult() {
+        _state.update { it.copy(nodeNameCollisionResult = null) }
+    }
+
+    /**
+     * Move nodes
+     *
+     * @param nodes
+     */
+    fun moveNodes(nodes: Map<Long, Long>) {
+        viewModelScope.launch {
+            val result = runCatching {
+                moveNodesUseCase(nodes)
+            }.onFailure {
+                Timber.e(it)
+            }
+            _state.update { state -> state.copy(moveRequestResult = result) }
+        }
     }
 }

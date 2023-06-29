@@ -51,7 +51,6 @@ import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
 import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
@@ -81,7 +80,8 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.MoveRequestResult
-import mega.privacy.android.domain.entity.node.MoveRequestResult.GeneralMovement
+import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import nz.mega.documentscanner.DocumentScannerActivity
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -106,9 +106,6 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     @Inject
     lateinit var filePrepareUseCase: FilePrepareUseCase
-
-    @Inject
-    lateinit var legacyMoveNodeUseCase: LegacyMoveNodeUseCase
 
     @Inject
     lateinit var getNodeUseCase: GetNodeUseCase
@@ -375,16 +372,46 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
 
     private fun collectFlows() {
         collectFlow(viewModel.state) { uiState ->
-            val result = uiState.moveRequestResult
-            if (result != null) {
-                showMovementResult(result, result.nodes.first())
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    moveRequestMessageMapper.invoke(result),
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-
+            val nodeNameCollisionResult = uiState.nodeNameCollisionResult
+            if (nodeNameCollisionResult != null) {
+                handleNodesNameCollisionResult(nodeNameCollisionResult)
+                viewModel.markHandleNodeNameCollisionResult()
+            }
+            if (uiState.moveRequestResult != null) {
+                handleMovementResult(uiState.moveRequestResult)
                 viewModel.markHandleMoveRequestResult()
+            }
+        }
+    }
+
+    private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {
+        dismissAlertDialogIfExists(statusDialog)
+        if (moveRequestResult.isSuccess) {
+            val data = moveRequestResult.getOrThrow()
+            if (data !is MoveRequestResult.DeleteMovement) {
+                showMovementResult(data, data.nodes.first())
+            }
+            showSnackbar(
+                Constants.SNACKBAR_TYPE,
+                moveRequestMessageMapper(data),
+                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+            )
+        } else {
+            manageCopyMoveException(moveRequestResult.exceptionOrNull())
+        }
+    }
+
+    private fun handleNodesNameCollisionResult(result: NodeNameCollisionResult) {
+        if (result.conflictNodes.isNotEmpty()) {
+            dismissAlertDialogIfExists(statusDialog)
+            nameCollisionActivityContract
+                ?.launch(ArrayList(result.conflictNodes.values.map {
+                    NameCollision.Movement.getMovementCollision(it)
+                }))
+        }
+        if (result.noConflictNodes.isNotEmpty()) {
+            if (result.type == NodeNameCollisionType.MOVE) {
+                viewModel.moveNodes(result.noConflictNodes)
             }
         }
     }
@@ -615,43 +642,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             }
             statusDialog = temp
             if (moveHandles == null || moveHandles.isEmpty()) return
-            composite.add(
-                checkNameCollisionUseCase.checkHandleList(
-                    moveHandles,
-                    toHandle,
-                    NameCollisionType.MOVE
-                )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray>, throwable: Throwable? ->
-                        if (throwable == null) {
-                            if (collisions.isNotEmpty()) {
-                                dismissAlertDialogIfExists(statusDialog)
-                                nameCollisionActivityContract?.launch(collisions)
-                            }
-                            if (handlesWithoutCollision.isNotEmpty()) {
-                                composite.add(
-                                    legacyMoveNodeUseCase.move(handlesWithoutCollision, toHandle)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe { moveResult: GeneralMovement, moveThrowable: Throwable? ->
-                                            if (moveThrowable == null) {
-                                                showMovementResult(
-                                                    moveResult,
-                                                    handlesWithoutCollision[0]
-                                                )
-                                                showSnackbar(
-                                                    Constants.SNACKBAR_TYPE,
-                                                    moveRequestMessageMapper.invoke(moveResult),
-                                                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                                )
-                                            } else {
-                                                manageCopyMoveException(moveThrowable)
-                                            }
-                                        })
-                            }
-                        }
-                    })
+            viewModel.checkMoveNodesNameCollision(moveHandles.toList(), toHandle)
         } else if (requestCode == Constants.REQUEST_CODE_GET_FILES && resultCode == RESULT_OK) {
             if (intent == null) {
                 return

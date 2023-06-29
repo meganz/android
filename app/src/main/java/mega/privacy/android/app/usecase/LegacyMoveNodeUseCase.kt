@@ -19,9 +19,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -34,7 +32,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
-    private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -159,49 +156,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
     }
 
     /**
-     * Moves nodes to a new location.
-     *
-     * @param handles           List of MegaNode handles to move.
-     * @param newParentHandle   Parent MegaNode handle in which the nodes have to be moved.
-     * @return The movement.
-     */
-    fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult.GeneralMovement> =
-        rxSingle(ioDispatcher) {
-            val parentNode = getMegaNode(newParentHandle)
-                ?: throw MegaNodeException.ParentDoesNotExistException()
-
-            var errorCount = 0
-            val oldParentHandle = if (handles.size == 1) {
-                getMegaNode(handles.first())?.parentHandle
-            } else {
-                INVALID_HANDLE
-            }
-
-            for (handle in handles) {
-                val node = getMegaNode(handle)
-                if (node == null) {
-                    errorCount++
-                } else {
-                    runCatching {
-                        moveAsync(node = node, parentNode = parentNode)
-                    }.onFailure {
-                        if (it.shouldEmmitError()) {
-                            throw it
-                        } else {
-                            errorCount++
-                        }
-                    }
-                }
-            }
-
-            MoveRequestResult.GeneralMovement(
-                count = handles.size,
-                errorCount = errorCount,
-                oldParentHandle = oldParentHandle
-            ).also { resetAccountDetailsIfNeeded(it) }
-        }
-
-    /**
      * Checks if the error of the request is over quota, pre over quota or foreign node.
      *
      * @return True if the error is one of those specified above, false otherwise.
@@ -210,16 +164,6 @@ class LegacyMoveNodeUseCase @Inject constructor(
         when (this) {
             is QuotaExceededMegaException, is NotEnoughQuotaMegaException, is ForeignNodeException -> true
             else -> false
-        }
-
-    /**
-     * Resets the account details timestamp if some request finished with success.
-     */
-    private suspend fun resetAccountDetailsIfNeeded(request: MoveRequestResult) =
-        withContext(ioDispatcher) {
-            if (request.successCount > 0) {
-                accountRepository.resetAccountDetailsTimeStamp()
-            }
         }
 
     private suspend fun getMegaNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
