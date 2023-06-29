@@ -31,8 +31,7 @@
     <fragment
         android:id="@+id/track_info"
         android:name="mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment"
-        android:label=""
-        tools:layout="@layout/fragment_audio_track_info">
+        android:label="">
         <argument
             android:name="adapterType"
             app:argType="integer" />

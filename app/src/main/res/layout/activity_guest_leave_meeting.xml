@@ -72,7 +72,7 @@
         android:background="@color/grey_012_white_012"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/info_bg" />
+        app:layout_constraintTop_toBottomOf="@id/tv_left_meetings_sub1" />
 
     <TextView
         android:id="@+id/tv_left_meetings_title2"

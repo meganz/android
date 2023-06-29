@@ -240,6 +240,9 @@ class TrackInfoViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    _nodeInfo.postValue(
+                        _nodeInfo.value?.copy(availableOffline = available)
+                    )
                     _offlineRemoveSnackBarShow.value = !available
                 }, logErr("TrackInfoViewModel toggleAvailableOffline"))
         )
