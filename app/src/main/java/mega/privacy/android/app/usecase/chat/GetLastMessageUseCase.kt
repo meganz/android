@@ -164,12 +164,11 @@ class GetLastMessageUseCase @Inject constructor(
 
     private fun getChatCallStatusMessage(chatId: Long, isMeeting: Boolean): String? =
         if (megaChatApi.hasCallInChatRoom(chatId)) {
-            megaChatApi.getChatCall(chatId)
-                ?.takeIf { it.status == CALL_STATUS_USER_NO_PRESENT || it.status == CALL_STATUS_IN_PROGRESS }
-                ?.let { call ->
+            megaChatApi.getChatCall(chatId)?.status
+                ?.takeIf { it == CALL_STATUS_USER_NO_PRESENT || it == CALL_STATUS_IN_PROGRESS }
+                ?.let {
                     when {
                         isMeeting -> context.getString(R.string.meetings_list_ongoing_call_message)
-                        call.isRinging -> context.getString(R.string.notification_subtitle_incoming)
                         else -> context.getString(R.string.ongoing_call_messages)
                     }
                 }

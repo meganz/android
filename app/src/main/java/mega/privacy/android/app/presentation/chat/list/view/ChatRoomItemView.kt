@@ -43,8 +43,8 @@ import com.google.accompanist.placeholder.fade
 import com.google.accompanist.placeholder.placeholder
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_900
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -161,7 +161,7 @@ internal fun ChatRoomItemView(
                     width = Dimension.preferredWrapContent
                 }
                 .placeholder(
-                    color = MaterialTheme.colors.grey_200_grey_700,
+                    color = MaterialTheme.colors.grey_020_grey_900,
                     shape = RoundedCornerShape(4.dp),
                     highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
                     visible = isLoading,
@@ -285,7 +285,7 @@ internal fun ChatRoomItemView(
                 }
                 .padding(vertical = if (isLoading) 2.dp else 0.dp)
                 .placeholder(
-                    color = MaterialTheme.colors.grey_200_grey_700,
+                    color = MaterialTheme.colors.grey_020_grey_900,
                     shape = RoundedCornerShape(4.dp),
                     highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
                     visible = isLoading,
@@ -316,7 +316,7 @@ internal fun ChatRoomItemView(
                     top.linkTo(middleText.bottom, 4.dp)
                 }
                 .placeholder(
-                    color = MaterialTheme.colors.grey_200_grey_700,
+                    color = MaterialTheme.colors.grey_020_grey_900,
                     shape = RoundedCornerShape(4.dp),
                     highlight = PlaceholderHighlight.fade(MaterialTheme.colors.surface),
                     visible = isLoading,
@@ -353,7 +353,7 @@ internal fun ChatRoomItemView(
                 end.linkTo(moreButton.start, 8.dp)
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
-                visibility = if (item.unreadCount > 0)
+                visibility = if (!isLoading && item.unreadCount > 0)
                     Visibility.Visible
                 else
                     Visibility.Gone

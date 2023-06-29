@@ -330,8 +330,8 @@ class ChatTabsFragment : Fragment() {
                     }
 
                     R.id.menu_chat_archive -> {
-                        val selectedMeetings = viewModel.getState().value.selectedIds
-                        viewModel.archiveChats(selectedMeetings)
+                        val selectedMeetings = viewModel.getState().value.selectedIds.toLongArray()
+                        viewModel.archiveChats(*selectedMeetings)
                         viewModel.clearSelection()
                         true
                     }

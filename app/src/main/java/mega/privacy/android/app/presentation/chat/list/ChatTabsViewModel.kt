@@ -238,39 +238,46 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
-     * Archive chat
+     * Archive chats
      *
-     * @param chatId    Chat id to be archived
+     * @param chatIds    Chat ids to be archived
      */
-    fun archiveChat(chatId: Long) {
+    fun archiveChats(vararg chatIds: Long) {
+        val singleParam = chatIds.size == 1
         viewModelScope.launch {
-            val chatTitle = state.value.findChatItem(chatId)?.title
-            runCatching { archiveChatUseCase(chatId, true) }
+            var stringParam: String? = null
+            var intParam: Int? = null
+            if (singleParam) {
+                stringParam = state.value.findChatItem(chatIds.first())?.title
+            } else {
+                intParam = chatIds.size
+            }
+
+            runCatching { chatIds.forEach { archiveChatUseCase(it, true) } }
                 .onSuccess {
-                    val snackBarItem = SnackBarItem(
-                        stringRes = R.string.success_archive_chat,
-                        stringArg = chatTitle
+                    updateSnackBar(
+                        SnackBarItem(
+                            stringRes = if (singleParam)
+                                R.string.success_archive_chat
+                            else
+                                R.string.archived_chats_show_option,
+                            stringArg = stringParam,
+                            intArg = intParam,
+                        )
                     )
-                    updateSnackBar(snackBarItem)
                 }
                 .onFailure {
                     Timber.e(it)
-                    val snackBarItem = SnackBarItem(
-                        stringRes = R.string.error_archive_chat,
-                        stringArg = chatTitle
-                    )
-                    updateSnackBar(snackBarItem)
+                    if (singleParam) {
+                        updateSnackBar(
+                            SnackBarItem(
+                                stringRes = R.string.error_archive_chat,
+                                stringArg = stringParam
+                            )
+                        )
+                    }
                 }
         }
-    }
-
-    /**
-     * Archive chats
-     *
-     * @param chatIds   Chat ids to be archived
-     */
-    fun archiveChats(chatIds: List<Long>) {
-        chatIds.forEach(::archiveChat)
     }
 
     /**

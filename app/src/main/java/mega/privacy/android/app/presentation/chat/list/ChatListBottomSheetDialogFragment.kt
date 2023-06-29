@@ -144,7 +144,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun onArchiveClick() {
-        viewModel.archiveChat(chatId)
+        viewModel.archiveChats(chatId)
         dismissAllowingStateLoss()
     }
 
