@@ -60,7 +60,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -101,7 +101,7 @@ import javax.inject.Inject
  * @property setupPrimaryFolderUseCase Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolderUseCase Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
- * @property stopCameraUploadUseCase Stop the camera upload
+ * @property stopCameraUploadsUseCase Stop the camera upload
  * @property rescheduleCameraUploadUseCase Reschedule the camera upload
  * @property stopCameraUploadAndHeartbeatUseCase Stop the camera upload and heartbeat
  */
@@ -141,7 +141,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
     private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
-    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
 ) : ViewModel() {
@@ -625,11 +625,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
-     * Stop camera upload
+     * Stop camera uploads
      * Cancel camera upload and heartbeat workers
      */
-    fun stopCameraUpload() = viewModelScope.launch {
-        stopCameraUploadUseCase()
+    fun stopCameraUploads() = viewModelScope.launch {
+        stopCameraUploadsUseCase(shouldReschedule = false)
         stopCameraUploadAndHeartbeatUseCase()
     }
 

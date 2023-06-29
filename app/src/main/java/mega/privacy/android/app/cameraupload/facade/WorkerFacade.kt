@@ -81,15 +81,17 @@ class WorkerFacade @Inject constructor(
     /**
      * Fire a request to stop camera upload service.
      *
-     * @param aborted true if the Camera Uploads has been aborted prematurely
+     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
-    override suspend fun fireStopCameraUploadJob(aborted: Boolean) {
+    override suspend fun stopCameraUploads(shouldReschedule: Boolean) {
         cancelUniqueCameraUploadWorkRequest()
         cancelPeriodicCameraUploadWorkRequest()
 
         // Reschedule the Camera Upload to launch in a later time
-        // This case only happens if the user cancel all transfers without disabling the Camera Uploads
-        if (!aborted) {
+        // This case only happens if :
+        // - the user cancel all transfers without disabling the Camera Uploads
+        // - the camera uploads folder have been moved to rubbish bin
+        if (shouldReschedule) {
             scheduleCameraUploadJob()
         }
         Timber.d("fireStopCameraUploadJob() SUCCESS")
@@ -159,7 +161,7 @@ class WorkerFacade @Inject constructor(
      * Reschedule Camera Upload with time interval
      */
     override suspend fun rescheduleCameraUpload() {
-        fireStopCameraUploadJob()
+        stopCameraUploads(shouldReschedule = false)
         delay(CU_RESCHEDULE_INTERVAL)
         scheduleCameraUploadJob()
     }

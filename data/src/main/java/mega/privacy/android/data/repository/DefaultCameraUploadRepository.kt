@@ -617,9 +617,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         workerGateway.fireCameraUploadJob()
     }
 
-    override suspend fun fireStopCameraUploadJob(aborted: Boolean) = withContext(ioDispatcher) {
-        workerGateway.fireStopCameraUploadJob(aborted)
-    }
+    override suspend fun stopCameraUploads(shouldReschedule: Boolean) =
+        withContext(ioDispatcher) {
+            workerGateway.stopCameraUploads(shouldReschedule = shouldReschedule)
+        }
 
     override suspend fun scheduleCameraUploadJob() = withContext(ioDispatcher) {
         workerGateway.scheduleCameraUploadJob()

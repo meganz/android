@@ -15,9 +15,9 @@ interface WorkerGateway {
     /**
      * Fire a request to stop camera upload service.
      *
-     * @param aborted true if the Camera Uploads has been aborted prematurely
+     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
-    suspend fun fireStopCameraUploadJob(aborted: Boolean = true)
+    suspend fun stopCameraUploads(shouldReschedule: Boolean)
 
     /**
      * Schedule job of camera upload

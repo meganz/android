@@ -9,13 +9,17 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.StopAudioService
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
-import org.junit.Before
-import org.junit.Test
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LocalLogoutAppUseCaseTest {
 
     private lateinit var underTest: LocalLogoutAppUseCase
@@ -25,10 +29,10 @@ class LocalLogoutAppUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val pushesRepository = mock<PushesRepository>()
     private val billingRepository = mock<BillingRepository>()
-    private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val stopAudioService = mock<StopAudioService>()
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = LocalLogoutAppUseCase(
             loginRepository = loginRepository,
@@ -36,8 +40,21 @@ class LocalLogoutAppUseCaseTest {
             transferRepository = transferRepository,
             pushesRepository = pushesRepository,
             billingRepository = billingRepository,
-            stopCameraUploadUseCase = stopCameraUploadUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             stopAudioService = stopAudioService
+        )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            loginRepository,
+            accountRepository,
+            transferRepository,
+            pushesRepository,
+            billingRepository,
+            stopCameraUploadsUseCase,
+            stopAudioService,
         )
     }
 
@@ -56,7 +73,7 @@ class LocalLogoutAppUseCaseTest {
         verify(pushesRepository).clearPushToken()
         verify(billingRepository).clearCache()
         verify(loginRepository).broadcastLogout()
-        verify(stopCameraUploadUseCase).invoke()
+        verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
         verify(stopAudioService).invoke()
         verify(clearPsa).invoke()
     }

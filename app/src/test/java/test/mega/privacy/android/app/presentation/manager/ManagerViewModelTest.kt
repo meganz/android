@@ -86,7 +86,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -94,7 +94,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -224,7 +223,7 @@ class ManagerViewModelTest {
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
-    private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
     private val createShareKey = mock<CreateShareKey>()
     private val deleteOldestCompletedTransfersUseCase =
@@ -290,7 +289,7 @@ class ManagerViewModelTest {
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             startCameraUploadUseCase = startCameraUploadUseCase,
-            stopCameraUploadUseCase = stopCameraUploadUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             createShareKey = createShareKey,
             saveContactByEmailUseCase = saveContactByEmailUseCase,
             deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
@@ -558,15 +557,16 @@ class ManagerViewModelTest {
         runTest {
             underTest.startCameraUpload()
             testScheduler.advanceUntilIdle()
-            verify(startCameraUploadUseCase, times(1)).invoke()
+            verify(startCameraUploadUseCase).invoke()
         }
 
     @Test
     fun `test that when stopCameraUpload is called, stopCameraUploadUseCase is called`() =
         runTest {
-            underTest.stopCameraUpload()
+            val shouldReschedule = true
+            underTest.stopCameraUploads(shouldReschedule)
             testScheduler.advanceUntilIdle()
-            verify(stopCameraUploadUseCase, times(1)).invoke()
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = shouldReschedule)
         }
 
     @Test

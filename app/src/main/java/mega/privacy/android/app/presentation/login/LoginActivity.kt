@@ -318,7 +318,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
         Util.getCustomAlertBuilder(this, title, text, null)
             .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
-                viewModel.stopCameraUpload()
+                viewModel.stopCameraUploads()
             }.setNegativeButton(getString(R.string.general_no), null)
             .show()
     }

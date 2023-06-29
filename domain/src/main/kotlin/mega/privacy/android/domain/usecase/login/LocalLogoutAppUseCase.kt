@@ -7,7 +7,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.StopAudioService
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
 /**
@@ -19,7 +19,7 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
     private val pushesRepository: PushesRepository,
     private val billingRepository: BillingRepository,
-    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val stopAudioService: StopAudioService,
 ) {
 
@@ -39,7 +39,7 @@ class LocalLogoutAppUseCase @Inject constructor(
         pushesRepository.clearPushToken()
         billingRepository.clearCache()
         loginRepository.broadcastLogout()
-        stopCameraUploadUseCase()
+        stopCameraUploadsUseCase(shouldReschedule = false)
         stopAudioService()
         clearPsa()
     }

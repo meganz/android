@@ -7,7 +7,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import javax.inject.Inject
 
 /**
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class FileProviderViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
 ) : ViewModel() {
 
     /**
@@ -26,10 +26,10 @@ class FileProviderViewModel @Inject constructor(
     fun getStorageState() = monitorStorageStateEventUseCase.getState()
 
     /**
-     * Stop camera upload
+     * Stop camera uploads
      */
-    fun stopCameraUpload() = viewModelScope.launch {
-        stopCameraUploadUseCase()
+    fun stopCameraUploads() = viewModelScope.launch {
+        stopCameraUploadsUseCase(shouldReschedule = false)
     }
 
     /**

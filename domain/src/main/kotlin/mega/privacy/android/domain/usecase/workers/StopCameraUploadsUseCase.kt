@@ -6,17 +6,17 @@ import javax.inject.Inject
 /**
  * Use Case to stop camera upload
  */
-class StopCameraUploadUseCase @Inject constructor(
+class StopCameraUploadsUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
 ) {
     /**
      * invoke
-     * @param aborted
+     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
-    suspend operator fun invoke(aborted: Boolean = true) {
+    suspend operator fun invoke(shouldReschedule: Boolean) {
         if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.setCameraUploadsEnabled(false)
-            cameraUploadRepository.fireStopCameraUploadJob(aborted = aborted)
+            cameraUploadRepository.stopCameraUploads(shouldReschedule = shouldReschedule)
         }
     }
 }

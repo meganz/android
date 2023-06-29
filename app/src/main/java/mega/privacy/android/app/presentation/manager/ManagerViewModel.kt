@@ -79,7 +79,7 @@ import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -111,7 +111,7 @@ import javax.inject.Inject
  * @property monitorVerificationStatus
  * @property monitorUserUpdates
  * @property startCameraUploadUseCase
- * @property stopCameraUploadUseCase
+ * @property stopCameraUploadsUseCase
  * @property deleteOldestCompletedTransfersUseCase
  * @property getIncomingContactRequestsUseCase
  * @property cancelTransfersUseCase
@@ -158,7 +158,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
-    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     private val createShareKey: CreateShareKey,
     private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
@@ -666,10 +666,10 @@ class ManagerViewModel @Inject constructor(
     /**
      * Stop camera upload
      *
-     * @param aborted true if the CU is aborted prematurely
+     * @param shouldReschedule true if the Camera Uploads should be rescheduled at a later time
      */
-    fun stopCameraUpload(aborted: Boolean = true) = viewModelScope.launch {
-        stopCameraUploadUseCase(aborted = aborted)
+    fun stopCameraUploads(shouldReschedule: Boolean) = viewModelScope.launch {
+        stopCameraUploadsUseCase(shouldReschedule = shouldReschedule)
     }
 
     /**

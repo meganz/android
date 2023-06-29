@@ -75,7 +75,7 @@ import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -108,7 +108,7 @@ class LoginViewModel @Inject constructor(
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
-    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase,
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase,
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase,
@@ -769,7 +769,8 @@ class LoginViewModel @Inject constructor(
     /**
      * Stop camera upload
      */
-    fun stopCameraUpload() = viewModelScope.launch { stopCameraUploadUseCase() }
+    fun stopCameraUploads() =
+        viewModelScope.launch { stopCameraUploadsUseCase(shouldReschedule = false) }
 
     /**
      * Updates a pin of the 2FA code in state.

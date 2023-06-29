@@ -52,7 +52,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUse
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -108,7 +108,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setupPrimaryFolderUseCase = mock<SetupPrimaryFolderUseCase>()
     private val setupSecondaryFolderUseCase = mock<SetupSecondaryFolderUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
-    private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
 
@@ -163,7 +163,7 @@ class SettingsCameraUploadsViewModelTest {
             setupPrimaryFolderUseCase = setupPrimaryFolderUseCase,
             setupSecondaryFolderUseCase = setupSecondaryFolderUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
-            stopCameraUploadUseCase = stopCameraUploadUseCase,
+            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
         )
@@ -692,9 +692,9 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            underTest.stopCameraUpload()
+            underTest.stopCameraUploads()
 
-            verify(stopCameraUploadUseCase).invoke()
+            verify(stopCameraUploadsUseCase).invoke(shouldReschedule = false)
         }
 
     @Test
@@ -712,7 +712,7 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            underTest.stopCameraUpload()
+            underTest.stopCameraUploads()
 
             verify(stopCameraUploadAndHeartbeatUseCase).invoke()
         }

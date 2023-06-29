@@ -1412,7 +1412,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY || intent.action == Constants.ACTION_OPEN_MEGA_LINK || intent.action == Constants.ACTION_OPEN_MEGA_FOLDER_LINK) {
                         openLink = true
                     } else if (intent.action == Constants.ACTION_CANCEL_CAM_SYNC) {
-                        viewModel.stopCameraUpload()
+                        viewModel.stopCameraUploads(shouldReschedule = false)
                         finish()
                         return true
                     }
@@ -1948,7 +1948,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             Constants.ACTION_CANCEL_CAM_SYNC -> {
-                viewModel.stopCameraUpload()
+                viewModel.stopCameraUploads(shouldReschedule = false)
                 finish()
             }
 
@@ -2988,7 +2988,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     builder.setPositiveButton(
                         getString(R.string.general_yes)
                     ) { _: DialogInterface?, _: Int ->
-                        viewModel.stopCameraUpload()
+                        viewModel.stopCameraUploads(shouldReschedule = false)
                         sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_SETTING))
                         transfersFragment?.destroyActionMode()
                     }
@@ -5327,7 +5327,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         shouldSendBroadCastEvent: Boolean,
     ) {
         if (shouldStopUpload) {
-            viewModel.stopCameraUpload()
+            viewModel.stopCameraUploads(shouldReschedule = true)
         }
         if (shouldSendBroadCastEvent) {
             sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING))
@@ -9144,7 +9144,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 R.string.cancel_all_action
             ) { _: DialogInterface?, _: Int ->
                 viewModel.cancelAllTransfers()
-                viewModel.stopCameraUpload(aborted = false)
+                viewModel.stopCameraUploads(shouldReschedule = true)
                 refreshFragment(FragmentTag.TRANSFERS.tag)
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)
             }

@@ -57,7 +57,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.LinkedList
@@ -261,7 +260,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that a new video quality is set when uploading videos`(videoQuality: VideoQuality) =
             runTest {
                 underTest.setUploadVideoQuality(videoQuality)
-                verify(localStorageGateway, times(1)).setUploadVideoQuality(videoQuality.value)
+                verify(localStorageGateway).setUploadVideoQuality(videoQuality.value)
             }
     }
 
@@ -272,7 +271,7 @@ class DefaultCameraUploadRepositoryTest {
         @EnumSource(SyncStatus::class)
         fun `test that the upload video sync status is updated`(syncStatus: SyncStatus) = runTest {
             underTest.setUploadVideoSyncStatus(syncStatus)
-            verify(localStorageGateway, times(1)).setUploadVideoSyncStatus(syncStatus.value)
+            verify(localStorageGateway).setUploadVideoSyncStatus(syncStatus.value)
         }
     }
 
@@ -469,7 +468,7 @@ class DefaultCameraUploadRepositoryTest {
             val testPath = "test/new/primary/path"
 
             underTest.setPrimaryFolderLocalPath(testPath)
-            verify(localStorageGateway, times(1)).setPrimaryFolderLocalPath(testPath)
+            verify(localStorageGateway).setPrimaryFolderLocalPath(testPath)
         }
 
         @ParameterizedTest(name = "is in SD card: {0}")
@@ -493,7 +492,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the primary folder in the SD card is handled`(isInSDCard: Boolean) =
             runTest {
                 underTest.setPrimaryFolderInSDCard(isInSDCard)
-                verify(localStorageGateway, times(1)).setPrimaryFolderInSDCard(isInSDCard)
+                verify(localStorageGateway).setPrimaryFolderInSDCard(isInSDCard)
             }
 
         @Test
@@ -583,7 +582,7 @@ class DefaultCameraUploadRepositoryTest {
             val testPath = "test/new/secondary/path"
 
             underTest.setSecondaryFolderLocalPath(testPath)
-            verify(localStorageGateway, times(1)).setSecondaryFolderLocalPath(testPath)
+            verify(localStorageGateway).setSecondaryFolderLocalPath(testPath)
         }
 
         @ParameterizedTest(name = "secondary folder enabled: {0}")
@@ -607,7 +606,7 @@ class DefaultCameraUploadRepositoryTest {
             val testSDCardPath = "test/sd/card/path"
 
             underTest.setSecondaryFolderSDCardUriPath(testSDCardPath)
-            verify(localStorageGateway, times(1)).setSecondaryFolderSDCardUriPath(testSDCardPath)
+            verify(localStorageGateway).setSecondaryFolderSDCardUriPath(testSDCardPath)
         }
 
         @Test
@@ -720,7 +719,7 @@ class DefaultCameraUploadRepositoryTest {
         fun `test that the file names for uploads are handled`(keepFileNames: Boolean) =
             runTest {
                 underTest.setUploadFileNamesKept(keepFileNames)
-                verify(localStorageGateway, times(1)).setUploadFileNamesKept(keepFileNames)
+                verify(localStorageGateway).setUploadFileNamesKept(keepFileNames)
             }
     }
 
@@ -746,10 +745,7 @@ class DefaultCameraUploadRepositoryTest {
         ) =
             runTest {
                 underTest.setChargingRequiredForVideoCompression(chargingRequired)
-                verify(
-                    localStorageGateway,
-                    times(1)
-                ).setChargingRequiredForVideoCompression(chargingRequired)
+                verify(localStorageGateway).setChargingRequiredForVideoCompression(chargingRequired)
             }
 
         @ParameterizedTest(name = "device charging: {0}")
@@ -856,31 +852,32 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the worker is called to start camera uploads`() = runTest {
             underTest.fireCameraUploadJob()
-            verify(workerGateway, times(1)).fireCameraUploadJob()
+            verify(workerGateway).fireCameraUploadJob()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads`() = runTest {
-            underTest.fireStopCameraUploadJob()
-            verify(workerGateway, times(1)).fireStopCameraUploadJob()
+            val shouldReschedule = false
+            underTest.stopCameraUploads(shouldReschedule)
+            verify(workerGateway).stopCameraUploads(shouldReschedule)
         }
 
         @Test
         fun `test that the worker is called to schedule camera uploads`() = runTest {
             underTest.scheduleCameraUploadJob()
-            verify(workerGateway, times(1)).scheduleCameraUploadJob()
+            verify(workerGateway).scheduleCameraUploadJob()
         }
 
         @Test
         fun `test that the worker is called to reschedule camera uploads`() = runTest {
             underTest.rescheduleCameraUpload()
-            verify(workerGateway, times(1)).rescheduleCameraUpload()
+            verify(workerGateway).rescheduleCameraUpload()
         }
 
         @Test
         fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
             underTest.stopCameraUploadSyncHeartbeatWorkers()
-            verify(workerGateway, times(1)).cancelCameraUploadAndHeartbeatWorkRequest()
+            verify(workerGateway).cancelCameraUploadAndHeartbeatWorkRequest()
         }
 
         @Test
