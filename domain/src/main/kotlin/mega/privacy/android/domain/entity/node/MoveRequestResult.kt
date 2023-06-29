@@ -77,4 +77,15 @@ sealed class MoveRequestResult(
         errorCount = errorCount,
         nodes = nodes,
     )
+
+    /**
+     * Result of copy
+     */
+    class Copy(
+        count: Int,
+        errorCount: Int,
+    ) : MoveRequestResult(
+        count = count,
+        errorCount = errorCount,
+    )
 }

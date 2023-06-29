@@ -146,5 +146,41 @@ class MoveRequestMessageMapper @Inject constructor(
                     }"
                 }
             }
+
+            is MoveRequestResult.Copy -> {
+                when {
+                    request.isAllRequestError -> {
+                        context.resources.getQuantityString(
+                            R.plurals.general_copy_snackbar_fail,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    request.isSuccess -> {
+                        context.resources.getQuantityString(
+                            R.plurals.general_copy_snackbar_success,
+                            request.count,
+                            request.count
+                        )
+                    }
+
+                    else -> {
+                        "${
+                            context.resources.getQuantityString(
+                                R.plurals.general_copy_snackbar_concat_success,
+                                request.count - request.errorCount,
+                                request.count - request.errorCount
+                            )
+                        }${
+                            context.resources.getQuantityString(
+                                R.plurals.general_copy_snackbar_concat_fail,
+                                request.errorCount,
+                                request.errorCount
+                            )
+                        }"
+                    }
+                }
+            }
         }
 }

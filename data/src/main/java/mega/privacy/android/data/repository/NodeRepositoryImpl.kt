@@ -450,8 +450,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         newNodeParent: NodeId,
         newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
-        val node = megaApiGateway.getMegaNodeByHandle(nodeToCopy.longValue)
-        val parent = megaApiGateway.getMegaNodeByHandle(newNodeParent.longValue)
+        val node = getMegaNodeByHandle(nodeToCopy, true)
+        val parent = getMegaNodeByHandle(newNodeParent, true)
         requireNotNull(node) { "Node to copy with handle $nodeToCopy not found" }
         requireNotNull(parent) { "Destination node with handle $newNodeParent not found" }
         suspendCancellableCoroutine { continuation ->
