@@ -8,10 +8,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoScreen
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoRoute
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -29,8 +28,6 @@ class AchievementsInfoFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-    private val viewModel: AchievementsInfoViewModel by viewModels()
-
     /**
      * onCreateView
      */
@@ -45,7 +42,7 @@ class AchievementsInfoFragment : Fragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                AchievementsInfoScreen(viewModel = viewModel)
+                AchievementsInfoRoute {}
             }
         }
     }

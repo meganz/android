@@ -9,11 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsScreen
+import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsRoute
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -25,8 +24,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class InviteFriendsFragment : Fragment() {
-    private val viewModel by viewModels<InviteFriendsViewModel>()
-
     /**
      * Get system's default theme mode
      */
@@ -47,7 +44,7 @@ class InviteFriendsFragment : Fragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                InviteFriendsScreen(viewModel = viewModel)
+                InviteFriendsRoute {}
             }
         }
     }

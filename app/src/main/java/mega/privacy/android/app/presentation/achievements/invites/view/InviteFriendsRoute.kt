@@ -18,13 +18,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,17 +37,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
-import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
 import mega.privacy.android.core.ui.theme.extensions.grey_020_dark_grey
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
@@ -80,34 +75,22 @@ internal object InviteFriendsViewTestTags {
  * Invite Friends Screen in Jetpack Compose
  */
 @Composable
-fun InviteFriendsScreen(viewModel: InviteFriendsViewModel) {
-    val snackBarHostState = remember { SnackbarHostState() }
+fun InviteFriendsRoute(
+    viewModel: InviteFriendsViewModel = hiltViewModel(),
+    onSetToolbarTitle: (Int) -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        scaffoldState = rememberScaffoldState(),
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState) { data ->
-                Snackbar(
-                    modifier = Modifier.testTag(Constants.SNACKBAR_TEST_TAG),
-                    snackbarData = data,
-                    backgroundColor = MaterialTheme.colors.black_white
-                )
-            }
-        }
-    ) { padding ->
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-        InviteFriendsView(
-            modifier = Modifier.padding(padding),
-            uiState = uiState
-        )
+    LaunchedEffect(Unit) {
+        onSetToolbarTitle(R.string.title_referral_bonuses)
     }
+
+    InviteFriendsView(uiState = uiState)
 }
 
 @Composable
 internal fun InviteFriendsView(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     uiState: InviteFriendsUIState,
 ) {
     val context = LocalContext.current

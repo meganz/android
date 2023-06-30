@@ -13,34 +13,36 @@ import mega.privacy.android.app.presentation.achievements.info.model.Achievement
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
-import java.io.Serializable
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model for AchievementsInfoFragment
- * @see AchievementsInfoFragment
+ * ViewModel for AchievementsInfoScreen
  */
 @HiltViewModel
 class AchievementsInfoViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
     private val numberOfDaysMapper: NumberOfDaysMapper,
 ) : ViewModel() {
-    private val achievementsOverview =
-        savedStateHandle.get<Serializable>(ACHIEVEMENTS_OVERVIEW) as? AchievementsOverview
+    private val achievementInfoArgs = AchievementInfoArgs(savedStateHandle)
     private val achievementType =
-        savedStateHandle.get<Serializable>(ACHIEVEMENTS_TYPE) as? AchievementType
+        AchievementType.values()
+            .firstOrNull {
+                it.classValue == achievementInfoArgs.achievementTypeId
+            }
     private val _uiState = MutableStateFlow(AchievementsInfoUIState())
 
     /**
-     * Flow of [AchievementsInfoFragment] UI State
+     * Flow of [AchievementsInfoUIState] UI State
      * @see AchievementsInfoUIState
      */
     val uiState = _uiState.asStateFlow()
 
     init {
         setInitialAchievementsType()
-        updateAchievementsRemainingDays()
-        updateAwardedStorage()
+        fetchAchievementsOverview()
     }
 
     /**
@@ -53,60 +55,64 @@ class AchievementsInfoViewModel @Inject constructor(
     }
 
     /**
+     * Fetch the current user's achievements overview
+     */
+    private fun fetchAchievementsOverview() = viewModelScope.launch {
+        runCatching {
+            getAccountAchievementsOverviewUseCase().also {
+                updateAchievementsRemainingDays(it)
+                updateAwardedStorage(it)
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
+    }
+
+    /**
      * Update achievements remaining days if any
      * this may not be updated if the user didn't have any achievements awarded to them
      */
-    private fun updateAchievementsRemainingDays() = viewModelScope.launch {
-        achievementsOverview
-            ?.awardedAchievements
-            ?.firstOrNull { it.type == achievementType }
-            ?.let { award ->
-                val remainingDays =
-                    numberOfDaysMapper(award.expirationTimestampInSeconds.toMillis())
+    private fun updateAchievementsRemainingDays(achievementsOverview: AchievementsOverview) =
+        viewModelScope.launch {
+            achievementsOverview
+                .awardedAchievements
+                .firstOrNull { it.type == achievementType }
+                ?.let { award ->
+                    val remainingDays =
+                        numberOfDaysMapper(award.expirationTimestampInSeconds.toMillis())
 
-                _uiState.update {
-                    it.copy(
-                        awardId = award.awardId,
-                        achievementRemainingDays = remainingDays,
-                        isAchievementExpired = remainingDays < 1,
-                        isAchievementAlmostExpired = remainingDays <= 15,
-                        isAchievementAwarded = award.awardId != -1,
-                    )
+                    _uiState.update {
+                        it.copy(
+                            awardId = award.awardId,
+                            achievementRemainingDays = remainingDays,
+                            isAchievementExpired = remainingDays < 1,
+                            isAchievementAlmostExpired = remainingDays <= 15,
+                            isAchievementAwarded = award.awardId != -1,
+                        )
+                    }
                 }
-            }
-    }
+        }
 
     /**
      * Update the amount of storage that can be awarded or already has been awarded
      * depends on if the user has been awarded or not
      * MEGA_ACHIEVEMENT_WELCOME is by default should have already been awarded to the user
      */
-    private fun updateAwardedStorage() = viewModelScope.launch {
-        val awardedStorage =
-            if (uiState.value.isAchievementAwarded.not() && achievementType != AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
-                achievementsOverview?.allAchievements?.first {
-                    it.type == achievementType
-                }?.grantStorageInBytes
-            } else {
-                achievementsOverview?.awardedAchievements?.first {
-                    it.awardId == uiState.value.awardId
-                }?.rewardedStorageInBytes
+    private fun updateAwardedStorage(achievementsOverview: AchievementsOverview) =
+        viewModelScope.launch {
+            val awardedStorage =
+                if (uiState.value.isAchievementAwarded.not() && achievementType != AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
+                    achievementsOverview.allAchievements.firstOrNull {
+                        it.type == achievementType
+                    }?.grantStorageInBytes
+                } else {
+                    achievementsOverview.awardedAchievements.firstOrNull {
+                        it.awardId == uiState.value.awardId
+                    }?.rewardedStorageInBytes
+                }
+
+            _uiState.update {
+                it.copy(awardStorageInBytes = awardedStorage ?: 0)
             }
-
-        _uiState.update {
-            it.copy(awardStorageInBytes = awardedStorage ?: 0)
         }
-    }
-
-    companion object {
-        /**
-         * Achievements overview tag to be passed as fragment arguments
-         */
-        const val ACHIEVEMENTS_OVERVIEW = "achievements_overview"
-
-        /**
-         * Achievements type tag to be passed as fragment arguments
-         */
-        const val ACHIEVEMENTS_TYPE = "achievements_type"
-    }
 }

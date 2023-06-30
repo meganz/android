@@ -191,7 +191,7 @@ public class ContactController {
             }
         } else if (context instanceof AchievementsActivity) {
             if (!isOnline(context)) {
-                ((AchievementsActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                ((AchievementsActivity) context).showSnackbar(R.string.error_server_connection_problem);
                 return;
             }
 

@@ -9,12 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusView
+import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusRoute
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.data.qualifier.MegaApi
@@ -29,12 +28,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ReferralBonusesFragment : Fragment() {
-    /**
-     * View Model for [ReferralBonusesFragment]
-     * @see ReferralBonusesViewModel
-     */
-    private val viewModel by viewModels<ReferralBonusesViewModel>()
-
     /**
      * [MegaApiAndroid] injection
      */
@@ -67,10 +60,9 @@ class ReferralBonusesFragment : Fragment() {
         setContent {
             val themeMode by getThemeMode()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                ReferralBonusView(uiState = uiState)
+                ReferralBonusRoute {}
             }
         }
     }

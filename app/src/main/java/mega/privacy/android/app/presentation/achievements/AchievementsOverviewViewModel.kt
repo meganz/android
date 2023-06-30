@@ -3,9 +3,13 @@ package mega.privacy.android.app.presentation.achievements
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -69,8 +73,20 @@ class AchievementsOverviewViewModel @Inject constructor(
                         registrationAwardStorage = overview.registrationAwardStorage(),
                     )
                 }
-                .onFailure { _state.value = AchievementsUIState(showError = true) }
+                .onFailure {
+                    showErrorMessage(R.string.cancel_subscription_error)
+                }
         }
+    }
+
+    /**
+     * Updates the errorMessage state
+     * This method is only here to support the legacy function of ContactController
+     * Should remove this once it's unused
+     */
+    @Deprecated("This method is only used to support showing snackbar from ContactController, remove it once it's refactored")
+    fun showErrorMessage(message: Int) = viewModelScope.launch {
+        _state.update { it.copy(errorMessage = triggered(message)) }
     }
 
     private fun AchievementsOverview.registrationAwardDaysLeft() =
@@ -148,5 +164,13 @@ class AchievementsOverviewViewModel @Inject constructor(
         val endTime = end.timeInMillis
         val diffTime = startTime - endTime
         return diffTime / TimeUnit.DAYS.toMillis(1)
+    }
+
+    /**
+     * Mark the showError state to consumed after the event is triggered
+     * @see AchievementsUIState
+     */
+    fun resetErrorState() = viewModelScope.launch {
+        _state.update { it.copy(errorMessage = consumed()) }
     }
 }

@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -24,7 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesViewModel
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
@@ -58,28 +61,42 @@ internal object TestTags {
 }
 
 /**
- * Referral Bonus Fragment in Jetpack Compose
+ * Referral Bonus Screen in Jetpack Compose
  */
+@Composable
+fun ReferralBonusRoute(
+    viewModel: ReferralBonusesViewModel = hiltViewModel(),
+    onSetToolbarTitle: (Int) -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = Unit) {
+        onSetToolbarTitle(R.string.title_referral_bonuses)
+    }
+
+    ReferralBonusView(uiState = uiState)
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ReferralBonusView(uiState: ReferralBonusesUIState) {
-    Scaffold(scaffoldState = rememberScaffoldState()) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            items(
-                key = { it },
-                count = uiState.awardedInviteAchievements.size,
-            ) { idx ->
-                ReferralListItem(
-                    modifier = Modifier
-                        .animateItemPlacement(),
-                    data = uiState.awardedInviteAchievements[idx],
-                    index = idx
-                )
-            }
+internal fun ReferralBonusView(
+    modifier: Modifier = Modifier,
+    uiState: ReferralBonusesUIState,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        items(
+            key = { it },
+            count = uiState.awardedInviteAchievements.size,
+        ) { idx ->
+            ReferralListItem(
+                modifier = Modifier
+                    .animateItemPlacement(),
+                data = uiState.awardedInviteAchievements[idx],
+                index = idx
+            )
         }
     }
 }
@@ -206,6 +223,7 @@ internal fun ReferralListItem(
 private fun ReferralBonusViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ReferralBonusView(
+            modifier = Modifier,
             uiState = ReferralBonusesUIState(
                 awardedInviteAchievements = listOf(
                     // The image here is free to use anywhere for preview purposes

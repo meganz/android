@@ -10,14 +10,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel
-import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
+import mega.privacy.android.app.presentation.achievements.info.achievementTypeIdArg
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievement
+import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverviewUseCase
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -36,6 +36,8 @@ class AchievementsInfoViewModelTest {
     private lateinit var underTest: AchievementsInfoViewModel
     private val savedStateHandle = SavedStateHandle()
     private val deviceGateway = mock<DeviceGateway>()
+    private val getAccountAchievementsOverviewUseCase =
+        mock<GetAccountAchievementsOverviewUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -49,18 +51,22 @@ class AchievementsInfoViewModelTest {
 
     @BeforeEach
     fun resetMocks() {
-        reset(deviceGateway)
+        reset(deviceGateway, getAccountAchievementsOverviewUseCase)
     }
 
     private fun initTestClass() {
-        underTest = AchievementsInfoViewModel(savedStateHandle, NumberOfDaysMapper(deviceGateway))
+        underTest = AchievementsInfoViewModel(
+            savedStateHandle = savedStateHandle,
+            getAccountAchievementsOverviewUseCase = getAccountAchievementsOverviewUseCase,
+            numberOfDaysMapper = NumberOfDaysMapper(deviceGateway)
+        )
     }
 
     @Test
     fun `test that achievements type should update with correct value from savedStateHandle`() =
         runTest {
             val expectedAchievement = AchievementType.MEGA_ACHIEVEMENT_WELCOME
-            savedStateHandle[ACHIEVEMENTS_TYPE] = expectedAchievement
+            savedStateHandle[achievementTypeIdArg] = expectedAchievement.classValue
 
             initTestClass()
 
@@ -81,10 +87,10 @@ class AchievementsInfoViewModelTest {
             val endTime =
                 startTime.timeInMillis + TimeUnit.DAYS.toMillis(expectedDaysLeft.toLong()) + 1000
 
-            whenever(deviceGateway.now).thenReturn(startTime.timeInMillis)
+            savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
 
-            savedStateHandle[ACHIEVEMENTS_TYPE] = expectedAchievementType
-            savedStateHandle[ACHIEVEMENTS_OVERVIEW] =
+            whenever(deviceGateway.now).thenReturn(startTime.timeInMillis)
+            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
                 AchievementsOverview(
                     allAchievements = emptyList(),
                     awardedAchievements = listOf(
@@ -100,6 +106,7 @@ class AchievementsInfoViewModelTest {
                     achievedStorageFromReferralsInBytes = 0,
                     achievedTransferFromReferralsInBytes = 0
                 )
+            )
 
             initTestClass()
 
@@ -116,8 +123,8 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_INVITE
             val expectedGrantedStorage = 126312783L
 
-            savedStateHandle[ACHIEVEMENTS_TYPE] = expectedAchievementType
-            savedStateHandle[ACHIEVEMENTS_OVERVIEW] =
+            savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
+            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
                 AchievementsOverview(
                     allAchievements = listOf(
                         Achievement(
@@ -140,6 +147,7 @@ class AchievementsInfoViewModelTest {
                     achievedStorageFromReferralsInBytes = 0,
                     achievedTransferFromReferralsInBytes = 0
                 )
+            )
 
             initTestClass()
 
@@ -156,8 +164,8 @@ class AchievementsInfoViewModelTest {
             val expectedAchievementType = AchievementType.MEGA_ACHIEVEMENT_WELCOME
             val expectedGrantedStorage = 126312783L
 
-            savedStateHandle[ACHIEVEMENTS_TYPE] = expectedAchievementType
-            savedStateHandle[ACHIEVEMENTS_OVERVIEW] =
+            savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
+            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
                 AchievementsOverview(
                     allAchievements = listOf(
                         Achievement(
@@ -180,6 +188,7 @@ class AchievementsInfoViewModelTest {
                     achievedStorageFromReferralsInBytes = 0,
                     achievedTransferFromReferralsInBytes = 0
                 )
+            )
 
             initTestClass()
 
@@ -197,8 +206,8 @@ class AchievementsInfoViewModelTest {
             val expectedRewardedStorage = 126312783L
             val expectedAwardId = Random.nextInt(from = 1, until = 1000)
 
-            savedStateHandle[ACHIEVEMENTS_TYPE] = expectedAchievementType
-            savedStateHandle[ACHIEVEMENTS_OVERVIEW] =
+            savedStateHandle[achievementTypeIdArg] = expectedAchievementType.classValue
+            whenever(getAccountAchievementsOverviewUseCase()).thenReturn(
                 AchievementsOverview(
                     allAchievements = emptyList(),
                     awardedAchievements = listOf(
@@ -214,6 +223,7 @@ class AchievementsInfoViewModelTest {
                     achievedStorageFromReferralsInBytes = 0,
                     achievedTransferFromReferralsInBytes = 0
                 )
+            )
 
             initTestClass()
 

@@ -2,26 +2,18 @@ package mega.privacy.android.app.presentation.achievements
 
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.inputmethod.InputMethodManager
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
+import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
-import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoFragment
-import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_OVERVIEW
-import mega.privacy.android.app.presentation.achievements.info.AchievementsInfoViewModel.Companion.ACHIEVEMENTS_TYPE
-import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsFragment
-import mega.privacy.android.app.presentation.achievements.model.AchievementsUIState
-import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.achievement.AchievementType
+import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,6 +23,13 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class AchievementsActivity : PasscodeActivity() {
+    /**
+     * Get system's default theme mode
+     */
+    @Inject
+    lateinit var getThemeMode: GetThemeMode
+
+    private val viewModel: AchievementsOverviewViewModel by viewModels()
 
     /**
      * fetcher
@@ -38,12 +37,6 @@ class AchievementsActivity : PasscodeActivity() {
     @Inject
     @Deprecated("This field will be removed in future")
     lateinit var fetcher: GetAchievementsListener
-
-    private val viewModel: AchievementsOverviewViewModel by viewModels()
-
-    private val binding: ActivityAchievementsBinding by lazy(LazyThreadSafetyMode.NONE) {
-        ActivityAchievementsBinding.inflate(layoutInflater)
-    }
 
     /**
      * On create
@@ -55,30 +48,16 @@ class AchievementsActivity : PasscodeActivity() {
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
-        fetcher.fetch()
-        setContentView(binding.root)
-        binding.toolbarAchievements.isVisible = true
-        setSupportActionBar(binding.toolbarAchievements)
-        supportActionBar?.apply {
-            setHomeAsUpIndicator(if (Util.isDarkMode(this@AchievementsActivity)) R.drawable.ic_arrow_back_white else R.drawable.ic_arrow_back_black)
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-        }
-        if (savedInstanceState == null) {
-            val ft = supportFragmentManager.beginTransaction()
-            ft.add(R.id.fragment_container_achievements, AchievementsFragment(), TAG_ACHIEVEMENTS)
-            ft.commitNow()
-        }
+        setContent {
+            val themeMode by getThemeMode()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-        collectFlow(
-            viewModel.state,
-            collectBlock = ::handleEvent
-        )
-    }
-
-    private fun handleEvent(event: AchievementsUIState) {
-        if (event.showError) {
-            showSnackbar(getString(R.string.cancel_subscription_error))
+            /**
+             * AndroidTheme will be removed once the AchievementsActivity is removed in the future
+             */
+            AndroidTheme(isDark = themeMode.isDarkMode()) {
+                AchievementsFeatureScreen(viewModel)
+            }
         }
     }
 
@@ -95,69 +74,10 @@ class AchievementsActivity : PasscodeActivity() {
     }
 
     /**
-     * Show fragment
-     *
+     * Deprecated showing SnackBar method from ContactController
      */
-    @JvmOverloads
-    fun showFragment(
-        fragmentName: Int,
-        arguments: Bundle?,
-        type: AchievementType = AchievementType.INVALID_ACHIEVEMENT,
-    ) {
-        Timber.d("showFragment: $fragmentName type: ${type.name}")
-        val ft = supportFragmentManager.beginTransaction()
-        var fragment: Fragment? = null
-        var tag = ""
-        when (fragmentName) {
-            Constants.ACHIEVEMENTS_FRAGMENT -> {
-                Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS)
-                supportActionBar?.title =
-                    getString(R.string.achievements_title)
-                fragment = AchievementsFragment()
-                tag = "achievementsFragment"
-            }
-
-            Constants.INVITE_FRIENDS_FRAGMENT -> {
-                fragment = InviteFriendsFragment().apply {
-                    this.arguments = arguments
-                }
-                tag = "inviteFriendsFragment"
-                ft.addToBackStack(tag)
-            }
-
-            Constants.BONUSES_FRAGMENT -> {
-                fragment = ReferralBonusesFragment()
-                tag = "referralBonusesFragment"
-                ft.addToBackStack(tag)
-            }
-
-            Constants.INFO_ACHIEVEMENTS_FRAGMENT -> {
-                fragment = AchievementsInfoFragment().apply {
-                    this.arguments = bundleOf(
-                        ACHIEVEMENTS_OVERVIEW to viewModel.state.value.achievementsOverview,
-                        ACHIEVEMENTS_TYPE to type
-                    )
-                }
-                tag = "infoAchievementsFragment"
-                ft.addToBackStack(tag)
-            }
-
-            else -> {}
-        }
-        fragment?.let {
-            ft.replace(R.id.fragment_container_achievements, it, tag).commit()
-        }
-    }
-
-    /**
-     * Show snackbar
-     *
-     */
-    fun showSnackbar(s: String) {
-        showSnackbar(binding.fragmentContainerAchievements, s)
-    }
-
-    companion object {
-        private const val TAG_ACHIEVEMENTS = "achievementsFragment"
+    @Deprecated("This method is only used to support showing snackbar from ContactController, remove it once it's refactored")
+    fun showSnackbar(@StringRes message: Int) {
+        viewModel.showErrorMessage(message)
     }
 }

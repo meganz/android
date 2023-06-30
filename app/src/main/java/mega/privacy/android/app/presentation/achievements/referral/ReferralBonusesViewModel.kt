@@ -17,7 +17,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * ReferralBonusesViewModel for [ReferralBonusesFragment]
+ * ReferralBonusesViewModel for ReferralBonusScreen
  */
 @HiltViewModel
 class ReferralBonusesViewModel @Inject constructor(
@@ -28,7 +28,7 @@ class ReferralBonusesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ReferralBonusesUIState())
 
     /**
-     * Flow of [ReferralBonusesFragment] UI State
+     * Flow of ReferralBonusScreen UI State
      * @see ReferralBonusesUIState
      * @see ReferralBonusesUIState
      */

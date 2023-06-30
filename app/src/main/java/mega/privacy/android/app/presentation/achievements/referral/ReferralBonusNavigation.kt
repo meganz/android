@@ -1,0 +1,30 @@
+package mega.privacy.android.app.presentation.achievements.referral
+
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
+import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusRoute
+
+/**
+ * Route for [ReferralBonusRoute]
+ */
+internal const val referralBonusRoute = "achievements/referrals"
+
+/**
+ * Composable destination for [ReferralBonusRoute]
+ */
+fun NavGraphBuilder.referralBonusScreen(
+    onSetToolbarTitle: (Int) -> Unit,
+) {
+    composable(route = referralBonusRoute) {
+        ReferralBonusRoute(onSetToolbarTitle = onSetToolbarTitle)
+    }
+}
+
+/**
+ * Navigation for [ReferralBonusRoute]
+ */
+fun NavController.navigateToReferralBonus(navOptions: NavOptions? = null) {
+    this.navigate(route = referralBonusRoute, navOptions = navOptions)
+}

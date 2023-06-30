@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
-import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel.Companion.REFERRAL_STORAGE_BONUS
+import mega.privacy.android.app.presentation.achievements.invites.storageBonusInBytesArg
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -70,6 +70,8 @@ class InviteFriendsViewModelTest {
     @Test
     fun `test that on view model init should fetch use case and update ui state correctly`() =
         runTest {
+            savedStateHandle[storageBonusInBytesArg] = 0L
+
             initMocks()
             initTestClass()
 
@@ -81,7 +83,7 @@ class InviteFriendsViewModelTest {
     @Test
     fun `test that getAccountAchievementsOverviewUseCase should not be called when referral storage value from saved state exists`() =
         runTest {
-            savedStateHandle[REFERRAL_STORAGE_BONUS] = reward100Mb
+            savedStateHandle[storageBonusInBytesArg] = reward100Mb
 
             initTestClass()
 

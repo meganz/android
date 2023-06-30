@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
-import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesFragment
-import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
@@ -19,20 +17,20 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * InviteFriendsViewModel
- * ViewModel for [InviteFriendsFragment]
+ * ViewModel for InviteFriendsScreen
  */
 @HiltViewModel
 class InviteFriendsViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val getAccountAchievementsOverviewUseCase: GetAccountAchievementsOverviewUseCase,
 ) : ViewModel() {
+    private val inviteFriendsArgs = InviteFriendsArgs(savedStateHandle)
     private val _uiState = MutableStateFlow(InviteFriendsUIState())
 
     /**
-     * Flow of [ReferralBonusesFragment] UI State
-     * @see ReferralBonusesUIState
-     * @see ReferralBonusesUIState
+     * Flow of [InviteFriendsUIState] UI State
+     * @see InviteFriendsUIState
+     * @see InviteFriendsUIState
      */
     val uiState = _uiState.asStateFlow()
 
@@ -52,9 +50,8 @@ class InviteFriendsViewModel @Inject constructor(
              * Will skip getAccountAchievementsOverviewUseCase calls when a value is present
              * This is added to remove unnecessary and redundant use case calls when not needed.
              */
-            val savedReferral = savedStateHandle.get<Long?>(REFERRAL_STORAGE_BONUS)
-            if (savedReferral != null && savedReferral > 0) {
-                _uiState.update { it.copy(grantStorageInBytes = savedReferral) }
+            if (inviteFriendsArgs.storageBonusInBytes > 0) {
+                _uiState.update { it.copy(grantStorageInBytes = inviteFriendsArgs.storageBonusInBytes) }
                 return@launch
             }
 
@@ -72,12 +69,5 @@ class InviteFriendsViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
-    }
-
-    companion object {
-        /**
-         * Arguments flag to check if the previous fragment passes the value of Referral Storage Bonus from invites
-         */
-        const val REFERRAL_STORAGE_BONUS = "referral_storage_bonus"
     }
 }

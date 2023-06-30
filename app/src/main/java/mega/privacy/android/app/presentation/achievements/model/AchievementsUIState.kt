@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.achievements.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 
 /**
@@ -8,7 +10,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
  * @property achievementsOverview Overview for all achievements
  * @property currentStorage Current storage from achievements
  * @property areAllRewardsExpired Are all rewards expired
- * @property showError Show error state
+ * @property errorMessage error message to be shown to the user
  * @property hasReferrals User has any referrals accomplished
  * @property referralsStorage Storage by referrals
  * @property referralsAwardStorage Storage awarded by referrals
@@ -27,7 +29,7 @@ data class AchievementsUIState(
     val achievementsOverview: AchievementsOverview? = null,
     val currentStorage: Long? = null,
     val areAllRewardsExpired: Boolean = false,
-    val showError: Boolean = false,
+    val errorMessage: StateEventWithContent<Int> = consumed(),
     val hasReferrals: Boolean = false,
     val referralsStorage: Long? = null,
     val referralsAwardStorage: Long = 0,
