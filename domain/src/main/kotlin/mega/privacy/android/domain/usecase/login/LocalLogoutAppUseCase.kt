@@ -1,8 +1,10 @@
 package mega.privacy.android.domain.usecase.login
 
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.ClearPsa
@@ -21,6 +23,8 @@ class LocalLogoutAppUseCase @Inject constructor(
     private val billingRepository: BillingRepository,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     private val stopAudioService: StopAudioService,
+    private val photosRepository: PhotosRepository,
+    private val albumRepository: AlbumRepository,
 ) {
 
     /**
@@ -38,6 +42,8 @@ class LocalLogoutAppUseCase @Inject constructor(
         }
         pushesRepository.clearPushToken()
         billingRepository.clearCache()
+        albumRepository.clearCache()
+        photosRepository.clearCache()
         loginRepository.broadcastLogout()
         stopCameraUploadUseCase()
         stopAudioService()
