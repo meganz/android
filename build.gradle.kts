@@ -35,6 +35,10 @@ allprojects {
             url =
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mega-sdk-android")
         }
+        maven {
+            url =
+                uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mobile-analytics")
+        }
     }
     apply(plugin = "com.jfrog.artifactory")
     apply(plugin = "maven-publish")

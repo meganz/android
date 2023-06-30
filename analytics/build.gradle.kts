@@ -62,6 +62,9 @@ dependencies {
     lintChecks(project(":lint"))
     implementation(project(":domain"))
 
+    // Analytics
+    implementation(lib.mega.analytics)
+
     // DI
     implementation(lib.javax.inject)
     kapt(google.hilt.android.compiler)

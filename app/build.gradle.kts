@@ -410,6 +410,7 @@ dependencies {
     }
     implementation(lib.compose.state.events)
     implementation(testlib.hamcrest)
+    implementation(lib.mega.analytics)
 
     coreLibraryDesugaring(lib.desugar)
 
