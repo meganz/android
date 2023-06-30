@@ -67,6 +67,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
@@ -174,6 +175,7 @@ class ManagerViewModel @Inject constructor(
     private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
     private val deleteNodesUseCase: DeleteNodesUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
+    private val copyNodesUseCase: CopyNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -754,12 +756,16 @@ class ManagerViewModel @Inject constructor(
      * @param nodes
      * @param targetNode
      */
-    fun checkMoveNodesNameCollision(nodes: List<Long>, targetNode: Long) {
+    fun checkNodesNameCollision(
+        nodes: List<Long>,
+        targetNode: Long,
+        type: NodeNameCollisionType,
+    ) {
         viewModelScope.launch {
             runCatching {
                 checkNodesNameCollisionUseCase(
                     nodes.associateWith { targetNode },
-                    NodeNameCollisionType.MOVE
+                    type
                 )
             }.onSuccess { result ->
                 _state.update { it.copy(nodeNameCollisionResult = result) }
@@ -780,6 +786,24 @@ class ManagerViewModel @Inject constructor(
                 moveNodesUseCase(nodes)
             }.onSuccess {
                 setMoveTargetPath(nodes.values.first())
+            }.onFailure {
+                Timber.e(it)
+            }
+            _state.update { state -> state.copy(moveRequestResult = result) }
+        }
+    }
+
+    /**
+     * Copy nodes
+     *
+     * @param nodes
+     */
+    fun copyNodes(nodes: Map<Long, Long>) {
+        viewModelScope.launch {
+            val result = runCatching {
+                copyNodesUseCase(nodes)
+            }.onSuccess {
+                setCopyTargetPath(nodes.values.first())
             }.onFailure {
                 Timber.e(it)
             }

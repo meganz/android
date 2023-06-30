@@ -13,5 +13,10 @@ enum class NodeNameCollisionType {
     /**
      * Move node
      */
-    MOVE
+    MOVE,
+
+    /**
+     * Copy
+     */
+    COPY
 }

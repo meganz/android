@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
+import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
@@ -243,6 +244,7 @@ class ManagerViewModelTest {
     private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
     private val deleteNodesUseCase = mock<DeleteNodesUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
+    private val copyNodesUseCase = mock<CopyNodesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -303,6 +305,7 @@ class ManagerViewModelTest {
             moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
             deleteNodesUseCase = deleteNodesUseCase,
             moveNodesUseCase = moveNodesUseCase,
+            copyNodesUseCase = copyNodesUseCase
         )
     }
 
@@ -923,7 +926,7 @@ class ManagerViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.nodeNameCollisionResult).isNull()
-                underTest.checkMoveNodesNameCollision(nodes, targetNode)
+                underTest.checkNodesNameCollision(nodes, targetNode, NodeNameCollisionType.MOVE)
                 val updatedState = awaitItem()
                 assertThat(updatedState.nodeNameCollisionResult).isNotNull()
             }
@@ -961,6 +964,45 @@ class ManagerViewModelTest {
                 assertThat(state.moveRequestResult).isNull()
                 underTest.moveNodes(nodes)
                 verifyNoInteractions(setMoveLatestTargetPathUseCase)
+                val updatedState = awaitItem()
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isFailure).isTrue()
+            }
+        }
+
+
+    @Test
+    fun `test that moveRequestResult updated correctly when calling copyNodes successfully`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val result = mock<MoveRequestResult.GeneralMovement>()
+            val nodes = mapOf(1L to 100L, 2L to 100L)
+            whenever(moveNodesUseCase(nodes)).thenReturn(result)
+            whenever(setCopyLatestTargetPathUseCase(100L)).thenReturn(Unit)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.moveRequestResult).isNull()
+                underTest.copyNodes(nodes)
+                val updatedState = awaitItem()
+                verify(setCopyLatestTargetPathUseCase).invoke(100L)
+                assertThat(updatedState.moveRequestResult).isNotNull()
+                assertThat(updatedState.moveRequestResult?.isSuccess).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that moveRequestResult updated correctly when calling copyNodes failed`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            val nodes = mapOf(1L to 100L, 2L to 100L)
+            whenever(copyNodesUseCase(nodes)).thenThrow(RuntimeException::class.java)
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.moveRequestResult).isNull()
+                underTest.copyNodes(nodes)
+                verifyNoInteractions(setCopyLatestTargetPathUseCase)
                 val updatedState = awaitItem()
                 assertThat(updatedState.moveRequestResult).isNotNull()
                 assertThat(updatedState.moveRequestResult?.isFailure).isTrue()

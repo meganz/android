@@ -173,7 +173,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
@@ -184,17 +183,16 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottom
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.chat.archived.ArchivedChatsActivity
+import mega.privacy.android.app.presentation.chat.list.ChatTabsFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
@@ -274,7 +272,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogS
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.DownloadNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -430,9 +427,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var uploadUseCase: UploadUseCase
-
-    @Inject
-    lateinit var legacyCopyNodeUseCase: LegacyCopyNodeUseCase
 
     @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
@@ -2374,7 +2368,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun handleMovementResult(moveRequestResult: Result<MoveRequestResult>) {
         if (moveRequestResult.isSuccess) {
             val data = moveRequestResult.getOrThrow()
-            if (data !is MoveRequestResult.DeleteMovement) {
+            if (data !is MoveRequestResult.DeleteMovement && data !is MoveRequestResult.Copy) {
                 showMovementResult(data, data.nodes.first())
             }
             showSnackbar(
@@ -2398,6 +2392,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             when (result.type) {
                 NodeNameCollisionType.RESTORE -> viewModel.restoreNodes(result.noConflictNodes)
                 NodeNameCollisionType.MOVE -> viewModel.moveNodes(result.noConflictNodes)
+                NodeNameCollisionType.COPY -> viewModel.copyNodes(result.noConflictNodes)
             }
         }
     }
@@ -7431,7 +7426,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val moveHandles = intent.getLongArrayExtra("MOVE_HANDLES") ?: LongArray(0)
                 val toHandle = intent.getLongExtra("MOVE_TO", 0)
                 if (moveHandles.isNotEmpty()) {
-                    viewModel.checkMoveNodesNameCollision(moveHandles.toList(), toHandle)
+                    viewModel.checkNodesNameCollision(moveHandles.toList(), toHandle, NodeNameCollisionType.MOVE)
                 }
             }
 
@@ -7443,36 +7438,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 val copyHandles = intent.getLongArrayExtra("COPY_HANDLES") ?: LongArray(0)
                 val toHandle = intent.getLongExtra("COPY_TO", 0)
-                checkNameCollisionUseCase.checkHandleList(
-                    copyHandles,
-                    toHandle,
-                    NameCollisionType.COPY,
-                )
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray> ->
-                            if (collisions.isNotEmpty()) {
-                                dismissAlertDialogIfExists(statusDialog)
-                                nameCollisionActivityContract?.launch(collisions)
-                            }
-                            if (handlesWithoutCollision.isNotEmpty()) {
-                                legacyCopyNodeUseCase.copy(handlesWithoutCollision, toHandle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { copyResult: CopyRequestResult?, copyThrowable: Throwable? ->
-                                        dismissAlertDialogIfExists(statusDialog)
-                                        if (!manageCopyMoveException(copyThrowable)) {
-                                            viewModel.setCopyTargetPath(toHandle)
-                                            copyResult?.let { showCopyResult(it) }
-                                        }
-                                    }
-                                    .addTo(composite)
-                            }
-                        },
-                        { throwable: Throwable -> Timber.e(throwable) }
+                if (copyHandles.isNotEmpty()) {
+                    viewModel.checkNodesNameCollision(
+                        copyHandles.toList(),
+                        toHandle,
+                        NodeNameCollisionType.COPY
                     )
-                    .addTo(composite)
+                }
             }
 
             requestCode == Constants.REQUEST_CODE_REFRESH_API_SERVER && resultCode == Activity.RESULT_OK -> {
@@ -7700,31 +7672,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 { Timber.d("Upload started") },
                 { t: Throwable? -> Timber.e(t) })
             .addTo(composite)
-    }
-
-    /**
-     * Shows the copy result.
-     *
-     * @param result Object containing the request result.
-     */
-    private fun showCopyResult(result: CopyRequestResult) {
-        showSnackbar(
-            Constants.SNACKBAR_TYPE,
-            copyRequestMessageMapper(result),
-            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-        )
-        if (result.successCount <= 0) {
-            return
-        }
-        if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            if (isCloudAdded) {
-                fileBrowserViewModel.refreshNodes()
-            }
-        } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
-            refreshRubbishBin()
-        } else if (drawerItem === DrawerItem.INBOX) {
-            refreshInboxList()
-        }
     }
 
     fun createGroupChat(
