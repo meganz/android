@@ -3,8 +3,10 @@ package mega.privacy.android.domain.usecase.login
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.ClearPsa
@@ -31,6 +33,8 @@ class LocalLogoutAppUseCaseTest {
     private val billingRepository = mock<BillingRepository>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val stopAudioService = mock<StopAudioService>()
+    private val photosRepository = mock<PhotosRepository>()
+    private val albumRepository = mock<AlbumRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -40,6 +44,8 @@ class LocalLogoutAppUseCaseTest {
             transferRepository = transferRepository,
             pushesRepository = pushesRepository,
             billingRepository = billingRepository,
+            photosRepository = photosRepository,
+            albumRepository = albumRepository,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             stopAudioService = stopAudioService
         )
