@@ -564,16 +564,22 @@ class MediaDiscoveryFragment : Fragment() {
         when (item.itemId) {
             R.id.action_zoom_in -> {
                 mediaDiscoveryGlobalStateViewModel.zoomIn()
-                mediaDiscoveryViewModel.handlePhotoItems(
-                    mediaDiscoveryViewModel.state.value.sourcePhotos
-                )
+                with(mediaDiscoveryViewModel) {
+                    handlePhotoItems(
+                        sortAndFilterPhotos(state.value.sourcePhotos),
+                        state.value.sourcePhotos
+                    )
+                }
             }
 
             R.id.action_zoom_out -> {
                 mediaDiscoveryGlobalStateViewModel.zoomOut()
-                mediaDiscoveryViewModel.handlePhotoItems(
-                    mediaDiscoveryViewModel.state.value.sourcePhotos
-                )
+                with(mediaDiscoveryViewModel) {
+                    handlePhotoItems(
+                        sortAndFilterPhotos(state.value.sourcePhotos),
+                        state.value.sourcePhotos
+                    )
+                }
             }
 
             R.id.action_menu_sort_by -> {

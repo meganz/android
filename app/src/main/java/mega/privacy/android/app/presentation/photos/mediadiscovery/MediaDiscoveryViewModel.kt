@@ -183,7 +183,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         }
     }
 
-    private fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {
+    internal fun sortAndFilterPhotos(sourcePhotos: List<Photo>): List<Photo> {
         val filteredPhotos = when (_state.value.currentMediaType) {
             FilterMediaType.ALL_MEDIA -> sourcePhotos
             FilterMediaType.IMAGES -> sourcePhotos.filterIsInstance<Photo.Image>()
