@@ -6,11 +6,6 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 internal sealed interface SyncNewFolderAction {
 
     /**
-     * @param remoteFolder - selected remote folder
-     */
-    data class RemoteFolderSelected(val remoteFolder: RemoteFolder) : SyncNewFolderAction
-
-    /**
      * @param path - selected local folder path
      */
     data class LocalFolderSelected(val path: Uri) : SyncNewFolderAction

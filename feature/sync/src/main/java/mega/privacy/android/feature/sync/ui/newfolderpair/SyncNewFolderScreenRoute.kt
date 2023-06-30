@@ -8,6 +8,7 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.Fo
 @Composable
 internal fun SyncNewFolderScreenRoute(
     viewModel: SyncNewFolderViewModel,
+    openSelectMegaFolderScreen: () -> Unit,
     openNextScreen: (SyncNewFolderState) -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -18,6 +19,7 @@ internal fun SyncNewFolderScreenRoute(
         selectedMegaFolder = state.value.selectedMegaFolder,
         localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
         folderNameChanged = { viewModel.handleAction(FolderNameChanged(it)) },
+        selectMegaFolderClicked = openSelectMegaFolderScreen,
         syncClicked = { openNextScreen(state.value) }
     )
 }

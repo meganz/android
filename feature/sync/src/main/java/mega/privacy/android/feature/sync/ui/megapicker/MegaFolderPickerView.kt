@@ -33,7 +33,7 @@ internal fun MegaFolderPickerView(
     showChangeViewType: Boolean,
     listState: LazyListState,
     getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
-    onFolderClick: () -> Unit,
+    onFolderClick: (TypedNode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(state = listState, modifier = modifier) {
@@ -41,7 +41,6 @@ internal fun MegaFolderPickerView(
             key = "header"
         ) {
             HeaderViewItem(
-                modifier = modifier,
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 sortOrder = sortOrder,
@@ -86,7 +85,7 @@ internal fun MegaFolderPickerView(
                 isFavourite = false,
                 isSharedWithPublicLink = false,
                 imageState = imageState,
-                onClick = { onFolderClick() },
+                onClick = { onFolderClick(nodesList[it]) },
                 isEnabled = nodeEntity is FolderNode,
             )
         }

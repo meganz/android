@@ -35,16 +35,6 @@ internal class SyncNewFolderViewModelTest {
     }
 
     @Test
-    fun `test that remote folder selected action results in updated state`() {
-        val remoteFolder = RemoteFolder(1231, "remoteFolder")
-        val expectedState = SyncNewFolderState(selectedMegaFolder = remoteFolder)
-
-        underTest.handleAction(SyncNewFolderAction.RemoteFolderSelected(remoteFolder))
-
-        assertThat(expectedState).isEqualTo(underTest.state.value)
-    }
-
-    @Test
     fun `test that local folder selected action results in updated state`() = runTest {
         val localFolderContentUri =
             "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"

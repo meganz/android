@@ -26,6 +26,7 @@ internal fun SyncNewFolderScreen(
     selectedMegaFolder: RemoteFolder?,
     localFolderSelected: (Uri) -> Unit,
     folderNameChanged: (String) -> Unit,
+    selectMegaFolderClicked: () -> Unit,
     syncClicked: () -> Unit,
 ) {
 
@@ -40,7 +41,7 @@ internal fun SyncNewFolderScreen(
                 folderPicker.launch(null)
             },
             selectMEGAFolderClicked = {
-                // Will be implemented in next MR
+                selectMegaFolderClicked()
             },
             onFolderPairNameChanged = { folderPairName ->
                 folderNameChanged(folderPairName)
@@ -79,6 +80,7 @@ private fun PreviewSyncNewFolderScreen() {
             selectedMegaFolder = null,
             localFolderSelected = {},
             folderNameChanged = {},
+            selectMegaFolderClicked = {},
             syncClicked = {}
         )
     }

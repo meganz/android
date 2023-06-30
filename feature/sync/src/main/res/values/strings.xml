@@ -8,4 +8,5 @@
     <plurals name="num_folders_with_parameter" />
     <plurals name="num_folders_num_files" />
     <plurals name="num_folders_num_files_2" />
+    <string name="general_select_to_download" />
 </resources>

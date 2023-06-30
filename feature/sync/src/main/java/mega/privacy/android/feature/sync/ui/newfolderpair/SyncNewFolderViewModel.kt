@@ -21,11 +21,12 @@ internal class SyncNewFolderViewModel @Inject constructor(
 
     fun handleAction(action: SyncNewFolderAction) {
         when (action) {
-            is SyncNewFolderAction.RemoteFolderSelected -> {
-                _state.update { state ->
-                    state.copy(selectedMegaFolder = action.remoteFolder)
-                }
-            }
+            // This code will be replaced in the next MR
+//            is SyncNewFolderAction.RemoteFolderSelected -> {
+//                _state.update { state ->
+//                    state.copy(selectedMegaFolder = action.remoteFolder)
+//                }
+//            }
 
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {

@@ -16,6 +16,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -38,6 +39,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                openSelectMegaFolderScreen = {}
             )
         }
 
@@ -62,6 +64,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                openSelectMegaFolderScreen = {}
             )
         }
 
@@ -78,6 +81,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                openSelectMegaFolderScreen = {}
             )
         }
 
@@ -101,6 +105,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = {},
+                openSelectMegaFolderScreen = {}
             )
         }
 
@@ -118,6 +123,7 @@ class SyncNewFolderScreenRouteTest {
             SyncNewFolderScreenRoute(
                 viewModel,
                 openNextScreen = openNextScreenCallback,
+                openSelectMegaFolderScreen = {}
             )
         }
 
@@ -125,5 +131,25 @@ class SyncNewFolderScreenRouteTest {
             .performClick()
 
         verifyNoInteractions(openNextScreenCallback)
+    }
+
+    @Test
+    fun `test that click on select mega folder button invokes openSelectMegaFolderScreen lambda`() {
+        val emptyState = SyncNewFolderState()
+        val openSelectMegaFolderScreenLambda = mock<() -> Unit>()
+        whenever(state.value).thenReturn(emptyState)
+        whenever(viewModel.state).thenReturn(state)
+        composeTestRule.setContent {
+            SyncNewFolderScreenRoute(
+                viewModel,
+                openNextScreen = {},
+                openSelectMegaFolderScreen = openSelectMegaFolderScreenLambda
+            )
+        }
+
+        composeTestRule.onNodeWithText("MEGA folder")
+            .performClick()
+
+        verify(openSelectMegaFolderScreenLambda).invoke()
     }
 }
