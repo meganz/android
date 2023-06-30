@@ -379,7 +379,7 @@ class ChatTabsViewModel @Inject constructor(
      * Clear search query
      */
     fun clearSearchQuery() {
-        state.update { it.copy(searchQuery = null) }
+        setSearchQuery(null)
     }
 
     /**

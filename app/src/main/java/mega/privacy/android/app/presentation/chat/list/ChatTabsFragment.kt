@@ -8,10 +8,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.appcompat.widget.SearchView
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.MenuProvider
@@ -41,6 +39,7 @@ import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -168,27 +167,7 @@ class ChatTabsFragment : Fragment() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.fragment_chat_tabs, menu)
-                menu.findItem(R.id.menu_search)?.actionView?.let { it as SearchView }?.apply {
-                    findViewById<ImageView>(androidx.appcompat.R.id.search_button)
-                        ?.setImageResource(mega.privacy.android.core.R.drawable.ic_search)
-                    setOnQueryTextListener(
-                        object : SearchView.OnQueryTextListener {
-                            override fun onQueryTextSubmit(query: String): Boolean {
-                                viewModel.setSearchQuery(query)
-                                return false
-                            }
-
-                            override fun onQueryTextChange(newText: String): Boolean {
-                                viewModel.setSearchQuery(newText)
-                                return true
-                            }
-                        },
-                    )
-                    setOnCloseListener {
-                        viewModel.clearSearchQuery()
-                        false
-                    }
-                }
+                menu.findItem(R.id.menu_search)?.setupSearchView(viewModel::setSearchQuery)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean = true
