@@ -76,4 +76,39 @@ interface ChatParticipantsRepository {
      * @return Participant permissions.
      */
     suspend fun getPermissions(chatId: Long, participant: ChatParticipant): ChatRoomPermission
+
+    /**
+     * Request user attributes
+     *
+     * This function is useful to get the email address, first name, last name and full name
+     * from chat link participants that they are not loaded
+     *
+     * After request is finished, you can call to MegaChatApi::getUserFirstnameFromCache,
+     * MegaChatApi::getUserLastnameFromCache, MegaChatApi::getUserFullnameFromCache,
+     * MegaChatApi::getUserEmailFromCache (email will not available in anonymous mode)
+     *
+     * @param chatId Handle of the chat whose member attributes requested
+     * @param usersHandles List of user handles whose attributes have to be requested
+     */
+    suspend fun loadUserAttributes(chatId: Long, usersHandles: List<Long>)
+
+    /**
+     * Returns the current fullname of the user
+     *
+     * Returns NULL if data is not cached yet.
+     *
+     * @param userHandle Handle of the user whose fullname is requested.
+     * @return The full name from user
+     */
+    suspend fun getUserFullNameFromCache(userHandle: Long): String?
+
+    /**
+     * Returns the current email address of the user
+     *
+     * Returns NULL if data is not cached yet or it's not possible to get
+     *
+     * @param userHandle Handle of the user whose email is requested.
+     * @return The email from user
+     */
+    suspend fun getUserEmailFromCache(userHandle: Long): String?
 }

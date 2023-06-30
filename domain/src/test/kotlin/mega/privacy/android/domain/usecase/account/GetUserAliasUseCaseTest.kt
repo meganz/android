@@ -36,7 +36,7 @@ class GetUserAliasUseCaseTest {
         reset(accountRepository)
     }
 
-    @ParameterizedTest(name = "{0} when getting it from cache is {1} and getting it from request is {2}")
+    @ParameterizedTest(name = "{2} when getting it from cache is {0} and getting it from request is {1}")
     @MethodSource("provideParameters")
     fun `test that Alias is`(
         aliasFromCache: String?,

@@ -3,7 +3,7 @@ package mega.privacy.android.data.mapper.chat
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission

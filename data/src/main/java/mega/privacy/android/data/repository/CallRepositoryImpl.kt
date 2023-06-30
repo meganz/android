@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper

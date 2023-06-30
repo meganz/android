@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.meeting
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus

@@ -1,4 +1,4 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.handles
 
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaHandleList

@@ -1,18 +1,22 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
+import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.exception.ChatRoomDoesNotExistException
+import mega.privacy.android.domain.exception.NullMegaHandleListException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
@@ -45,6 +49,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val contactsRepository: ContactsRepository,
     private val requestLastGreen: RequestLastGreen,
     private val chatPermissionsMapper: ChatPermissionsMapper,
+    private val megaHandleListMapper: MegaHandleListMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
@@ -197,6 +202,31 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
         return ChatRoomPermission.Unknown
     }
+
+    override suspend fun loadUserAttributes(chatId: Long, usersHandles: List<Long>) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                megaHandleListMapper(usersHandles)?.let { megaHandleList ->
+                    val listener = continuation.getChatRequestListener("loadUserAttributes") {}
+
+                    megaChatApiGateway.loadUserAttributes(chatId, megaHandleList, listener)
+
+                    continuation.invokeOnCancellation {
+                        megaChatApiGateway.removeRequestListener(listener)
+                    }
+                } ?: continuation.resumeWith(Result.failure(NullMegaHandleListException()))
+            }
+        }
+
+    override suspend fun getUserFullNameFromCache(userHandle: Long): String? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getUserFullNameFromCache(userHandle)
+        }
+
+    override suspend fun getUserEmailFromCache(userHandle: Long): String? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getUserEmailFromCache(userHandle)
+        }
 
     override suspend fun areCredentialsVerified(participant: ChatParticipant): Boolean =
         runCatching { contactsRepository.areCredentialsVerified(participant.email) }.fold(

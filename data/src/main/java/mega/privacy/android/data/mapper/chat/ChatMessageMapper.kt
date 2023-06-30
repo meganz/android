@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.chat
 
-import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatMessageChange

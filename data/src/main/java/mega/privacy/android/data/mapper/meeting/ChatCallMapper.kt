@@ -1,6 +1,6 @@
 package mega.privacy.android.data.mapper.meeting
 
-import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatCall
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
