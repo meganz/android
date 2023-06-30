@@ -7,7 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -39,18 +39,28 @@ import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.billing.GetYearlySubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.util.stream.Stream
 
 
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UpgradeAccountViewModelTest {
     private lateinit var underTest: UpgradeAccountViewModel
 
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getMonthlySubscriptionsUseCase = mock<GetMonthlySubscriptionsUseCase>()
     private val getYearlySubscriptionsUseCase = mock<GetYearlySubscriptionsUseCase>()
     private val getCurrentSubscriptionPlanUseCase = mock<GetCurrentSubscriptionPlanUseCase>()
@@ -67,34 +77,27 @@ class UpgradeAccountViewModelTest {
             formattedSizeMapper,
         )
     private val getPaymentMethodUseCase = mock<GetPaymentMethodUseCase>()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() }.thenReturn(accountDetailFlow)
-    }
-    private val expectedInitialCurrentPlan = AccountType.FREE
-    private val expectedCurrentPlan = AccountType.PRO_I
-    private val expectedShowBuyNewSubscriptionDialog = true
-    private val expectedInitialCurrentPayment = UpgradePayment()
-    private val expectedCurrentPayment =
-        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.GOOGLE_WALLET)
-    private val expectedCurrentPaymentUpdated =
-        UpgradePayment(Constants.PRO_II, PaymentMethod.GOOGLE_WALLET)
-    private val expectedAccountDetail = AccountDetail(
-        storageDetail = null,
-        sessionDetail = null,
-        transferDetail = null,
-        levelDetail = AccountLevelDetail(
-            accountType = AccountType.PRO_I,
-            subscriptionStatus = SubscriptionStatus.VALID,
-            subscriptionRenewTime = 1873874783274L,
-            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
-            proExpirationTime = 378672463728467L,
-        )
-    )
 
-    @Before
+    @BeforeAll
+    fun initialise() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-        initViewModel()
+        reset(
+            getMonthlySubscriptionsUseCase,
+            getYearlySubscriptionsUseCase,
+            getCurrentSubscriptionPlanUseCase,
+            getCurrentPaymentUseCase,
+            isBillingAvailableUseCase,
+            getPaymentMethodUseCase,
+            localisedPriceStringMapper,
+            localisedPriceCurrencyCodeStringMapper,
+            formattedSizeMapper,
+            getPaymentMethodUseCase,
+            monitorAccountDetailUseCase,
+        )
     }
 
     private fun initViewModel() {
@@ -110,7 +113,7 @@ class UpgradeAccountViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
@@ -119,8 +122,8 @@ class UpgradeAccountViewModelTest {
     fun `test that initial state has all Pro plans listed`() = runTest {
         whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
         whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-        underTest.state.map { it.localisedSubscriptionsList }.distinctUntilChanged().test {
-            assertThat(awaitItem()).isEmpty()
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
             assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
         }
     }
@@ -131,8 +134,8 @@ class UpgradeAccountViewModelTest {
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            initViewModel()
             underTest.state.map { it.currentSubscriptionPlan }.distinctUntilChanged().test {
-                assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPlan)
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPlan)
             }
         }
@@ -141,8 +144,8 @@ class UpgradeAccountViewModelTest {
     fun `test that initial state has current payment listed if current payment is available`() =
         runTest {
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+            initViewModel()
             underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
-                assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPayment)
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPayment)
             }
         }
@@ -154,12 +157,10 @@ class UpgradeAccountViewModelTest {
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
-
+            initViewModel()
             underTest.currentPaymentCheck(Constants.PRO_II)
 
             underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
-                assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPayment)
-                assertThat(awaitItem()).isEqualTo(expectedCurrentPayment)
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPaymentUpdated)
             }
             underTest.state.map { it.showBuyNewSubscriptionDialog }.distinctUntilChanged().test {
@@ -167,35 +168,22 @@ class UpgradeAccountViewModelTest {
             }
         }
 
-    @Test
-    fun `test that showBillingWarning state is set to True`() =
+    @ParameterizedTest(name = "test that showBillingWarning state is set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that showBillingWarning state is set correctly`(boolean: Boolean) =
         runTest {
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
-            underTest.setBillingWarningVisibility(true)
+            initViewModel()
+
+            underTest.setBillingWarningVisibility(boolean)
 
             underTest.state.test {
                 val showBillingWarning = awaitItem().showBillingWarning
-                assertThat(showBillingWarning).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that showBillingWarning state is set to False`() =
-        runTest {
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
-
-            underTest.setBillingWarningVisibility(false)
-
-            underTest.state.test {
-                val showBillingWarning = awaitItem().showBillingWarning
-                assertThat(showBillingWarning).isFalse()
+                assertThat(showBillingWarning).isEqualTo(boolean)
             }
         }
 
@@ -207,6 +195,8 @@ class UpgradeAccountViewModelTest {
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
+            initViewModel()
+
             underTest.setShowBuyNewSubscriptionDialog(expectedShowBuyNewSubscriptionDialog)
 
             underTest.state.test {
@@ -217,35 +207,22 @@ class UpgradeAccountViewModelTest {
             }
         }
 
-    @Test
-    fun `test that isMonthlySelected state is set to True`() =
+    @ParameterizedTest(name = "test that isMonthlySelected state is set to {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isMonthlySelected state is set correctly`(boolean: Boolean) =
         runTest {
             whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
-            underTest.onSelectingMonthlyPlan(true)
+            initViewModel()
+
+            underTest.onSelectingMonthlyPlan(boolean)
 
             underTest.state.test {
                 val isMonthlySelected = awaitItem().isMonthlySelected
-                assertThat(isMonthlySelected).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that isMonthlySelected state is set to False`() =
-        runTest {
-            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
-            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
-            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
-
-            underTest.onSelectingMonthlyPlan(false)
-
-            underTest.state.test {
-                val isMonthlySelected = awaitItem().isMonthlySelected
-                assertThat(isMonthlySelected).isFalse()
+                assertThat(isMonthlySelected).isEqualTo(boolean)
             }
         }
 
@@ -256,6 +233,8 @@ class UpgradeAccountViewModelTest {
             whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
             whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
             whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+
+            initViewModel()
 
             underTest.onSelectingPlanType(AccountType.PRO_II)
 
@@ -277,33 +256,77 @@ class UpgradeAccountViewModelTest {
             }
         }
 
-    @Test
-    fun `test that userSubscription return correct value if monitorAccountDetailUseCase return not null`() =
+    @ParameterizedTest(name = "test that userSubscription return {1} if monitorAccountDetailUseCase return {0}")
+    @MethodSource("provideParameters")
+    fun `test that userSubscription return correct value`(
+        accountDetail: AccountDetail,
+        expectedUserSubscription: UserSubscription,
+    ) =
         runTest {
-            accountDetailFlow.emit(expectedAccountDetail)
+            whenever(getMonthlySubscriptionsUseCase()).thenReturn(expectedMonthlySubscriptionsList)
+            whenever(getYearlySubscriptionsUseCase()).thenReturn(expectedYearlySubscriptionsList)
+            whenever(getCurrentSubscriptionPlanUseCase()).thenReturn(expectedCurrentPlan)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+            initViewModel()
+
+            accountDetailFlow.emit(accountDetail)
 
             advanceUntilIdle()
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.userSubscription).isEqualTo(UserSubscription.MONTHLY_SUBSCRIBED)
+                assertThat(state.userSubscription).isEqualTo(expectedUserSubscription)
             }
 
         }
 
-    @Test
-    fun `test that userSubscription return correct value if monitorAccountDetailUseCase return null`() =
-        runTest {
-            accountDetailFlow.emit(AccountDetail())
+    private fun provideParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            expectedAccountDetailWithMonthlySubscription,
+            UserSubscription.MONTHLY_SUBSCRIBED
+        ),
+        Arguments.of(
+            expectedAccountDetailWithYearlySubscription,
+            UserSubscription.YEARLY_SUBSCRIBED
+        ),
+        Arguments.of(
+            AccountDetail(),
+            UserSubscription.NOT_SUBSCRIBED
+        ),
+    )
 
-            advanceUntilIdle()
-
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.userSubscription).isEqualTo(UserSubscription.NOT_SUBSCRIBED)
-            }
-
-        }
+    private val expectedCurrentPlan = AccountType.PRO_I
+    private val expectedShowBuyNewSubscriptionDialog = true
+    private val expectedCurrentPayment =
+        UpgradePayment(Constants.INVALID_VALUE, PaymentMethod.GOOGLE_WALLET)
+    private val expectedCurrentPaymentUpdated =
+        UpgradePayment(Constants.PRO_II, PaymentMethod.GOOGLE_WALLET)
+    private val expectedAccountDetailWithMonthlySubscription = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = AccountType.PRO_I,
+            subscriptionStatus = SubscriptionStatus.VALID,
+            subscriptionRenewTime = 1873874783274L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            proExpirationTime = 378672463728467L,
+        )
+    )
+    private val expectedAccountDetailWithYearlySubscription = AccountDetail(
+        storageDetail = null,
+        sessionDetail = null,
+        transferDetail = null,
+        levelDetail = AccountLevelDetail(
+            accountType = AccountType.PRO_II,
+            subscriptionStatus = SubscriptionStatus.VALID,
+            subscriptionRenewTime = 1873874783274L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
+            proExpirationTime = 378672463728467L,
+        )
+    )
 
     private val subscriptionProIMonthly = Subscription(
         accountType = AccountType.PRO_I,
