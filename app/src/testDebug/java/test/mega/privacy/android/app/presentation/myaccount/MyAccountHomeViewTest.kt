@@ -63,6 +63,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import test.mega.privacy.android.app.fromId
+import test.mega.privacy.android.app.fromPluralId
 import test.mega.privacy.android.app.hasBackgroundColor
 import kotlin.random.Random
 
@@ -401,15 +402,15 @@ class MyAccountHomeViewTest {
 
     @Test
     fun `test that contacts should show correct number of contacts when screen loads`() {
-        val randomContacts = Random.nextInt(from = 1, until = 100)
+        val randomContact = Random.nextInt(from = 1, until = 100)
 
         initMyAccountWithDefaults(
-            MyAccountHomeUIState(visibleContacts = randomContacts)
+            MyAccountHomeUIState(visibleContacts = randomContact)
         )
 
         composeTestRule.onNodeWithTag(testTag = "${CONTACTS}_description", useUnmergedTree = true)
             .assertIsDisplayed()
-            .assert(hasText("$randomContacts connections"))
+            .assert(hasText(fromPluralId(R.plurals.my_account_connections, randomContact)))
     }
 
     @Test
