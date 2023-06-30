@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -78,7 +77,6 @@ class SettingsCameraUploadsViewModelTest {
     private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
-    private val disableCameraUploadsUseCase = mock<DisableCameraUploadsUseCase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
@@ -134,7 +132,6 @@ class SettingsCameraUploadsViewModelTest {
             areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
-            disableCameraUploadsUseCase = disableCameraUploadsUseCase,
             disableMediaUploadSettings = disableMediaUploadSettings,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getUploadOptionUseCase = getUploadOptionUseCase,
@@ -655,16 +652,6 @@ class SettingsCameraUploadsViewModelTest {
                 verify(resetCameraUploadTimeStamps).invoke(clearCamSyncRecords = true)
                 verify(clearCacheDirectory).invoke()
             }
-        }
-
-    @Test
-    fun `test that disableCameraUploadsInDatabase is invoked when calling disableCameraUploadsInDB`() =
-        runTest {
-            setupUnderTest()
-
-            underTest.disableCameraUploads()
-
-            verify(disableCameraUploadsUseCase).invoke()
         }
 
     @Test

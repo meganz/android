@@ -1,12 +1,14 @@
 package mega.privacy.android.domain.usecase.workers
 
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import javax.inject.Inject
 
 /**
  * Use Case to stop camera upload
  */
 class StopCameraUploadsUseCase @Inject constructor(
+    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
     private val cameraUploadRepository: CameraUploadRepository,
 ) {
     /**
@@ -15,7 +17,9 @@ class StopCameraUploadsUseCase @Inject constructor(
      */
     suspend operator fun invoke(shouldReschedule: Boolean) {
         if (cameraUploadRepository.isCameraUploadsEnabled()) {
-            cameraUploadRepository.setCameraUploadsEnabled(false)
+            if (!shouldReschedule) {
+                disableCameraUploadsUseCase()
+            }
             cameraUploadRepository.stopCameraUploads(shouldReschedule = shouldReschedule)
         }
     }

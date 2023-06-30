@@ -1185,7 +1185,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     fun disableCameraUploads() {
         viewModel.stopCameraUploads()
-        viewModel.disableCameraUploads()
         disableCameraUploadUIProcess()
     }
 

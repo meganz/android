@@ -33,7 +33,6 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
-import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
@@ -72,7 +71,6 @@ import javax.inject.Inject
  * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
  * @property checkEnableCameraUploadsStatus Checks the Camera Uploads status before enabling
  * @property clearCacheDirectory Clears all the contents of the internal cache directory
- * @property disableCameraUploadsUseCase Disables Camera Uploads by manipulating values in the database
  * @property disableMediaUploadSettings Disables Media Uploads by manipulating a certain value in the database
  * @property getPrimaryFolderPathUseCase Retrieves the Primary Folder path
  * @property getUploadOptionUseCase Retrieves the upload option of Camera Uploads
@@ -112,7 +110,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val clearCacheDirectory: ClearCacheDirectory,
-    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getUploadOptionUseCase: GetUploadOptionUseCase,
@@ -357,14 +354,6 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun resetTimestampsAndCacheDirectory() = viewModelScope.launch {
         resetCameraUploadTimeStamps(clearCamSyncRecords = true)
         clearCacheDirectory()
-    }
-
-    /**
-     * Call [disableCameraUploadsUseCase] to disable Camera Uploads by manipulating
-     * values in the database
-     */
-    fun disableCameraUploads() = viewModelScope.launch {
-        disableCameraUploadsUseCase()
     }
 
     /**
