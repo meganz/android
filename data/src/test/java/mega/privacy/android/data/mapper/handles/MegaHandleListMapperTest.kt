@@ -37,7 +37,7 @@ internal class MegaHandleListMapperTest {
 
         val megaHandleList = underTest(list)
         assertions.forEach {
-            it.invoke(megaHandleList!!)
+            it.invoke(megaHandleList ?: throw NullPointerException())
         }
     }
 
