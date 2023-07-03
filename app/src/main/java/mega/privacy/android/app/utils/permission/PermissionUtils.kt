@@ -8,6 +8,7 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.Manifest.permission.RECORD_AUDIO
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
@@ -17,7 +18,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
-import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -148,6 +148,15 @@ object PermissionUtils {
     } else {
         getReadExternalStoragePermission()
     }
+
+    /**
+     * Get READ_MEDIA_VISUAL_USER_SELECTED
+     *
+     * @return READ_MEDIA_VISUAL_USER_SELECTED
+     */
+    @RequiresApi(34)
+    @JvmStatic
+    fun getPartialMediaPermission() = READ_MEDIA_VISUAL_USER_SELECTED
 
     /**
      * Get READ_EXTERNAL_STORAGE

@@ -78,6 +78,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getPartialMediaPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -964,12 +965,22 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 .setMessage(R.string.settings_camera_uploads_grant_media_permissions_body)
                 .setPositiveButton(R.string.settings_camera_uploads_grant_media_permissions_positive_button) { dialog, _ ->
                     if (shouldShowMediaPermissionsRationale()) {
-                        enableCameraUploadsPermissionLauncher.launch(
-                            arrayOf(
-                                getImagePermissionByVersion(),
-                                getVideoPermissionByVersion(),
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            enableCameraUploadsPermissionLauncher.launch(
+                                arrayOf(
+                                    getImagePermissionByVersion(),
+                                    getVideoPermissionByVersion(),
+                                    getPartialMediaPermission(),
+                                )
                             )
-                        )
+                        } else {
+                            enableCameraUploadsPermissionLauncher.launch(
+                                arrayOf(
+                                    getImagePermissionByVersion(),
+                                    getVideoPermissionByVersion(),
+                                )
+                            )
+                        }
                     } else {
                         // User has selected "Never Ask Again". Starting Android 11, selecting "Deny"
                         // more than once is equivalent to selecting "Never Ask Again"
@@ -1157,18 +1168,26 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             // Check if the necessary permissions to enable Camera Uploads have been granted.
             // The permissions are adaptive depending on the Android SDK version
             Timber.d("Checking if the necessary permissions have been granted")
-            val permissionsList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                arrayOf(
-                    getNotificationsPermission(),
-                    getImagePermissionByVersion(),
-                    getVideoPermissionByVersion()
-                )
-            } else {
-                arrayOf(
-                    getImagePermissionByVersion(),
-                    getVideoPermissionByVersion()
-                )
-            }
+            val permissionsList =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    arrayOf(
+                        getNotificationsPermission(),
+                        getImagePermissionByVersion(),
+                        getVideoPermissionByVersion(),
+                        getPartialMediaPermission(),
+                    )
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    arrayOf(
+                        getNotificationsPermission(),
+                        getImagePermissionByVersion(),
+                        getVideoPermissionByVersion()
+                    )
+                } else {
+                    arrayOf(
+                        getImagePermissionByVersion(),
+                        getVideoPermissionByVersion()
+                    )
+                }
             if (hasPermissions(context, *permissionsList)) {
                 Timber.d("All necessary permissions have been granted")
                 viewModel.handleEnableCameraUploads()
