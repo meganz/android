@@ -17,19 +17,19 @@
         <action
             android:id="@+id/action_viewer_to_new_slideshow"
             app:destination="@id/new_slideshow" />
+
     </fragment>
 
     <fragment
         android:id="@+id/image_slideshow"
         android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
         android:label="@string/action_slideshow"
-        tools:layout="@layout/fragment_image_slideshow" >
-    </fragment>
+        tools:layout="@layout/fragment_image_slideshow" />
 
     <fragment
         android:id="@+id/slideshow_settings"
         android:name="mega.privacy.android.app.presentation.slideshow.SlideshowSettingsFragment"
-        android:label="@string/slideshow_settings_page_title"/>
+        android:label="@string/slideshow_settings_page_title" />
 
     <fragment
         android:id="@+id/new_slideshow"

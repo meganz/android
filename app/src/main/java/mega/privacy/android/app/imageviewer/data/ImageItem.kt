@@ -5,6 +5,7 @@ import android.net.Uri
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.photos.Album
 
 /**
  * Data object that encapsulates an item representing an Image.
@@ -123,6 +124,25 @@ sealed class ImageItem {
     ) : ImageItem()
 
     /**
+     * Data object that encapsulates an item representing an Image from a MegaNode for Album Sharing.
+     *
+     * @property handle         MegaNode handle
+     * @property id             Image item unique Id
+     * @property name           Image name
+     * @property infoText       Image information preformatted text
+     * @property nodeItem       Image node item
+     * @property imageResult    Image result containing each Image Uri
+     */
+    data class AlbumImportNode constructor(
+        val handle: Long,
+        override val id: Long,
+        override val name: String,
+        override val infoText: String = "",
+        override val nodeItem: MegaNodeItem? = null,
+        override val imageResult: ImageResult? = null,
+    ) : ImageItem()
+
+    /**
      * Get MegaNode handle when ImageItem has one.
      *
      * @return  MegaNode handle
@@ -133,6 +153,7 @@ sealed class ImageItem {
             is ChatNode -> handle
             is PublicNode -> handle
             is OfflineNode -> handle
+            is AlbumImportNode -> handle
             else -> null
         }
 
@@ -146,6 +167,7 @@ sealed class ImageItem {
                         && this.nodeItem?.hashCode() == other.nodeItem?.hashCode()
                         && this.imageResult?.hashCode() == other.imageResult?.hashCode()
             }
+
             else -> false
         }
 
@@ -170,6 +192,7 @@ sealed class ImageItem {
                 nodeItem ?: this.nodeItem,
                 imageResult ?: this.imageResult
             )
+
             is OfflineNode -> copy(
                 handle,
                 fileUri,
@@ -179,6 +202,7 @@ sealed class ImageItem {
                 nodeItem ?: this.nodeItem,
                 imageResult ?: this.imageResult
             )
+
             is ChatNode -> copy(
                 handle,
                 chatMessageId,
@@ -190,6 +214,7 @@ sealed class ImageItem {
                 nodeItem ?: this.nodeItem,
                 imageResult ?: this.imageResult
             )
+
             is PublicNode -> copy(
                 handle,
                 nodePublicLink,
@@ -199,11 +224,21 @@ sealed class ImageItem {
                 nodeItem ?: this.nodeItem,
                 imageResult ?: this.imageResult
             )
+
             is File -> copy(
                 fileUri,
                 id,
                 name,
                 infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
+
+            is AlbumImportNode -> copy(
+                handle,
+                id,
+                nodeItem?.name ?: name,
+                nodeItem?.node?.getInfoText(context) ?: infoText,
                 nodeItem ?: this.nodeItem,
                 imageResult ?: this.imageResult
             )

@@ -62,6 +62,7 @@ import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import mega.privacy.android.domain.usecase.ResetTotalDownloads
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByOfflineNodeHandleUseCase
@@ -132,6 +133,7 @@ class ImageViewerViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle,
+    private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -272,6 +274,13 @@ class ImageViewerViewModel @Inject constructor(
             .subscribeAndUpdateImages(currentNodeHandle)
     }
 
+    fun retrieveImagesFromAlbumSharing(
+        currentNodeHandle: Long? = null,
+    ) {
+        getImageHandlesUseCase.get(isAlbumSharing = true)
+            .subscribeAndUpdateImages(currentNodeHandle)
+    }
+
     fun retrieveImages(
         nodeHandles: LongArray,
         currentNodeHandle: Long? = null,
@@ -318,7 +327,11 @@ class ImageViewerViewModel @Inject constructor(
             is ImageItem.Node ->
                 getNodeUseCase.getNodeItem(imageItem.handle)
 
-            is ImageItem.File -> {
+            is ImageItem.AlbumImportNode ->
+                getNodeUseCase.getAlbumSharingNodeItem(imageItem.handle)
+
+            is ImageItem.File,
+            -> {
                 // do nothing
                 return
             }
@@ -391,16 +404,29 @@ class ImageViewerViewModel @Inject constructor(
                     onLoadSingleImageFailure(itemId, it)
                 }
 
-                is ImageItem.Node -> getImageByNodeHandleUseCase(
-                    imageItem.handle,
-                    fullSize, highPriority
-                ) { resetTotalDownloadsIfNeeded() }.catch {
-                    onLoadSingleImageFailure(itemId, it)
-                }.collectLatest {
-                    onLoadSingleImageSuccess(itemId, it)
-                }
+                is ImageItem.Node ->
+                    getImageByNodeHandleUseCase(
+                        imageItem.handle,
+                        fullSize, highPriority
+                    ) { resetTotalDownloadsIfNeeded() }.catch {
+                        onLoadSingleImageFailure(itemId, it)
+                    }.collectLatest {
+                        onLoadSingleImageSuccess(itemId, it)
+                    }
 
-                is ImageItem.File -> runCatching {
+
+                is ImageItem.AlbumImportNode ->
+                    getImageByAlbumImportNodeUseCase(
+                        imageItem.handle,
+                        fullSize, highPriority
+                    ) { resetTotalDownloadsIfNeeded() }.catch {
+                        onLoadSingleImageFailure(itemId, it)
+                    }.collectLatest {
+                        onLoadSingleImageSuccess(itemId, it)
+                    }
+
+                is ImageItem.File,
+                -> runCatching {
                     getImageFromFileUseCase(imageItem.fileUri.toFile(), highPriority)
                 }.onSuccess {
                     onLoadSingleImageSuccess(itemId, it)

@@ -15,10 +15,12 @@ import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetPhotoByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
 import org.junit.Before
 import org.junit.Test
@@ -39,6 +41,8 @@ class SlideshowViewModelTest {
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase = mock()
     private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase = mock()
     private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase = mock()
+    private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase = mock()
+    private val getPhotoByAlbumImportNodeUseCase: GetPhotoByAlbumImportNodeUseCase = mock()
 
     @Before
     fun setUp() {
@@ -63,7 +67,9 @@ class SlideshowViewModelTest {
         getImageForChatMessageUseCase = getImageForChatMessageUseCase,
         getChatPhotoByMessageIdUseCase = getChatPhotoByMessageIdUseCase,
         getImageByNodePublicLinkUseCase = getImageByNodePublicLinkUseCase,
-        getPhotoByPublicLinkUseCase = getPhotoByPublicLinkUseCase
+        getPhotoByPublicLinkUseCase = getPhotoByPublicLinkUseCase,
+        getImageByAlbumImportNodeUseCase = getImageByAlbumImportNodeUseCase,
+        getPhotoByAlbumImportNodeUseCase = getPhotoByAlbumImportNodeUseCase,
     )
 
     @Test

@@ -22,6 +22,10 @@ sealed interface SlideshowItem {
         override val photo: Photo,
         val link: String,
     ) : SlideshowItem
+
+    data class AlbumSharingItem(
+        override val photo: Photo,
+    ) : SlideshowItem
 }
 
 

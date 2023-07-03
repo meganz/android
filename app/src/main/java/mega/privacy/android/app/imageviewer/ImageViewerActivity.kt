@@ -88,6 +88,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         const val IMAGE_OFFSCREEN_PAGE_LIMIT = 2
         private const val EXTRA_SHOW_SLIDESHOW = "EXTRA_SHOW_SLIDESHOW"
         private const val EXTRA_IS_TIMELINE = "EXTRA_IS_TIMELINE"
+        private const val EXTRA_IS_ALBUM_SHARING = "isAlbumSharing"
 
         /**
          * Get Image Viewer intent to show a single image node.
@@ -229,6 +230,19 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
             }
 
+        @JvmStatic
+        @JvmOverloads
+        fun getIntentForAlbumSharing(
+            context: Context,
+            currentNodeHandle: Long? = null,
+            showSlideshow: Boolean = false,
+        ): Intent =
+            Intent(context, ImageViewerActivity::class.java).apply {
+                putExtra(EXTRA_IS_ALBUM_SHARING, true)
+                putExtra(INTENT_EXTRA_KEY_HANDLE, currentNodeHandle)
+                putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
+            }
+
         /**
          * Get Image Viewer intent to show a list of image nodes from chat messages.
          *
@@ -353,6 +367,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     }
     private val showSlideshow by lazy { intent.getBooleanExtra(EXTRA_SHOW_SLIDESHOW, false) }
     private val isTimeline by lazy { intent.getBooleanExtra(EXTRA_IS_TIMELINE, false) }
+    private val isAlbumSharing by lazy { intent.getBooleanExtra(EXTRA_IS_ALBUM_SHARING, false) }
     private val isFileVersion by lazy {
         intent.getBooleanExtra(
             INTENT_EXTRA_KEY_IS_FILE_VERSION,
@@ -457,6 +472,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             when {
                 isTimeline ->
                     viewModel.retrieveImagesFromTimeline(nodeHandle)
+
+                isAlbumSharing ->
+                    viewModel.retrieveImagesFromAlbumSharing(nodeHandle)
 
                 parentNodeHandle != INVALID_HANDLE ->
                     viewModel.retrieveImagesFromParent(parentNodeHandle, childOrder, nodeHandle)

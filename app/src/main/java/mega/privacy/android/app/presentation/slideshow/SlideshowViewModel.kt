@@ -21,10 +21,12 @@ import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodePublicLinkUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetPhotoByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.slideshow.GetPhotoByPublicLinkUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,6 +46,8 @@ class SlideshowViewModel @Inject constructor(
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase,
     private val getImageByNodePublicLinkUseCase: GetImageByNodePublicLinkUseCase,
     private val getPhotoByPublicLinkUseCase: GetPhotoByPublicLinkUseCase,
+    private val getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase,
+    private val getPhotoByAlbumImportNodeUseCase: GetPhotoByAlbumImportNodeUseCase,
 ) : ViewModel() {
 
     /**
@@ -87,6 +91,13 @@ class SlideshowViewModel @Inject constructor(
                         val link = (it as ImageItem.PublicNode).nodePublicLink
                         createLinkItem(link)
                     }
+                }
+
+                is ImageItem.AlbumImportNode -> {
+                    imageItems.map {
+                        getPhotoByAlbumImportNodeUseCase(NodeId(it.getNodeHandle() ?: it.id))
+                    }.filterIsInstance<Photo.Image>()
+                        .map { SlideshowItem.AlbumSharingItem(it) }
                 }
 
                 else -> {
@@ -164,9 +175,15 @@ class SlideshowViewModel @Inject constructor(
             link = slideshowItem.link
         )
 
-        is SlideshowItem.DefaultItem -> getDefaultItemImage(
-            nodeHandle = slideshowItem.photo.id
-        )
+        is SlideshowItem.AlbumSharingItem ->
+            getAlbumSharingItemImage(
+                nodeHandle = slideshowItem.photo.id
+            )
+
+        is SlideshowItem.DefaultItem ->
+            getDefaultItemImage(
+                nodeHandle = slideshowItem.photo.id
+            )
     }
 
     private suspend fun getDefaultItemImage(
@@ -202,6 +219,18 @@ class SlideshowViewModel @Inject constructor(
         resetDownloads: () -> Unit = {},
     ) = getImageByNodePublicLinkUseCase(
         nodeFileLink = link,
+        fullSize = fullSize,
+        highPriority = highPriority,
+        resetDownloads = resetDownloads,
+    )
+
+    private suspend fun getAlbumSharingItemImage(
+        nodeHandle: Long,
+        fullSize: Boolean = true,
+        highPriority: Boolean = false,
+        resetDownloads: () -> Unit = {},
+    ) = getImageByAlbumImportNodeUseCase(
+        nodeHandle = nodeHandle,
         fullSize = fullSize,
         highPriority = highPriority,
         resetDownloads = resetDownloads,

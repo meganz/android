@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDe
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importdeeplink.AlbumImportDeeplinkScreen
+import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportPreviewProvider
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
@@ -56,6 +57,9 @@ class AlbumScreenWrapperActivity : BaseActivity() {
     private val isAlbumNewLink: Boolean by lazy(LazyThreadSafetyMode.NONE) {
         intent.getBooleanExtra(ALBUM_NEW_LINK, true)
     }
+
+    @Inject
+    lateinit var albumImportPreviewProvider: AlbumImportPreviewProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -169,7 +173,13 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 )
                                 startActivity(shareIntent)
                             },
-                            onPreviewPhoto = {},
+                            onPreviewPhoto = {
+                                albumImportPreviewProvider.onPreviewPhoto(
+                                    activity = this,
+                                    photo = it,
+                                    photos = albumImportViewModel.stateFlow.value.photos.toList()
+                                )
+                            },
                             onNavigateFileExplorer = {
                                 val intent = Intent(this, FileExplorerActivity::class.java).apply {
                                     action = FileExplorerActivity.ACTION_IMPORT_ALBUM

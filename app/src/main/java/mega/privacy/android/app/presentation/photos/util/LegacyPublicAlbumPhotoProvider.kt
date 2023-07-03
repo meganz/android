@@ -21,7 +21,7 @@ import kotlin.coroutines.resume
             "this provider will be refactored too.",
 )
 @Singleton
-internal class LegacyPublicAlbumPhotoNodeProvider @Inject constructor(
+class LegacyPublicAlbumPhotoNodeProvider @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {

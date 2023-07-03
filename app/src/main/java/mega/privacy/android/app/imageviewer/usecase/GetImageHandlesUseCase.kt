@@ -7,6 +7,7 @@ import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
@@ -49,6 +50,7 @@ class GetImageHandlesUseCase @Inject constructor(
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
     private val dbHandler: DatabaseHandler,
     private val sortOrderIntMapper: SortOrderIntMapper,
+    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
 ) {
 
     /**
@@ -64,6 +66,7 @@ class GetImageHandlesUseCase @Inject constructor(
      * @param sortOrder         Node search order
      * @param isOffline         Flag to check if it's offline node
      * @param isTimeline        Flag to check if should get timeline images
+     * @param isAlbumSharing    Flag to check if should get album sharing images
      * @return                  Single with image nodes
      */
     fun get(
@@ -77,12 +80,17 @@ class GetImageHandlesUseCase @Inject constructor(
         sortOrder: SortOrder? = SortOrder.ORDER_PHOTO_ASC,
         isOffline: Boolean? = false,
         isTimeline: Boolean? = false,
+        isAlbumSharing: Boolean? = false,
     ): Single<List<ImageItem>> =
         Single.fromCallable {
             val items = mutableListOf<ImageItem>()
             when {
                 isTimeline == true ->
                     items.addTimelineNodes()
+
+                isAlbumSharing == true ->
+                    items.addAlbumSharingNodes()
+
                 parentNodeHandle != null && parentNodeHandle != INVALID_HANDLE -> {
                     val parentNode = getNodeUseCase.get(parentNodeHandle).blockingGetOrNull()
                     if (parentNode != null && megaApi.hasChildren(parentNode)) {
@@ -91,6 +99,7 @@ class GetImageHandlesUseCase @Inject constructor(
                         error("Node is null or has no children")
                     }
                 }
+
                 nodeHandles?.isNotEmpty() == true -> {
                     if (isOffline == true) {
                         items.addOfflineNodeHandles(nodeHandles)
@@ -98,12 +107,16 @@ class GetImageHandlesUseCase @Inject constructor(
                         items.addNodeHandles(nodeHandles)
                     }
                 }
+
                 nodeFileLinks?.isNotEmpty() == true ->
                     items.addNodeFileLinks(nodeFileLinks)
+
                 chatRoomId != null && chatMessageIds?.isNotEmpty() == true ->
                     items.addChatChildren(chatRoomId, chatMessageIds)
+
                 imageFileUri != null ->
                     items.addFileImageUris(imageFileUri, showNearbyFiles)
+
                 else -> {
                     error("Invalid parameters")
                 }
@@ -304,6 +317,21 @@ class GetImageHandlesUseCase @Inject constructor(
             .forEach { node ->
                 this.add(
                     ImageItem.Node(
+                        id = node.handle,
+                        handle = node.handle,
+                        name = node.name,
+                    )
+                )
+            }
+    }
+
+    private fun MutableList<ImageItem>.addAlbumSharingNodes() {
+        legacyPublicAlbumPhotoNodeProvider.getPublicNodes()
+            .filter { it.isValidForImageViewer() }
+            .sortedByDescending { it.modificationTime }
+            .forEach { node ->
+                this.add(
+                    ImageItem.AlbumImportNode(
                         id = node.handle,
                         handle = node.handle,
                         name = node.name,

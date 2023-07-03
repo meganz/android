@@ -27,6 +27,7 @@ import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByAlbumImportNodeUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import nz.mega.sdk.MegaNode
@@ -55,6 +56,7 @@ internal class ImageViewerViewModelTest {
     private lateinit var isUserLoggedIn: IsUserLoggedIn
     private lateinit var getGlobalChangesUseCase: GetGlobalChangesUseCase
     private lateinit var context: Context
+    private lateinit var getImageByAlbumImportNodeUseCase: GetImageByAlbumImportNodeUseCase
 
     @BeforeAll
     fun initialise() {
@@ -104,6 +106,7 @@ internal class ImageViewerViewModelTest {
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
             moveNodeToRubbishByHandle = mock(),
+            getImageByAlbumImportNodeUseCase = mock(),
             context = context,
         )
     }

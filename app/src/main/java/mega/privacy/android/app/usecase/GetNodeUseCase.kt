@@ -11,6 +11,7 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
+import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.usecase.exception.toMegaException
@@ -48,6 +49,7 @@ class GetNodeUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val databaseHandler: LegacyDatabaseHandler,
+    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
 
@@ -68,6 +70,28 @@ class GetNodeUseCase @Inject constructor(
      */
     fun getNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
         get(nodeHandle).flatMap(::getNodeItem)
+
+    /**
+     * Get a MegaNode given a Node Handle for album sharing.
+     *
+     * @param nodeHandle    Mega node handle
+     * @return              Single with Mega Node
+     */
+    private fun getAlbumSharingNode(nodeHandle: Long): Single<MegaNode> =
+        Single.fromCallable {
+            legacyPublicAlbumPhotoNodeProvider.getPublicNode(nodeHandle)
+                ?: throw NullPointerException()
+        }
+
+    /**
+     * Get a MegaNodeItem given a Node Handle for album sharing.
+     *
+     * @param nodeHandle    Mega node handle
+     * @return              Single with Mega Node Item
+     */
+    fun getAlbumSharingNodeItem(nodeHandle: Long): Single<MegaNodeItem> =
+        getAlbumSharingNode(nodeHandle).flatMap(::getNodeItem)
+
 
     /**
      * Get a MegaNodeItem given a Node public link.
@@ -108,11 +132,13 @@ class GetNodeUseCase @Inject constructor(
                     hasReadAccess = true
                     hasReadWriteAccess = true
                 }
+
                 MegaShare.ACCESS_FULL -> {
                     hasReadAccess = true
                     hasReadWriteAccess = true
                     hasFullAccess = true
                 }
+
                 MegaShare.ACCESS_OWNER -> {
                     hasReadAccess = true
                     hasReadWriteAccess = true
@@ -285,8 +311,10 @@ class GetNodeUseCase @Inject constructor(
                 val offlineFile = OfflineUtils.getOfflineFile(context, offlineNode)
                 val isFileAvailable = FileUtil.isFileAvailable(offlineFile)
                 val isFileDownloadedLatest = nodeHandle.getMegaNode()?.let { node ->
-                    FileUtil.isFileDownloadedLatest(offlineFile,
-                        node) && offlineFile.length() == node.size
+                    FileUtil.isFileDownloadedLatest(
+                        offlineFile,
+                        node
+                    ) && offlineFile.length() == node.size
                 } ?: false
                 return@fromCallable isFileAvailable && isFileDownloadedLatest
             }
@@ -362,6 +390,7 @@ class GetNodeUseCase @Inject constructor(
 
                     OfflineUtils.saveOffline(offlineParent, node, activity)
                 }
+
                 !setOffline && isAvailableOffline -> {
                     removeOfflineNode(node.handle, activity).blockingAwait()
                 }

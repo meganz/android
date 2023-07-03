@@ -50,9 +50,11 @@ class AlbumImportViewModelTest {
 
     private val mockLegacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider = mock()
 
-    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase = mock()
+    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase =
+        mock()
 
-    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase = mock()
+    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase =
+        mock()
 
     private val mockMonitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
