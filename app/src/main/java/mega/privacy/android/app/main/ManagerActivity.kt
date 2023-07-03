@@ -160,6 +160,7 @@ import mega.privacy.android.app.main.adapters.TransfersPageAdapter
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -5183,7 +5184,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.action_menu_clear_rubbish_bin -> {
-                showClearRubbishBinDialog()
+                ClearRubbishBinDialogFragment().show(
+                    supportFragmentManager,
+                    ClearRubbishBinDialogFragment.TAG
+                )
                 true
             }
 
@@ -6275,19 +6279,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             getString(R.string.context_creating_folder)
         )
         megaApi.createFolder(folderName, parentNode, this)
-    }
-
-    private fun showClearRubbishBinDialog() {
-        Timber.d("showClearRubbishBinDialog")
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getString(R.string.context_clear_rubbish))
-        builder.setMessage(getString(R.string.clear_rubbish_confirmation))
-        builder.setPositiveButton(
-            getString(R.string.general_clear)
-        ) { _, _ -> nodeController.cleanRubbishBin() }
-        builder.setNegativeButton(getString(android.R.string.cancel), null)
-        val clearRubbishBinDialog = builder.create()
-        clearRubbishBinDialog.show()
     }
 
     fun chooseAddContactDialog() {
