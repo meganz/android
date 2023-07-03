@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.achievements.invites.view
 
 import android.content.Intent
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -18,9 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +46,7 @@ import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
+import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -55,6 +58,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 internal object InviteFriendsViewTestTags {
     // InviteFriendsView
     private const val INVITE_FRIENDS_VIEW = "invite_friends_view"
+    const val TOOLBAR = "$INVITE_FRIENDS_VIEW:toolbar"
     const val IMAGE_MAIN = "$INVITE_FRIENDS_VIEW:image_main"
     const val DESCRIPTION = "$INVITE_FRIENDS_VIEW:description"
     const val INVITE_CONTACTS_BUTTON = "$INVITE_FRIENDS_VIEW:invite_contacts_button"
@@ -75,16 +79,8 @@ internal object InviteFriendsViewTestTags {
  * Invite Friends Screen in Jetpack Compose
  */
 @Composable
-fun InviteFriendsRoute(
-    viewModel: InviteFriendsViewModel = hiltViewModel(),
-    onSetToolbarTitle: (Int) -> Unit
-) {
+fun InviteFriendsRoute(viewModel: InviteFriendsViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        onSetToolbarTitle(R.string.title_referral_bonuses)
-    }
-
     InviteFriendsView(uiState = uiState)
 }
 
@@ -109,99 +105,117 @@ internal fun InviteFriendsView(
             }
         }
     }
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val scrollState = rememberScrollState()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.grey_020_dark_grey)
-            .verticalScroll(rememberScrollState())
-    ) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = rememberScaffoldState(),
+        topBar = {
+            SimpleTopAppBar(
+                modifier = Modifier.testTag(InviteFriendsViewTestTags.TOOLBAR),
+                titleId = R.string.title_referral_bonuses,
+                elevation = scrollState.value > 0,
+                onBackPressed = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }
+            )
+        },
+    ) { padding ->
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 6.dp)
-                .background(MaterialTheme.colors.surface)
+            modifier = modifier
+                .padding(padding)
+                .fillMaxSize()
+                .background(MaterialTheme.colors.grey_020_dark_grey)
+                .verticalScroll(rememberScrollState())
         ) {
-            Image(
+            Column(
                 modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.IMAGE_MAIN)
-                    .padding(top = 20.dp)
-                    .align(Alignment.CenterHorizontally),
-                painter = painterResource(id = R.drawable.ic_invite_friends_big),
-                contentDescription = "Invite Friends Image"
-            )
-            Text(
-                modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.DESCRIPTION)
-                    .padding(top = 24.dp, start = 24.dp, end = 24.dp)
-                    .align(Alignment.CenterHorizontally),
-                text = stringResource(
-                    id = R.string.figures_achievements_text_referrals,
-                    storageFormatted
-                ),
-                color = MaterialTheme.colors.textColorSecondary,
-                textAlign = TextAlign.Center
-            )
-            RaisedDefaultMegaButton(
-                modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.INVITE_CONTACTS_BUTTON)
-                    .padding(top = 16.dp, bottom = 26.dp)
-                    .align(Alignment.CenterHorizontally),
-                textId = R.string.invite_contacts,
-                onClick = {
-                    val intent = Intent(context, InviteContactActivity::class.java).apply {
-                        putExtra(InviteContactActivity.KEY_FROM, true)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 6.dp)
+                    .background(MaterialTheme.colors.surface)
+            ) {
+                Image(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.IMAGE_MAIN)
+                        .padding(top = 20.dp)
+                        .align(Alignment.CenterHorizontally),
+                    painter = painterResource(id = R.drawable.ic_invite_friends_big),
+                    contentDescription = "Invite Friends Image"
+                )
+                Text(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.DESCRIPTION)
+                        .padding(top = 24.dp, start = 24.dp, end = 24.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = stringResource(
+                        id = R.string.figures_achievements_text_referrals,
+                        storageFormatted
+                    ),
+                    color = MaterialTheme.colors.textColorSecondary,
+                    textAlign = TextAlign.Center
+                )
+                RaisedDefaultMegaButton(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.INVITE_CONTACTS_BUTTON)
+                        .padding(top = 16.dp, bottom = 26.dp)
+                        .align(Alignment.CenterHorizontally),
+                    textId = R.string.invite_contacts,
+                    onClick = {
+                        val intent = Intent(context, InviteContactActivity::class.java).apply {
+                            putExtra(InviteContactActivity.KEY_FROM, true)
+                        }
+                        activityLauncher.launch(intent)
                     }
-                    activityLauncher.launch(intent)
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 6.dp)
+                    .background(MaterialTheme.colors.surface)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.HOW_IT_WORKS_TITLE)
+                        .padding(top = 24.dp)
+                        .align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.subtitle1.copy(letterSpacing = 0.sp),
+                    color = MaterialTheme.colors.dark_blue_500_dark_blue_200,
+                    text = stringResource(id = R.string.title_achievement_invite_friends)
+                )
+                Text(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.HOW_IT_WORKS_DESCRIPTION)
+                        .padding(top = 24.dp, start = 24.dp, end = 24.dp)
+                        .align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp),
+                    color = MaterialTheme.colors.textColorSecondary,
+                    text = stringResource(id = R.string.first_paragraph_achievement_invite_friends)
+                )
+                Text(
+                    modifier = Modifier
+                        .testTag(InviteFriendsViewTestTags.FOOTER)
+                        .padding(top = 40.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
+                        .align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.caption.copy(letterSpacing = 0.sp),
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
+                    text = stringResource(id = R.string.second_paragraph_achievement_invite_friends)
+                )
+            }
+
+            InviteConfirmationDialog(
+                isDialogVisible = isDialogVisible,
+                description = if (numberOfInvites > 1) R.string.invite_sent_text_multi else R.string.invite_sent_text,
+                onDismiss = {
+                    isDialogVisible = false
                 }
             )
         }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 6.dp)
-                .background(MaterialTheme.colors.surface)
-        ) {
-            Text(
-                modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.HOW_IT_WORKS_TITLE)
-                    .padding(top = 24.dp)
-                    .align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.subtitle1.copy(letterSpacing = 0.sp),
-                color = MaterialTheme.colors.dark_blue_500_dark_blue_200,
-                text = stringResource(id = R.string.title_achievement_invite_friends)
-            )
-            Text(
-                modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.HOW_IT_WORKS_DESCRIPTION)
-                    .padding(top = 24.dp, start = 24.dp, end = 24.dp)
-                    .align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.body2.copy(letterSpacing = 0.sp),
-                color = MaterialTheme.colors.textColorSecondary,
-                text = stringResource(id = R.string.first_paragraph_achievement_invite_friends)
-            )
-            Text(
-                modifier = Modifier
-                    .testTag(InviteFriendsViewTestTags.FOOTER)
-                    .padding(top = 40.dp, start = 24.dp, end = 24.dp, bottom = 24.dp)
-                    .align(Alignment.CenterHorizontally),
-                style = MaterialTheme.typography.caption.copy(letterSpacing = 0.sp),
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
-                text = stringResource(id = R.string.second_paragraph_achievement_invite_friends)
-            )
-        }
-
-        InviteConfirmationDialog(
-            isDialogVisible = isDialogVisible,
-            description = if (numberOfInvites > 1) R.string.invite_sent_text_multi else R.string.invite_sent_text,
-            onDismiss = {
-                isDialogVisible = false
-            }
-        )
     }
 }
 

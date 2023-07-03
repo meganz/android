@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -16,9 +17,7 @@ import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.presentation.achievements.info.model.AchievementsInfoUIState
 import mega.privacy.android.app.presentation.achievements.info.util.toAchievementsInfoAttribute
 import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoView
-import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.CHECK_ICON
-import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.SUBTITLE
-import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags.TITLE
+import mega.privacy.android.app.presentation.achievements.info.view.AchievementsInfoViewTestTags
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.red_300
 import mega.privacy.android.core.ui.theme.red_600
@@ -47,6 +46,23 @@ class AchievementsInfoViewTest {
     )
 
     @Test
+    fun `test that toolbar should render with correct title`() {
+        composeTestRule.setContent {
+            AchievementsInfoView(
+                modifier = Modifier,
+                uiState = AchievementsInfoUIState(
+                    achievementType = achievementType.random(),
+                    awardStorageInBytes = oneHundredMbInBytes
+                )
+            )
+        }
+
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TOOLBAR)
+            .assertIsDisplayed()
+            .assert(hasAnyDescendant(hasText(fromId(R.string.achievements_title))))
+    }
+
+    @Test
     fun `test that invite friends view should render with correct main icon`() {
         val expectedType = achievementType.random()
 
@@ -61,7 +77,7 @@ class AchievementsInfoViewTest {
         }
 
         composeTestRule.onNodeWithContentDescription(expectedType.name).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CHECK_ICON).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.CHECK_ICON).assertDoesNotExist()
     }
 
     @Test
@@ -80,7 +96,7 @@ class AchievementsInfoViewTest {
         }
 
         composeTestRule.onNodeWithContentDescription(expectedType.name).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(CHECK_ICON).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.CHECK_ICON).assertIsDisplayed()
     }
 
     @Test
@@ -100,7 +116,7 @@ class AchievementsInfoViewTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
             .assert(
                 hasText(
                     fromId(
@@ -129,7 +145,7 @@ class AchievementsInfoViewTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
             .assert(
                 hasText(
                     fromPluralId(
@@ -157,7 +173,7 @@ class AchievementsInfoViewTest {
             )
         }
 
-        composeTestRule.onNodeWithTag(TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
             .assert(hasText(fromId(R.string.expired_label)))
     }
 
@@ -180,7 +196,7 @@ class AchievementsInfoViewTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
             .assert(hasTextColor(red_600))
     }
 
@@ -203,7 +219,7 @@ class AchievementsInfoViewTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(TITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.TITLE).assertIsDisplayed()
             .assert(hasTextColor(red_300))
     }
 
@@ -229,7 +245,7 @@ class AchievementsInfoViewTest {
             }
         }
 
-        composeTestRule.onNodeWithTag(SUBTITLE).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementsInfoViewTestTags.SUBTITLE).assertIsDisplayed()
             .assert(hasText(fromId(textResourceId, oneHundredMbInBytes.toUnitString(context))))
     }
 }

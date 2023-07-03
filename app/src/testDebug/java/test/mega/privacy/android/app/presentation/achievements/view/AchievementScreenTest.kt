@@ -1,23 +1,29 @@
 package test.mega.privacy.android.app.presentation.achievements.view
 
-import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.view.AchievementView
+import mega.privacy.android.app.presentation.achievements.view.AchievementViewTestTags
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
+import test.mega.privacy.android.app.fromId
 
 @RunWith(AndroidJUnit4::class)
+@Config(qualifiers = "w720dp-h1280dp-xhdpi")
 internal class AchievementScreenTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    val composeTestRule = createComposeRule()
 
     @Test
-    fun `test that main achievement screen title is visible`() {
+    fun `test that main achievement screen toolbar and title is visible with correct value`() {
         composeTestRule.setContent {
             AchievementView(
                 currentStorage = 0,
@@ -37,8 +43,12 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.unlocked_rewards_title))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.HEADER)
             .assertIsDisplayed()
+            .assert(hasAnyDescendant(hasText(fromId(R.string.unlocked_rewards_title))))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.TOOLBAR)
+            .assertIsDisplayed()
+            .assert(hasAnyDescendant(hasText(fromId(R.string.achievements_title))))
     }
 
     @Test
@@ -62,7 +72,8 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_referral_bonuses))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.INVITE_BONUS_SECTION)
+            .assert(hasText(fromId(R.string.title_referral_bonuses)))
             .assertIsDisplayed()
     }
 
@@ -87,7 +98,8 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_install_app))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.INSTALL_MOBILE_SECTION)
+            .assert(hasText(fromId(R.string.title_install_app)))
             .assertIsDisplayed()
     }
 
@@ -112,8 +124,9 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_install_desktop))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.INSTALL_DESKTOP_SECTION)
             .assertIsDisplayed()
+            .assert(hasText(fromId(R.string.title_install_desktop)))
     }
 
     @Test
@@ -137,8 +150,8 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_regitration))
-            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.REGISTRATION_BONUS_SECTION)
+            .assert(hasText(fromId(R.string.title_regitration)))
     }
 
     @Test
@@ -162,7 +175,7 @@ internal class AchievementScreenTest {
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.title_regitration))
+        composeTestRule.onNodeWithTag(AchievementViewTestTags.REGISTRATION_BONUS_SECTION)
             .assertDoesNotExist()
     }
 }

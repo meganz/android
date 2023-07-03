@@ -17,14 +17,12 @@ internal const val achievementsRoute = "achievements/main"
  * Composable destination for [AchievementRoute]
  */
 fun NavGraphBuilder.achievementScreen(
-    onSetToolbarTitle: (Int) -> Unit,
     onNavigateToInviteFriends: (Long) -> Unit,
     onNavigateToInfoAchievements: (achievementType: AchievementType) -> Unit,
     onNavigateToReferralBonuses: () -> Unit,
 ) {
     composable(achievementsRoute) {
         AchievementRoute(
-            onSetToolbarTitle = onSetToolbarTitle,
             onNavigateToInfoAchievements = onNavigateToInfoAchievements,
             onNavigateToInviteFriends = onNavigateToInviteFriends,
             onNavigateToReferralBonuses = onNavigateToReferralBonuses

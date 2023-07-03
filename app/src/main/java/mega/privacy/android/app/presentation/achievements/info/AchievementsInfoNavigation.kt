@@ -24,9 +24,7 @@ internal class AchievementInfoArgs(val achievementTypeId: Int) {
 /**
  * Composable destination for [AchievementsInfoRoute]
  */
-fun NavGraphBuilder.achievementsInfoScreen(
-    onSetToolbarTitle: (Int) -> Unit
-) {
+fun NavGraphBuilder.achievementsInfoScreen() {
     composable(
         route = "$achievementsInfoRoute?achievement_type_id={$achievementTypeIdArg}",
         arguments = listOf(
@@ -35,7 +33,7 @@ fun NavGraphBuilder.achievementsInfoScreen(
             },
         )
     ) {
-        AchievementsInfoRoute(onSetToolbarTitle = onSetToolbarTitle)
+        AchievementsInfoRoute()
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.achievements.invites.view.InviteFri
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.HOW_IT_WORKS_TITLE
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.IMAGE_MAIN
 import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.INVITE_CONTACTS_BUTTON
+import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewTestTags.TOOLBAR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +50,20 @@ class InviteFriendsViewTest {
     val composeTestRule = createComposeRule()
 
     private val oneHundredMbInBytes = 104857600L
+
+    @Test
+    fun `test that toolbar should render with correct title`() {
+        composeTestRule.setContent {
+            InviteFriendsView(
+                modifier = Modifier,
+                uiState = InviteFriendsUIState(oneHundredMbInBytes)
+            )
+        }
+
+        composeTestRule.onNodeWithTag(TOOLBAR)
+            .assertIsDisplayed()
+            .assert(hasAnyDescendant(hasText(fromId(R.string.title_referral_bonuses))))
+    }
 
     @Test
     fun `test that invite friends view should render correctly on first load`() {

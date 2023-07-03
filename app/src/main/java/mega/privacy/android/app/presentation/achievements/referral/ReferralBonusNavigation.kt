@@ -14,11 +14,9 @@ internal const val referralBonusRoute = "achievements/referrals"
 /**
  * Composable destination for [ReferralBonusRoute]
  */
-fun NavGraphBuilder.referralBonusScreen(
-    onSetToolbarTitle: (Int) -> Unit,
-) {
+fun NavGraphBuilder.referralBonusScreen() {
     composable(route = referralBonusRoute) {
-        ReferralBonusRoute(onSetToolbarTitle = onSetToolbarTitle)
+        ReferralBonusRoute()
     }
 }
 

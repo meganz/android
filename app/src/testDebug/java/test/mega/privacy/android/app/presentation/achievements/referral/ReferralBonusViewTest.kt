@@ -3,12 +3,14 @@ package test.mega.privacy.android.app.presentation.achievements.referral
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusView
 import mega.privacy.android.app.presentation.achievements.referral.view.TestTags
@@ -21,6 +23,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import test.mega.privacy.android.app.fromId
 import kotlin.random.Random
 
 @HiltAndroidTest
@@ -33,6 +36,19 @@ class ReferralBonusViewTest {
     private val name = "Qwerty Uiop"
     private val email = "qwerty@uiop.com"
     private val expirationInDays = Random.nextInt(from = 1, until = 200).toLong()
+
+    @Test
+    fun `test that toolbar should render with correct title`() {
+        val achievements = listOf(createReferralBonusAchievements("Qwerty Uiop", null))
+
+        composeTestRule.setContent {
+            ReferralBonusView(uiState = ReferralBonusesUIState(awardedInviteAchievements = achievements))
+        }
+
+        composeTestRule.onNodeWithTag(TestTags.TOOLBAR)
+            .assertIsDisplayed()
+            .assert(hasAnyDescendant(hasText(fromId(R.string.title_referral_bonuses))))
+    }
 
     @Test
     fun `test that on first load should render with correct state`() {

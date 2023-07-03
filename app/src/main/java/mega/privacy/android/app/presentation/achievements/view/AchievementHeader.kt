@@ -9,6 +9,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -21,10 +22,11 @@ import mega.privacy.android.core.ui.theme.extensions.dark_blue_500_dark_blue_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 @Composable
-internal fun AchievementHeader(storageQuota: String?) {
+internal fun AchievementHeader(storageQuota: String?, testTag: String) {
     Card(shape = MaterialTheme.shapes.large) {
         Column(
             modifier = Modifier
+                .testTag(testTag)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

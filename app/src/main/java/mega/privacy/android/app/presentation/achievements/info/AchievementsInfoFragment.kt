@@ -42,7 +42,7 @@ class AchievementsInfoFragment : Fragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                AchievementsInfoRoute {}
+                AchievementsInfoRoute()
             }
         }
     }

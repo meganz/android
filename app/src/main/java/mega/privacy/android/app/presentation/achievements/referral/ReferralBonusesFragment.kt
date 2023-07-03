@@ -62,7 +62,7 @@ class ReferralBonusesFragment : Fragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                ReferralBonusRoute {}
+                ReferralBonusRoute()
             }
         }
     }

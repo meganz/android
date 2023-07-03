@@ -23,9 +23,7 @@ internal class InviteFriendsArgs(val storageBonusInBytes: Long) {
 /**
  * Composable destination for [InviteFriendsRoute]
  */
-fun NavGraphBuilder.inviteFriendsScreen(
-    onSetToolbarTitle: (Int) -> Unit
-) {
+fun NavGraphBuilder.inviteFriendsScreen() {
     composable(
         route = "$inviteFriendsRoute?storage_bonus={$storageBonusInBytesArg}",
         arguments = listOf(
@@ -35,7 +33,7 @@ fun NavGraphBuilder.inviteFriendsScreen(
             },
         )
     ) {
-        InviteFriendsRoute(onSetToolbarTitle = onSetToolbarTitle)
+        InviteFriendsRoute()
     }
 }
 

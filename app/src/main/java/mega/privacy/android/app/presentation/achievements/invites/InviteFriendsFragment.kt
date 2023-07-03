@@ -44,7 +44,7 @@ class InviteFriendsFragment : Fragment() {
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                InviteFriendsRoute {}
+                InviteFriendsRoute()
             }
         }
     }

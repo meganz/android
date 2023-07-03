@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.achievements.referral.view
 
 import android.graphics.Color
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,11 +10,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +36,7 @@ import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -48,6 +52,9 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 
 internal object TestTags {
+    private const val REFERRAL_BONUS_VIEW = "referral_bonus_view"
+    const val TOOLBAR = "$REFERRAL_BONUS_VIEW:toolbar"
+
     /**
      * Because this screens components are a list of items, the suffix index_ is necessary to help
      * determine the row of the tested views.
@@ -64,16 +71,8 @@ internal object TestTags {
  * Referral Bonus Screen in Jetpack Compose
  */
 @Composable
-fun ReferralBonusRoute(
-    viewModel: ReferralBonusesViewModel = hiltViewModel(),
-    onSetToolbarTitle: (Int) -> Unit,
-) {
+fun ReferralBonusRoute(viewModel: ReferralBonusesViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(key1 = Unit) {
-        onSetToolbarTitle(R.string.title_referral_bonuses)
-    }
-
     ReferralBonusView(uiState = uiState)
 }
 
@@ -83,20 +82,39 @@ internal fun ReferralBonusView(
     modifier: Modifier = Modifier,
     uiState: ReferralBonusesUIState,
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
-        items(
-            key = { it },
-            count = uiState.awardedInviteAchievements.size,
-        ) { idx ->
-            ReferralListItem(
-                modifier = Modifier
-                    .animateItemPlacement(),
-                data = uiState.awardedInviteAchievements[idx],
-                index = idx
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val scrollState = rememberScrollState()
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        scaffoldState = rememberScaffoldState(),
+        topBar = {
+            SimpleTopAppBar(
+                modifier = Modifier.testTag(TestTags.TOOLBAR),
+                titleId = R.string.title_referral_bonuses,
+                elevation = scrollState.value > 0,
+                onBackPressed = {
+                    onBackPressedDispatcher?.onBackPressed()
+                }
             )
+        },
+    ) { padding ->
+        LazyColumn(
+            modifier = modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            items(
+                key = { it },
+                count = uiState.awardedInviteAchievements.size,
+            ) { idx ->
+                ReferralListItem(
+                    modifier = Modifier
+                        .animateItemPlacement(),
+                    data = uiState.awardedInviteAchievements[idx],
+                    index = idx
+                )
+            }
         }
     }
 }
