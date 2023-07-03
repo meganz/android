@@ -11,6 +11,7 @@ import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferMapper
+import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -26,6 +27,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val activeTransferMapper: ActiveTransferMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
+    private val activeTransferTotalsMapper: ActiveTransferTotalsMapper,
     private val encryptData: EncryptData,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
@@ -113,4 +115,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteActiveTransferByTag(tag: Int) =
         activeTransferDao.deleteActiveTransferByTag(tag)
+
+    override fun getActiveTransferTotalsByType(transferType: TransferType) =
+        activeTransferDao.getTotalsByType(transferType).map { activeTransferTotalsMapper(it) }
 }

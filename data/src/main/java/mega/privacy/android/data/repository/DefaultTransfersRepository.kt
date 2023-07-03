@@ -27,6 +27,7 @@ import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -389,4 +390,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun deleteActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
         megaLocalRoomGateway.deleteActiveTransferByTag(tag)
     }
+
+    override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
+        megaLocalRoomGateway.getActiveTransferTotalsByType(transferType)
 }

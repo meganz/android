@@ -2,6 +2,7 @@ package mega.privacy.android.data.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -16,12 +17,20 @@ import mega.privacy.android.domain.entity.transfer.TransferType
  * @param transferredBytes the current amount of bytes already transferred
  * @param isFinished true if the transfer has already finished but it's still part of the current
  */
-@Entity(MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS)
+@Entity(
+    MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS,
+    indices = [Index(value = ["transfer_type"])]
+)
 internal data class ActiveTransferEntity(
     @PrimaryKey
-    @ColumnInfo(name = "tag") val tag: Int,
-    @ColumnInfo(name = "transfer_type") val transferType: TransferType,
-    @ColumnInfo(name = "total_bytes") val totalBytes: Long,
-    @ColumnInfo(name = "transferred_bytes") val transferredBytes: Long,
-    @ColumnInfo(name = "is_finished") val isFinished: Boolean,
+    @ColumnInfo(name = "tag")
+    val tag: Int,
+    @ColumnInfo(name = "transfer_type")
+    val transferType: TransferType,
+    @ColumnInfo(name = "total_bytes")
+    val totalBytes: Long,
+    @ColumnInfo(name = "transferred_bytes")
+    val transferredBytes: Long,
+    @ColumnInfo(name = "is_finished")
+    val isFinished: Boolean,
 )

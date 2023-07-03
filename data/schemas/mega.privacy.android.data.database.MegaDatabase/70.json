@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 70,
-    "identityHash": "b3e790c24a95ed4bcf648df78dde3b87",
+    "identityHash": "b3e69554c7726f09749fcf058c254eec",
     "entities": [
       {
         "tableName": "contacts",
@@ -181,14 +181,24 @@
             "tag"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_active_transfers_transfer_type",
+            "unique": false,
+            "columnNames": [
+              "transfer_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_active_transfers_transfer_type` ON `${TABLE_NAME}` (`transfer_type`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3e790c24a95ed4bcf648df78dde3b87')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b3e69554c7726f09749fcf058c254eec')"
     ]
   }
 }

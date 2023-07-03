@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
+import mega.privacy.android.data.database.entity.ActiveTransferTotalsEntity
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 @Dao
@@ -25,5 +26,8 @@ internal interface ActiveTransferDao {
 
     @Query("DELETE FROM active_transfers WHERE tag = :tag")
     suspend fun deleteActiveTransferByTag(tag: Int)
+
+    @Query("SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, SUM(transferred_bytes) as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type")
+    fun getTotalsByType(transferType: TransferType): Flow<ActiveTransferTotalsEntity>
 
 }

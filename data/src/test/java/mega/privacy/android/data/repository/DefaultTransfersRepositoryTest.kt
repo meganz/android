@@ -19,6 +19,7 @@ import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -600,6 +601,18 @@ class DefaultTransfersRepositoryTest {
         ) = runTest {
             underTest.deleteActiveTransferByTag(tag)
             verify(megaLocalRoomGateway).deleteActiveTransferByTag(tag)
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that getActiveTransferTotalsByType gateway result is returned when getActiveTransferTotalsByType is called`(
+            transferType: TransferType,
+        ) = runTest {
+            val expected = mock<Flow<ActiveTransferTotals>>()
+            whenever(megaLocalRoomGateway.getActiveTransferTotalsByType(transferType))
+                .thenReturn(expected)
+            val actual = underTest.getActiveTransferTotalsByType(transferType)
+            assertThat(actual).isEqualTo(expected)
         }
     }
 }

@@ -22,13 +22,13 @@ class ActiveTransferDaoTest {
     private lateinit var activeTransferDao: ActiveTransferDao
     private lateinit var db: MegaDatabase
 
-    private val entities = (0..10).map { tag ->
+    private val entities = (0..20).map { tag ->
         ActiveTransferEntity(
             tag = tag,
-            transferType = if (tag.rem(2) == 0) TransferType.TYPE_DOWNLOAD else TransferType.TYPE_UPLOAD,
-            totalBytes = 1024,
-            transferredBytes = 512,
-            isFinished = true,
+            transferType = TransferType.values()[tag.rem(TransferType.values().size)],
+            totalBytes = 1024 * (tag.toLong() % 5 + 1),
+            transferredBytes = 512 * (tag.toLong() % 5 + 1),
+            isFinished = tag.rem(5) == 0
         )
     }
 
@@ -63,6 +63,43 @@ class ActiveTransferDaoTest {
             val expected = entities.filter { it.transferType == type }
             val actual = activeTransferDao.getActiveTransfersByType(type).first()
             assertThat(actual).containsExactlyElementsIn(expected)
+        }
+    }
+
+    @Test
+    fun test_that_getTotals_returns_correct_totalBytes() = runTest {
+        TransferType.values().forEach { type ->
+            val expectedTotal = entities.filter { it.transferType == type }.sumOf { it.totalBytes }
+            val actual = activeTransferDao.getTotalsByType(type).first()
+            assertThat(actual.totalBytes).isEqualTo(expectedTotal)
+        }
+    }
+
+    @Test
+    fun test_that_getTotals_returns_correct_transferredBytes() = runTest {
+        TransferType.values().forEach { type ->
+            val expectedTransferredBytes =
+                entities.filter { it.transferType == type }.sumOf { it.transferredBytes }
+            val actual = activeTransferDao.getTotalsByType(type).first()
+            assertThat(actual.transferredBytes).isEqualTo(expectedTransferredBytes)
+        }
+    }
+
+    @Test
+    fun test_that_getTotals_returns_correct_totalTransfers() = runTest {
+        TransferType.values().forEach { type ->
+            val expected = entities.count { it.transferType == type }
+            val actual = activeTransferDao.getTotalsByType(type).first()
+            assertThat(actual.totalTransfers).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun test_that_getTotals_returns_correct_totalFinishedTransfers() = runTest {
+        TransferType.values().forEach { type ->
+            val expected = entities.count { it.transferType == type && it.isFinished }
+            val actual = activeTransferDao.getTotalsByType(type).first()
+            assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
         }
     }
 }
