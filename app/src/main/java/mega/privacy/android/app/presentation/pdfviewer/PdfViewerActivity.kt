@@ -38,9 +38,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LINK_SHARE_FILE_INFO
-import mega.privacy.android.analytics.event.link.LinkShare
-import mega.privacy.android.analytics.event.link.SHARE_FILE
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -1157,7 +1156,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
 
             R.id.pdf_viewer_share -> {
-                trackOnShareClicked()
+                Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
                 if (type == Constants.ZIP_ADAPTER) {
                     FileUtil.shareFile(this, File(uri.toString()))
                 } else if (type == Constants.OFFLINE_ADAPTER || !inside) {
@@ -1165,7 +1164,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 } else if (type == Constants.FILE_LINK_ADAPTER) {
                     shareLink(this, intent.getStringExtra(Constants.URL_FILE_LINK))
                 } else {
-                    shareNode(this, megaApi.getNodeByHandle(handle))
+                    val node = megaApi.getNodeByHandle(handle)
+                    node?.let {
+                        Analytics.tracker.trackButtonPress(
+                            if (it.isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                        )
+                    }
+                    shareNode(this, node)
                 }
             }
 
@@ -1650,14 +1655,5 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
          */
         @JvmField
         var loading = true
-    }
-
-    private fun trackOnShareClicked() {
-        Analytics.tracker.trackGeneralEvent(
-            LinkShare(
-                uniqueIdentifier = SHARE_FILE,
-                info = LINK_SHARE_FILE_INFO
-            )
-        )
     }
 }

@@ -22,9 +22,7 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LINK_SHARE_FILE_INFO
-import mega.privacy.android.analytics.event.link.LinkShare
-import mega.privacy.android.analytics.event.link.SHARE_FILE
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -547,11 +545,6 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun shouldSetStatusBarColor(): Boolean = false
 
     private fun trackOnShareClicked() {
-        Analytics.tracker.trackGeneralEvent(
-            LinkShare(
-                uniqueIdentifier = SHARE_FILE,
-                info = LINK_SHARE_FILE_INFO
-            )
-        )
+        Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
     }
 }

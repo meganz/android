@@ -24,6 +24,26 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.core.R as CoreUiR
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkManageLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkManageLinkTapFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkProFeatureSeeNotNowPlanFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkProFeatureSeeNotNowPlanFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkProFeatureSeeNotNowPlanFolderDialogInfo
+import mega.privacy.android.analytics.event.link.LinkProFeatureSeePlanFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkProFeatureSeePlanFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkReSetPasswordFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkReSetPasswordFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkRemovePasswordFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkRemovePasswordFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSendDecryptionKeyFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSendDecryptionKeyFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSetExpiryDateFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSetExpiryDateFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSetPasswordFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkSetPasswordFolderButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -106,6 +126,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                         showShareKeyOrPasswordDialog(SHARE)
                     else -> viewModel.shareLink { intent -> startActivity(intent) }
                 }
+                viewModel.getNode()?.let {
+                    Analytics.tracker.trackButtonPress(
+                        if (it.isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                    )
+                }
             }
             R.id.action_chat -> {
                 chatLauncher.launch(Unit)
@@ -142,7 +167,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         binding.resetPasswordButton.setOnClickListener {
             checkIfShouldHidePassword()
-            viewModel.onResetPasswordClicked()
+            viewModel.getNode()?.let {
+                Analytics.tracker.trackButtonPress(
+                    if (it.isFolder) LinkReSetPasswordFolderButtonInfo else LinkReSetPasswordFileButtonInfo
+                )
+            }
             findNavController().navigate(GetLinkFragmentDirections.setPassword(true))
         }
 
@@ -187,6 +216,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             viewModel.export(isFirstTime = true)
         }
 
+        node?.let {
+            if (it.isFolder) Analytics.tracker.trackButtonPress(LinkManageLinkTapFolderButtonInfo) else LinkManageLinkTapFileButtonInfo
+        }
         binding.scrollViewGetLink.postDelayed(::checkScroll, POST_CHECK_SCROLL)
     }
 
@@ -215,6 +247,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private fun removePasswordClick() {
         checkIfShouldHidePassword()
         viewModel.removeLinkWithPassword()
+        viewModel.getNode()?.let {
+            Analytics.tracker.trackButtonPress(
+                if (it.isFolder) LinkRemovePasswordFolderButtonInfo else LinkRemovePasswordFileButtonInfo
+            )
+        }
     }
 
     /**
@@ -229,7 +266,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         binding.decryptedKeyLayout.alpha = alpha
         binding.expiryDateLayout.alpha = alpha
         binding.passwordProtectionLayout.alpha = alpha
-
         if (node?.isExported == true) {
             binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
             binding.decryptedKeySwitch.apply {
@@ -271,7 +307,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.expiryDateSwitch.isChecked = true
             binding.expiryDateSetText.isVisible = true
             binding.expiryDateSetText.text = date
-            viewModel.onSetExpiryDateClicked()
+            onSetExpiryDateClicked()
         } else {
             binding.expiryDateSwitch.isChecked = false
             binding.expiryDateSetText.isVisible = false
@@ -363,6 +399,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * @param isSwitchClick True if the click was in the switch, false if it was in other part of the view.
      */
     private fun sendDecryptedKeySeparatelyClick(isSwitchClick: Boolean) {
+        if (binding.decryptedKeySwitch.isChecked) {
+            viewModel.getNode()?.let {
+                Analytics.tracker.trackButtonPress(
+                    if (it.isFolder) LinkSendDecryptionKeyFolderButtonInfo
+                    else LinkSendDecryptionKeyFileButtonInfo
+                )
+            }
+        }
         if (!isSwitchClick) {
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
@@ -374,7 +418,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
 
         updateSendDecryptedKeySeparatelyLayouts()
-        viewModel.onUpdateDecryptedKeyClicked(binding.decryptedKeySwitch.isChecked)
     }
 
     /**
@@ -397,7 +440,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * @param isSwitchClick True if the click was in the switch, false if it was in other part of the view.
      */
     private fun setExpiryDateClick(isSwitchClick: Boolean) {
-        viewModel.onSetExpiryDateClicked()
+        onSetExpiryDateClicked()
         checkIfShouldHidePassword()
         val node = viewModel.getNode()
         val isPro = viewModel.isPro()
@@ -434,14 +477,26 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             .setCancelable(false)
             .setPositiveButton(getString(R.string.button_plans_almost_full_warning)) { _, _ ->
                 (requireActivity() as BaseActivity).apply {
+                    viewModel.getNode()?.let {
+                        Analytics.tracker.trackButtonPress(
+                            if (it.isFolder) LinkProFeatureSeePlanFolderButtonInfo
+                            else LinkProFeatureSeePlanFileButtonInfo
+                        )
+                    }
                     navigateToUpgradeAccount()
                     finish()
                 }
             }
             .setNegativeButton(
-                getString(R.string.verify_account_not_now_button),
-                null
-            )
+                getString(R.string.verify_account_not_now_button)
+            ) { _, _ ->
+                viewModel.getNode()?.let {
+                    Analytics.tracker.trackButtonPress(
+                        if (it.isFolder) LinkProFeatureSeeNotNowPlanFolderButtonInfo
+                        else LinkProFeatureSeeNotNowPlanFileButtonInfo
+                    )
+                }
+            }
             .create()
             .show()
     }
@@ -473,7 +528,11 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * Manages the click on set password protection option.
      */
     private fun setPasswordProtectionClick() {
-        viewModel.onSetPasswordClicked()
+        viewModel.getNode()?.let {
+            Analytics.tracker.trackButtonPress(
+                if (it.isFolder) LinkSetPasswordFolderButtonInfo else LinkSetPasswordFileButtonInfo
+            )
+        }
         if (viewModel.isPro()) {
             checkIfShouldHidePassword()
             findNavController().navigate(GetLinkFragmentDirections.setPassword(false))
@@ -601,5 +660,16 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         val withElevation = binding.scrollViewGetLink.canScrollVertically(SCROLLING_UP_DIRECTION)
         viewModel.setElevation(withElevation)
+    }
+
+    /**
+     * Track when expiry date to node is set
+     */
+    private fun onSetExpiryDateClicked() {
+        viewModel.getNode()?.let {
+            Analytics.tracker.trackButtonPress(
+                if (it.isFolder) LinkSetExpiryDateFolderButtonInfo else LinkSetExpiryDateFileButtonInfo
+            )
+        }
     }
 }

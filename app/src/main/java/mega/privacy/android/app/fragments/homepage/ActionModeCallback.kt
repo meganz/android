@@ -3,6 +3,10 @@ package mega.privacy.android.app.fragments.homepage
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -51,7 +55,15 @@ class ActionModeCallback constructor(
                 NodeController(mainActivity).chooseLocationToMoveNodes(nodesHandles)
             }
             R.id.cab_menu_share_out -> {
+                if (selectedNodes.size == 1) {
+                    Analytics.tracker.trackButtonPress(
+                        if (selectedNodes[0].isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                    )
+                } else {
+                    Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
+                }
                 MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
+
             }
             R.id.cab_menu_share_link, R.id.cab_menu_edit_link -> {
                 Timber.d("Public link option")

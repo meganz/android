@@ -6,6 +6,10 @@ import android.net.Uri
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -66,6 +70,13 @@ class FavouriteActionModeCallback(
                 }
 
                 R.id.cab_menu_share_out -> {
+                    if (selectedNodes.size == 1) {
+                        Analytics.tracker.trackButtonPress(
+                            if (selectedNodes[0].isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                        )
+                    } else {
+                        Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
+                    }
                     MegaNodeUtil.shareNodes(mainActivity, selectedNodes)
                 }
 

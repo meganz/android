@@ -33,6 +33,9 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.file.CloudDriveScreenInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -391,6 +394,13 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.SHARE_OUT_CLICKED -> {
+                    if (it.selectedMegaNode.size == 1) {
+                        Analytics.tracker.trackButtonPress(
+                            if (it.selectedMegaNode[0].isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                        )
+                    } else {
+                        Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
+                    }
                     MegaNodeUtil.shareNodes(requireContext(), it.selectedMegaNode)
                 }
 
