@@ -123,6 +123,17 @@ interface TransferRepository {
     suspend fun broadcastTransferOverQuota()
 
     /**
+     * Monitor storage over quota
+     */
+    fun monitorStorageOverQuota(): Flow<Boolean>
+
+    /**
+     * Broadcast storage over quota
+     *
+     */
+    suspend fun broadcastStorageOverQuota()
+
+    /**
      * Cancels all transfers, uploads and downloads.
      */
     suspend fun cancelTransfers()

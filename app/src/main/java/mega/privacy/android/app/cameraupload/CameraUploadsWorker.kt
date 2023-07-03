@@ -102,6 +102,7 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.BroadcastStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DisableCameraUploadsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
@@ -114,6 +115,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ReportUploadFinishedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ReportUploadInterruptedUseCase
@@ -615,6 +617,19 @@ class CameraUploadsWorker @AssistedInject constructor(
     lateinit var stringWrapper: StringWrapper
 
     /**
+     * [MonitorStorageOverQuotaUseCase]
+     */
+    @Inject
+    lateinit var monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase
+
+    /**
+     * [BroadcastStorageOverQuotaUseCase]
+     */
+    @Inject
+    lateinit var broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase
+
+
+    /**
      * True if the camera uploads attributes have already been requested
      * from the server
      */
@@ -695,6 +710,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Job to monitor charging stopped status flow
      */
     private var monitorChargingStoppedStatusJob: Job? = null
+
+    /**
+     * Job to monitor transfer over quota status flow
+     */
+    private var monitorStorageOverQuotaStatusJob: Job? = null
+
 
     override suspend fun doWork() = coroutineScope {
         Timber.d("Start CU Worker")
@@ -807,6 +828,20 @@ class CameraUploadsWorker @AssistedInject constructor(
                 if (isChargingRequired(totalVideoSize)) {
                     Timber.d("Detected device stops charging.")
                     videoCompressionJob?.cancel()
+                }
+            }
+        }
+    }
+
+    private fun monitorStorageOverQuotaStatus() {
+        monitorStorageOverQuotaStatusJob = scope?.launch(ioDispatcher) {
+            monitorStorageOverQuotaUseCase().collect {
+                if (it) {
+                    showStorageOverQuotaNotification()
+                    endService(
+                        cancelMessage = "Storage Quota Filled - Cancel Camera Upload",
+                        aborted = true
+                    )
                 }
             }
         }
@@ -1365,8 +1400,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
         if (error is QuotaExceededMegaException) {
             Timber.w("${if (error.value != 0L) "Transfer" else "Storage"} Over Quota Error: ${error.errorCode}")
-            showStorageOverQuotaNotification()
-            endService(aborted = true)
+            broadcastStorageOverQuotaUseCase()
         }
     }
 
@@ -1622,6 +1656,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
+        monitorStorageOverQuotaStatus()
         handleLocalIpChangeUseCase(shouldRetryChatConnections = false)
 
         // Reset properties
@@ -1709,6 +1744,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             monitorBatteryLevelStatusJob?.cancel()
             monitorChargingStoppedStatusJob?.cancel()
             sendBackupHeartbeatJob?.cancel()
+            monitorStorageOverQuotaStatusJob?.cancel()
         }
     }
 

@@ -75,10 +75,21 @@ internal interface AppEventGateway {
     fun monitorTransferOverQuota(): Flow<Boolean>
 
     /**
+     * Monitor storage over quota
+     */
+    fun monitorStorageOverQuota(): Flow<Boolean>
+
+    /**
      * Broadcast transfer over quota
      *
      */
     suspend fun broadcastTransferOverQuota()
+
+    /**
+     * Broadcast storage over quota
+     *
+     */
+    suspend fun broadcastStorageOverQuota()
 
     /**
      * Monitors logout.

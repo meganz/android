@@ -269,6 +269,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         appEventGateway.broadcastTransferOverQuota()
     }
 
+    override fun monitorStorageOverQuota(): Flow<Boolean> =
+        appEventGateway.monitorStorageOverQuota()
+
+    override suspend fun broadcastStorageOverQuota() {
+        appEventGateway.broadcastStorageOverQuota()
+    }
+
     override suspend fun cancelTransfers() = withContext(ioDispatcher) {
         megaApiGateway.cancelTransfers(MegaTransfer.TYPE_UPLOAD)
         megaApiGateway.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
