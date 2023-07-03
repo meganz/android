@@ -34,7 +34,6 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
-import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -169,7 +168,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onTitleValueChange = viewModel::onTitleChange,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
-                            if (optionSelected == RecurrenceDialogOption.Custom) {
+                            if (optionSelected == RecurrenceDialogOption.Custom ||
+                                optionSelected == RecurrenceDialogOption.Customised
+                            ) {
                                 viewModel.setInitialCustomRules()
                                 navController.navigate(CUSTOM_RECURRENCE_TAG)
                             } else {
@@ -197,13 +198,13 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         },
                         onFrequencyTypeChanged = viewModel::onFrequencyTypeChanged,
                         onIntervalChanged = viewModel::onIntervalChanged,
-                        onMonthDayChanged = viewModel::onMonthDayChanged,
-                        onWeekdaysClicked = viewModel::onWeekdaysOptionTap,
                         onFocusChanged = viewModel::onFocusChanged,
+                        onWeekdaysClicked = viewModel::onWeekdaysOptionTap,
                         onDayClicked = viewModel::onDayClicked,
                         onMonthlyRadioButtonClicked = viewModel::onMonthlyRadioButtonClicked,
-                        onMonthWeekDayChanged = viewModel::onMonthWeekDayChanged,
-                        onWeekOfMonthChanged = viewModel::onWeekOfMonthChanged
+                        onMonthDayChanged = viewModel::onMonthDayChanged,
+                        onWeekOfMonthChanged = viewModel::onWeekOfMonthChanged,
+                        onMonthWeekDayChanged = viewModel::onMonthWeekDayChanged
                     )
                 }
             }
@@ -218,7 +219,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     private fun openScheduledMeetingInfo(chatId: Long) {
         val intentOpenChat = Intent(this, ScheduledMeetingInfoActivity::class.java).apply {
             putExtra(Constants.CHAT_ID, chatId)
-            putExtra(Constants.SCHEDULED_MEETING_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            putExtra(Constants.SCHEDULED_MEETING_ID, -1)
             putExtra(Constants.SCHEDULED_MEETING_CREATED, true)
         }
         finish()

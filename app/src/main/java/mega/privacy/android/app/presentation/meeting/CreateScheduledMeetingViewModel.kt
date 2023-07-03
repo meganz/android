@@ -95,10 +95,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         scheduledMeetingEnabled = flag,
-                        currentWeekDay = weekDayMapper(
-                            Instant.now().atZone(ZoneId.systemDefault()).dayOfWeek
-                        ),
-                        currentDayOfMonth = Instant.now().atZone(ZoneId.systemDefault()).dayOfMonth
                     )
                 }
             }
@@ -108,11 +104,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Recurring meeting button clicked
      */
-    fun onRecurrenceTap() {
+    fun onRecurrenceTap() =
         _state.update { state ->
             state.copy(recurringMeetingDialog = !state.recurringMeetingDialog)
         }
-    }
 
     /**
      * Enable or disable meeting link option
@@ -280,19 +275,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     interval = if (newFreq == OccurrenceFrequencyType.Invalid) 0 else 1,
                     until = state.rulesSelected.until,
                     weekDayList = when (newFreq) {
-                        OccurrenceFrequencyType.Weekly -> listOf(
-                            weekDayMapper(
-                                state.startDate.dayOfWeek
-                            )
-                        )
-
+                        OccurrenceFrequencyType.Weekly -> listOf(state.getStartWeekDay())
                         else -> null
                     },
                     monthDayList = when (newFreq) {
-                        OccurrenceFrequencyType.Monthly -> listOf(
-                            state.startDate.dayOfMonth
-                        )
-
+                        OccurrenceFrequencyType.Monthly -> state.getStartMonthDayList()
                         else -> null
                     },
                     monthWeekDayList = emptyList()
@@ -306,14 +293,21 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Check if month warning should be shown
      */
-    private fun checkMonthWarning() {
-        val shouldShown = state.value.rulesSelected.freq == OccurrenceFrequencyType.Monthly &&
-                state.value.rulesSelected.interval == 1 &&
-                (state.value.startDate.dayOfMonth == MONTH_WITH_29_DAYS ||
-                        state.value.startDate.dayOfMonth == MONTH_WITH_30_DAYS ||
-                        state.value.startDate.dayOfMonth == MONTH_WITH_31_DAYS)
-        _state.update { state -> state.copy(showMonthlyRecurrenceWarning = shouldShown) }
-    }
+    private fun shouldShownMonthWarning(freq: OccurrenceFrequencyType, dayOfMonth: Int?): Boolean =
+        dayOfMonth != null && freq == OccurrenceFrequencyType.Monthly && (dayOfMonth == MONTH_WITH_29_DAYS || dayOfMonth == MONTH_WITH_30_DAYS || dayOfMonth == MONTH_WITH_31_DAYS)
+
+    /**
+     * Check if month warning should be shown
+     */
+    private fun checkMonthWarning() =
+        _state.update { state ->
+            state.copy(
+                showMonthlyRecurrenceWarning = shouldShownMonthWarning(
+                    state.rulesSelected.freq,
+                    state.rulesSelected.monthDayList?.first()
+                )
+            )
+        }
 
     /**
      * Remove open add contact screen
@@ -362,17 +356,13 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param text Meeting title
      */
-    fun onTitleChange(text: String) {
+    fun onTitleChange(text: String) =
         _state.update { state ->
-            state.copy(meetingTitle = text.ifEmpty { "" })
+            state.copy(
+                meetingTitle = text.ifEmpty { "" },
+                isEmptyTitleError = if (text.isNotEmpty()) false else state.isEmptyTitleError
+            )
         }
-
-        if (text.isNotEmpty()) {
-            _state.update { state ->
-                state.copy(isEmptyTitleError = false)
-            }
-        }
-    }
 
     /**
      * Discard meeting button clicked
@@ -443,6 +433,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                         if (state.value.enabledMeetingLinkOption) {
                             createMeetingLink(id)
                         } else {
+                            Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $id")
                             openInfo(id)
                         }
                     }
@@ -456,12 +447,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param chatId Chat Id.
      */
-    fun openInfo(chatId: Long?) {
-        Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $chatId")
+    fun openInfo(chatId: Long?) =
         _state.update { state ->
             state.copy(chatIdToOpenInfoScreen = chatId)
         }
-    }
 
     /**
      * Get participants emails
@@ -490,7 +479,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * Set the new initial custom rules
      */
     fun setInitialCustomRules() {
-
+        val monthDayList = state.value.rulesSelected.monthDayList
         updateCustomRules(
             newFreq = if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Invalid) OccurrenceFrequencyType.Daily else state.value.rulesSelected.freq,
             newInterval = if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Invalid) 1 else state.value.rulesSelected.interval,
@@ -498,6 +487,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             newWeekDayList = state.value.rulesSelected.weekDayList,
             newMonthDayList = state.value.rulesSelected.monthDayList,
             newMonthWeekDayList = state.value.rulesSelected.monthWeekDayList,
+            newMonthDayOption = if (monthDayList.isNullOrEmpty()) state.value.getStartMonthDay() else monthDayList.first(),
+            newMonthWeekDayListOption = state.value.rulesSelected.monthWeekDayList.ifEmpty { state.value.customRecurrenceState.getDefaultMonthWeekDayList() }
         )
     }
 
@@ -512,10 +503,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             newFreq = newType,
             newInterval = 1,
             newWeekDayList = if (newType == OccurrenceFrequencyType.Weekly) mutableListOf<Weekday>().apply {
-                add(state.value.currentWeekDay)
+                add(state.value.getStartWeekDay())
             } else null,
             newMonthDayList = if (newType == OccurrenceFrequencyType.Monthly) mutableListOf<Int>().apply {
-                add(state.value.currentDayOfMonth)
+                add(state.value.getStartMonthDay())
             } else null,
             newMonthWeekDayList = emptyList()
         )
@@ -527,10 +518,14 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newValue
      */
     fun onIntervalChanged(newValue: String) {
-        val newInterval = when {
+        var newInterval: Int? = when {
             newValue.isEmpty() -> -1
-            newValue.toInt() > state.value.customRecurrenceState.newRules.freq.DropdownType.MaximumValue -> state.value.customRecurrenceState.newRules.interval
-            else -> newValue.toInt()
+            else -> newValue.toIntOrNull()
+        }
+
+        newInterval = when {
+            newInterval == null || newInterval == 0 || newInterval > state.value.customRecurrenceState.newRules.freq.DropdownType.MaximumValue -> state.value.customRecurrenceState.newRules.interval
+            else -> newInterval
         }
 
         updateCustomRules(
@@ -547,17 +542,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newValue
      */
     fun onMonthDayChanged(newValue: String) {
-        val currentList = state.value.customRecurrenceState.newRules.monthDayList
         val newMonthDay = when {
             newValue.isEmpty() -> -1
-            newValue.toInt() > MAXIMUM_DAYS_IN_MONTH -> if (currentList.isNullOrEmpty()) 1 else currentList.first()
+            newValue.toInt() > MAXIMUM_DAYS_IN_MONTH -> state.value.customRecurrenceState.monthDayOption
             else -> newValue.toInt()
         }
 
         updateCustomRules(
-            newMonthDayList = mutableListOf<Int>().apply {
-                add(newMonthDay)
-            },
+            newMonthDayList = listOf(newMonthDay),
+            newMonthDayOption = newMonthDay,
         )
     }
 
@@ -567,19 +560,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newValue  [Weekday]
      */
     fun onMonthWeekDayChanged(newValue: Weekday) {
-        val monthWeekdayList: List<MonthWeekDayItem> =
-            state.value.customRecurrenceState.newRules.monthWeekDayList
-
-        val currentWeekOfMonth: WeekOfMonth =
-            if (monthWeekdayList.isEmpty()) WeekOfMonth.First else monthWeekdayList.first().weekOfMonth
-        val newWeekdaysList = mutableListOf<Weekday>().apply {
-            add(newValue)
-        }
+        val list = listOf(
+            MonthWeekDayItem(
+                state.value.customRecurrenceState.monthWeekDayListOption.first().weekOfMonth,
+                listOf(newValue)
+            )
+        )
 
         updateCustomRules(
-            newMonthWeekDayList = mutableListOf<MonthWeekDayItem>().apply {
-                add(MonthWeekDayItem(currentWeekOfMonth, newWeekdaysList))
-            },
+            newMonthWeekDayList = list,
+            newMonthWeekDayListOption = list
         )
     }
 
@@ -589,44 +579,38 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newValue  [WeekOfMonth]
      */
     fun onWeekOfMonthChanged(newValue: WeekOfMonth) {
-        val monthWeekdayList: List<MonthWeekDayItem> =
-            state.value.customRecurrenceState.newRules.monthWeekDayList
-
-        val currentWeekdaysList: List<Weekday> =
-            if (monthWeekdayList.isEmpty()) mutableListOf<Weekday>().apply {
-                add(Weekday.Monday)
-            } else monthWeekdayList.first().weekDaysList
-
+        val list = listOf(
+            MonthWeekDayItem(
+                newValue,
+                state.value.customRecurrenceState.monthWeekDayListOption.first().weekDaysList
+            )
+        )
 
         updateCustomRules(
-            newMonthWeekDayList = mutableListOf<MonthWeekDayItem>().apply {
-                add(MonthWeekDayItem(newValue, currentWeekdaysList))
-            },
+            newMonthWeekDayList = list,
+            newMonthWeekDayListOption = list
         )
     }
 
     /**
      * Check when focus changed and disable weekdays option
      */
-    fun onFocusChanged() {
+    fun onFocusChanged() =
         updateCustomRules(
             newWeekDayList = if (state.value.customRecurrenceState.newRules.freq == OccurrenceFrequencyType.Weekly) state.value.customRecurrenceState.newRules.weekDayList else null,
             newMonthDayList = if (state.value.customRecurrenceState.newRules.freq == OccurrenceFrequencyType.Monthly) state.value.customRecurrenceState.newRules.monthDayList else null,
             newMonthWeekDayList = if (state.value.customRecurrenceState.newRules.freq == OccurrenceFrequencyType.Monthly) state.value.customRecurrenceState.newRules.monthWeekDayList else emptyList(),
         )
-    }
 
     /**
      * Weekdays option clicked
      */
     fun onWeekdaysOptionTap() {
         val enabled = !state.value.customRecurrenceState.isWeekdaysSelected
-
         val newFreq =
             if (enabled) OccurrenceFrequencyType.Daily else state.value.customRecurrenceState.newRules.freq
         val newWeekdayList = if (enabled) state.value.getWeekdaysList() else null
         val newInterval = if (enabled) 1 else state.value.customRecurrenceState.newRules.interval
-
         updateCustomRules(
             newFreq = newFreq,
             newInterval = newInterval,
@@ -639,7 +623,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param day  [Weekday]
      */
-    fun onDayClicked(day: Weekday) {
+    fun onDayClicked(day: Weekday) =
         mutableListOf<Weekday>().apply {
             state.value.customRecurrenceState.newRules.weekDayList?.let(::addAll)
         }.let { list ->
@@ -652,7 +636,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 newWeekDayList = list.sortedBy { it.ordinal }
             )
         }
-    }
 
     /**
      * Monthly radio button clicked
@@ -667,6 +650,17 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 )
             )
         }
+
+        updateCustomRules(
+            newMonthDayList = when (newOptionClicked) {
+                MonthlyRecurrenceOption.MonthDay -> listOf(state.value.customRecurrenceState.monthDayOption)
+                MonthlyRecurrenceOption.MonthWeekday -> null
+            },
+            newMonthWeekDayList = when (newOptionClicked) {
+                MonthlyRecurrenceOption.MonthDay -> emptyList()
+                MonthlyRecurrenceOption.MonthWeekday -> state.value.customRecurrenceState.monthWeekDayListOption
+            }
+        )
     }
 
     /**
@@ -676,8 +670,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newInterval               new interval
      * @param newUntil                  new value until
      * @param newWeekDayList            new [Weekday] list
-     * @param newMonthDayList           new month day list
+     * @param newMonthDayList           new [MonthWeekDayItem] list
      * @param newMonthWeekDayList       new month weekday list
+     * @param newMonthDayOption         new month day option
+     * @param newMonthDayOption         new [MonthWeekDayItem] list option
      */
     private fun updateCustomRules(
         newFreq: OccurrenceFrequencyType = state.value.customRecurrenceState.newRules.freq,
@@ -686,6 +682,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         newWeekDayList: List<Weekday>? = state.value.customRecurrenceState.newRules.weekDayList,
         newMonthDayList: List<Int>? = state.value.customRecurrenceState.newRules.monthDayList,
         newMonthWeekDayList: List<MonthWeekDayItem> = state.value.customRecurrenceState.newRules.monthWeekDayList,
+        newMonthDayOption: Int = state.value.customRecurrenceState.monthDayOption,
+        newMonthWeekDayListOption: List<MonthWeekDayItem> = state.value.customRecurrenceState.monthWeekDayListOption,
     ) {
         val newRules = ChatScheduledRules(
             freq = newFreq,
@@ -700,91 +698,50 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             val isWeekdaysSelected =
                 newRules.freq == OccurrenceFrequencyType.Daily && newRules.weekDayList == state.getWeekdaysList()
 
+            val isValidRecurrence = newRules != state.rulesSelected && newRules.interval != -1 && (
+                    (newRules.freq == OccurrenceFrequencyType.Daily) ||
+                            (newRules.freq == OccurrenceFrequencyType.Weekly && !newRules.weekDayList.isNullOrEmpty()) ||
+                            (newRules.freq == OccurrenceFrequencyType.Monthly)
+                    )
+
             state.copy(
                 customRecurrenceState = state.customRecurrenceState.copy(
                     newRules = newRules,
                     isWeekdaysSelected = isWeekdaysSelected,
-                    isValidRecurrence = newRules != state.rulesSelected && (!isWeekdaysSelected || newRules.interval == 1),
+                    isValidRecurrence = isValidRecurrence,
+                    monthDayOption = newMonthDayOption,
+                    monthWeekDayListOption = newMonthWeekDayListOption,
+                    showMonthlyRecurrenceWarning = shouldShownMonthWarning(
+                        newRules.freq,
+                        newRules.monthDayList?.first()
+                    )
                 )
             )
         }
 
-        Timber.d("New rules selected ${state.value.customRecurrenceState.newRules}")
+        Timber.d("Custom rules updated ${state.value.customRecurrenceState.newRules}")
     }
 
     /**
      * On accept custom rules
      */
     fun onAcceptClicked() {
-        when (state.value.customRecurrenceState.newRules.freq) {
-            OccurrenceFrequencyType.Invalid -> {}
-            OccurrenceFrequencyType.Daily ->
-                _state.update { state ->
-                    state.copy(
-                        customRecurrenceState = state.customRecurrenceState.copy(
-                            newRules = state.customRecurrenceState.newRules.copy(
-                                weekDayList = null,
-                                monthDayList = null,
-                                monthWeekDayList = emptyList()
-                            )
-                        ),
-                    )
-                }
-
-            OccurrenceFrequencyType.Weekly ->
-                _state.update { state ->
-                    state.copy(
-                        customRecurrenceState = state.customRecurrenceState.copy(
-                            newRules = state.customRecurrenceState.newRules.copy(
-                                monthDayList = null,
-                                monthWeekDayList = emptyList()
-                            )
-                        ),
-                    )
-                }
-
-            OccurrenceFrequencyType.Monthly ->
-                _state.update { state ->
-                    state.copy(
-                        customRecurrenceState = state.customRecurrenceState.copy(
-                            newRules = state.customRecurrenceState.newRules.copy(
-                                weekDayList = null,
-                                monthDayList = if (state.customRecurrenceState.monthlyRadioButtonOptionSelected == MonthlyRecurrenceOption.MonthWeekday ||
-                                    state.customRecurrenceState.newRules.monthDayList?.get(0) == -1
-                                )
-                                    null
-                                else
-                                    state.customRecurrenceState.newRules.monthDayList,
-                                monthWeekDayList = if (state.customRecurrenceState.monthlyRadioButtonOptionSelected == MonthlyRecurrenceOption.MonthDay)
-                                    emptyList()
-                                else
-                                    state.customRecurrenceState.newRules.monthWeekDayList
-                            )
-                        ),
-                    )
-                }
-        }
-
-        val newRulesSelected = state.value.customRecurrenceState.newRules
-        val monthlyRadioButtonOptionSelected =
-            state.value.customRecurrenceState.monthlyRadioButtonOptionSelected
         _state.update { state ->
             state.copy(
-                rulesSelected = newRulesSelected,
-                customRecurrenceState = CustomRecurrenceState(monthlyRadioButtonOptionSelected = monthlyRadioButtonOptionSelected),
+                rulesSelected = state.customRecurrenceState.newRules,
+                customRecurrenceState = state.customRecurrenceState.copy(newRules = ChatScheduledRules())
             )
         }
-
+        Timber.d("Accepted rules ${state.value.customRecurrenceState.newRules}")
     }
 
     /**
      * On reject custom rules
      */
-    fun onRejectClicked() {
+    fun onRejectClicked() =
         _state.update { state ->
             state.copy(customRecurrenceState = CustomRecurrenceState())
         }
-    }
 
     /**
      * Updates state after shown snackBar.

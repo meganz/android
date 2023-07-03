@@ -349,7 +349,6 @@ private fun ActionButton(
                 }
             )
 
-
             if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
                 Text(
                     modifier = Modifier
@@ -359,17 +358,17 @@ private fun ActionButton(
                             top = 8.dp,
                             bottom = 8.dp
                         ),
-                    style = MaterialTheme.typography.subtitle2,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
+                    style = MaterialTheme.typography.subtitle2.copy(
+                        color = MaterialTheme.colors.textColorSecondary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Normal,
+                    ),
                     text = pluralStringResource(
                         R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
                         state.startDate.dayOfMonth,
                         state.startDate.dayOfMonth
                     ),
-                    color = MaterialTheme.colors.textColorSecondary
                 )
-
                 CustomDivider(withStartPadding = true)
             }
         }
@@ -528,8 +527,8 @@ private fun ActionOption(
                         subtitle = getScheduledMeetingFrequencyText(
                             state.rulesSelected,
                             state.isWeekdays(),
-                            state.currentWeekDay,
-                            state.currentDayOfMonth
+                            state.getStartWeekDay(),
+                            state.getStartMonthDay()
                         )
                     }
 
@@ -622,8 +621,8 @@ private fun RecurringMeetingDialog(
                     RecurrenceDialogOption.Customised -> getScheduledMeetingFrequencyText(
                         rules = state.rulesSelected,
                         state.isWeekdays(),
-                        state.currentWeekDay,
-                        state.currentDayOfMonth,
+                        state.getStartWeekDay(),
+                        state.getStartMonthDay(),
                         true
                     )
                 }

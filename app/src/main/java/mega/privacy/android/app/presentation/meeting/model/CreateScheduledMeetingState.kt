@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.entity.meeting.Weekday
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -42,8 +43,6 @@ import java.time.temporal.ChronoUnit
  * @property showMonthlyRecurrenceWarning               True, if the text on the monthly recurrence warning should be displayed. False, if not.
  * @property isCreatingMeeting                          True, if the meeting is being created. False, if not.
  * @property weekList                                   List of [Weekday] in the week.
- * @property currentWeekDay                             [Weekday]
- * @property currentDayOfMonth                          Current month day
  */
 data class CreateScheduledMeetingState constructor(
     val openAddContact: Boolean? = null,
@@ -81,8 +80,6 @@ data class CreateScheduledMeetingState constructor(
             Weekday.Saturday,
             Weekday.Sunday
         ),
-    val currentWeekDay: Weekday = Weekday.Monday,
-    val currentDayOfMonth: Int = 1,
 ) {
     /**
      * Check if it's valid title
@@ -154,9 +151,40 @@ data class CreateScheduledMeetingState constructor(
         return when (rulesSelected.freq) {
             OccurrenceFrequencyType.Invalid -> false
             OccurrenceFrequencyType.Daily -> rulesSelected.interval > 1 || weekDayList != null
-            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1 || (weekDayList != null && (weekDayList.size > 1 || weekDayList.first() != currentWeekDay))
-            OccurrenceFrequencyType.Monthly -> rulesSelected.interval > 1 || (monthDayList != null && (monthDayList.size > 1 || monthDayList.first() != currentDayOfMonth)) || monthWeekDayList.isNotEmpty()
+            OccurrenceFrequencyType.Weekly -> rulesSelected.interval > 1 || (weekDayList != null && (weekDayList.size > 1 || weekDayList.first() != getStartWeekDay()))
+            OccurrenceFrequencyType.Monthly -> rulesSelected.interval > 1 || (monthDayList != null && (monthDayList.size > 1 || monthDayList.first() != getStartMonthDay())) || monthWeekDayList.isNotEmpty()
         }
+    }
+
+    /**
+     * Get month day of start date
+     *
+     * @return month day
+     */
+    fun getStartMonthDay(): Int = startDate.dayOfMonth
+
+    /**
+     * Get month day list of start date
+     *
+     * @return month day list
+     */
+    fun getStartMonthDayList() = listOf(
+        startDate.dayOfMonth
+    )
+
+    /**
+     * Get weekday of start date
+     *
+     * @return weekday
+     */
+    fun getStartWeekDay(): Weekday = when (startDate.dayOfWeek) {
+        DayOfWeek.MONDAY -> Weekday.Monday
+        DayOfWeek.TUESDAY -> Weekday.Tuesday
+        DayOfWeek.WEDNESDAY -> Weekday.Wednesday
+        DayOfWeek.THURSDAY -> Weekday.Thursday
+        DayOfWeek.FRIDAY -> Weekday.Friday
+        DayOfWeek.SATURDAY -> Weekday.Saturday
+        else -> Weekday.Sunday
     }
 
     /**

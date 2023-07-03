@@ -13,7 +13,7 @@ internal class MegaMonthWeekDayListMapper @Inject constructor(
     private val megaWeekOfMonthMapper: MegaWeekOfMonthMapper,
 ) {
     operator fun invoke(monthWeekDayList: List<MonthWeekDayItem>?): MegaIntegerMap? {
-        if (monthWeekDayList == null) return null
+        if (monthWeekDayList.isNullOrEmpty()) return null
 
         val map: MegaIntegerMap = MegaIntegerMap.createInstance()
         val key = megaWeekOfMonthMapper(monthWeekDayList.first().weekOfMonth)

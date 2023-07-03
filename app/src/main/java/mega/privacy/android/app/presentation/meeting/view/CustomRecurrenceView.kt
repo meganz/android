@@ -1,9 +1,13 @@
 package mega.privacy.android.app.presentation.meeting.view
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,9 +32,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -42,6 +48,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.InitialLetterStringId
@@ -57,9 +64,9 @@ import mega.privacy.android.core.ui.controls.divider.CustomDivider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
-import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
@@ -106,10 +113,13 @@ internal fun CustomRecurrenceView(
             )
         }
     ) { paddingValues ->
+        BackPressHandler(onBackPressed = onRejectClicked)
+
         LazyColumn(
             state = listState,
             modifier = Modifier.padding(paddingValues)
         ) {
+
             item(key = "Occurs every") {
                 OccursEverySection(
                     modifier = Modifier,
@@ -145,19 +155,18 @@ internal fun CustomRecurrenceView(
 
                 DropdownOccurrenceType.Month ->
                     item(key = "Occurs monthly") {
-                        val monthDayList = state.customRecurrenceState.newRules.monthDayList
-                        val monthWeekDayList: List<MonthWeekDayItem> =
-                            state.customRecurrenceState.newRules.monthWeekDayList
+                        val monthDayList = state.customRecurrenceState.monthDayOption
+                        val monthWeekDayList = state.customRecurrenceState.monthWeekDayListOption
 
                         OccursMonthlySection(
                             modifier = Modifier,
                             monthlyOptionSelected = state.customRecurrenceState.monthlyRadioButtonOptionSelected,
-                            dropdownWeekdaySelected = if (monthWeekDayList.isEmpty()) Weekday.Monday else monthWeekDayList.first().weekDaysList.first(),
-                            dropdownWeekOfMonthSelected = if (monthWeekDayList.isEmpty()) WeekOfMonth.First else monthWeekDayList.first().weekOfMonth,
-                            monthDayOptionSelected = when {
-                                monthDayList.isNullOrEmpty() -> 1.toString()
-                                monthDayList.first() == -1 -> ""
-                                else -> monthDayList.first().toString()
+                            showWarning = state.customRecurrenceState.showMonthlyRecurrenceWarning,
+                            dropdownWeekdaySelected = monthWeekDayList.first().weekDaysList.first(),
+                            dropdownWeekOfMonthSelected = monthWeekDayList.first().weekOfMonth,
+                            monthDayOptionSelected = when (monthDayList) {
+                                -1 -> ""
+                                else -> monthDayList.toString()
                             },
                             onRadioButtonClicked = onMonthlyRadioButtonClicked,
                             onMonthDayChanged = onMonthDayChanged,
@@ -223,6 +232,31 @@ private fun CustomRecurrenceAppBar(
     )
 }
 
+@Composable
+private fun BackPressHandler(
+    backPressedDispatcher: OnBackPressedDispatcher? =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher,
+    onBackPressed: () -> Unit,
+) {
+    val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                currentOnBackPressed()
+            }
+        }
+    }
+
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher?.addCallback(backCallback)
+
+        onDispose {
+            backCallback.remove()
+        }
+    }
+}
+
 /**
  * Occurs every option
  *
@@ -260,7 +294,7 @@ private fun OccursEverySection(
             TextFieldChip(
                 onTextChange = onIntervalChanged,
                 modifier = modifier
-                    .padding(end = 10.dp),
+                    .padding(end = 5.dp),
                 text = if (interval == -1) "" else interval.toString(),
                 isDisabled = isWeekdaysSelected,
                 onFocusChange = onFocusChanged
@@ -337,11 +371,11 @@ private fun OccursWeeklySection(
         modifier
             .testTag(TEST_TAG_OCCURS_WEEKLY)
             .fillMaxWidth()
-            .padding(start = 16.dp, bottom = 23.dp, end = 16.dp)
+            .padding(bottom = 23.dp)
     ) {
         Text(
             modifier = modifier
-                .padding(top = 9.dp, bottom = 23.dp),
+                .padding(top = 9.dp, bottom = 23.dp, start = 16.dp),
             text = stringResource(id = R.string.meetings_custom_recurrence_occurs_on_section),
             style = MaterialTheme.typography.body2.copy(
                 color = MaterialTheme.colors.onPrimary,
@@ -354,7 +388,7 @@ private fun OccursWeeklySection(
                 TextButtonChip(
                     onClick = { onDayClicked(it) },
                     text = stringResource(id = it.InitialLetterStringId),
-                    modifier = modifier.padding(end = 16.dp),
+                    modifier = modifier.padding(start = 16.dp),
                     isChecked = customRecurrenceList.contains(it)
                 )
             }
@@ -375,6 +409,7 @@ private fun OccursMonthlySection(
     dropdownWeekdaySelected: Weekday,
     dropdownWeekOfMonthSelected: WeekOfMonth,
     monthDayOptionSelected: String,
+    showWarning: Boolean,
     onRadioButtonClicked: (MonthlyRecurrenceOption) -> Unit,
     onMonthDayChanged: (String) -> Unit,
     onWeekOfMonthChanged: (WeekOfMonth) -> Unit,
@@ -407,18 +442,20 @@ private fun OccursMonthlySection(
                     Row(
                         modifier
                             .fillMaxWidth()
-                            .height(56.dp)
+                            .defaultMinSize(minHeight = 56.dp)
                             .selectable(
                                 selected = (item == monthlyOptionSelected),
                                 onClick = {
-                                    onRadioButtonClicked(item)
+                                    if (item != monthlyOptionSelected) {
+                                        onRadioButtonClicked(item)
+                                    }
                                 },
                                 role = Role.RadioButton
                             )
                     ) {
                         Box(
                             modifier = modifier
-                                .fillMaxHeight(),
+                                .height(56.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             RadioButton(
@@ -428,12 +465,16 @@ private fun OccursMonthlySection(
                                     unselectedColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
                                     disabledColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
                                 ),
-                                onClick = { onRadioButtonClicked(item) }
+                                onClick = {
+                                    if (item != monthlyOptionSelected) {
+                                        onRadioButtonClicked(item)
+                                    }
+                                }
                             )
                         }
                         Box(
                             modifier = modifier
-                                .fillMaxHeight(),
+                                .height(56.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             when (item) {
@@ -462,7 +503,11 @@ private fun OccursMonthlySection(
                                                 modifier = modifier.padding(start = 5.dp),
                                                 text = monthDayOptionSelected,
                                                 isDisabled = item != monthlyOptionSelected,
-                                                onFocusChange = {}
+                                                onFocusChange = {
+                                                    if (item != monthlyOptionSelected) {
+                                                        onRadioButtonClicked(item)
+                                                    }
+                                                }
                                             )
                                         }
                                     }
@@ -476,7 +521,11 @@ private fun OccursMonthlySection(
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             DropdownMenuChip(
-                                                onDropdownExpanded = { onRadioButtonClicked(item) },
+                                                onDropdownExpanded = {
+                                                    if (item != monthlyOptionSelected) {
+                                                        onRadioButtonClicked(item)
+                                                    }
+                                                },
                                                 options = listOf(
                                                     WeekOfMonth.First,
                                                     WeekOfMonth.Second,
@@ -501,7 +550,11 @@ private fun OccursMonthlySection(
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             DropdownMenuChip(
-                                                onDropdownExpanded = { onRadioButtonClicked(item) },
+                                                onDropdownExpanded = {
+                                                    if (item != monthlyOptionSelected) {
+                                                        onRadioButtonClicked(item)
+                                                    }
+                                                },
                                                 options = listOf(
                                                     Weekday.Monday,
                                                     Weekday.Tuesday,
@@ -529,6 +582,27 @@ private fun OccursMonthlySection(
                     CustomDivider(
                         withStartPadding = true, startPadding = 54.dp
                     )
+                    if (item == MonthlyRecurrenceOption.MonthDay && showWarning) {
+                        Row {
+                            Box(
+                                modifier = modifier
+                                    .padding(start = 54.dp, end = 8.dp, bottom = 5.dp, top = 5.dp),
+                            ) {
+                                Text(
+                                    text = pluralStringResource(
+                                        id = R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
+                                        monthDayOptionSelected.toInt(),
+                                        monthDayOptionSelected.toInt()
+                                    ),
+                                    style = MaterialTheme.typography.subtitle2.copy(
+                                        color = MaterialTheme.colors.textColorSecondary,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.Normal,
+                                    ),
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
