@@ -41,7 +41,6 @@ import mega.privacy.android.app.imageviewer.usecase.GetImageHandlesUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
-import mega.privacy.android.app.usecase.CancelTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
 import mega.privacy.android.app.usecase.GetGlobalChangesUseCase.Result
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -71,6 +70,7 @@ import mega.privacy.android.domain.usecase.imageviewer.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -120,7 +120,7 @@ class ImageViewerViewModel @Inject constructor(
     private val getGlobalChangesUseCase: GetGlobalChangesUseCase,
     private val getNodeUseCase: GetNodeUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
-    private val cancelTransferUseCase: CancelTransferUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
     private val isUserLoggedInUseCase: IsUserLoggedIn,
     private val deleteChatMessageUseCase: DeleteChatMessageUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
@@ -831,12 +831,13 @@ class ImageViewerViewModel @Inject constructor(
     fun stopImageLoading(itemId: Long) {
         images.value?.find { itemId == it.id }?.imageResult?.let { imageResult ->
             imageResult.transferTag?.let { tag ->
-                cancelTransferUseCase.cancel(tag)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onError = Timber::e
-                    ).addTo(composite)
+                viewModelScope.launch {
+                    runCatching {
+                        cancelTransferByTagUseCase(tag)
+                    }.onFailure {
+                        Timber.e(it)
+                    }
+                }
             }
             imageResult.fullSizeUri?.let { fullSizeImageUri ->
                 Fresco.getImagePipeline()?.evictFromMemoryCache(fullSizeImageUri.toUri())
