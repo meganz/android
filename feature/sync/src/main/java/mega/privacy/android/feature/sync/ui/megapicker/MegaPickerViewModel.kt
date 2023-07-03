@@ -12,11 +12,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.usecase.SetSelectedMegaFolderUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 internal class MegaPickerViewModel @Inject constructor(
-//    private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase // The line is added in the next MR
+    private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -41,7 +43,7 @@ internal class MegaPickerViewModel @Inject constructor(
                 val id = state.value.currentFolder?.id?.longValue
                 val name = state.value.currentFolder?.name
                 if (id != null && name != null) {
-//                    setSelectedMegaFolderUseCase(RemoteFolder(id, name)) // The line is added in the next MR
+                    setSelectedMegaFolderUseCase(RemoteFolder(id, name))
                 }
             }
         }

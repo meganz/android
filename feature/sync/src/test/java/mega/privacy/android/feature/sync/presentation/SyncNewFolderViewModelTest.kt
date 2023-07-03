@@ -4,12 +4,14 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
@@ -26,16 +28,23 @@ import org.mockito.kotlin.whenever
 internal class SyncNewFolderViewModelTest {
 
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase = mock()
+    private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @BeforeEach
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = SyncNewFolderViewModel(getExternalPathByContentUriUseCase)
+    }
+
+    @AfterEach
+    fun resetAndTearDown() {
+        Dispatchers.resetMain()
+        reset(getExternalPathByContentUriUseCase, monitorSelectedMegaFolderUseCase)
     }
 
     @Test
     fun `test that local folder selected action results in updated state`() = runTest {
+        initViewModel()
         val localFolderContentUri =
             "content://com.android.externalstorage.documents/tree/primary%3ASync%2FsomeFolder"
         val localFolderUri: Uri = mock()
@@ -53,6 +62,7 @@ internal class SyncNewFolderViewModelTest {
 
     @Test
     fun `test that folder name changed action results in updated state`() {
+        initViewModel()
         val folderPairName = "folderPairName"
         val expectedState = SyncNewFolderState(folderPairName = folderPairName)
 
@@ -61,9 +71,24 @@ internal class SyncNewFolderViewModelTest {
         assertThat(expectedState).isEqualTo(underTest.state.value)
     }
 
-    @AfterEach
-    fun resetAndTearDown() {
-        Dispatchers.resetMain()
-        reset(getExternalPathByContentUriUseCase)
+    @Test
+    fun `test that when mega folder is updated state is also updated`() = runTest {
+        val remoteFolder = RemoteFolder(123L, "someFolder")
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
+            flow {
+                emit(remoteFolder)
+            }
+        )
+        initViewModel()
+        val expectedState = SyncNewFolderState(selectedMegaFolder = remoteFolder)
+
+        assertThat(expectedState).isEqualTo(underTest.state.value)
+    }
+
+    private fun initViewModel() {
+        underTest = SyncNewFolderViewModel(
+            getExternalPathByContentUriUseCase,
+            monitorSelectedMegaFolderUseCase
+        )
     }
 }
