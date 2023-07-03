@@ -31,7 +31,9 @@ fun ImageItem.shouldShowDownloadOption(): Boolean =
     nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
 
 fun ImageItem.shouldShowOfflineOption(): Boolean =
-    this !is ImageItem.OfflineNode && nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
+    this !is ImageItem.OfflineNode && nodeItem?.node?.isTakenDown != true
+            && nodeItem?.isFromRubbishBin != true
+            && this !is ImageItem.AlbumImportNode
 
 fun ImageItem.shouldShowManageLinkOption(): Boolean =
     this !is ImageItem.ChatNode && nodeItem?.hasOwnerAccess == true
@@ -47,7 +49,9 @@ fun ImageItem.shouldShowSendToContactOption(isUserLoggedIn: Boolean): Boolean =
 
 fun ImageItem.shouldShowShareOption(): Boolean =
     nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
-            && (this is ImageItem.OfflineNode || nodeItem?.hasOwnerAccess == true || this !is ImageItem.PublicNode)
+            && (this is ImageItem.OfflineNode
+            || nodeItem?.hasOwnerAccess == true
+            || this !is ImageItem.PublicNode) && this !is ImageItem.AlbumImportNode
 
 fun ImageItem.shouldShowRenameOption(): Boolean =
     this !is ImageItem.OfflineNode && nodeItem?.isFromRubbishBin != true && nodeItem?.hasFullAccess == true
