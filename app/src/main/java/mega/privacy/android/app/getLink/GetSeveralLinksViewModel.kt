@@ -12,7 +12,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
+import mega.privacy.android.app.getLink.useCase.LegacyExportNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
@@ -29,14 +29,14 @@ import javax.inject.Inject
  * View Model used for manage data related to [GetSeveralLinksFragment].
  * Its shared with its activity [GetLinkActivity].
  *
- * @property megaApi             MegaApiAndroid instance to use.
- * @property exportNodeUseCase   Use case to export nodes.
- * @property getThumbnailUseCase Use case to request thumbnails.
+ * @property megaApi                    MegaApiAndroid instance to use.
+ * @property legacyExportNodeUseCase    Use case to export nodes.
+ * @property getThumbnailUseCase        Use case to request thumbnails.
  */
 @HiltViewModel
 class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
-    private val exportNodeUseCase: ExportNodeUseCase,
+    private val legacyExportNodeUseCase: LegacyExportNodeUseCase,
     private val getThumbnailUseCase: GetThumbnailUseCase,
 ) : BaseRxViewModel() {
 
@@ -111,7 +111,7 @@ class GetSeveralLinksViewModel @Inject constructor(
     private fun exportNodes(pendingExports: List<MegaNode>) {
         if (pendingExports.isNotEmpty()) {
             exportingNodes.value = true
-            exportNodeUseCase.export(pendingExports)
+            legacyExportNodeUseCase.export(pendingExports)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(

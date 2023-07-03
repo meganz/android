@@ -16,7 +16,7 @@ import javax.inject.Inject
  *
  * @property megaApi MegaApiAndroid instance to use.
  */
-class ExportNodeUseCase @Inject constructor(
+class LegacyExportNodeUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val getNodeUseCase: GetNodeUseCase
 ) {

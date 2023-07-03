@@ -93,7 +93,7 @@ internal class ImageViewerViewModelTest {
             getImageHandlesUseCase = mock(),
             getGlobalChangesUseCase = getGlobalChangesUseCase,
             getNodeUseCase = mock(),
-            exportNodeUseCase = mock(),
+            legacyExportNodeUseCase = mock(),
             cancelTransferByTagUseCase = mock(),
             isUserLoggedInUseCase = isUserLoggedIn,
             deleteChatMessageUseCase = mock(),

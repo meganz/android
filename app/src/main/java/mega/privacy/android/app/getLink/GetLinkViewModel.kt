@@ -16,7 +16,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
-import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
+import mega.privacy.android.app.getLink.useCase.LegacyExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.Util
@@ -39,14 +39,14 @@ import javax.inject.Inject
  * @property megaApi                        MegaApiAndroid instance to use.
  * @property dbH                            DataBaseHandle instance to use.
  * @property encryptLinkWithPasswordUseCase Use case to encrypt a link with a password.
- * @property exportNodeUseCase              Use case to export a node.
+ * @property legacyExportNodeUseCase        Use case to export a node.
  */
 @HiltViewModel
 class GetLinkViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
-    private val exportNodeUseCase: ExportNodeUseCase,
+    private val legacyExportNodeUseCase: LegacyExportNodeUseCase,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -125,7 +125,7 @@ class GetLinkViewModel @Inject constructor(
      * Exports the node.
      */
     fun export(isFirstTime: Boolean = false) {
-        exportNodeUseCase.export(node)
+        legacyExportNodeUseCase.export(node)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -148,7 +148,7 @@ class GetLinkViewModel @Inject constructor(
      * @param expiryDate Expiry date to export.
      */
     fun exportWithTimestamp(expiryDate: Long) {
-        exportNodeUseCase.export(node, expiryDate)
+        legacyExportNodeUseCase.export(node, expiryDate)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
