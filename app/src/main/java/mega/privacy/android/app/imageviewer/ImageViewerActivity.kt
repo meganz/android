@@ -454,7 +454,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             // Apply system bars top and bottom insets
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-                binding.toolbar.updatePadding(0, insets.top, 0, 0)
+                binding.toolbar.updatePadding(insets.left, insets.top, insets.right, 0)
                 binding.imagesNavHostFragment.updatePadding(
                     insets.left,
                     0,
