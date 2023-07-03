@@ -44,12 +44,14 @@ fun <T : TypedNode> NodeListView(
     onMenuClick: (NodeUIItem<T>) -> Unit,
     onItemClicked: (NodeUIItem<T>) -> Unit,
     onLongClick: (NodeUIItem<T>) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
     listState: LazyListState,
     getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
+    showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
     showChangeViewType: Boolean = true,
 ) {
@@ -62,10 +64,12 @@ fun <T : TypedNode> NodeListView(
                     modifier = modifier,
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                     sortOrder = sortOrder,
                     isListView = true,
                     showSortOrder = showSortOrder,
-                    showChangeViewType = showChangeViewType
+                    showChangeViewType = showChangeViewType,
+                    showMediaDiscoveryButton = showMediaDiscoveryButton,
                 )
             }
         }
@@ -109,8 +113,7 @@ fun <T : TypedNode> NodeListView(
                 imageState = imageState,
                 onClick = { onItemClicked(nodeUIItemList[it]) },
                 onLongClick = { onLongClick(nodeUIItemList[it]) },
-                onMenuClick = { onMenuClick(nodeUIItemList[it]) },
-            )
+            ) { onMenuClick(nodeUIItemList[it]) }
         }
     }
 }
@@ -126,12 +129,14 @@ private fun NodeListViewPreview(
             onMenuClick = {},
             onItemClicked = {},
             onLongClick = {},
+            onEnterMediaDiscoveryClick = {},
             sortOrder = "",
             onSortOrderClick = {},
             onChangeViewTypeClick = {},
             showSortOrder = true,
             listState = LazyListState(),
             getThumbnail = { _, _ -> },
+            showMediaDiscoveryButton = false,
             modifier = Modifier,
             showChangeViewType = true
         )

@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
+import mega.privacy.android.core.R as CoreUIR
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -9,8 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
-import mega.privacy.android.core.R as CoreUIR
-import androidx.compose.foundation.isSystemInDarkTheme
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.ui.controls.lists.HeaderViewItem
@@ -43,6 +43,7 @@ internal fun MegaFolderPickerView(
             HeaderViewItem(
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
+                onEnterMediaDiscoveryClick = {},
                 sortOrder = sortOrder,
                 isListView = true,
                 showSortOrder = showSortOrder,

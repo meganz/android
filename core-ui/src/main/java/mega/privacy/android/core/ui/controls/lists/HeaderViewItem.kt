@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -22,6 +23,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
+
+const val MEDIA_DISCOVERY_TAG = "header_view_item:image_media_discovery"
 
 /**
  * Header View item for [NodesView] or [NodeGridView]
@@ -34,11 +37,13 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 fun HeaderViewItem(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     isListView: Boolean,
     showSortOrder: Boolean,
     showChangeViewType: Boolean,
     modifier: Modifier = Modifier,
+    showMediaDiscoveryButton: Boolean = false,
 ) {
     Row(
         modifier = modifier
@@ -65,6 +70,18 @@ fun HeaderViewItem(
             }
         }
         Spacer(modifier = Modifier.weight(1f))
+        if (showMediaDiscoveryButton) {
+            Image(
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .padding(end = 16.dp)
+                    .clickable { onEnterMediaDiscoveryClick() }
+                    .testTag(MEDIA_DISCOVERY_TAG),
+                painter = painterResource(id = R.drawable.ic_media_discovery),
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
+                contentDescription = "Enter media discovery"
+            )
+        }
         if (showChangeViewType) {
             Image(
                 modifier = Modifier
@@ -98,6 +115,7 @@ private fun PreviewHeaderView(
             modifier = Modifier,
             onChangeViewTypeClick = {},
             onSortOrderClick = {},
+            onEnterMediaDiscoveryClick = {},
             isListView = true,
             sortOrder = "Name",
             showSortOrder = showSortOrder,

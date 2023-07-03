@@ -37,6 +37,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
@@ -178,9 +179,21 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 emptyViewString = getEmptyViewString(),
                 thumbnailViewModel = thumbnailViewModel,
                 onDisputeTakeDownClicked = ::navigateToLink,
-                onLinkClicked = ::navigateToLink
+                onLinkClicked = ::navigateToLink,
+                onEnterMediaDiscoveryClick = ::onEnterMediaDiscoveryClick,
             )
         }
+    }
+
+    private fun onEnterMediaDiscoveryClick() {
+        viewModel.clearAllSelection()
+        val mediaHandle = viewModel.state.value.rootNode?.id?.longValue ?: -1
+        MediaDiscoveryActivity.startMDActivity(
+            context = this@FolderLinkComposeActivity,
+            mediaHandle = mediaHandle,
+            folderName = supportActionBar?.title.toString(),
+            isOpenByMDIcon = true
+        )
     }
 
     private fun onSelectImportLocation() {

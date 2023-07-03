@@ -19,8 +19,8 @@ import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BU
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
 import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
+import mega.privacy.android.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -64,8 +64,9 @@ class FolderLinkViewTest {
                 onStorageDialogAchievementButtonClick = { },
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
                 thumbnailViewModel = mock(),
-                onLinkClicked = {},
-                onDisputeTakeDownClicked = {}
+                onLinkClicked = { },
+                onDisputeTakeDownClicked = { },
+                onEnterMediaDiscoveryClick = { }
             )
         }
     }
@@ -105,6 +106,22 @@ class FolderLinkViewTest {
         composeTestRule.onNodeWithContentDescription("Folder").assertIsDisplayed()
     }
 
+
+    @Test
+    fun `test that media discovery option is shown`() {
+        val nodeName = "Folder1"
+        val node = mock<TypedFolderNode>()
+        whenever(node.name).thenReturn(nodeName)
+        setComposeContent(
+            FolderLinkState(
+                isNodesFetched = true,
+                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                hasDbCredentials = true
+            )
+        )
+        composeTestRule.onNodeWithTag(MEDIA_DISCOVERY_TAG).assertIsDisplayed()
+    }
+
     @Test
     fun `test that nodes view is displayed when nodes are fetched`() {
         val nodeName = "Folder1"
@@ -114,7 +131,7 @@ class FolderLinkViewTest {
             FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
-                    NodeUIItem<TypedNode>(
+                    NodeUIItem(
                         node,
                         isSelected = false,
                         isInvisible = false
@@ -134,7 +151,7 @@ class FolderLinkViewTest {
             FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
-                    NodeUIItem<TypedNode>(
+                    NodeUIItem(
                         node,
                         isSelected = false,
                         isInvisible = false
@@ -156,7 +173,7 @@ class FolderLinkViewTest {
             FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
-                    NodeUIItem<TypedNode>(
+                    NodeUIItem(
                         node,
                         isSelected = false,
                         isInvisible = false
@@ -177,7 +194,7 @@ class FolderLinkViewTest {
             FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(
-                    NodeUIItem<TypedNode>(
+                    NodeUIItem(
                         node,
                         isSelected = false,
                         isInvisible = false

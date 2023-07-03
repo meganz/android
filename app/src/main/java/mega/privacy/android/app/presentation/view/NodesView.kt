@@ -49,6 +49,8 @@ fun <T : TypedNode> NodesView(
     gridState: LazyGridState = LazyGridState(),
     spanCount: Int = 2,
     showSortOrder: Boolean = true,
+    showMediaDiscoveryButton: Boolean = false,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
 ) {
     val takenDownDialog = remember { mutableStateOf(Pair(false, false)) }
     val orientation = LocalConfiguration.current.orientation
@@ -66,12 +68,14 @@ fun <T : TypedNode> NodesView(
                 }
             },
             onLongClick = onLongClick,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
             listState = listState,
             getThumbnail = getThumbnail,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = span)
@@ -87,13 +91,15 @@ fun <T : TypedNode> NodesView(
                 }
             },
             onLongClick = onLongClick,
+            onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = span,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClick,
             showSortOrder = showSortOrder,
             gridState = gridState,
-            getThumbnail = getThumbnail
+            getThumbnail = getThumbnail,
+            showMediaDiscoveryButton = showMediaDiscoveryButton,
         )
     }
     if (takenDownDialog.value.first) {

@@ -30,12 +30,14 @@ fun <T : TypedNode> NodeGridView(
     onMenuClick: (NodeUIItem<T>) -> Unit,
     onItemClicked: (NodeUIItem<T>) -> Unit,
     onLongClick: (NodeUIItem<T>) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     showSortOrder: Boolean,
     gridState: LazyGridState,
     getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
+    showMediaDiscoveryButton: Boolean,
     modifier: Modifier = Modifier,
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
@@ -57,10 +59,12 @@ fun <T : TypedNode> NodeGridView(
                     modifier = modifier,
                     onSortOrderClick = onSortOrderClick,
                     onChangeViewTypeClick = onChangeViewTypeClick,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                     sortOrder = sortOrder,
                     isListView = false,
                     showSortOrder = showSortOrder,
                     showChangeViewType = showChangeViewType,
+                    showMediaDiscoveryButton = showMediaDiscoveryButton,
                 )
             }
         }
@@ -83,7 +87,7 @@ fun <T : TypedNode> NodeGridView(
                 onMenuClick = onMenuClick,
                 onItemClicked = onItemClicked,
                 onLongClick = onLongClick,
-                imageState = imageState
+                imageState = imageState,
             )
         }
     }

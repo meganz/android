@@ -145,6 +145,7 @@ internal fun FolderLinkView(
     thumbnailViewModel: ThumbnailViewModel,
     onLinkClicked: (String) -> Unit,
     onDisputeTakeDownClicked: (String) -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -265,7 +266,9 @@ internal fun FolderLinkView(
                     gridState = gridState,
                     getThumbnail = thumbnailViewModel::getThumbnail,
                     onLinkClicked = onLinkClicked,
-                    onDisputeTakeDownClicked = onDisputeTakeDownClicked
+                    onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                    showMediaDiscoveryButton = true,
+                    onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                 )
                 ImportDownloadView(
                     Modifier
@@ -295,7 +298,7 @@ internal fun FolderLinkView(
                 dismissClickListener = onStorageStatusDialogDismiss,
                 horizontalActionButtonClickListener = onStorageDialogHorizontalActionButtonClick,
                 verticalActionButtonClickListener = onStorageDialogVerticalActionButtonClick,
-                achievementButtonClickListener = onStorageDialogAchievementButtonClick
+                achievementButtonClickListener = onStorageDialogAchievementButtonClick,
             )
         }
     }
