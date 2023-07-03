@@ -402,7 +402,7 @@ class PhotosFragment : Fragment() {
         handleMenuIcons(isShowing = photosViewModel.state.value.isMenuShowing)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val isEnabled = getFeatureFlagUseCase(AppFeatures.AlbumSharing)
+            val isEnabled = false
             this@PhotosFragment.menu?.findItem(R.id.action_import)?.isVisible = isEnabled
         }
     }

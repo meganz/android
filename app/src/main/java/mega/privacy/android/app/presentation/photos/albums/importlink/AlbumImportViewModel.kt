@@ -92,6 +92,7 @@ internal class AlbumImportViewModel @Inject constructor(
                 isInitialized = true,
                 isLogin = isLogin,
                 isLocalAlbumsLoaded = !isLogin,
+                isAvailableStorageCollected = !isLogin,
             )
         }
     }

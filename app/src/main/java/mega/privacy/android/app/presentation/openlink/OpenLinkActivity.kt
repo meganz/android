@@ -35,6 +35,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -52,6 +53,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
+import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS
@@ -87,6 +89,7 @@ import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -157,6 +160,19 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             !matchRegexs(url, MEGA_REGEXS) -> {
                 Timber.d("The link is not a MEGA link: $url")
                 setError(getString(R.string.open_link_not_valid_link))
+            }
+            // Album link
+            matchRegexs(url, ALBUM_LINK_REGEXS) -> {
+                lifecycleScope.launch {
+                    val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
+                        context = this@OpenLinkActivity,
+                        albumLink = AlbumLink(url.orEmpty()),
+                    ).apply {
+                        flags = FLAG_ACTIVITY_CLEAR_TOP
+                    }
+                    startActivity(intent)
+                    finish()
+                }
             }
             // Email verification link
             matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS) -> {

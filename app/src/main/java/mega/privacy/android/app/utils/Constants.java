@@ -736,6 +736,10 @@ public class Constants {
             "^https://mega\\.nz/businessinvite.+$"
     };
 
+    public static final String[] ALBUM_LINK_REGEXS = {
+            "^https://mega\\.nz/collection/.+$",
+    };
+
     //Types of blocked accounts
     public static final String ACCOUNT_NOT_BLOCKED = "0";
     public static final String TOS_COPYRIGHT_ACCOUNT_BLOCK = "200";
