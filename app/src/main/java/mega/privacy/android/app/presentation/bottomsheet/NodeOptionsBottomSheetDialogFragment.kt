@@ -21,6 +21,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -229,7 +232,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionInfo.setOnClickListener { onPropertiesClicked(node) }
                 optionLink.setOnClickListener { onLinkClicked(node) }
                 optionRemoveLink.setOnClickListener { onRemoveLinkClicked(node) }
-                optionShare.setOnClickListener { shareNode(requireActivity(), node) }
+                optionShare.setOnClickListener {
+                    Analytics.tracker.trackButtonPress(
+                        if (node.isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                    )
+                    shareNode(requireActivity(), node)
+                }
                 optionShareFolder.setOnClickListener { nodeOptionsViewModel.createShareKey() }
                 optionClearShares.setOnClickListener { onClearShareClicked(node) }
                 optionLeaveShares.setOnClickListener { onLeaveShareClicked(node) }

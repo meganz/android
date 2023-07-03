@@ -30,6 +30,9 @@ import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_I
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -276,7 +279,14 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
             R.id.action_get_link, R.id.action_remove_link -> viewModel.manageLink(this)
             R.id.action_send_to_chat -> nodeAttacher.attachNode(viewModel.getNode()!!)
-            R.id.action_share -> viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
+            R.id.action_share -> {
+                viewModel.getNode()?.let {
+                    Analytics.tracker.trackButtonPress(
+                        if (it.isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
+                    )
+                }
+                viewModel.share(this, intent.getStringExtra(URL_FILE_LINK) ?: "")
+            }
             R.id.action_rename -> renameNode()
             R.id.action_move -> selectFolderToMove(this, longArrayOf(viewModel.getNode()!!.handle))
             R.id.action_copy -> selectFolderToCopy(this, longArrayOf(viewModel.getNode()!!.handle))
