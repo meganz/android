@@ -8,8 +8,6 @@ import android.os.Bundle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_REENABLE_CU_PREFERENCE
 import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_PREFERENCE
 import mega.privacy.android.app.fragments.settingsFragments.SettingsCameraUploadsFragment
@@ -42,32 +40,12 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
                         Timber.d("Refresh Camera Uploads Settings Event Received")
                         it.refreshCameraUploadsSettings()
                     }
+
                     ACTION_DISABLE_MEDIA_UPLOADS_SETTING -> {
                         Timber.d("Disable Media Uploads UI Event Received")
                         it.disableMediaUploadUIProcess()
                     }
-                    else -> Unit
-                }
-            }
-        }
-    }
 
-    private val enableDisableCameraUploadsReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent == null || intent.action == null || settingsFragment == null) {
-                return
-            }
-
-            settingsFragment?.let {
-                when (intent.action) {
-                    ACTION_UPDATE_DISABLE_CU_SETTING -> {
-                        Timber.d("Disable Camera Uploads Event Received")
-                        it.disableCameraUploads()
-                    }
-                    ACTION_UPDATE_DISABLE_CU_UI_SETTING -> {
-                        Timber.d("Disable Camera Uploads UI Event Received")
-                        it.disableCameraUploadUIProcess()
-                    }
                     else -> Unit
                 }
             }
@@ -160,10 +138,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
             )
         )
 
-        val filterCUMUSettings = IntentFilter(ACTION_UPDATE_DISABLE_CU_SETTING)
-        filterCUMUSettings.addAction(ACTION_UPDATE_DISABLE_CU_UI_SETTING)
-        registerReceiver(enableDisableCameraUploadsReceiver, filterCUMUSettings)
-
         val filterUpdateCUSettings = IntentFilter(BROADCAST_ACTION_INTENT_SETTINGS_UPDATED)
         filterUpdateCUSettings.addAction(ACTION_REFRESH_CAMERA_UPLOADS_SETTING)
         filterUpdateCUSettings.addAction(ACTION_DISABLE_MEDIA_UPLOADS_SETTING)
@@ -176,7 +150,6 @@ class CameraUploadsPreferencesActivity : PreferencesBaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(cameraUploadsDestinationReceiver)
-        unregisterReceiver(enableDisableCameraUploadsReceiver)
         unregisterReceiver(updateCameraUploadsSettingsReceiver)
         unregisterReceiver(receiverCameraUploadsAttrChanged)
         unregisterReceiver(reEnableCameraUploadsPreferenceReceiver)

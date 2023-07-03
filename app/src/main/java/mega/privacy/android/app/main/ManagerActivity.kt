@@ -124,8 +124,6 @@ import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
@@ -2253,10 +2251,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 hideAddPhoneNumberButton()
             }
             updateInboxSectionVisibility(managerState.hasInboxChildren)
-            stopUploadProcessAndSendBroadcast(
-                managerState.shouldStopCameraUpload,
-                managerState.shouldSendCameraBroadcastEvent
-            )
             if (managerState.enabledFlags.contains(AppFeatures.AndroidSync)) {
                 syncSection.visibility = View.VISIBLE
                 syncNavigator.startSyncService(this)
@@ -2984,7 +2978,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         getString(R.string.general_yes)
                     ) { _: DialogInterface?, _: Int ->
                         viewModel.stopCameraUploads(shouldReschedule = false)
-                        sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_SETTING))
                         transfersFragment?.destroyActionMode()
                     }
                     builder.setNegativeButton(getString(R.string.general_no), null)
@@ -5312,21 +5305,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.HOMEPAGE) {
             LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
         }
-        viewModel.checkCameraUploadFolder(true, null)
         refreshRubbishBin()
         setToolbarTitle()
-    }
-
-    private fun stopUploadProcessAndSendBroadcast(
-        shouldStopUpload: Boolean,
-        shouldSendBroadCastEvent: Boolean,
-    ) {
-        if (shouldStopUpload) {
-            viewModel.stopCameraUploads(shouldReschedule = true)
-        }
-        if (shouldSendBroadCastEvent) {
-            sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING))
-        }
     }
 
     private fun refreshRubbishBin() {

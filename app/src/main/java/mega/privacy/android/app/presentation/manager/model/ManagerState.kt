@@ -14,8 +14,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
  * @property transfersTab
  * @property isFirstLogin
  * @property hasInboxChildren
- * @property shouldStopCameraUpload
- * @property shouldSendCameraBroadcastEvent
  * @property nodeUpdateReceived
  * @property pendingActionsCount
  * @property shouldAlertUserAboutSecurityUpgrade
@@ -36,8 +34,6 @@ data class ManagerState(
     val transfersTab: TransfersTab = TransfersTab.NONE,
     val isFirstLogin: Boolean = false,
     val hasInboxChildren: Boolean = false,
-    val shouldStopCameraUpload: Boolean = false,
-    val shouldSendCameraBroadcastEvent: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,

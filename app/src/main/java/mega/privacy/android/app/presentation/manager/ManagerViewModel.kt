@@ -268,7 +268,7 @@ class ManagerViewModel @Inject constructor(
                 val nodeList = it.changes.keys.toList()
                 checkItemForInbox(nodeList)
                 onReceiveNodeUpdate(true)
-                checkCameraUploadFolder(false, nodeList)
+                checkCameraUploadFolder(nodeList)
                 checkUnverifiedSharesCount()
             }
         }
@@ -517,35 +517,26 @@ class ManagerViewModel @Inject constructor(
 
     /**
      * After nodes on Cloud Drive changed or some nodes are moved to rubbish bin,
-     * need to check CU and MU folders' status.
+     * need to check if CU and MU folders have been moved to rubbish bin
+     * If true, then stop the camera uploads process and reschedule
      *
-     * @param shouldDisable If CU or MU folder is deleted by current client, then CU should be disabled. Otherwise not.
      * @param updatedNodes  Nodes which have changed.
      */
-    fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<Node>?) {
-        viewModelScope.launch {
-            val primaryHandle = getPrimarySyncHandleUseCase()
-            val secondaryHandle = getSecondarySyncHandleUseCase()
-            updatedNodes?.let {
-                val nodeMap = it.associateBy { node -> node.id.longValue }
-                // If CU and MU folder don't change then return.
-                if (!nodeMap.containsKey(primaryHandle) && !nodeMap.containsKey(secondaryHandle)) {
-                    Timber.d("Updated nodes don't include CU/MU, return.")
-                    return@launch
-                }
-            }
-            val result =
-                areCameraUploadsFoldersInRubbishBinUseCase(
-                    shouldDisable,
-                    primaryHandle,
-                    secondaryHandle
-                )
-            _state.update {
-                it.copy(
-                    shouldStopCameraUpload = result.shouldStopProcess,
-                    shouldSendCameraBroadcastEvent = result.shouldSendEvent,
-                )
-            }
+    private suspend fun checkCameraUploadFolder(updatedNodes: List<Node>?) {
+        val primaryHandle = getPrimarySyncHandleUseCase()
+        val secondaryHandle = getSecondarySyncHandleUseCase()
+
+        updatedNodes?.firstOrNull {
+            it.id.longValue == primaryHandle || it.id.longValue == secondaryHandle
+        } ?: return
+
+        val areCameraFoldersInRubbishBin =
+            areCameraUploadsFoldersInRubbishBinUseCase(
+                primaryHandle,
+                secondaryHandle
+            )
+        if (areCameraFoldersInRubbishBin) {
+            stopCameraUploads(shouldReschedule = true)
         }
     }
 
