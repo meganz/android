@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.event.link.LinkConfirmPasswordFileButtonInfo
 import mega.privacy.android.analytics.event.link.LinkConfirmPasswordFolderButtonInfo
 import mega.privacy.android.app.R
@@ -417,7 +418,9 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         if (validateForm()) {
             alreadyReset = true
             viewModel.getNode()?.let {
-                if (it.isFolder) LinkConfirmPasswordFolderButtonInfo else LinkConfirmPasswordFileButtonInfo
+                Analytics.tracker.trackButtonPress(
+                    if (it.isFolder) LinkConfirmPasswordFolderButtonInfo else LinkConfirmPasswordFileButtonInfo
+                )
             }
             viewModel.encryptLink(binding.passwordText.text.toString())
         }

@@ -36,7 +36,7 @@ object LinkSetExpiryDateFolderButtonInfo : ButtonInfo {
  * LinkSetExpiryDateFileButtonInfo
  */
 object LinkSetExpiryDateFileButtonInfo : ButtonInfo {
-    override val name = "Set expiry date for folder"
+    override val name = "Set expiry date for file"
     override val screen = null
     override val dialog = null
     override val uniqueIdentifier = 4

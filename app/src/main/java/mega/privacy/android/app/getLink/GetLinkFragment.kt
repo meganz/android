@@ -217,7 +217,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
 
         node?.let {
-            if (it.isFolder) Analytics.tracker.trackButtonPress(LinkManageLinkTapFolderButtonInfo) else LinkManageLinkTapFileButtonInfo
+            Analytics.tracker.trackButtonPress(
+                if (it.isFolder) LinkManageLinkTapFolderButtonInfo else LinkManageLinkTapFileButtonInfo
+            )
         }
         binding.scrollViewGetLink.postDelayed(::checkScroll, POST_CHECK_SCROLL)
     }
