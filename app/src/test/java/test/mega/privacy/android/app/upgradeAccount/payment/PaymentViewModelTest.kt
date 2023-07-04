@@ -3,20 +3,22 @@ package test.mega.privacy.android.app.upgradeAccount.payment
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PRO_I
+import mega.privacy.android.app.utils.Constants.PRO_II
+import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.billing.GetPaymentMethodUseCase
 import mega.privacy.android.domain.usecase.GetPricing
@@ -24,16 +26,22 @@ import mega.privacy.android.domain.usecase.billing.GetActiveSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailableUseCase
 import nz.mega.sdk.MegaApiJava
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.reset
+import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class PaymentViewModelTest {
     private val getPaymentMethodUseCase: GetPaymentMethodUseCase = mock()
     private val getPricing: GetPricing = mock()
@@ -45,10 +53,22 @@ internal class PaymentViewModelTest {
 
     private lateinit var underTest: PaymentViewModel
 
-    @Before
-    fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
-        initViewModel()
+    @BeforeAll
+    fun initialise() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            getPaymentMethodUseCase,
+            getPricing,
+            getLocalPricingUseCase,
+            isBillingAvailableUseCase,
+            getActiveSubscriptionUseCase,
+            context,
+            savedStateHandle
+        )
     }
 
     private fun initViewModel() {
@@ -63,65 +83,50 @@ internal class PaymentViewModelTest {
         )
     }
 
-    @After
+    @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
-    @Test
-    fun `test that title and titleColor return correctly when pass upgrade type`() = runTest {
-        val expectedTitleMap = mapOf(
-            PRO_LITE to R.string.prolite_account,
-            PRO_I to R.string.pro1_account,
-            Constants.PRO_II to R.string.pro2_account,
-            Constants.PRO_III to R.string.pro3_account
-        )
-        val expectedTitleColorMap = mapOf(
-            PRO_LITE to R.color.orange_400_orange_300,
-            PRO_I to R.color.red_600_red_300,
-            Constants.PRO_II to R.color.red_600_red_300,
-            Constants.PRO_III to R.color.red_600_red_300
-        )
-        (PRO_I..PRO_LITE).forEach { upgradeType ->
-            whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(upgradeType)
+    @ParameterizedTest(name = "test that title and titleColor return correctly when pass upgrade type {0}")
+    @MethodSource("provideParametersForTitleAndColor")
+    fun `test that title and titleColor return correctly when pass upgrade type`(
+        upgradeTypeConstant: Int,
+        titleValue: Int,
+        titleColorValue: Int,
+    ) =
+        runTest {
+            whenever(getPricing(false)).thenReturn(Pricing(emptyList()))
+            whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(
+                upgradeTypeConstant
+            )
             initViewModel()
             underTest.state.test {
                 val state = awaitItem()
-                assertEquals(expectedTitleMap[upgradeType], state.title)
-                assertEquals(expectedTitleColorMap[upgradeType], state.titleColor)
+                assertThat(state.title).isEqualTo(titleValue)
+                assertThat(state.titleColor).isEqualTo(titleColorValue)
             }
         }
-    }
 
-    @Test
-    fun `test that isPaymentMethodAvailable returns true when isBillingAvailableUseCase returns true and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
+    @ParameterizedTest(name = "test that isPaymentMethodAvailable returns {0} when isBillingAvailableUseCase returns {0} and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET")
+    @ValueSource(booleans = [true, false])
+    fun `test that isPaymentMethodAvailable is set correctly`(boolean: Boolean) =
         runTest {
+            whenever(getPricing(false)).thenReturn(Pricing(emptyList()))
             whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-            whenever(isBillingAvailableUseCase()).thenReturn(true)
+            whenever(isBillingAvailableUseCase()).thenReturn(boolean)
             whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
             initViewModel()
             underTest.state.test {
                 val state = awaitItem()
-                assertTrue(state.isPaymentMethodAvailable)
-            }
-        }
-
-    @Test
-    fun `test that isPaymentMethodAvailable returns false when isBillingAvailableUseCase returns false and getPaymentMethodUseCase contains PAYMENT_METHOD_GOOGLE_WALLET`() =
-        runTest {
-            whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
-            whenever(isBillingAvailableUseCase()).thenReturn(false)
-            whenever(getPaymentMethodUseCase(false)).thenReturn(PaymentMethodFlags(1L shl MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET))
-            initViewModel()
-            underTest.state.drop(1).test {
-                val state = awaitItem()
-                assertFalse(state.isPaymentMethodAvailable)
+                assertThat(state.isPaymentMethodAvailable).isEqualTo(boolean)
             }
         }
 
 
     @Test
     fun `test that an exception from getPaymentMethod is not propagated`() = runTest {
+        whenever(getPricing(false)).thenReturn(Pricing(emptyList()))
         whenever(savedStateHandle.get<Int>(PaymentActivity.UPGRADE_TYPE)).thenReturn(PRO_I)
         whenever(isBillingAvailableUseCase()).thenReturn(true)
         whenever(getPaymentMethodUseCase(false)).thenAnswer {
@@ -131,9 +136,9 @@ internal class PaymentViewModelTest {
             )
         }
         initViewModel()
-        underTest.state.drop(1).test {
+        underTest.state.test {
             val state = awaitItem()
-            assertFalse(state.isPaymentMethodAvailable)
+            assertThat(state.isPaymentMethodAvailable).isFalse()
         }
     }
 
@@ -143,10 +148,33 @@ internal class PaymentViewModelTest {
         whenever(isBillingAvailableUseCase()).thenReturn(true)
         whenever(getPricing(false)).thenAnswer { throw MegaException(1, "Not available") }
         initViewModel()
-        underTest.state.drop(1).test {
+        underTest.state.test {
             val state = awaitItem()
-            assertEquals(state.monthlyPrice, "")
-            assertEquals(state.yearlyPrice, "")
+            assertThat(state.monthlyPrice).isEqualTo("")
+            assertThat(state.yearlyPrice).isEqualTo("")
         }
     }
+
+    private fun provideParametersForTitleAndColor(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            PRO_LITE,
+            R.string.prolite_account,
+            R.color.orange_400_orange_300
+        ),
+        Arguments.of(
+            PRO_I,
+            R.string.pro1_account,
+            R.color.red_600_red_300
+        ),
+        Arguments.of(
+            PRO_II,
+            R.string.pro2_account,
+            R.color.red_600_red_300
+        ),
+        Arguments.of(
+            PRO_III,
+            R.string.pro3_account,
+            R.color.red_600_red_300
+        ),
+    )
 }
