@@ -19,8 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -33,7 +32,7 @@ import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.GetIntentFromFolderLinkToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.usecase.GetNodeUseCase
@@ -89,9 +88,8 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
-    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
-    private val getNodeByHandle: GetNodeByHandle,
-    private val getNodeListByIds: GetNodeListByIds,
+    private val getIntentFromFolderLinkToOpenFileMapper: GetIntentFromFolderLinkToOpenFileMapper,
+    private val getPublicNodeListByIds: GetPublicNodeListByIds,
     private val getNodeUseCase: GetNodeUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase,
@@ -376,7 +374,7 @@ class FolderLinkViewModel @Inject constructor(
      *
      * @param folderSubHandle   Handle of the folder to fetch the nodes for
      */
-    fun fetchNodes(folderSubHandle: String) {
+    fun fetchNodes(folderSubHandle: String?) {
         viewModelScope.launch {
             runCatching { fetchFolderNodesUseCase(folderSubHandle) }
                 .onSuccess { result ->
@@ -572,10 +570,11 @@ class FolderLinkViewModel @Inject constructor(
                     openFolder(nodeUIItem)
                 } else if (nodeUIItem.node is FileNode) {
                     runCatching {
-                        getIntentToOpenFileMapper(
+                        getIntentFromFolderLinkToOpenFileMapper(
                             activity = activity,
                             fileNode = nodeUIItem.node,
-                            Constants.FOLDER_LINK_ADAPTER
+                            viewType = Constants.FOLDER_LINK_ADAPTER,
+                            childrenNodeIds = state.value.nodesList.map { it.id.longValue }
                         )
                     }.onSuccess { intent ->
                         intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }
@@ -676,7 +675,7 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             if (isMultipleNodeSelected()) {
                 val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
-                val selectedNodes = getNodeListByIds(selectedNodeIds)
+                val selectedNodes = getPublicNodeListByIds(selectedNodeIds)
                 _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
                 clearAllSelection()
             } else {
@@ -686,8 +685,8 @@ class FolderLinkViewModel @Inject constructor(
                         ?: state.value.rootNode?.id?.longValue
 
                 downloadNodeId?.let {
-                    getNodeByHandle(downloadNodeId)?.let { downloadNode ->
-                        _state.update { it.copy(downloadNodes = triggered(listOf(downloadNode))) }
+                    getPublicNodeListByIds(listOf(downloadNodeId)).let { downloadNode ->
+                        _state.update { it.copy(downloadNodes = triggered(downloadNode)) }
                     }
                 } ?: Timber.w("rootNode null!!")
             }

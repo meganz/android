@@ -121,7 +121,5 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     }
 
     private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
-        nodeMapper(
-            node,
-        )
+        nodeMapper(node, fromFolderLink = true)
 }

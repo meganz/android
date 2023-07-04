@@ -100,6 +100,7 @@ class NodeRepositoryImplTest {
         ),
         folderNodeMapper = FolderNodeMapper(
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             fetChildrenMapper = fetChildrenMapper
         )
     )

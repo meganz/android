@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -16,6 +17,7 @@ import javax.inject.Inject
  */
 internal class FolderNodeMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val fetChildrenMapper: FetchChildrenMapper,
 ) {
     /**
@@ -24,15 +26,24 @@ internal class FolderNodeMapper @Inject constructor(
      * @param megaNode
      * @return
      */
-    suspend operator fun invoke(megaNode: MegaNode): FolderNode = DefaultFolderNode(
+    suspend operator fun invoke(
+        megaNode: MegaNode,
+        fromFolderLink: Boolean,
+    ): FolderNode = DefaultFolderNode(
         id = NodeId(megaNode.handle),
         name = megaNode.name,
         label = megaNode.label,
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
         hasVersion = megaApiGateway.hasVersion(megaNode),
-        childFolderCount = megaApiGateway.getNumChildFolders(megaNode),
-        childFileCount = megaApiGateway.getNumChildFiles(megaNode),
+        childFolderCount = if (fromFolderLink)
+            megaApiFolderGateway.getNumChildFolders(megaNode)
+        else
+            megaApiGateway.getNumChildFolders(megaNode),
+        childFileCount = if (fromFolderLink)
+            megaApiFolderGateway.getNumChildFiles(megaNode)
+        else
+            megaApiGateway.getNumChildFiles(megaNode),
         isFavourite = megaNode.isFavourite,
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
             ExportedData(it.publicLink, it.publicLinkCreationTime)

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -20,6 +21,7 @@ internal class FetchChildrenMapperTest {
     private lateinit var underTest: FetchChildrenMapper
 
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
 
     private val nodeMapper = mock<NodeMapper>()
@@ -28,6 +30,7 @@ internal class FetchChildrenMapperTest {
     internal fun setUp() {
         underTest = FetchChildrenMapper(
             megaApiGateway = megaApiGateway,
+            megaApiFolderGateway = megaApiFolderGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             nodeMapperProvider = { nodeMapper },
             ioDispatcher = UnconfinedTestDispatcher()

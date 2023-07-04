@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper.node
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
@@ -22,6 +23,7 @@ import javax.inject.Provider
  */
 internal class FetchChildrenMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
+    private val megaApiFolderGateway: MegaApiFolderGateway,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val nodeMapperProvider: Provider<NodeMapper>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -32,11 +34,19 @@ internal class FetchChildrenMapper @Inject constructor(
      * @param megaNode
      * @return
      */
-    operator fun invoke(megaNode: MegaNode): suspend (SortOrder) -> List<UnTypedNode> {
+    operator fun invoke(
+        megaNode: MegaNode,
+        fromFolderLink: Boolean = false
+    ): suspend (SortOrder) -> List<UnTypedNode> {
         return { order ->
             withContext(ioDispatcher) {
-                megaApiGateway.getChildren(megaNode, sortOrderIntMapper(order))
-                    .map { nodeMapperProvider.get().invoke(it) }
+                if (fromFolderLink) {
+                    megaApiFolderGateway.getChildren(megaNode, sortOrderIntMapper(order))
+                        .map { nodeMapperProvider.get().invoke(it) }
+                } else {
+                    megaApiGateway.getChildren(megaNode, sortOrderIntMapper(order))
+                        .map { nodeMapperProvider.get().invoke(it) }
+                }
             }
         }
     }

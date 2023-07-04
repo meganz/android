@@ -3,6 +3,7 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
@@ -33,6 +34,10 @@ class NodeMapperTest {
         onBlocking { isInRubbish(any()) }.thenReturn(false)
         onBlocking { isPendingShare(any()) }.thenReturn(false)
     }
+    private val megaApiFolderGateway = mock<MegaApiFolderGateway> {
+        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
+        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
+    }
 
     private val expectedName = "testName"
     private val expectedSize = 1000L
@@ -57,7 +62,8 @@ class NodeMapperTest {
             ),
             folderNodeMapper = FolderNodeMapper(
                 megaApiGateway = megaApiGateway,
-                fetChildrenMapper = mock { on { invoke(any()) }.thenReturn { emptyList() } }
+                megaApiFolderGateway = megaApiFolderGateway,
+                fetChildrenMapper = mock { on { invoke(any(), any()) }.thenReturn { emptyList() } }
             )
         )
     }

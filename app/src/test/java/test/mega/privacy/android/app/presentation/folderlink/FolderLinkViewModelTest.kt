@@ -14,13 +14,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetNodeListByIds
+import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
-import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.GetIntentFromFolderLinkToOpenFileMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
@@ -72,9 +71,9 @@ class FolderLinkViewModelTest {
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
-    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper = mock()
-    private val getNodeByHandle: GetNodeByHandle = mock()
-    private val getNodeListByIds: GetNodeListByIds = mock()
+    private val getIntentFromFolderLinkToOpenFileMapper: GetIntentFromFolderLinkToOpenFileMapper =
+        mock()
+    private val getPublicNodeListByIds: GetPublicNodeListByIds = mock()
     private val getNodeUseCase: GetNodeUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val areAchievementsEnabledUseCase: AreAchievementsEnabledUseCase = mock()
@@ -111,9 +110,8 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getIntentToOpenFileMapper,
-            getNodeByHandle,
-            getNodeListByIds,
+            getIntentFromFolderLinkToOpenFileMapper,
+            getPublicNodeListByIds,
             getNodeUseCase,
             getStringFromStringResMapper,
             areAchievementsEnabledUseCase,

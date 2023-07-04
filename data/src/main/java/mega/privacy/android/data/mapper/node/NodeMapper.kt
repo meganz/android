@@ -21,8 +21,9 @@ internal class NodeMapper @Inject constructor(
      */
     suspend operator fun invoke(
         megaNode: MegaNode,
+        fromFolderLink: Boolean = false,
     ) = if (megaNode.isFolder) {
-        folderNodeMapper(megaNode)
+        folderNodeMapper(megaNode, fromFolderLink)
     } else {
         fileNodeMapper(megaNode)
     }

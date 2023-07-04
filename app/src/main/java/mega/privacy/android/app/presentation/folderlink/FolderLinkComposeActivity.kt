@@ -244,7 +244,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                         }
 
                         it.isLoginComplete && !it.isNodesFetched -> {
-                            it.folderSubHandle?.let { handle -> viewModel.fetchNodes(handle) }
+                            viewModel.fetchNodes(it.folderSubHandle)
                             // Get cookies settings after login.
                             MegaApplication.getInstance().checkEnabledCookies()
                         }
