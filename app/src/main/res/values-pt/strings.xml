@@ -4082,7 +4082,7 @@
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Configurações</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
-    <string name="cloud_drive_media_discovery_banner_ok">OK, entendido</string>
+    <string name="cloud_drive_media_discovery_banner_ok">Entendi</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Qualquer pessoa com este link pode entrar na reunião e visualizar o chat correspondente.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
@@ -4908,7 +4908,7 @@
         <item quantity="other">Não foi possível atualizar as permissões de %1$d contatos</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, entendido</string>
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Entendi</string>
     <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
     <plurals name="rubbish_bin_remove_items_snackbar_success">
         <item quantity="one">%1$d item foi permanentemente eliminado</item>
@@ -5044,7 +5044,7 @@
     <!-- Album import error access description -->
     <string name="album_import_error_access_description">O link para o álbum foi removido ou o álbum foi deletado. Entre em contato com a pessoa que compartilhou o link com você.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">OK, entendido</string>
+    <string name="album_import_error_access_confirmation">Entendi</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">Áudio</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5190,5 +5190,85 @@
         <item quantity="other">%1$s e %2$s, a cada %3$d semanas</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Você já tem uma assinatura deste plano</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Não foi possível salvar o álbum</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">A sua conta não tem armazenamento suficiente para salvar este álbum na sua Nuvem de arquivos - faça um upgrade para obter mais espaço.</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">Dia</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">segunda-feira</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">segunda-feira</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">terça-feira</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">terça-feira</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">quarta-feira</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">quarta-feira</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">quinta-feira</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">quinta-feira</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">sexta-feira</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">sexta-feira</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">sábado</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">sábado</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">domingo</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">domingo</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">Primeiro(a)</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">Segundo(a)</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Terceiro(a)</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Quarto(a)</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Quinto(a)</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="one">Primeiro(a) %1$s do mês</item>
+        <item quantity="many">Primeiro(a) %1$s a cada %2$d de meses</item>
+        <item quantity="other">Primeiro(a) %1$s a cada %2$d meses</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="one">Segundo(a) %1$s do mês</item>
+        <item quantity="many">Segundo(a) %1$s a cada %2$d de meses</item>
+        <item quantity="other">Segundo(a) %1$s a cada %2$d meses</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="one">Terceiro(a) %1$s do mês</item>
+        <item quantity="many">Terceiro(a) %1$s a cada %2$d de meses</item>
+        <item quantity="other">Terceiro(a) %1$s a cada %2$d meses</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="one">Quarto(a) %1$s do mês</item>
+        <item quantity="many">Quarto(a) %1$s a cada %2$d de meses</item>
+        <item quantity="other">Quarto(a) %1$s a cada %2$d meses</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="one">Quinto(a) %1$s do mês</item>
+        <item quantity="many">Quinto(a) %1$s a cada %2$d de meses</item>
+        <item quantity="other">Quinto(a) %1$s a cada %2$d meses</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="one">Todo mês no dia %2$d</item>
+        <item quantity="many">A cada %1$s de meses no dia %2$d</item>
+        <item quantity="other">A cada %1$s meses no dia %2$d</item>
+    </plurals>
 </resources>

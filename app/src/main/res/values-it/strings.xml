@@ -1946,7 +1946,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prossima volta che effettuerai l’accesso al tuo account ti verrà chiesto di inserire il codice di 6 cifre che ti è stato fornito dall\’app di autenticazione.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">Per favore, salva la tua <b>chiave di recupero</b> in un luogo sicuro, per evitare problemi nel caso tu perda accesso alla tua app, o se vuoi disattivare l\’autenticazione a due fattori (2FA).</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Codice non valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4992,9 +4992,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">Ricorda queste preferenze</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">Centro dei dispositivi</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">Centro dei dispositivi</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">Ogni giorno</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -5056,39 +5056,39 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">Risparmia fino al 16% con il pagamento annuale</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]Spazio di archiviazione:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Banda di trasferimento:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/mese[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/anno[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">Raccomandato</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Piano corrente</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <string name="account_upgrade_account_description_title_features">Caratteristiche dei piani Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Link protetti da password</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Link con date di scadenza</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Condivisione della banda di trasferimento</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Backup automatici</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Riavvolgimento fino a 90 giorni su Pro&#160;Lite e fino a 365 giorni su Pro&#160;I, II, e III (in arrivo)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Pulizia regolare del Cestino programmabile tra 7 giorni e 10 anni</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Acquista Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Acquista Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Acquista Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Acquista Pro&#160;III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">Termini di Servizio</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5124,34 +5124,36 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">Rinomina album</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">Un album di nome “%1$s” già esiste nei tuoi Album. Inserisci un nuovo nome per l\’album che stai salvando.</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">Inserisci un nome per l\’album</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">Puoi effettuare l\’upgrade del tuo abbonamento corrente sulla nostra [A]pagina dei prezzi.[/A]</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Anyone with this link can view and download your data</item>
-        <item quantity="other">Anyone with these links can view and download your data</item>
+        <item quantity="one">Chiunque con questo link può visualizzare e scaricare i tuoi dati</item>
+        <item quantity="many">Chiunque con questi link può visualizzare e scaricare i tuoi dati</item>
+        <item quantity="other">Chiunque con questi link può visualizzare e scaricare i tuoi dati</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Salva nel Cloud drive</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">Salvataggio&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">“%1$s” salvato nel Cloud drive</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">“%1$s” non può essere salvato nel Cloud drive. Riprova più tardi, e se il problema persiste contatta la persona che ha condiviso il link con te.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">Giorni della settimana</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">Avviene ogni</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Ogni giorno</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="one">Ogni giorno</item>
+        <item quantity="many">Ogni %1$d di giorni</item>
+        <item quantity="other">Ogni %1$d giorni</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
@@ -5160,7 +5162,7 @@
         <item quantity="other">Link creati e copiati negli appunti</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <string name="meetings_custom_recurrence_occurs_on_section">Avviene di</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">L</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
@@ -5177,14 +5179,90 @@
     <string name="meetings_custom_recurrence_sunday_option">S</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="one">%1$s, ogni settimana</item>
+        <item quantity="many">%1$s, ogni %2$d di settimane</item>
+        <item quantity="other">%1$s, ogni %2$d settimane</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="one">%1$s e %2$s, ogni settimana</item>
+        <item quantity="many">%1$s e %2$s, ogni %3$d di settimane</item>
+        <item quantity="other">%1$s e %2$s, ogni %3$d settimane</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Hai già un abbonamento per questo piano</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Impossibile salvare l\’album</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">Non hai abbastanza spazio di archiviazione per salvare questo album nel tuo Cloud Drive. Effettua ora l\’upgrade per ottenere più spazio.</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">Giorno</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">lunedì</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">lunedì</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">martedì</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">martedì</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">mercoledì</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">mercoledì</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">giovedì</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">giovedì</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">venerdì</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">venerdì</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">sabato</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">sabato</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">domenica</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">domenica</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">First</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">Second</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Third</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Fourth</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Fifth</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="one">First %1$s of every month</item>
+        <item quantity="other">First %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="one">Second %1$s of every month</item>
+        <item quantity="other">Second %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="one">Third %1$s of every month</item>
+        <item quantity="other">Third %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="one">Fourth %1$s of every month</item>
+        <item quantity="other">Fourth %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="one">Fifth %1$s of every month</item>
+        <item quantity="other">Fifth %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="one">Every month on the %2$d</item>
+        <item quantity="other">Every %1$s months on the %2$d</item>
+    </plurals>
 </resources>

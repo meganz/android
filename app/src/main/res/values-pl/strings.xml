@@ -607,7 +607,7 @@
     <!-- text message to remind user to resend verification code -->
     <string name="verify_account_resend_label">Nie otrzymałeś kodu?</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="general_resend_button">Wyślin ponownie</string>
+    <string name="general_resend_button">Wyślij ponownie</string>
     <!-- error message that will show to user when host detected that the mobile number has been registered already -->
     <string name="verify_account_error_phone_number_register">Ten numer jest już powiązany z kontem MEGA.</string>
     <!-- error message that will show to user when user reached the sms verification daily limit -->
@@ -1333,7 +1333,7 @@
     <!-- Hint text explaining that you can change the email and resend the create account link to the new email address -->
     <string name="confirm_email_misspelled">Jeśli adres e-mail został błędnie wpisany, popraw go i kliknij przycisk [A]Wyślij ponownie[A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
-    <string name="confirm_email_misspelled_resend">Wyślin ponownie</string>
+    <string name="confirm_email_misspelled_resend">Wyślij ponownie</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
     <string name="confirm_email_misspelled_email_sent">E-mail został wysłany</string>
     <!-- text_copyright_alert_title -->
@@ -5293,7 +5293,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">-&#160;Automatyczne kopie zapasowe</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">-&#160;Przewijanie historii do 90 dni na Pro&#160;Lite i do 365 dni na Pro&#160;I, II i III (wkrótce)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">-&#160;Zaplanuj czyszczenie pojemnika na śmieci od 7 dni do 10 lat</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -5398,14 +5398,104 @@
     <string name="meetings_custom_recurrence_sunday_option">N</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="one">%1$s, co tydzień</item>
+        <item quantity="few">%1$s, co %2$d tygodni</item>
+        <item quantity="many">%1$s, co %2$d tygodni</item>
+        <item quantity="other">%1$s, co %2$d tygodni</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="one">%1$s i %2$s, co tydzień</item>
+        <item quantity="few">%1$s i %2$s, co %3$d tygodni</item>
+        <item quantity="many">%1$s i %2$s, co %3$d tygodni</item>
+        <item quantity="other">%1$s i %2$s, co %3$d tygodni</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Posiadasz już cykliczną subskrypcję dla tego planu.</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Nie można zapisać albumu</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">Nie masz wystarczającej ilości miejsca, aby zapisać ten album na dysku w chmurze. Uaktualnij teraz, aby uzyskać więcej miejsca.</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">Dzień</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">Poniedziałek</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">Poniedziałek</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">Wtorek</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">Wtorek</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">Środa</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">Środa</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">Czwartek</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">Czwartek</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">Piątek</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">Piątek</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">Sobota</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">Sobota</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">Niedziela</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">Niedziela</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">Pierwszy</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">Drugi</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Trzeci</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Czwarty</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">piątego</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="one">Pierwszy %1$s każdego miesiąca</item>
+        <item quantity="few">Pierwszy %1$s każdego %2$d miesiąca</item>
+        <item quantity="many">Pierwszy %1$s każdego %2$d miesiąca</item>
+        <item quantity="other">Pierwszy %1$s każdego %2$d miesiąca</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="one">Drugi %1$s każdego miesiąca</item>
+        <item quantity="few">Drugi %1$s co %2$d miesięcy</item>
+        <item quantity="many">Drugi %1$s co %2$d miesięcy</item>
+        <item quantity="other">Drugi %1$s co %2$d miesięcy</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="one">Trzeci %1$s każdego miesiąca</item>
+        <item quantity="few">Trzeci %1$s co %2$d miesięcy</item>
+        <item quantity="many">Trzeci %1$s co %2$d miesięcy</item>
+        <item quantity="other">Trzeci %1$s co %2$d miesięcy</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="one">Czwarty %1$s każdego miesiąca</item>
+        <item quantity="few">Czwarty %1$s każdego %2$d miesiąca</item>
+        <item quantity="many">Czwarty %1$s każdego %2$d miesiąca</item>
+        <item quantity="other">Czwarty %1$s każdego %2$d miesiąca</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="one">Piąty %1$s każdego miesiąca</item>
+        <item quantity="few">Piąty %1$s każdego %2$d miesiąca</item>
+        <item quantity="many">Piąty %1$s każdego %2$d miesiąca</item>
+        <item quantity="other">Piąty %1$s każdego %2$d miesiąca</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="one">Co miesiąc w dniu %2$d</item>
+        <item quantity="few">Co %1$s miesięcy na %2$d</item>
+        <item quantity="many">Co %1$s miesięcy na %2$d</item>
+        <item quantity="other">Co %1$s miesięcy na %2$d</item>
+    </plurals>
 </resources>
