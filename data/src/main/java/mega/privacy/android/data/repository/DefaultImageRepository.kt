@@ -103,6 +103,15 @@ internal class DefaultImageRepository @Inject constructor(
             }
         }
 
+    override suspend fun getPublicNodeThumbnailFromLocal(handle: Long): File? =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(handle)?.run {
+                getThumbnailFile(this).takeIf {
+                    it?.exists() ?: false
+                }
+            }
+        }
+
     private suspend fun getThumbnailFile(node: MegaNode): File? =
         cacheGateway.getCacheFile(
             CacheFolderConstant.THUMBNAIL_FOLDER,
@@ -121,6 +130,31 @@ internal class DefaultImageRepository @Inject constructor(
                                         continuation.resumeWith(Result.success(thumbnail))
                                     } else {
                                         continuation.failWithError(error, "getThumbnailFromServer")
+                                    }
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+    override suspend fun getPublicNodeThumbnailFromServer(handle: Long): File? =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { node ->
+                getThumbnailFile(node)?.let { thumbnail ->
+                    suspendCancellableCoroutine { continuation ->
+                        megaApiFolderGateway.getThumbnail(node, thumbnail.absolutePath,
+                            OptionalMegaRequestListenerInterface(
+                                onRequestFinish = { _, error ->
+                                    if (error.errorCode == MegaError.API_OK) {
+                                        continuation.resumeWith(Result.success(thumbnail))
+                                    } else {
+                                        Timber.e(error.toException("getPublicNodeThumbnailFromServer"))
+                                        continuation.failWithError(
+                                            error,
+                                            "getPublicNodeThumbnailFromServer"
+                                        )
                                     }
                                 }
                             )

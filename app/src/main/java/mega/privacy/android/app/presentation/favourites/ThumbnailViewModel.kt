@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetThumbnail
+import mega.privacy.android.domain.usecase.photos.GetPublicNodeThumbnailUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -25,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ThumbnailViewModel @Inject constructor(
     private val getThumbnail: GetThumbnail,
+    private val getPublicNodeThumbnailUseCase: GetPublicNodeThumbnailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -39,6 +41,26 @@ class ThumbnailViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             runCatching {
                 flowOf(getThumbnail(handle)).collectLatest { file ->
+                    withContext(mainDispatcher) {
+                        onFinished(file)
+                    }
+                }
+            }.onFailure {
+                Timber.e("ThumbnailViewModel getFlowThumbnail error message is ${it.message}")
+            }
+        }
+    }
+
+    /**
+     * Get public node thumbnail
+     * @param handle the node handle that gets the thumbnail
+     * @param onFinished the callback after the thumbnail is downloaded
+     */
+    fun getPublicNodeThumbnail(handle: Long, onFinished: (file: File?) -> Unit) {
+        Timber.v("ThumbnailViewModel start to getPublicNodeThumbnail thumbnail $handle")
+        viewModelScope.launch(ioDispatcher) {
+            runCatching {
+                flowOf(getPublicNodeThumbnailUseCase(handle)).collectLatest { file ->
                     withContext(mainDispatcher) {
                         onFinished(file)
                     }

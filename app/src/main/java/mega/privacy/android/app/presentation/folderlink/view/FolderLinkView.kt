@@ -264,7 +264,7 @@ internal fun FolderLinkView(
                     showSortOrder = false,
                     listState = listState,
                     gridState = gridState,
-                    getThumbnail = thumbnailViewModel::getThumbnail,
+                    getThumbnail = thumbnailViewModel::getPublicNodeThumbnail,
                     onLinkClicked = onLinkClicked,
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked,
                     showMediaDiscoveryButton = true,

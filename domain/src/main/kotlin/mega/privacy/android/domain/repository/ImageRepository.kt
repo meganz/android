@@ -19,12 +19,27 @@ interface ImageRepository {
     suspend fun getThumbnailFromLocal(handle: Long): File?
 
     /**
+     * Check public node thumbnail from local
+     * @param handle node handle
+     * @return thumbnail file
+     */
+    suspend fun getPublicNodeThumbnailFromLocal(handle: Long): File?
+
+    /**
      * Check thumbnail from server
      * @param handle node handle
      * @return thumbnail file
      */
     @Throws(MegaException::class)
     suspend fun getThumbnailFromServer(handle: Long): File?
+
+    /**
+     * Check public node thumbnail from server
+     * @param handle node handle
+     * @return thumbnail file
+     */
+    @Throws(MegaException::class)
+    suspend fun getPublicNodeThumbnailFromServer(handle: Long): File?
 
     /**
      * Check preview from local
