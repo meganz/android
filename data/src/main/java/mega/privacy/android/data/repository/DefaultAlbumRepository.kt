@@ -567,7 +567,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     override suspend fun saveAlbumToFolder(
         folderName: String,
         photoIds: List<NodeId>,
-        targetParentFolderNodeId: NodeId
+        targetParentFolderNodeId: NodeId,
     ): List<NodeId> = withContext(ioDispatcher) {
         val getFinalFolderName: suspend (MegaNode) -> String = { folder ->
             var finalFolderName = folderName
@@ -665,6 +665,11 @@ internal class DefaultAlbumRepository @Inject constructor(
             )
         }
     }
+
+    override suspend fun getAlbumPhotoFileUrlByNodeHandle(nodeId: NodeId): String? =
+        publicNodesMap[nodeId]?.let { node ->
+            megaApiGateway.httpServerGetLocalLink(node)
+        }
 
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()

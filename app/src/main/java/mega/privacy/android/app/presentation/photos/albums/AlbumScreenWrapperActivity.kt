@@ -177,7 +177,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 albumImportPreviewProvider.onPreviewPhoto(
                                     activity = this,
                                     photo = it,
-                                    photos = albumImportViewModel.stateFlow.value.photos.toList()
                                 )
                             },
                             onNavigateFileExplorer = {

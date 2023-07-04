@@ -517,6 +517,26 @@ class DefaultAlbumRepositoryTest {
         assertThat(photo).isNotNull()
     }
 
+    @Test
+    fun `test that get public photo file url works properly`() = runTest {
+        // given
+        val nodeId = NodeId(1L)
+        val node = mock<MegaNode>()
+        val testUri = "uri"
+
+        underTest = createUnderTest(this)
+        (underTest as DefaultAlbumRepository).publicNodesMap[nodeId] = node
+
+        whenever(megaApiGateway.httpServerGetLocalLink(node))
+            .thenReturn(testUri)
+
+        // when
+        val uri = underTest.getAlbumPhotoFileUrlByNodeHandle(nodeId)
+
+        // then
+        assertEquals(testUri, uri)
+    }
+
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
         nodeRepository = nodeRepository,
         megaApiGateway = megaApiGateway,

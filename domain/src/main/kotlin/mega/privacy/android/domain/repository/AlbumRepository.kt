@@ -237,6 +237,14 @@ interface AlbumRepository {
     suspend fun getPublicPhoto(nodeId: NodeId): Photo?
 
     /**
+     * Get album photo file url by node handle
+     *
+     * @param nodeId - Node id of public photo
+     * @return local link
+     */
+    suspend fun getAlbumPhotoFileUrlByNodeHandle(nodeId: NodeId): String?
+
+    /**
      * Clear all albums cache
      */
     fun clearCache()

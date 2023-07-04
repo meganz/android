@@ -15,8 +15,9 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
+import mega.privacy.android.domain.usecase.GetAlbumPhotoFileUrlByNodeIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetFingerprintUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
@@ -24,18 +25,24 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUse
 import java.io.File
 import javax.inject.Inject
 
+/**
+ * AlbumImport Preview help class
+ */
 class AlbumImportPreviewProvider @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
-    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
+    private val getAlbumPhotoFileUrlByNodeIdUseCase: GetAlbumPhotoFileUrlByNodeIdUseCase,
 ) {
+
+    /**
+     * onPreviewPhoto
+     */
     fun onPreviewPhoto(
         activity: Activity,
         photo: Photo,
-        photos: List<Photo>,
     ) {
         if (photo is Photo.Video) {
             (activity as LifecycleOwner).lifecycleScope.launch {
@@ -44,7 +51,6 @@ class AlbumImportPreviewProvider @Inject constructor(
         } else {
             ImageViewerActivity.getIntentForAlbumSharing(
                 activity,
-//                photos.map { it.id }.toLongArray(),
                 photo.id,
             ).run {
                 activity.startActivity(this)
@@ -150,7 +156,7 @@ class AlbumImportPreviewProvider @Inject constructor(
      * @param intent Intent
      * @return updated intent
      */
-    suspend fun updateIntent(
+    private suspend fun updateIntent(
         handle: Long,
         name: String,
         isNeedsMoreBufferSize: Boolean,
@@ -168,7 +174,7 @@ class AlbumImportPreviewProvider @Inject constructor(
                 Constants.MAX_BUFFER_16MB
             }
         )
-        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
+        getAlbumPhotoFileUrlByNodeIdUseCase(NodeId(handle))?.let { url ->
             Uri.parse(url)?.let { uri ->
                 intent.setDataAndType(uri, MimeTypeList.typeForName(name).type)
             }
