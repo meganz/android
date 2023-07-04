@@ -612,7 +612,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 imageItem.shouldShowManageLinkOption() && !isFileVersion
             findItem(R.id.action_send_to_chat)?.isVisible =
                 imageItem.shouldShowSendToContactOption(viewModel.isUserLoggedIn()) && !isFileVersion
-            findItem(R.id.action_more)?.isVisible = imageItem.nodeItem != null && !isFileVersion
+            findItem(R.id.action_more)?.isVisible =
+                imageItem.nodeItem != null && !isFileVersion && imageItem !is ImageItem.AlbumImportNode
         }
         return super.onPrepareOptionsMenu(menu)
     }
