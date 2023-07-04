@@ -612,13 +612,6 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getUnTypedRootNode(): UnTypedNode? =
-        withContext(ioDispatcher) {
-            megaApiGateway.getRootNode()?.let { megaNode ->
-                convertToUnTypedNode(megaNode)
-            }
-        }
-
     override suspend fun getRootNodeFromMegaApiFolder(): UnTypedNode? =
         withContext(ioDispatcher) {
             megaApiFolderGateway.getRootNode()?.let { megaNode ->

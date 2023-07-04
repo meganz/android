@@ -15,5 +15,5 @@ class GetRootNodeUseCase @Inject constructor(
      *
      * @return root node
      */
-    suspend operator fun invoke() = nodeRepository.getUnTypedRootNode()
+    suspend operator fun invoke() = nodeRepository.getRootNode()
 }

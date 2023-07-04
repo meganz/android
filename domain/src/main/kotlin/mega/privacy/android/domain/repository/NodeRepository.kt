@@ -429,13 +429,6 @@ interface NodeRepository {
     suspend fun getInboxNode(): UnTypedNode?
 
     /**
-     * Get root node
-     *
-     * @return [UnTypedNode]?
-     */
-    suspend fun getUnTypedRootNode(): UnTypedNode?
-
-    /**
      * MegaApiFolder gets root node
      *
      * @return [UnTypedNode]?

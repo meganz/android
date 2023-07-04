@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
@@ -66,7 +67,7 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
 
     private fun createNodeNameCollision(
         currentNode: UnTypedNode,
-        parent: UnTypedNode,
+        parent: Node,
         conflictNode: UnTypedNode,
     ) = NodeNameCollision(
         collisionHandle = conflictNode.id.longValue,
