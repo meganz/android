@@ -1,4 +1,4 @@
-package mega.privacy.android.app.notifications
+package mega.privacy.android.app.presentation.notifications
 
 import android.app.Notification
 import android.app.NotificationChannel

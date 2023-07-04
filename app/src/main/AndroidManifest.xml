@@ -512,7 +512,7 @@
             android:name=".meeting.CallNotificationIntentService"
             android:exported="false" />
         <service
-            android:name=".notifications.DownloadNotificationIntentService"
+            android:name=".presentation.notifications.DownloadNotificationIntentService"
             android:exported="false" />
         <service
             android:name=".UploadService"

@@ -43,9 +43,9 @@ import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
-import mega.privacy.android.app.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.CacheFolderManager

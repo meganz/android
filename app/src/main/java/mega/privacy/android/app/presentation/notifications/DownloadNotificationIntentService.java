@@ -1,4 +1,4 @@
-package mega.privacy.android.app.notifications;
+package mega.privacy.android.app.presentation.notifications;
 
 
 import static mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB;
