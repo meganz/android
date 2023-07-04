@@ -153,15 +153,15 @@ internal class MegaChatApiFacade @Inject constructor(
                 trySend(ChatRoomUpdate.OnChatRoomUpdate(chat))
             }
 
-            override fun onMessageLoaded(api: MegaChatApiJava?, msg: MegaChatMessage) {
+            override fun onMessageLoaded(api: MegaChatApiJava?, msg: MegaChatMessage?) {
                 trySend(ChatRoomUpdate.OnMessageLoaded(msg))
             }
 
-            override fun onMessageReceived(api: MegaChatApiJava?, msg: MegaChatMessage) {
+            override fun onMessageReceived(api: MegaChatApiJava?, msg: MegaChatMessage?) {
                 trySend(ChatRoomUpdate.OnMessageReceived(msg))
             }
 
-            override fun onMessageUpdate(api: MegaChatApiJava?, msg: MegaChatMessage) {
+            override fun onMessageUpdate(api: MegaChatApiJava?, msg: MegaChatMessage?) {
                 trySend(ChatRoomUpdate.OnMessageUpdate(msg))
             }
 
