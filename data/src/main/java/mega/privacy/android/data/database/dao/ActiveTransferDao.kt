@@ -18,16 +18,26 @@ internal interface ActiveTransferDao {
     @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
     fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransferEntity>>
 
+    @Query("SELECT * FROM active_transfers WHERE transfer_type = :transferType")
+    suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransferEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateActiveTransfer(entity: ActiveTransferEntity)
 
-    @Query("DELETE FROM active_transfers")
-    suspend fun deleteAllActiveTransfers()
+    @Query("DELETE FROM active_transfers WHERE transfer_type = :transferType")
+    suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
 
-    @Query("DELETE FROM active_transfers WHERE tag = :tag")
-    suspend fun deleteActiveTransferByTag(tag: Int)
+    @Query("DELETE FROM active_transfers WHERE tag IN (:tags)")
+    suspend fun deleteActiveTransferByTag(tags: List<Int>)
 
-    @Query("SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, SUM(transferred_bytes) as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type")
+    @Query(TOTALS_QUERY)
     fun getTotalsByType(transferType: TransferType): Flow<ActiveTransferTotalsEntity>
 
+    @Query(TOTALS_QUERY)
+    fun getCurrentTotalsByType(transferType: TransferType): ActiveTransferTotalsEntity
+
+    companion object {
+        private const val TOTALS_QUERY =
+            "SELECT transfer_type as transfersType, SUM(total_bytes) as totalBytes, SUM(transferred_bytes) as transferredBytes, COUNT(*) as totalTransfers, SUM(is_finished) as totalFinishedTransfers FROM active_transfers WHERE transfer_type = :transferType GROUP by transfer_type"
+    }
 }

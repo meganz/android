@@ -19,7 +19,9 @@ internal class TransferAppDataMapper @Inject constructor() {
      * @param appDataRaw the app data [String] as it is in MegaTransfer
      * @return a [List] of [TransferAppData]
      */
-    operator fun invoke(appDataRaw: String): List<TransferAppData> =
+    operator fun invoke(
+        appDataRaw: String,
+    ): List<TransferAppData> = if (appDataRaw.isEmpty()) emptyList() else {
         appDataRaw
             .split(APP_DATA_REPEATED_TRANSFER_SEPARATOR)
             .flatMap { it.split(APP_DATA_SEPARATOR) }
@@ -32,7 +34,9 @@ internal class TransferAppDataMapper @Inject constructor() {
                 val result = when (type) {
                     VoiceClip -> TransferAppData.VoiceClip
                     CameraUpload -> TransferAppData.CameraUpload
-                    ChatUpload -> values.firstIfNotBlank()?.let { TransferAppData.ChatUpload(it) }
+                    ChatUpload -> values.firstIfNotBlank()
+                        ?.let { TransferAppData.ChatUpload(it) }
+
                     SDCardDownload -> {
                         values.firstIfNotBlank()?.let {
                             TransferAppData.SdCardDownload(it, values.getOrNull(1))
@@ -57,6 +61,7 @@ internal class TransferAppDataMapper @Inject constructor() {
                 }
                 return@mapNotNull result
             }
+    }
 
     private fun List<String>.firstIfNotBlank() = this.firstOrNull()?.takeIf { it.isNotBlank() }
 

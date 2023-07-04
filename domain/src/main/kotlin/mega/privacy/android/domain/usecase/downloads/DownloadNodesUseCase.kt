@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferNotStarted
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -28,6 +29,7 @@ class DownloadNodesUseCase @Inject constructor(
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase,
     private val transferRepository: TransferRepository,
+    private val fileSystemRepository: FileSystemRepository,
 ) {
     /**
      * Downloads a node to the specified path and returns a Flow to monitor the progress
@@ -49,7 +51,8 @@ class DownloadNodesUseCase @Inject constructor(
         }
         val alreadyProcessed = mutableSetOf<NodeId>()
         var finishProcessingSend = false
-        return flow<MultiTransferEvent> {
+        return flow {
+            fileSystemRepository.createDirectory(destinationPath)
             nodeIds.forEach { nodeId ->
                 runCatching {
                     emitAll(

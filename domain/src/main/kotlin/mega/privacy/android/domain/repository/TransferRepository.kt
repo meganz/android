@@ -324,18 +324,24 @@ interface TransferRepository {
     suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
-     * Delete all active transfer, use it with caution
+     * Delete all active transfer
      */
-    suspend fun deleteAllActiveTransfers()
+    suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
 
     /**
      * Delete an active transfer by its tag
      */
-    suspend fun deleteActiveTransferByTag(tag: Int)
+    suspend fun deleteActiveTransferByTag(tags: List<Int>)
 
     /**
      * Get active transfer totals by type
      * @return a flow of active transfer totals
      */
     fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
+
+    /**
+     * Get the current active transfer totals by type
+     * @return the current active transfer totals
+     */
+    suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals
 }

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.CancelTokenRepository
+import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
@@ -45,6 +46,7 @@ class DownloadNodesUseCaseTest {
     private val folderNode: TypedFolderNode = mock()
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase = mock()
+    private val fileSystemRepository: FileSystemRepository = mock()
 
     private lateinit var underTest: DownloadNodesUseCase
 
@@ -54,14 +56,15 @@ class DownloadNodesUseCaseTest {
             DownloadNodesUseCase(
                 cancelCancelTokenUseCase,
                 invalidateCancelTokenUseCase,
-                transferRepository
+                transferRepository,
+                fileSystemRepository,
             )
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            transferRepository, cancelTokenRepository,
+            transferRepository, cancelTokenRepository, fileSystemRepository,
             fileNode, folderNode, invalidateCancelTokenUseCase, cancelCancelTokenUseCase
         )
     }
@@ -238,6 +241,14 @@ class DownloadNodesUseCaseTest {
                 }).hasSize(1)
             }
         }
+
+    @Test
+    fun `test that destination folder is created`() = runTest {
+        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(fileSystemRepository).createDirectory(DESTINATION_PATH_FOLDER)
+    }
 
     @Test
     fun `test that cancel token is invalidated when all transfers are processed`() = runTest {

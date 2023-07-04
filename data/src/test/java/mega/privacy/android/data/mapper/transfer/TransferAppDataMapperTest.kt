@@ -8,6 +8,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper.Companion.APP_DATA_SEPARATOR
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -21,6 +22,11 @@ class TransferAppDataMapperTest {
     @BeforeAll
     fun setup() {
         underTest = TransferAppDataMapper()
+    }
+
+    @Test
+    fun `test that an empty string is mapped to an empty list`() {
+        Truth.assertThat(underTest("")).isEmpty()
     }
 
     @ParameterizedTest(name = "Input parameters: {0} expected result: {1}")

@@ -15,4 +15,6 @@ data class ActiveTransferTotals(
     val totalFinishedTransfers: Int,
     val totalBytes: Long,
     val transferredBytes: Long,
-)
+) {
+    val progressPercent by lazy { if (totalBytes == 0L) 0 else ((transferredBytes * 100L) / totalBytes).toInt() }
+}

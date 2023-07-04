@@ -39,7 +39,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -572,9 +571,8 @@ class DefaultTransfersRepositoryTest {
         ) =
             runTest {
                 val expected = mock<List<ActiveTransfer>>()
-                val result = flowOf(expected)
-                whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                    .thenReturn(result)
+                whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
+                    .thenReturn(expected)
                 val actual = underTest.getCurrentActiveTransfersByType(transferType)
                 assertThat(actual).isEqualTo(expected)
             }
@@ -587,20 +585,21 @@ class DefaultTransfersRepositoryTest {
                 verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
             }
 
-        @Test
-        fun `test that deleteAllActiveTransfers gateway is called when deleteAllActiveTransfers is called`() =
-            runTest {
-                underTest.deleteAllActiveTransfers()
-                verify(megaLocalRoomGateway).deleteAllActiveTransfers()
-            }
-
         @ParameterizedTest
-        @ValueSource(ints = [1, 55, 102])
-        fun `test that deleteActiveTransferByTag gateway is called when deleteActiveTransferByTag is called`(
-            tag: Int,
+        @EnumSource(TransferType::class)
+        fun `test that deleteAllActiveTransfersByType gateway is called when deleteAllActiveTransfersByType is called`(
+            transferType: TransferType,
         ) = runTest {
-            underTest.deleteActiveTransferByTag(tag)
-            verify(megaLocalRoomGateway).deleteActiveTransferByTag(tag)
+            underTest.deleteAllActiveTransfersByType(transferType)
+            verify(megaLocalRoomGateway).deleteAllActiveTransfersByType(transferType)
+        }
+
+        @Test
+        fun `test that deleteActiveTransferByTag gateway is called when deleteActiveTransferByTag is called`(
+        ) = runTest {
+            val tags = mock<List<Int>>()
+            underTest.deleteActiveTransferByTag(tags)
+            verify(megaLocalRoomGateway).deleteActiveTransferByTag(tags)
         }
 
         @ParameterizedTest
@@ -612,6 +611,18 @@ class DefaultTransfersRepositoryTest {
             whenever(megaLocalRoomGateway.getActiveTransferTotalsByType(transferType))
                 .thenReturn(expected)
             val actual = underTest.getActiveTransferTotalsByType(transferType)
+            assertThat(actual).isEqualTo(expected)
+        }
+
+        @ParameterizedTest
+        @EnumSource(TransferType::class)
+        fun `test that getCurrentActiveTransferTotalsByType gateway result is returned when getCurrentActiveTransferTotalsByType is called`(
+            transferType: TransferType,
+        ) = runTest {
+            val expected = mock<ActiveTransferTotals>()
+            whenever(megaLocalRoomGateway.getCurrentActiveTransferTotalsByType(transferType))
+                .thenReturn(expected)
+            val actual = underTest.getCurrentActiveTransferTotalsByType(transferType)
             assertThat(actual).isEqualTo(expected)
         }
     }

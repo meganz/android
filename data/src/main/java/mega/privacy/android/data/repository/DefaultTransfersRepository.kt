@@ -6,7 +6,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -375,7 +374,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
-            megaLocalRoomGateway.getActiveTransfersByType(transferType).first()
+            megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType)
         }
 
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
@@ -383,14 +382,20 @@ internal class DefaultTransfersRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
         }
 
-    override suspend fun deleteAllActiveTransfers() = withContext(ioDispatcher) {
-        megaLocalRoomGateway.deleteAllActiveTransfers()
-    }
+    override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
+        }
 
-    override suspend fun deleteActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.deleteActiveTransferByTag(tag)
+    override suspend fun deleteActiveTransferByTag(tags: List<Int>) = withContext(ioDispatcher) {
+        megaLocalRoomGateway.deleteActiveTransferByTag(tags)
     }
 
     override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
         megaLocalRoomGateway.getActiveTransferTotalsByType(transferType)
+
+    override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals =
+        withContext(ioDispatcher) {
+            megaLocalRoomGateway.getCurrentActiveTransferTotalsByType(transferType)
+        }
 }

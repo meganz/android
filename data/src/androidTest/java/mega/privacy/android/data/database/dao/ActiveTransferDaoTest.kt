@@ -49,6 +49,28 @@ class ActiveTransferDaoTest {
         db.close()
     }
 
+    fun test_that_insert_a_new_entity_actually_inserts_the_entity() = runTest {
+        val newEntity = ActiveTransferEntity(
+            tag = 100,
+            transferType = TransferType.TYPE_UPLOAD,
+            totalBytes = 1024,
+            transferredBytes = 512,
+            isFinished = true,
+        )
+        activeTransferDao.insertOrUpdateActiveTransfer(newEntity)
+        val actual = activeTransferDao.getActiveTransferByTag(newEntity.tag)
+        assertThat(actual).isEqualTo(newEntity)
+    }
+
+    fun test_that_insert_a_duplicated_transfer_replaces_original_one() = runTest {
+        val firstEntity = entities.first()
+        val modified = firstEntity.copy(isFinished = !firstEntity.isFinished)
+        activeTransferDao.insertOrUpdateActiveTransfer(modified)
+        val result = activeTransferDao.getCurrentActiveTransfersByType(firstEntity.transferType)
+        assertThat(result).contains(modified)
+        assertThat(result).doesNotContain(firstEntity)
+    }
+
     @Test
     fun test_that_getActiveTransferByTag_returns_the_correct_active_transfer() = runTest {
         entities.forEach { entity ->
@@ -62,6 +84,15 @@ class ActiveTransferDaoTest {
         TransferType.values().forEach { type ->
             val expected = entities.filter { it.transferType == type }
             val actual = activeTransferDao.getActiveTransfersByType(type).first()
+            assertThat(actual).containsExactlyElementsIn(expected)
+        }
+    }
+
+    @Test
+    fun test_that_getCurrentActiveTransfersByType_returns_all_transfers_of_that_type() = runTest {
+        TransferType.values().forEach { type ->
+            val expected = entities.filter { it.transferType == type }
+            val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
             assertThat(actual).containsExactlyElementsIn(expected)
         }
     }
@@ -100,6 +131,41 @@ class ActiveTransferDaoTest {
             val expected = entities.count { it.transferType == type && it.isFinished }
             val actual = activeTransferDao.getTotalsByType(type).first()
             assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun test_that_getCurrentTotals_returns_correct_totalFinishedTransfers() = runTest {
+        TransferType.values().forEach { type ->
+            val expected = entities.count { it.transferType == type && it.isFinished }
+            val actual = activeTransferDao.getCurrentTotalsByType(type)
+            assertThat(actual.totalFinishedTransfers).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    fun test_deleteAllActiveTransfersByType_deletes_all_transfers_of_that_type() = runTest {
+        TransferType.values().forEach { type ->
+            val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
+            assertThat(initial).isNotEmpty()
+            activeTransferDao.deleteAllActiveTransfersByType(type)
+            val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
+            assertThat(actual).isEmpty()
+        }
+    }
+
+    @Test
+    fun test_deleteActiveTransferByTag_deletes_all_transfers_with_given_tags() = runTest {
+        TransferType.values().forEach { type ->
+            val initial = activeTransferDao.getCurrentActiveTransfersByType(type)
+            assertThat(initial).isNotEmpty()
+            val toDelete = initial.take(initial.size / 2)
+            activeTransferDao.deleteActiveTransferByTag(toDelete.map { it.tag })
+            val actual = activeTransferDao.getCurrentActiveTransfersByType(type)
+            assertThat(initial).isNotEmpty()
+            toDelete.forEach {
+                assertThat(actual).doesNotContain(it)
+            }
         }
     }
 }
