@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
@@ -16,15 +15,14 @@ import mega.privacy.android.domain.repository.NodeRepository
 import javax.inject.Inject
 
 /**
- * Get Photos from a folder by its id
+ * Get Photos from a folder by  its id
  */
-@OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetTypedNodesFromFolder @Inject constructor(
+class GetTypedNodesFromFolderUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
-) : GetTypedNodesFromFolder {
+) {
 
-    override fun invoke(folderId: NodeId): Flow<List<TypedNode>> {
+    operator fun invoke(folderId: NodeId): Flow<List<TypedNode>> {
         return flow {
             val nodes = getChildren(folderId)
             emit(nodes)

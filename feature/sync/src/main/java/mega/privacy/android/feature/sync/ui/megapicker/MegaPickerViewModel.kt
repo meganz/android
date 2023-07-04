@@ -1,17 +1,17 @@
 package mega.privacy.android.feature.sync.ui.megapicker
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.domain.entity.FolderType
-import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.node.UnTypedNode
+import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.SetSelectedMegaFolderUseCase
 import javax.inject.Inject
@@ -19,24 +19,24 @@ import javax.inject.Inject
 @HiltViewModel
 internal class MegaPickerViewModel @Inject constructor(
     private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
     val state: StateFlow<MegaPickerState> = _state.asStateFlow()
 
     init {
-        _state.update {
-            val mockState = getMockState()
-            it.copy(
-                currentFolder = mockState.currentFolder, nodes = mockState.nodes
-            )
+        viewModelScope.launch {
+            val rootFolder = getRootNodeUseCase()
+            rootFolder?.let(::fetchFolders)
         }
     }
 
     fun handleAction(action: MegaPickerAction) {
         when (action) {
             is MegaPickerAction.FolderClicked -> {
-                // Change current folder
+                fetchFolders(action.folder)
             }
 
             MegaPickerAction.CurrentFolderSelected -> {
@@ -49,32 +49,15 @@ internal class MegaPickerViewModel @Inject constructor(
         }
     }
 
-    private fun getMockState(): MegaPickerState = MegaPickerState(
-        object : TypedFolderNode {
-            override val isInRubbishBin = false
-            override val isShared = false
-            override val isPendingShare = false
-            override val device = null
-            override val childFolderCount = 1
-            override val childFileCount = 1
-            override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
-            override val type = FolderType.Default
-            override val id = NodeId(1L)
-            override val name = "My important files"
-            override val parentId = NodeId(2L)
-            override val base64Id = "11L"
-            override val label = 1
-            override val hasVersion = true
-            override val isFavourite = false
-            override val exportedData = null
-            override val isTakenDown = false
-            override val isIncomingShare = false
-            override val isNodeKeyDecrypted = false
-            override val creationTime = System.currentTimeMillis()
-        }, getMockData()
-    )
-
-
-    private fun getMockData(): List<TypedNode> = SampleNodeDataProvider.values
-
+    private fun fetchFolders(currentFolder: Node) {
+        viewModelScope.launch {
+            getTypedNodesFromFolder(currentFolder.id).collectLatest { childFolders ->
+                _state.update {
+                    it.copy(
+                        currentFolder = currentFolder, nodes = childFolders
+                    )
+                }
+            }
+        }
+    }
 }

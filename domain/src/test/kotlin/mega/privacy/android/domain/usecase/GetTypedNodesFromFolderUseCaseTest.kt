@@ -23,16 +23,17 @@ import org.mockito.kotlin.whenever
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetTypedNodesFromFolderTest {
-    lateinit var underTest: GetTypedNodesFromFolder
+class GetTypedNodesFromFolderUseCaseTest {
+    lateinit var underTest: GetTypedNodesFromFolderUseCase
 
     private val nodeRepository = mock<NodeRepository>()
 
-    private val addNodeType = mock<AddNodeType> { onBlocking { invoke(any()) }.thenReturn(mock<TypedFolderNode>()) }
+    private val addNodeType =
+        mock<AddNodeType> { onBlocking { invoke(any()) }.thenReturn(mock<TypedFolderNode>()) }
 
     @Before
     fun setUp() {
-        underTest = DefaultGetTypedNodesFromFolder(
+        underTest = GetTypedNodesFromFolderUseCase(
             nodeRepository = nodeRepository,
             addNodeType = addNodeType
         )
