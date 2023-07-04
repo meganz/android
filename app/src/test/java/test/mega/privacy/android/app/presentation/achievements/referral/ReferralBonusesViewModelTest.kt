@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesViewModel
+import mega.privacy.android.app.presentation.achievements.referral.view.ReferralBonusesViewModel
 import mega.privacy.android.data.mapper.NumberOfDaysMapper
 import mega.privacy.android.data.mapper.ReferralBonusAchievementsMapper
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview

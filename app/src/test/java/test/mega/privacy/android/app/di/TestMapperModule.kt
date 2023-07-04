@@ -6,10 +6,9 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.MapperModule
+import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
-import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
-import mega.privacy.android.app.presentation.achievements.UIMegaAchievementMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
@@ -36,9 +35,6 @@ object TestMapperModule {
 
     @Provides
     fun providePlaylistItemMapper(): PlaylistItemMapper = mock()
-
-    @Provides
-    fun provideAchievementsMapper(): UIMegaAchievementMapper = mock()
 
     @Provides
     fun provideHeaderMapper(): HeaderMapper = ::toHeader

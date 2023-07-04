@@ -30,7 +30,6 @@ import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.achievements.referral.ReferralBonusesViewModel
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent

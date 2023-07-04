@@ -70,7 +70,6 @@
 
     <activity
         android:id="@+id/achievements"
-        android:name="mega.privacy.android.app.presentation.achievements.AchievementsActivity"
-        tools:layout="@layout/activity_achievements"/>
+        android:name="mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity" />
 
 </navigation>

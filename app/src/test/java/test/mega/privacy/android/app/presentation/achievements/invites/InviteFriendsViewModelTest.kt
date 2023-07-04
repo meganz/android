@@ -9,8 +9,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
 import mega.privacy.android.app.presentation.achievements.invites.storageBonusInBytesArg
+import mega.privacy.android.app.presentation.achievements.invites.view.InviteFriendsViewModel
 import mega.privacy.android.domain.entity.achievement.Achievement
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview

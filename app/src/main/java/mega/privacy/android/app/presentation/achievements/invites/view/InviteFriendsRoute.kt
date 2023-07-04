@@ -44,7 +44,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.toUnitString
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.presentation.achievements.invites.InviteFriendsViewModel
 import mega.privacy.android.app.presentation.achievements.invites.model.InviteFriendsUIState
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton

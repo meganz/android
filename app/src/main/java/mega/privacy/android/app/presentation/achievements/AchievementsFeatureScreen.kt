@@ -39,6 +39,13 @@ fun AchievementsFeatureScreen(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val navHostController = rememberNavController()
 
+    /**
+     * This event effect existed because ContactController is calling AchievementsActivity to show snackbar
+     * This should be moved to AchievementsRoute once ContactController dependency is removed
+     * The reason why this is put here is that it needs the activity lifecycle and also the view model instance
+     * referenced in the activity, because ContactController is calling the activity method. Instead of passing
+     * the view model instance to the AchievementsRoute, better to just put the effect to ease out future modification.
+     */
     EventEffect(uiState.errorMessage, viewModel::resetErrorState) {
         snackbarHostState.showSnackbar(context.resources.getString(it))
     }

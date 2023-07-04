@@ -24,7 +24,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
-import mega.privacy.android.app.presentation.achievements.AchievementsActivity;
+import mega.privacy.android.app.presentation.achievements.AchievementsFeatureActivity;
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
@@ -189,14 +189,14 @@ public class ContactController {
                     megaApi.inviteContact(contactEmails.get(i), null, MegaContactRequest.INVITE_ACTION_ADD, inviteMultipleListener);
                 }
             }
-        } else if (context instanceof AchievementsActivity) {
+        } else if (context instanceof AchievementsFeatureActivity) {
             if (!isOnline(context)) {
-                ((AchievementsActivity) context).showSnackbar(R.string.error_server_connection_problem);
+                ((AchievementsFeatureActivity) context).showSnackbar(R.string.error_server_connection_problem);
                 return;
             }
 
             if (contactEmails.size() == 1) {
-                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, ((AchievementsActivity) context).getFetcher());
+                megaApi.inviteContact(contactEmails.get(0), null, MegaContactRequest.INVITE_ACTION_ADD, ((AchievementsFeatureActivity) context).getFetcher());
             } else if (contactEmails.size() > 1) {
                 inviteMultipleListener = new MultipleRequestListener(-1, context);
                 for (int i = 0; i < contactEmails.size(); i++) {

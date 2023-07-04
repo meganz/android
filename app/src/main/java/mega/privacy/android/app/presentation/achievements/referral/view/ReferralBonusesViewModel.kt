@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.achievements.referral
+package mega.privacy.android.app.presentation.achievements.referral.view
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

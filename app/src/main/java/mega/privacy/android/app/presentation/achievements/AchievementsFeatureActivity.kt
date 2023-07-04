@@ -22,7 +22,7 @@ import javax.inject.Inject
  *
  */
 @AndroidEntryPoint
-class AchievementsActivity : PasscodeActivity() {
+class AchievementsFeatureActivity : PasscodeActivity() {
     /**
      * Get system's default theme mode
      */
