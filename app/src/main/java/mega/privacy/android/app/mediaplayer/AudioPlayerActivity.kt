@@ -24,6 +24,8 @@ import com.google.android.exoplayer2.util.Util
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
@@ -350,6 +352,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
                         else -> {
                             playerServiceGateway?.let {
+                                Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
                                 MegaNodeUtil.shareNode(
                                     context = this,
                                     node = megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
