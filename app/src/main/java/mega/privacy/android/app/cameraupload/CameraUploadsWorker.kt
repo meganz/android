@@ -22,7 +22,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -55,7 +54,6 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -63,7 +61,6 @@ import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -133,7 +130,6 @@ import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBacku
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetTypedChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
@@ -319,12 +315,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     @Inject
     lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
-
-    /**
-     * GetChildrenNode
-     */
-    @Inject
-    lateinit var getTypedChildrenNodeUseCase: GetTypedChildrenNodeUseCase
 
     /**
      * ProcessMediaForUpload
@@ -1143,7 +1133,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
     ) = coroutineScope {
-        val copyFileAsyncList = mutableListOf<Job>()
         val uploadFileAsyncList = mutableListOf<Job>()
         // If the Service detects that all upload transfers are paused when turning on
         // Camera Uploads, update the Primary and Secondary Folder Backup States to
@@ -1167,65 +1156,53 @@ class CameraUploadsWorker @AssistedInject constructor(
         startHeartbeat(finalList)
 
         for (record in finalList) {
-            val isSecondary = record.isSecondary
-            val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
-            val shouldBeSkipped = createTemporaryFileIfNeeded(record, isSecondary)
+            val parent =
+                (if (record.isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
+            val shouldBeSkipped = createTemporaryFileIfNeeded(record)
             if (shouldBeSkipped) continue
             if (record.isCopyOnly) {
                 Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
                 record.nodeHandle?.let { nodeHandle ->
                     getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
                         cameraUploadState.totalToUpload++
-                        copyFileAsyncList.add(async {
+                        uploadFileAsyncList.add(launch {
                             handleCopyNode(
                                 nodeToCopy = nodeToCopy,
                                 newNodeParent = parent,
                                 newNodeName = record.fileName.orEmpty(),
                             )
+                            updateUpload()
                         })
                     }
                 }
             } else {
                 val fileToUpload = getFileToUpload(record, isCompressedVideo)
                 fileToUpload?.let {
-                    // compare size
-                    val node = checkExistBySize(parent, it.length())
-                    if (node != null && node.fingerprint == null) {
-                        Timber.d(
-                            "Node with handle: ${node.id.longValue} already exists, delete record from database."
-                        )
-                        deleteSyncRecord(it.path, isSecondary)
-                    } else {
-                        cameraUploadState.totalToUpload++
-                        val lastModified = getLastModifiedTime(record)
+                    cameraUploadState.totalToUpload++
+                    val lastModified = getLastModifiedTime(record)
 
-                        // If the local file path exists, call the Use Case to upload the file
-                        uploadFileAsyncList.add(async {
-                            startUploadUseCase(
-                                localPath = it.path,
-                                parentNodeId = parent.id,
-                                fileName = record.fileName,
-                                modificationTime = lastModified / 1000,
-                                appData = Constants.APP_DATA_CU,
-                                isSourceTemporary = false,
-                                shouldStartFirst = false,
-                            ).conflate().collect { globalTransfer ->
-                                // Handle the GlobalTransfer emitted by the Use Case
-                                onGlobalTransferUpdated(globalTransfer)
-                            }
-                        })
-                    }
+                    // If the local file path exists, call the Use Case to upload the file
+                    uploadFileAsyncList.add(launch {
+                        startUploadUseCase(
+                            localPath = it.path,
+                            parentNodeId = parent.id,
+                            fileName = record.fileName,
+                            modificationTime = lastModified / 1000,
+                            appData = Constants.APP_DATA_CU,
+                            isSourceTemporary = false,
+                            shouldStartFirst = false,
+                        ).conflate().collect { globalTransfer ->
+                            // Handle the GlobalTransfer emitted by the Use Case
+                            onGlobalTransferUpdated(globalTransfer)
+                        }
+                    })
                 } ?: run {
                     Timber.d("Local file is unavailable, delete record from database.")
                     record.localPath?.let {
-                        deleteSyncRecord(it, isSecondary)
+                        deleteSyncRecord(it, record.isSecondary)
                     }
                 }
             }
-        }
-        if (copyFileAsyncList.isNotEmpty()) {
-            updateUpload()
-            copyFileAsyncList.joinAll()
         }
         uploadFileAsyncList.joinAll()
     }
@@ -1244,13 +1221,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * create Temporary File and Remove Coordinates based on the settings
      * @param record [SyncRecord]
-     * @param isSecondary [Boolean]
      *
      * @return [Boolean] indicates whether given [SyncRecord] should  be uploaded or not
      */
     private suspend fun createTemporaryFileIfNeeded(
         record: SyncRecord,
-        isSecondary: Boolean,
     ): Boolean {
         var shouldBeSkipped = false
         if (record.type == SyncRecordType.TYPE_PHOTO && !record.isCopyOnly) {
@@ -1287,7 +1262,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                     Timber.e("Temporary File creation exception $it")
                     if (it is FileNotFoundException) {
                         record.localPath?.let { newPath ->
-                            deleteSyncRecord(newPath, isSecondary = isSecondary)
+                            deleteSyncRecord(newPath, isSecondary = record.isSecondary)
                         }
                     }
                     shouldBeSkipped = true
@@ -1465,17 +1440,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 lastPrimaryHandle = node.id.longValue
             }
         }
-    }
-
-    private suspend fun checkExistBySize(parent: Node, size: Long): FileNode? {
-        val nodeList =
-            getTypedChildrenNodeUseCase(parent.id, SortOrder.ORDER_ALPHABETICAL_ASC)
-        for (node in nodeList) {
-            if (node is FileNode && node.size == size) {
-                return node
-            }
-        }
-        return null
     }
 
     private fun getLastModifiedTime(file: SyncRecord): Long {
