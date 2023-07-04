@@ -69,7 +69,7 @@ fun PhotosScreen(
             photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
             val photosTab = PhotosTab.values()[page]
             pagerState.scrollToPage(photosTab.ordinal)
-            Analytics.tracker.trackTabSelected(photosTab.analyticsInfo)
+            Analytics.tracker.trackEvent(photosTab.analyticsInfo)
         }
     }
 

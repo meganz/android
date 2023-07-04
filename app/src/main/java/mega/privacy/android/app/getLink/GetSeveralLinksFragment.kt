@@ -12,9 +12,6 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkGetLinkForNodesButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -73,7 +70,6 @@ class GetSeveralLinksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
         setupObservers()
-        Analytics.tracker.trackButtonPress(LinkGetLinkForNodesButtonInfo)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -81,14 +77,15 @@ class GetSeveralLinksFragment : Fragment() {
             android.R.id.home -> {
                 requireActivity().onBackPressedDispatcher.onBackPressed()
             }
+
             R.id.action_share -> {
-                Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
                 startActivity(
                     Intent(Intent.ACTION_SEND)
                         .setType(TYPE_TEXT_PLAIN)
                         .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
                 )
             }
+
             R.id.action_chat -> {
                 chatLauncher.launch(Unit)
             }

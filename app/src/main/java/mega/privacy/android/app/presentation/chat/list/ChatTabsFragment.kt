@@ -23,9 +23,6 @@ import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.chat.ChatScreenInfo
-import mega.privacy.android.analytics.event.chat.ChatsTabInfo
-import mega.privacy.android.analytics.event.chat.MeetingsTabInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -46,6 +43,9 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatStatus
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.ChatScreenEvent
+import mega.privacy.mobile.analytics.event.ChatsTabEvent
+import mega.privacy.mobile.analytics.event.MeetingsTabEvent
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -149,8 +149,8 @@ class ChatTabsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Analytics.tracker.trackScreenView(ChatScreenInfo)
-        Firebase.crashlytics.log("Screen: ${ChatScreenInfo.name}")
+        Analytics.tracker.trackEvent(ChatScreenEvent)
+        Firebase.crashlytics.log("Screen: ${ChatScreenEvent.eventName}")
     }
 
     override fun onStop() {
@@ -201,10 +201,10 @@ class ChatTabsFragment : Fragment() {
         view?.hideKeyboard()
 
         if (currentTab == ChatTab.CHATS) {
-            Analytics.tracker.trackTabSelected(ChatsTabInfo)
+            Analytics.tracker.trackEvent(ChatsTabEvent)
         } else {
             viewModel.requestMeetings()
-            Analytics.tracker.trackTabSelected(MeetingsTabInfo)
+            Analytics.tracker.trackEvent(MeetingsTabEvent)
         }
     }
 

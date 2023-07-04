@@ -59,7 +59,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.yield
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.content.SlideShowInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -76,6 +75,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.SlideShowScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -108,8 +108,8 @@ class SlideshowFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Analytics.tracker.trackScreenView(SlideShowInfo)
-        Firebase.crashlytics.log("Screen view: ${SlideShowInfo.name}")
+        Analytics.tracker.trackEvent(SlideShowScreenEvent)
+        Firebase.crashlytics.log("Screen view: ${SlideShowScreenEvent.eventName}")
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

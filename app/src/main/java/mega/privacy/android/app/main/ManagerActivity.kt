@@ -104,10 +104,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.file.IncomingSharesTabInfo
-import mega.privacy.android.analytics.event.file.LinkSharesTabInfo
-import mega.privacy.android.analytics.event.file.OutgoingSharesTabInfo
-import mega.privacy.android.analytics.event.file.SharedItemsScreenInfo
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
 import mega.privacy.android.app.MegaApplication
@@ -342,6 +338,10 @@ import mega.privacy.android.domain.usecase.login.MonitorEphemeralCredentialsUseC
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterFragment
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import mega.privacy.android.feature.sync.ui.navigator.SyncNavigator
+import mega.privacy.mobile.analytics.event.IncomingSharesTabEvent
+import mega.privacy.mobile.analytics.event.LinkSharesTabEvent
+import mega.privacy.mobile.analytics.event.OutgoingSharesTabEvent
+import mega.privacy.mobile.analytics.event.SharedItemsScreenEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -1266,7 +1266,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 checkScrollElevation()
                 when (SharesTab.fromPosition(position)) {
                     SharesTab.INCOMING_TAB -> {
-                        Analytics.tracker.trackTabSelected(IncomingSharesTabInfo)
+                        Analytics.tracker.trackEvent(IncomingSharesTabEvent)
                         if (isOutgoingAdded) {
                             outgoingSharesFragment?.hideActionMode()
                         } else if (isLinksAdded) {
@@ -1275,7 +1275,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     SharesTab.OUTGOING_TAB -> {
-                        Analytics.tracker.trackTabSelected(OutgoingSharesTabInfo)
+                        Analytics.tracker.trackEvent(OutgoingSharesTabEvent)
                         if (isIncomingAdded) {
                             incomingSharesFragment?.hideActionMode()
                         } else if (isLinksAdded) {
@@ -1284,7 +1284,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
 
                     SharesTab.LINKS_TAB -> {
-                        Analytics.tracker.trackTabSelected(LinkSharesTabInfo)
+                        Analytics.tracker.trackEvent(LinkSharesTabEvent)
                         if (isIncomingAdded) {
                             incomingSharesFragment?.hideActionMode()
                         } else if (isOutgoingAdded) {
@@ -4301,7 +4301,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun onSelectSharedItemsDrawerItem() {
-        Analytics.tracker.trackScreenView(SharedItemsScreenInfo)
+        Analytics.tracker.trackEvent(SharedItemsScreenEvent)
         lifecycleScope.launch {
             if (isSharesTabComposeEnabled()) {
 
@@ -5609,7 +5609,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.bottom_navigation_item_shared_items -> {
-                Analytics.tracker.trackScreenView(SharedItemsScreenInfo)
+                Analytics.tracker.trackEvent(SharedItemsScreenEvent)
                 if (drawerItem === DrawerItem.SHARED_ITEMS) {
                     if (tabItemShares === SharesTab.INCOMING_TAB && this.incomingSharesState().incomingHandle != MegaApiJava.INVALID_HANDLE) {
                         incomingSharesViewModel.resetIncomingTreeDepth()

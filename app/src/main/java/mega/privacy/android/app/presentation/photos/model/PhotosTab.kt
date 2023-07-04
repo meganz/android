@@ -1,22 +1,23 @@
 package mega.privacy.android.app.presentation.photos.model
 
-import mega.privacy.android.analytics.event.TabInfo
-import mega.privacy.android.analytics.event.content.AlbumsTabInfo
-import mega.privacy.android.analytics.event.content.TimelineTabInfo
+import mega.privacy.mobile.analytics.core.event.identifier.TabSelectedEventIdentifier
+import mega.privacy.mobile.analytics.event.AlbumsTabEvent
+import mega.privacy.mobile.analytics.event.TimelineTabEvent
+
 
 /**
  * Photos tab
  *
  * @property analyticsInfo
  */
-enum class PhotosTab(val analyticsInfo: TabInfo) {
+enum class PhotosTab(val analyticsInfo: TabSelectedEventIdentifier) {
     /**
      * Timeline
      */
-    Timeline(TimelineTabInfo),
+    Timeline(TimelineTabEvent),
 
     /**
      * Albums
      */
-    Albums(AlbumsTabInfo)
+    Albums(AlbumsTabEvent)
 }

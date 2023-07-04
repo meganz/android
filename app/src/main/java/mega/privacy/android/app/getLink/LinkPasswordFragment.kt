@@ -16,9 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkConfirmPasswordFileButtonInfo
-import mega.privacy.android.analytics.event.link.LinkConfirmPasswordFolderButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.interfaces.Scrollable
@@ -240,6 +237,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
                 binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
             }
+
             MegaApiJava.PASSWORD_STRENGTH_WEAK -> {
                 binding.shapePasswordFirst.background = weakShape
                 binding.shapePasswordSecond.background = weakShape
@@ -253,6 +251,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
                 binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Weak)
             }
+
             MegaApiJava.PASSWORD_STRENGTH_MEDIUM -> {
                 binding.shapePasswordFirst.background = mediumShape
                 binding.shapePasswordSecond.background = mediumShape
@@ -266,6 +265,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
                 binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
             }
+
             MegaApiJava.PASSWORD_STRENGTH_GOOD -> {
                 binding.shapePasswordFirst.background = goodShape
                 binding.shapePasswordSecond.background = goodShape
@@ -279,6 +279,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
                 binding.passwordLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Good)
             }
+
             else -> {
                 binding.shapePasswordFirst.background = strongShape
                 binding.shapePasswordSecond.background = strongShape
@@ -311,6 +312,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordLayout.setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
                 binding.passwordErrorIcon.visibility = GONE
             }
+
             R.id.confirm_password_text -> {
                 binding.confirmPasswordLayout.error = null
                 binding.confirmPasswordLayout.setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
@@ -363,6 +365,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
                 binding.passwordErrorIcon.visibility = VISIBLE
                 binding.passwordLayout.isErrorEnabled = true
             }
+
             R.id.confirm_password_text -> {
                 binding.confirmPasswordLayout.isErrorEnabled = false
                 binding.confirmPasswordLayout.error = error
@@ -417,11 +420,6 @@ class LinkPasswordFragment : Fragment(), Scrollable {
     private fun confirmClick() {
         if (validateForm()) {
             alreadyReset = true
-            viewModel.getNode()?.let {
-                Analytics.tracker.trackButtonPress(
-                    if (it.isFolder) LinkConfirmPasswordFolderButtonInfo else LinkConfirmPasswordFileButtonInfo
-                )
-            }
             viewModel.encryptLink(binding.passwordText.text.toString())
         }
     }

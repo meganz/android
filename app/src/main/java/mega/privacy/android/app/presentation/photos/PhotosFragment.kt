@@ -46,7 +46,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -95,6 +94,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.mobile.analytics.event.PhotoScreenEvent
 import javax.inject.Inject
 
 /** A temporary bridge to support compatibility between view and compose architecture. */
@@ -205,8 +205,8 @@ class PhotosFragment : Fragment() {
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
-        Analytics.tracker.trackScreenView(PhotosScreenInfo)
-        Firebase.crashlytics.log("Screen: ${PhotosScreenInfo.name}")
+        Analytics.tracker.trackEvent(PhotoScreenEvent)
+        Firebase.crashlytics.log("Screen: ${PhotoScreenEvent.eventName}")
         super.onResume()
     }
 

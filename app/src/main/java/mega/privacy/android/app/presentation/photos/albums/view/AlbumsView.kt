@@ -68,11 +68,6 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.content.DeleteAlbumCancelButtonInfo
-import mega.privacy.android.analytics.event.content.DeleteAlbumConfirmButtonInfo
-import mega.privacy.android.analytics.event.content.DeleteAlbumsConfirmationDialogInfo
-import mega.privacy.android.analytics.event.content.PhotosScreenInfo
-import mega.privacy.android.analytics.event.content.RemoveLinksConfirmationDialogInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
@@ -93,6 +88,10 @@ import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DeleteAlbumConfirmButtonPressedEvent
+import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
+import mega.privacy.mobile.analytics.event.RemoveLinksConfirmationDialogEvent
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -417,7 +416,7 @@ fun DeleteAlbumsConfirmationDialog(
     val isLight = MaterialTheme.colors.isLight
 
     LaunchedEffect(Unit) {
-        Analytics.tracker.trackDialogDisplayed(DeleteAlbumsConfirmationDialogInfo, PhotosScreenInfo)
+        Analytics.tracker.trackEvent(DeleteAlbumsConfirmationDialogEvent)
     }
     MegaDialog(
         titleString = pluralStringResource(
@@ -437,13 +436,13 @@ fun DeleteAlbumsConfirmationDialog(
             )
         },
         onDismissRequest = {
-            Analytics.tracker.trackButtonPress(DeleteAlbumCancelButtonInfo)
+            Analytics.tracker.trackEvent(DeleteAlbumCancelButtonPressedEvent)
             onCancelClicked()
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    Analytics.tracker.trackButtonPress(DeleteAlbumConfirmButtonInfo)
+                    Analytics.tracker.trackEvent(DeleteAlbumConfirmButtonPressedEvent)
                     onCancelClicked()
                     onDeleteClicked(selectedAlbumIds)
                 },
@@ -479,7 +478,7 @@ fun RemoveLinksConfirmationDialog(
     onRemove: () -> Unit,
 ) {
     LaunchedEffect(Unit) {
-        Analytics.tracker.trackDialogDisplayed(RemoveLinksConfirmationDialogInfo, PhotosScreenInfo)
+        Analytics.tracker.trackEvent(RemoveLinksConfirmationDialogEvent)
     }
     MegaAlertDialog(
         title = pluralStringResource(

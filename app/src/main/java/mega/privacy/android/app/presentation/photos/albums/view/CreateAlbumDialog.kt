@@ -41,8 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.content.CreateNewAlbumDialogInfo
-import mega.privacy.android.analytics.event.content.PhotosScreenInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
@@ -54,6 +52,7 @@ import mega.privacy.android.core.ui.theme.red_900
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
+import mega.privacy.mobile.analytics.event.CreateNewAlbumDialogEvent
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -69,7 +68,7 @@ fun CreateNewAlbumDialog(
     isInputValid: () -> Boolean = { true },
 ) {
     LaunchedEffect(Unit) {
-        Analytics.tracker.trackDialogDisplayed(CreateNewAlbumDialogInfo, PhotosScreenInfo)
+        Analytics.tracker.trackEvent(CreateNewAlbumDialogEvent)
     }
 
     var textState by rememberSaveable { mutableStateOf(initialInputText()) }

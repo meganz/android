@@ -38,9 +38,6 @@ import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.file.HomeScreenInfo
-import mega.privacy.android.analytics.event.file.OfflineTabInfo
-import mega.privacy.android.analytics.event.file.RecentsTabInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
@@ -64,6 +61,9 @@ import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.mobile.analytics.event.HomeScreenEvent
+import mega.privacy.mobile.analytics.event.OfflineTabEvent
+import mega.privacy.mobile.analytics.event.RecentsTabEvent
 import nz.mega.sdk.MegaBanner
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -158,11 +158,11 @@ class HomepageFragment : Fragment() {
             override fun onPageSelected(position: Int) {
                 when (position) {
                     BottomSheetPagerAdapter.RECENT_INDEX -> {
-                        Analytics.tracker.trackTabSelected(RecentsTabInfo)
+                        Analytics.tracker.trackEvent(RecentsTabEvent)
                     }
 
                     BottomSheetPagerAdapter.OFFLINE_INDEX -> {
-                        Analytics.tracker.trackTabSelected(OfflineTabInfo)
+                        Analytics.tracker.trackEvent(OfflineTabEvent)
                     }
                 }
                 currentSelectedTabFragment = childFragmentManager.findFragmentByTag("f$position")
@@ -233,8 +233,8 @@ class HomepageFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        Analytics.tracker.trackScreenView(HomeScreenInfo)
-        Firebase.crashlytics.log("Screen: ${HomeScreenInfo.name}")
+        Analytics.tracker.trackEvent(HomeScreenEvent)
+        Firebase.crashlytics.log("Screen: ${HomeScreenEvent.eventName}")
 
         // Retrieve the banners from the server again, for the banners are possibly varied
         // while the app is on the background

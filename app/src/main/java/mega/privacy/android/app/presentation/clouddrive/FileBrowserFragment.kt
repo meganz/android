@@ -43,10 +43,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.file.CloudDriveScreenInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -71,7 +67,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -96,7 +91,9 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -266,8 +263,8 @@ class FileBrowserFragment : RotatableFragment() {
 
     override fun onResume() {
         super.onResume()
-        Analytics.tracker.trackScreenView(CloudDriveScreenInfo)
-        Firebase.crashlytics.log("Screen: ${CloudDriveScreenInfo.name}")
+        Analytics.tracker.trackEvent(CloudDriveScreenEvent)
+        Firebase.crashlytics.log("Screen: ${CloudDriveScreenEvent.eventName}")
     }
 
     /**
@@ -1295,11 +1292,6 @@ class FileBrowserFragment : RotatableFragment() {
 
                 R.id.cab_menu_share_out -> {
                     documents?.let {
-                        if (it.size == 1) {
-                            Analytics.tracker.trackButtonPress(if (it[0].isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo)
-                        } else {
-                            Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
-                        }
                         shareNodes(requireContext(), it)
                     }
                     clearSelections()

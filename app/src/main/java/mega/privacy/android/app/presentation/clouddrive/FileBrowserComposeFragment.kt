@@ -32,10 +32,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.file.CloudDriveScreenInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkForNodesButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -52,7 +48,6 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
-import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
@@ -63,8 +58,10 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -170,8 +167,8 @@ class FileBrowserComposeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        Analytics.tracker.trackScreenView(CloudDriveScreenInfo)
-        Firebase.crashlytics.log("Screen: ${CloudDriveScreenInfo.name}")
+        Analytics.tracker.trackEvent(CloudDriveScreenEvent)
+        Firebase.crashlytics.log("Screen: ${CloudDriveScreenEvent.eventName}")
     }
 
     /**
@@ -394,13 +391,6 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.SHARE_OUT_CLICKED -> {
-                    if (it.selectedMegaNode.size == 1) {
-                        Analytics.tracker.trackButtonPress(
-                            if (it.selectedMegaNode[0].isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
-                        )
-                    } else {
-                        Analytics.tracker.trackButtonPress(LinkShareLinkForNodesButtonInfo)
-                    }
                     MegaNodeUtil.shareNodes(requireContext(), it.selectedMegaNode)
                 }
 

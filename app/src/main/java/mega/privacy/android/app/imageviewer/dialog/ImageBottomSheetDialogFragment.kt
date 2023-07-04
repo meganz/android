@@ -21,8 +21,6 @@ import com.facebook.imagepipeline.common.RotationOptions
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.WebViewActivity
@@ -340,10 +338,12 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         trackOnShareClicked()
                         OfflineUtils.shareOfflineNode(context, imageItem.handle)
                     }
+
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
                     }
+
                     node != null -> {
                         trackOnShareClicked()
                         viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
@@ -352,6 +352,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             }
                         }
                     }
+
                     file != null -> {
                         trackOnShareClicked()
                         FileUtil.shareFile(context, file)
@@ -545,6 +546,5 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     override fun shouldSetStatusBarColor(): Boolean = false
 
     private fun trackOnShareClicked() {
-        Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
     }
 }

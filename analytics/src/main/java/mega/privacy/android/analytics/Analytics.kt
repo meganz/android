@@ -34,10 +34,10 @@ object Analytics {
     /**
      * Initialise
      *
-     * @param tracker
+     * @param analyticsTracker
      */
-    fun initialise(tracker: AnalyticsTracker?) {
-        instance = tracker
+    fun initialise(analyticsTracker: AnalyticsTracker?) {
+        instance = analyticsTracker
     }
 
     /**

@@ -56,6 +56,7 @@ dependencies {
 
     implementation(project(":app"))
     implementation(project(":analytics"))
+    implementation(lib.mega.analytics)
 
     implementation(testlib.bundles.ui.test)
     implementation(testlib.bundles.unit.test)

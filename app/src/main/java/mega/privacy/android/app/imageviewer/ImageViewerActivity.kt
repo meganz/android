@@ -24,8 +24,6 @@ import androidx.navigation.ui.navigateUp
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
@@ -799,6 +797,5 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         (supportFragmentManager.findFragmentById(R.id.images_nav_host_fragment) as NavHostFragment).navController
 
     private fun trackOnShareClicked() {
-        Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
     }
 }

@@ -39,8 +39,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -450,7 +448,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         else -> {
-                            Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
                             playerServiceGateway?.run {
                                 MegaNodeUtil.shareNode(
                                     context = this@VideoPlayerActivity,

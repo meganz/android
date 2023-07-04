@@ -2,8 +2,8 @@ package mega.privacy.android.core.ui.test
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.DialogInfo
-import mega.privacy.android.analytics.event.ScreenInfo
+import mega.privacy.mobile.analytics.core.event.identifier.DialogDisplayedEventIdentifier
+import mega.privacy.mobile.analytics.core.event.identifier.ScreenViewEventIdentifier
 import org.junit.Rule
 import org.junit.Test
 
@@ -13,16 +13,16 @@ internal class AnalyticsTestRuleTest {
 
     @Test
     internal fun `test that events are captured`() {
-        val expected = object : ScreenInfo {
-            override val name: String
+        val expected = object : ScreenViewEventIdentifier {
+            override val eventName: String
                 get() = ""
             override val uniqueIdentifier: Int
                 get() = 1
         }
 
-        Analytics.tracker.trackScreenView(expected)
+        Analytics.tracker.trackEvent(expected)
 
-        assertThat(underTest.events.map { it.info }).contains(expected)
+        assertThat(underTest.events).contains(expected)
     }
 
 
@@ -30,13 +30,17 @@ internal class AnalyticsTestRuleTest {
     internal fun `test that events are listed in order`() {
         val intRange = Array(5) { it }
         intRange.map {
-            val event = object : DialogInfo {
-                override val name = it.toString()
+            val event = object : DialogDisplayedEventIdentifier {
+                override val eventName = it.toString()
                 override val uniqueIdentifier = it
+                override val dialogName: String
+                    get() = ""
+                override val screenName: String?
+                    get() = null
             }
-            Analytics.tracker.trackDialogDisplayed(event)
+            Analytics.tracker.trackEvent(event)
         }
 
-        assertThat(underTest.events.map { it.info.uniqueIdentifier }).containsExactly(*intRange)
+        assertThat(underTest.events.map { it.uniqueIdentifier }).containsExactly(*intRange)
     }
 }

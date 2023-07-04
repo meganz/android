@@ -37,9 +37,6 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFileButtonInfo
-import mega.privacy.android.analytics.event.link.LinkShareLinkTapFolderButtonInfo
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -1156,7 +1153,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             }
 
             R.id.pdf_viewer_share -> {
-                Analytics.tracker.trackButtonPress(LinkShareLinkTapFileButtonInfo)
                 if (type == Constants.ZIP_ADAPTER) {
                     FileUtil.shareFile(this, File(uri.toString()))
                 } else if (type == Constants.OFFLINE_ADAPTER || !inside) {
@@ -1165,11 +1161,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     shareLink(this, intent.getStringExtra(Constants.URL_FILE_LINK))
                 } else {
                     val node = megaApi.getNodeByHandle(handle)
-                    node?.let {
-                        Analytics.tracker.trackButtonPress(
-                            if (it.isFolder) LinkShareLinkTapFolderButtonInfo else LinkShareLinkTapFileButtonInfo
-                        )
-                    }
                     shareNode(this, node)
                 }
             }
