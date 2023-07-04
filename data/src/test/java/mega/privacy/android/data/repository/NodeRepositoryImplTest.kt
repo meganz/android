@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaError
@@ -552,6 +553,102 @@ class NodeRepositoryImplTest {
         whenever(fileTypeInfoMapper.invoke(megaNode)).thenReturn(PdfFileTypeInfo)
         return megaNode
     }
+
+    @Test
+    fun `test that exportNode throws IllegalArgumentException when node is not found`() =
+        runTest {
+            val node = NodeId(1L)
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
+            assertThrows<IllegalArgumentException> {
+                underTest.exportNode(node, null)
+            }
+        }
+
+    @Test
+    fun `test that exportNode throws IllegalArgumentException when node is taken down`() =
+        runTest {
+            val node = NodeId(1L)
+            val megaNode = mock<MegaNode> {
+                on { isTakenDown }.thenReturn(true)
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
+            assertThrows<IllegalArgumentException> {
+                underTest.exportNode(node, null)
+            }
+        }
+
+
+    @Test
+    fun `test that exportNode returns publicLink as result when node is exported but not expired and expireTime matches`() =
+        runTest {
+            val node = NodeId(1L)
+            val expireTime = 2L
+            val expected = "public_link"
+            val megaNode = mock<MegaNode> {
+                on { isTakenDown }.thenReturn(false)
+                on { isExported }.thenReturn(true)
+                on { isExpired }.thenReturn(false)
+                on { expirationTime }.thenReturn(expireTime)
+                on { publicLink }.thenReturn(expected)
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
+            val actual = underTest.exportNode(node, expireTime)
+            assertThat(actual).isEqualTo(expected)
+        }
+
+
+    @Test
+    fun `test that exportNode is successful when SDK call is successful`() = runTest {
+
+        val node = NodeId(1L)
+        val expireTime = 2L
+        val expected = "result_link"
+        val megaNode = mock<MegaNode> {
+            on { isTakenDown }.thenReturn(false)
+        }
+        whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+
+        whenever(megaApiGateway.exportNode(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                api = mock(),
+                request = mock {
+                    on { link }.thenReturn(expected)
+                },
+                error = mock {
+                    on { errorCode }.thenReturn(
+                        MegaError.API_OK
+                    )
+                },
+            )
+        }
+        assertThat(underTest.exportNode(node, expireTime)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that exportNode throws MegaException when SDK returns error`() =
+        runTest {
+            val node = NodeId(1L)
+            val expireTime = 2L
+            val megaNode = mock<MegaNode> {
+                on { isTakenDown }.thenReturn(false)
+            }
+            whenever(megaApiGateway.getMegaNodeByHandle(node.longValue)).thenReturn(megaNode)
+
+            whenever(megaApiGateway.exportNode(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_EINTERNAL
+                        )
+                    },
+                )
+            }
+            assertThrows<MegaException> {
+                underTest.exportNode(node, expireTime)
+            }
+        }
 
     companion object {
         private const val nodeHandle = 1L

@@ -2633,4 +2633,18 @@ interface MegaApiGateway {
      * Create a cancel token
      */
     fun createCancelToken(): MegaCancelToken
+
+
+    /**
+     * Export a MegaNode
+     *
+     * @param node the MegaNode to export
+     * @param expireTime the time in seconds since epoch to set as expiry date
+     * @param listener MegaRequestListener to track this request
+     */
+    fun exportNode(
+        node: MegaNode,
+        expireTime: Long?,
+        listener: MegaRequestListenerInterface,
+    )
 }

@@ -1257,4 +1257,16 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun reconnect() = megaApi.reconnect()
 
     override fun createCancelToken(): MegaCancelToken = MegaCancelToken.createInstance()
+
+    override fun exportNode(
+        node: MegaNode,
+        expireTime: Long?,
+        listener: MegaRequestListenerInterface,
+    ) {
+        if (expireTime != null && expireTime > 0) {
+            megaApi.exportNode(node, expireTime.toInt(), listener)
+        } else {
+            megaApi.exportNode(node, listener)
+        }
+    }
 }

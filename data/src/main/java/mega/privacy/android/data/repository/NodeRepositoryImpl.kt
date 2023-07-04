@@ -642,4 +642,20 @@ internal class NodeRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun exportNode(nodeToExport: NodeId, expireTime: Long?): String =
+        withContext(ioDispatcher) {
+            val node = getMegaNodeByHandle(nodeToExport, true)
+            requireNotNull(node) { "Node to export with handle ${nodeToExport.longValue} not found" }
+            require(!node.isTakenDown) { "Node to export with handle ${nodeToExport.longValue} not found" }
+
+            if (node.isExported && !node.isExpired && node.expirationTime == expireTime) {
+                return@withContext node.publicLink
+            }
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("exportNode") { it.link }
+                megaApiGateway.exportNode(node, expireTime, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }

@@ -449,4 +449,17 @@ interface NodeRepository {
      * @throws IllegalArgumentException if the node does not exist or is not in the rubbish bin
      */
     suspend fun deleteNodeByHandle(nodeToDelete: NodeId)
+
+
+    /**
+     * Export a MegaNode referenced by its [NodeId]
+     *
+     * @param nodeToExport the node's [NodeId] that we want to export
+     * @param expireTime the time in seconds since epoch to set as expiry date
+     * @return the [String] The link if the request finished with success, error if not
+     */
+    suspend fun exportNode(
+        nodeToExport: NodeId,
+        expireTime: Long?,
+    ): String
 }
