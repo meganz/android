@@ -484,4 +484,10 @@ interface AccountRepository {
      * @return The alias from user
      */
     suspend fun getUserAliasFromCache(userHandle: Long): String?
+
+    /**
+     * Checks whether MEGA Achievements are enabled for the open account
+     * @return True if enabled, false otherwise.
+     */
+    suspend fun isAchievementsEnabled(): Boolean
 }

@@ -33,10 +33,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.billing.MegaPurchase
-import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.Node
@@ -143,7 +141,6 @@ class ManagerViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
-    private val getPricing: GetPricing,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -563,13 +560,6 @@ class ManagerViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * Get product accounts
-     *
-     */
-    suspend fun getProductAccounts(): List<Product> =
-        runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
 
     /**
      * Ask for full account info

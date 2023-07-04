@@ -161,6 +161,7 @@ import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
+import mega.privacy.android.app.main.dialog.StorageStatusDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -279,7 +280,6 @@ import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings
-import mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -323,7 +323,6 @@ import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
-import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.TransfersStatus
@@ -512,7 +511,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var storageState: StorageState = StorageState.Unknown //Default value
     private var storageStateFromBroadcast: StorageState = StorageState.Unknown //Default value
     private var showStorageAlertWithDelay = false
-    private var isStorageStatusDialogShown = false
 
     private var confirmationTransfersDialog: AlertDialog? = null
     private var reconnectDialog: AlertDialog? = null
@@ -601,7 +599,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var processFileDialog: AlertDialog? = null
     private var permissionsDialog: AlertDialog? = null
     private var presenceStatusDialog: AlertDialog? = null
-    private var alertDialogStorageStatus: AlertDialog? = null
     private var enable2FADialog: AlertDialog? = null
 
     private var searchMenuItem: MenuItem? = null
@@ -917,7 +914,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         outState.putInt("elevation", mElevationCause)
         outState.putSerializable("storageState", storageState)
-        outState.putBoolean("isStorageStatusDialogShown", isStorageStatusDialogShown)
         outState.putInt(
             "comesFromNotificationDeepBrowserTreeIncoming",
             comesFromNotificationDeepBrowserTreeIncoming
@@ -1884,7 +1880,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 closeDrawer()
             }
-            checkCurrentStorageStatus(true)
+            checkCurrentStorageStatus()
             viewModel.startCameraUpload()
 
             //INITIAL FRAGMENT
@@ -2138,8 +2134,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         mElevationCause = savedInstanceState.getInt("elevation", 0)
         storageState = savedInstanceState.serializable("storageState")
             ?: StorageState.Unknown
-        isStorageStatusDialogShown =
-            savedInstanceState.getBoolean("isStorageStatusDialogShown", false)
         comesFromNotificationDeepBrowserTreeIncoming = savedInstanceState.getInt(
             "comesFromNotificationDeepBrowserTreeIncoming",
             Constants.INVALID_VALUE
@@ -3192,7 +3186,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         dbH.removeSentPendingMessages()
         megaApi.removeRequestListener(this)
         composite.clear()
-        isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
@@ -3281,8 +3274,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (showStorageAlertWithDelay) {
             showStorageAlertWithDelay = false
             checkStorageStatus(
-                if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState(),
-                false
+                if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState()
             )
         }
         if (!firstTimeAfterInstallation) {
@@ -3686,7 +3678,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 clickDrawerItem(drawerItem)
                 supportInvalidateOptionsMenu()
                 updateAccountDetailsVisibleInfo()
-                checkCurrentStorageStatus(false)
+                checkCurrentStorageStatus()
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
                 if (MegaApplication.openChatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
@@ -7052,12 +7044,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 
-    private fun navigateToAchievements() {
-        Timber.d("navigateToAchievements")
-        getProLayout.visibility = View.GONE
-        showMyAccount(IntentConstants.ACTION_OPEN_ACHIEVEMENTS, null, null)
-    }
-
     private fun navigateToContacts() {
         closeDrawer()
         startActivity(ContactsActivity.getListIntent(this))
@@ -7397,7 +7383,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 val moveHandles = intent.getLongArrayExtra("MOVE_HANDLES") ?: LongArray(0)
                 val toHandle = intent.getLongExtra("MOVE_TO", 0)
                 if (moveHandles.isNotEmpty()) {
-                    viewModel.checkNodesNameCollision(moveHandles.toList(), toHandle, NodeNameCollisionType.MOVE)
+                    viewModel.checkNodesNameCollision(
+                        moveHandles.toList(),
+                        toHandle,
+                        NodeNameCollisionType.MOVE
+                    )
                 }
             }
 
@@ -7834,13 +7824,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param onCreate Flag to indicate if the method was called from "onCreate" or not.
      */
-    private fun checkCurrentStorageStatus(onCreate: Boolean) {
+    private fun checkCurrentStorageStatus() {
         // If the current storage state is not initialized is because the app received the
         // event informing about the storage state  during login, the ManagerActivity
         // wasn't active and for this reason the value is stored in the MegaApplication object.
         val storageStateToCheck: StorageState =
             if (storageState !== StorageState.Unknown) storageState else viewModel.getStorageState()
-        checkStorageStatus(storageStateToCheck, onCreate)
+        checkStorageStatus(storageStateToCheck)
     }
 
     /**
@@ -7849,7 +7839,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param newStorageState Storage state to check.
      * @param onCreate        Flag to indicate if the method was called from "onCreate" or not.
      */
-    private fun checkStorageStatus(newStorageState: StorageState?, onCreate: Boolean) {
+    private fun checkStorageStatus(newStorageState: StorageState?) {
         val uploadServiceIntent = Intent(this, UploadService::class.java)
         when (newStorageState) {
             StorageState.Green -> {
@@ -7880,10 +7870,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.e(e, "Exception starting UploadService")
                     e.printStackTrace()
                 }
-                if (onCreate && isStorageStatusDialogShown) {
-                    isStorageStatusDialogShown = false
-                    showStorageAlmostFullDialog()
-                } else if (newStorageState.ordinal > storageState.ordinal) {
+                if (newStorageState.ordinal > storageState.ordinal) {
                     showStorageAlmostFullDialog()
                 }
                 storageState = newStorageState
@@ -7893,10 +7880,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             StorageState.Red -> {
                 Timber.w("STORAGE STATE RED")
-                if (onCreate && isStorageStatusDialogShown) {
-                    isStorageStatusDialogShown = false
-                    showStorageFullDialog()
-                } else if (newStorageState.ordinal > storageState.ordinal) {
+                if (newStorageState.ordinal > storageState.ordinal) {
                     showStorageFullDialog()
                 }
             }
@@ -7955,186 +7939,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         storageState: StorageState,
         overQuotaAlert: Boolean,
         preWarning: Boolean,
-    ) = lifecycleScope.launch {
-        Timber.d("showStorageStatusDialog")
-        if (myAccountInfo.accountType == -1) {
-            Timber.w("Do not show dialog, not info of the account received yet")
-            return@launch
+    ) {
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            StorageStatusDialogFragment.newInstance(storageState, overQuotaAlert, preWarning)
+                .show(supportFragmentManager, StorageStatusDialogFragment.TAG)
         }
-        if (isStorageStatusDialogShown) {
-            Timber.d("Storage status dialog already shown")
-            return@launch
-        }
-        val dialogBuilder = MaterialAlertDialogBuilder(this@ManagerActivity)
-        val inflater: LayoutInflater = this@ManagerActivity.layoutInflater
-        val dialogView = inflater.inflate(R.layout.storage_status_dialog_layout, null)
-        dialogBuilder.setView(dialogView)
-        val title = dialogView.findViewById<TextView>(R.id.storage_status_title)
-        title.text = getString(R.string.action_upgrade_account)
-        val image = dialogView.findViewById<ImageView>(R.id.image_storage_status)
-        val text = dialogView.findViewById<TextView>(R.id.text_storage_status)
-        val pro3 = pRO3OneMonth()
-        var storageString: String? = ""
-        var transferString: String? = ""
-        if (pro3 != null) {
-            storageString = Util.getSizeStringGBBased(pro3.storage.toLong())
-            transferString = Util.getSizeStringGBBased(pro3.transfer.toLong())
-        }
-        when (storageState) {
-            StorageState.Green -> {
-                Timber.d("STORAGE STATE GREEN")
-                return@launch
-            }
-
-            StorageState.Orange -> {
-                image.setImageResource(R.drawable.ic_storage_almost_full)
-                text.text = String.format(
-                    getString(R.string.text_almost_full_warning),
-                    storageString,
-                    transferString
-                )
-            }
-
-            StorageState.Red -> {
-                image.setImageResource(R.drawable.ic_storage_full)
-                text.text = String.format(
-                    getString(R.string.text_storage_full_warning),
-                    storageString,
-                    transferString
-                )
-            }
-
-            else -> {
-                Timber.w("STORAGE STATE INVALID VALUE: %d", storageState.ordinal)
-                return@launch
-            }
-        }
-        if (overQuotaAlert) {
-            if (!preWarning) title.text = getString(R.string.overquota_alert_title)
-            text.text =
-                getString(if (preWarning) R.string.pre_overquota_alert_text else R.string.overquota_alert_text)
-        }
-        val horizontalButtonsLayout =
-            dialogView.findViewById<LinearLayout>(R.id.horizontal_buttons_storage_status_layout)
-        val verticalButtonsLayout =
-            dialogView.findViewById<LinearLayout>(R.id.vertical_buttons_storage_status_layout)
-        val dismissClickListener = View.OnClickListener {
-            alertDialogStorageStatus?.dismiss()
-            isStorageStatusDialogShown = false
-        }
-        val upgradeClickListener = View.OnClickListener {
-            alertDialogStorageStatus?.dismiss()
-            isStorageStatusDialogShown = false
-            navigateToUpgradeAccount()
-        }
-        val achievementsClickListener = View.OnClickListener {
-            alertDialogStorageStatus?.dismiss()
-            isStorageStatusDialogShown = false
-            Timber.d("Go to achievements section")
-            navigateToAchievements()
-        }
-        val customPlanClickListener = View.OnClickListener {
-            alertDialogStorageStatus?.dismiss()
-            isStorageStatusDialogShown = false
-            askForCustomizedPlan(this@ManagerActivity, megaApi.myEmail, myAccountInfo.accountType)
-        }
-        val verticalDismissButton =
-            dialogView.findViewById<Button>(R.id.vertical_storage_status_button_dissmiss)
-        verticalDismissButton.setOnClickListener(dismissClickListener)
-        val horizontalDismissButton =
-            dialogView.findViewById<Button>(R.id.horizontal_storage_status_button_dissmiss)
-        horizontalDismissButton.setOnClickListener(dismissClickListener)
-        val verticalActionButton =
-            dialogView.findViewById<Button>(R.id.vertical_storage_status_button_action)
-        val horizontalActionButton =
-            dialogView.findViewById<Button>(R.id.horizontal_storage_status_button_payment)
-        val achievementsButton =
-            dialogView.findViewById<Button>(R.id.vertical_storage_status_button_achievements)
-        achievementsButton.setOnClickListener(achievementsClickListener)
-        when (myAccountInfo.accountType) {
-            MegaAccountDetails.ACCOUNT_TYPE_PROIII -> {
-                Timber.d("Show storage status dialog for USER PRO III")
-                if (!overQuotaAlert) {
-                    when (storageState) {
-                        StorageState.Orange -> {
-                            text.text = getString(R.string.text_almost_full_warning_pro3_account)
-                        }
-
-                        StorageState.Red -> {
-                            text.text = getString(R.string.text_storage_full_warning_pro3_account)
-                        }
-
-                        else -> {}
-                    }
-                }
-                horizontalActionButton.text = getString(R.string.button_custom_almost_full_warning)
-                horizontalActionButton.setOnClickListener(customPlanClickListener)
-                verticalActionButton.text = getString(R.string.button_custom_almost_full_warning)
-                verticalActionButton.setOnClickListener(customPlanClickListener)
-            }
-
-            MegaAccountDetails.ACCOUNT_TYPE_LITE, MegaAccountDetails.ACCOUNT_TYPE_PROI, MegaAccountDetails.ACCOUNT_TYPE_PROII -> {
-                Timber.d("Show storage status dialog for USER PRO")
-                if (!overQuotaAlert) {
-                    when (storageState) {
-                        StorageState.Orange -> {
-                            text.text = String.format(
-                                getString(R.string.text_almost_full_warning_pro_account),
-                                storageString,
-                                transferString
-                            )
-                        }
-
-                        StorageState.Red -> {
-                            text.text = String.format(
-                                getString(R.string.text_storage_full_warning_pro_account),
-                                storageString,
-                                transferString
-                            )
-                        }
-
-                        else -> {}
-                    }
-                }
-                horizontalActionButton.text = getString(R.string.my_account_upgrade_pro)
-                horizontalActionButton.setOnClickListener(upgradeClickListener)
-                verticalActionButton.text = getString(R.string.my_account_upgrade_pro)
-                verticalActionButton.setOnClickListener(upgradeClickListener)
-            }
-
-            MegaAccountDetails.ACCOUNT_TYPE_FREE -> {
-                Timber.d("Show storage status dialog for FREE USER")
-                horizontalActionButton.text = getString(R.string.button_plans_almost_full_warning)
-                horizontalActionButton.setOnClickListener(upgradeClickListener)
-                verticalActionButton.text = getString(R.string.button_plans_almost_full_warning)
-                verticalActionButton.setOnClickListener(upgradeClickListener)
-            }
-
-            else -> {
-                Timber.d("Show storage status dialog for FREE USER")
-                horizontalActionButton.text = getString(R.string.button_plans_almost_full_warning)
-                horizontalActionButton.setOnClickListener(upgradeClickListener)
-                verticalActionButton.text = getString(R.string.button_plans_almost_full_warning)
-                verticalActionButton.setOnClickListener(upgradeClickListener)
-            }
-        }
-        if (megaApi.isAchievementsEnabled) {
-            horizontalButtonsLayout.visibility = View.GONE
-            verticalButtonsLayout.visibility = View.VISIBLE
-        } else {
-            horizontalButtonsLayout.visibility = View.VISIBLE
-            verticalButtonsLayout.visibility = View.GONE
-        }
-        alertDialogStorageStatus = dialogBuilder.create()
-        alertDialogStorageStatus?.setCancelable(false)
-        alertDialogStorageStatus?.setCanceledOnTouchOutside(false)
-        isStorageStatusDialogShown = true
-        alertDialogStorageStatus?.show()
     }
-
-    // Edge case: when this method is called, TYPE_GET_PRICING hasn't finished yet.
-    private suspend fun pRO3OneMonth(): Product? = viewModel.getProductAccounts()
-        .firstOrNull { it.level == Constants.PRO_III && it.months == 1 }
 
     private fun refreshOfflineNodes() {
         Timber.d("updateOfflineView")
@@ -10237,8 +10047,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 storageStateFromBroadcast = data.storageState ?: StorageState.Unknown
                 if (!showStorageAlertWithDelay) {
                     checkStorageStatus(
-                        if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState(),
-                        false
+                        if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState()
                     )
                 }
                 updateAccountDetailsVisibleInfo()

@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -49,13 +51,15 @@ internal fun StorageStatusDialogView(
     verticalActionButtonClickListener: () -> Unit,
     achievementButtonClickListener: () -> Unit,
     modifier: Modifier = Modifier,
+    usePlatformDefaultWidth: Boolean = true,
 ) {
     val detail = getDetail(state = state)
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
             dismissOnClickOutside = false,
-            dismissOnBackPress = false
+            dismissOnBackPress = false,
+            usePlatformDefaultWidth = usePlatformDefaultWidth
         )
     ) {
         Surface(
@@ -64,7 +68,11 @@ internal fun StorageStatusDialogView(
             elevation = 24.dp,
             shape = RoundedCornerShape(4.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

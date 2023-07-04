@@ -274,7 +274,6 @@ class ManagerViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
-            getPricing = getPricing,
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             getActiveSubscriptionUseCase = mock(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -725,18 +724,6 @@ class ManagerViewModelTest {
             advanceUntilIdle()
             assertThat(underTest.onGetNumUnreadUserAlerts().test().value().second).isEqualTo(3)
         }
-
-    @Test
-    fun `test that an exception from get pricing is not propagated`() = runTest {
-        whenever(getPricing(any())).thenAnswer { throw MegaException(1, "It's broken") }
-
-        with(underTest) {
-            getProductAccounts()
-            state.test {
-                assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
-            }
-        }
-    }
 
     @Test
     fun `test that an exception from get full account info is not propagated`() = runTest {

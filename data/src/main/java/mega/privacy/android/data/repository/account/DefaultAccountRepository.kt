@@ -134,7 +134,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
     private val ephemeralCredentialsGateway: EphemeralCredentialsGateway,
-    private val accountBlockedDetailMapper: AccountBlockedDetailMapper
+    private val accountBlockedDetailMapper: AccountBlockedDetailMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -890,6 +890,10 @@ internal class DefaultAccountRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaChatApiGateway.getUserAliasFromCache(userHandle)
         }
+
+    override suspend fun isAchievementsEnabled() = withContext(ioDispatcher) {
+        megaApiGateway.isAchievementsEnabled
+    }
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
