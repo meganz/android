@@ -24,14 +24,14 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -99,7 +99,7 @@ class NameCollisionViewModel @Inject constructor(
                 }
                 .onStart {
                     getFileVersionsOption(true)
-                }
+                }.catch { Timber.e(it) }
                 .collect {
                     updateFileVersioningInfo()
                 }
@@ -588,7 +588,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun setMovementResult(
         movementResult: MoveRequestResult.GeneralMovement,
-        moveToHandle: Long
+        moveToHandle: Long,
     ) {
         if (moveToHandle != -1L)
             setMoveLatestPath(moveToHandle)
