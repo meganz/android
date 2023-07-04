@@ -4564,9 +4564,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">记住偏好设置</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">设备中心</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">设备中心</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">每日</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4638,7 +4638,7 @@
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">当前方案</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <string name="account_upgrade_account_description_title_features">Pro方案的功能</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
@@ -4699,8 +4699,7 @@
     <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Anyone with this link can view and download your data</item>
-        <item quantity="other">Anyone with these links can view and download your data</item>
+        <item quantity="other">任何拥有这些链接的人都可以查看和下载您的数据</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">保存到云盘</string>
@@ -4723,8 +4722,7 @@
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
-        <item quantity="one">Link created and copied to your clipboard</item>
-        <item quantity="other">Links created and copied to your clipboard</item>
+        <item quantity="other">链接已创建并复制到您的剪贴板</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
@@ -4754,4 +4752,78 @@
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
     <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">日</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">周一</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">周一</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">周二</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">周二</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">周三</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">周三</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">周四</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">周四</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">周五</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">周五</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">周六</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">周六</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">周日</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">周日</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">First</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">Second</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Third</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Fourth</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Fifth</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="one">First %1$s of every month</item>
+        <item quantity="other">First %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="one">Second %1$s of every month</item>
+        <item quantity="other">Second %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="one">Third %1$s of every month</item>
+        <item quantity="other">Third %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="one">Fourth %1$s of every month</item>
+        <item quantity="other">Fourth %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="one">Fifth %1$s of every month</item>
+        <item quantity="other">Fifth %1$s of every %2$d months</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="one">Every month on the %2$d</item>
+        <item quantity="other">Every %1$s months on the %2$d</item>
+    </plurals>
 </resources>

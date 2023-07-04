@@ -4748,5 +4748,73 @@
         <item quantity="other">%1$sと%2$s、%3$d週間ごと</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">このプランの定期的なサブスクリプションをすでにお持ちです</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">アルバムを保存できません</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">このアルバムをクラウドドライブに保存するのに十分なストレージがありません。今すぐアップグレードしてストレージを増やしてください。</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">日にち</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">月曜日</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">月曜日</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">火曜日</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">火曜日</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">水曜日</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">水曜日</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">木曜日</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">木曜日</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">金曜日</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">金曜日</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">土曜日</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">土曜日</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">日曜日</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">日曜日</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">第1</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">第2</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">第3</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">第4</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">第5</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="other">%2$dか月ごとの最初の%1$s</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="other">%2$dか月ごとの第2%1$s</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="other">%2$dか月ごとの第3%1$s</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="other">%2$dか月ごとの第4%1$s</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="other">%2$dか月ごとの第5%1$s</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="other">%1$s月ごとに、第%2$d日</item>
+    </plurals>
 </resources>

@@ -233,7 +233,7 @@
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
     <string name="title_incoming_shares_explorer">Mục chia sẻ nhận được</string>
     <!-- Title of the share with file explorer -->
-    <string name="title_incoming_shares_with_explorer">Mục chia sẻ nhận được từ</string>
+    <string name="title_incoming_shares_with_explorer">Mục chia&#160;sẻ nhận được từ</string>
     <!-- message when there are no files in the Cloud drive -->
     <string name="file_browser_empty_cloud_drive">Không có tệp&#160;tin nào trong Ổ&#160;Mây</string>
     <!-- Text that indicates that a folder is currently empty -->
@@ -331,7 +331,7 @@
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Đang chuẩn bị tệp tin</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_download">Tải xuống</string>
+    <string name="context_download">Tải&#160;xuống</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_move">Di chuyển</string>
     <!-- while moving a file or folder -->
@@ -1116,7 +1116,7 @@
     <!-- Answer for confirmation dialog. -->
     <string name="general_dismiss">Đã đọc</string>
     <!-- Content of a normal message that cannot be recognized -->
-    <string name="error_message_unrecognizable">Tin nhắn không nhận dạng được</string>
+    <string name="error_message_unrecognizable">Tin&#160;nhắn không nhận dạng được</string>
     <!-- Title of the settings section to configure the autoaway of chat presence -->
     <string name="settings_autoaway_title">Tự động vắng mặt</string>
     <!-- Subtitle of the settings section to configure the autoaway of chat presence -->
@@ -1934,7 +1934,7 @@
     <!-- Menu option to restore an item from the Rubbish bin -->
     <string name="context_restore">Khôi phục</string>
     <!-- success message when a node was restore from Rubbish bin -->
-    <string name="context_correctly_node_restored">Đã được khôi phục vào %s</string>
+    <string name="context_correctly_node_restored">Đã được khôi&#160;phục vào %s</string>
     <!-- error message when a node was restore from Rubbish bin -->
     <string name="context_no_restored">Lỗi phát sinh. Mục không thể khôi phục.</string>
     <!-- menu item from contact section to send a message to a contact -->
@@ -2492,7 +2492,7 @@
     <!-- Text of the dialog shown when a pdf required password -->
     <string name="text_pdf_password">%s là tệp tin PDF được bảo vệ với mật khẩu. Xin nhập mật khẩu để mở PDF này.</string>
     <!-- Error of the dialog shown wen a pdf required password and the user has been typed three times a wrong password -->
-    <string name="error_max_pdf_password">Mật khẩu vừa nhập không hợp lệ.</string>
+    <string name="error_max_pdf_password">Mật&#160;khẩu vừa nhập không hợp lệ.</string>
     <!-- Alert shown when exists some call and the user tries to play an audio or video -->
     <string name="not_allow_play_alert">Việc phát nội dung phương tiện số không thực hiện được khi có cuộc gọi đang diễn ra.</string>
     <!-- Text shown in the list of chats when there is a call in progress but I am not on it -->
@@ -4748,5 +4748,73 @@
         <item quantity="other">%1$s và %2$s, mỗi %3$d tuần</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Bạn hiện đang có một đăng&#160;ký định&#160;kỳ cho gói này</string>
+    <!-- Album import storage exceeded title -->
+    <string name="album_import_storage_exceeded_title">Không thể lưu lại album</string>
+    <!-- Album import storage exceeded description -->
+    <string name="album_import_storage_exceeded_description">Bạn không có đủ không&#160;gian lưu&#160;trữ để lưu lại album này vào Ổ&#160;Mây của bạn. Nâng&#160;cấp ngay để có thêm không&#160;gian lưu&#160;trữ.</string>
+    <!-- Title of occurs on day option in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_occurs_on_day_section">Ngày</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section">thứ&#160;Hai</string>
+    <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_monday_monthly_section_sentence_middle">thứ&#160;Hai</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section">thứ&#160;Ba</string>
+    <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">thứ&#160;Ba</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">thứ&#160;Tư</string>
+    <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">thứ&#160;Tư</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section">thứ&#160;Năm</string>
+    <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">thứ&#160;Năm</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section">thứ&#160;Sáu</string>
+    <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">thứ&#160;Sáu</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section">thứ&#160;Bảy</string>
+    <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">thứ&#160;Bảy</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section">Chủ&#160;Nhật</string>
+    <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
+    <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">Chủ&#160;Nhật</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
+    <string name="meetings_custom_recurrence_first_week_monthly_section">đầu&#160;tiên</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
+    <string name="meetings_custom_recurrence_second_week_monthly_section">lần thứ nhì</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
+    <string name="meetings_custom_recurrence_third_week_monthly_section">lần thứ ba</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">lần thứ tư</string>
+    <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">lần thứ năm</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
+        <item quantity="other">%1$s đầu&#160;tiên của mỗi %2$d tháng</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
+        <item quantity="other">%1$s lần thứ nhì của mỗi %2$d tháng</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
+        <item quantity="other">%1$s lần thứ ba của mỗi %2$d tháng</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
+        <item quantity="other">%1$s lần thứ tư của mỗi %2$d tháng</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
+        <item quantity="other">%1$s lần thứ năm của mỗi %2$d tháng</item>
+    </plurals>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
+    <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
+        <item quantity="other">Mỗi %1$s tháng vào ngày %2$d</item>
+    </plurals>
 </resources>
