@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -557,10 +558,11 @@ class DefaultTransfersRepositoryTest {
             transferType: TransferType,
         ) =
             runTest {
-                val expected = mock<Flow<List<ActiveTransfer>>>()
+                val expected = mock<List<ActiveTransfer>>()
+                val flow = flowOf(expected)
                 whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
-                    .thenReturn(expected)
-                val actual = underTest.getActiveTransfersByType(transferType)
+                    .thenReturn(flow)
+                val actual = underTest.getActiveTransfersByType(transferType).first()
                 assertThat(actual).isEqualTo(expected)
             }
 
@@ -607,10 +609,11 @@ class DefaultTransfersRepositoryTest {
         fun `test that getActiveTransferTotalsByType gateway result is returned when getActiveTransferTotalsByType is called`(
             transferType: TransferType,
         ) = runTest {
-            val expected = mock<Flow<ActiveTransferTotals>>()
+            val expected = mock<ActiveTransferTotals>()
+            val flow = flowOf(expected)
             whenever(megaLocalRoomGateway.getActiveTransferTotalsByType(transferType))
-                .thenReturn(expected)
-            val actual = underTest.getActiveTransferTotalsByType(transferType)
+                .thenReturn(flow)
+            val actual = underTest.getActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
         }
 

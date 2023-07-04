@@ -370,7 +370,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override fun getActiveTransfersByType(transferType: TransferType) =
-        megaLocalRoomGateway.getActiveTransfersByType(transferType)
+        megaLocalRoomGateway
+            .getActiveTransfersByType(transferType)
+            .flowOn(ioDispatcher)
+            .cancellable()
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
@@ -392,7 +395,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
-        megaLocalRoomGateway.getActiveTransferTotalsByType(transferType)
+        megaLocalRoomGateway
+            .getActiveTransferTotalsByType(transferType)
+            .flowOn(ioDispatcher)
+            .cancellable()
 
     override suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals =
         withContext(ioDispatcher) {
