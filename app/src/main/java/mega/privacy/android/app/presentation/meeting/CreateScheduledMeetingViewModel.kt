@@ -488,7 +488,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             newMonthDayList = state.value.rulesSelected.monthDayList,
             newMonthWeekDayList = state.value.rulesSelected.monthWeekDayList,
             newMonthDayOption = if (monthDayList.isNullOrEmpty()) state.value.getStartMonthDay() else monthDayList.first(),
-            newMonthWeekDayListOption = state.value.rulesSelected.monthWeekDayList.ifEmpty { state.value.customRecurrenceState.getDefaultMonthWeekDayList() }
+            newMonthWeekDayListOption = state.value.rulesSelected.monthWeekDayList.ifEmpty { state.value.getDefaultMonthWeekDayList() }
         )
     }
 
@@ -542,10 +542,14 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      * @param newValue
      */
     fun onMonthDayChanged(newValue: String) {
-        val newMonthDay = when {
+        var newMonthDay: Int? = when {
             newValue.isEmpty() -> -1
-            newValue.toInt() > MAXIMUM_DAYS_IN_MONTH -> state.value.customRecurrenceState.monthDayOption
-            else -> newValue.toInt()
+            else -> newValue.toIntOrNull()
+        }
+
+        newMonthDay = when {
+            newMonthDay == null || newMonthDay == 0 || newMonthDay > MAXIMUM_DAYS_IN_MONTH -> state.value.customRecurrenceState.monthDayOption
+            else -> newMonthDay
         }
 
         updateCustomRules(
@@ -701,7 +705,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             val isValidRecurrence = newRules != state.rulesSelected && newRules.interval != -1 && (
                     (newRules.freq == OccurrenceFrequencyType.Daily) ||
                             (newRules.freq == OccurrenceFrequencyType.Weekly && !newRules.weekDayList.isNullOrEmpty()) ||
-                            (newRules.freq == OccurrenceFrequencyType.Monthly)
+                            (newRules.freq == OccurrenceFrequencyType.Monthly && newMonthDayOption != -1)
                     )
 
             state.copy(
@@ -714,7 +718,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     showMonthlyRecurrenceWarning = shouldShownMonthWarning(
                         newRules.freq,
                         newRules.monthDayList?.first()
-                    )
+                    ),
+                    monthlyRadioButtonOptionSelected = when {
+                        newRules.monthWeekDayList.isEmpty() -> MonthlyRecurrenceOption.MonthDay
+                        else -> MonthlyRecurrenceOption.MonthWeekday
+                    },
                 )
             )
         }
@@ -732,6 +740,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 customRecurrenceState = state.customRecurrenceState.copy(newRules = ChatScheduledRules())
             )
         }
+        checkMonthWarning()
         Timber.d("Accepted rules ${state.value.customRecurrenceState.newRules}")
     }
 

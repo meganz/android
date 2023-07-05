@@ -168,13 +168,15 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onTitleValueChange = viewModel::onTitleChange,
                         onRecurrenceDialogOptionClicked = { optionSelected ->
                             viewModel.dismissDialog()
-                            if (optionSelected == RecurrenceDialogOption.Custom ||
-                                optionSelected == RecurrenceDialogOption.Customised
-                            ) {
-                                viewModel.setInitialCustomRules()
-                                navController.navigate(CUSTOM_RECURRENCE_TAG)
-                            } else {
-                                viewModel.onDefaultRecurrenceOptionTap(optionSelected)
+                            when {
+                                optionSelected == RecurrenceDialogOption.Custom -> {
+                                    viewModel.setInitialCustomRules()
+                                    navController.navigate(CUSTOM_RECURRENCE_TAG)
+                                }
+
+                                optionSelected != RecurrenceDialogOption.Customised -> {
+                                    viewModel.onDefaultRecurrenceOptionTap(optionSelected)
+                                }
                             }
                         }
                     )

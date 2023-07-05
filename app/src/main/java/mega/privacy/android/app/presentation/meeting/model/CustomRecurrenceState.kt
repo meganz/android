@@ -30,12 +30,4 @@ data class CustomRecurrenceState constructor(
     val monthlyRadioButtonOptionSelected: MonthlyRecurrenceOption = MonthlyRecurrenceOption.MonthDay,
     val isValidRecurrence: Boolean = true,
     val showMonthlyRecurrenceWarning: Boolean = false,
-) {
-    /**
-     * Get month weekday list
-     *
-     * @return month weekday list
-     */
-    fun getDefaultMonthWeekDayList() =
-        listOf(MonthWeekDayItem(WeekOfMonth.First, listOf(Weekday.Monday)))
-}
+)

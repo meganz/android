@@ -5,14 +5,18 @@ import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewM
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 import java.time.DayOfWeek
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import java.time.temporal.WeekFields
 
 /**
  * Data class defining the state of [CreateScheduledMeetingViewModel]
@@ -163,6 +167,16 @@ data class CreateScheduledMeetingState constructor(
      */
     fun getStartMonthDay(): Int = startDate.dayOfMonth
 
+
+    /**
+     * Get month weekday list
+     *
+     * @return month weekday list
+     */
+    fun getDefaultMonthWeekDayList(): List<MonthWeekDayItem> {
+        return listOf(MonthWeekDayItem(getNumberOfWeek(), listOf(getStartWeekDay())))
+    }
+
     /**
      * Get month day list of start date
      *
@@ -185,6 +199,23 @@ data class CreateScheduledMeetingState constructor(
         DayOfWeek.FRIDAY -> Weekday.Friday
         DayOfWeek.SATURDAY -> Weekday.Saturday
         else -> Weekday.Sunday
+    }
+
+    /**
+     * Get number of week in start date
+     */
+    private fun getNumberOfWeek(): WeekOfMonth {
+        val weekOfMonth = LocalDate
+            .from(startDate)
+            .get(WeekFields.ISO.weekOfMonth())
+
+        return when (weekOfMonth) {
+            1 -> WeekOfMonth.First
+            2 -> WeekOfMonth.Second
+            3 -> WeekOfMonth.Third
+            4 -> WeekOfMonth.Fourth
+            else -> WeekOfMonth.Fifth
+        }
     }
 
     /**

@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.meeting.view
 
 import android.content.res.Configuration
 import android.text.format.DateFormat
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -29,10 +32,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -130,6 +135,7 @@ internal fun CreateScheduledMeetingView(
             )
         }
     ) { paddingValues ->
+        BackPressHandler(onBackPressed = onDiscardClicked)
 
         DiscardMeetingAlertDialog(
             state = state,
@@ -203,6 +209,31 @@ internal fun CreateScheduledMeetingView(
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     onScrollChange(!firstItemVisible)
+}
+
+@Composable
+private fun BackPressHandler(
+    backPressedDispatcher: OnBackPressedDispatcher? =
+        LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher,
+    onBackPressed: () -> Unit,
+) {
+    val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+
+    val backCallback = remember {
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                currentOnBackPressed()
+            }
+        }
+    }
+
+    DisposableEffect(key1 = backPressedDispatcher) {
+        backPressedDispatcher?.addCallback(backCallback)
+
+        onDispose {
+            backCallback.remove()
+        }
+    }
 }
 
 /**
@@ -350,26 +381,32 @@ private fun ActionButton(
             )
 
             if (action == ScheduleMeetingAction.Recurrence && state.showMonthlyRecurrenceWarning) {
-                Text(
-                    modifier = Modifier
-                        .padding(
-                            start = 72.dp,
-                            end = 16.dp,
-                            top = 8.dp,
-                            bottom = 8.dp
-                        ),
-                    style = MaterialTheme.typography.subtitle2.copy(
-                        color = MaterialTheme.colors.textColorSecondary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Normal,
-                    ),
-                    text = pluralStringResource(
-                        R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
-                        state.startDate.dayOfMonth,
-                        state.startDate.dayOfMonth
-                    ),
-                )
-                CustomDivider(withStartPadding = true)
+                state.rulesSelected.monthDayList?.let { list ->
+                    list.first().let { day ->
+                        Text(
+                            modifier = Modifier
+                                .padding(
+                                    start = 72.dp,
+                                    end = 16.dp,
+                                    top = 8.dp,
+                                    bottom = 8.dp
+                                ),
+                            style = MaterialTheme.typography.subtitle2.copy(
+                                color = MaterialTheme.colors.textColorSecondary,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Normal,
+                            ),
+                            text = pluralStringResource(
+                                R.plurals.meetings_schedule_meeting_recurrence_monthly_description,
+                                day,
+                                day
+                            ),
+                        )
+                        CustomDivider(withStartPadding = true)
+                    }
+
+                }
+
             }
         }
     }
