@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -53,10 +55,11 @@ class PushMessageWorker @AssistedInject constructor(
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
-    private val getChatNotificationUseCase: GetChatNotificationUseCase,
+    private val scheduledMeetingPushMessageNotification: ScheduledMeetingPushMessageNotification,
     private val createNotificationChannels: CreateChatNotificationChannelsUseCase,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val notificationManager: NotificationManagerCompat,
+    private val getChatRoom: GetChatRoom,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -111,14 +114,15 @@ class PushMessageWorker @AssistedInject constructor(
 
                 is ScheduledMeetingPushMessage -> {
                     if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
-                        runCatching { getChatNotificationUseCase(pushMessage) }
-                            .onSuccess { result ->
-                                notificationManager.notify(result.first, result.second)
-                            }
-                            .onFailure { error ->
-                                Timber.e(error)
-                                return@withContext Result.failure()
-                            }
+                        runCatching {
+                            scheduledMeetingPushMessageNotification.show(
+                                applicationContext,
+                                pushMessage.updateTitle()
+                            )
+                        }.onFailure { error ->
+                            Timber.e(error)
+                            return@withContext Result.failure()
+                        }
                     }
                 }
 
@@ -207,6 +211,11 @@ class PushMessageWorker @AssistedInject constructor(
     private suspend fun areMeetingRemindersEnabled(): Boolean =
         callsPreferencesGateway.getCallsMeetingRemindersPreference().firstOrNull() ==
                 CallsMeetingReminders.Enabled
+
+    private suspend fun ScheduledMeetingPushMessage.updateTitle(): ScheduledMeetingPushMessage =
+        runCatching { getChatRoom(chatRoomHandle)?.title }.getOrNull()?.let { chatRoomTitle ->
+            copy(title = chatRoomTitle)
+        } ?: this
 
     companion object {
         const val NOTIFICATION_CHANNEL_ID = 1086
