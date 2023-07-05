@@ -41,8 +41,6 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
-import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
-import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
@@ -465,18 +463,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     @Inject
     lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
-
-    /**
-     * Camera Service Wake Lock Handler
-     */
-    @Inject
-    lateinit var cameraServiceWakeLockHandler: CameraServiceWakeLockHandler
-
-    /**
-     * Camera Service Wifi Lock Handler
-     */
-    @Inject
-    lateinit var cameraServiceWifiLockHandler: CameraServiceWifiLockHandler
 
     /**
      * Disable Camera Uploads in Database
@@ -1614,7 +1600,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun initService() {
         // Start monitoring external events
-        startWakeAndWifiLocks()
         monitorConnectivityStatus()
         monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
@@ -1651,23 +1636,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
-
-    /**
-     * When [CameraUploadsWorker] is initialized, start the Wake and Wifi Locks
-     */
-    private fun startWakeAndWifiLocks() {
-        cameraServiceWakeLockHandler.startWakeLock()
-        cameraServiceWifiLockHandler.startWifiLock()
-    }
-
-    /**
-     * When [CameraUploadsWorker] ends, Stop both Wake and Wifi Locks
-     */
-    private fun stopWakeAndWifiLocks() {
-        cameraServiceWakeLockHandler.stopWakeLock()
-        cameraServiceWifiLockHandler.stopWifiLock()
-    }
-
     /**
      * Proceed with the end of the service
      * Clean up the resources
@@ -1684,7 +1652,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         sendStatusToBackupCenter(aborted = aborted)
         cancelAllPendingTransfers()
         broadcastProgress(100, 0)
-        stopWakeAndWifiLocks()
         cancelNotification()
 
         // isStopped signals means that the worker has been cancelled from the WorkManager
