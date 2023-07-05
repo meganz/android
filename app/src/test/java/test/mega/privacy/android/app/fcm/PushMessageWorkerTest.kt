@@ -36,7 +36,6 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
@@ -46,7 +45,7 @@ import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationBehaviourUseCase
-import nz.mega.sdk.MegaRequest
+import mega.privacy.android.domain.usecase.notifications.LegacyPushReceivedUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -72,11 +71,12 @@ class PushMessageWorkerTest {
     private lateinit var workDatabase: WorkDatabase
 
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
-    private val pushReceived = mock<PushReceived>()
+    private val pushReceivedUseCase = mock<LegacyPushReceivedUseCase>()
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase>()
     private val pushMessageMapper = mock<PushMessageMapper>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
-    private val scheduledMeetingPushMessageNotification = mock<ScheduledMeetingPushMessageNotification>()
+    private val scheduledMeetingPushMessageNotification =
+        mock<ScheduledMeetingPushMessageNotification>()
     private val createNotificationChannels = mock<CreateChatNotificationChannelsUseCase>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val notificationManager = mock<NotificationManagerCompat>()
@@ -126,7 +126,7 @@ class PushMessageWorkerTest {
                 }, workExecutor)
             ),
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
-            pushReceived = pushReceived,
+            pushReceivedUseCase = pushReceivedUseCase,
             retryPendingConnectionsUseCase = retryPendingConnectionsUseCase,
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
@@ -167,7 +167,7 @@ class PushMessageWorkerTest {
     @Test
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
         whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
-        whenever(pushReceived.invoke(any())).thenReturn(mock())
+        whenever(pushReceivedUseCase.invoke(any())).thenReturn(mock())
 
         underTest.doWork()
         verify(retryPendingConnectionsUseCase).invoke(false)
@@ -214,7 +214,7 @@ class PushMessageWorkerTest {
             val request = mock<ChatRequest> {
                 on { chatHandle }.thenReturn(null)
             }
-            whenever(pushReceived(true)).thenReturn(request)
+            whenever(pushReceivedUseCase(true)).thenReturn(request)
             val result = underTest.doWork()
 
             assertThat(result).isEqualTo(ListenableWorker.Result.success())

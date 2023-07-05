@@ -40,6 +40,15 @@ interface PushesRepository {
     suspend fun pushReceived(beep: Boolean): ChatRequest
 
     /**
+     * Notifies a push has been received.
+     *
+     * @param beep   True if should beep, false otherwise.
+     * @param chatId Chat identifier.
+     * @return Result of the request. Required for creating the notification.
+     */
+    suspend fun pushReceived(beep: Boolean, chatId: Long): ChatRequest
+
+    /**
      * Clear push token
      *
      */

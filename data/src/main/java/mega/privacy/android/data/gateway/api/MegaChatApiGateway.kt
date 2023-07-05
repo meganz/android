@@ -1,10 +1,10 @@
 package mega.privacy.android.data.gateway.api
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatLoggerInterface
@@ -77,6 +77,15 @@ interface MegaChatApiGateway {
      * @param listener  Listener.
      */
     fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface?)
+
+    /**
+     * Notifies a push has been received.
+     *
+     * @param beep      True if should beep, false otherwise.
+     * @param chatId    Chat identifier.
+     * @param listener  Listener.
+     */
+    fun pushReceived(beep: Boolean, chatId: Long, listener: MegaChatRequestListenerInterface?)
 
     /**
      * Refreshes DNS servers and retries pending connections.

@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.PushReceived
+import mega.privacy.android.domain.usecase.notifications.LegacyPushReceivedUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
 import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
@@ -50,7 +50,7 @@ import timber.log.Timber
  * Worker class to manage push notifications.
  *
  * @property backgroundFastLoginUseCase        Required for performing a complete login process with an existing session.
- * @property pushReceived                      Required for notifying received pushes.
+ * @property pushReceivedUseCase                      Required for notifying received pushes.
  * @property retryPendingConnectionsUseCase    Required for retrying pending connections.
  * @property pushMessageMapper                 [PushMessageMapper].
  */
@@ -59,7 +59,7 @@ class PushMessageWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val pushReceived: PushReceived,
+    private val pushReceivedUseCase: LegacyPushReceivedUseCase,
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
@@ -114,7 +114,7 @@ class PushMessageWorker @AssistedInject constructor(
 
             when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
                 is ChatPushMessage -> {
-                    runCatching { pushReceived(pushMessage.shouldBeep) }
+                    runCatching { pushReceivedUseCase(pushMessage.shouldBeep) }
                         .onSuccess { request ->
                             request.chatHandle?.let { chatId ->
                                 if (isChatNotifiableUseCase(chatId) && areNotificationsEnabled()) {

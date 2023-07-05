@@ -20,20 +20,20 @@ package mega.privacy.android.domain.entity
  * @property text                  Text relative to this request.
  * @property link                  Link relative to this request.
  * @property peersListByChatHandle Map of chat handles with their peers list related to the request.
- *                                 This value is valid for [ChatRequestType.PushReceived].
+ *                                 This value is valid for [ChatRequestType.PushReceivedUseCase].
  *                                 Each key is a chat handle, and its value corresponds to a list of
  *                                 user handles for unread messages in that chat.
  *                                 You can get the chat handles list with [handleList]
  * @property handleList            List of handles related to this request.
  *                                 This value is valid for these requests:
- *                                 - [ChatRequestType.PushReceived]: List of chat handles with unread messages.
+ *                                 - [ChatRequestType.PushReceivedUseCase]: List of chat handles with unread messages.
  *                                 - [ChatRequestType.LoadPreview] : List with one call identifier, if call doesn't exit it will be NULL.
  * @property paramType             Type of parameter related to the request.
  *                                 This value is valid for these requests:
  *                                 - [ChatRequestType.DisableAudioVideoCall]: ChatRequestParamType.Audio if audio request, ChatRequestParamType.Video if video request.
  *                                 - [ChatRequestType.AttachNodeMessage]: One for voice clips, zero for other nodes.
  *                                 - [ChatRequestType.RetryPendingConnections]: One for refreshUrl
- *                                 - [ChatRequestType.PushReceived]: Zero
+ *                                 - [ChatRequestType.PushReceivedUseCase]: Zero
  */
 data class ChatRequest(
     val type: ChatRequestType,

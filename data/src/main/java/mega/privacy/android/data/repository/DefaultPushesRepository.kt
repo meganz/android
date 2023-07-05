@@ -85,6 +85,19 @@ internal class DefaultPushesRepository @Inject constructor(
             }
         }
 
+    override suspend fun pushReceived(beep: Boolean, chatId: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApi.pushReceived(
+                    beep,
+                    chatId,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = onRequestPushReceivedCompleted(continuation)
+                    )
+                )
+            }
+        }
+
     override suspend fun clearPushToken() = withContext(ioDispatcher) {
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
             .clear().apply()

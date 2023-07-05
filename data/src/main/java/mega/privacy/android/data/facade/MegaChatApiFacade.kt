@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import mega.privacy.android.data.model.meeting.ChatCallUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
@@ -68,6 +68,12 @@ internal class MegaChatApiFacade @Inject constructor(
         beep: Boolean,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.pushReceived(beep, listener)
+
+    override fun pushReceived(
+        beep: Boolean,
+        chatId: Long,
+        listener: MegaChatRequestListenerInterface?,
+    ) = chatApi.pushReceived(beep, chatId, listener)
 
     override fun retryPendingConnections(
         disconnect: Boolean,
