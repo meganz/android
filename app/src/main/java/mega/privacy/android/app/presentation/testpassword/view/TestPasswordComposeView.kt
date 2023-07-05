@@ -106,6 +106,7 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PA
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_LAYOUT_TAG
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.MegaTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
@@ -362,7 +363,7 @@ internal fun TestPasswordComposeView(
             }
 
             if (uiState.isLoading) {
-                CircularProgressIndicator(
+                MegaCircularProgressIndicator(
                     modifier = Modifier
                         .constrainAs(loading) {
                             top.linkTo(appbar.bottom)
@@ -371,9 +372,7 @@ internal fun TestPasswordComposeView(
                             bottom.linkTo(parent.bottom)
                         }
                         .testTag(PROGRESS_LOADING_TAG)
-                        .size(44.dp),
-                    color = teal_300
-                )
+                        .size(44.dp))
             }
         }
 

@@ -4,11 +4,9 @@ import android.content.res.Configuration
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -21,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
@@ -59,12 +58,10 @@ fun ProgressDialog(
                         0x8A000000
                     )
                 )
-                LinearProgressIndicator(
+                MegaLinearProgressIndicator(
                     progress = progress,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(top = 32.dp, bottom = 32.dp),
-                    color = if (!MaterialTheme.colors.isLight) teal_200 else teal_300
                 )
                 TextButton(
                     onClick = onCancel,

@@ -18,13 +18,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.teal_300
 
 /**
- *  A common loading dialog with a [CircularProgressIndicator] and text.
+ *  A common loading dialog with a [MegaCircularProgressIndicator] and text.
  */
 @Composable
 fun LoadingDialog(
@@ -71,10 +72,7 @@ fun LoadingDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-                    CircularProgressIndicator(
-                        modifier = Modifier,
-                        color = teal_300,
-                    )
+                    MegaCircularProgressIndicator()
 
                     Text(
                         text = text,

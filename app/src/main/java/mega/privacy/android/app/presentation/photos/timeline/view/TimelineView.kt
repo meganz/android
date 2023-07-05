@@ -24,7 +24,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -42,7 +41,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
@@ -54,6 +52,8 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
+import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
@@ -108,6 +108,7 @@ fun TimelineView(
                         photosGridView()
                     }
                 }
+
                 else -> {
                     val dateCards = when (timelineViewState.selectedTimeBarTab) {
                         TimeBarTab.Years -> timelineViewState.yearsCardPhotos
@@ -236,11 +237,8 @@ fun CameraUploadProgressBar(
                     modifier = Modifier.padding(vertical = 14.dp, horizontal = 16.dp),
                 )
 
-                LinearProgressIndicator(
-                    progress = timelineViewState.progress,
-                    modifier = Modifier.fillMaxWidth(),
-                    color = colorResource(id = R.color.teal_300),
-                    backgroundColor = colorResource(id = R.color.grey_alpha_012)
+                MegaLinearProgressIndicator(
+                    progress = timelineViewState.progress
                 )
             }
         }
@@ -293,11 +291,7 @@ private fun EnableCameraUploadButton(onClick: () -> Unit, isVisible: () -> Boole
 /**
  * CU Progress Bar Preview
  */
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "DarkPreviewProgressBar"
-)
-@Preview
+@CombinedThemePreviews()
 @Composable
 fun PreviewProgressBar() {
     AndroidTheme(isSystemInDarkTheme()) {

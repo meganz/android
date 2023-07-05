@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -47,6 +46,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.body1Medium
@@ -131,9 +131,8 @@ internal fun SetupScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(
+            MegaCircularProgressIndicator(
                 modifier = Modifier.size(50.dp),
-                color = MaterialTheme.colors.teal_300_teal_200
             )
         }
     }

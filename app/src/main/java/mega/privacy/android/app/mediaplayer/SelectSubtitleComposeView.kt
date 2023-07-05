@@ -60,6 +60,7 @@ import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.core.ui.controls.appbar.SearchAppBar
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.model.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.teal_300
@@ -167,10 +168,12 @@ internal fun SelectSubtitleView(
                     EmptyTopBar {
                         onBackPressed()
                     }
+
                 selectedSubtitleFileInfo != null ->
                     SelectedTopBar {
                         onBackPressed()
                     }
+
                 else -> SearchAppBar(
                     searchWidgetState = searchState,
                     typedSearch = query ?: "",
@@ -201,20 +204,21 @@ internal fun SelectSubtitleView(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center,
                             content = {
-                                CircularProgressIndicator(
+                                MegaCircularProgressIndicator(
                                     modifier = Modifier
                                         .size(44.dp)
                                         .testTag(PROGRESS_TEST_TAG),
-                                    color = teal_300,
                                 )
                             },
                         )
+
                         isEmpty || items.isEmpty() -> SubtitleEmptyView(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .testTag(EMPTY_LIST_TEST_TAG),
                             isSearchMode = searchState == SearchWidgetState.EXPANDED
                         )
+
                         else -> SubtitleFileInfoListView(
                             subtitleInfoList = items,
                         ) { index ->

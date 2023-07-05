@@ -76,6 +76,7 @@ import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption
@@ -372,9 +373,8 @@ fun AlbumsView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
                 content = {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(44.dp),
-                        color = teal_300,
+                    MegaCircularProgressIndicator(
+                        modifier = Modifier.size(44.dp)
                     )
                 },
             )

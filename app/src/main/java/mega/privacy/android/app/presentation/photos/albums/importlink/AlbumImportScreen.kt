@@ -64,6 +64,7 @@ import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.MegaEmptyView
 import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
 import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.grey_020
@@ -731,9 +732,8 @@ private fun ImportAlbumDialog(
                             .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         content = {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(44.dp),
-                                color = teal_300,
+                            MegaCircularProgressIndicator(
+                                modifier = Modifier.size(44.dp)
                             )
 
                             Spacer(modifier = Modifier.width(16.dp))

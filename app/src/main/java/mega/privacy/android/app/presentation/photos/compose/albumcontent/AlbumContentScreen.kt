@@ -13,10 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
@@ -57,9 +55,10 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
@@ -172,19 +171,13 @@ fun AlbumContentScreen(
             )
 
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp),
-                    color = teal_300,
-                )
+                MegaLinearProgressIndicator()
             }
         } else if (albumContentState.isAddingPhotos) {
-            CircularProgressIndicator(
+            MegaCircularProgressIndicator(
                 modifier = Modifier
                     .size(44.dp)
-                    .align(Alignment.Center),
-                color = teal_300,
+                    .align(Alignment.Center)
             )
         } else {
             when (albumsState.currentAlbum) {
@@ -195,6 +188,7 @@ fun AlbumContentScreen(
                         .formatColorTag(context, 'B', R.color.grey_300_grey_600)
                         .toSpannedHtmlText()
                 )
+
                 Album.GifAlbum -> Back()
                 Album.RawAlbum -> Back()
                 is Album.UserAlbum -> MegaEmptyView(
@@ -204,13 +198,16 @@ fun AlbumContentScreen(
                         .formatColorTag(context, 'B', R.color.grey_300_grey_600)
                         .toSpannedHtmlText()
                 )
+
                 null -> Back()
             }
         }
 
-        Column(modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+        ) {
             val userAlbum = albumsState.currentUserAlbum
             if (userAlbum != null && albumContentState.isAddingPhotosProgressCompleted) {
                 val message = pluralStringResource(
@@ -396,11 +393,13 @@ private fun AddFabButton(
             .size(56.dp)
     ) {
         Icon(
-            painter = painterResource(id = if (MaterialTheme.colors.isLight) {
-                R.drawable.ic_add_white
-            } else {
-                R.drawable.ic_add
-            }),
+            painter = painterResource(
+                id = if (MaterialTheme.colors.isLight) {
+                    R.drawable.ic_add_white
+                } else {
+                    R.drawable.ic_add
+                }
+            ),
             contentDescription = "Add",
             tint = if (!MaterialTheme.colors.isLight) {
                 Color.Black

@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDuration
@@ -64,6 +63,8 @@ import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFac
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
+import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -289,11 +290,10 @@ private fun RequireLogin(
                 .padding(start = 22.dp, top = 10.dp, end = 22.dp)
                 .alpha(if (state.isLocalLogoutInProgress) 1f else 0f)
         ) {
-            CircularProgressIndicator(
+            MegaCircularProgressIndicator(
                 modifier = Modifier
                     .size(16.dp)
                     .padding(start = 3.dp),
-                color = MaterialTheme.colors.secondary,
                 strokeWidth = 1.dp
             )
             Text(
@@ -383,14 +383,11 @@ private fun LoginInProgress(
                             stringId = R.string.login_preparing_filelist,
                             modifier = Modifier.padding(top = 5.dp)
                         )
-                        LinearProgressIndicator(
+                        MegaLinearProgressIndicator(
                             progress = it.floatValue,
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .padding(start = 10.dp, top = 10.dp, end = 10.dp)
-                                .testTag(FETCH_NODES_PROGRESS_TEST_TAG),
-                            backgroundColor = MaterialTheme.colors.grey_200_grey_700,
-                            color = MaterialTheme.colors.secondary
+                                .testTag(FETCH_NODES_PROGRESS_TEST_TAG)
                         )
                     }
                 }
