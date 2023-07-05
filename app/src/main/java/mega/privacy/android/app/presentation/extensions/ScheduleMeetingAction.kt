@@ -6,6 +6,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 internal val ScheduleMeetingAction.title: Int
     get() = when (this) {
         ScheduleMeetingAction.Recurrence -> R.string.meetings_schedule_meeting_recurrence_label
+        ScheduleMeetingAction.EndRecurrence -> R.string.meetings_schedule_meeting_end_recurrence_label
         ScheduleMeetingAction.MeetingLink -> R.string.meeting_link
         ScheduleMeetingAction.AddParticipants -> R.string.add_participants_menu_item
         ScheduleMeetingAction.SendCalendarInvite -> R.string.meetings_schedule_meeting_send_calendar_invite_label
@@ -16,6 +17,7 @@ internal val ScheduleMeetingAction.title: Int
 internal val ScheduleMeetingAction.description: Int?
     get() = when (this) {
         ScheduleMeetingAction.Recurrence -> null
+        ScheduleMeetingAction.EndRecurrence -> null
         ScheduleMeetingAction.MeetingLink -> R.string.scheduled_meetings_share_meeting_link_panel_title
         ScheduleMeetingAction.AddParticipants -> null
         ScheduleMeetingAction.SendCalendarInvite -> null
@@ -23,9 +25,10 @@ internal val ScheduleMeetingAction.description: Int?
         ScheduleMeetingAction.AddDescription -> null
     }
 
-internal val ScheduleMeetingAction.icon: Int
+internal val ScheduleMeetingAction.icon: Int?
     get() = when (this) {
         ScheduleMeetingAction.Recurrence -> R.drawable.ic_recurrence
+        ScheduleMeetingAction.EndRecurrence -> null
         ScheduleMeetingAction.MeetingLink -> R.drawable.ic_meeting_link_info
         ScheduleMeetingAction.AddParticipants -> R.drawable.add_participants
         ScheduleMeetingAction.SendCalendarInvite -> R.drawable.ic_send_calendar

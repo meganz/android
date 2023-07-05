@@ -23,6 +23,9 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 private const val PLACEHOLDER_A_OPEN = "[A]"
 private const val PLACEHOLDER_A_CLOSE = "[/A]"
@@ -1127,6 +1130,23 @@ fun getScheduledMeetingFrequencyText(
             stringResource(id = R.string.meetings_schedule_meeting_recurrence_monthly_label)
         }
     }
+}
+
+/**
+ * Get the appropriate end recurrence string for a scheduled meeting.
+ *
+ * @param date         [ZonedDateTime]
+ */
+@Composable
+fun getScheduledMeetingEndRecurrenceText(
+    date: ZonedDateTime,
+): String {
+    val dateFormatter: DateTimeFormatter =
+        DateTimeFormatter
+            .ofPattern("d MMM yyyy")
+            .withZone(ZoneId.systemDefault())
+
+    return dateFormatter.format(date)
 }
 
 /**

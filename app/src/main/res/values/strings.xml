@@ -5038,6 +5038,10 @@
         <item quantity="one">Every month on the %2$d</item>
         <item quantity="other">Every %1$s months on the %2$d</item>
     </plurals>
+  <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_end_recurrence_label">End recurrence</string>
+    <!-- Title of Ends section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_ends_section">Ends</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
         <item quantity="one">Download started</item>
@@ -5048,4 +5052,5 @@
         <item quantity="one">Download complete</item>
         <item quantity="other">%1$d downloads complete</item>
     </plurals>
+>>>>>>> develop
 </resources>

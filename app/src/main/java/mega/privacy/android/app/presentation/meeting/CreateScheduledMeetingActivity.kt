@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,6 +33,7 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
@@ -68,6 +70,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
         const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
     }
+
+    private lateinit var navController: NavHostController
 
     /**
      * Perform Activity initialization
@@ -138,7 +142,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsState()
-        val navController = rememberNavController()
+        navController = rememberNavController()
 
         AndroidTheme(isDark = isDark) {
             NavHost(
@@ -204,9 +208,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                         onWeekdaysClicked = viewModel::onWeekdaysOptionTap,
                         onDayClicked = viewModel::onDayClicked,
                         onMonthlyRadioButtonClicked = viewModel::onMonthlyRadioButtonClicked,
-                        onMonthDayChanged = viewModel::onMonthDayChanged,
+                        onEndsRadioButtonClicked = viewModel::onEndsRadioButtonClicked,
+                        onMonthWeekDayChanged = viewModel::onMonthWeekDayChanged,
                         onWeekOfMonthChanged = viewModel::onWeekOfMonthChanged,
-                        onMonthWeekDayChanged = viewModel::onMonthWeekDayChanged
+                        onDateClicked = {
+                            viewModel.onEndsRadioButtonClicked(EndsRecurrenceOption.CustomDate)
+                            showUntilDatePicker()
+                        },
+                        onMonthDayChanged = viewModel::onMonthDayChanged,
                     )
                 }
             }
@@ -226,6 +235,45 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         }
         finish()
         this.startActivity(intentOpenChat)
+    }
+
+    /**
+     * Show until date picker
+     */
+    private fun showUntilDatePicker() {
+        if (materialDatePicker != null)
+            return
+
+        val currentState = viewModel.state.value
+        val currentDate = currentState.customRecurrenceState.endDateOccurrenceOption
+        val dateValidator = DateValidatorPointForward.now()
+        val milliseconds = currentDate.toInstant().toEpochMilli()
+        val selection = milliseconds + TimeZone.getDefault().getOffset(milliseconds)
+
+        materialDatePicker = MaterialDatePicker.Builder.datePicker()
+            .setTheme(R.style.MaterialCalendarTheme)
+            .setPositiveButtonText(getString(R.string.general_ok))
+            .setNegativeButtonText(getString(R.string.button_cancel))
+            .setTitleText(getString(R.string.meetings_schedule_meeting_calendar_select_date_label))
+            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+            .setSelection(selection)
+            .setCalendarConstraints(
+                CalendarConstraints.Builder().setValidator(dateValidator).build()
+            )
+            .build()
+            .apply {
+                addOnDismissListener {
+                    materialDatePicker = null
+                }
+                addOnPositiveButtonClickListener { selection ->
+                    viewModel.onUntilDateTap(
+                        ZonedDateTime.from(
+                            Instant.ofEpochMilli(selection).atZone(ZoneId.systemDefault())
+                        )
+                    )
+                }
+                show(supportFragmentManager, "DatePicker")
+            }
     }
 
     /**
@@ -340,6 +388,11 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     private fun onActionTap(action: ScheduleMeetingAction) {
         when (action) {
             ScheduleMeetingAction.Recurrence -> viewModel.onRecurrenceTap()
+            ScheduleMeetingAction.EndRecurrence -> {
+                viewModel.setInitialCustomRules()
+                navController.navigate(CUSTOM_RECURRENCE_TAG)
+            }
+
             ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
             ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
             ScheduleMeetingAction.SendCalendarInvite -> viewModel.onSendCalendarInviteTap()

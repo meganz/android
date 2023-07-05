@@ -161,6 +161,12 @@ data class CreateScheduledMeetingState constructor(
     }
 
     /**
+     * Get start date plus 6 months
+     * @return start date time plus 6 months
+     */
+    fun getStartDateTimePlus6Months(): ZonedDateTime = startDate.plusMonths(6)
+
+    /**
      * Get month day of start date
      *
      * @return month day

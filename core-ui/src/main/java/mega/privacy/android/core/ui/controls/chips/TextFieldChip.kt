@@ -47,6 +47,8 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
  * @param onFocusChange     Detects when is focus
  * @param modifier          [Modifier]
  * @param isDisabled        True, if it's disabled. False, if not
+ * @param readOnly          True if it is not a edit text view.
+ * @param isSmall           True it's small box. False if not.
  */
 @Composable
 fun TextFieldChip(
@@ -55,6 +57,8 @@ fun TextFieldChip(
     onFocusChange: () -> Unit,
     modifier: Modifier = Modifier,
     isDisabled: Boolean = false,
+    readOnly: Boolean = false,
+    isSmall: Boolean = true,
 ) = Box {
 
     var isFocused by remember { mutableStateOf(true) }
@@ -74,6 +78,7 @@ fun TextFieldChip(
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
+            readOnly = readOnly,
             modifier = modifier
                 .focusRequester(focusRequester)
                 .onFocusChanged {
@@ -101,9 +106,17 @@ fun TextFieldChip(
             ),
             decorationBox = { innerTextField ->
                 Box(
-                    modifier = modifier
+                    modifier = if (isSmall) modifier
                         .width(IntrinsicSize.Min)
                         .height(IntrinsicSize.Min)
+                        .widthIn(min = 40.dp)
+                        .heightIn(min = 32.dp)
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colors.onPrimary,
+                            shape = RoundedCornerShape(size = 8.dp)
+                        )
+                        .padding(top = 6.dp, bottom = 6.dp) else modifier
                         .widthIn(min = 40.dp)
                         .heightIn(min = 32.dp)
                         .border(
@@ -126,13 +139,14 @@ private fun PreviewTextFieldChip(
     @PreviewParameter(TextFieldProvider::class) state: TextFieldState,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        var text by remember { mutableStateOf("99") }
+        var text by remember { mutableStateOf("8 Sep 2022") }
 
         TextFieldChip(
             onTextChange = { text = it },
             text = text,
             modifier = Modifier,
             isDisabled = true,
+            isSmall = false,
             onFocusChange = { }
         )
     }

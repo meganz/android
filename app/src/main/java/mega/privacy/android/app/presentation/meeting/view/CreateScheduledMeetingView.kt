@@ -56,6 +56,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.meeting.StringId
+import mega.privacy.android.app.presentation.extensions.meeting.getUntilZonedDateTime
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
@@ -71,6 +72,7 @@ import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -342,14 +344,16 @@ private fun ActionButton(
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            if ((action != ScheduleMeetingAction.Recurrence && action != ScheduleMeetingAction.AddParticipants) ||
-                (action == ScheduleMeetingAction.Recurrence && state.scheduledMeetingEnabled) ||
+            if ((action != ScheduleMeetingAction.Recurrence && action != ScheduleMeetingAction.EndRecurrence && action != ScheduleMeetingAction.AddParticipants) ||
+                ((action == ScheduleMeetingAction.Recurrence || action == ScheduleMeetingAction.EndRecurrence) && state.scheduledMeetingEnabled) ||
                 (action == ScheduleMeetingAction.AddParticipants && state.allowAddParticipants)
             ) {
                 onButtonClicked(action)
             }
         }) {
-        if (action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription) {
+        if ((action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription)
+            && (action != ScheduleMeetingAction.EndRecurrence || state.rulesSelected.freq != OccurrenceFrequencyType.Invalid)
+        ) {
             ActionOption(
                 state = state,
                 action = action,
@@ -361,6 +365,7 @@ private fun ActionButton(
                 },
                 hasSwitch = when (action) {
                     ScheduleMeetingAction.Recurrence,
+                    ScheduleMeetingAction.EndRecurrence,
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.AddDescription,
                     -> false
@@ -372,6 +377,7 @@ private fun ActionButton(
             CustomDivider(
                 withStartPadding = when (action) {
                     ScheduleMeetingAction.Recurrence,
+                    ScheduleMeetingAction.EndRecurrence,
                     ScheduleMeetingAction.AddParticipants,
                     ScheduleMeetingAction.SendCalendarInvite,
                     -> true
@@ -522,17 +528,19 @@ private fun ActionOption(
             modifier = Modifier
                 .weight(1f)
         ) {
-            Box(
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .clip(RectangleShape)
-                    .wrapContentSize(Alignment.TopCenter)
-            ) {
-                Icon(
-                    painter = painterResource(id = action.icon),
-                    contentDescription = "${action.name} icon",
-                    tint = MaterialTheme.colors.textColorSecondary
-                )
+            action.icon?.let { icon ->
+                Box(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .clip(RectangleShape)
+                        .wrapContentSize(Alignment.TopCenter)
+                ) {
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = "${action.name} icon",
+                        tint = MaterialTheme.colors.textColorSecondary
+                    )
+                }
             }
 
             Column(
@@ -541,7 +549,10 @@ private fun ActionOption(
             ) {
                 Text(
                     modifier = Modifier
-                        .padding(start = 32.dp, end = 15.dp),
+                        .padding(
+                            if (action == ScheduleMeetingAction.EndRecurrence) 54.dp else 32.dp,
+                            end = 15.dp
+                        ),
                     style = MaterialTheme.typography.subtitle1,
                     text = stringResource(id = action.title),
                     color = MaterialTheme.colors.onPrimary
@@ -550,15 +561,19 @@ private fun ActionOption(
                 var subtitle: String? = null
 
                 when (action) {
-                    ScheduleMeetingAction.MeetingLink -> action.description?.let { description ->
-                        subtitle = stringResource(id = description)
+                    ScheduleMeetingAction.MeetingLink -> {
+                        action.description?.let { description ->
+                            subtitle = stringResource(id = description)
+                        }
                     }
 
-                    ScheduleMeetingAction.AddParticipants -> if (state.numOfParticipants > 1) subtitle =
-                        stringResource(
-                            id = R.string.number_of_participants,
-                            state.numOfParticipants
-                        )
+                    ScheduleMeetingAction.AddParticipants -> {
+                        if (state.numOfParticipants > 1) subtitle =
+                            stringResource(
+                                id = R.string.number_of_participants,
+                                state.numOfParticipants
+                            )
+                    }
 
                     ScheduleMeetingAction.Recurrence -> {
                         subtitle = getScheduledMeetingFrequencyText(
@@ -569,6 +584,14 @@ private fun ActionOption(
                         )
                     }
 
+                    ScheduleMeetingAction.EndRecurrence -> {
+                        val untilZonedDateTime = state.rulesSelected.getUntilZonedDateTime()
+                        subtitle = when (untilZonedDateTime) {
+                            null -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
+                            else -> getScheduledMeetingEndRecurrenceText(untilZonedDateTime)
+                        }
+                    }
+
                     else -> {}
                 }
 
@@ -576,9 +599,8 @@ private fun ActionOption(
                     Text(
                         modifier = Modifier
                             .padding(
-                                start = 32.dp,
-                                end = 16.dp,
-                                top = if (action == ScheduleMeetingAction.MeetingLink) 10.dp else if (action == ScheduleMeetingAction.Recurrence) 6.dp else 2.dp
+                                start = if (action == ScheduleMeetingAction.EndRecurrence) 54.dp else 32.dp,
+                                end = 15.dp
                             ),
                         style = MaterialTheme.typography.body2,
                         text = it,

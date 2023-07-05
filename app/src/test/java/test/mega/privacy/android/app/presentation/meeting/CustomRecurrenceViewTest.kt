@@ -10,6 +10,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ACCEPT_ICON
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_BACK_ICON
+import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_ENDS
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_DAILY
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_EVERY
 import mega.privacy.android.app.presentation.meeting.view.TEST_TAG_OCCURS_MONTHLY
@@ -144,6 +145,23 @@ class CustomRecurrenceViewTest {
     }
 
     @Test
+    fun `test that ends is shown`() {
+        initComposeRuleContent(
+            CreateScheduledMeetingState(
+                meetingTitle = "Title meeting",
+                rulesSelected = getMonthlyRules(),
+                customRecurrenceState = CustomRecurrenceState(
+                    newRules = getMonthlyRules(),
+                ),
+                participantItemList = emptyList(),
+                buttons = ScheduleMeetingAction.values().asList(),
+                snackBar = null
+            )
+        )
+        composeTestRule.onNodeWithTag(TEST_TAG_ENDS).assertExists()
+    }
+
+    @Test
     fun `test that on click event is fired when accept icon is clicked`() {
         val mock = mock<() -> Unit>()
         composeTestRule.setContent {
@@ -155,8 +173,8 @@ class CustomRecurrenceViewTest {
                     buttons = ScheduleMeetingAction.values().asList(),
                     snackBar = null
                 ),
-                onScrollChange = {},
                 onAcceptClicked = mock,
+                onScrollChange = {},
                 onRejectClicked = {},
                 onIntervalChanged = {},
                 onFrequencyTypeChanged = {},
@@ -164,9 +182,11 @@ class CustomRecurrenceViewTest {
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
                 onMonthlyRadioButtonClicked = {},
+                onEndsRadioButtonClicked = {},
                 onMonthDayChanged = {},
                 onMonthWeekDayChanged = {},
-                onWeekOfMonthChanged = {}
+                onWeekOfMonthChanged = {},
+                onDateClicked = {},
             )
         }
 
@@ -186,18 +206,20 @@ class CustomRecurrenceViewTest {
                     buttons = ScheduleMeetingAction.values().asList(),
                     snackBar = null
                 ),
+                onRejectClicked = mock,
                 onScrollChange = {},
                 onAcceptClicked = {},
-                onRejectClicked = mock,
                 onIntervalChanged = {},
                 onFrequencyTypeChanged = {},
                 onDayClicked = {},
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
                 onMonthlyRadioButtonClicked = {},
+                onEndsRadioButtonClicked = {},
                 onMonthDayChanged = {},
                 onMonthWeekDayChanged = {},
-                onWeekOfMonthChanged = {}
+                onWeekOfMonthChanged = {},
+                onDateClicked = {},
             )
         }
 
@@ -255,9 +277,11 @@ class CustomRecurrenceViewTest {
                 onWeekdaysClicked = {},
                 onFocusChanged = {},
                 onMonthlyRadioButtonClicked = {},
+                onEndsRadioButtonClicked = {},
                 onMonthDayChanged = {},
                 onMonthWeekDayChanged = {},
-                onWeekOfMonthChanged = {}
+                onWeekOfMonthChanged = {},
+                onDateClicked = {},
             )
         }
     }

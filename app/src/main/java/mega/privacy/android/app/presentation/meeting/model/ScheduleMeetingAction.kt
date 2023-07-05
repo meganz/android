@@ -11,6 +11,11 @@ enum class ScheduleMeetingAction {
     Recurrence,
 
     /**
+     * Set end recurrence.
+     */
+    EndRecurrence,
+
+    /**
      * Meeting link.
      */
     MeetingLink,

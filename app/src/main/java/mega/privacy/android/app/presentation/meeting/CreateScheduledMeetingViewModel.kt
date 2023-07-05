@@ -14,6 +14,8 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.MaximumValue
 import mega.privacy.android.app.presentation.extensions.meeting.OccurrenceType
+import mega.privacy.android.app.presentation.extensions.meeting.getUntilZonedDateTime
+import mega.privacy.android.app.presentation.extensions.meeting.isForever
 import mega.privacy.android.app.presentation.meeting.mapper.RecurrenceDialogOptionMapper
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
@@ -23,6 +25,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
+import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
@@ -184,6 +187,17 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Set until date
+     *
+     * @param selectedUntilDate     Until date
+     */
+    fun onUntilDateTap(selectedUntilDate: ZonedDateTime) =
+        updateCustomRules(
+            newEndDateOccurrenceOption = selectedUntilDate,
+            newUntil = selectedUntilDate.toEpochSecond()
+        )
 
     /**
      * Set start date and time
@@ -405,7 +419,6 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             sendEmails = state.enabledSendCalendarInviteOption,
                             isEmpty = false
                         )
-
                         createChatroomAndSchedMeetingUseCase(
                             peerList = state.getParticipantsIds(),
                             isMeeting = true,
@@ -488,7 +501,9 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             newMonthDayList = state.value.rulesSelected.monthDayList,
             newMonthWeekDayList = state.value.rulesSelected.monthWeekDayList,
             newMonthDayOption = if (monthDayList.isNullOrEmpty()) state.value.getStartMonthDay() else monthDayList.first(),
-            newMonthWeekDayListOption = state.value.rulesSelected.monthWeekDayList.ifEmpty { state.value.getDefaultMonthWeekDayList() }
+            newMonthWeekDayListOption = state.value.rulesSelected.monthWeekDayList.ifEmpty { state.value.getDefaultMonthWeekDayList() },
+            newEndDateOccurrenceOption = state.value.rulesSelected.getUntilZonedDateTime()
+                ?: state.value.getStartDateTimePlus6Months()
         )
     }
 
@@ -667,17 +682,34 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         )
     }
 
+
+    /**
+     * Ends radio button clicked
+     *
+     * @param newOptionClicked  [EndsRecurrenceOption]
+     */
+    fun onEndsRadioButtonClicked(newOptionClicked: EndsRecurrenceOption) {
+        updateCustomRules(
+            newUntil = when (newOptionClicked) {
+                EndsRecurrenceOption.Never -> 0L
+                EndsRecurrenceOption.CustomDate -> state.value.customRecurrenceState.endDateOccurrenceOption.toEpochSecond()
+            }
+        )
+    }
+
+
     /**
      * Update custom rules
      *
-     * @param newFreq                   new frequency
-     * @param newInterval               new interval
-     * @param newUntil                  new value until
-     * @param newWeekDayList            new [Weekday] list
-     * @param newMonthDayList           new [MonthWeekDayItem] list
-     * @param newMonthWeekDayList       new month weekday list
-     * @param newMonthDayOption         new month day option
-     * @param newMonthDayOption         new [MonthWeekDayItem] list option
+     * @param newFreq                       new frequency
+     * @param newInterval                   new interval
+     * @param newUntil                      new value until
+     * @param newWeekDayList                new [Weekday] list
+     * @param newMonthDayList               new [MonthWeekDayItem] list
+     * @param newMonthWeekDayList           new month weekday list
+     * @param newMonthDayOption             new month day option
+     * @param newMonthDayOption             new [MonthWeekDayItem] list option
+     * @param newEndDateOccurrenceOption    new [ZonedDateTime]
      */
     private fun updateCustomRules(
         newFreq: OccurrenceFrequencyType = state.value.customRecurrenceState.newRules.freq,
@@ -688,6 +720,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         newMonthWeekDayList: List<MonthWeekDayItem> = state.value.customRecurrenceState.newRules.monthWeekDayList,
         newMonthDayOption: Int = state.value.customRecurrenceState.monthDayOption,
         newMonthWeekDayListOption: List<MonthWeekDayItem> = state.value.customRecurrenceState.monthWeekDayListOption,
+        newEndDateOccurrenceOption: ZonedDateTime = state.value.customRecurrenceState.endDateOccurrenceOption,
     ) {
         val newRules = ChatScheduledRules(
             freq = newFreq,
@@ -708,6 +741,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             (newRules.freq == OccurrenceFrequencyType.Monthly && newMonthDayOption != -1)
                     )
 
+
             state.copy(
                 customRecurrenceState = state.customRecurrenceState.copy(
                     newRules = newRules,
@@ -719,10 +753,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                         newRules.freq,
                         newRules.monthDayList?.first()
                     ),
+                    endDateOccurrenceOption = newEndDateOccurrenceOption,
                     monthlyRadioButtonOptionSelected = when {
                         newRules.monthWeekDayList.isEmpty() -> MonthlyRecurrenceOption.MonthDay
                         else -> MonthlyRecurrenceOption.MonthWeekday
                     },
+                    endsRadioButtonOptionSelected = when {
+                        newRules.isForever() -> EndsRecurrenceOption.Never
+                        else -> EndsRecurrenceOption.CustomDate
+                    }
                 )
             )
         }
@@ -740,6 +779,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 customRecurrenceState = state.customRecurrenceState.copy(newRules = ChatScheduledRules())
             )
         }
+
         checkMonthWarning()
         Timber.d("Accepted rules ${state.value.customRecurrenceState.newRules}")
     }

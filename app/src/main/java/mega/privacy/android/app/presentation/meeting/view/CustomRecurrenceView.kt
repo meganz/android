@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.view
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,9 +68,11 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.DropdownOccurrenceType
+import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
+import java.time.ZonedDateTime
 
 /**
  * Custom recurrence View
@@ -77,17 +80,19 @@ import mega.privacy.android.domain.entity.meeting.Weekday
 @Composable
 internal fun CustomRecurrenceView(
     state: CreateScheduledMeetingState,
-    onScrollChange: (Boolean) -> Unit,
     onAcceptClicked: () -> Unit,
     onRejectClicked: () -> Unit,
+    onWeekdaysClicked: () -> Unit,
+    onFocusChanged: () -> Unit,
+    onDateClicked: () -> Unit,
+    onScrollChange: (Boolean) -> Unit,
     onIntervalChanged: (String) -> Unit,
     onMonthDayChanged: (String) -> Unit,
     onMonthWeekDayChanged: (Weekday) -> Unit,
     onFrequencyTypeChanged: (DropdownOccurrenceType) -> Unit,
     onDayClicked: (Weekday) -> Unit,
-    onWeekdaysClicked: () -> Unit,
-    onFocusChanged: () -> Unit,
     onMonthlyRadioButtonClicked: (MonthlyRecurrenceOption) -> Unit,
+    onEndsRadioButtonClicked: (EndsRecurrenceOption) -> Unit,
     onWeekOfMonthChanged: (WeekOfMonth) -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -174,6 +179,16 @@ internal fun CustomRecurrenceView(
                             onWeekOfMonthChanged = onWeekOfMonthChanged
                         )
                     }
+            }
+
+            item(key = "Ends") {
+                EndsSection(
+                    modifier = Modifier,
+                    endsOptionSelected = state.customRecurrenceState.endsRadioButtonOptionSelected,
+                    onRadioButtonClicked = onEndsRadioButtonClicked,
+                    date = state.customRecurrenceState.endDateOccurrenceOption,
+                    onDateClicked = onDateClicked,
+                )
             }
         }
     }
@@ -610,6 +625,136 @@ private fun OccursMonthlySection(
 }
 
 /**
+ * Ends recurrence option
+ *
+ * @param endsOptionSelected    [EndsRecurrenceOption]
+ * @param date                  [ZonedDateTime]
+ */
+@Composable
+private fun EndsSection(
+    modifier: Modifier,
+    date: ZonedDateTime,
+    endsOptionSelected: EndsRecurrenceOption,
+    onDateClicked: () -> Unit,
+    onRadioButtonClicked: (EndsRecurrenceOption) -> Unit,
+) {
+    val endsSectionRadioOptions: List<EndsRecurrenceOption> = listOf(
+        EndsRecurrenceOption.Never,
+        EndsRecurrenceOption.CustomDate,
+    )
+
+    Column(
+        modifier
+            .testTag(TEST_TAG_ENDS)
+            .fillMaxWidth()
+            .padding(start = 16.dp, bottom = 23.dp)
+    ) {
+        Text(
+            modifier = modifier
+                .padding(top = 9.dp),
+            text = stringResource(id = R.string.meetings_custom_recurrence_ends_section),
+            style = MaterialTheme.typography.body2.copy(
+                color = MaterialTheme.colors.onPrimary,
+                textAlign = TextAlign.Center
+            ),
+        )
+
+        Row {
+            Column(modifier = modifier.selectableGroup()) {
+                endsSectionRadioOptions.forEach { item ->
+                    Row(
+                        modifier
+                            .fillMaxWidth()
+                            .defaultMinSize(minHeight = 56.dp)
+                            .selectable(
+                                selected = (item == endsOptionSelected),
+                                onClick = {
+                                    if (item != endsOptionSelected) {
+                                        onRadioButtonClicked(item)
+                                    }
+                                },
+                                role = Role.RadioButton
+                            )
+                    ) {
+                        Box(
+                            modifier = modifier
+                                .height(56.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            RadioButton(
+                                selected = (item == endsOptionSelected),
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = MaterialTheme.colors.secondary,
+                                    unselectedColor = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+                                    disabledColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled)
+                                ),
+                                onClick = {
+                                    if (item != endsOptionSelected) {
+                                        onRadioButtonClicked(item)
+                                    }
+                                }
+                            )
+                        }
+                        Box(
+                            modifier = modifier
+                                .height(56.dp)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
+                            when (item) {
+                                EndsRecurrenceOption.Never -> {
+                                    Row {
+                                        Box(
+                                            modifier = modifier
+                                                .fillMaxHeight(),
+                                            contentAlignment = Alignment.CenterStart,
+                                        ) {
+                                            Text(
+                                                text = stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label),
+                                                style = MaterialTheme.typography.subtitle1.copy(
+                                                    color = MaterialTheme.colors.onPrimary,
+                                                    textAlign = TextAlign.Center
+                                                ),
+                                            )
+                                        }
+                                    }
+                                }
+
+                                EndsRecurrenceOption.CustomDate -> {
+                                    Row {
+                                        Box(
+                                            modifier = modifier
+                                                .fillMaxHeight()
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.CenterStart,
+                                        ) {
+                                            TextFieldChip(
+                                                onTextChange = {},
+                                                modifier = modifier.clickable {
+                                                    onDateClicked()
+                                                },
+                                                text = getScheduledMeetingEndRecurrenceText(date),
+                                                isDisabled = item != endsOptionSelected,
+                                                readOnly = true,
+                                                isSmall = false,
+                                                onFocusChange = {}
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    CustomDivider(
+                        withStartPadding = true, startPadding = 54.dp
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
  * Custom Recurrence View Preview
  */
 @CombinedThemePreviews
@@ -634,13 +779,16 @@ private fun PreviewCustomRecurrenceView() {
             onWeekdaysClicked = {},
             onFocusChanged = {},
             onMonthlyRadioButtonClicked = {},
+            onEndsRadioButtonClicked = {},
             onMonthDayChanged = {},
             onMonthWeekDayChanged = {},
-            onWeekOfMonthChanged = {}
+            onWeekOfMonthChanged = {},
+            onDateClicked = {},
         )
     }
 }
 
+internal const val TEST_TAG_ENDS = "testTagOccursEnds"
 internal const val TEST_TAG_OCCURS_MONTHLY = "testTagOccursMonthly"
 internal const val TEST_TAG_OCCURS_WEEKLY = "testTagOccursWeekly"
 internal const val TEST_TAG_OCCURS_DAILY = "testTagOccursDaily"
