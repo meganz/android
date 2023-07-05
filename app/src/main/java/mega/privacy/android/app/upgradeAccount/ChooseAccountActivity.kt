@@ -181,6 +181,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         setFreePlan()
 
+        binding.upgradeProliteLayout.isVisible = productAccounts.any { it.level == PRO_LITE }
+
         for (i in productAccounts.indices) {
             val account = productAccounts[i]
 
@@ -204,16 +206,19 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                         binding.storageProI.text = textStorage
                         binding.bandwidthProI.text = textTransfer
                     }
+
                     PRO_II -> {
                         binding.monthProIi.text = textToShow
                         binding.storageProIi.text = textStorage
                         binding.bandwidthProIi.text = textTransfer
                     }
+
                     PRO_III -> {
                         binding.monthProIii.text = textToShow
                         binding.storageProIii.text = textStorage
                         binding.bandwidthProIii.text = textTransfer
                     }
+
                     PRO_LITE -> {
                         binding.monthLite.text = textToShow
                         binding.storageLite.text = textStorage
