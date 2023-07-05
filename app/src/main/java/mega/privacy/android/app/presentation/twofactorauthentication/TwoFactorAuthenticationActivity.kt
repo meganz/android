@@ -279,6 +279,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
             when {
                 scanOrCopyIsShown || newAccount -> {
+                    viewModel.getAuthenticationCode()
                     showScanOrCopyLayout()
                 }
 

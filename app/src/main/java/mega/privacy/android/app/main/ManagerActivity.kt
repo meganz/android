@@ -157,6 +157,7 @@ import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
+import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.StorageStatusDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
@@ -253,7 +254,6 @@ import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingShare
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaManager
@@ -599,7 +599,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var processFileDialog: AlertDialog? = null
     private var permissionsDialog: AlertDialog? = null
     private var presenceStatusDialog: AlertDialog? = null
-    private var enable2FADialog: AlertDialog? = null
 
     private var searchMenuItem: MenuItem? = null
     private var doNotDisturbMenuItem: MenuItem? = null
@@ -616,9 +615,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var layoutCallMenuItem: LinearLayout? = null
     private var typesCameraPermission = Constants.INVALID_TYPE_PERMISSIONS
 
-    private var isEnable2FADialogShown = false
-    private var enable2FAButton: Button? = null
-    private var skip2FAButton: Button? = null
     var comesFromNotifications = false
     var comesFromNotificationsLevel = 0
     var comesFromNotificationHandle = Constants.INVALID_VALUE.toLong()
@@ -889,7 +885,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             outState.putBoolean("turnOnNotifications", turnOnNotifications)
         }
         outState.putInt("orientationSaved", orientationSaved)
-        outState.putBoolean("isEnable2FADialogShown", isEnable2FADialogShown)
         outState.putInt("bottomNavigationCurrentItem", bottomNavigationCurrentItem)
         outState.putBoolean("searchExpand", searchExpand)
         outState.putBoolean("comesFromNotifications", comesFromNotifications)
@@ -2105,7 +2100,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         selectedAccountType = savedInstanceState.getInt("selectedAccountType", -1)
         turnOnNotifications = savedInstanceState.getBoolean("turnOnNotifications", false)
         orientationSaved = savedInstanceState.getInt("orientationSaved")
-        isEnable2FADialogShown = savedInstanceState.getBoolean("isEnable2FADialogShown", false)
         bottomNavigationCurrentItem =
             savedInstanceState.getInt("bottomNavigationCurrentItem", -1)
         searchExpand = savedInstanceState.getBoolean("searchExpand", false)
@@ -2268,7 +2262,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             updateUnverifiedSharesBadge(managerState.pendingActionsCount)
 
             //Show 2FA dialog to the user on Second Launch after sign up
-            if (managerState.show2FADialog || isEnable2FADialogShown) {
+            if (managerState.show2FADialog) {
                 showEnable2FADialog()
             }
 
@@ -4545,21 +4539,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showEnable2FADialog() {
         Timber.d("newAccount: %s", newAccount)
         newAccount = false
-        val builder = MaterialAlertDialogBuilder(this)
-        val v = layoutInflater.inflate(R.layout.dialog_enable_2fa_create_account, null)
-        builder.setView(v)
-        enable2FAButton = v.findViewById(R.id.enable_2fa_button)
-        enable2FAButton?.setOnClickListener(this)
-        skip2FAButton = v.findViewById(R.id.skip_enable_2fa_button)
-        skip2FAButton?.setOnClickListener(this)
-        enable2FADialog = builder.create()
-        enable2FADialog?.setCanceledOnTouchOutside(false)
-        try {
-            enable2FADialog?.show()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        isEnable2FADialogShown = true
+        Enable2FADialogFragment().show(supportFragmentManager, Enable2FADialogFragment.TAG)
     }
 
     /**
@@ -7087,21 +7067,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 //Add navigation to Upgrade Account
                 Timber.d("Click on Upgrade in pro panel!")
                 navigateToUpgradeAccount()
-            }
-
-            R.id.enable_2fa_button -> {
-                enable2FADialog?.dismiss()
-                isEnable2FADialogShown = false
-                val intent = Intent(this, TwoFactorAuthenticationActivity::class.java)
-                intent.putExtra(IntentConstants.EXTRA_NEW_ACCOUNT, true)
-                startActivity(intent)
-            }
-
-            R.id.skip_enable_2fa_button -> {
-                isEnable2FADialogShown = false
-                if (enable2FADialog != null) {
-                    enable2FADialog?.dismiss()
-                }
             }
 
             R.id.navigation_drawer_account_section, R.id.my_account_section -> {
