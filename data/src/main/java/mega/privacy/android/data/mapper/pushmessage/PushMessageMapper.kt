@@ -22,7 +22,11 @@ class PushMessageMapper @Inject constructor() {
             PUSH_TYPE_CALL -> PushMessage.CallPushMessage
             PUSH_TYPE_CHAT -> {
                 PushMessage.ChatPushMessage(
-                    shouldBeep = data.getString(KEY_CHAT_SILENT) != VALUE_NO_BEEP
+                    shouldBeep = data.getString(KEY_CHAT_SILENT) != VALUE_NO_BEEP,
+                    chatId = data.getString(KEY_CHAT_ROOM_HANDLE)
+                        ?.base64ToUserHandle() ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
+                    msgId = data.getString(KEY_MSG_HANDLE)
+                        ?.base64ToUserHandle() ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
                 )
             }
 
@@ -32,7 +36,7 @@ class PushMessageMapper @Inject constructor() {
                         ?.base64ToUserHandle() ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
                     userHandle = data.getString(KEY_SCHED_MEETING_USER_HANDLE)
                         ?.base64ToUserHandle() ?: MegaApiJava.INVALID_HANDLE,
-                    chatRoomHandle = data.getString(KEY_SCHED_MEETING_CHAT_ROOM_HANDLE)
+                    chatRoomHandle = data.getString(KEY_CHAT_ROOM_HANDLE)
                         ?.base64ToUserHandle() ?: MegaChatApiJava.MEGACHAT_INVALID_HANDLE,
                     title = data.getString(KEY_SCHED_MEETING_TITLE)?.decodeBase64(),
                     description = data.getString(KEY_SCHED_MEETING_DESCRIPTION)?.decodeBase64(),
@@ -59,11 +63,13 @@ class PushMessageMapper @Inject constructor() {
         const val PUSH_TYPE_ACCEPTANCE = "5"
         const val PUSH_TYPE_SCHED_MEETING = "7"
 
+        private const val KEY_CHAT_ROOM_HANDLE = "chatid"
+        private const val KEY_MSG_HANDLE = "msgid"
+
         private const val KEY_TYPE = "type"
         private const val KEY_CHAT_SILENT = "silent"
         private const val KEY_SCHED_MEETING_HANDLE = "id"
         private const val KEY_SCHED_MEETING_USER_HANDLE = "u"
-        private const val KEY_SCHED_MEETING_CHAT_ROOM_HANDLE = "chatid"
         private const val KEY_SCHED_MEETING_TITLE = "t"
         private const val KEY_SCHED_MEETING_DESCRIPTION = "d"
         private const val KEY_SCHED_MEETING_TIMEZONE = "tz"

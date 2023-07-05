@@ -18,10 +18,14 @@ sealed class PushMessage {
      * Chat push message
      *
      * @property shouldBeep
+     * @property chatId
+     * @property msgId
      * @constructor Create empty Chat push message
      */
     data class ChatPushMessage(
         val shouldBeep: Boolean,
+        val chatId: Long,
+        val msgId: Long,
     ) : PushMessage()
 
     /**

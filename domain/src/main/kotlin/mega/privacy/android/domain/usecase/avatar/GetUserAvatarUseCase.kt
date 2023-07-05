@@ -1,11 +1,12 @@
 package mega.privacy.android.domain.usecase.avatar
 
 import mega.privacy.android.domain.repository.AvatarRepository
+import javax.inject.Inject
 
 /**
  * Use case for getting the avatar of a user.
  */
-class GetUserAvatarUseCase(
+class GetUserAvatarUseCase @Inject constructor(
     private val avatarRepository: AvatarRepository,
 ) {
 

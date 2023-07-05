@@ -45,7 +45,7 @@ internal object ChatMessageNotification {
         msg: ChatMessage,
         senderName: String,
         senderAvatar: File?,
-        senderAvatarColor: String,
+        senderAvatarColor: Int,
         notificationBehaviour: NotificationBehaviour,
         fileDurationMapper: FileDurationMapper,
     ) {
@@ -245,14 +245,14 @@ internal object ChatMessageNotification {
         context: Context,
         senderAvatar: File?,
         chat: ChatRoom,
-        senderAvatarColor: String,
+        senderAvatarColor: Int,
     ) = if (senderAvatar?.exists() == true && senderAvatar.length() > 0) {
         BitmapFactory.decodeFile(senderAvatar.absolutePath, BitmapFactory.Options())
     } else {
         val color = if (chat.isGroup) {
             ContextCompat.getColor(context, R.color.grey_012_white_012)
         } else {
-            Color.parseColor(senderAvatarColor)
+            senderAvatarColor
         }
 
         AvatarUtil.getDefaultAvatar(

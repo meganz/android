@@ -27,8 +27,10 @@ import mega.privacy.android.app.fcm.CreateChatNotificationChannelsUseCase
 import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
@@ -36,8 +38,15 @@ import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
+import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
+import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
+import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationBehaviourUseCase
+import nz.mega.sdk.MegaRequest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -71,7 +80,15 @@ class PushMessageWorkerTest {
     private val createNotificationChannels = mock<CreateChatNotificationChannelsUseCase>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val notificationManager = mock<NotificationManagerCompat>()
+    private val isChatNotifiableUseCase = mock<IsChatNotifiableUseCase>()
     private val getChatRoom = mock<GetChatRoom>()
+    private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
+    private val getMessageSenderNameUseCase = mock<GetMessageSenderNameUseCase>()
+    private val getUserAvatarUseCase = mock<GetUserAvatarUseCase>()
+    private val getUserAvatarColorUseCase = mock<GetUserAvatarColorUseCase>()
+    private val getChatMessageNotificationBehaviourUseCase =
+        mock<GetChatMessageNotificationBehaviourUseCase>()
+    private val fileDurationMapper = mock<FileDurationMapper>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
 
@@ -117,8 +134,15 @@ class PushMessageWorkerTest {
             createNotificationChannels = createNotificationChannels,
             callsPreferencesGateway = callsPreferencesGateway,
             notificationManager = notificationManager,
-            ioDispatcher = ioDispatcher,
+            isChatNotifiableUseCase = isChatNotifiableUseCase,
             getChatRoom = getChatRoom,
+            getChatMessageUseCase = getChatMessageUseCase,
+            getMessageSenderNameUseCase = getMessageSenderNameUseCase,
+            getUserAvatarUseCase = getUserAvatarUseCase,
+            getUserAvatarColorUseCase = getUserAvatarColorUseCase,
+            getChatMessageNotificationBehaviourUseCase = getChatMessageNotificationBehaviourUseCase,
+            fileDurationMapper = fileDurationMapper,
+            ioDispatcher = ioDispatcher
         )
 
         whenever(notificationManager.notify(any(), any())).then(mock())
@@ -186,8 +210,11 @@ class PushMessageWorkerTest {
     @Test
     fun `test that ChatPushMessage are triggered as expected`() {
         runTest {
-            whenever(pushMessageMapper(any())).thenReturn(PushMessage.ChatPushMessage(true))
-
+            whenever(pushMessageMapper(any())).thenReturn(PushMessage.ChatPushMessage(true, 1L, 2L))
+            val request = mock<ChatRequest> {
+                on { chatHandle }.thenReturn(null)
+            }
+            whenever(pushReceived(true)).thenReturn(request)
             val result = underTest.doWork()
 
             assertThat(result).isEqualTo(ListenableWorker.Result.success())

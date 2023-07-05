@@ -19,7 +19,7 @@ class GetMessageSenderNameUseCase @Inject constructor(
      * @param chatId The chat identifier the message belongs to.
      * @return The sender name if any.
      */
-    suspend fun invoke(userHandle: Long, chatId: Long) =
+    suspend operator fun invoke(userHandle: Long, chatId: Long) =
         getUserAliasUseCase(userHandle) ?: getSenderName(userHandle, chatId)
 
     private suspend fun getSenderName(userHandle: Long, chatId: Long): String? {
