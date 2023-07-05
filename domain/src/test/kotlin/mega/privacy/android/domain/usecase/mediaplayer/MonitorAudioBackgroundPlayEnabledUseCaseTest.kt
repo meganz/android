@@ -40,7 +40,7 @@ class MonitorAudioBackgroundPlayEnabledUseCaseTest {
         }
 
         underTest().test {
-            Truth.assertThat(awaitItem()).isFalse()
+            Truth.assertThat(awaitItem()).isTrue()
             awaitComplete()
         }
     }

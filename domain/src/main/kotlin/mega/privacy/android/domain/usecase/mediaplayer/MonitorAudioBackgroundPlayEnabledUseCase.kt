@@ -17,5 +17,5 @@ class MonitorAudioBackgroundPlayEnabledUseCase @Inject constructor(
      * @return Flow of Boolean
      */
     operator fun invoke() = mediaPlayerRepository.monitorAudioBackgroundPlayEnabled()
-        .map { it ?: false }
+        .map { it ?: true }
 }
