@@ -51,7 +51,7 @@ fun MegaAlertDialog(
             Text(
                 modifier = Modifier.testTag(TITLE_TAG),
                 text = it,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.h6,
                 color = MaterialTheme.colors.onSurface,
             )
         },
