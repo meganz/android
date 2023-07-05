@@ -117,9 +117,14 @@ object CacheFolderManager {
         runBlocking { cacheFolderGateway.clearCache() }
     }
 
+
+    /**
+     *  Deletes the Cache folder if it is empty
+     *
+     *  @param folderName Name of the folder
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun deleteCacheFolderIfEmpty(context: Context, folderName: String) {
+    fun deleteCacheFolderIfEmpty(folderName: String) {
         cacheFolderGateway.deleteCacheFolderIfEmpty(folderName)
     }
 

@@ -503,7 +503,7 @@ internal class UploadService : LifecycleService() {
         stopForeground()
         Timber.d("After stopSelf")
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            deleteCacheFolderIfEmpty(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+            deleteCacheFolderIfEmpty(CacheFolderManager.TEMPORARY_FOLDER)
         }
     }
 
@@ -846,7 +846,6 @@ internal class UploadService : LifecycleService() {
             cancel()
             Timber.d("After cancel")
             deleteCacheFolderIfEmpty(
-                applicationContext,
                 CacheFolderManager.TEMPORARY_FOLDER
             )
         } else {

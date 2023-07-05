@@ -681,7 +681,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         Timber.d("After stopSelf")
 
         try {
-            deleteCacheFolderIfEmpty(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+            deleteCacheFolderIfEmpty(CacheFolderManager.TEMPORARY_FOLDER)
         } catch (e: Exception) {
             Timber.e("EXCEPTION: pathSelfie not deleted", e)
         }
@@ -1066,7 +1066,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             } else {
                 //Delete recursively all files and folder-??????
                 deleteCacheFolderIfEmpty(
-                    applicationContext,
                     CacheFolderManager.TEMPORARY_FOLDER
                 )
             }

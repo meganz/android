@@ -106,7 +106,7 @@ internal class CacheFolderFacade @Inject constructor(
     override fun deleteCacheFolderIfEmpty(folderName: String) {
         appScope.launch(ioDispatcher) {
             getCacheFolderAsync(folderName)?.apply {
-                if (fileGateway.isFileAvailable(this) && !this.list().isNullOrEmpty()) {
+                if (fileGateway.isFileAvailable(this) && this.list().isNullOrEmpty()) {
                     this.delete()
                 }
             }
