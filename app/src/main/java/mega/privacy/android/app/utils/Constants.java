@@ -318,7 +318,7 @@ public class Constants {
     public static final int VIEWER_FROM_VIDEOS = 6;
     public static final int VIEWER_FROM_OFFLINE = 7;
     public static final int VIEWER_FROM_RECETS_BUCKET = 8;
-    public static final int VIEWER_FROM_RECETS = 10;
+    public static final int VIEWER_FROM_RECENT_ACTIONS = 10;
     public static final int VIEWER_FROM_CONTACT_FILE_LIST = 11;
     public static final int VIEWER_FROM_FOLDER_LINK = 12;
     public static final int VIEWER_FROM_ZIP_BROWSER = 13;

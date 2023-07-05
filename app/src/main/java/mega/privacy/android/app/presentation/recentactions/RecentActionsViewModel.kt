@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
@@ -37,7 +36,6 @@ import javax.inject.Inject
  * @property getRecentActionsUseCase
  * @property getVisibleContactsUseCase
  * @property setHideRecentActivityUseCase
- * @property getNodeByHandle
  * @property getNodeByIdUseCase
  * @property getAccountDetailsUseCase
  * @param areCredentialsVerifiedUseCase
@@ -49,7 +47,6 @@ class RecentActionsViewModel @Inject constructor(
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
@@ -200,11 +197,6 @@ class RecentActionsViewModel @Inject constructor(
         bucket: RecentActionBucket,
     ) = kotlin.runCatching { getAccountDetailsUseCase(false).email == bucket.userEmail }
         .getOrDefault(false)
-
-    /**
-     * get a MegaNode by id
-     */
-    suspend fun getMegaNode(handle: Long) = getNodeByHandle(handle)
 
     /**
      * Retrieve the parent folder shares type of a node

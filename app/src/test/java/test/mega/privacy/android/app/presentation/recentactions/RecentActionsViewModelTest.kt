@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.recentactions.RecentActionsViewModel
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSharesType
@@ -54,9 +53,6 @@ class RecentActionsViewModelTest {
 
     private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
         onBlocking { invoke() }.thenReturn(emptyList())
-    }
-    private val getNodeByHandle = mock<GetNodeByHandle> {
-        onBlocking { invoke(any()) }.thenReturn(null)
     }
     private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
         onBlocking { invoke(any()) }.thenReturn(mock())
@@ -113,7 +109,6 @@ class RecentActionsViewModelTest {
             getRecentActionsUseCase = getRecentActionsUseCase,
             getVisibleContactsUseCase = getVisibleContactsUseCase,
             setHideRecentActivityUseCase = setHideRecentActivityUseCase,
-            getNodeByHandle = getNodeByHandle,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             monitorHideRecentActivityUseCase = monitorHideRecentActivityUseCase,

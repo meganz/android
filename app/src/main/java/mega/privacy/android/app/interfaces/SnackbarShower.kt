@@ -7,7 +7,7 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 interface SnackbarShower {
-    fun showSnackbar(type: Int, content: String?, chatId: Long)
+    fun showSnackbar(type: Int = SNACKBAR_TYPE, content: String?, chatId: Long = -1L)
 
     companion object {
         val IDLE = object : SnackbarShower {
