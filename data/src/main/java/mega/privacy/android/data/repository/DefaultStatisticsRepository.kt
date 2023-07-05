@@ -5,11 +5,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
-import mega.privacy.android.data.mapper.analytics.AnalyticsEventMessageMapper
-import mega.privacy.android.domain.entity.analytics.AnalyticsEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.StatisticsRepository
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -19,7 +16,6 @@ internal class DefaultStatisticsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaApiGateway: MegaApiGateway,
     private val statisticsPreferencesGateway: StatisticsPreferencesGateway,
-    private val analyticsEventMessageMapper: AnalyticsEventMessageMapper,
 ) : StatisticsRepository {
 
     @Deprecated(
@@ -58,26 +54,5 @@ internal class DefaultStatisticsRepository @Inject constructor(
         clickCountFolder: Int,
         mediaHandle: Long,
     ) = statisticsPreferencesGateway.setClickCountFolder(clickCountFolder, mediaHandle)
-
-    override suspend fun logEvent(event: AnalyticsEvent) {
-        withContext(ioDispatcher) {
-            val message = analyticsEventMessageMapper(event)
-            Timber.d(
-                """
-                    ** LogEvent called **
-                    eventId: ${event.getEventIdentifier()} 
-                    message: $message
-                    addJourneyId = true
-                    viewId = ${event.viewId}
-                    """.trimIndent()
-            )
-            megaApiGateway.sendEvent(
-                eventId = event.getEventIdentifier(),
-                message = message,
-                addJourneyId = true,
-                viewId = event.viewId,
-            )
-        }
-    }
 
 }

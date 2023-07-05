@@ -6,14 +6,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
-import mega.privacy.android.data.mapper.analytics.AnalyticsEventMessageMapper
-import mega.privacy.android.domain.entity.analytics.ScreenViewEvent
 import mega.privacy.android.domain.repository.StatisticsRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import kotlin.test.assertEquals
 
@@ -34,15 +30,12 @@ class DefaultStatisticsRepositoryTest {
         }.thenReturn(flowOf(1))
     }
 
-    private val analyticsEventMessageMapper = mock<AnalyticsEventMessageMapper>()
-
     @BeforeEach
     internal fun setUp() {
         underTest = DefaultStatisticsRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
             megaApiGateway = megaApiGateway,
             statisticsPreferencesGateway = statisticsPreferencesGateway,
-            analyticsEventMessageMapper = analyticsEventMessageMapper,
         )
     }
 
@@ -99,26 +92,4 @@ class DefaultStatisticsRepositoryTest {
             verify(statisticsPreferencesGateway).setClickCountFolder(newCount, defaultMediaHandle)
         }
 
-    @Test
-    internal fun `test that logEvent calls send event with the event properties`() = runTest {
-        val expectedMessage = "ExpectedMessage"
-        val expectedEventId = 5
-        val expectedViewId = "ExpectedViewId"
-
-        //We need to mock a specific event type because Mockito cannot mock sealed interfaces
-        val event = mock<ScreenViewEvent> {
-            on { getEventIdentifier() }.thenReturn(expectedEventId)
-            on { viewId }.thenReturn(expectedViewId)
-        }
-
-        analyticsEventMessageMapper.stub {
-            on { invoke(any()) }.thenReturn(expectedMessage)
-        }
-
-        underTest.logEvent(event)
-
-        verify(megaApiGateway).sendEvent(
-            expectedEventId, expectedMessage, true, expectedViewId
-        )
-    }
 }
