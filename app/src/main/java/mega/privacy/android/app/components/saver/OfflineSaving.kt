@@ -86,7 +86,7 @@ class OfflineSaving(
                 context.getString(R.string.copy_already_downloaded)
             } else {
                 context.resources.getQuantityString(
-                    R.plurals.download_finish,
+                    R.plurals.download_complete,
                     totalFiles,
                     totalFiles
                 )

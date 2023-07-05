@@ -217,7 +217,7 @@ class MegaNodeSaving(
                     app.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
                 } else {
                     app.resources.getQuantityString(
-                        R.plurals.download_began,
+                        R.plurals.download_started,
                         numberOfNodesPending,
                         numberOfNodesPending
                     )

@@ -1513,7 +1513,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     private fun checkTransfersFinishedState(transfersFinishedState: TransfersFinishedState) =
         with(transfersFinishedState) {
             val generalDownloadMessage = resources.getQuantityString(
-                R.plurals.download_finish,
+                R.plurals.download_complete,
                 numberFiles,
                 numberFiles
             )
