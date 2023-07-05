@@ -17,6 +17,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -212,6 +213,7 @@ abstract class MediaPlayerActivity : PasscodeActivity() {
 
                                 adapterType == FOLDER_LINK_ADAPTER
                                         || adapterType == FROM_IMAGE_VIEWER
+                                        || adapterType == FROM_ALBUM_SHARING
                                         || adapterType == VERSIONS_ADAPTER -> {
                                     menu.toggleAllMenuItemsVisibility(false)
                                     menu.findItem(R.id.save_to_device).isVisible = true

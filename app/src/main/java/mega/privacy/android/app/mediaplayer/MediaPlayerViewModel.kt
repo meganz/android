@@ -20,6 +20,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlayerMenuClickedEvent
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.photos.util.LegacyPublicAlbumPhotoNodeProvider
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -45,6 +46,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    private val legacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -266,4 +268,14 @@ class MediaPlayerViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get node for album sharing
+     * Because the MegaNode cannot be got by getNodeByHandle if the album shares from others,
+     * using legacyPublicAlbumPhotoNodeProvider to get MegaNode
+     *
+     * @param handle node handle
+     */
+    fun getNodeForAlbumSharing(handle: Long) =
+        legacyPublicAlbumPhotoNodeProvider.getPublicNode(handle)
 }

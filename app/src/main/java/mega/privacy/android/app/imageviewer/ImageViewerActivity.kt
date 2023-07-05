@@ -47,6 +47,7 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_LINK
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ARRAY_OFFLINE
@@ -202,7 +203,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 putExtra(EXTRA_SHOW_SLIDESHOW, showSlideshow)
                 if (fromFolderLink)
                     putExtra(
-                        Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                        INTENT_EXTRA_KEY_ADAPTER_TYPE,
                         Constants.FOLDER_LINK_ADAPTER //FolderLink type
                     )
             }
@@ -375,7 +376,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     private val adapterType by lazy {
         intent.getIntExtra(
-            Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+            INTENT_EXTRA_KEY_ADAPTER_TYPE,
             FROM_IMAGE_VIEWER
         )
     }
@@ -732,7 +733,14 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             putExtra(INTENT_EXTRA_KEY_POSITION, 0)
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
+            putExtra(
+                INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                if (isAlbumSharing) {
+                    FROM_ALBUM_SHARING
+                } else {
+                    adapterType
+                }
+            )
             putExtra(
                 INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
                 megaApi.getNodeByHandle(nodeHandle)?.parentHandle ?: INVALID_HANDLE

@@ -74,7 +74,7 @@ class AlbumImportPreviewProvider @Inject constructor(
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(
                 Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                Constants.FROM_IMAGE_VIEWER
+                Constants.FROM_ALBUM_SHARING
             )
             putExtra(
                 Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,

@@ -69,6 +69,7 @@ import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_INBOX
 import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
@@ -367,6 +368,16 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                                         needSerialize = true
                                     )
                                 } ?: Timber.w("currentDocument is NULL")
+                            }
+                        }
+
+                        FROM_ALBUM_SHARING -> {
+                            viewModel.getNodeForAlbumSharing(playingHandle)?.let { node ->
+                                nodeSaver.saveNode(
+                                    node = node,
+                                    fromMediaViewer = true,
+                                    needSerialize = true
+                                )
                             }
                         }
 

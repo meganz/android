@@ -311,7 +311,7 @@ public class Constants {
     public static final int FROM_IMAGE_VIEWER = 2036;
     public static final int FAVOURITES_ADAPTER = 2039;
     public static final int FROM_MEDIA_DISCOVERY = 2040;
-
+    public static final int FROM_ALBUM_SHARING = 2041;
     public static final int VIEWER_FROM_INCOMING_SHARES = 2;
     public static final int VIEWER_FROM_OUTGOING_SHARES = 3;
     public static final int VIEWER_FROM_LINKS = 4;
