@@ -528,13 +528,6 @@
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
         <receiver
-            android:name=".receivers.CustomInstallReferrerReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".receivers.ChargeEventReceiver"
             android:enabled="true"
             android:exported="false">
