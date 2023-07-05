@@ -195,7 +195,6 @@ import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.inbox.InboxFragment
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
@@ -2915,11 +2914,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
                 Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_FOLDER_LINK")
-                    val intentFolderLink =
-                        if (isFeatureEnabled(AppFeatures.FolderLinkCompose))
-                            Intent(this, FolderLinkComposeActivity::class.java)
-                        else
-                            Intent(this, FolderLinkActivity::class.java)
+                    val intentFolderLink = Intent(this, FolderLinkComposeActivity::class.java)
                     intentFolderLink.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intentFolderLink.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                     intent.dataString?.let {

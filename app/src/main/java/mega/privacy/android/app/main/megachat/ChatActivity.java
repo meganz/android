@@ -179,7 +179,7 @@ import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
-import static mega.privacy.android.app.utils.OnSingleClickListener.*;
+import static mega.privacy.android.app.utils.OnSingleClickListener.setOnSingleClickListener;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.DATE;
@@ -384,7 +384,7 @@ import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContac
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
@@ -406,7 +406,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.utils.OnSingleClickListener;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -1375,7 +1374,7 @@ public class ChatActivity extends PasscodeActivity
             openLink = new Intent(this, FileLinkActivity.class);
             openLink.setAction(ACTION_OPEN_MEGA_LINK);
         } else {
-            openLink = new Intent(this, FolderLinkActivity.class);
+            openLink = new Intent(this, FolderLinkComposeActivity.class);
             openLink.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
         }
 

@@ -87,7 +87,6 @@ import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
 import mega.privacy.android.app.presentation.search.SearchFragment;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesFragment;
@@ -426,8 +425,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((ContactFileListFragment) fragment).hideMultipleSelect();
             } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
                 ((ContactSharedFolderFragment) fragment).hideMultipleSelect();
-            } else if (type == FOLDER_LINK_ADAPTER) {
-                ((FolderLinkActivity) context).hideMultipleSelect();
             } else if (type == SEARCH_ADAPTER) {
                 ((SearchFragment) fragment).hideMultipleSelect();
             } else if (type == LINKS_ADAPTER) {
@@ -1313,8 +1310,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             ((ContactFileListFragment) fragment).itemClick(currentPosition);
         } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
             ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
-        } else if (type == FOLDER_LINK_ADAPTER) {
-            ((FolderLinkActivity) context).itemClick(currentPosition);
         } else if (type == SEARCH_ADAPTER) {
             ((SearchFragment) fragment).itemClick(currentPosition);
         } else if (type == LINKS_ADAPTER) {
@@ -1342,8 +1337,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 ((ContactFileListFragment) fragment).itemClick(currentPosition);
             } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
                 ((ContactSharedFolderFragment) fragment).itemClick(currentPosition);
-            } else if (type == FOLDER_LINK_ADAPTER) {
-                ((FolderLinkActivity) context).itemClick(currentPosition);
             } else if (type == SEARCH_ADAPTER) {
                 ((SearchFragment) fragment).itemClick(currentPosition);
             } else if (type == LINKS_ADAPTER) {
@@ -1355,8 +1348,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else {
             if (type == CONTACT_FILE_ADAPTER) {
                 ((ContactFileListFragment) fragment).showOptionsPanel(n);
-            } else if (type == FOLDER_LINK_ADAPTER) {
-                ((FolderLinkActivity) context).showOptionsPanel(n);
             } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
                 ((ContactSharedFolderFragment) fragment).showOptionsPanel(n);
             } else {
@@ -1390,10 +1381,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else if (type == CONTACT_FILE_ADAPTER) {
             ((ContactFileListFragment) fragment).activateActionMode();
             ((ContactFileListFragment) fragment).itemClick(currentPosition);
-        } else if (type == FOLDER_LINK_ADAPTER) {
-            Timber.d("FOLDER_LINK_ADAPTER");
-            ((FolderLinkActivity) context).activateActionMode();
-            ((FolderLinkActivity) context).itemClick(currentPosition);
         } else if (type == SEARCH_ADAPTER) {
             ((SearchFragment) fragment).activateActionMode();
             ((SearchFragment) fragment).itemClick(currentPosition);

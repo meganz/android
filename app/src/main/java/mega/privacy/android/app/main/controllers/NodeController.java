@@ -45,7 +45,7 @@ import mega.privacy.android.app.main.FileLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
@@ -235,7 +235,7 @@ public class NodeController {
             ((ManagerActivity) context).startActivity(openFileIntent);
             return FILE_LINK;
         } else if (AndroidMegaRichLinkMessage.isFolderLink(url)) {
-            Intent openFolderIntent = new Intent(context, FolderLinkActivity.class);
+            Intent openFolderIntent = new Intent(context, FolderLinkComposeActivity.class);
             openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             openFolderIntent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             openFolderIntent.setData(Uri.parse(url));

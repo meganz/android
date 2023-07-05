@@ -368,7 +368,6 @@ class ManagerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
-            AppFeatures.FolderLinkCompose.takeIf { getFeatureFlagValueUseCase(it) },
             AppFeatures.FileBrowserCompose.takeIf { getFeatureFlagValueUseCase(it) },
             AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) }
         )

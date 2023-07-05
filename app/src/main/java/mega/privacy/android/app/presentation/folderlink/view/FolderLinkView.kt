@@ -70,6 +70,7 @@ import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -211,7 +212,7 @@ internal fun FolderLinkView(
         topBar = {
             if (state.selectedNodeCount > 0) {
                 FolderLinkSelectedTopAppBar(
-                    title = title,
+                    title = state.selectedNodeCount.toString(),
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed,
                     onSelectAllClicked = onSelectAllActionClicked,
@@ -372,6 +373,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 text = title,
                 style = MaterialTheme.typography.subtitle1,
                 fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colors.teal_300_teal_200
             )
         },
         navigationIcon = {
@@ -379,7 +381,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.general_back_button),
-                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                    tint = MaterialTheme.colors.teal_300_teal_200
                 )
             }
         },
@@ -388,7 +390,7 @@ internal fun FolderLinkSelectedTopAppBar(
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.label_more),
-                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                    tint = MaterialTheme.colors.teal_300_teal_200
                 )
             }
 

@@ -23,7 +23,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
@@ -32,7 +31,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
@@ -222,11 +220,8 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             // Folder Download link
             matchRegexs(url, FOLDER_LINK_REGEXS) -> {
                 lifecycleScope.launch {
-                    val intent = if (getFeatureFlagValueUseCase(AppFeatures.FolderLinkCompose)) {
+                    val intent =
                         Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
-                    } else {
-                        Intent(this@OpenLinkActivity, FolderLinkActivity::class.java)
-                    }
                     startActivity(
                         intent
                             .putExtra(

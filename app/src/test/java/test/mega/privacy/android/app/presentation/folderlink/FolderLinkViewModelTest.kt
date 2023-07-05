@@ -152,15 +152,6 @@ class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that isNodesFetched updated correctly`() = runTest {
-        underTest.state.map { it.isNodesFetched }.distinctUntilChanged().test {
-            assertThat(awaitItem()).isFalse()
-            underTest.updateIsNodesFetched(true)
-            assertThat(awaitItem()).isTrue()
-        }
-    }
-
-    @Test
     fun `test that on login into folder and on result OK values are updated correctly`() = runTest {
         val folderLink = "abcd"
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)

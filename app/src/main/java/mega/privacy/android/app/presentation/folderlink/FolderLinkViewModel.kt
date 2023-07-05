@@ -71,7 +71,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model class for [FolderLinkActivity]
+ * View Model class for [FolderLinkComposeActivity]
  */
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(
@@ -222,17 +222,6 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
-     * Update whether nodes are fetched or not
-     *
-     * @param value Whether nodes are fetched
-     */
-    fun updateIsNodesFetched(value: Boolean) {
-        _state.update {
-            it.copy(isNodesFetched = value)
-        }
-    }
-
-    /**
      * Reset the askForDecryptionKeyDialog boolean
      */
     fun resetAskForDecryptionKeyDialog() {
@@ -333,7 +322,7 @@ class FolderLinkViewModel @Inject constructor(
      * Get product accounts
      *
      */
-    suspend fun getProductAccounts(): List<Product> =
+    private suspend fun getProductAccounts(): List<Product> =
         runCatching { getPricing(false).products }.getOrElse { Pricing(emptyList()).products }
 
     /**
@@ -478,6 +467,10 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun handleBackPress() {
         viewModelScope.launch {
+            if (state.value.selectedNodeCount > 0) {
+                clearAllSelection()
+                return@launch
+            }
             state.value.parentNode?.let { parentNode ->
                 runCatching { getFolderParentNodeUseCase(parentNode.id) }
                     .onSuccess { newParentNode ->
@@ -518,6 +511,9 @@ class FolderLinkViewModel @Inject constructor(
                         Timber.w("parentNode == NULL")
                         _state.update { it.copy(finishActivity = true) }
                     }
+            } ?: {
+                Timber.w("parentNode == NULL")
+                _state.update { it.copy(finishActivity = true) }
             }
         }
     }

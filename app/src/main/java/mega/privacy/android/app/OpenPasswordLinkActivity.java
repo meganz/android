@@ -21,7 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface;
 import mega.privacy.android.app.main.DecryptAlertDialog;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
@@ -116,7 +116,7 @@ public class OpenPasswordLinkActivity extends PasscodeActivity
 
             if (matchRegexs(decryptedLink, FOLDER_LINK_REGEXS)) {
                 Timber.d("Folder link url");
-                intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkActivity.class);
+                intent = new Intent(OpenPasswordLinkActivity.this, FolderLinkComposeActivity.class);
                 intent.setAction(ACTION_OPEN_MEGA_FOLDER_LINK);
             } else if (matchRegexs(decryptedLink, FILE_LINK_REGEXS)) {
                 Timber.d("Open link url");

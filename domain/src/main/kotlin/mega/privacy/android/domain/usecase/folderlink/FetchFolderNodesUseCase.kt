@@ -35,6 +35,7 @@ class FetchFolderNodesUseCase @Inject constructor(
                         runCatching { addNodeType(rootNode) as TypedFolderNode }
                             .onSuccess { typedFolderNode ->
                                 folderNodesResult.rootNode = typedFolderNode
+                                folderNodesResult.parentNode = typedFolderNode
                                 var parentHandle = typedFolderNode.id.longValue
 
                                 if (folderSubHandle != null) {
