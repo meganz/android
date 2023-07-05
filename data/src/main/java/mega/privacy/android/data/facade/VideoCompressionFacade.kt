@@ -81,29 +81,28 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                                     )
                                 ) {
                                     send(VideoCompressionState.InsufficientStorage)
-                                    return@let
+                                } else {
+                                    prepareAndChangeResolution(attachment) { progress ->
+                                        trySend(
+                                            VideoCompressionState.Progress(
+                                                progress,
+                                                currentFileIndex,
+                                                config.total,
+                                                attachment.newPath
+                                            )
+                                        )
+                                    }
+                                    send(
+                                        VideoCompressionState.FinishedCompression(
+                                            attachment.newPath,
+                                            true,
+                                            attachment.pendingMessageId,
+                                        )
+                                    )
                                 }
                             } ?: run {
                                 send(VideoCompressionState.InsufficientStorage)
-                                return@let
                             }
-                            prepareAndChangeResolution(attachment) { progress ->
-                                trySend(
-                                    VideoCompressionState.Progress(
-                                        progress,
-                                        currentFileIndex,
-                                        config.total,
-                                        attachment.newPath
-                                    )
-                                )
-                            }
-                            send(
-                                VideoCompressionState.FinishedCompression(
-                                    attachment.newPath,
-                                    true,
-                                    attachment.pendingMessageId,
-                                )
-                            )
                         }
                     }.onSuccess {
                         send(VideoCompressionState.Successful(attachment?.id))

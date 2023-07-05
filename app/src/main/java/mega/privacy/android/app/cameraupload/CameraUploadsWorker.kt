@@ -10,7 +10,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.Build
-import android.os.StatFs
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -1628,16 +1627,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         cameraUploadState.totalUploaded = 0
         cameraUploadState.totalToUpload = 0
         missingAttributesChecked = false
-
+        // Clear sync records if needed
+        clearSyncRecords()
         // Create temp root folder
         runCatching { tempRoot = createCameraUploadTemporaryRootDirectory() }
             .onFailure {
                 Timber.w("Root path doesn't exist")
-                endService(aborted = true)
+                throw it
             }
-
-        // Clear sync records if needed
-        clearSyncRecords()
     }
 
     /**
@@ -1952,7 +1949,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                                 }
 
                                 VideoCompressionState.InsufficientStorage -> {
-                                    onInsufficientSpace()
+                                    onInsufficientSpace(fullList)
                                 }
 
                                 is VideoCompressionState.Progress -> {
@@ -2007,10 +2004,11 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Not enough space available
      */
-    private suspend fun onInsufficientSpace() {
+    private suspend fun onInsufficientSpace(records: List<SyncRecord>) {
         Timber.w("Insufficient space for video compression.")
-        endService(aborted = true)
+        records.forEach { setRecordPendingOrRemove(it) }
         showOutOfSpaceNotification()
+        endService(aborted = true)
     }
 
     /**
@@ -2042,21 +2040,21 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Compression failed
      */
     private suspend fun onCompressFailed(record: SyncRecord) {
+        setRecordPendingOrRemove(record)
+    }
+
+    private suspend fun setRecordPendingOrRemove(record: SyncRecord) {
         val localPath = record.localPath
         val isSecondary = record.isSecondary
-        Timber.w("Compression failed for file with timestamp:  %s", record.timestamp)
+        Timber.w("Compression failed for file with timestamp: ${record.timestamp}")
         val srcFile = localPath?.let { File(it) }
         if (srcFile != null && srcFile.exists()) {
             try {
-                val stat = StatFs(tempRoot)
-                val availableFreeSpace = stat.availableBytes.toDouble()
-                if (availableFreeSpace > srcFile.length()) {
-                    setSyncRecordPendingByPath(localPath, isSecondary)
-                    Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
-                    record.newPath?.let { newPath ->
-                        if (newPath.startsWith(tempRoot)) {
-                            File(newPath).takeIf { it.exists() }?.delete()
-                        }
+                setSyncRecordPendingByPath(localPath, isSecondary)
+                Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
+                record.newPath?.let { newPath ->
+                    if (newPath.startsWith(tempRoot)) {
+                        File(newPath).takeIf { it.exists() }?.delete()
                     }
                 }
                 // record will remain in DB and will be re-compressed next launch
@@ -2243,6 +2241,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val title = context.getString(R.string.title_out_of_space)
         val message = context.getString(R.string.message_out_of_space)
-        showNotification(title, message, pendingIntent, true)
+        val notification = createNotification(title, message, pendingIntent, true)
+        notificationManager.notify(Constants.NOTIFICATION_NOT_ENOUGH_STORAGE, notification)
     }
 }

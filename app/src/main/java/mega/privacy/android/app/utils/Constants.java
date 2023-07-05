@@ -360,6 +360,7 @@ public class Constants {
     public static final int NOTIFICATION_STORAGE_OVERQUOTA = 14;
     public static final int NOTIFICATION_CHAT_UPLOAD = 15;
     public static final int NOTIFICATION_UPLOAD_FOLDER = 16;
+    public static final int NOTIFICATION_NOT_ENOUGH_STORAGE = 17;
 
     public static final int SUCCESSFUL_VOICE_CLIP_TRANSFER = 1;
     public static final int ERROR_VOICE_CLIP_TRANSFER = 2;
