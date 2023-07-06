@@ -14,7 +14,6 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Lifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
@@ -40,13 +39,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
             }
         }
     }
-    private val signalPresenceReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttChat != null && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
-                sttChat?.updatePresenceConfigChat(false)
-            }
-        }
-    }
 
     /**
      * onCreate
@@ -61,17 +53,21 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
             richLinksUpdateReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)
         )
-        registerReceiver(
-            signalPresenceReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE)
-        )
     }
 
     private fun collectFlows() {
         collectFlow(viewModel.state) { chatPreferencesState ->
-            if (chatPreferencesState.isPushNotificationSettingsUpdatedEvent) {
-                sttChat?.updateNotifChat()
-                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            with(chatPreferencesState) {
+                if (isPushNotificationSettingsUpdatedEvent) {
+                    sttChat?.updateNotifChat()
+                    viewModel.onConsumePushNotificationSettingsUpdateEvent()
+                }
+                if (signalPresenceUpdate) {
+                    if (sttChat != null && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
+                        sttChat?.updatePresenceConfigChat(false)
+                    }
+                    viewModel.onSignalPresenceUpdateConsumed()
+                }
             }
         }
     }
@@ -82,7 +78,6 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(richLinksUpdateReceiver)
-        unregisterReceiver(signalPresenceReceiver)
     }
 
     /**
