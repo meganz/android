@@ -63,7 +63,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -137,7 +137,7 @@ internal class FileInfoViewModelTest {
     private val stopSharingNode: StopSharingNode = mock()
     private val nodeActionMapper: NodeActionMapper = mock()
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
-    private val monitorOnlineStatusUpdates = mock<MonitorOnlineStatusUseCase>()
+    private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase>()
     private val clipboardGateway = mock<ClipboardGateway>()
     private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
@@ -195,7 +195,7 @@ internal class FileInfoViewModelTest {
             stopSharingNode = stopSharingNode,
             getAvailableNodeActionsUseCase = getAvailableNodeActionsUseCase,
             nodeActionMapper = nodeActionMapper,
-            monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
+            monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             clipboardGateway = clipboardGateway,
             getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
@@ -218,7 +218,7 @@ internal class FileInfoViewModelTest {
         whenever(getNodeVersionsByHandleUseCase(nodeId)).thenReturn(null)
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
-        whenever(monitorOnlineStatusUpdates.invoke()).thenReturn(emptyFlow())
+        whenever(monitorChatOnlineStatusUseCase.invoke()).thenReturn(emptyFlow())
         whenever(monitorContactUpdates.invoke()).thenReturn(emptyFlow())
         whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
             .thenReturn(File(null as File?, thumbUri))

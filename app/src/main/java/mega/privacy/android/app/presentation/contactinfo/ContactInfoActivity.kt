@@ -36,9 +36,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
@@ -66,6 +63,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.ChatExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -77,7 +75,6 @@ import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -116,12 +113,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
-
-    /**
-     * Use case to subscribe to global events related to MegaChat.
-     */
-    @Inject
-    lateinit var getChatChangesUseCase: GetChatChangesUseCase
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -355,7 +346,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         // State icon resource id default value.
         contactStateIcon =
             if (Util.isDarkMode(this)) R.drawable.ic_offline_dark_standard else R.drawable.ic_offline_light
-        checkChatChanges()
         val extras = intent.extras
         if (extras != null) {
             setUpViews()
@@ -840,30 +830,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     /**
-     * Start call with chat created
-     *
-     * @param chatId Chat id.
-     */
-    private fun startCallWithChat(chatId: Long) {
-        if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            enableCallLayouts(false)
-            val audio = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
-            var video = startVideo
-            if (video) {
-                video = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
-            }
-            viewModel.onCallTap(chatId, video, audio)
-        }
-    }
-
-    /**
-     * Start call
-     */
-    private fun startCall() {
-        viewModel.chatId?.let { startCallWithChat(it) }
-    }
-
-    /**
      * Collecting Flows from ViewModel
      */
     private fun collectFlows() {
@@ -877,9 +843,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     getString(R.string.call_error),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
-            } else if (contactInfoState.isCallStarted == true) {
-                enableCallLayouts(true)
             }
+
+            enableCallLayouts(contactInfoState.enableCallLayout)
 
             if (contactInfoState.callStatusChanged) {
                 checkScreenRotationToShowCall()
@@ -919,12 +885,47 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 viewModel.onConsumeNameCollisions()
             }
 
+            if (contactInfoState.shouldInitiateCall) {
+                verifyPermissionAndJoinCall()
+            }
+
+            if (contactInfoState.navigateToMeeting) {
+                navigateToMeetingActivity(contactInfoState)
+            }
+
             updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
             updateBasicInfo(contactInfoState)
             setFoldersButtonText(contactInfoState.inShares)
             updateUI()
         }
+    }
+
+    private fun navigateToMeetingActivity(contactInfoState: ContactInfoState) {
+        val intentMeeting = Intent(this, MeetingActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            action = MeetingActivity.MEETING_ACTION_IN
+            putExtra(MeetingActivity.MEETING_CHAT_ID, contactInfoState.currentCallChatId)
+            putExtra(
+                MeetingActivity.MEETING_AUDIO_ENABLE,
+                contactInfoState.currentCallAudioStatus
+            )
+            putExtra(
+                MeetingActivity.MEETING_VIDEO_ENABLE,
+                contactInfoState.currentCallVideoStatus
+            )
+        }
+        viewModel.onConsumeNavigateToMeeting()
+        startActivity(intentMeeting)
+    }
+
+    private fun verifyPermissionAndJoinCall() {
+        val audio = hasPermissions(this, Manifest.permission.RECORD_AUDIO)
+        var video = startVideo
+        if (video) {
+            video = hasPermissions(this, Manifest.permission.CAMERA)
+        }
+        viewModel.joinCall(video, audio)
     }
 
     private fun handleOneOffEvents(contactInfoState: ContactInfoState) {
@@ -1021,10 +1022,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         if (grantResults.isEmpty()) return
         when (requestCode) {
             Constants.REQUEST_RECORD_AUDIO -> if (CallUtil.checkCameraPermission(this)) {
-                startCall()
+                verifyPermissionAndJoinCall()
             }
 
-            Constants.REQUEST_CAMERA -> startCall()
+            Constants.REQUEST_CAMERA -> verifyPermissionAndJoinCall()
         }
         nodeSaver.handleRequestPermissionsResult(requestCode)
     }
@@ -1082,7 +1083,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun startingACall(withVideo: Boolean) {
         startVideo = withVideo
         if (CallUtil.canCallBeStartedFromContactOption(this, passcodeManagement)) {
-            startCall()
+            verifyPermissionAndJoinCall()
         }
     }
 
@@ -1470,31 +1471,4 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         showSnackbar(type, activityChatContactBinding.fragmentContainer, content, chatId)
     }
 
-    /**
-     * Receive changes to OnChatOnlineStatusUpdate, OnChatConnectionStateUpdate and OnChatPresenceLastGreen and make the necessary changes
-     */
-    private fun checkChatChanges() {
-        getChatChangesUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ next: GetChatChangesUseCase.Result? ->
-                if (next is GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-                    viewModel.getUserStatusAndRequestForLastGreen()
-                }
-                if (next is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
-                    val chatId = next.chatid
-                    val newState = next.newState
-                    val chatRoom = megaChatApi.getChatRoom(chatId)
-                    if (CallUtil.isChatConnectedInOrderToInitiateACall(newState, chatRoom)) {
-                        startCall()
-                    }
-                }
-                if (next is GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
-                    val userHandle = next.userHandle
-                    val lastGreen = next.lastGreen
-                    viewModel.updateLastGreen(userHandle, lastGreen)
-                }
-            }) { t: Throwable? -> Timber.e(t) }
-            .addTo(composite)
-    }
 }

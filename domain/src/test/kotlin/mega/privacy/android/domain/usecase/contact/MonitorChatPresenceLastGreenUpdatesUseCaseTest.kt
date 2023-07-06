@@ -12,10 +12,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class MonitorLastGreenUpdatesUseCaseTest {
+class MonitorChatPresenceLastGreenUpdatesUseCaseTest {
 
     private val contactsRepository = mock<ContactsRepository>()
-    private val underTest = MonitorLastGreenUpdatesUseCase(contactsRepository)
+    private val underTest = MonitorChatPresenceLastGreenUpdatesUseCase(contactsRepository)
 
     @Test
     fun `test that monitor last green updates returns flow of user last green`() = runTest {

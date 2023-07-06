@@ -61,7 +61,6 @@ class ContactInfoViewTest {
 
     private val contactState = ContactInfoState(
         error = null,
-        isCallStarted = false,
         userStatus = UserStatus.Online,
         lastGreen = 0,
         isFromContacts = false,

@@ -30,8 +30,8 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,17 +39,17 @@ import javax.inject.Inject
 /**
  * StartConversationFragment view model.
  *
- * @property getVisibleContactsUseCase          [GetVisibleContactsUseCase]
- * @property getContactDataUseCase                     [GetContactDataUseCase]
- * @property startConversationUseCase                  [StartConversationUseCase]
- * @property monitorContactUpdates              [MonitorContactUpdates]
- * @property applyContactUpdates                [ApplyContactUpdates]
- * @property monitorLastGreenUpdatesUseCase     [MonitorLastGreenUpdatesUseCase]
- * @property monitorOnlineStatusUseCase         [MonitorOnlineStatusUseCase]
- * @property monitorContactRequestUpdates       [MonitorContactRequestUpdates]
- * @property addNewContacts                     [AddNewContacts]
- * @property requestLastGreen                   [RequestLastGreen]
- * @property state        Current view state as [StartConversationState]
+ * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
+ * @property getContactDataUseCase                          [GetContactDataUseCase]
+ * @property startConversationUseCase                       [StartConversationUseCase]
+ * @property monitorContactUpdates                          [MonitorContactUpdates]
+ * @property applyContactUpdates                            [ApplyContactUpdates]
+ * @property monitorChatPresenceLastGreenUpdatesUseCase     [MonitorChatPresenceLastGreenUpdatesUseCase]
+ * @property monitorChatOnlineStatusUseCase                 [MonitorChatOnlineStatusUseCase]
+ * @property monitorContactRequestUpdates                   [MonitorContactRequestUpdates]
+ * @property addNewContacts                                 [AddNewContacts]
+ * @property requestLastGreen                               [RequestLastGreen]
+ * @property state                    Current view state as [StartConversationState]
  */
 @HiltViewModel
 class StartConversationViewModel @Inject constructor(
@@ -58,8 +58,8 @@ class StartConversationViewModel @Inject constructor(
     private val startConversationUseCase: StartConversationUseCase,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val applyContactUpdates: ApplyContactUpdates,
-    private val monitorLastGreenUpdatesUseCase: MonitorLastGreenUpdatesUseCase,
-    private val monitorOnlineStatusUseCase: MonitorOnlineStatusUseCase,
+    private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
+    private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
@@ -198,7 +198,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun observeLastGreenUpdates() {
         viewModelScope.launch {
-            monitorLastGreenUpdatesUseCase().collectLatest { (handle, lastGreen) ->
+            monitorChatPresenceLastGreenUpdatesUseCase().collectLatest { (handle, lastGreen) ->
                 _state.value.contactItemList.apply {
                     findItemByHandle(handle)?.apply {
                         toMutableList().apply {
@@ -213,7 +213,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun observeOnlineStatusUpdates() {
         viewModelScope.launch {
-            monitorOnlineStatusUseCase().collectLatest { (userHandle, status) ->
+            monitorChatOnlineStatusUseCase().collectLatest { (userHandle, status) ->
                 if (status != UserStatus.Online) {
                     requestLastGreen(userHandle)
                 }

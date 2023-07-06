@@ -8,7 +8,9 @@ import javax.inject.Inject
 /**
  * Use case for monitoring updates on last green.
  */
-class MonitorLastGreenUpdatesUseCase @Inject constructor(private val contactsRepository: ContactsRepository) {
+class MonitorChatPresenceLastGreenUpdatesUseCase @Inject constructor(
+    private val contactsRepository: ContactsRepository,
+) {
 
     /**
      * Invoke.

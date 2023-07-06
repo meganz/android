@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Use case for monitoring updates on chat online statuses.
  */
-class MonitorOnlineStatusUseCase @Inject constructor(private val contactsRepository: ContactsRepository) {
+class MonitorChatOnlineStatusUseCase @Inject constructor(private val contactsRepository: ContactsRepository) {
 
     /**
      * Invoke.

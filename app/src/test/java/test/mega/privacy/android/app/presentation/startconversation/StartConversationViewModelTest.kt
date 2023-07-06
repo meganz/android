@@ -30,8 +30,8 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
 import org.junit.Before
@@ -108,11 +108,12 @@ class StartConversationViewModelTest {
         onBlocking { invoke(eq(testContactList), any()) }.thenReturn(testContactList)
     }
 
-    private val monitorLastGreenUpdatesUseCase = mock<MonitorLastGreenUpdatesUseCase> {
-        on { invoke() }.thenReturn(emptyFlow())
-    }
+    private val monitorChatPresenceLastGreenUpdatesUseCase =
+        mock<MonitorChatPresenceLastGreenUpdatesUseCase> {
+            on { invoke() }.thenReturn(emptyFlow())
+        }
 
-    private val monitorOnlineStatusUseCase = mock<MonitorOnlineStatusUseCase> {
+    private val monitorChatOnlineStatusUseCase = mock<MonitorChatOnlineStatusUseCase> {
         on { invoke() }.thenReturn(emptyFlow())
     }
 
@@ -135,8 +136,8 @@ class StartConversationViewModelTest {
             startConversationUseCase = startConversationUseCase,
             monitorContactUpdates = monitorContactUpdates,
             applyContactUpdates = applyContactUpdates,
-            monitorLastGreenUpdatesUseCase = monitorLastGreenUpdatesUseCase,
-            monitorOnlineStatusUseCase = monitorOnlineStatusUseCase,
+            monitorChatPresenceLastGreenUpdatesUseCase = monitorChatPresenceLastGreenUpdatesUseCase,
+            monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             addNewContacts = addNewContacts,
             monitorConnectivityUseCase = monitorConnectivityUseCase,

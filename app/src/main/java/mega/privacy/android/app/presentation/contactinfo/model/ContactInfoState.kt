@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * Contact info UI state
  *
  * @property error                                      String resource id for showing an error.
- * @property isCallStarted                              Handle when a call is started.
  * @property userStatus                                 user status
  * @property lastGreen                                  last seen time gap in minutes
  * @property isFromContacts                             Checks if contact info launched from contacts screen
@@ -34,10 +33,14 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property nameCollisions                             Checks if copy has name collisions
  * @property isTransferComplete                         checks if file transfer complete
  * @property copyError                                  Copy node error
+ * @property shouldInitiateCall                         Initiates call with the contact
+ * @property currentCallChatId                          Chat id of the call.
+ * @property currentCallAudioStatus                     True, if audio is on. False, if audio is off.
+ * @property currentCallVideoStatus                     True, if video is on. False, if video is off.
+ * @property enableCallLayout                           call button is enabled and disabled based on this
  */
 data class ContactInfoState(
     val error: Int? = null,
-    val isCallStarted: Boolean? = false,
     val userStatus: UserStatus = UserStatus.Invalid,
     val lastGreen: Int = 0,
     val isFromContacts: Boolean = false,
@@ -59,6 +62,11 @@ data class ContactInfoState(
     val nameCollisions: List<NameCollision> = emptyList(),
     val copyError: Throwable? = null,
     val inShares: List<UnTypedNode> = emptyList(),
+    val shouldInitiateCall: Boolean = false,
+    val currentCallChatId: Long = INVALID_CHAT_HANDLE,
+    val currentCallAudioStatus: Boolean = false,
+    val currentCallVideoStatus: Boolean = false,
+    val enableCallLayout: Boolean = true,
 ) {
 
     /**
@@ -91,5 +99,14 @@ data class ContactInfoState(
      * shows edit or add nick name
      */
     val modifyNickNameTextId by lazy(LazyThreadSafetyMode.NONE) { if (hasAlias) R.string.edit_nickname else R.string.add_nickname }
+
+    /**
+     * Initiates navigation to meeting activity upon joining a call
+     */
+    val navigateToMeeting = currentCallChatId != INVALID_CHAT_HANDLE
+
+    companion object {
+        private const val INVALID_CHAT_HANDLE = -1L
+    }
 
 }

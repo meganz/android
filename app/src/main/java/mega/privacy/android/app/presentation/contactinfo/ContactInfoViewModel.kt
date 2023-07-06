@@ -20,7 +20,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.meeting.gateway.CameraGateway
@@ -35,9 +34,6 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -58,16 +54,20 @@ import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCase
 import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.meeting.IsChatConnectedToInitiateCallUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -81,10 +81,7 @@ import javax.inject.Inject
  *
  * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
  * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
- * @property startChatCall                      [StartChatCall]
- * @property getChatRoomUseCase                 [GetChatRoomUseCase]
  * @property passcodeManagement                 [PasscodeManagement]
- * @property chatApiGateway                     [MegaChatApiGateway]
  * @property cameraGateway                      [CameraGateway]
  * @property chatManagement                     [ChatManagement]
  * @property monitorContactUpdates              [MonitorContactUpdates]
@@ -103,10 +100,7 @@ import javax.inject.Inject
 class ContactInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val startChatCall: StartChatCall,
-    private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
-    private val chatApiGateway: MegaChatApiGateway,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
     private val monitorContactUpdates: MonitorContactUpdates,
@@ -130,6 +124,11 @@ class ContactInfoViewModel @Inject constructor(
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
+    private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
+    private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
+    private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
+    private val isChatConnectedToInitiateCallUseCase: IsChatConnectedToInitiateCallUseCase,
+    private val openOrStartCall: OpenOrStartCall,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -190,7 +189,37 @@ class ContactInfoViewModel @Inject constructor(
         monitorChatSessionUpdates()
         chatMuteUpdates()
         monitorNodeChanges()
+        monitorChatOnlineStatusUpdates()
+        monitorChatPresenceGreenUpdates()
+        monitorChatConnectionStateUpdates()
     }
+
+    private fun monitorChatConnectionStateUpdates() = viewModelScope.launch {
+        monitorChatConnectionStateUseCase().collectLatest {
+            val shouldInitiateCall = isChatConnectedToInitiateCallUseCase(
+                newState = it.chatConnectionStatus,
+                chatRoom = getChatRoom(it.chatId),
+                isWaitingForCall = MegaApplication.isWaitingForCall,
+                userWaitingForCall = MegaApplication.userWaitingForCall,
+            )
+            if (shouldInitiateCall && chatId != INVALID_CHAT_HANDLE) {
+                _state.update { state -> state.copy(shouldInitiateCall = true) }
+            }
+        }
+    }
+
+    private fun monitorChatPresenceGreenUpdates() = viewModelScope.launch {
+        monitorChatPresenceLastGreenUpdatesUseCase().collectLatest {
+            updateLastGreen(userHandle = it.handle, lastGreen = it.lastGreen)
+        }
+    }
+
+    private fun monitorChatOnlineStatusUpdates() = viewModelScope.launch {
+        monitorChatOnlineStatusUseCase().collectLatest {
+            getUserStatusAndRequestForLastGreen()
+        }
+    }
+
 
     private fun monitorNodeChanges() = viewModelScope.launch {
         monitorNodeUpdates()
@@ -296,56 +325,45 @@ class ContactInfoViewModel @Inject constructor(
     /**
      * Starts a call
      *
-     * @param chatId Chat id
-     * @param video Start call with video on or off
-     * @param audio Start call with audio on or off
+     * @param hasVideo Start call with video on or off
+     * @param hasAudio Start call with audio on or off
      */
-    fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
-        if (chatApiGateway.getChatCall(chatId) != null) {
-            _state.update { it.copy(isCallStarted = true) }
-
-            Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(
-                MegaApplication.getInstance().applicationContext, chatId, true, passcodeManagement
-            )
-            return
-        }
-
+    fun joinCall(hasVideo: Boolean, hasAudio: Boolean) = viewModelScope.launch {
+        val chatId = chatId ?: return@launch
+        Timber.d("Start call")
+        _state.update { it.copy(enableCallLayout = false, shouldInitiateCall = false) }
         MegaApplication.isWaitingForCall = false
-
         cameraGateway.setFrontCamera()
+        runCatching {
+            openOrStartCall(chatId = chatId, video = hasVideo, audio = hasAudio)
+        }.onSuccess { call ->
+            call?.let { chatCall ->
+                Timber.d("Call started")
+                openCurrentCall(call = chatCall)
+            } ?: _state.update { it.copy(enableCallLayout = true) }
+        }.onFailure {
+            _state.update { state -> state.copy(enableCallLayout = true) }
+            Timber.w("Exception opening or starting call: $it")
+        }
+    }
 
-        viewModelScope.launch {
-            runCatching {
-                startChatCall(chatId, video, audio)
-            }.onFailure { exception ->
-                _state.update { it.copy(error = R.string.call_error) }
-                Timber.e(exception)
-            }.onSuccess { resultStartCall ->
-                _state.update { it.copy(isCallStarted = true) }
-                val resultChatId = resultStartCall.chatHandle
-                if (resultChatId != null) {
-                    val videoEnable = resultStartCall.flag
-                    val paramType = resultStartCall.paramType
-                    val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-
-                    CallUtil.addChecksForACall(resultChatId, videoEnable)
-
-                    chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                        if (call.isOutgoing) {
-                            chatManagement.setRequestSentCall(call.callId, true)
-                        }
-                    }
-
-                    CallUtil.openMeetingWithAudioOrVideo(
-                        MegaApplication.getInstance().applicationContext,
-                        resultChatId,
-                        audioEnable,
-                        videoEnable,
-                        passcodeManagement
-                    )
-                }
-            }
+    /**
+     * Open current call
+     *
+     * @param call  [ChatCall]
+     */
+    private fun openCurrentCall(call: ChatCall) {
+        chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+        chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+        passcodeManagement.showPasscodeScreen = true
+        MegaApplication.getInstance().openCallService(call.chatId)
+        _state.update {
+            it.copy(
+                currentCallChatId = call.chatId,
+                currentCallAudioStatus = call.hasLocalAudio,
+                currentCallVideoStatus = call.hasLocalVideo,
+                enableCallLayout = true,
+            )
         }
     }
 
@@ -548,6 +566,21 @@ class ContactInfoViewModel @Inject constructor(
     }
 
     /**
+     * on Consume initiate call
+     */
+    fun onConsumeNavigateToMeeting() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    currentCallChatId = INVALID_CHAT_HANDLE,
+                    currentCallAudioStatus = false,
+                    currentCallVideoStatus = false
+                )
+            }
+        }
+    }
+
+    /**
      * Remove selected contact from user account
      * InShares are removed and existing calls are closed
      * Exits from contact info page if succeeds
@@ -558,9 +591,9 @@ class ContactInfoViewModel @Inject constructor(
                 Timber.w("Exception removing contact.", it)
                 false
             }
-        }
+        } ?: false
         _state.update {
-            it.copy(isUserRemoved = isRemoved ?: false)
+            it.copy(isUserRemoved = isRemoved)
         }
     }
 
@@ -658,7 +691,6 @@ class ContactInfoViewModel @Inject constructor(
      *
      * Verifies duplicate name is available in target folder
      * @param handles results from copy result launcher
-     * @param context context of parent activity
      */
     @SuppressLint("CheckResult")
     fun checkCopyNameCollision(handles: Pair<LongArray, Long>?) {

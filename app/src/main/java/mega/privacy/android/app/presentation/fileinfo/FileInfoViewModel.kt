@@ -60,7 +60,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
-import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -108,7 +108,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val monitorChildrenUpdates: MonitorChildrenUpdates,
     private val monitorContactUpdates: MonitorContactUpdates,
-    private val monitorOnlineStatusUpdates: MonitorOnlineStatusUseCase,
+    private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val getNodeVersionsByHandleUseCase: GetNodeVersionsByHandleUseCase,
     private val getOutShares: GetOutShares,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
@@ -645,7 +645,7 @@ class FileInfoViewModel @Inject constructor(
 
     private fun monitorOnlineState() =
         viewModelScope.launch {
-            monitorOnlineStatusUpdates().filter { onlineStatus ->
+            monitorChatOnlineStatusUseCase().filter { onlineStatus ->
                 _uiState.value.outShares.any { it.contactItem.handle == onlineStatus.userHandle }
             }.collect { onlineStatus ->
                 updateState { uiState ->
