@@ -26,7 +26,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -46,7 +45,6 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -1280,7 +1278,7 @@ public class Util {
      */
     public static void takePicture(Activity activity, int option) {
         Timber.d("takePicture");
-        File newFile = buildTempFile(activity, "picture.jpg");
+        File newFile = buildTempFile("picture.jpg");
         try {
             newFile.createNewFile();
         } catch (IOException e) {

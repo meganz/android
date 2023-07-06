@@ -236,8 +236,8 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
         /*Avatar*/
         ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
         File avatar = (holder.email == null) ?
-                buildAvatarFile(context, userHandle + ".jpg") :
-                buildAvatarFile(context, holder.email + ".jpg");
+                buildAvatarFile(userHandle + ".jpg") :
+                buildAvatarFile(holder.email + ".jpg");
 
         Bitmap bitmap = null;
         if (isFileAvailable(avatar)) {
@@ -254,7 +254,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                         return;
                     }
 
-                    megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
                 } else {
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
@@ -265,7 +265,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                     return;
                 }
 
-                megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
             }
         } else {
 
@@ -274,7 +274,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
                 return;
             }
 
-            megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+            megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
         }
     }
 

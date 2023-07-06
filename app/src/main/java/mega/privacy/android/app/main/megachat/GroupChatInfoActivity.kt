@@ -1494,7 +1494,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             if (!TextUtil.isTextEmpty(handle)) {
                 megaApi.getUserAvatar(
                     handle,
-                    buildAvatarFile(this, handle + FileUtil.JPG_EXTENSION)?.absolutePath,
+                    buildAvatarFile(handle + FileUtil.JPG_EXTENSION)?.absolutePath,
                     GetAttrUserListener(this, positionInAdapter)
                 )
             }

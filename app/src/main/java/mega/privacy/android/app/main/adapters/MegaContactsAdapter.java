@@ -250,7 +250,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
 
         UserAvatarListener listener = new UserAvatarListener(context, holder);
 
-        File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+        File avatar = buildAvatarFile(holder.contactMail + ".jpg");
         Bitmap bitmap = null;
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
@@ -261,16 +261,16 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
                 bitmap = getRoundedRectBitmap(context, bitmap, 3);
                 if (bitmap == null) {
                     avatar.delete();
-                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                 } else {
                     Timber.d("Do not ask for user avatar - its in cache: %s", avatar.getAbsolutePath());
                     holder.imageView.setImageBitmap(bitmap);
                 }
             } else {
-                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
             }
         } else {
-            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
         }
 
         holder.imageButtonThreeDots.setTag(holder);
@@ -303,7 +303,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
                 holder.imageView.setImageBitmap(bitmap);
             } else {
                 createDefaultAvatar(holder, contact);
-                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(), new UserAvatarListener(context, holder));
+                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(), new UserAvatarListener(context, holder));
             }
         }
     }
@@ -333,7 +333,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
 
         UserAvatarListener listener = new UserAvatarListener(context, holder);
 
-        File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+        File avatar = buildAvatarFile(holder.contactMail + ".jpg");
         Bitmap bitmap = null;
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
@@ -343,15 +343,15 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                 if (bitmap == null) {
                     avatar.delete();
-                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                 } else {
                     holder.imageView.setImageBitmap(bitmap);
                 }
             } else {
-                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
             }
         } else {
-            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
         }
     }
 
@@ -377,7 +377,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
 
             UserAvatarListener listener = new UserAvatarListener(context, holder);
 
-            File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+            File avatar = buildAvatarFile(holder.contactMail + ".jpg");
             Bitmap bitmap = null;
             if (isFileAvailable(avatar)) {
                 if (avatar.length() > 0) {
@@ -387,16 +387,16 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
                     bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                     if (bitmap == null) {
                         avatar.delete();
-                        megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                     } else {
                         Timber.d("Do not ask for user avatar - its in cache: %s", avatar.getAbsolutePath());
                         holder.imageView.setImageBitmap(bitmap);
                     }
                 } else {
-                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                 }
             } else {
-                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
             }
         } else {
 
@@ -407,7 +407,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
 
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
 
-                File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+                File avatar = buildAvatarFile(holder.contactMail + ".jpg");
                 Bitmap bitmap = null;
                 if (isFileAvailable(avatar)) {
                     if (avatar.length() > 0) {
@@ -417,15 +417,15 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
                         bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                         if (bitmap == null) {
                             avatar.delete();
-                            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                            megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                         } else {
                             holder.imageView.setImageBitmap(bitmap);
                         }
                     } else {
-                        megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                     }
                 } else {
-                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(context, contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getMegaUser(), buildAvatarFile(contact.getMegaUser().getEmail() + ".jpg").getAbsolutePath(), listener);
                 }
             }
         }

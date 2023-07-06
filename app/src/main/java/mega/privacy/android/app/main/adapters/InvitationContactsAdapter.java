@@ -268,7 +268,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     private Bitmap getMegaUserAvatar(InvitationContactInfo contact) {
         Timber.d("getMegaUserAvatar");
         String email = contact.getDisplayInfo();
-        File avatar = buildAvatarFile(context, email + IMAGE_EXTENSION);
+        File avatar = buildAvatarFile(email + IMAGE_EXTENSION);
         String path = avatar.getAbsolutePath();
         if (isFileAvailable(avatar)) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();

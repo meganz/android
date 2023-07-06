@@ -674,7 +674,7 @@ public class OfflineUtils {
             }
         }
 
-        removeOldTempFolder(context, OLD_OFFLINE_DIR);
+        removeOldTempFolder(OLD_OFFLINE_DIR);
     }
 
     private static void deleteOldOfflineReference(DatabaseHandler dbH, File oldOfflineFile, MegaOffline oldOfflineNode) {

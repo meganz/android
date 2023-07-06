@@ -575,7 +575,7 @@ class TextEditorViewModel @Inject constructor(
             return
         }
 
-        val tempFile = CacheFolderManager.buildTempFile(activity, fileName.value)
+        val tempFile = CacheFolderManager.buildTempFile(fileName.value)
         if (tempFile == null) {
             Timber.e("Cannot get temporal file.")
             return

@@ -117,7 +117,7 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
         String email = contact.getEmail();
         holder.contactMail = email;
         UserAvatarListener listener = new UserAvatarListener(context,holder);
-        File avatar = buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(email + ".jpg");
         Bitmap bitmap;
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {
@@ -127,15 +127,15 @@ public class LastContactsAdapter extends RecyclerView.Adapter<LastContactsAdapte
                 bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(),bOpts);
                 if (bitmap == null) {
                     avatar.delete();
-                    megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
+                    megaApi.getUserAvatar(contact,buildAvatarFile(email + ".jpg").getAbsolutePath(),listener);
                 } else {
                     holder.avatarImage.setImageBitmap(bitmap);
                 }
             } else {
-                megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
+                megaApi.getUserAvatar(contact,buildAvatarFile(email + ".jpg").getAbsolutePath(),listener);
             }
         } else {
-            megaApi.getUserAvatar(contact,buildAvatarFile(context,email + ".jpg").getAbsolutePath(),listener);
+            megaApi.getUserAvatar(contact,buildAvatarFile(email + ".jpg").getAbsolutePath(),listener);
         }
         
     }

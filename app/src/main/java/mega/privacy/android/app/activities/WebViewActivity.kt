@@ -346,7 +346,6 @@ class WebViewActivity : BaseActivity() {
                 val fileName = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
                 file = CacheFolderManager.buildTempFile(
-                    this,
                     fileName + getContentExtension(contentType)
                 )
             } catch (e: IOException) {

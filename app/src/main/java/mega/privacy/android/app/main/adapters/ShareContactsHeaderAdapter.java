@@ -222,7 +222,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
                     } else {
                         holder.avatar.setImageBitmap(getAvatarShareContact(mContext, contact));
                         megaApi.getUserAvatar(contact.getMegaContactAdapter().getMegaUser(),
-                                buildAvatarFile(mContext, contact.getMegaContactAdapter().getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(),
+                                buildAvatarFile(contact.getMegaContactAdapter().getMegaUser().getEmail() + JPG_EXTENSION).getAbsolutePath(),
                                 new UserAvatarListenerShare(mContext, holder));
                     }
                 }

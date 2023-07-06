@@ -1046,7 +1046,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun setOfflineAvatar() {
         val userEmail = viewModel.userEmail ?: return
         Timber.d("setOfflineAvatar")
-        val avatar = buildAvatarFile(this, "$userEmail.jpg")
+        val avatar = buildAvatarFile("$userEmail.jpg")
         if (avatar?.exists() == true) {
             val imBitmap: Bitmap?
             if (avatar.length() > 0) {

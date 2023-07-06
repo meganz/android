@@ -1397,7 +1397,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
                     transfer.nodeHandle,
                     Constants.ERROR_VOICE_CLIP_TRANSFER
                 )
-                val localFile = buildVoiceClipFile(this@DownloadService, transfer.fileName)
+                val localFile = buildVoiceClipFile(transfer.fileName)
                 if (FileUtil.isFileAvailable(localFile)) {
                     Timber.d("Delete own voiceclip : exists")
                     localFile?.delete()
@@ -1475,7 +1475,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
                         transfer.nodeHandle,
                         Constants.ERROR_VOICE_CLIP_TRANSFER
                     )
-                    val localFile = buildVoiceClipFile(this@DownloadService, transfer.fileName)
+                    val localFile = buildVoiceClipFile(transfer.fileName)
                     if (FileUtil.isFileAvailable(localFile)) {
                         Timber.d("Delete own voice clip : exists")
                         localFile?.delete()

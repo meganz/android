@@ -76,7 +76,7 @@ class GetThumbnailUseCase @Inject constructor(
             }
 
             val thumbnailFile =
-                CacheFolderManager.buildThumbnailFile(context, node.getThumbnailFileName())
+                CacheFolderManager.buildThumbnailFile(node.getThumbnailFileName())
 
             if (thumbnailFile?.exists() == true) {
                 emitter.onSuccess(thumbnailFile.toUri())

@@ -466,7 +466,6 @@ class CallService : Service() {
     fun setProfileContactAvatar(userHandle: Long, fullName: String, email: String): Bitmap {
         val avatar =
             buildAvatarFile(
-                this,
                 email + FileUtil.JPG_EXTENSION
             )
         if (FileUtil.isFileAvailable(avatar)) {

@@ -223,9 +223,9 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
             String userHandle = MegaApiAndroid.userHandleToBase64(handle);
 
             if (holder.email == null) {
-                avatar = buildAvatarFile(context, userHandle + ".jpg");
+                avatar = buildAvatarFile(userHandle + ".jpg");
             } else {
-                avatar = buildAvatarFile(context, holder.email + ".jpg");
+                avatar = buildAvatarFile(holder.email + ".jpg");
             }
 
             Bitmap bitmap = null;
@@ -243,7 +243,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                             return;
                         }
 
-                        megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
                     } else {
                         holder.avatar.setImageBitmap(getCircleBitmap(bitmap));
                     }
@@ -254,7 +254,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                         return;
                     }
 
-                    megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
                 }
             } else {
 
@@ -263,7 +263,7 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                     return;
                 }
 
-                megaApi.getUserAvatar(holder.email, buildAvatarFile(context, holder.email + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(holder.email, buildAvatarFile(holder.email + ".jpg").getAbsolutePath(), listener);
             }
         }
     }

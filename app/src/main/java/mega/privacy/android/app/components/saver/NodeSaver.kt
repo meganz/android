@@ -337,7 +337,7 @@ class NodeSaver(
                 }
 
                 val parentPath =
-                    buildVoiceClipFile(app, nodes[0].name)?.parentFile?.path ?: return@Callable
+                    buildVoiceClipFile(nodes[0].name)?.parentFile?.path ?: return@Callable
 
                 val totalSize = nodesTotalSize(nodes)
 

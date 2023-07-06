@@ -229,7 +229,7 @@ public class ChatController {
      */
     public static void deleteOwnVoiceClip(Context mContext, String nameFile) {
         Timber.d("deleteOwnVoiceClip");
-        File localFile = buildVoiceClipFile(mContext, nameFile);
+        File localFile = buildVoiceClipFile(nameFile);
         if (!isFileAvailable(localFile)) return;
         localFile.delete();
     }

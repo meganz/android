@@ -193,7 +193,7 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
         }
 
         /*Avatar*/
-        avatar = buildAvatarFile(context, mail + ".jpg");
+        avatar = buildAvatarFile(mail + ".jpg");
         Bitmap bitmap = null;
         if (isFileAvailable(avatar) && avatar.length() > 0) {
             BitmapFactory.Options bOpts = new BitmapFactory.Options();

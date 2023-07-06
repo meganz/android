@@ -209,7 +209,7 @@ public class MegaApiUtils {
                 }
 
                 if (!included) {
-                    File avatar = buildAvatarFile(context, users.get(i).getEmail() + ".jpg");
+                    File avatar = buildAvatarFile(users.get(i).getEmail() + ".jpg");
                     if (isFileAvailable(avatar)) {
                         if (avatar.length() > 0) {
                             lastContacted.add(users.get(i));

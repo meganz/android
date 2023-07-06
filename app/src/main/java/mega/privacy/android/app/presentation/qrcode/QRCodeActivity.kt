@@ -143,7 +143,6 @@ class QRCodeActivity : PasscodeActivity() {
     private fun saveToFileSystem(parentPath: String) {
         val myEmail = megaApi.myEmail
         val qrFile: File? = CacheFolderManager.buildQrFile(
-            context = this,
             fileName = myEmail + MyCodeFragment.QR_IMAGE_FILE_NAME
         )
 

@@ -116,7 +116,7 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
                     pendingAvatars.remove(request.getEmail());
 
                     if (holder.contactMail.compareTo(request.getEmail()) == 0) {
-                        File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+                        File avatar = buildAvatarFile(holder.contactMail + ".jpg");
                         Bitmap bitmap = null;
                         if (isFileAvailable(avatar)) {
                             if (avatar.length() > 0) {
@@ -292,19 +292,19 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
                     megaApi.getUserAttribute(contact, 1, listener);
                     megaApi.getUserAttribute(contact, 2, listener);
 
-                    File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+                    File avatar = buildAvatarFile(holder.contactMail + ".jpg");
                     Bitmap bitmap;
                     if (isFileAvailable(avatar) && avatar.length() > 0) {
                         BitmapFactory.Options bOpts = new BitmapFactory.Options();
                         bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                         if (bitmap == null) {
                             avatar.delete();
-                            megaApi.getUserAvatar(contact, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
+                            megaApi.getUserAvatar(contact, buildAvatarFile(holder.contactMail + ".jpg").getAbsolutePath(), listener);
                         } else {
                             holder.imageView.setImageBitmap(bitmap);
                         }
                     } else {
-                        megaApi.getUserAvatar(contact, buildAvatarFile(context, holder.contactMail + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(contact, buildAvatarFile(holder.contactMail + ".jpg").getAbsolutePath(), listener);
                     }
                 }
             }

@@ -495,7 +495,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                             val chatTempFolder = getCacheFolder(
                                 CacheFolderManager.CHAT_TEMPORARY_FOLDER
                             )
-                            var outFile = buildChatTempFile(applicationContext, file.name)
+                            var outFile = buildChatTempFile(file.name)
                             var index = 0
 
                             if (outFile != null) {
@@ -1057,7 +1057,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             Timber.d("After cancel")
 
             if (isVoiceClip()) {
-                val localFile = buildVoiceClipFile(this@ChatUploadService, fileName)
+                val localFile = buildVoiceClipFile(fileName)
 
                 if (FileUtil.isFileAvailable(localFile) && localFile!!.name != fileName) {
                     localFile.delete()

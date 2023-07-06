@@ -34,7 +34,6 @@ import static nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.Html;
@@ -386,8 +385,8 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         /*Avatar*/
         ChatUserAvatarListener listener = new ChatUserAvatarListener(context, holder);
         File avatar = ((ViewHolderNormalChatList) holder).contactMail == null ?
-                buildAvatarFile(context, userHandle + ".jpg") :
-                buildAvatarFile(context, ((ViewHolderNormalChatList) holder).contactMail + ".jpg");
+                buildAvatarFile(userHandle + ".jpg") :
+                buildAvatarFile(((ViewHolderNormalChatList) holder).contactMail + ".jpg");
 
         Bitmap bitmap = null;
         if (isFileAvailable(avatar)) {
@@ -404,7 +403,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                         return;
                     }
 
-                    megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile(context, ((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile(((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
                 } else {
                     ((ViewHolderNormalChatList) holder).imageView.setImageBitmap(bitmap);
                 }
@@ -414,7 +413,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                     Timber.w("megaApi is Null in Offline mode");
                     return;
                 }
-                megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile(context, ((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile(((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
             }
         } else {
 
@@ -422,7 +421,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 Timber.w("megaApi is Null in Offline mode");
                 return;
             }
-            megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile(context, ((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
+            megaApi.getUserAvatar(((ViewHolderNormalChatList) holder).contactMail, buildAvatarFile( ((ViewHolderNormalChatList) holder).contactMail + ".jpg").getAbsolutePath(), listener);
         }
     }
 

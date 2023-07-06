@@ -55,7 +55,6 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import mega.privacy.android.analytics.Analytics;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -268,7 +267,7 @@ public class FileUtil {
     }
 
     private static File createTemporalFile(Context context, String fileName, String data) {
-        final File file = buildTempFile(context, fileName);
+        final File file = buildTempFile(fileName);
 
         try {
             FileOutputStream fOut = new FileOutputStream(file);

@@ -71,7 +71,7 @@ class DeleteChatMessageUseCase @Inject constructor(
      * @param node  Node file to be deleted
      */
     private fun deleteVoiceClipFile(node: MegaNode) {
-        CacheFolderManager.buildVoiceClipFile(context, node.name)?.let {
+        CacheFolderManager.buildVoiceClipFile(node.name)?.let {
             if (FileUtil.isFileAvailable(it)) it.delete()
         }
     }

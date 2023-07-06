@@ -21,7 +21,7 @@ class MeetingAvatarListener(private val context: Context, private val peerId: Lo
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         if (e.errorCode == MegaError.API_OK) {
             if (TextUtils.isEmpty(request.email)) {
-                val avatar = CacheFolderManager.buildAvatarFile(context, request.email + ".jpg")
+                val avatar = CacheFolderManager.buildAvatarFile(request.email + ".jpg")
                 if (FileUtil.isFileAvailable(avatar)) {
                     LiveEventBus.get(
                         EventConstants.EVENT_MEETING_GET_AVATAR,

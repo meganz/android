@@ -49,7 +49,7 @@ class AbstractMeetingOnBoardingRepository @Inject constructor(
     suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(Dispatchers.IO) {
         megaApi.getUserAvatar(
             megaApi.myUser,
-            CacheFolderManager.buildAvatarFile(context,
+            CacheFolderManager.buildAvatarFile(
                 megaApi.myEmail + JPG_EXTENSION)?.absolutePath,
             listener
         )

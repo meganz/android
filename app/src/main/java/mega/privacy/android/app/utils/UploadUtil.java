@@ -26,7 +26,7 @@ public class UploadUtil {
      */
     public static File getTemporalTakePictureFile(Context context) {
         Timber.d("uploadTakePicture");
-        File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
+        File imgFile = CacheFolderManager.getCacheFile(CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
             Util.showSnackbar(context, context.getString(R.string.general_error));
             return null;
@@ -34,7 +34,7 @@ public class UploadUtil {
 
         String name = Util.getPhotoSyncName(imgFile.lastModified(), imgFile.getAbsolutePath());
         Timber.d("Taken picture Name: %s", name);
-        File newFile = CacheFolderManager.buildTempFile(context, name);
+        File newFile = CacheFolderManager.buildTempFile(name);
         imgFile.renameTo(newFile);
 
         return newFile;

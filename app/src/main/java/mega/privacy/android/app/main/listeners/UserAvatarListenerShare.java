@@ -1,6 +1,9 @@
 package mega.privacy.android.app.main.listeners;
 
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,9 +16,6 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
 
 public class UserAvatarListenerShare implements MegaRequestListenerInterface {
 
@@ -37,7 +37,7 @@ public class UserAvatarListenerShare implements MegaRequestListenerInterface {
         if (e.getErrorCode() == MegaError.API_OK){
 
             if (holder.mail.compareTo(request.getEmail()) == 0){
-                File avatar = buildAvatarFile(context, holder.mail + ".jpg");
+                File avatar = buildAvatarFile(holder.mail + ".jpg");
                 Bitmap bitmap = null;
                 if (isFileAvailable(avatar)) {
                     if (avatar.length() > 0){

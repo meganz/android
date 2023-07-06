@@ -96,7 +96,7 @@ public class ChatUserAvatarListener implements MegaRequestListenerInterface {
     }
 
     private Bitmap getBitmap(String email) {
-        File avatar = buildAvatarFile(context, email + ".jpg");
+        File avatar = buildAvatarFile(email + ".jpg");
         Bitmap bitmap;
         if (isFileAvailable(avatar)) {
             if (avatar.length() > 0) {

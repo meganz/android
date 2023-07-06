@@ -844,7 +844,6 @@ class MyAccountViewModel @Inject constructor(
         val myEmail = megaApi.myUser?.email
         val imgFile = if (!path.isNullOrEmpty()) File(path)
         else CacheFolderManager.getCacheFile(
-            app,
             CacheFolderManager.TEMPORARY_FOLDER,
             "picture.jpg"
         )
@@ -853,7 +852,7 @@ class MyAccountViewModel @Inject constructor(
             return
         }
 
-        val newFile = CacheFolderManager.buildAvatarFile(app, myEmail + "Temp.jpg")
+        val newFile = CacheFolderManager.buildAvatarFile(myEmail + "Temp.jpg")
 
         if (newFile != null) {
             MegaUtilsAndroid.createAvatar(imgFile, newFile)
@@ -879,7 +878,7 @@ class MyAccountViewModel @Inject constructor(
      * @param snackbarShower
      */
     fun deleteProfileAvatar(context: Context, snackbarShower: SnackbarShower) {
-        CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.let {
+        CacheFolderManager.buildAvatarFile(megaApi.myEmail + JPG_EXTENSION)?.let {
             if (FileUtil.isFileAvailable(it)) {
                 Timber.d("Avatar to delete: ${it.absolutePath}")
                 it.delete()

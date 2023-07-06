@@ -326,7 +326,7 @@ public class AvatarUtil {
      * @return Bitmap of the avatar if the file exists.
      */
     public static Bitmap getAvatarBitmap(String avatarName) {
-        return getAvatarBitmap(buildAvatarFile(MegaApplication.getInstance(), avatarName + JPG_EXTENSION));
+        return getAvatarBitmap(buildAvatarFile(avatarName + JPG_EXTENSION));
     }
 
     /**
@@ -403,7 +403,7 @@ public class AvatarUtil {
 
     @Nullable
     public static Pair<Boolean, Bitmap> getCircleAvatar(Context context, String email) {
-        File avatar = buildAvatarFile(context, email + JPG_EXTENSION);
+        File avatar = buildAvatarFile(email + JPG_EXTENSION);
         if (!(isFileAvailable(avatar) && avatar.length() > 0)) {
             return Pair.create(false, null);
         }
@@ -533,6 +533,6 @@ public class AvatarUtil {
 
     @Nullable
     public static File getUserAvatarFile(Context context, String userEmail) {
-        return CacheFolderManager.buildAvatarFile(context, userEmail + ".jpg");
+        return CacheFolderManager.buildAvatarFile(userEmail + ".jpg");
     }
 }

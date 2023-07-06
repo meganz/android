@@ -126,7 +126,7 @@ public final class ContactsAdvancedNotificationBuilder implements MegaRequestLis
         counter = 0;
         megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_FIRSTNAME, this);
         megaApi.getUserAttribute(email, MegaApiJava.USER_ATTR_LASTNAME, this);
-        megaApi.getUserAvatar(email, buildAvatarFile(context, email + ".jpg").getAbsolutePath(), this);
+        megaApi.getUserAvatar(email, buildAvatarFile(email + ".jpg").getAbsolutePath(), this);
 
     }
 

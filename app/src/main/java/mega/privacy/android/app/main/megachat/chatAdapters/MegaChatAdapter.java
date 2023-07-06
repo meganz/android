@@ -125,7 +125,6 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import androidx.compose.ui.platform.ComposeView;
 import androidx.core.content.ContextCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.RecyclerView;
@@ -200,7 +199,6 @@ import nz.mega.sdk.MegaNodeList;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaStringList;
-import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUtilsAndroid;
 import timber.log.Timber;
@@ -413,7 +411,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 previewCache.put(node.getHandle(), preview);
                 return 0;
             } else {
-                destination = CacheFolderManager.buildPreviewFile(context, node.getName());
+                destination = CacheFolderManager.buildPreviewFile(node.getName());
 
                 if (isFileAvailable(destination)) {
                     if (destination.length() == node.getSize()) {
@@ -5196,7 +5194,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 } else {
                     Timber.d("myMessage: SENT -> available ");
                     boolean isDownloaded = false;
-                    File vcFile = CacheFolderManager.buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
+                    File vcFile = CacheFolderManager.buildVoiceClipFile(message.getMegaNodeList().get(0).getName());
                     if (isFileAvailable(vcFile) && vcFile.length() == message.getMegaNodeList().get(0).getSize()) {
                         isDownloaded = true;
                     }
@@ -5359,7 +5357,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 boolean isDownloaded = false;
 
-                File vcFile = CacheFolderManager.buildVoiceClipFile(context, message.getMegaNodeList().get(0).getName());
+                File vcFile = CacheFolderManager.buildVoiceClipFile(message.getMegaNodeList().get(0).getName());
                 if (isFileAvailable(vcFile) && vcFile.length() == message.getMegaNodeList().get(0).getSize()) {
                     isDownloaded = true;
                 }
@@ -6500,7 +6498,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.othersContactLinkAvatar.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
         }
 
-        File avatar = CacheFolderManager.buildAvatarFile(context, result.getEmail() + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(result.getEmail() + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -6543,7 +6541,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             holder.contentContactMessageContactThumb.getHierarchy().setPlaceholderImage(drawableDefaultAvatar);
         }
 
-        File avatar = CacheFolderManager.buildAvatarFile(context, email + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(email + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -6574,7 +6572,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         /*Avatar*/
         holder.contactImageView.setImageRequest(null);
-        File avatar = CacheFolderManager.buildAvatarFile(context, userHandleEncoded + JPG_EXTENSION);
+        File avatar = CacheFolderManager.buildAvatarFile(userHandleEncoded + JPG_EXTENSION);
         Uri uri = getAvatarUri(avatar);
 
         if (uri == null) {
@@ -7947,7 +7945,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 MegaNodeList nodeList = currentMessage.getMessage().getMegaNodeList();
                 if (nodeList.size() < 1 || !isVoiceClip(nodeList.get(0).getName())) break;
 
-                File vcFile = CacheFolderManager.buildVoiceClipFile(context, nodeList.get(0).getName());
+                File vcFile = CacheFolderManager.buildVoiceClipFile(nodeList.get(0).getName());
                 if (!isFileAvailable(vcFile) || vcFile.length() != nodeList.get(0).getSize())
                     downloadVoiceClip(holder, positionInAdapter, currentMessage.getMessage().getUserHandle(), nodeList);
 

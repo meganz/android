@@ -1,6 +1,5 @@
 package mega.privacy.android.app.utils
 
-import android.content.Context
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
@@ -61,9 +60,7 @@ object CacheFolderManager {
      * Get Cache Folder given folder Name
      */
     @JvmStatic
-    fun getCacheFolder(folderName: String): File? {
-        return cacheFolderGateway.getCacheFolder(folderName)
-    }
+    fun getCacheFolder(folderName: String): File? = cacheFolderGateway.getCacheFolder(folderName)
 
     /**
      * Create Cache Folders
@@ -88,62 +85,82 @@ object CacheFolderManager {
     }
 
 
+    /**
+     * Get QR Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildQrFile(context: Context, fileName: String?): File? {
+    fun buildQrFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(QR_FOLDER, fileName)
     }
 
+    /**
+     * Get Preview Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildPreviewFile(context: Context, fileName: String?): File? {
+    fun buildPreviewFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(PREVIEW_FOLDER, fileName)
     }
 
+    /**
+     * Get Thumbnail Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildThumbnailFile(context: Context, fileName: String?): File? {
+    fun buildThumbnailFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(THUMBNAIL_FOLDER, fileName)
     }
 
+    /**
+     * Get Avatar Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildAvatarFile(context: Context, fileName: String?): File? {
+    fun buildAvatarFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(AVATAR_FOLDER, fileName)
     }
 
+    /**
+     * Get Voice Clip Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildVoiceClipFile(context: Context, fileName: String?): File? {
+    fun buildVoiceClipFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(VOICE_CLIP_FOLDER, fileName)
     }
 
+    /**
+     * Get Temp Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildTempFile(context: Context, fileName: String?): File? {
+    fun buildTempFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(TEMPORARY_FOLDER, fileName)
     }
 
+    /**
+     * Get Chat Temp Cache File Instance
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun buildChatTempFile(context: Context, fileName: String?): File? {
+    fun buildChatTempFile(fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(CHAT_TEMPORARY_FOLDER, fileName)
     }
 
+    /**
+     * Get Cache File Instance given folderName & fileName
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun getCacheFile(context: Context, folderName: String, fileName: String?): File? {
+    fun getCacheFile(folderName: String, fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(folderName, fileName)
     }
 
+    /**
+     * Get Cache Size
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
     fun getCacheSize(): Long {
         return cacheFolderGateway.getCacheSize()
     }
 
+    /**
+     * Clear Cache
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
     fun clearCache() {
         runBlocking { cacheFolderGateway.clearCache() }
     }
@@ -159,12 +176,17 @@ object CacheFolderManager {
         cacheFolderGateway.deleteCacheFolderIfEmpty(folderName)
     }
 
+    /**
+     * Remove old temp folder
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun removeOldTempFolder(context: Context?, folderName: String) {
+    fun removeOldTempFolder(folderName: String) {
         cacheFolderGateway.removeOldTempFolder(folderName)
     }
 
+    /**
+     * Get old temp folder
+     */
     @JvmStatic
     fun getOldTempFolder(folderName: String): File {
         return cacheFolderGateway.getOldTempFolder(folderName)

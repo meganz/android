@@ -434,7 +434,7 @@ public class ChatUtil {
                 return null;
             }
 
-            outFile = buildChatTempFile(MegaApplication.getInstance().getApplicationContext(), file.getName());
+            outFile = buildChatTempFile(file.getName());
             if (outFile == null) {
                 Timber.e("File NULL when building it for upload a scaled image to chat.");
                 return null;

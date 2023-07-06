@@ -502,7 +502,6 @@ class InMeetingRepository @Inject constructor(
             megaApi.getUserAvatar(
                 mail,
                 CacheFolderManager.buildAvatarFile(
-                    context,
                     mail + FileUtil.JPG_EXTENSION
                 )?.absolutePath, MeetingAvatarListener(context, peerId)
             )
@@ -563,7 +562,6 @@ class InMeetingRepository @Inject constructor(
         megaApi.getUserAvatar(
             email,
             CacheFolderManager.buildAvatarFile(
-                context,
                 email + FileUtil.JPG_EXTENSION
             )?.absolutePath, MeetingAvatarListener(context, peerId)
         )

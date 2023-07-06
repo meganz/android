@@ -93,7 +93,7 @@ class QRCodeSaveBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val parentNode = megaApi.rootNode
         val myEmail = megaApi.myUser?.email ?: return
         val qrFile =
-            buildQrFile(requireActivity(), myEmail + MyCodeFragment.QR_IMAGE_FILE_NAME)
+            buildQrFile(myEmail + MyCodeFragment.QR_IMAGE_FILE_NAME)
                 ?.takeIf { FileUtil.isFileAvailable(it) }
                 ?: run {
                     Util.showSnackbar(requireActivity(), getString(R.string.error_upload_qr))

@@ -1038,7 +1038,7 @@ internal class UploadService : LifecycleService() {
 
             if (error.errorCode == MegaError.API_OK) {
                 // Get the uploaded file from cache root directory.
-                getCacheFile(applicationContext, "", fileName)
+                getCacheFile( "", fileName)
                     ?.takeIf { it.exists() }
                     ?.let { uploadedFile ->
                         Timber.d("Delete file!: ${uploadedFile.absolutePath}")

@@ -3243,7 +3243,7 @@ public class ChatActivity extends PasscodeActivity
 
         long timeStamp = System.currentTimeMillis() / 1000;
         outputFileName = "/note_voice" + getVoiceClipName(timeStamp);
-        File vcFile = buildVoiceClipFile(this, outputFileName);
+        File vcFile = buildVoiceClipFile(outputFileName);
         outputFileVoiceNotes = vcFile.getAbsolutePath();
         if (outputFileVoiceNotes == null) return;
         if (myAudioRecorder == null) myAudioRecorder = new MediaRecorder();
@@ -8993,7 +8993,7 @@ public class ChatActivity extends PasscodeActivity
         if (path.startsWith("content:")) {
             file = getFileFromContentUri(this, Uri.parse(path));
         } else if (isVoiceClip(path)) {
-            file = buildVoiceClipFile(this, outputFileName);
+            file = buildVoiceClipFile(outputFileName);
             if (!isFileAvailable(file)) return;
         } else {
             file = new File(path);

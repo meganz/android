@@ -157,7 +157,7 @@ public class ContactsHorizontalAdapter extends RecyclerView.Adapter<ContactsHori
             Bitmap bitmap = getUserAvatar(MegaApiAndroid.userHandleToBase64(megaContact.getHandle()), email);
             if (bitmap == null) {
                 UserAvatarListener listener = new UserAvatarListener(context, holder);
-                megaApi.getUserAvatar(email, buildAvatarFile(context, email + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(email, buildAvatarFile(email + ".jpg").getAbsolutePath(), listener);
             }
         }
     }

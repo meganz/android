@@ -46,7 +46,7 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
 
         if (e.getErrorCode() == MegaError.API_OK) {
             if (holder.contactMail.compareTo(request.getEmail()) == 0) {
-                File avatar = buildAvatarFile(context, holder.contactMail + ".jpg");
+                File avatar = buildAvatarFile(holder.contactMail + ".jpg");
                 Bitmap bitmap = null;
                 if (isFileAvailable(avatar)) {
                     if (avatar.length() > 0) {
