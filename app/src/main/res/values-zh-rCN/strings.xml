@@ -1854,7 +1854,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登录您的帐户时，系统会要求您输入身份验证应用程序中提供的6位数验证码。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">为避免您忘记密码或想要禁用双重验证时出现问题，请将您的<b>恢复密钥</b>保存到安全位置。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">验证码无效</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -4626,13 +4626,13 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">按年结算最多可节省16%</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]存储空间：[/B][A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]传输流量：[/B][A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/月[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/年[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推荐</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -4640,25 +4640,25 @@
     <!-- Title of description of features, which are available for users, if they buy plan. -->
     <string name="account_upgrade_account_description_title_features">Pro方案的功能</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;受密码保护的链接</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;为链接设置到期日期</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;传输流量共享</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;自动备份</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite最多可还原90天，Pro&#160;I、II和III最多可还原365天（即将推出）</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;安排垃圾桶清理工作7天至10年</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">购买Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">购买Pro I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">购买Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">购买Pro III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">服务条款</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -4692,11 +4692,11 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">重命名相册</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">您的相册中已存在一个名为“%1$s”的相册。请为您要保存的相册输入一个新名称。</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">输入相册名称</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">您可以在我们的[A]定价页面[/A]升级您当前的订阅方案。</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="other">任何拥有这些链接的人都可以查看和下载您的数据</item>
@@ -4704,13 +4704,13 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">保存到云盘</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">正在保存&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">“%1$s”已保存到云盘</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">“%1$s”无法保存到云盘。请稍后重试，如果问题仍然存在，请联系与您共享链接的人。</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">工作日</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">每</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
@@ -4826,4 +4826,16 @@
         <item quantity="one">Every month on the %2$d</item>
         <item quantity="other">Every %1$s months on the %2$d</item>
     </plurals>
+    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
+    <plurals name="download_started">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
+    <plurals name="download_complete">
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_end_recurrence_label">结束重复</string>
+    <!-- Title of Ends section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_ends_section">结束</string>
 </resources>
