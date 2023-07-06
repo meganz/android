@@ -1269,4 +1269,20 @@ internal class MegaApiFacade @Inject constructor(
             megaApi.exportNode(node, listener)
         }
     }
+
+    @Deprecated(message = "This statistical value is deprecated")
+    override val numPendingUploads: Int
+        get() = megaApi.numPendingUploads
+
+    @Deprecated(message = "This statistical value is deprecated")
+    override val totalUploads: Int
+        get() = megaApi.totalUploads
+
+    @Deprecated(message = "This statistical value is deprecated")
+    override val totalUploadBytes: Long
+        get() = megaApi.totalUploadBytes
+
+    @Deprecated(message = "This statistical value is deprecated")
+    override val totalUploadedBytes: Long
+        get() = megaApi.totalUploadedBytes
 }

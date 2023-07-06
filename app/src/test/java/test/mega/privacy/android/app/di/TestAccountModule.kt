@@ -13,10 +13,10 @@ import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
 import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.ResetAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
@@ -41,7 +41,7 @@ object TestAccountModule {
         on { runBlocking { invoke() } }.thenReturn("")
     }
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase> {
-        on { runBlocking { invoke(false) } }
+        on { runBlocking { invoke(false) } }.thenReturn(Unit)
     }
     private val isBusinessAccountActive = mock<IsBusinessAccountActive> {
         on { runBlocking { invoke() } }.thenReturn(false)

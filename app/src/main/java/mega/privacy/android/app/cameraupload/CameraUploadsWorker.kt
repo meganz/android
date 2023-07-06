@@ -47,8 +47,7 @@ import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.data.gateway.PermissionGateway
-import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
@@ -146,7 +145,6 @@ import java.io.FileNotFoundException
 import java.time.Instant
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlin.math.roundToInt
 
 
@@ -159,6 +157,76 @@ class CameraUploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val permissionsGateway: PermissionGateway,
     private val isNotEnoughQuota: IsNotEnoughQuota,
+    private val megaApi: MegaApiGateway,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
+    private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
+    private val isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase,
+    private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
+    private val isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase,
+    private val deleteSyncRecord: DeleteSyncRecord,
+    private val deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath,
+    private val deleteSyncRecordByFingerprint: DeleteSyncRecordByFingerprint,
+    private val setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase,
+    private val shouldCompressVideo: ShouldCompressVideo,
+    private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
+    private val clearSyncRecords: ClearSyncRecords,
+    private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
+    private val getSyncRecordByPath: GetSyncRecordByPath,
+    private val getPendingSyncRecords: GetPendingSyncRecords,
+    private val compressedVideoPending: CompressedVideoPending,
+    private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus,
+    private val setSyncRecordPendingByPath: SetSyncRecordPendingByPath,
+    private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
+    private val isChargingRequired: IsChargingRequired,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val processMediaForUploadUseCase: ProcessMediaForUploadUseCase,
+    private val getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase,
+    private val setPrimarySyncHandle: SetPrimarySyncHandle,
+    private val setSecondarySyncHandle: SetSecondarySyncHandle,
+    private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
+    private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorCameraUploadPauseState: MonitorCameraUploadPauseState,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorBatteryInfo: MonitorBatteryInfo,
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
+    private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
+    private val monitorChargingStoppedState: MonitorChargingStoppedState,
+    private val handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase,
+    private val cancelTransferByTagUseCase: CancelTransferByTagUseCase,
+    private val cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase,
+    private val copyNodeUseCase: CopyNodeUseCase,
+    private val setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase,
+    private val startUploadUseCase: StartUploadUseCase,
+    private val createCameraUploadFolder: CreateCameraUploadFolder,
+    private val setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase,
+    private val setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase,
+    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
+    private val resetTotalUploadsUseCase: ResetTotalUploadsUseCase,
+    private val disableCameraUploadsUseCase: DisableCameraUploadsUseCase,
+    private val compressVideos: CompressVideos,
+    private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
+    private val disableMediaUploadSettings: DisableMediaUploadSettings,
+    private val createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory,
+    private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
+    private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
+    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
+    private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
+    private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase,
+    private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase,
+    private val updateCameraUploadsBackupUseCase: UpdateCameraUploadsBackupUseCase,
+    private val updateMediaUploadsBackupUseCase: UpdateMediaUploadsBackupUseCase,
+    private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
+    private val reportUploadFinishedUseCase: ReportUploadFinishedUseCase,
+    private val reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase,
+    private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
+    private val legacyCompletedTransferMapper: LegacyCompletedTransferMapper,
+    private val setCoordinatesUseCase: SetCoordinatesUseCase,
+    private val isChargingUseCase: IsChargingUseCase,
+    private val stringWrapper: StringWrapper,
+    private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
+    private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -172,436 +240,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
     }
-
-    /**
-     * The [MegaApiAndroid] for SDK calls, which will be removed once all direct calls have
-     * been converted to Use Cases
-     */
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
-
-    /**
-     * [GetPrimaryFolderPathUseCase]
-     */
-    @Inject
-    lateinit var getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase
-
-    /**
-     * [IsPrimaryFolderPathValidUseCase]
-     */
-    @Inject
-    lateinit var isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase
-
-    /**
-     * [IsSecondaryFolderSetUseCase]
-     */
-    @Inject
-    lateinit var isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase
-
-    /**
-     * IsSecondaryFolderEnabled
-     */
-    @Inject
-    lateinit var isSecondaryFolderEnabled: IsSecondaryFolderEnabled
-
-    /**
-     * IsCameraUploadsEnabledUseCase
-     */
-    @Inject
-    lateinit var isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase
-
-    /**
-     * IsWifiNotSatisfied Use Case
-     */
-    @Inject
-    lateinit var isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase
-
-    /**
-     * DeleteSyncRecord
-     */
-    @Inject
-    lateinit var deleteSyncRecord: DeleteSyncRecord
-
-    /**
-     * DeleteSyncRecordByLocalPath
-     */
-    @Inject
-    lateinit var deleteSyncRecordByLocalPath: DeleteSyncRecordByLocalPath
-
-    /**
-     * DeleteSyncRecordByFingerprint
-     */
-    @Inject
-    lateinit var deleteSyncRecordByFingerprint: DeleteSyncRecordByFingerprint
-
-    /**
-     * SetPrimaryFolderLocalPathUseCase
-     */
-    @Inject
-    lateinit var setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase
-
-    /**
-     * ShouldCompressVideo
-     */
-    @Inject
-    lateinit var shouldCompressVideo: ShouldCompressVideo
-
-    /**
-     * SetSecondaryFolderLocalPathUseCase
-     */
-    @Inject
-    lateinit var setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase
-
-    /**
-     * ClearSyncRecords
-     */
-    @Inject
-    lateinit var clearSyncRecords: ClearSyncRecords
-
-    /**
-     * Are Location Tags Enabled
-     */
-    @Inject
-    lateinit var areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase
-
-    /**
-     * GetSyncRecordByPath
-     */
-    @Inject
-    lateinit var getSyncRecordByPath: GetSyncRecordByPath
-
-    /**
-     * GetPendingSyncRecords
-     */
-    @Inject
-    lateinit var getPendingSyncRecords: GetPendingSyncRecords
-
-    /**
-     * CompressedVideoPending
-     */
-    @Inject
-    lateinit var compressedVideoPending: CompressedVideoPending
-
-    /**
-     * GetVideoSyncRecordsByStatus
-     */
-    @Inject
-    lateinit var getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus
-
-    /**
-     * SetSyncRecordPendingByPath
-     */
-    @Inject
-    lateinit var setSyncRecordPendingByPath: SetSyncRecordPendingByPath
-
-    /**
-     * Get Video Compression Size Limit
-     */
-    @Inject
-    lateinit var getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase
-
-    /**
-     * IsChargingRequired
-     */
-    @Inject
-    lateinit var isChargingRequired: IsChargingRequired
-
-    /**
-     * [GetNodeByIdUseCase]
-     */
-    @Inject
-    lateinit var getNodeByIdUseCase: GetNodeByIdUseCase
-
-    /**
-     * ProcessMediaForUpload
-     */
-    @Inject
-    lateinit var processMediaForUploadUseCase: ProcessMediaForUploadUseCase
-
-    /**
-     * [GetUploadFolderHandleUseCase]
-     */
-    @Inject
-    lateinit var getUploadFolderHandleUseCase: GetUploadFolderHandleUseCase
-
-    /**
-     * SetPrimarySyncHandle
-     */
-    @Inject
-    lateinit var setPrimarySyncHandle: SetPrimarySyncHandle
-
-    /**
-     * SetSecondarySyncHandle
-     */
-    @Inject
-    lateinit var setSecondarySyncHandle: SetSecondarySyncHandle
-
-    /**
-     * GetDefaultNodeHandleUseCase
-     */
-    @Inject
-    lateinit var getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase
-
-    /**
-     * AreTransfersPausedUseCase
-     */
-    @Inject
-    lateinit var areTransfersPausedUseCase: AreTransfersPausedUseCase
-
-    /**
-     * Sync Record Type Mapper
-     */
-    @Inject
-    lateinit var syncRecordTypeIntMapper: SyncRecordTypeIntMapper
-
-    /**
-     * IO dispatcher for camera upload work
-     */
-    @IoDispatcher
-    @Inject
-    lateinit var ioDispatcher: CoroutineDispatcher
-
-    /**
-     * Monitor camera upload pause state
-     */
-    @Inject
-    lateinit var monitorCameraUploadPauseState: MonitorCameraUploadPauseState
-
-    /**
-     * Monitor connectivity
-     */
-    @Inject
-    lateinit var monitorConnectivityUseCase: MonitorConnectivityUseCase
-
-    /**
-     * Monitor battery level
-     */
-    @Inject
-    lateinit var monitorBatteryInfo: MonitorBatteryInfo
-
-    /**
-     * Background Fast Login
-     */
-    @Inject
-    lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
-
-    /**
-     * Is Node In Rubbish or deleted
-     */
-    @Inject
-    lateinit var isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase
-
-    /**
-     * Monitor charging stop status
-     */
-    @Inject
-    lateinit var monitorChargingStoppedState: MonitorChargingStoppedState
-
-    /**
-     * initiate mega api connection based on IP
-     */
-    @Inject
-    lateinit var handleLocalIpChangeUseCase: HandleLocalIpChangeUseCase
-
-    /**
-     * CancelTransferByTagUseCase
-     */
-    @Inject
-    lateinit var cancelTransferByTagUseCase: CancelTransferByTagUseCase
-
-    /**
-     * CancelAllUploadTransfersUseCase
-     */
-    @Inject
-    lateinit var cancelAllUploadTransfersUseCase: CancelAllUploadTransfersUseCase
-
-    /**
-     * CopyNodeUseCase
-     */
-    @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
-
-    /**
-     * SetOriginalFingerprintUseCase
-     */
-    @Inject
-    lateinit var setOriginalFingerprintUseCase: SetOriginalFingerprintUseCase
-
-    /**
-     * Start Upload
-     */
-    @Inject
-    lateinit var startUploadUseCase: StartUploadUseCase
-
-    /**
-     * Create Camera Upload Folder
-     */
-    @Inject
-    lateinit var createCameraUploadFolder: CreateCameraUploadFolder
-
-    /**
-     * Setup Primary Folder
-     */
-    @Inject
-    lateinit var setupPrimaryFolderUseCase: SetupPrimaryFolderUseCase
-
-    /**
-     * Setup Secondary Folder
-     */
-    @Inject
-    lateinit var setupSecondaryFolderUseCase: SetupSecondaryFolderUseCase
-
-    /**
-     * Establish Camera Uploads Sync Handles
-     */
-    @Inject
-    lateinit var establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase
-
-    /**
-     * Reset Total Uploads
-     */
-    @Inject
-    lateinit var resetTotalUploadsUseCase: ResetTotalUploadsUseCase
-
-    /**
-     * Disable Camera Uploads in Database
-     */
-    @Inject
-    lateinit var disableCameraUploadsUseCase: DisableCameraUploadsUseCase
-
-    /**
-     * Compress Videos
-     */
-    @Inject
-    lateinit var compressVideos: CompressVideos
-
-    /**
-     * Reset Media Upload Time Stamps
-     */
-    @Inject
-    lateinit var resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps
-
-    /**
-     * Disable Media Upload Settings
-     */
-    @Inject
-    lateinit var disableMediaUploadSettings: DisableMediaUploadSettings
-
-    /**
-     * Create camera upload temporary root directory
-     */
-    @Inject
-    lateinit var createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory
-
-    /**
-     * DeleteCameraUploadsTemporaryRootDirectoryUseCase
-     */
-    @Inject
-    lateinit var deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase
-
-    /**
-     * Broadcast camera upload progress
-     */
-    @Inject
-    lateinit var broadcastCameraUploadProgress: BroadcastCameraUploadProgress
-
-    /**
-     * ScheduleCameraUploadUseCase
-     */
-    @Inject
-    lateinit var scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase
-
-    /**
-     * CreateTempFileAndRemoveCoordinatesUseCase
-     */
-    @Inject
-    lateinit var createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase
-
-    /**
-     * SendCameraUploadsBackupHeartBeatUseCase
-     */
-    @Inject
-    lateinit var sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase
-
-    /**
-     * SendMediaUploadsBackupHeartBeatUseCase
-     */
-    @Inject
-    lateinit var sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase
-
-    /**
-     * UpdateCameraUploadsBackupUseCase
-     */
-    @Inject
-    lateinit var updateCameraUploadsBackupUseCase: UpdateCameraUploadsBackupUseCase
-
-    /**
-     * UpdateMediaUploadsBackupUseCase
-     */
-    @Inject
-    lateinit var updateMediaUploadsBackupUseCase: UpdateMediaUploadsBackupUseCase
-
-    /**
-     * SendBackupHeartBeatSyncUseCase
-     */
-    @Inject
-    lateinit var sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase
-
-    /**
-     * ReportUploadFinishedUseCase
-     */
-    @Inject
-    lateinit var reportUploadFinishedUseCase: ReportUploadFinishedUseCase
-
-    /**
-     * ReportUploadInterruptedUseCase
-     */
-    @Inject
-    lateinit var reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase
-
-    /**
-     * AddCompletedTransferUseCase
-     */
-    @Inject
-    lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
-
-    /**
-     * Temporary mapper that convert a CompletedTransfer to legacy model [AndroidCompletedTransfer]
-     * Should be removed once [AndroidCompletedTransfer] removed from codebase
-     */
-    @Inject
-    lateinit var legacyCompletedTransferMapper: LegacyCompletedTransferMapper
-
-    /**
-     * Set coordinates for image files
-     */
-    @Inject
-    lateinit var setCoordinatesUseCase: SetCoordinatesUseCase
-
-    /**
-     * [IsChargingUseCase]
-     */
-    @Inject
-    lateinit var isChargingUseCase: IsChargingUseCase
-
-    /**
-     * [StringWrapper]
-     */
-    @Inject
-    lateinit var stringWrapper: StringWrapper
-
-    /**
-     * [MonitorStorageOverQuotaUseCase]
-     */
-    @Inject
-    lateinit var monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase
-
-    /**
-     * [BroadcastStorageOverQuotaUseCase]
-     */
-    @Inject
-    lateinit var broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase
 
 
     /**

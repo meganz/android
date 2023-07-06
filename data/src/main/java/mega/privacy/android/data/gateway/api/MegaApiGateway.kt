@@ -2647,4 +2647,24 @@ interface MegaApiGateway {
         expireTime: Long?,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Total Number of Pending Uploads
+     */
+    val numPendingUploads: Int
+
+    /**
+     * Total Number of Uploads
+     */
+    val totalUploads: Int
+
+    /**
+     * Total Upload Bytes
+     */
+    val totalUploadBytes: Long
+
+    /**
+     * Total Uploaded Bytes
+     */
+    val totalUploadedBytes: Long
 }
