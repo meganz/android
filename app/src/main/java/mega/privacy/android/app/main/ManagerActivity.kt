@@ -165,6 +165,7 @@ import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
 import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
+import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
@@ -455,6 +456,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var hasArchivedChatsUseCase: HasArchivedChatsUseCase
+
+    @Inject
+    lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper
 
     private val subscriptions = CompositeDisposable()
 
@@ -1466,7 +1470,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         rootNode = megaApi.rootNode
         if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
             Timber.d("Action: %s", intent?.action)
-            if (!handleRedirectIntentActions(intent?.action)) {
+            if (!handleRedirectIntentActions(intent)) {
                 refreshSession()
             }
             return true
@@ -1885,179 +1889,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return false
     }
 
-    private fun handleRedirectIntentActions(action: String?): Boolean {
-        when (action) {
-            Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
-                loginIntent.data = Uri.parse(intent.dataString)
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OPEN_MEGA_LINK -> {
-                val fileLinkIntent = Intent(this, FileLinkActivity::class.java)
-                fileLinkIntent.putExtra(
-                    Constants.VISIBLE_FRAGMENT,
-                    Constants.LOGIN_FRAGMENT
-                )
-                fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                fileLinkIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
-                fileLinkIntent.data = Uri.parse(intent.dataString)
-                startActivity(fileLinkIntent)
-                finish()
-            }
-
-            Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                loginIntent.data = Uri.parse(intent.dataString)
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OPEN_CHAT_LINK -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OPEN_CHAT_LINK
-                loginIntent.data = Uri.parse(intent.dataString)
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_CANCEL_CAM_SYNC -> {
-                viewModel.stopCameraUploads(shouldReschedule = false)
-                finish()
-            }
-
-            Constants.ACTION_EXPORT_MASTER_KEY -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = intent.action
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_SHOW_TRANSFERS -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_SHOW_TRANSFERS
-                loginIntent.putExtra(
-                    TRANSFERS_TAB,
-                    intent.serializable<TransfersTab>(TRANSFERS_TAB) ?: TransfersTab.NONE
-                )
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_IPC -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_IPC
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_CHAT_NOTIFICATION_MESSAGE -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_CHAT_SUMMARY -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_CHAT_SUMMARY
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OPEN_HANDLE_NODE -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OPEN_HANDLE_NODE
-                loginIntent.data = Uri.parse(intent.dataString)
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OVERQUOTA_TRANSFER -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OVERQUOTA_TRANSFER
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OVERQUOTA_STORAGE -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OVERQUOTA_STORAGE
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                Timber.d("Login")
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(
-                    Constants.CONTACT_HANDLE,
-                    intent.getLongExtra(Constants.CONTACT_HANDLE, -1)
-                )
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_OPEN_CONTACTS_SECTION
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE
-                startActivity(loginIntent)
-                finish()
-            }
-
-            Constants.ACTION_SHOW_UPGRADE_ACCOUNT -> {
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                loginIntent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                loginIntent.action = Constants.ACTION_SHOW_UPGRADE_ACCOUNT
-                startActivity(loginIntent)
-                finish()
-            }
-
-            else -> {
-                return false
-            }
+    private fun handleRedirectIntentActions(intent: Intent?): Boolean {
+        intent ?: return false
+        if (intent.action == Constants.ACTION_CANCEL_CAM_SYNC) {
+            viewModel.stopCameraUploads(shouldReschedule = false)
+            finish()
+            return true
         }
-        return true
+        managerRedirectIntentMapper(intent)?.let { redirectIntent ->
+            startActivity(redirectIntent)
+            finish()
+            return true
+        }
+
+        return false
     }
 
     private fun registerEventBusObservers() {
