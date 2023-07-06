@@ -6,6 +6,7 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import timber.log.Timber
@@ -100,7 +101,13 @@ class RecentActionBucketActionModeCallback constructor(
                 viewModel.clearSelection()
             }
             R.id.cab_menu_trash -> {
-                managerActivity.askConfirmationMoveToRubbish(nodesHandles)
+                if (nodesHandles.isNotEmpty()) {
+                    ConfirmMoveToRubbishBinDialogFragment.newInstance(nodesHandles)
+                        .show(
+                            managerActivity.supportFragmentManager,
+                            ConfirmMoveToRubbishBinDialogFragment.TAG
+                        )
+                }
                 viewModel.clearSelection()
             }
         }

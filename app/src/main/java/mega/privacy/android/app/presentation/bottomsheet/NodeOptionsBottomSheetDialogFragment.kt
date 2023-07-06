@@ -33,6 +33,7 @@ import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
@@ -967,9 +968,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onDeleteClicked(node: MegaNode) {
-        (requireActivity() as ManagerActivity).askConfirmationMoveToRubbish(
-            listOf(node.handle)
-        )
+        ConfirmMoveToRubbishBinDialogFragment.newInstance(listOf(node.handle))
+            .show(
+                requireActivity().supportFragmentManager,
+                ConfirmMoveToRubbishBinDialogFragment.TAG
+            )
         setStateBottomSheetBehaviorHidden()
     }
 

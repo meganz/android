@@ -5698,41 +5698,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }, 50)
     }
 
-    /**
-     * Displays a confirmation dialog before moving the selected nodes to the Rubbish Bin
-     *
-     * @param handleList List of Nodes selected for removal
-     */
-    fun askConfirmationMoveToRubbish(handleList: List<Long>?) {
-        Timber.d("askConfirmationMoveToRubbish")
-        if (handleList.isNullOrEmpty()) {
-            Timber.w("handleList NULL or empty")
-            return
-        }
-        val handle = handleList[0]
-        val node = megaApi.getNodeByHandle(handle)
-        val builder = MaterialAlertDialogBuilder(this)
-        if (!megaApi.isInRubbish(node)) {
-            if (CameraUploadUtil.getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled()) {
-                builder.setMessage(resources.getString(R.string.confirmation_move_cu_folder_to_rubbish))
-            } else if (CameraUploadUtil.getSecondaryFolderHandle() == handle && CameraUploadUtil.isSecondaryEnabled()) {
-                builder.setMessage(R.string.confirmation_move_mu_folder_to_rubbish)
-            } else {
-                builder.setMessage(resources.getString(R.string.confirmation_move_to_rubbish))
-            }
-            builder.setPositiveButton(R.string.general_move) { _: DialogInterface?, _: Int ->
-                viewModel.moveNodesToRubbishBin(handleList)
-            }
-        } else {
-            builder.setMessage(resources.getString(R.string.confirmation_delete_from_mega))
-            builder.setPositiveButton(R.string.rubbish_bin_delete_confirmation_dialog_button_delete) { _: DialogInterface?, _: Int ->
-                viewModel.deleteNodes(handleList)
-            }
-        }
-        builder.setNegativeButton(R.string.general_cancel, null)
-        builder.show()
-    }
-
     fun showWarningDialogOfShare(node: MegaNode, nodeType: Int, actionType: Int) {
         Timber.d("showWarningDialogOfShareFolder")
         if (actionType == ACTION_BACKUP_SHARE_FOLDER) {

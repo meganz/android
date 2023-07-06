@@ -10,6 +10,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -86,9 +87,13 @@ class FavouriteActionModeCallback(
                 }
 
                 R.id.cab_menu_trash -> {
-                    mainActivity.askConfirmationMoveToRubbish(
-                        nodeHandles
-                    )
+                    if (nodeHandles.isNotEmpty()) {
+                        ConfirmMoveToRubbishBinDialogFragment.newInstance(nodeHandles)
+                            .show(
+                                mainActivity.supportFragmentManager,
+                                ConfirmMoveToRubbishBinDialogFragment.TAG
+                            )
+                    }
                 }
 
                 R.id.cab_menu_select_all -> viewModel.selectAll()

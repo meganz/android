@@ -33,6 +33,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
@@ -703,7 +704,15 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     }
                     hideActionMode()
                 }
-                R.id.cab_menu_trash -> managerActivity?.askConfirmationMoveToRubbish(handleList)
+                R.id.cab_menu_trash -> {
+                    if (handleList.isNotEmpty()) {
+                        ConfirmMoveToRubbishBinDialogFragment.newInstance(handleList)
+                            .show(
+                                requireActivity().supportFragmentManager,
+                                ConfirmMoveToRubbishBinDialogFragment.TAG
+                            )
+                    }
+                }
                 R.id.cab_menu_select_all -> selectAll()
                 R.id.cab_menu_clear_selection -> hideActionMode()
                 R.id.cab_menu_remove_share -> managerActivity?.showConfirmationRemoveAllSharingContacts(

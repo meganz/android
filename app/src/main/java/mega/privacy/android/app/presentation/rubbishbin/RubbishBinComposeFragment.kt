@@ -32,6 +32,7 @@ import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.ThumbnailViewModel
@@ -264,7 +265,13 @@ class RubbishBinComposeFragment : Fragment() {
 
                 R.id.cab_menu_delete -> {
                     val documents = viewModel.state.value.selectedNodeHandles
-                    ((requireActivity()) as ManagerActivity).askConfirmationMoveToRubbish(documents)
+                    if (documents.isNotEmpty()) {
+                        ConfirmMoveToRubbishBinDialogFragment.newInstance(documents)
+                            .show(
+                                requireActivity().supportFragmentManager,
+                                ConfirmMoveToRubbishBinDialogFragment.TAG
+                            )
+                    }
                     actionMode?.finish()
                 }
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -74,9 +75,13 @@ fun MediaDiscoveryFragment.actionMoveToTrash() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(mediaDiscoveryViewModel.getSelectedIds())
     }
-    managerActivity.askConfirmationMoveToRubbish(
-        selectedPhotosIds
-    )
+    if (selectedPhotosIds.isNotEmpty()) {
+        ConfirmMoveToRubbishBinDialogFragment.newInstance(selectedPhotosIds)
+            .show(
+                managerActivity.supportFragmentManager,
+                ConfirmMoveToRubbishBinDialogFragment.TAG
+            )
+    }
 }
 
 fun MediaDiscoveryFragment.destroyActionMode() {

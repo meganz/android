@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.photos.timeline.actionMode
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.clearSelectedPhotos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.selectAllShowingPhotos
@@ -75,9 +76,13 @@ fun PhotosFragment.actionMoveToTrash() {
     val selectedPhotosIds = arrayListOf<Long>().apply {
         addAll(timelineViewModel.getSelectedIds())
     }
-    managerActivity.askConfirmationMoveToRubbish(
-        selectedPhotosIds
-    )
+    if (selectedPhotosIds.isNotEmpty()) {
+        ConfirmMoveToRubbishBinDialogFragment.newInstance(selectedPhotosIds)
+            .show(
+                managerActivity.supportFragmentManager,
+                ConfirmMoveToRubbishBinDialogFragment.TAG
+            )
+    }
 }
 
 fun PhotosFragment.destroyActionMode() {

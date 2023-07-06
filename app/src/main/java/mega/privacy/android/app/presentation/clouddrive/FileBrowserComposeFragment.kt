@@ -42,6 +42,7 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -409,9 +410,14 @@ class FileBrowserComposeFragment : Fragment() {
                 }
 
                 OptionItems.MOVE_TO_RUBBISH_CLICKED -> {
-                    (requireActivity() as ManagerActivity).askConfirmationMoveToRubbish(
-                        fileBrowserViewModel.state.value.selectedNodeHandles
-                    )
+                    fileBrowserViewModel.state.value.selectedNodeHandles.takeIf { handles -> handles.isNotEmpty() }
+                        ?.let { handles ->
+                            ConfirmMoveToRubbishBinDialogFragment.newInstance(handles)
+                                .show(
+                                    requireActivity().supportFragmentManager,
+                                    ConfirmMoveToRubbishBinDialogFragment.TAG
+                                )
+                        }
                 }
 
                 OptionItems.REMOVE_SHARE_CLICKED -> {

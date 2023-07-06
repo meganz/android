@@ -49,6 +49,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
@@ -558,11 +559,13 @@ class SearchFragment : RotatableFragment() {
                 }
 
                 R.id.cab_menu_trash -> {
-                    val handleList = arrayListOf<Long>()
-                    for (document in documents) {
-                        handleList.add(document.handle)
+                    if (documents.isNotEmpty()) {
+                        ConfirmMoveToRubbishBinDialogFragment.newInstance(documents.map { it.handle })
+                            .show(
+                                managerActivity.supportFragmentManager,
+                                ConfirmMoveToRubbishBinDialogFragment.TAG
+                            )
                     }
-                    managerActivity.askConfirmationMoveToRubbish(handleList)
                 }
 
                 R.id.cab_menu_select_all -> {

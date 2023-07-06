@@ -64,6 +64,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
@@ -1330,11 +1331,12 @@ class FileBrowserFragment : RotatableFragment() {
                 }
 
                 R.id.cab_menu_trash -> {
-                    documents?.map { it.handle }?.let {
-                        handleList.addAll(it)
-                        (requireActivity() as? ManagerActivity)?.askConfirmationMoveToRubbish(
-                            handleList
-                        )
+                    documents?.map { it.handle }?.takeIf { it.isNotEmpty() }?.let { handles ->
+                        ConfirmMoveToRubbishBinDialogFragment.newInstance(handles)
+                            .show(
+                                requireActivity().supportFragmentManager,
+                                ConfirmMoveToRubbishBinDialogFragment.TAG
+                            )
                     }
                 }
 

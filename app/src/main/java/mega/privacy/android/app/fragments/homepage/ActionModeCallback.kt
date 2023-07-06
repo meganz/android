@@ -6,6 +6,7 @@ import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -81,9 +82,13 @@ class ActionModeCallback constructor(
             }
 
             R.id.cab_menu_trash -> {
-                mainActivity.askConfirmationMoveToRubbish(
-                    nodesHandles
-                )
+                if (nodesHandles.isNotEmpty()) {
+                    ConfirmMoveToRubbishBinDialogFragment.newInstance(nodesHandles)
+                        .show(
+                            mainActivity.supportFragmentManager,
+                            ConfirmMoveToRubbishBinDialogFragment.TAG
+                        )
+                }
             }
 
             R.id.cab_menu_select_all -> viewModel.selectAll()
