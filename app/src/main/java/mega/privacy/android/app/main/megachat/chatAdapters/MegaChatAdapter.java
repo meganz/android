@@ -1578,7 +1578,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             hideLayoutsLocationMessages(position, ((ViewHolderMessageChat) holder));
 
             String path = message.getPendingMessage().getFilePath();
-            File voiceClipDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.VOICE_CLIP_FOLDER);
+            File voiceClipDir = CacheFolderManager.getCacheFolder(CacheFolderManager.VOICE_CLIP_FOLDER);
             String name = message.getPendingMessage().getName();
             int type = message.getPendingMessage().getType();
 

@@ -231,7 +231,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         dbH.resetExtendedAccountDetailsTimestamp()
 
         // clear the cache files stored in the external cache folder.
-        clearPublicCache(this)
+        clearPublicCache()
         ContextUtils.initialize(applicationContext)
 
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()

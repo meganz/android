@@ -44,7 +44,7 @@ public class InputStreamSource implements DocumentSource {
             throws IOException {
 
         File tmpFolder = CacheFolderManager
-                .getCacheFolder(context, CacheFolderManager.TEMPORARY_FOLDER);
+                .getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER);
         if (tmpFolder == null || tmpFileName == null) {
             // fail to create tmp folder, or no tmpFileName provided, fallback to old behavior
             return core.newDocument(Util.toByteArray(inputStream), password);

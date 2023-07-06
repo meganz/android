@@ -1047,7 +1047,7 @@ internal class UploadService : LifecycleService() {
             }
 
             Timber.d("IN Finish: $fileName path: $localPath")
-            getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+            getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
                 ?.takeIf { it.exists() && localPath.isNotEmpty() }
                 ?.let { tmpPic ->
                     if (localPath.startsWith(tmpPic.absolutePath)) {

@@ -581,7 +581,7 @@ public class ThumbnailUtils {
      */
     public static File getThumbFolder(Context context) {
         if (!isFileAvailable(thumbDir)) {
-            thumbDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.THUMBNAIL_FOLDER);
+            thumbDir = CacheFolderManager.getCacheFolder(CacheFolderManager.THUMBNAIL_FOLDER);
         }
         Timber.d("getThumbFolder(): thumbDir= %s", thumbDir);
         return thumbDir;

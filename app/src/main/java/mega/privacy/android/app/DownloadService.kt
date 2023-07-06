@@ -1511,7 +1511,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     private fun alterDocument(uri: Uri, fileName: String?) {
         Timber.d("alterUri")
         try {
-            val tempFolder = getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+            val tempFolder = getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
             if (!FileUtil.isFileAvailable(tempFolder)) return
             val sourceLocation = tempFolder?.absolutePath + File.separator + fileName
 

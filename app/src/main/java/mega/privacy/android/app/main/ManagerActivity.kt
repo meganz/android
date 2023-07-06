@@ -1011,7 +1011,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         registerBroadcastReceivers()
         registerEventBusObservers()
-        CacheFolderManager.createCacheFolders(this)
+        CacheFolderManager.createCacheFolders()
         checkChatChanges()
         Timber.d("retryChatPendingConnections()")
         megaChatApi.retryPendingConnections(false, null)
@@ -7209,7 +7209,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     service.putExtra(DownloadService.EXTRA_HASH, handleToDownload)
                     service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString())
                     val tempFolder =
-                        CacheFolderManager.getCacheFolder(this, CacheFolderManager.TEMPORARY_FOLDER)
+                        CacheFolderManager.getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
                     if (!FileUtil.isFileAvailable(tempFolder)) {
                         showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.general_error), -1)
                         return

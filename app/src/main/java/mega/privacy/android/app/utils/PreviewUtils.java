@@ -35,7 +35,7 @@ public class PreviewUtils {
      */
     public static File getPreviewFolder(Context context) {
         if (!isFileAvailable(previewDir)) {
-            previewDir = CacheFolderManager.getCacheFolder(context, CacheFolderManager.PREVIEW_FOLDER);
+            previewDir = CacheFolderManager.getCacheFolder(CacheFolderManager.PREVIEW_FOLDER);
         }
         return previewDir;
     }

@@ -8,34 +8,68 @@ import mega.privacy.android.app.di.EntryPointsModule
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import java.io.File
 
+/**
+ * CacheFolder Manager
+ */
 object CacheFolderManager {
-
-    private const val OLD_TEMPORARY_PIC_DIR = "MEGA/MEGA AppTemp"
-    private const val OLD_PROFILE_PID_DIR = "MEGA/MEGA Profile Images"
-    private const val OLD_ADVANCES_DEVICES_DIR = "MEGA/MEGA Temp"
-    private const val OLD_CHAT_TEMPORARY_DIR = "MEGA/MEGA Temp/Chat"
+    /**
+     * THUMBNAIL_FOLDER
+     */
     const val THUMBNAIL_FOLDER = "thumbnailsMEGA"
+
+    /**
+     * PREVIEW_FOLDER
+     */
     const val PREVIEW_FOLDER = "previewsMEGA"
+
+    /**
+     * AVATAR_FOLDER
+     */
     const val AVATAR_FOLDER = "avatarsMEGA"
+
+    /**
+     * QR_FOLDER
+     */
     private const val QR_FOLDER = "qrMEGA"
+
+    /**
+     * VOICE_CLIP_FOLDER
+     */
     const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
+
+    /**
+     * TEMPORARY_FOLDER
+     */
     const val TEMPORARY_FOLDER = "tempMEGA"
+
+    /**
+     * CHAT_TEMPORARY_FOLDER
+     */
     const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
 
+    /**
+     * CacheFolder Gateway
+     */
     val cacheFolderGateway: CacheFolderGateway by lazy {
-        EntryPointAccessors.fromApplication(MegaApplication.getInstance(),
-            EntryPointsModule.CacheFolderManagerEntryPoint::class.java).cacheFolderGateway
+        EntryPointAccessors.fromApplication(
+            MegaApplication.getInstance(),
+            EntryPointsModule.CacheFolderManagerEntryPoint::class.java
+        ).cacheFolderGateway
     }
 
+    /**
+     * Get Cache Folder given folder Name
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun getCacheFolder(context: Context, folderName: String): File? {
+    fun getCacheFolder(folderName: String): File? {
         return cacheFolderGateway.getCacheFolder(folderName)
     }
 
+    /**
+     * Create Cache Folders
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun createCacheFolders(context: Context) {
+    fun createCacheFolders() {
         cacheFolderGateway.apply {
             createCacheFolder(THUMBNAIL_FOLDER)
             createCacheFolder(PREVIEW_FOLDER)
@@ -45,17 +79,14 @@ object CacheFolderManager {
         }
     }
 
+    /**
+     * Clear External Cache Dir
+     */
     @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun clearPublicCache(context: Context) {
+    fun clearPublicCache() {
         cacheFolderGateway.clearPublicCache()
     }
 
-    @JvmStatic
-    @Suppress("UNUSED_PARAMETER")
-    fun createCacheFolder(context: Context, name: String) {
-        cacheFolderGateway.createCacheFolder(name)
-    }
 
     @JvmStatic
     @Suppress("UNUSED_PARAMETER")
@@ -126,18 +157,6 @@ object CacheFolderManager {
     @JvmStatic
     fun deleteCacheFolderIfEmpty(folderName: String) {
         cacheFolderGateway.deleteCacheFolderIfEmpty(folderName)
-    }
-
-    @JvmStatic
-    fun removeOldTempFolders(context: Context?) {
-        removeOldTempFolder(context, OLD_TEMPORARY_PIC_DIR)
-        removeOldTempFolder(context, OLD_PROFILE_PID_DIR)
-        removeOldTempFolder(context, OLD_ADVANCES_DEVICES_DIR)
-        removeOldTempFolder(context, OLD_CHAT_TEMPORARY_DIR)
-        val oldOfflineFolder = getOldTempFolder(OfflineUtils.OLD_OFFLINE_DIR)
-        if (FileUtil.isFileAvailable(oldOfflineFolder)) {
-            OfflineUtils.moveOfflineFiles(context)
-        }
     }
 
     @JvmStatic

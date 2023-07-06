@@ -493,7 +493,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                         Timber.d("DATA connection is Mp4Video")
                         try {
                             val chatTempFolder = getCacheFolder(
-                                applicationContext,
                                 CacheFolderManager.CHAT_TEMPORARY_FOLDER
                             )
                             var outFile = buildChatTempFile(applicationContext, file.name)
@@ -1231,7 +1230,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             }
 
             val tempPic =
-                getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)
+                getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
 
             Timber.d("IN Finish: $nodeHandle")
 
