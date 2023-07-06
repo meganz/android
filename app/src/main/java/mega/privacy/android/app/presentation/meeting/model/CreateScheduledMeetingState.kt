@@ -179,9 +179,8 @@ data class CreateScheduledMeetingState constructor(
      *
      * @return month weekday list
      */
-    fun getDefaultMonthWeekDayList(): List<MonthWeekDayItem> {
-        return listOf(MonthWeekDayItem(getNumberOfWeek(), listOf(getStartWeekDay())))
-    }
+    fun getDefaultMonthWeekDayList(): List<MonthWeekDayItem> =
+        listOf(MonthWeekDayItem(getNumberOfWeek(), listOf(getStartWeekDay())))
 
     /**
      * Get month day list of start date
@@ -191,6 +190,22 @@ data class CreateScheduledMeetingState constructor(
     fun getStartMonthDayList() = listOf(
         startDate.dayOfMonth
     )
+
+    /**
+     * Get initial start date
+     *
+     * @return [ZonedDateTime]
+     */
+    fun getInitialStartDate(): ZonedDateTime = startDate.truncatedTo(ChronoUnit.MINUTES)
+        .minusMinutes(startDate.minute.toLong() % 5)
+        .plusMinutes(5)
+
+    /**
+     * Get initial end date
+     *
+     * @return [ZonedDateTime]
+     */
+    fun getInitialEndDate(): ZonedDateTime = getInitialStartDate().plus(30, ChronoUnit.MINUTES)
 
     /**
      * Get weekday of start date

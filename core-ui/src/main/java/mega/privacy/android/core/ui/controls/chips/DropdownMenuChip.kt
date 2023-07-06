@@ -41,6 +41,7 @@ import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Dropdown menu Chip
@@ -89,7 +90,7 @@ fun <T> DropdownMenuChip(
                     modifier = modifier
                         .border(
                             width = 1.dp,
-                            color = MaterialTheme.colors.onPrimary,
+                            color = MaterialTheme.colors.textColorSecondary,
                             shape = RoundedCornerShape(size = 8.dp)
                         )
                         .width(IntrinsicSize.Min)

@@ -95,9 +95,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getFeatureFlagValue(AppFeatures.ScheduleMeeting).let { flag ->
-                _state.update {
-                    it.copy(
+                _state.update { state ->
+                    state.copy(
                         scheduledMeetingEnabled = flag,
+                        startDate = state.getInitialStartDate(),
+                        endDate = state.getInitialEndDate()
                     )
                 }
             }
@@ -244,6 +246,9 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 rulesSelected = state.rulesSelected.copy(
                     weekDayList = newWeekdayList,
                     monthDayList = newMonthDayList,
+                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else newStartZonedDateTime.plusMonths(
+                        6
+                    ).toEpochSecond()
                 )
             )
         }
@@ -405,10 +410,15 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         if (state.value.meetingTitle.isNotEmpty()) {
             val newFreq =
                 if (state.value.isWeekdays()) OccurrenceFrequencyType.Weekly else state.value.rulesSelected.freq
+
+            val newUntil =
+                if (state.value.rulesSelected.until < state.value.startDate.toEpochSecond()) state.value.startDate.toEpochSecond() else state.value.rulesSelected.until
+
             _state.update { state ->
                 state.copy(
                     isCreatingMeeting = true, rulesSelected = state.rulesSelected.copy(
                         freq = newFreq,
+                        until = newUntil
                     )
                 )
             }
@@ -419,6 +429,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             sendEmails = state.enabledSendCalendarInviteOption,
                             isEmpty = false
                         )
+
                         createChatroomAndSchedMeetingUseCase(
                             peerList = state.getParticipantsIds(),
                             isMeeting = true,

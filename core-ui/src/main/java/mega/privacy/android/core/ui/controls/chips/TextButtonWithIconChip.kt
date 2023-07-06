@@ -30,6 +30,7 @@ import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
  * Text button with icon chip
@@ -61,7 +62,7 @@ fun TextButtonWithIconChip(
             shape = RoundedCornerShape(size = 8.dp),
             border = BorderStroke(
                 1.dp,
-                if (isChecked) MaterialTheme.colors.secondary else MaterialTheme.colors.onPrimary
+                if (isChecked) MaterialTheme.colors.secondary else MaterialTheme.colors.textColorSecondary
             ),
             enabled = true,
             colors = if (isChecked) colorsChecked() else colorsUnChecked(),
