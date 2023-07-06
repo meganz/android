@@ -5271,4 +5271,20 @@
         <item quantity="many">Cada %1$s meses el día %2$d</item>
         <item quantity="other">Cada %1$s meses el día %2$d</item>
     </plurals>
+    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
+    <plurals name="download_started">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
+    <plurals name="download_complete">
+        <item quantity="one"></item>
+        <item quantity="many"></item>
+        <item quantity="other"></item>
+    </plurals>
+    <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_end_recurrence_label">Dejar de repetir</string>
+    <!-- Title of Ends section in Custom Recurrence screen -->
+    <string name="meetings_custom_recurrence_ends_section">Finaliza el</string>
 </resources>
