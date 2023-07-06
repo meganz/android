@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.activities.settingsActivities.ChatPreferencesViewModel
+import mega.privacy.android.domain.usecase.MonitorChatSignalPresenceUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import org.junit.After
 import org.junit.Before
@@ -28,11 +29,17 @@ class ChatPreferencesViewModelTest {
             onBlocking { invoke() }.thenReturn(flowOf(true))
         }
 
+    private val monitorChatSignalPresenceUseCase =
+        mock<MonitorChatSignalPresenceUseCase> {
+            onBlocking { invoke() }.thenReturn(flowOf(Unit))
+        }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = ChatPreferencesViewModel(
-            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase
+            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
+            monitorChatSignalPresenceUseCase = monitorChatSignalPresenceUseCase,
         )
     }
 
@@ -64,6 +71,31 @@ class ChatPreferencesViewModelTest {
                 underTest.onConsumePushNotificationSettingsUpdateEvent()
                 val updatedState = awaitItem()
                 Truth.assertThat(updatedState.isPushNotificationSettingsUpdatedEvent).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that when chat signal presence is updated state is also updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatSignalPresenceUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.signalPresenceUpdate).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when onSignalPresenceUpdateConsumed is called then state is also updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorChatSignalPresenceUseCase).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.signalPresenceUpdate).isTrue()
+                underTest.onSignalPresenceUpdateConsumed()
+                val updatedState = awaitItem()
+                Truth.assertThat(updatedState.signalPresenceUpdate).isFalse()
             }
         }
 }
