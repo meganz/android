@@ -354,4 +354,29 @@ internal class FileSystemRepositoryImplTest {
                 deleteRootDirectory
             )
         }
+
+    @Test
+    fun `test that data return from sdk when fileVersionsOptionCache is API_ENOENT and call getFileVersionsOption with forceRefresh true`() =
+        runTest {
+            val expectedFileVersionsOption = false
+            val api = mock<MegaApiJava>()
+            val request = mock<MegaRequest> {
+                on { flag }.thenReturn(expectedFileVersionsOption)
+            }
+            val error = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+            }
+            whenever(fileVersionsOptionCache.get()).thenReturn(null)
+            whenever(megaApiGateway.getFileVersionsOption(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    api,
+                    request,
+                    error
+                )
+            }
+            val actual = underTest.getFileVersionsOption(true)
+            verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
+            verify(megaApiGateway, times(1)).getFileVersionsOption(any())
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
+        }
 }

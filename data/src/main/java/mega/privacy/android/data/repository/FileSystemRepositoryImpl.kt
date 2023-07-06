@@ -213,7 +213,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
                         MegaError.API_OK -> continuation.resumeWith(Result.success(request.flag))
-                        MegaError.API_ENOENT -> continuation.resumeWith(Result.success(true))
+                        MegaError.API_ENOENT -> continuation.resumeWith(Result.success(false))
                         else -> continuation.failWithError(error, "fetchFileVersionsOption")
                     }
                 }
