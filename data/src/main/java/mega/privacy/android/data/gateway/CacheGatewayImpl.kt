@@ -1,22 +1,21 @@
-package mega.privacy.android.data.facade
+package mega.privacy.android.data.gateway
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 /**
- * Cache folder implementation
+ * Cache Gateway implementation
  *
  * @property context
  * @property ioDispatcher
  */
-internal class CacheFacade @Inject constructor(
+internal class CacheGatewayImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CacheGateway {

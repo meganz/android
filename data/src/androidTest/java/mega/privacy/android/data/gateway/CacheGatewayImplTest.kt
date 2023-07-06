@@ -1,4 +1,4 @@
-package mega.privacy.android.data.facade
+package mega.privacy.android.data.gateway
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
@@ -6,7 +6,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheGateway
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
@@ -16,7 +15,7 @@ import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
-class CacheFacadeTest {
+class CacheGatewayImplTest {
     private lateinit var underTest: CacheGateway
     private lateinit var context: Context
 
@@ -24,7 +23,7 @@ class CacheFacadeTest {
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().targetContext
         deleteCache()
-        underTest = CacheFacade(
+        underTest = CacheGatewayImpl(
             context = context,
             ioDispatcher = UnconfinedTestDispatcher(),
         )

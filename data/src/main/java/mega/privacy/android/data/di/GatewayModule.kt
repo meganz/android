@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.BillingFacade
-import mega.privacy.android.data.facade.CacheFacade
+import mega.privacy.android.data.gateway.CacheGatewayImpl
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
@@ -117,7 +117,7 @@ internal abstract class GatewayModule {
      * Provides CacheGateway implementation
      */
     @Binds
-    abstract fun bindCacheGateway(implementation: CacheFacade): CacheGateway
+    abstract fun bindCacheGateway(implementation: CacheGatewayImpl): CacheGateway
 
     @Binds
     abstract fun bindChatPreferencesGateway(implementation: ChatPreferencesDataStore): ChatPreferencesGateway
