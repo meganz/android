@@ -18,14 +18,6 @@ public class CameraUploadUtil {
      * @see GetUploadFolderHandleUseCase
      * @deprecated Replace all calls with use case
      */
-    public static long getPrimaryFolderHandle() {
-        return getUploadFolderHandle(true);
-    }
-
-    /**
-     * @see GetUploadFolderHandleUseCase
-     * @deprecated Replace all calls with use case
-     */
     public static long getSecondaryFolderHandle() {
         return getUploadFolderHandle(false);
     }
