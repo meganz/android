@@ -6,6 +6,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.resetMain
@@ -13,7 +14,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.transfer.FinishProcessingTransfers
+import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
@@ -29,6 +32,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -47,6 +51,7 @@ class DownloadNodesUseCaseTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val invalidateCancelTokenUseCase: InvalidateCancelTokenUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
+    private val transfer: Transfer = mock()
 
     private lateinit var underTest: DownloadNodesUseCase
 
@@ -65,7 +70,7 @@ class DownloadNodesUseCaseTest {
     fun resetMocks() {
         reset(
             transferRepository, cancelTokenRepository, fileSystemRepository,
-            fileNode, folderNode, invalidateCancelTokenUseCase, cancelCancelTokenUseCase
+            fileNode, folderNode, invalidateCancelTokenUseCase, cancelCancelTokenUseCase, transfer,
         )
     }
 
@@ -92,8 +97,10 @@ class DownloadNodesUseCaseTest {
     }
 
     @ParameterizedTest(name = "appdata: \"{0}\"")
-    @ValueSource(strings = ["test1", "", " ", "some space"])
-    fun `test that repository is called with the proper appData`(appData: String?) = runTest {
+    @MethodSource("provideAppData")
+    fun `test that repository is called with the proper appData`(
+        appData: TransferAppData?,
+    ) = runTest {
         underTest(listOf(nodeId), DESTINATION_PATH_FOLDER, appData, false).test {
             verify(transferRepository).startDownload(
                 nodeId,
@@ -105,6 +112,16 @@ class DownloadNodesUseCaseTest {
             awaitComplete()
         }
     }
+
+    private fun provideAppData() = listOf(
+        TransferAppData.BackgroundTransfer,
+        TransferAppData.SdCardDownload("target", null),
+        TransferAppData.CameraUpload,
+        TransferAppData.VoiceClip,
+        TransferAppData.TextFileUpload(TransferAppData.TextFileUpload.Mode.Create, false),
+        TransferAppData.ChatUpload("id")
+    )
+
 
     @Test
     fun `test that repository start download is invoked for each nodeId when start download is invoked`() =
@@ -176,32 +193,75 @@ class DownloadNodesUseCaseTest {
         }
 
     @Test
-    fun `test that transfer events are emitted when each transfer is updated`() = runTest {
-        nodeIds.forEach {
-            whenever(
-                transferRepository.startDownload(
-                    it, DESTINATION_PATH_FOLDER, null, false,
-                )
-            ).thenReturn(
-                flowOf(
-                    mock<TransferEvent.TransferStartEvent>(),
-                    mock<TransferEvent.TransferUpdateEvent>(),
-                    mock<TransferEvent.TransferFinishEvent>(),
-                )
+    fun `test that transfer single node events are emitted when each transfer is updated`() =
+        runTest {
+            whenever(transfer.isFolderTransfer).thenReturn(false)
+            val flow = flowOf(
+                mock<TransferEvent.TransferStartEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferUpdateEvent> { on { it.transfer }.thenReturn(transfer) },
+                mock<TransferEvent.TransferFinishEvent> { on { it.transfer }.thenReturn(transfer) },
             )
-        }
-        underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
-            repeat(nodeIds.size) {
-                Truth.assertThat(awaitItem())
-                    .isInstanceOf(TransferEvent.TransferStartEvent::class.java)
-                Truth.assertThat(awaitItem())
-                    .isInstanceOf(TransferEvent.TransferUpdateEvent::class.java)
-                Truth.assertThat(awaitItem())
-                    .isInstanceOf(TransferEvent.TransferFinishEvent::class.java)
+            nodeIds.forEach {
+                whenever(
+                    transferRepository.startDownload(
+                        it, DESTINATION_PATH_FOLDER, null, false,
+                    )
+                ).thenReturn(flow)
             }
-            awaitComplete()
+            underTest(
+                nodeIds,
+                DESTINATION_PATH_FOLDER,
+                null,
+                false
+            ).filterIsInstance<DownloadNodesEvent.SingleTransferEvent>().test {
+                repeat(nodeIds.size) {
+                    Truth.assertThat(awaitItem().transferEvent)
+                        .isInstanceOf(TransferEvent.TransferStartEvent::class.java)
+                    Truth.assertThat(awaitItem().transferEvent)
+                        .isInstanceOf(TransferEvent.TransferUpdateEvent::class.java)
+                    Truth.assertThat(awaitItem().transferEvent)
+                        .isInstanceOf(TransferEvent.TransferFinishEvent::class.java)
+                }
+                awaitComplete()
+            }
         }
-    }
+
+    @Test
+    fun `test that finished processing event is emitted when each node finishes its processing`() =
+        runTest {
+            val transfers = nodeIds.associateWith { nodeId ->
+                mock<Transfer> {
+                    on { isFolderTransfer }.thenReturn(true)
+                    on { nodeHandle }.thenReturn(nodeId.longValue)
+                }
+            }
+            val flows = nodeIds.associateWith { nodeId ->
+                flowOf(
+                    mock<TransferEvent.TransferFinishEvent> {
+                        on { it.transfer }.thenReturn(transfers[nodeId])
+                    }
+                )
+            }
+            nodeIds.forEach {
+                whenever(
+                    transferRepository.startDownload(
+                        it, DESTINATION_PATH_FOLDER, null, false,
+                    )
+                ).thenReturn(flows[it])
+            }
+            underTest(
+                nodeIds,
+                DESTINATION_PATH_FOLDER,
+                null,
+                false
+            ).filterIsInstance<DownloadNodesEvent.TransferFinishedProcessing>().test {
+                nodeIds.forEach {
+                    println("waiting nodeId $it")
+                    Truth.assertThat(awaitItem().nodeId).isEqualTo(it)
+                }
+                awaitComplete()
+            }
+        }
 
 
     @Test
@@ -213,7 +273,7 @@ class DownloadNodesUseCaseTest {
 
         underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
             Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                (event as? Event.Item)?.value?.takeIf { it is FinishProcessingTransfers }
+                (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
             }).hasSize(1)
         }
     }
@@ -237,7 +297,7 @@ class DownloadNodesUseCaseTest {
 
             underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
                 Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is FinishProcessingTransfers }
+                    (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
                 }).hasSize(1)
             }
         }
@@ -273,7 +333,7 @@ class DownloadNodesUseCaseTest {
 
             underTest(nodeIds, DESTINATION_PATH_FOLDER, null, false).test {
                 Truth.assertThat(cancelAndConsumeRemainingEvents().mapNotNull { event ->
-                    (event as? Event.Item)?.value?.takeIf { it is FinishProcessingTransfers }
+                    (event as? Event.Item)?.value?.takeIf { it is DownloadNodesEvent.FinishProcessingTransfers }
                 }).isEmpty()
             }
         }

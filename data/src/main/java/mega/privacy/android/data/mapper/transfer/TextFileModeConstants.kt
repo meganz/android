@@ -15,7 +15,12 @@ internal enum class TextFileModeConstants(
     companion object {
 
         private val constantsDictionary by lazy { values().associateBy { it.sdkFileModeValue } }
+        private val modesDictionary by lazy { values().associateBy { it.textFileDataMode } }
+
         fun getFileDataModeFromSdkValue(sdkTypeConstant: String?) =
             constantsDictionary[sdkTypeConstant]?.textFileDataMode
+
+        fun getSdkValueFromFileDataMode(mode: Mode) =
+            modesDictionary[mode]?.sdkFileModeValue
     }
 }

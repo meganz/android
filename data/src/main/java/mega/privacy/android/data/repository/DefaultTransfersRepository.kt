@@ -20,6 +20,7 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
+import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferDataMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
@@ -56,6 +58,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val transferEventMapper: TransferEventMapper,
     private val transferMapper: TransferMapper,
+    private val transferAppDataStringMapper: TransferAppDataStringMapper,
     private val appEventGateway: AppEventGateway,
     private val localStorageGateway: MegaLocalStorageGateway,
     private val workerManagerGateway: WorkManagerGateway,
@@ -126,7 +129,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun startDownload(
         nodeId: NodeId,
         localPath: String,
-        appData: String?,
+        appData: TransferAppData?,
         shouldStartFirst: Boolean,
     ) = callbackFlow {
         val listener = transferListener(channel)
@@ -136,7 +139,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                 node = megaNode,
                 localPath = localPath,
                 fileName = megaNode.name,
-                appData = appData,
+                appData = appData?.let { transferAppDataStringMapper(listOf(it)) },
                 startFirst = shouldStartFirst,
                 cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
                 collisionCheck = COLLISION_CHECK_FINGERPRINT,

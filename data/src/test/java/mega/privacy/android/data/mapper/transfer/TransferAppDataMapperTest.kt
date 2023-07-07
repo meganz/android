@@ -95,7 +95,7 @@ class TransferAppDataMapperTest {
             "$SDCardDownload$APP_DATA_INDICATOR", //missing fields
         )
 
-        private val correctParameters = listOf(
+        internal val correctParameters = listOf(
             generateAppDataString(ChatUpload, FAKE_ID)
                     to listOf(TransferAppData.ChatUpload(FAKE_ID)),
             generateAppDataString(VoiceClip)

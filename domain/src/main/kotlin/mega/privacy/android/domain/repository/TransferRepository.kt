@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -263,7 +264,7 @@ interface TransferRepository {
     fun startDownload(
         nodeId: NodeId,
         localPath: String,
-        appData: String?,
+        appData: TransferAppData?,
         shouldStartFirst: Boolean,
     ): Flow<TransferEvent>
 
