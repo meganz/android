@@ -1,10 +1,9 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -38,11 +38,11 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
  */
 @Composable
 fun <T> ConfirmationWithRadioButtonsDialog(
+    modifier: Modifier = Modifier,
     radioOptions: List<T>?,
     onOptionSelected: (T) -> Unit,
     onDismissRequest: () -> Unit,
-    buttonText: String,
-    modifier: Modifier = Modifier,
+    buttonText: String? = null,
     titleText: String = "",
     initialSelectedOption: T? = null,
     optionDescriptionMapper: @Composable (T) -> String = { it.toString() },
@@ -77,7 +77,7 @@ fun <T> ConfirmationWithRadioButtonsDialog(
                             text = titleText,
                             style = MaterialTheme.typography.h6.copy(
                                 color = MaterialTheme.colors.onPrimary,
-                                textAlign = TextAlign.Start
+                                textAlign = TextAlign.Start,
                             )
                         )
                     }
@@ -97,38 +97,31 @@ fun <T> ConfirmationWithRadioButtonsDialog(
                                     role = Role.RadioButton
                                 )
                                 .padding(horizontal = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
                                 selected = (item == initialSelectedOption),
                                 colors = radioButtonColors,
                                 onClick = { onOptionSelected(item) }
                             )
-                            Box(
+                            Text(
                                 modifier = modifier
-                                    .fillMaxHeight(),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Text(
-                                    modifier = modifier
-                                        .padding(start = 20.dp),
-                                    text = optionDescriptionMapper(item),
-                                    style = MaterialTheme.typography.subtitle1.copy(
-                                        color = MaterialTheme.colors.onPrimary,
-                                        textAlign = TextAlign.Start
-                                    )
+                                    .padding(start = 20.dp),
+                                text = optionDescriptionMapper(item),
+                                style = MaterialTheme.typography.subtitle1.copy(
+                                    color = MaterialTheme.colors.onPrimary,
+                                    textAlign = TextAlign.Start
                                 )
-                            }
+                            )
                         }
                     }
                 }
 
-                Box(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
+                if (!buttonText.isNullOrEmpty()) {
                     TextButton(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.End),
                         onClick = onDismissRequest,
                     ) {
                         Text(
@@ -139,6 +132,8 @@ fun <T> ConfirmationWithRadioButtonsDialog(
                             )
                         )
                     }
+                } else {
+                    Spacer(modifier = modifier.height(8.dp))
                 }
             }
         }
@@ -153,6 +148,21 @@ private fun PreviewConfirmationWithRadioButtonsDialog() {
         ConfirmationWithRadioButtonsDialog(
             titleText = "Dialog title",
             buttonText = "Cancel",
+            initialSelectedOption = "Light",
+            radioOptions = listOf("Light", "Dark", "Busy", "System default"),
+            onOptionSelected = { },
+            onDismissRequest = { }
+        )
+    }
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun PreviewConfirmationWithRadioButtonsDialogWithoutActionButton() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ConfirmationWithRadioButtonsDialog(
+            titleText = "Dialog title",
             initialSelectedOption = "Light",
             radioOptions = listOf("Light", "Dark", "Busy", "System default"),
             onOptionSelected = { },

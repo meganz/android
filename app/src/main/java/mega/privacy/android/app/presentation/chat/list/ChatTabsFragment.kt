@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
@@ -141,7 +142,7 @@ class ChatTabsFragment : Fragment() {
             (activity as? ManagerActivity?)?.showFabButton()
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
             (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
-                (activity as? ManagerActivity?)?.showPresenceStatusDialog()
+                ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
             }
             setupMenu()
         }

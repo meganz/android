@@ -33,7 +33,7 @@ internal class GetCurrentUserStatusUseCaseTest {
 
     @ParameterizedTest(name = "test that UseCase returns correctly when repository returns {0}")
     @EnumSource(UserStatus::class)
-    fun `test that setOnlineStatus invoke correctly`(status: UserStatus) = runTest {
+    fun `test that getCurrentStatus returns correctly`(status: UserStatus) = runTest {
         whenever(chatParticipantsRepository.getCurrentStatus()).thenReturn(status)
         Truth.assertThat(underTest()).isEqualTo(status)
     }

@@ -95,7 +95,6 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
@@ -279,7 +278,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
@@ -460,8 +458,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     @Inject
     lateinit var managerRedirectIntentMapper: ManagerRedirectIntentMapper
 
-    private val subscriptions = CompositeDisposable()
-
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
     private lateinit var getProText: TextView
@@ -601,7 +597,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var statusDialog: AlertDialog? = null
     private var processFileDialog: AlertDialog? = null
     private var permissionsDialog: AlertDialog? = null
-    private var presenceStatusDialog: AlertDialog? = null
 
     private var searchMenuItem: MenuItem? = null
     private var doNotDisturbMenuItem: MenuItem? = null
@@ -3024,16 +3019,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         LiveEventBus.get(Constants.EVENT_FAB_CHANGE, Boolean::class.java)
             .removeObserver(fabChangeObserver)
         cancelSearch()
-        if (reconnectDialog != null) {
-            reconnectDialog?.cancel()
-        }
-        if (confirmationTransfersDialog != null) {
-            confirmationTransfersDialog?.dismiss()
-        }
+        reconnectDialog?.cancel()
+        confirmationTransfersDialog?.dismiss()
         dismissAlertDialogIfExists(processFileDialog)
         dismissAlertDialogIfExists(openLinkDialog)
         nodeSaver.destroy()
-        subscriptions.dispose()
         super.onDestroy()
     }
 
@@ -5857,57 +5847,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun resetJoiningChatLink() {
         joiningToChatLink = false
         linkJoinToChatLink = null
-    }
-
-    fun showPresenceStatusDialog() {
-        Timber.d("showPresenceStatusDialog")
-        val dialogBuilder = MaterialAlertDialogBuilder(this)
-        val items = arrayOf<CharSequence>(
-            getString(R.string.online_status), getString(R.string.away_status), getString(
-                R.string.busy_status
-            ), getString(R.string.offline_status)
-        )
-        var statusToShow: Int = megaChatApi.onlineStatus
-        when (statusToShow) {
-            MegaChatApi.STATUS_ONLINE -> {
-                statusToShow = 0
-            }
-
-            MegaChatApi.STATUS_AWAY -> {
-                statusToShow = 1
-            }
-
-            MegaChatApi.STATUS_BUSY -> {
-                statusToShow = 2
-            }
-
-            MegaChatApi.STATUS_OFFLINE -> {
-                statusToShow = 3
-            }
-        }
-        dialogBuilder.setSingleChoiceItems(items, statusToShow) { _, item ->
-            presenceStatusDialog?.dismiss()
-            when (item) {
-                0 -> {
-                    megaChatApi.setOnlineStatus(MegaChatApi.STATUS_ONLINE, this)
-                }
-
-                1 -> {
-                    megaChatApi.setOnlineStatus(MegaChatApi.STATUS_AWAY, this)
-                }
-
-                2 -> {
-                    megaChatApi.setOnlineStatus(MegaChatApi.STATUS_BUSY, this)
-                }
-
-                3 -> {
-                    megaChatApi.setOnlineStatus(MegaChatApi.STATUS_OFFLINE, this)
-                }
-            }
-        }
-        dialogBuilder.setTitle(getString(R.string.status_label))
-        presenceStatusDialog = dialogBuilder.create()
-        presenceStatusDialog?.show()
     }
 
     override fun uploadFiles() {
