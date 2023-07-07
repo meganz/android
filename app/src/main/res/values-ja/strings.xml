@@ -4819,11 +4819,11 @@
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d件のダウンロードが開始されました</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="other"></item>
+        <item quantity="other">%1$d件のダウンロードが完了しました</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">定期開催を終了する</string>

@@ -5041,18 +5041,18 @@
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Elke maand op de %2$d</item>
-        <item quantity="other">Elke %1$s maanden op de %2$d</item>
+        <item quantity="one">Every month on day %2$d</item>
+        <item quantity="other">Every %1$s months on day %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Download gestart</item>
+        <item quantity="other">%1$d downloads gestart</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one"></item>
-        <item quantity="other"></item>
+        <item quantity="one">Download voltooid</item>
+        <item quantity="other">%1$d downloads voltooid</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Herhaling beëindigen</string>
