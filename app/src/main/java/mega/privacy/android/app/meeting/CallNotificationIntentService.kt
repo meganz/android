@@ -193,14 +193,6 @@ class CallNotificationIntentService : Service(),
                 }
 
                 START_SCHED_MEET -> {
-                    if (!hasPermissions(
-                            this@CallNotificationIntentService,
-                            Manifest.permission.RECORD_AUDIO
-                        )
-                    ) {
-                        stopSelf()
-                        return
-                    }
                     processMeetingCall()
                 }
 
