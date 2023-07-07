@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -15,6 +16,7 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.SetSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerAction
@@ -37,6 +39,7 @@ internal class MegaPickerViewModelTest {
     private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase = mock()
     private val getRootNodeUseCase: GetRootNodeUseCase = mock()
     private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase = mock()
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
 
     private val childrenNodes: List<TypedNode> = mock()
 
@@ -52,7 +55,12 @@ internal class MegaPickerViewModelTest {
     @AfterEach
     fun resetAndTearDown() {
         Dispatchers.resetMain()
-        reset(setSelectedMegaFolderUseCase, getRootNodeUseCase, getTypedNodesFromFolder)
+        reset(
+            setSelectedMegaFolderUseCase,
+            getRootNodeUseCase,
+            getTypedNodesFromFolder,
+            getNodeByHandleUseCase
+        )
     }
 
     @Test
@@ -97,6 +105,37 @@ internal class MegaPickerViewModelTest {
     }
 
     @Test
+    fun `test that back click fetches children of parent folder`() = runTest {
+        val currentFolderId = NodeId(43434L)
+        val parentFolderId = NodeId(9845748L)
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { parentId } doReturn parentFolderId
+        }
+        val parentFolder: TypedFolderNode = mock {
+            on { id } doReturn parentFolderId
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+        })
+        whenever(getNodeByHandleUseCase(parentFolderId.longValue)).thenReturn(parentFolder)
+        whenever(getTypedNodesFromFolder(parentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+        })
+        val expectedState = MegaPickerState(
+            currentFolder = parentFolder, nodes = childrenNodes
+        )
+        initViewModel()
+
+        underTest.handleAction(MegaPickerAction.BackClicked)
+
+        underTest.state.test {
+            assertThat(awaitItem()).isEqualTo(expectedState)
+        }
+    }
+
+    @Test
     fun `test that folder selection sets selected folder`() = runTest {
         val currentFolderId = NodeId(2323L)
         val currentFolderName = "some secret folder"
@@ -122,7 +161,10 @@ internal class MegaPickerViewModelTest {
 
     private fun initViewModel() {
         underTest = MegaPickerViewModel(
-            setSelectedMegaFolderUseCase, getRootNodeUseCase, getTypedNodesFromFolder
+            setSelectedMegaFolderUseCase,
+            getRootNodeUseCase,
+            getTypedNodesFromFolder,
+            getNodeByHandleUseCase
         )
     }
 }

@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.SetSelectedMegaFolderUseCase
 import javax.inject.Inject
@@ -21,6 +22,7 @@ internal class MegaPickerViewModel @Inject constructor(
     private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
     private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase,
+    private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MegaPickerState())
@@ -37,6 +39,16 @@ internal class MegaPickerViewModel @Inject constructor(
         when (action) {
             is MegaPickerAction.FolderClicked -> {
                 fetchFolders(action.folder)
+            }
+
+            is MegaPickerAction.BackClicked -> {
+                state.value.currentFolder?.let { currentFolder ->
+                    viewModelScope.launch {
+                        val parentNode = getNodeByHandleUseCase(currentFolder.parentId.longValue)
+                        parentNode
+                            ?.let(::fetchFolders)
+                    }
+                }
             }
 
             MegaPickerAction.CurrentFolderSelected -> {

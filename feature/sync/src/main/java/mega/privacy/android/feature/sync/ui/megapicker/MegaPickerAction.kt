@@ -6,5 +6,7 @@ internal sealed interface MegaPickerAction {
 
     data class FolderClicked(val folder: TypedNode) : MegaPickerAction
 
+    object BackClicked : MegaPickerAction
+
     object CurrentFolderSelected : MegaPickerAction
 }
