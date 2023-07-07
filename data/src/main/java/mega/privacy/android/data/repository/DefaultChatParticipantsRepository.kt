@@ -10,6 +10,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
+import mega.privacy.android.data.mapper.chat.UserStatusToIntMapper
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
@@ -50,6 +51,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val requestLastGreen: RequestLastGreen,
     private val chatPermissionsMapper: ChatPermissionsMapper,
     private val megaHandleListMapper: MegaHandleListMapper,
+    private val userStatusToIntMapper: UserStatusToIntMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
@@ -154,9 +156,10 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         return UserStatus.Invalid
     }
 
-    override suspend fun getCurrentStatus(): UserStatus =
+    override suspend fun getCurrentStatus(): UserStatus = withContext(ioDispatcher) {
         runCatching { megaChatApiGateway.getOnlineStatus().let { userStatus[it] } }.getOrNull()
             ?: UserStatus.Invalid
+    }
 
     override suspend fun getAlias(participant: ChatParticipant): String? =
         runCatching { contactsRepository.getUserAlias(participant.handle) }.fold(
@@ -233,4 +236,16 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             onSuccess = { cred -> cred },
             onFailure = { false }
         )
+
+    override suspend fun setOnlineStatus(status: UserStatus) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("setOnlineStatus") {}
+
+            megaChatApiGateway.setOnlineStatus(userStatusToIntMapper(status), listener)
+
+            continuation.invokeOnCancellation {
+                megaChatApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
 }

@@ -481,4 +481,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override fun getChatConnectionState(chatId: Long) = chatApi.getChatConnectionState(chatId)
 
     override suspend fun getNumUnreadChats() = chatApi.unreadChats
+
+    override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) =
+        chatApi.setOnlineStatus(status, listener)
 }

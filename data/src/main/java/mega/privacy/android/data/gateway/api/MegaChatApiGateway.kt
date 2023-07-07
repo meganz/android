@@ -734,4 +734,30 @@ interface MegaChatApiGateway {
      * @return Number of unread chats.
      */
     suspend fun getNumUnreadChats(): Int
+
+    /**
+     * Set your online status.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_SET_CHAT_STATUS
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaRequest::getNumber - Returns the new status of the user in chat.
+     *
+     * @param status Online status in the chat.
+     *
+     * It can be one of the following values:
+     * - MegaChatApi::STATUS_OFFLINE = 1
+     * The user appears as being offline
+     *
+     * - MegaChatApi::STATUS_BUSY = 2
+     * The user is busy and don't want to be disturbed.
+     *
+     * - MegaChatApi::STATUS_AWAY = 3
+     * The user is away and might not answer.
+     *
+     * - MegaChatApi::STATUS_ONLINE = 4
+     * The user is connected and online.
+     *
+     * @param listener MegaChatRequestListener to track this request
+     */
+    fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface)
 }

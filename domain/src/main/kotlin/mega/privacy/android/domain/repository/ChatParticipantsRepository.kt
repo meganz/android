@@ -111,4 +111,11 @@ interface ChatParticipantsRepository {
      * @return The email from user
      */
     suspend fun getUserEmailFromCache(userHandle: Long): String?
+
+    /**
+     * Set online status
+     *
+     * @param status
+     */
+    suspend fun setOnlineStatus(status: UserStatus)
 }
