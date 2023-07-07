@@ -78,7 +78,10 @@ public class ExposedShuffleOrder implements ShuffleOrder {
 
     @Override
     public int getPreviousIndex(int index) {
-        int shuffledIndex = indexInShuffled[index];
+        int shuffledIndex = 0;
+        if (indexInShuffled.length > index) {
+            shuffledIndex = indexInShuffled[index];
+        }
         return --shuffledIndex >= 0 ? shuffled[shuffledIndex] : C.INDEX_UNSET;
     }
 
