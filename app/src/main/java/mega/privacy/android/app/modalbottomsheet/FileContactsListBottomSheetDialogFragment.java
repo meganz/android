@@ -165,9 +165,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.file_contact_list_option_permissions_layout) {
-            listener.changePermissions(contact.getEmail());
+            listener.changePermissions(contact != null ? contact.getEmail() : nonContactEmail);
         } else if (id == R.id.file_contact_list_option_delete_layout) {
-            listener.removeFileContactShare(contact.getEmail());
+            listener.removeFileContactShare(contact != null ? contact.getEmail() : nonContactEmail);
         } else if (id == R.id.file_contact_list_option_info_layout) {
             ContactUtil.openContactInfoActivity(requireActivity(), share.getUser());
         }
