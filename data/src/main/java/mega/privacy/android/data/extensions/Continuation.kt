@@ -98,7 +98,7 @@ fun <T> Continuation<T>.getChatRequestListener(
 ): MegaChatRequestListenerInterface {
     val listener = OptionalMegaChatRequestListenerInterface(
         onRequestFinish = { request, error ->
-            if (error.errorCode == MegaError.API_OK) {
+            if (error.errorCode == MegaChatError.ERROR_OK) {
                 this.resumeWith(Result.success(block(request)))
             } else {
                 // log the error code when calling SDK api, it helps us easy to find the cause

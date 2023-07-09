@@ -12,9 +12,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.ConfirmationWithRadioButtonsDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -69,7 +71,14 @@ internal class ChatStatusDialogFragment : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.collectFlow(viewModel.state) {
-            if (it.shouldDismiss) {
+            it.result?.let { result ->
+                if (result.isFailure) {
+                    (activity as? BaseActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE,
+                        getString(R.string.changing_status_error),
+                        -1
+                    )
+                }
                 dismissAllowingStateLoss()
             }
         }

@@ -33,9 +33,9 @@ internal data class ChatStatusViewModel @Inject constructor(
 
     fun setUserStatus(status: UserStatus) {
         viewModelScope.launch {
-            runCatching { setCurrentUserStatusUseCase(status) }
+            val result = runCatching { setCurrentUserStatusUseCase(status) }
                 .onFailure { Timber.e(it) }
-            _state.update { it.copy(shouldDismiss = true) } // we don't care about result, this is previous logic
+            _state.update { it.copy(result = result) }
         }
     }
 }
@@ -44,9 +44,9 @@ internal data class ChatStatusViewModel @Inject constructor(
  * Chat status ui state
  *
  * @property status
- * @property shouldDismiss
+ * @property result
  */
 data class ChatStatusUiState(
     val status: UserStatus = UserStatus.Invalid,
-    val shouldDismiss: Boolean = false,
+    val result: Result<Unit>? = null,
 )

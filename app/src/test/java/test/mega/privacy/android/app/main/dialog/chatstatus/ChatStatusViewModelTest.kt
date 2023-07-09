@@ -20,7 +20,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,20 +54,37 @@ internal class ChatStatusViewModelTest {
         )
     }
 
-    @ParameterizedTest(name = "test that setUserStatus invoke {0} and shouldDismiss getting update")
+    @ParameterizedTest(name = "test that result getting update when calling setCurrentUserStatusUseCase {0} successfully")
     @EnumSource(UserStatus::class)
-    fun `test that setUserStatus invoke correctly and shouldDismiss getting update`(status: UserStatus) =
-        runTest {
-            initTestClass()
-            underTest.state.test {
-                Truth.assertThat(awaitItem().shouldDismiss).isFalse()
-            }
-            underTest.setUserStatus(status)
-            verify(setCurrentUserStatusUseCase).invoke(status)
-            underTest.state.test {
-                Truth.assertThat(awaitItem().shouldDismiss).isTrue()
-            }
+    fun `test that result getting update when calling setCurrentUserStatusUseCase successfully`(
+        status: UserStatus,
+    ) = runTest {
+        initTestClass()
+        underTest.state.test {
+            Truth.assertThat(awaitItem().result).isNull()
         }
+        whenever(setCurrentUserStatusUseCase(status)).thenReturn(Unit)
+        underTest.setUserStatus(status)
+        underTest.state.test {
+            Truth.assertThat(awaitItem().result?.isSuccess).isTrue()
+        }
+    }
+
+    @ParameterizedTest(name = "test that result getting update when calling setCurrentUserStatusUseCase {0} failed")
+    @EnumSource(UserStatus::class)
+    fun `test that result getting update when calling setCurrentUserStatusUseCase failed`(
+        status: UserStatus,
+    ) = runTest {
+        initTestClass()
+        underTest.state.test {
+            Truth.assertThat(awaitItem().result).isNull()
+        }
+        whenever(setCurrentUserStatusUseCase(status)).thenThrow(RuntimeException::class.java)
+        underTest.setUserStatus(status)
+        underTest.state.test {
+            Truth.assertThat(awaitItem().result?.isFailure).isTrue()
+        }
+    }
 
     @ParameterizedTest(name = "test that status update correctly when getCurrentUserStatusUseCase returns {0}")
     @EnumSource(UserStatus::class)

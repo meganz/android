@@ -16,7 +16,6 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaError
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -75,7 +74,30 @@ internal class DefaultChatParticipantsRepositoryTest {
     fun `test that setOnlineStatus returns success when api returns API_OK`() =
         runTest {
             val megaError = mock<MegaChatError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
+                on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+            }
+            val megaRequest = mock<MegaChatRequest>()
+
+            whenever(
+                megaChatApiGateway.setOnlineStatus(
+                    status = any(),
+                    listener = any(),
+                )
+            ).thenAnswer {
+                (it.arguments[1] as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = megaRequest,
+                    error = megaError,
+                )
+            }
+            Truth.assertThat(underTest.setOnlineStatus(any())).isEqualTo(Unit)
+        }
+
+    @Test
+    fun `test that setOnlineStatus returns success when api returns ERROR_ARGS`() =
+        runTest {
+            val megaError = mock<MegaChatError> {
+                on { errorCode }.thenReturn(MegaChatError.ERROR_ARGS)
             }
             val megaRequest = mock<MegaChatRequest>()
 
@@ -98,7 +120,7 @@ internal class DefaultChatParticipantsRepositoryTest {
     fun `test that setOnlineStatus returns an exception when api does not return API_OK`() =
         runTest {
             val megaError = mock<MegaChatError> {
-                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+                on { errorCode }.thenReturn(MegaChatError.ERROR_NOENT)
             }
             val megaRequest = mock<MegaChatRequest> {}
             whenever(

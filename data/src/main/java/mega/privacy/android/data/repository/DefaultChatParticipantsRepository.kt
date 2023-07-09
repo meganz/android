@@ -239,7 +239,24 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
     override suspend fun setOnlineStatus(status: UserStatus) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getChatRequestListener("setOnlineStatus") {}
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    when (error.errorCode) {
+                        MegaChatError.ERROR_OK -> {
+                            continuation.resumeWith(Result.success(Unit))
+                        }
+
+                        MegaChatError.ERROR_ARGS -> {
+                            // special case, user select the same status, we consider it is success case
+                            continuation.resumeWith(Result.success(Unit))
+                        }
+
+                        else -> {
+                            continuation.failWithError(error, "setOnlineStatus")
+                        }
+                    }
+                }
+            )
 
             megaChatApiGateway.setOnlineStatus(userStatusToIntMapper(status), listener)
 

@@ -7931,25 +7931,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             (application as MegaApplication).disableMegaChatApi()
             loggingSettings.resetLoggerSDK()
-        } else if (request.type == MegaChatRequest.TYPE_SET_ONLINE_STATUS) {
-            when (e.errorCode) {
-                MegaChatError.ERROR_OK -> {
-                    Timber.d("Status changed to: %s", request.number)
-                }
-
-                MegaChatError.ERROR_ARGS -> {
-                    Timber.w("Status not changed, the chosen one is the same")
-                }
-
-                else -> {
-                    Timber.e("ERROR WHEN TYPE_SET_ONLINE_STATUS %s", e.errorString)
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.changing_status_error),
-                        -1
-                    )
-                }
-            }
         } else if (request.type == MegaChatRequest.TYPE_ARCHIVE_CHATROOM) {
             val chatHandle: Long = request.chatHandle
             val chat: MegaChatRoom = megaChatApi.getChatRoom(chatHandle)
