@@ -145,7 +145,14 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = loginToFolderUseCase(folderLink)) {
                 FolderLoginStatus.SUCCESS -> {
-                    _state.update { it.copy(isInitialState = false, isLoginComplete = true) }
+                    _state.update {
+                        it.copy(
+                            isInitialState = false,
+                            isLoginComplete = true,
+                            errorDialogTitle = -1,
+                            errorDialogContent = -1
+                        )
+                    }
                 }
 
                 FolderLoginStatus.API_INCOMPLETE -> {
@@ -154,6 +161,8 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialog = true,
+                            errorDialogTitle = -1,
+                            errorDialogContent = -1
                         )
                     }
                 }
@@ -164,9 +173,9 @@ class FolderLinkViewModel @Inject constructor(
                             isInitialState = false,
                             isLoginComplete = false,
                             askForDecryptionKeyDialog = decryptionIntroduced,
-                            errorDialogTitle = result.errorDialogTitleId,
-                            errorDialogContent = result.errorDialogContentId,
-                            snackBarMessage = result.snackBarMessageId
+                            errorDialogTitle = if (decryptionIntroduced) -1 else result.errorDialogTitleId,
+                            errorDialogContent = if (decryptionIntroduced) -1 else result.errorDialogContentId,
+                            snackBarMessage = if (decryptionIntroduced) -1 else result.snackBarMessageId
                         )
                     }
                 }

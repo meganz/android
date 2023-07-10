@@ -300,10 +300,8 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             .setKey(mKey)
             .build()
 
-        decryptAlertDialog.dialog?.setOnDismissListener {
-            viewModel.resetAskForDecryptionKeyDialog()
-        }
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
+        viewModel.resetAskForDecryptionKeyDialog()
     }
 
     /**

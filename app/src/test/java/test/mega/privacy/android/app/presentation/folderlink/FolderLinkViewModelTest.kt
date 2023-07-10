@@ -160,6 +160,8 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.isLoginComplete).isTrue()
             assertThat(newValue.isInitialState).isFalse()
+            assertThat(newValue.errorDialogTitle).isEqualTo(-1)
+            assertThat(newValue.errorDialogContent).isEqualTo(-1)
         }
     }
 
@@ -174,6 +176,8 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialog).isTrue()
+                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
+                assertThat(newValue.errorDialogContent).isEqualTo(-1)
             }
         }
 
@@ -189,6 +193,9 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialog).isEqualTo(decryptionIntroduced)
+                assertThat(newValue.errorDialogTitle).isEqualTo(-1)
+                assertThat(newValue.errorDialogContent).isEqualTo(-1)
+                assertThat(newValue.snackBarMessage).isEqualTo(-1)
             }
         }
 
