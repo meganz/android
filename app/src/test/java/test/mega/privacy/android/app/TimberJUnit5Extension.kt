@@ -10,17 +10,11 @@ import timber.log.Timber
  * @ExtendWith(TimberJUnit5Extension::class)
  */
 class TimberJUnit5Extension : BeforeAllCallback, AfterAllCallback {
-    private val printlnTree = object : Timber.DebugTree() {
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            println("$tag: $message")
-        }
-    }
-
     override fun beforeAll(context: ExtensionContext?) {
-        Timber.plant(printlnTree)
+        Timber.plant(timberDebugTree)
     }
 
     override fun afterAll(context: ExtensionContext?) {
-        Timber.uproot(printlnTree)
+        Timber.uproot(timberDebugTree)
     }
 }

@@ -11,19 +11,13 @@ import timber.log.Timber
  * var timberRule = TimberJUnit4Extension()
  */
 class TimberJUnit4Extension : TestWatcher() {
-    private val printlnTree = object : Timber.DebugTree() {
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            println("$tag: $message")
-        }
-    }
-
     override fun starting(description: Description) {
         super.starting(description)
-        Timber.plant(printlnTree)
+        Timber.plant(timberDebugTree)
     }
 
     override fun finished(description: Description) {
         super.finished(description)
-        Timber.uproot(printlnTree)
+        Timber.uproot(timberDebugTree)
     }
 }
