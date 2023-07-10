@@ -109,31 +109,7 @@ internal class CacheFolderFacade @Inject constructor(
         }
     }
 
-
-    override fun buildAvatarFile(fileName: String?) =
-        getCacheFile(AVATAR_FOLDER, fileName)
-
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
-
-    override suspend fun clearAppData() {
-        Timber.d("clearAppData")
-        try {
-            fileGateway.deleteFolderAndSubFolders(context.filesDir)
-        } catch (e: IOException) {
-            Timber.e("Exception deleting private cache", e)
-        }
-    }
-
-    override suspend fun clearSdkCache() {
-        appScope.launch(ioDispatcher) {
-            Timber.d("clearSDK cache")
-            try {
-                fileGateway.deleteFilesInDirectory(context.dataDir)
-            } catch (e: IOException) {
-                Timber.e("Exception deleting sdk cache", e)
-            }
-        }
-    }
 
     override suspend fun getCameraUploadsCacheFolder(): File =
         File(cacheDir, CAMERA_UPLOADS_CACHE_FOLDER)

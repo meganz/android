@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
@@ -50,7 +50,7 @@ internal class DefaultAvatarRepositoryTest {
     private lateinit var underTest: DefaultAvatarRepository
 
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val cacheGateway = mock<CacheGateway>()
     private val contactsRepository = mock<ContactsRepository>()
     private val currentUser = mock<MegaUser> {
         on { it.isOwnChange }.thenReturn(0)
@@ -66,13 +66,12 @@ internal class DefaultAvatarRepositoryTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
-        whenever(cacheFolderGateway.buildAvatarFile(any())).thenReturn(File(""))
         whenever(megaApiGateway.globalUpdates).thenReturn(sharedFlow)
         underTest = DefaultAvatarRepository(
             megaApiGateway = megaApiGateway,
             avatarWrapper = avatarWrapper,
             bitmapFactoryWrapper = bitmapFactoryWrapper,
-            cacheFolderGateway = cacheFolderGateway,
+            cacheGateway = cacheGateway,
             contactsRepository = contactsRepository,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -102,6 +101,7 @@ internal class DefaultAvatarRepositoryTest {
     fun `when globalUpdates emit OnUsersUpdate with current user then monitorMyAvatarFile emit avatar file`() =
         runTest {
             testScheduler.advanceUntilIdle()
+            whenever(cacheGateway.buildAvatarFile(any())).thenReturn(File(""))
             whenever(megaApiGateway.myUser).thenReturn(currentUser)
             whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
             underTest.monitorMyAvatarFile().test {
@@ -156,9 +156,9 @@ internal class DefaultAvatarRepositoryTest {
                 on { exists() }.thenReturn(true)
             }
             val newFile = mock<File>()
-            whenever(cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
+            whenever(cacheGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
                 .thenReturn(oldFile)
-            whenever(cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
+            whenever(cacheGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
                 .thenReturn(newFile)
             whenever(oldFile.renameTo(newFile)).thenReturn(true)
             assertTrue(underTest.updateMyAvatarWithNewEmail(oldEmail, newEmail))
@@ -173,9 +173,9 @@ internal class DefaultAvatarRepositoryTest {
                 on { exists() }.thenReturn(false)
             }
             val newFile = mock<File>()
-            whenever(cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
+            whenever(cacheGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION))
                 .thenReturn(oldFile)
-            whenever(cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
+            whenever(cacheGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION))
                 .thenReturn(newFile)
             whenever(oldFile.renameTo(newFile)).thenReturn(false)
             assertFalse(underTest.updateMyAvatarWithNewEmail(oldEmail, newEmail))
@@ -219,7 +219,7 @@ internal class DefaultAvatarRepositoryTest {
         verify(megaApiGateway, times(0)).myUser
         verify(megaApiGateway, times(0)).getUserAvatar(any(), any())
         verify(
-            cacheFolderGateway,
+            cacheGateway,
             times(1)
         ).buildAvatarFile(email + FileConstant.JPG_EXTENSION)
     }
@@ -231,7 +231,7 @@ internal class DefaultAvatarRepositoryTest {
         }
         whenever(megaApiGateway.myUser).thenReturn(currentUser)
         whenever(megaApiGateway.accountEmail).thenReturn(CURRENT_USER_EMAIL)
-        whenever(cacheFolderGateway.buildAvatarFile(CURRENT_USER_EMAIL + FileConstant.JPG_EXTENSION)).thenReturn(expectedFile)
+        whenever(cacheGateway.buildAvatarFile(CURRENT_USER_EMAIL + FileConstant.JPG_EXTENSION)).thenReturn(expectedFile)
         Truth.assertThat(underTest.getMyAvatarFile(true)).isEqualTo(expectedFile)
     }
 }

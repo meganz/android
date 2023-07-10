@@ -18,7 +18,7 @@ import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
@@ -42,7 +42,7 @@ import kotlin.coroutines.suspendCoroutine
  * Default [AvatarRepository] implementation
  *
  * @param megaApiGateway
- * @param cacheFolderGateway
+ * @param cacheGateway
  * @param sharingScope scope for share flow
  * @param ioDispatcher coroutine dispatcher to execute
  * @param bitmapFactoryWrapper
@@ -50,7 +50,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultAvatarRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val contactsRepository: ContactsRepository,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
     private val databaseHandler: DatabaseHandler,
@@ -81,9 +81,9 @@ internal class DefaultAvatarRepository @Inject constructor(
 
     override fun monitorMyAvatarFile() = myAvatarFile.asSharedFlow()
 
-    private fun deleteAvatarFile(user: MegaUser) {
+    private suspend fun deleteAvatarFile(user: MegaUser) {
         val oldFile =
-            cacheFolderGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION) ?: return
+            cacheGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION) ?: return
         if (oldFile.exists()) {
             oldFile.delete()
         }
@@ -91,7 +91,7 @@ internal class DefaultAvatarRepository @Inject constructor(
 
     private suspend fun loadAvatarFile(user: MegaUser): File? {
         val avatarFile =
-            cacheFolderGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION)
+            cacheGateway.buildAvatarFile(user.email + FileConstant.JPG_EXTENSION)
                 ?: return null
         megaApiGateway.getUserAvatar(user, avatarFile.absolutePath)
         return avatarFile
@@ -119,7 +119,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                     return@withContext loadAvatarFile(it)
                 }
             }
-            return@withContext cacheFolderGateway.buildAvatarFile(databaseHandler.myEmail + FileConstant.JPG_EXTENSION)
+            return@withContext cacheGateway.buildAvatarFile(databaseHandler.myEmail + FileConstant.JPG_EXTENSION)
         }
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =
@@ -130,7 +130,7 @@ internal class DefaultAvatarRepository @Inject constructor(
 
     override suspend fun getAvatarFile(userEmail: String, skipCache: Boolean): File =
         withContext(ioDispatcher) {
-            val file = cacheFolderGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
+            val file = cacheGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
                 ?: error("Could not generate avatar file")
 
             if (!skipCache && file.exists() && file.canRead() && file.length() > 0) {
@@ -171,11 +171,11 @@ internal class DefaultAvatarRepository @Inject constructor(
         withContext(ioDispatcher) {
             if (oldEmail.isBlank() || oldEmail == newEmail) return@withContext false
             val oldFile =
-                cacheFolderGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION)
+                cacheGateway.buildAvatarFile(oldEmail + FileConstant.JPG_EXTENSION)
                     ?: return@withContext false
             if (oldFile.exists()) {
                 val newFile =
-                    cacheFolderGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION)
+                    cacheGateway.buildAvatarFile(newEmail + FileConstant.JPG_EXTENSION)
                         ?: return@withContext false
                 return@withContext oldFile.renameTo(newFile)
 

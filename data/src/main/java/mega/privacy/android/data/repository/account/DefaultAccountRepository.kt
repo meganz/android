@@ -23,7 +23,7 @@ import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -103,7 +103,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property accountSessionMapper         [AccountSessionMapper]
  * @property chatPreferencesGateway       [chatPreferencesGateway]
  * @property callsPreferencesGateway      [CallsPreferencesGateway]
- * @property cacheFolderGateway           [CacheFolderGateway]
+ * @property cacheGateway                 [CacheGateway]
  * @property appEventGateway              [AppEventGateway]
  */
 @ExperimentalContracts
@@ -129,7 +129,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val accountSessionMapper: AccountSessionMapper,
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
     private val appEventGateway: AppEventGateway,
@@ -674,8 +674,8 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun clearAppDataAndCache() = withContext(ioDispatcher) {
-        with(cacheFolderGateway) {
-            clearCache()
+        with(cacheGateway) {
+            clearCacheDirectory()
             clearAppData()
             clearSdkCache()
         }

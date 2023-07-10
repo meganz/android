@@ -56,21 +56,9 @@ interface CacheFolderGateway {
     fun deleteCacheFolderIfEmpty(folderName: String)
 
     /**
-     * return the avatar file
-     *
-     * @param fileName name of the file
-     */
-    fun buildAvatarFile(fileName: String?): File?
-
-    /**
      * create a default download location file
      */
     suspend fun buildDefaultDownloadDir(): File
-
-    /**
-     * Removes app data.
-     */
-    suspend fun clearAppData()
 
     /**
      * Returns the Camera Uploads Cache Folder
@@ -78,13 +66,6 @@ interface CacheFolderGateway {
      * @return A [File] representing the Camera Uploads Cache Folder
      */
     suspend fun getCameraUploadsCacheFolder(): File
-
-    /**
-     * clear sdk cache
-     *
-     * clears cache files in mega app directory
-     */
-    suspend fun clearSdkCache()
 
     /**
      * Returns cache directory of the app

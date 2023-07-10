@@ -59,4 +59,23 @@ interface CacheGateway {
      */
     suspend fun getFullSizeCacheFolder(): File?
 
+    /**
+     * return the avatar file
+     *
+     * @param fileName name of the file
+     */
+    suspend fun buildAvatarFile(fileName: String?): File?
+
+    /**
+     * Removes content of internal files directory
+     */
+    suspend fun clearAppData()
+
+    /**
+     * clear sdk cache
+     *
+     * clears cache files in mega app directory
+     */
+    suspend fun clearSdkCache()
+
 }

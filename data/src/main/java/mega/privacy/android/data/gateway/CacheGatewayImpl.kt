@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
@@ -42,15 +43,13 @@ internal class CacheGatewayImpl @Inject constructor(
         }
 
     override suspend fun clearCacheDirectory() {
-        withContext(ioDispatcher) {
-            try {
-                val dir = context.cacheDir
-                dir.list()?.forEach {
-                    deleteDir(File(dir, it))
-                }
-            } catch (e: Exception) {
-                Timber.e(e)
+        try {
+            val dir = context.cacheDir
+            dir.list()?.forEach {
+                deleteDir(File(dir, it))
             }
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
@@ -62,6 +61,31 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun getFullSizeCacheFolder(): File? =
         getOrCreateCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
+
+    override suspend fun buildAvatarFile(fileName: String?) =
+        fileName?.let { getCacheFile(CacheFolderConstant.AVATAR_FOLDER, it) }
+
+    override suspend fun clearAppData() {
+        try {
+            val dir = context.filesDir
+            dir.list()?.forEach {
+                deleteDir(File(dir, it))
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    override suspend fun clearSdkCache() {
+        try {
+            val dir = context.dataDir
+            dir.listFiles()?.forEach {
+                it.delete()
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
 
     /**
      * @param dir [File] indicates current directory or file

@@ -10,6 +10,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -91,7 +92,7 @@ class DefaultAccountRepositoryTest {
     private val chatPreferencesGateway = mock<ChatPreferencesGateway>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val accountPreferencesGateway = mock<AccountPreferencesGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val cacheGateway = mock<CacheGateway>()
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
     private val ephemeralCredentialsGateway = mock<EphemeralCredentialsGateway>()
@@ -149,7 +150,7 @@ class DefaultAccountRepositoryTest {
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,
             accountPreferencesGateway = accountPreferencesGateway,
-            cacheFolderGateway = cacheFolderGateway,
+            cacheGateway = cacheGateway,
             passwordStrengthMapper = passwordStrengthMapper,
             appEventGateway = appEventGateway,
             ephemeralCredentialsGateway = ephemeralCredentialsGateway,
@@ -946,9 +947,9 @@ class DefaultAccountRepositoryTest {
     fun `test that CacheFolderGateway is invoked when clearing app data and cache`() =
         runTest {
             underTest.clearAppDataAndCache()
-            verify(cacheFolderGateway).clearCache()
-            verify(cacheFolderGateway).clearAppData()
-            verify(cacheFolderGateway).clearSdkCache()
+            verify(cacheGateway).clearCacheDirectory()
+            verify(cacheGateway).clearAppData()
+            verify(cacheGateway).clearSdkCache()
         }
 
     @Test
