@@ -677,7 +677,6 @@ internal class DefaultAccountRepository @Inject constructor(
         with(cacheFolderGateway) {
             clearCache()
             clearAppData()
-            removeOldTempFolders()
             clearSdkCache()
         }
     }

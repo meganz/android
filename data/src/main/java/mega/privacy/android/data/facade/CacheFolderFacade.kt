@@ -36,10 +36,6 @@ internal class CacheFolderFacade @Inject constructor(
     companion object {
         private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
         private const val AVATAR_FOLDER = "avatarsMEGA"
-        private const val OLD_TEMPORARY_PIC_DIR = "MEGA/MEGA AppTemp"
-        private const val OLD_PROFILE_PID_DIR = "MEGA/MEGA Profile Images"
-        private const val OLD_ADVANCES_DEVICES_DIR = "MEGA/MEGA Temp"
-        private const val OLD_CHAT_TEMPORARY_DIR = "MEGA/MEGA Temp/Chat"
         private const val CAMERA_UPLOADS_CACHE_FOLDER = "cu"
     }
 
@@ -113,37 +109,11 @@ internal class CacheFolderFacade @Inject constructor(
         }
     }
 
-    override fun removeOldTempFolder(folderName: String) {
-        appScope.launch(ioDispatcher) {
-            getOldTempFolder(folderName).takeIf { it.exists() }?.let {
-                try {
-                    fileGateway.deleteFolderAndSubFolders(it)
-                } catch (e: IOException) {
-                    Timber.e(e, "Exception deleting ${it.name} directory")
-                }
-            }
-        }
-    }
-
-    override fun getOldTempFolder(folderName: String): File {
-        val externalStorageVolumes: Array<out File> =
-            ContextCompat.getExternalFilesDirs(context, null)
-        return File(externalStorageVolumes[0].absolutePath + File.separator + folderName)
-    }
 
     override fun buildAvatarFile(fileName: String?) =
         getCacheFile(AVATAR_FOLDER, fileName)
 
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
-
-    override suspend fun removeOldTempFolders() {
-        appScope.launch(ioDispatcher) {
-            removeOldTempFolder(OLD_TEMPORARY_PIC_DIR)
-            removeOldTempFolder(OLD_PROFILE_PID_DIR)
-            removeOldTempFolder(OLD_ADVANCES_DEVICES_DIR)
-            removeOldTempFolder(OLD_CHAT_TEMPORARY_DIR)
-        }
-    }
 
     override suspend fun clearAppData() {
         Timber.d("clearAppData")

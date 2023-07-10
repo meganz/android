@@ -948,7 +948,7 @@ class DefaultAccountRepositoryTest {
             underTest.clearAppDataAndCache()
             verify(cacheFolderGateway).clearCache()
             verify(cacheFolderGateway).clearAppData()
-            verify(cacheFolderGateway).removeOldTempFolders()
+            verify(cacheFolderGateway).clearSdkCache()
         }
 
     @Test

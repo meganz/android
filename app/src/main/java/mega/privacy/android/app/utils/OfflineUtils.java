@@ -1,8 +1,6 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
-import static mega.privacy.android.app.utils.CacheFolderManager.getOldTempFolder;
-import static mega.privacy.android.app.utils.CacheFolderManager.removeOldTempFolder;
 import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER;
 import static mega.privacy.android.app.utils.Constants.FROM_INBOX;
 import static mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES;
@@ -11,7 +9,6 @@ import static mega.privacy.android.app.utils.Constants.SEPARATOR;
 import static mega.privacy.android.app.utils.Constants.URL_INDICATOR;
 import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
 import static mega.privacy.android.app.utils.FileUtil.MAIN_DIR;
-import static mega.privacy.android.app.utils.FileUtil.copyFile;
 import static mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubFolders;
 import static mega.privacy.android.app.utils.FileUtil.getDirSize;
 import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
@@ -53,7 +50,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.gateway.api.MegaApiGateway;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.transfer.Transfer;
@@ -605,88 +601,6 @@ public class OfflineUtils {
         MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), parentId, fileOrFolder, origin, "-1");
         long checkInsert = dbH.setOfflineFile(mOffInsert);
         Timber.d("Test insert C: %s", checkInsert);
-    }
-
-    /**
-     * This method move the old offline files that exist in database into the private space. The conditions to move each file are:
-     * 1.- Exist a MegaOffline representing the file with id diferent to -1
-     * 2.- Exist a MegaNode on Cloud with the same handle that the MegaOffline object
-     * 3.- Exist the File to move
-     * 4.- The size of the MegaNode and the File are the same
-     * 5.- The path of the MegaNode and the MegaOffline are the same
-     * <p>
-     * If any of these conditions are not comply, any file will not be moved
-     * and will be removed from database. If some error happens when moving the file,
-     * it will be removed from database too.
-     *
-     * @param context
-     */
-    public static void moveOfflineFiles(Context context) {
-        Timber.d("moveOfflineFiles");
-
-        String nodePath = File.separator;
-        MegaApiAndroid megaApi;
-
-        megaApi = MegaApplication.getInstance().getMegaApi();
-
-        if (megaApi == null || megaApi.getRootNode() == null) return;
-
-        LegacyDatabaseHandler dbH = DbHandlerModuleKt.getDbHandler();
-        ArrayList<MegaOffline> offlineFiles = dbH.getOfflineFiles();
-
-        if (offlineFiles == null || offlineFiles.isEmpty()) return; //No files to move
-
-        for (MegaOffline offlineNode : offlineFiles) {
-            if (offlineNode.getHandle() == "-1" || offlineNode.isFolder()) continue;
-
-            MegaNode node = megaApi.getNodeByHandle(Long.parseLong(offlineNode.getHandle()));
-            if (node != null) {
-                nodePath = getNodePath(context, node);
-            }
-
-            File oldOfflineFile = findOldOfflineFile(offlineNode);
-
-            if (node == null
-                    || !isFileAvailable(oldOfflineFile)
-                    || node.getSize() != oldOfflineFile.length()
-                    || !node.getName().equals(oldOfflineFile.getName())
-                    || !nodePath.equals(offlineNode.getPath())) {
-                Timber.w("File not founded or not equal to the saved in database --> Remove");
-                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                continue;
-            }
-
-            File newOfflineFileDir = getOfflineFolder(context, getOfflinePath("", offlineNode));
-            File newOfflineFile = getOfflineFile(context, offlineNode);
-            if (!isFileAvailable(newOfflineFileDir) || newOfflineFile == null) {
-                Timber.w("Error creating new directory or creating new file");
-                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                continue;
-            }
-
-            try {
-                copyFile(oldOfflineFile, newOfflineFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Timber.w(e, "Error copying: %s", offlineNode.getHandle());
-                deleteOldOfflineReference(dbH, oldOfflineFile, offlineNode);
-                continue;
-            }
-        }
-
-        removeOldTempFolder(OLD_OFFLINE_DIR);
-    }
-
-    private static void deleteOldOfflineReference(DatabaseHandler dbH, File oldOfflineFile, MegaOffline oldOfflineNode) {
-        dbH.removeById(oldOfflineNode.getId());
-        if (isFileAvailable(oldOfflineFile)) {
-            oldOfflineFile.delete();
-        }
-    }
-
-    private static File findOldOfflineFile(MegaOffline offlineNode) {
-        String path = getOldTempFolder(MAIN_DIR).getAbsolutePath() + File.separator;
-        return new File(getOfflinePath(path, offlineNode), offlineNode.getName());
     }
 
     public static boolean existsOffline(Context context) {

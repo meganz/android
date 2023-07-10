@@ -175,20 +175,4 @@ object CacheFolderManager {
     fun deleteCacheFolderIfEmpty(folderName: String) {
         cacheFolderGateway.deleteCacheFolderIfEmpty(folderName)
     }
-
-    /**
-     * Remove old temp folder
-     */
-    @JvmStatic
-    fun removeOldTempFolder(folderName: String) {
-        cacheFolderGateway.removeOldTempFolder(folderName)
-    }
-
-    /**
-     * Get old temp folder
-     */
-    @JvmStatic
-    fun getOldTempFolder(folderName: String): File {
-        return cacheFolderGateway.getOldTempFolder(folderName)
-    }
 }

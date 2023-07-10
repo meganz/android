@@ -56,20 +56,6 @@ interface CacheFolderGateway {
     fun deleteCacheFolderIfEmpty(folderName: String)
 
     /**
-     * Removes old temporary folder if it exists
-     *
-     * @param folderName name of the folder
-     */
-    fun removeOldTempFolder(folderName: String)
-
-    /**
-     * Returns the requested file with the given name
-     *
-     * @param folderName Name of the folder
-     */
-    fun getOldTempFolder(folderName: String): File
-
-    /**
      * return the avatar file
      *
      * @param fileName name of the file
@@ -80,11 +66,6 @@ interface CacheFolderGateway {
      * create a default download location file
      */
     suspend fun buildDefaultDownloadDir(): File
-
-    /**
-     * Removes old temp folders.
-     */
-    suspend fun removeOldTempFolders()
 
     /**
      * Removes app data.
