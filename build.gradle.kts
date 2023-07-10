@@ -40,6 +40,9 @@ allprojects {
                 uri("${System.getenv("ARTIFACTORY_BASE_URL")}/artifactory/mega-gradle/mobile-analytics")
         }
     }
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
+    }
     apply(plugin = "com.jfrog.artifactory")
     apply(plugin = "maven-publish")
 }
