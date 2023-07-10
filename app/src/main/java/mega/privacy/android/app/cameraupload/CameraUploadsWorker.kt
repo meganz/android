@@ -339,35 +339,24 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             val isNotEnoughQuota = isNotEnoughQuota()
-            val hasMediaPermissions =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    permissionsGateway.hasPermissions(
-                        Manifest.permission.POST_NOTIFICATIONS,
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                        Manifest.permission.READ_MEDIA_VIDEO,
-                    ) || permissionsGateway.hasPermissions(
-                        Manifest.permission.POST_NOTIFICATIONS,
-                        Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
-                    )
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionsGateway.hasPermissions(
-                        Manifest.permission.POST_NOTIFICATIONS,
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                        Manifest.permission.READ_MEDIA_VIDEO,
-                    )
-                } else {
-                    permissionsGateway.hasPermissions(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                    )
-                }
-            Timber.d("isNotEnoughQuota: $isNotEnoughQuota, hasMediaPermissions: $hasMediaPermissions")
-            if (!isNotEnoughQuota && hasMediaPermissions) {
+            val hasPermission = hasMediaPermission()
+
+            Timber.d("isNotEnoughQuota: $isNotEnoughQuota, hasMediaPermissions: $hasPermission")
+            if (!isNotEnoughQuota && hasPermission) {
                 Timber.d("No active process, start service")
                 withContext(ioDispatcher) {
                     initService()
-                    performCompleteFastLogin()
+                    val isLoginSuccessful = performCompleteFastLogin()
+                    if (isLoginSuccessful) {
+                        startWorker()
+                    }
+                    endService(aborted = !isLoginSuccessful)
+                    if (isLoginSuccessful) {
+                        Result.success()
+                    } else {
+                        Result.failure()
+                    }
                 }
-                Result.success()
             } else {
                 Timber.d("Finished CU with Failure")
                 Result.failure()
@@ -377,6 +366,31 @@ class CameraUploadsWorker @AssistedInject constructor(
             endService(aborted = true)
             Result.failure()
         }
+    }
+
+    private fun hasMediaPermission(): Boolean {
+        val hasMediaPermissions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                ) || permissionsGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                )
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                )
+            } else {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                )
+            }
+        return hasMediaPermissions
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -994,8 +1008,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun onTransferTemporaryError(globalTransfer: TransferEvent.TransferTemporaryErrorEvent) {
         val error = globalTransfer.error
-
-        Timber.w("onTransferTemporaryError: ${globalTransfer.transfer.nodeHandle}")
+        Timber.e(error, "onTransferTemporaryError")
         if (error is QuotaExceededMegaException) {
             Timber.w("${if (error.value != 0L) "Transfer" else "Storage"} Over Quota Error: ${error.errorCode}")
             broadcastStorageOverQuotaUseCase()
@@ -1124,8 +1137,9 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     /**
      * When the user is not logged in, perform a Complete Fast Login procedure
+     * @return [Boolean] true if the login process successful otherwise false
      */
-    private suspend fun performCompleteFastLogin() {
+    private suspend fun performCompleteFastLogin(): Boolean {
         Timber.d("Waiting for the user to complete the Fast Login procedure")
 
         // arbitrary retry value
@@ -1140,22 +1154,18 @@ class CameraUploadsWorker @AssistedInject constructor(
             // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
             // app that a Login Procedure is occurring
             MegaApplication.isLoggingIn = true
-            val result = runCatching { backgroundFastLoginUseCase() }
+            val result = runCatching { backgroundFastLoginUseCase() }.onFailure {
+                Timber.e(it, "performCompleteFastLogin exception")
+            }
             MegaApplication.isLoggingIn = false
-
             if (result.isSuccess) {
                 Timber.d("Complete Fast Login procedure successful. Get cookies settings after login")
                 MegaApplication.getInstance().checkEnabledCookies()
-                Timber.d("Start process")
-                startWorker()
-                endService()
-            } else {
-                Timber.e("Complete Fast Login procedure unsuccessful with error ${result.exceptionOrNull()}. Stop process")
-                endService(aborted = true)
             }
+            return result.isSuccess
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
-            endService(aborted = true)
+            return false
         }
     }
 
