@@ -12,7 +12,9 @@ import mega.privacy.android.feature.sync.ui.model.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
 
 @Composable
-fun SyncListRoute() {
+fun SyncListRoute(
+    addFolderClicked: () -> Unit
+) {
     var state by remember { mutableStateOf(SyncListState(fakeData())) }
 
     SyncListScreen(
@@ -31,7 +33,8 @@ fun SyncListRoute() {
         },
         removeFolderClicked = {
 
-        }
+        },
+        addFolderClicked = addFolderClicked
     )
 }
 

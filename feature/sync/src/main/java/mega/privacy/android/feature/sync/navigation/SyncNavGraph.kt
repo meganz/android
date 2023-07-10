@@ -38,10 +38,15 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
                 navController.navigate(syncNewFolderRoute)
             }, backClicked = {
                 navController.popBackStack()
-            })
+            }
+            )
         }
         composable(route = syncList) {
-            SyncListRoute()
+            SyncListRoute(
+                addFolderClicked = {
+                    navController.navigate(syncNewFolderRoute)
+                }
+            )
         }
     }
 }
