@@ -56,7 +56,7 @@ class NodeMapperTest {
     internal fun setUp() {
         underTest = NodeMapper(
             fileNodeMapper = FileNodeMapper(
-                cacheFolderGateway = mock(),
+                cacheGateway = mock(),
                 megaApiGateway = megaApiGateway,
                 fileTypeInfoMapper = { PdfFileTypeInfo }
             ),

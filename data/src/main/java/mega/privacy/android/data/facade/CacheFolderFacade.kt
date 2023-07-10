@@ -136,15 +136,6 @@ internal class CacheFolderFacade @Inject constructor(
 
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
 
-    override fun getThumbnailCacheFolder(): File? =
-        getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)
-
-    override fun getPreviewCacheFolder(): File? =
-        getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)
-
-    override fun getFullSizeCacheFolder(): File? =
-        getCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
-
     override suspend fun removeOldTempFolders() {
         appScope.launch(ioDispatcher) {
             removeOldTempFolder(OLD_TEMPORARY_PIC_DIR)

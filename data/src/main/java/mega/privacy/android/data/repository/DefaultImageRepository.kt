@@ -65,7 +65,6 @@ import kotlin.coroutines.resumeWithException
  * @param cacheGateway CacheGateway
  * @param fileManagementPreferencesGateway FileManagementPreferencesGateway
  * @param fileGateway FileGateway
- * @param cacheFolderGateway CacheFolderGateway
  * @param imageNodeMapper ImageNodeMapper
  */
 internal class DefaultImageRepository @Inject constructor(
@@ -77,7 +76,6 @@ internal class DefaultImageRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
     private val fileGateway: FileGateway,
-    private val cacheFolderGateway: CacheFolderGateway,
     private val imageNodeMapper: ImageNodeMapper,
 ) : ImageRepository {
 
@@ -339,14 +337,17 @@ internal class DefaultImageRepository @Inject constructor(
             )
         }
 
-    override fun getThumbnailPath(): String =
-        cacheFolderGateway.getThumbnailCacheFolder()?.path ?: ""
+    override suspend fun getThumbnailPath(): String? = withContext(ioDispatcher) {
+        cacheGateway.getThumbnailCacheFolder()?.path
+    }
 
-    override fun getPreviewPath(): String =
-        cacheFolderGateway.getPreviewCacheFolder()?.path ?: ""
+    override suspend fun getPreviewPath(): String? = withContext(ioDispatcher) {
+        cacheGateway.getPreviewCacheFolder()?.path
+    }
 
-    override fun getFullImagePath(): String =
-        cacheFolderGateway.getFullSizeCacheFolder()?.path ?: ""
+    override suspend fun getFullImagePath(): String? = withContext(ioDispatcher) {
+        cacheGateway.getFullSizeCacheFolder()?.path
+    }
 
     override suspend fun getImageNodeByHandle(handle: Long): ImageNode =
         withContext(ioDispatcher) {

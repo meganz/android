@@ -43,4 +43,20 @@ interface CacheGateway {
      */
     suspend fun clearCacheDirectory()
 
+
+    /**
+     * Return node thumbnail folder
+     */
+    suspend fun getThumbnailCacheFolder(): File?
+
+    /**
+     * Return node preview folder
+     */
+    suspend fun getPreviewCacheFolder(): File?
+
+    /**
+     * Return node full size folder
+     */
+    suspend fun getFullSizeCacheFolder(): File?
+
 }

@@ -67,7 +67,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property shareDataMapper
  * @property megaExceptionMapper
  * @property sortOrderIntMapper
- * @property cacheFolderGateway
  * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property offlineNodeInformationMapper
@@ -86,7 +85,6 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
-    private val cacheFolderGateway: CacheFolderGateway,
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,

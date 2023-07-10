@@ -6,7 +6,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -51,7 +50,6 @@ class DefaultImageRepositoryTest {
     private val cacheGateway = mock<CacheGateway>()
     private val fileManagementPreferencesGateway = mock<FileManagementPreferencesGateway>()
     private val fileGateway = mock<FileGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
     private val imageNodeMapper = mock<ImageNodeMapper>()
 
     private val cacheDir = File("cache")
@@ -82,7 +80,6 @@ class DefaultImageRepositoryTest {
             cacheGateway = cacheGateway,
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileGateway = fileGateway,
-            cacheFolderGateway = cacheFolderGateway,
             imageNodeMapper = imageNodeMapper,
         )
     }
@@ -95,7 +92,6 @@ class DefaultImageRepositoryTest {
             megaChatApiGateway,
             cacheGateway,
             fileManagementPreferencesGateway,
-            cacheFolderGateway,
             imageNodeMapper
         )
     }

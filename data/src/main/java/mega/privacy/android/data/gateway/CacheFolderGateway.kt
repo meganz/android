@@ -82,21 +82,6 @@ interface CacheFolderGateway {
     suspend fun buildDefaultDownloadDir(): File
 
     /**
-     * Return node thumbnail folder
-     */
-    fun getThumbnailCacheFolder(): File?
-
-    /**
-     * Return node preview folder
-     */
-    fun getPreviewCacheFolder(): File?
-
-    /**
-     * Return node full size folder
-     */
-    fun getFullSizeCacheFolder(): File?
-
-    /**
      * Removes old temp folders.
      */
     suspend fun removeOldTempFolders()

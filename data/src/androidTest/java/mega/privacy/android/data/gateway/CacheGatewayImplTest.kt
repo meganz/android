@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.constant.CacheFolderConstant
 import org.junit.After
 import org.junit.Assert.fail
 import org.junit.Before
@@ -171,4 +172,93 @@ class CacheGatewayImplTest {
         val expected = context.cacheDir.listFiles()?.size
         assertThat(actual).isEqualTo(expected)
     }
+
+    /**
+     * Test that getThumbnailCacheFolder returns the Thumbnail Cache Folder
+     * when it exists in cache
+     */
+    @Test
+    fun test_that_getThumbnailCacheFolder_returns_the_folder_if_exist() = runTest {
+        val folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+        val expected = File(context.cacheDir, folderName)
+        createDirectory(expected)
+
+        assertThat(expected.exists()).isEqualTo(true)
+        assertThat(underTest.getThumbnailCacheFolder()).isEqualTo(expected)
+    }
+
+    /**
+     * Test that getThumbnailCacheFolder returns Thumbnail Cache Folder
+     * and create it in cache if the folder does not exist
+     */
+    @Test
+    fun test_that_getThumbnailCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+        runTest {
+            val folderName = CacheFolderConstant.THUMBNAIL_FOLDER
+            val expected = File(context.cacheDir, folderName)
+
+            assertThat(expected.exists()).isEqualTo(false)
+            assertThat(underTest.getThumbnailCacheFolder()).isEqualTo(expected)
+            assertThat(expected.exists()).isEqualTo(true)
+        }
+
+
+    /**
+     * Test that getPreviewCacheFolder returns the Preview Cache Folder
+     * when it exists in cache
+     */
+    @Test
+    fun test_that_getPreviewCacheFolder_returns_the_folder_if_exist() = runTest {
+        val folderName = CacheFolderConstant.PREVIEW_FOLDER
+        val expected = File(context.cacheDir, folderName)
+        createDirectory(expected)
+
+        assertThat(expected.exists()).isEqualTo(true)
+        assertThat(underTest.getPreviewCacheFolder()).isEqualTo(expected)
+    }
+
+    /**
+     * Test that getPreviewCacheFolder returns Preview Cache Folder
+     * and create it in cache if the folder does not exist
+     */
+    @Test
+    fun test_that_getPreviewCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+        runTest {
+            val folderName = CacheFolderConstant.PREVIEW_FOLDER
+            val expected = File(context.cacheDir, folderName)
+
+            assertThat(expected.exists()).isEqualTo(false)
+            assertThat(underTest.getPreviewCacheFolder()).isEqualTo(expected)
+            assertThat(expected.exists()).isEqualTo(true)
+        }
+
+
+    /**
+     * Test that getFullSizeCacheFolder returns the  Full Size Cache Folder
+     * when it exists in cache
+     */
+    @Test
+    fun test_that_getFullSizeCacheFolder_returns_the_folder_if_exist() = runTest {
+        val folderName = CacheFolderConstant.TEMPORARY_FOLDER
+        val expected = File(context.cacheDir, folderName)
+        createDirectory(expected)
+
+        assertThat(expected.exists()).isEqualTo(true)
+        assertThat(underTest.getFullSizeCacheFolder()).isEqualTo(expected)
+    }
+
+    /**
+     * Test that getFullSizeCacheFolder returns Full Size Cache Folder
+     * and create it in cache if the folder does not exist
+     */
+    @Test
+    fun test_that_getFullSizeCacheFolder_creates_the_folder_in_cacheDir_if_not_exist_and_return_it() =
+        runTest {
+            val folderName = CacheFolderConstant.TEMPORARY_FOLDER
+            val expected = File(context.cacheDir, folderName)
+
+            assertThat(expected.exists()).isEqualTo(false)
+            assertThat(underTest.getFullSizeCacheFolder()).isEqualTo(expected)
+            assertThat(expected.exists()).isEqualTo(true)
+        }
 }

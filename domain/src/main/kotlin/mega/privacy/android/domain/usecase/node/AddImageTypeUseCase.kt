@@ -38,7 +38,8 @@ class AddImageTypeUseCase @Inject constructor(
     private suspend fun getThumbnailPath(
         nodeName: String,
     ): String? {
-        val path = "${imageRepository.getThumbnailPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        val path =
+            "${imageRepository.getThumbnailPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             return path
         }
@@ -49,7 +50,8 @@ class AddImageTypeUseCase @Inject constructor(
     private suspend fun getPreviewPath(
         nodeName: String,
     ): String? {
-        val path = "${imageRepository.getPreviewPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        val path =
+            "${imageRepository.getPreviewPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             return path
         }
@@ -59,7 +61,7 @@ class AddImageTypeUseCase @Inject constructor(
 
     private suspend fun getFullImagePath(node: ImageNode): String? {
         val path =
-            "${imageRepository.getFullImagePath()}${File.separator}${node.base64Id}.${node.type.extension}"
+            "${imageRepository.getFullImagePath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
         val fullSizeFile = File(path)
         if (!isValidNodeFileUseCase(node, fullSizeFile)) {
             fileSystemRepository.deleteFile(fullSizeFile)
@@ -74,7 +76,8 @@ class AddImageTypeUseCase @Inject constructor(
         downloadThumbnail: suspend (String) -> String,
         nodeName: String,
     ): suspend () -> String = {
-        val path = "${imageRepository.getThumbnailPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        val path =
+            "${imageRepository.getThumbnailPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -86,7 +89,8 @@ class AddImageTypeUseCase @Inject constructor(
         downloadPreview: suspend (String) -> String,
         nodeName: String,
     ): suspend () -> String = {
-        val path = "${imageRepository.getPreviewPath()}${File.separator}${nodeName}$EXTENSION_JPG"
+        val path =
+            "${imageRepository.getPreviewPath() ?: DEFAULT_PATH}${File.separator}${nodeName}$EXTENSION_JPG"
         if (fileSystemRepository.doesFileExist(path)) {
             path
         } else {
@@ -98,7 +102,7 @@ class AddImageTypeUseCase @Inject constructor(
         { isPriority, resetDownloads ->
             flow {
                 val path =
-                    "${imageRepository.getFullImagePath()}${File.separator}${node.base64Id}.${node.type.extension}"
+                    "${imageRepository.getFullImagePath() ?: DEFAULT_PATH}${File.separator}${node.base64Id}.${node.type.extension}"
                 val fullSizeFile = File(path)
                 if (!isValidNodeFileUseCase(node, fullSizeFile)) {
                     fileSystemRepository.deleteFile(fullSizeFile)
@@ -122,5 +126,6 @@ class AddImageTypeUseCase @Inject constructor(
          * JPG Extension
          */
         const val EXTENSION_JPG = ".jpg"
+        const val DEFAULT_PATH = ""
     }
 }

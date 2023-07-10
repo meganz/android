@@ -3,7 +3,7 @@ package mega.privacy.android.data.mapper.node
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
@@ -23,7 +23,7 @@ import javax.inject.Inject
  * @constructor Create empty File node mapper
  */
 internal class FileNodeMapper @Inject constructor(
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
 ) {
@@ -45,15 +45,15 @@ internal class FileNodeMapper @Inject constructor(
         hasVersion = megaApiGateway.hasVersion(megaNode),
         thumbnailPath = getThumbnailCacheFilePath(
             megaNode,
-            cacheFolderGateway.getThumbnailCacheFolder()
+            cacheGateway.getThumbnailCacheFolder()
         ),
         previewPath = getPreviewCacheFilePath(
             megaNode,
-            cacheFolderGateway.getPreviewCacheFolder()
+            cacheGateway.getPreviewCacheFolder()
         ),
         fullSizePath = getFullSizeCacheFilePath(
             megaNode,
-            cacheFolderGateway.getFullSizeCacheFolder()
+            cacheGateway.getFullSizeCacheFolder()
         ),
         type = fileTypeInfoMapper(megaNode),
         isFavourite = megaNode.isFavourite,

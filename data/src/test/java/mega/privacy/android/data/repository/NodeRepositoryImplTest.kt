@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -80,7 +81,7 @@ class NodeRepositoryImplTest {
     private val shareDataMapper: ShareDataMapper = mock()
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
-    private val cacheFolderGateway: CacheFolderGateway = mock()
+    private val cacheGateway: CacheGateway = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
     private val offlineInformationMapper: OfflineInformationMapper = mock()
@@ -94,7 +95,7 @@ class NodeRepositoryImplTest {
     private val fetChildrenMapper = mock<FetchChildrenMapper>()
     private val nodeMapper: NodeMapper = NodeMapper(
         fileNodeMapper = FileNodeMapper(
-            cacheFolderGateway = cacheFolderGateway,
+            cacheGateway = cacheGateway,
             megaApiGateway = megaApiGateway,
             fileTypeInfoMapper = fileTypeInfoMapper
         ),
@@ -117,7 +118,6 @@ class NodeRepositoryImplTest {
             shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
-            cacheFolderGateway = cacheFolderGateway,
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             offlineNodeInformationMapper = offlineNodeInformationMapper,
@@ -545,7 +545,7 @@ class NodeRepositoryImplTest {
             on { isNodeKeyDecrypted }.thenReturn(true)
             on { hasPreview() }.thenReturn(true)
         }
-        whenever(cacheFolderGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
+        whenever(cacheGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
         whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
         whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFiles(megaNode)).thenReturn(3)

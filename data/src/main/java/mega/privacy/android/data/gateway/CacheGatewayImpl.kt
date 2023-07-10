@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
@@ -52,6 +53,15 @@ internal class CacheGatewayImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getThumbnailCacheFolder(): File? =
+        getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)
+
+    override suspend fun getPreviewCacheFolder(): File? =
+        getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)
+
+    override suspend fun getFullSizeCacheFolder(): File? =
+        getOrCreateCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
 
     /**
      * @param dir [File] indicates current directory or file
