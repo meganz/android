@@ -41,7 +41,6 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
-import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -60,6 +59,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaShare
@@ -402,13 +402,7 @@ class FileInfoActivity : BaseActivity() {
 
     private fun downloadNode() {
         PermissionUtils.checkNotificationsPermission(this)
-        nodeSaver.saveNode(
-            viewModel.node,
-            highPriority = false,
-            isFolderLink = false,
-            fromMediaViewer = false,
-            needSerialize = false
-        )
+        viewModel.startDownloadNode()
     }
 
     private fun showConfirmLeaveDialog() {
@@ -494,6 +488,15 @@ class FileInfoActivity : BaseActivity() {
 
             is FileInfoOneOffViewEvent.Message -> snackBarHostState.showSnackbar(getString(event.message))
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+            FileInfoOneOffViewEvent.StartLegacyDownload -> {
+                nodeSaver.saveNode(
+                    viewModel.node,
+                    highPriority = false,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    needSerialize = false
+                )
+            }
         }
     }
 

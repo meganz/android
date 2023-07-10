@@ -14,6 +14,15 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+
+    /**
+     * Enables DownloadWorker for download nodes, instead of DownloadService. This is a work in progress feature.
+     */
+    DownloadWorker(
+        "Enables DownloadWorker for download nodes, instead of DownloadService. This is a work in progress feature.",
+        false,
+    ),
+
     /**
      * Enables the Device Center functionality by displaying "Device center" in the Dashboard
      * Side Menu

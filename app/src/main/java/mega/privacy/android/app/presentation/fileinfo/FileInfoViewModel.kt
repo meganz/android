@@ -18,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -33,6 +34,7 @@ import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
 import mega.privacy.android.domain.entity.node.NodeChanges.Name
@@ -61,7 +63,9 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -77,6 +81,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
+import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -125,6 +130,9 @@ class FileInfoViewModel @Inject constructor(
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
+    private val getDefaultDownloadPathForNodeUseCase: GetDefaultDownloadPathForNodeUseCase,
+    private val startDownloadUseCase: StartDownloadUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -907,4 +915,26 @@ class FileInfoViewModel @Inject constructor(
         }
 
     private fun File.uriStringIfExists() = this.takeIf { it.exists() }?.toURI()?.toString()
+
+    /**
+     * It checks the feature flag and start downloading the node with the appropriate use case or launch an one off event to start legacy download
+     */
+    fun startDownloadNode() {
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
+                    getDefaultDownloadPathForNodeUseCase(parent)?.let { path ->
+                        startDownloadUseCase(
+                            destinationPath = path,
+                            nodes = listOf(typedNode),
+                            appData = null,
+                            isHighPriority = false
+                        ).collect {}
+                    }
+                }
+            } else {
+                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
+            }
+        }
+    }
 }

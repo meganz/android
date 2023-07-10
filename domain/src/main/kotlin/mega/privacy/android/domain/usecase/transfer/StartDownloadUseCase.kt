@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfer
 
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.cancellable
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -72,7 +74,9 @@ class StartDownloadUseCase @Inject constructor(
                         .onCompletion { error ->
                             if (error != null) {
                                 //if the start download is canceled before finishing processing we need to cancel the processing operation
-                                cancelCancelTokenUseCase()
+                                withContext(NonCancellable) {
+                                    cancelCancelTokenUseCase()
+                                }
                                 if (error !is CancellationException) {
                                     throw error
                                 }

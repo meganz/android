@@ -73,5 +73,10 @@ sealed interface FileInfoOneOffViewEvent {
      * @param collision the name collision detected
      */
     data class CollisionDetected(val collision: NameCollision) : FileInfoOneOffViewEvent
+
+    /**
+     * The node download must be initiated using the legacy method
+     */
+    object StartLegacyDownload : FileInfoOneOffViewEvent
 }
 

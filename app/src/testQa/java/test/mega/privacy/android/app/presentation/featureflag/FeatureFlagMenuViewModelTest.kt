@@ -53,7 +53,7 @@ class FeatureFlagMenuViewModelTest {
         runTest {
             underTest.state.test {
                 val initial = awaitItem()
-                assertTrue(initial.isEmpty())
+                assertTrue(initial.featureFlags.isEmpty())
             }
         }
     }
@@ -65,8 +65,8 @@ class FeatureFlagMenuViewModelTest {
         runTest {
             whenever(getAllFeatureFlags()).thenReturn(flowOf(map))
             underTest.state.map {
-                assertEquals(it[0].featureName, "featureName")
-                assertEquals(it[0].isEnabled, false)
+                assertEquals(it.featureFlags[0].featureName, "featureName")
+                assertEquals(it.featureFlags[0].isEnabled, false)
             }
         }
     }

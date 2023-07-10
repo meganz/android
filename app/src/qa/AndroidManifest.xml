@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name=".presentation.featureflag.FeatureFlagActivity"
+            android:exported="false"
+            android:label="@string/qa_feature_flag_title"
+            android:launchMode="singleTop"
+            android:parentActivityName=".main.ManagerActivity" />
+
+    </application>
+
+</manifest>

@@ -12,7 +12,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.featureflag.FeatureFlagDialogFragment
+import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
 import mega.privacy.android.screenshot.navigateToShowkase
 import java.io.File
@@ -38,23 +38,27 @@ class QASettingsFragment : PreferenceFragmentCompat() {
                 activity?.navigateToShowkase()
                 true
             }
+
             checkForUpdatesPreferenceKey -> {
                 viewModel.checkUpdatePressed()
                 true
             }
+
             exportLogsPreferenceKey -> {
                 viewModel.exportLogs(::sendShareLogFileIntent)
                 true
             }
+
             saveLogsPreferenceKey -> {
                 viewModel.exportLogs(::sendViewLogFileIntent)
                 true
             }
+
             featureFlagsPreferenceKey -> {
-                FeatureFlagDialogFragment.newInstance()
-                    .show(childFragmentManager, featureFlagsPreferenceKey)
+                startActivity(Intent(requireContext(), FeatureFlagActivity::class.java))
                 true
             }
+
             else -> super.onPreferenceTreeClick(preference)
         }
     }

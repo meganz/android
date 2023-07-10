@@ -23,6 +23,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
@@ -64,7 +65,9 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
+import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -80,6 +83,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
+import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.After
@@ -90,6 +94,7 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -143,6 +148,9 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
+    private val getDefaultDownloadPathForNodeUseCase = mock<GetDefaultDownloadPathForNodeUseCase>()
+    private val startDownloadUseCase = mock<StartDownloadUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -201,6 +209,9 @@ internal class FileInfoViewModelTest {
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
+            getDefaultDownloadPathForNodeUseCase = getDefaultDownloadPathForNodeUseCase,
+            startDownloadUseCase = startDownloadUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -924,6 +935,33 @@ internal class FileInfoViewModelTest {
                 Truth.assertThat(actual.sizeInBytes)
                     .isEqualTo(actualSize + versionsSize)
             }
+        }
+
+    @Test
+    fun `test that legacy download event is launched when download worker feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
+            underTest.startDownloadNode()
+            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+                .isEqualTo(FileInfoOneOffViewEvent.StartLegacyDownload)
+        }
+
+    @Test
+    fun `test that start download use case is invoked when download worker feature flag is enabled`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { id }.thenReturn(nodeId)
+                on { name }.thenReturn("name")
+                on { parentId }.thenReturn(parentId)
+            }.also { folderNode ->
+                whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
+            }
+            underTest.setNode(node.id.longValue)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
+            whenever(getNodeByIdUseCase(parentId)).thenReturn(mock<TypedFolderNode>())
+            whenever(getDefaultDownloadPathForNodeUseCase(any())).thenReturn("path")
+            underTest.startDownloadNode()
+            verify(startDownloadUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
         }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
