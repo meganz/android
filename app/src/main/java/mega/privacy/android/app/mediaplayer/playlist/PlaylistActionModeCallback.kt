@@ -4,14 +4,18 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.view.ActionMode
 import mega.privacy.android.app.R
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 
 /**
  * Action mode callback for playlist fragment
- * @param playerServiceViewModelGateway ServiceViewModelGateway
+ *
+ * @property removeSelections the function for removing all selections
+ * @property clearSelections the function for clearing all selections
  */
-class PlaylistActionModeCallback(private val playerServiceViewModelGateway: PlayerServiceViewModelGateway) :
+class PlaylistActionModeCallback(
+    private val removeSelections: () -> Unit,
+    private val clearSelections: () -> Unit,
+) :
     ActionMode.Callback {
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -27,13 +31,13 @@ class PlaylistActionModeCallback(private val playerServiceViewModelGateway: Play
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         if (item?.itemId == R.id.remove) {
-            playerServiceViewModelGateway.removeAllSelectedItems()
+            removeSelections
         }
         return true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         // When the action mode is finished, clear the selections
-        playerServiceViewModelGateway.clearSelections()
+        clearSelections
     }
 }

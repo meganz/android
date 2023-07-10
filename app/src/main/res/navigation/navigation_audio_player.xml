@@ -20,7 +20,7 @@
 
     <fragment
         android:id="@+id/playlist"
-        android:name="mega.privacy.android.app.mediaplayer.playlist.PlaylistFragment"
+        android:name="mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment"
         android:label=""
         tools:layout="@layout/fragment_audio_playlist">
         <action

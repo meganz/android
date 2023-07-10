@@ -10,7 +10,7 @@ import androidx.core.view.isVisible
 import com.google.android.exoplayer2.Player
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
-import mega.privacy.android.app.mediaplayer.playlist.PlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
+import mega.privacy.android.app.mediaplayer.playlist.AudioPlaylistFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode

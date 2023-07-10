@@ -3,18 +3,21 @@ package mega.privacy.android.app.mediaplayer.playlist
 import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.utils.Util
 
 /**
  * Implement the reorder playlist by drag the item
- * @param adapter PlaylistAdapter
- * @param playerServiceViewModelGateway ServiceViewModelGateway
- * @param playlistItemDecoration customized item decoration
+ * @property adapter PlaylistAdapter
+ * @property playingPosition current playing position
+ * @property swapItems the function for swapping items
+ * @property updatePlaySource the function for updating play source
+ * @property playlistItemDecoration customized item decoration
  */
 class PlaylistItemTouchCallBack(
     private val adapter: PlaylistAdapter,
-    private val playerServiceViewModelGateway: PlayerServiceViewModelGateway,
+    private val playingPosition: Int,
+    private val swapItems: (currentPosition: Int, targetPosition: Int) -> Unit,
+    private val updatePlaySource: () -> Unit,
     private val playlistItemDecoration: PlaylistItemDecoration,
 ) : ItemTouchHelper.Callback() {
     companion object {
@@ -48,13 +51,11 @@ class PlaylistItemTouchCallBack(
     ): Boolean {
         val currentPosition = viewHolder.absoluteAdapterPosition
         val targetPosition = target.absoluteAdapterPosition
-        playerServiceViewModelGateway.run {
-            // Only allow to reorder items of next list
-            if (currentPosition > getPlayingPosition() && targetPosition > getPlayingPosition()) {
-                isUpdatePlaySource = true
-                swapItems(currentPosition, targetPosition)
-                adapter.notifyItemMoved(currentPosition, targetPosition)
-            }
+        // Only allow to reorder items of next list
+        if (currentPosition > playingPosition && targetPosition > playingPosition) {
+            isUpdatePlaySource = true
+            swapItems(currentPosition, targetPosition)
+            adapter.notifyItemMoved(currentPosition, targetPosition)
         }
         return true
     }
@@ -78,6 +79,7 @@ class PlaylistItemTouchCallBack(
                     startCustomAnimator(viewHolder, ALPHA_MOVING, ELEVATION)
                     isDragging = false
                 }
+
                 isDragFinished -> {
                     recyclerView.addItemDecoration(playlistItemDecoration)
                     startCustomAnimator(viewHolder, ALPHA_FINISHED)
@@ -97,7 +99,7 @@ class PlaylistItemTouchCallBack(
         super.clearView(recyclerView, viewHolder)
         if (isUpdatePlaySource) {
             // After playlist reordered, update the play source of exoplayer
-            playerServiceViewModelGateway.updatePlaySource()
+            updatePlaySource()
             isUpdatePlaySource = false
         }
         isDragFinished = true
