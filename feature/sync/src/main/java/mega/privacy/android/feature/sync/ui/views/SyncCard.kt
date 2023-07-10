@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.sync.ui.views
 
-import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -26,9 +25,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -60,10 +59,14 @@ internal fun SyncCard(
             )
             .background(
                 MaterialTheme.colors.surface, shape = roundedCornersShape
-            ),
+            )
+            .clickable { expandClicked() },
     ) {
         SyncCardHeader(
-            folderPairName, status, expanded, expandClicked
+            folderPairName,
+            status,
+            expanded,
+            expandClicked
         )
 
         Divider(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp))
@@ -251,8 +254,7 @@ private fun IconButtonWithText(
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@CombinedThemePreviews
 @Composable
 private fun SyncCardExpandedPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -270,8 +272,7 @@ private fun SyncCardExpandedPreview() {
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@CombinedThemePreviews
 @Composable
 private fun SyncCardCollapsedPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -289,8 +290,7 @@ private fun SyncCardCollapsedPreview() {
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@CombinedThemePreviews
 @Composable
 private fun IconButtonPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {

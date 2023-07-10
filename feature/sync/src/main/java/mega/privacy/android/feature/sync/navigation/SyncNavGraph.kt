@@ -9,12 +9,14 @@ import com.google.accompanist.navigation.animation.composable
 import mega.privacy.android.feature.sync.ui.SyncEmptyScreen
 import mega.privacy.android.feature.sync.ui.megapicker.MegaPickerRoute
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRoute
+import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 
 const val syncRoute = "sync"
 
 private const val syncEmptyRoute = "sync/empty"
 private const val syncNewFolderRoute = "sync/new-folder"
 private const val syncMegaPicker = "sync/mega-picker"
+private const val syncList = "sync/list"
 
 @OptIn(ExperimentalAnimationApi::class)
 internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
@@ -28,8 +30,7 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
             SyncNewFolderScreenRoute(hiltViewModel(), openSelectMegaFolderScreen = {
                 navController.navigate(syncMegaPicker)
             }, openNextScreen = {
-                // Use the navController to navigate to the next screen
-                // At this stage, the next screen is not created yet
+                navController.navigate(syncList)
             })
         }
         composable(route = syncMegaPicker) {
@@ -38,6 +39,9 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
             }, backClicked = {
                 navController.popBackStack()
             })
+        }
+        composable(route = syncList) {
+            SyncListRoute()
         }
     }
 }
