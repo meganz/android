@@ -153,6 +153,7 @@ import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.StorageStatusDialogFragment
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
+import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -3452,33 +3453,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             } else {
                 Timber.w("showOnlineMode - Root is NULL")
                 if (MegaApplication.openChatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                    showConfirmationConnect()
+                    ConfirmConnectDialogFragment().show(
+                        supportFragmentManager,
+                        ConfirmConnectDialogFragment.TAG
+                    )
                 }
             }
-        } catch (e: Exception) {
-            Timber.w(e)
-        }
-    }
-
-    fun showConfirmationConnect() {
-        Timber.d("showConfirmationConnect")
-        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-            when (which) {
-                DialogInterface.BUTTON_POSITIVE -> refreshSession()
-                DialogInterface.BUTTON_NEGATIVE -> {
-                    Timber.d("showConfirmationConnect: BUTTON_NEGATIVE")
-                    setToolbarTitle()
-                }
-            }
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        try {
-            builder.setMessage(R.string.confirmation_to_reconnect)
-                .setPositiveButton(R.string.general_ok, dialogClickListener)
-                .setNegativeButton(R.string.general_cancel, dialogClickListener)
-            reconnectDialog = builder.create()
-            reconnectDialog?.setCanceledOnTouchOutside(false)
-            reconnectDialog?.show()
         } catch (e: Exception) {
             Timber.w(e)
         }
