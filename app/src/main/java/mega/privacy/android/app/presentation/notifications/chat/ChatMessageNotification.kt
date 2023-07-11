@@ -1,12 +1,10 @@
 package mega.privacy.android.app.presentation.notifications.chat
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import androidx.core.content.ContextCompat
@@ -27,7 +25,6 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
-import mega.privacy.android.domain.entity.settings.ChatSettings
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -68,19 +65,14 @@ internal object ChatMessageNotification {
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
         val title = EmojiUtilsShortcodes.emojify(chat?.title)
-        val msgContent =
-            if (msg.type == ChatMessageType.CALL_ENDED) {
-                context.getString(R.string.missed_call_notification_title)
-            } else {
-                EmojiUtilsShortcodes.emojify(
-                    getMsgContent(
-                        context,
-                        msg,
-                        senderName.orEmpty(),
-                        fileDurationMapper
-                    )
-                )
-            }
+        val msgContent = EmojiUtilsShortcodes.emojify(
+            getMsgContent(
+                context,
+                msg,
+                senderName.orEmpty(),
+                fileDurationMapper
+            )
+        )
 
         val largeIcon =
             getAvatar(

@@ -59,6 +59,14 @@ class MegaChatNotificationHandler @Inject constructor(
     override fun onChatNotification(api: MegaChatApiJava?, chatId: Long, msg: MegaChatMessage?) {
         Timber.d("onChatNotification")
 
+        if (msg?.type == MegaChatMessage.TYPE_CALL_STARTED
+            || msg?.type == MegaChatMessage.TYPE_CALL_ENDED
+            || msg?.type == MegaChatMessage.TYPE_SCHED_MEETING
+        ) {
+            Timber.d("No notification required ${msg.type}")
+            return
+        }
+
         updateAppBadge()
 
         val seenMessage = msg?.status == MegaChatMessage.STATUS_SEEN
