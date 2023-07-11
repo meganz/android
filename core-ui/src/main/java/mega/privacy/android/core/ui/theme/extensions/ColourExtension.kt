@@ -121,6 +121,12 @@ val Colors.white_alpha_087_grey_alpha_087: Color
     get() = if (isLight) white_alpha_087 else grey_alpha_087
 
 /**
+ * Color [grey_alpha_087] when light and [white] when dark
+ */
+val Colors.grey_alpha_087_white: Color
+    get() = if (isLight) grey_alpha_087 else white
+
+/**
  * Color [red_800] when light and [red_400] when dark
  */
 val Colors.red_800_red_400: Color
@@ -233,6 +239,14 @@ val Colors.grey_020_grey_700: Color
  */
 val Colors.teal_300_teal_200: Color
     get() = if (isLight) teal_300 else teal_200
+
+
+/**
+ * Color when light [teal_200] and when dark [teal_300]
+ * This is the opposite of [teal_300_teal_200] to be used when the background is also the opposite of the theme (snack bars for instance)
+ */
+val Colors.teal_200_teal_300: Color
+    get() = if (isLight) teal_200 else teal_300
 
 /**
  * Color [white] when light and [grey_alpha_087] when dark
