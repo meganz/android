@@ -42,7 +42,7 @@ internal class CacheFolderFacade @Inject constructor(
     override fun getCacheFolder(folderName: String): File? =
         runBlocking { getCacheFolderAsync(folderName) }
 
-    private suspend fun getCacheFolderAsync(folderName: String) = withContext(ioDispatcher) {
+    override suspend fun getCacheFolderAsync(folderName: String) = withContext(ioDispatcher) {
         val cache =
             if (folderName == CHAT_TEMPORARY_FOLDER) context.filesDir else context.cacheDir
         File(cache, folderName).takeIf { it.exists() || it.mkdir() }
@@ -77,6 +77,13 @@ internal class CacheFolderFacade @Inject constructor(
             }
         }
     }
+
+    override suspend fun getCacheFileAsync(folderName: String, fileName: String?) =
+        getCacheFolderAsync(folderName)?.takeIf { it.exists() }?.let {
+            fileName?.let { nonNullFileName ->
+                File(it, nonNullFileName)
+            }
+        }
 
     override fun getCacheSize(): Long = runBlocking {
         Timber.d("getCacheSize")

@@ -47,8 +47,8 @@ import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.textEditor.TextEditorUtil.getCreationOrEditorText
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CacheFolderManager.deleteCacheFolderIfEmpty
-import mega.privacy.android.app.utils.CacheFolderManager.getCacheFile
-import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolder
+import mega.privacy.android.app.utils.CacheFolderManager.getCacheFileAsync
+import mega.privacy.android.app.utils.CacheFolderManager.getCacheFolderAsync
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.PreviewUtils
@@ -1038,7 +1038,7 @@ internal class UploadService : LifecycleService() {
 
             if (error.errorCode == MegaError.API_OK) {
                 // Get the uploaded file from cache root directory.
-                getCacheFile( "", fileName)
+                getCacheFileAsync("", fileName)
                     ?.takeIf { it.exists() }
                     ?.let { uploadedFile ->
                         Timber.d("Delete file!: ${uploadedFile.absolutePath}")
@@ -1047,7 +1047,7 @@ internal class UploadService : LifecycleService() {
             }
 
             Timber.d("IN Finish: $fileName path: $localPath")
-            getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER)
+            getCacheFolderAsync(CacheFolderManager.TEMPORARY_FOLDER)
                 ?.takeIf { it.exists() && localPath.isNotEmpty() }
                 ?.let { tmpPic ->
                     if (localPath.startsWith(tmpPic.absolutePath)) {

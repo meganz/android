@@ -63,6 +63,13 @@ object CacheFolderManager {
     fun getCacheFolder(folderName: String): File? = cacheFolderGateway.getCacheFolder(folderName)
 
     /**
+     * Get Cache Folder given folder Name
+     */
+    @JvmStatic
+    suspend fun getCacheFolderAsync(folderName: String) =
+        cacheFolderGateway.getCacheFolderAsync(folderName)
+
+    /**
      * Create Cache Folders
      */
     @JvmStatic
@@ -148,6 +155,13 @@ object CacheFolderManager {
     fun getCacheFile(folderName: String, fileName: String?): File? {
         return cacheFolderGateway.getCacheFile(folderName, fileName)
     }
+
+    /**
+     * Get Cache File Instance given folderName & fileName
+     */
+    @JvmStatic
+    suspend fun getCacheFileAsync(folderName: String, fileName: String?) =
+        cacheFolderGateway.getCacheFileAsync(folderName, fileName)
 
     /**
      * Get Cache Size
