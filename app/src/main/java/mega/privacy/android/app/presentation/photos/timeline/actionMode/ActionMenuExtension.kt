@@ -26,7 +26,13 @@ fun PhotosFragment.actionShareLink() {
         addAll(timelineViewModel.getSelectedIds())
     }
     try {
-        LinksUtil.showGetLinkActivity(managerActivity, selectedPhotosIds.toLongArray())
+        selectedPhotosIds.let {
+            if (it.size == 1) {
+                LinksUtil.showGetLinkActivity(managerActivity, it[0])
+            } else {
+                LinksUtil.showGetLinkActivity(managerActivity, it.toLongArray())
+            }
+        }
     } catch (e: Exception) {
         e.printStackTrace() // workaround for potential risk if selectedPhotosIds is huge, need to refactor showGetLinkActivity
     }
