@@ -207,6 +207,18 @@ public class ShareInfo implements Serializable {
                 || path.contains(APP_PRIVATE_DIR2);
     }
 
+    /**
+     * Method to check whether Uri is Malformed. Previously, every Uri passed from external app was not checked
+     * and it enabled attacker to access our app private data such as users cookies file and shared preference
+     * this checks will be disable user's access to our app's private folder and uri that contains
+     * path traversal
+     * the different with `isPathInsecure` is this method removes spaces from the path
+     * eg: /data/data/ mega.privacy.android.app
+     * */
+    private static boolean isPathMalformed(String path) {
+        return isPathInsecure(path.replace(" ", ""));
+    }
+
     /*
      * Process Multiple files from GET_CONTENT Intent
      */
@@ -279,7 +291,12 @@ public class ShareInfo implements Serializable {
     /*
      * Get info from Uri
      */
-    public void processUri(Uri uri, Context context) {
+    public boolean processUri(Uri uri, Context context) {
+        if (isPathMalformed(uri.getPath())) {
+            Timber.e("processUri: Uri is restricted: %s", uri);
+            return false;
+        }
+
         Timber.d("processUri: %s", uri);
         // getting input stream
         inputStream = null;
@@ -287,7 +304,7 @@ public class ShareInfo implements Serializable {
             inputStream = context.getContentResolver().openInputStream(uri);
         } catch (FileNotFoundException fileNotFound) {
             Timber.e(fileNotFound, "Can't find uri: %s", uri);
-            return;
+            return false;
         } catch (Exception e) {
             Timber.e(e, "inputStream EXCEPTION!");
             String path = uri.getPath();
@@ -321,7 +338,7 @@ public class ShareInfo implements Serializable {
             if ((file != null) && file.exists() && file.canRead()) {
                 size = file.length();
                 Timber.d("The file is accesible!");
-                return;
+                return false;
             }
 
             file = null;
@@ -340,16 +357,16 @@ public class ShareInfo implements Serializable {
             if ((file != null) && file.exists() && file.canRead()) {
                 size = file.length();
                 Timber.d("Return here");
-                return;
+                return false;
             }
 
             if (title == null) {
                 Timber.w("Title is null, return!");
-                return;
+                return false;
             }
             if (title.contains("../") || title.contains(("..%2F"))) {
                 Timber.d("Internal path traversal: %s", title);
-                return;
+                return false;
             }
             Timber.d("Internal No path traversal: %s", title);
             if (context instanceof PdfViewerActivity
@@ -411,7 +428,7 @@ public class ShareInfo implements Serializable {
             if ((file != null) && file.exists() && file.canRead()) {
                 size = file.length();
                 Timber.d("The file is accesible!");
-                return;
+                return false;
             } else {
                 Timber.w("The file is not accesible!");
                 isContact = true;
@@ -419,6 +436,7 @@ public class ShareInfo implements Serializable {
             }
         }
         Timber.d("END processUri");
+        return true;
     }
 
     /*
