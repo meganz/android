@@ -5,10 +5,6 @@ package mega.privacy.android.app.main
 import com.google.android.material.R as MaterialR
 import mega.privacy.android.core.R as CoreUiR
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
@@ -42,7 +38,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.view.Window
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -130,7 +125,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_C
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase
-import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
@@ -466,7 +460,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var addPhoneNumberButton: Button
     private lateinit var addPhoneNumberLabel: TextView
     private lateinit var fabButton: FloatingActionButton
-    private lateinit var fabMaskButton: FloatingActionButton
     private var pendingActionsBadge: View? = null
 
     var rootNode: MegaNode? = null
@@ -674,12 +667,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var openLinkErrorText: TextView? = null
     private var openLinkOpenButton: Button? = null
     private var chatLinkDialogType = LINK_DIALOG_CHAT
-
-    // for Meeting
-    private var isFabExpanded = false
-    private lateinit var fabMaskLayout: View
-    private lateinit var windowContent: ViewGroup
-    private val fabViews = ArrayList<View>()
 
     // end for Meeting
     private var backupHandleList: ArrayList<Long>? = null
@@ -915,7 +902,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         outState.putInt(Constants.TYPE_CALL_PERMISSION, typesCameraPermission)
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink)
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
-        outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         photosFragment?.let {
             if (photosFragment?.isAdded == true) {
                 supportFragmentManager.putFragment(
@@ -1017,7 +1003,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         setupView()
         setGetProLabelText()
-        setupFabViews()
         initialiseChatBadgeView()
         setCallBadge()
         if (mElevationCause > 0) {
@@ -1969,7 +1954,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
         joiningToChatLink = savedInstanceState.getBoolean(JOINING_CHAT_LINK, false)
         linkJoinToChatLink = savedInstanceState.getString(LINK_JOINING_CHAT_LINK)
-        isFabExpanded = savedInstanceState.getBoolean(KEY_IS_FAB_EXPANDED, false)
         isInMDMode = savedInstanceState.getBoolean(STATE_KEY_IS_IN_MD_MODE, false)
         if (isInMDMode) {
             mediaDiscoveryFragment = supportFragmentManager.getFragment(
@@ -5161,11 +5145,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
             onBackPressedInSharedItemsDrawerItem()
         } else if (drawerItem === DrawerItem.CHAT) {
-            if (chatsFragment != null && isFabExpanded) {
-                collapseFab()
-            } else {
-                performOnBack()
-            }
+            performOnBack()
         } else if (drawerItem === DrawerItem.PHOTOS) {
             if (isInAlbumContent) {
                 fromAlbumContent = true
@@ -5973,151 +5953,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 getString(R.string.error_server_connection_problem),
                 MegaChatApiJava.MEGACHAT_INVALID_HANDLE
             )
-        }
-    }
-
-    /**
-     * Method to make appropriate actions when clicking on the FAB button
-     */
-    private fun fabMainClickCallback() {
-        if (isFabExpanded) {
-            collapseFab()
-        } else {
-            expandFab()
-        }
-    }
-
-    private fun setupFabViews() {
-        windowContent = this.window.findViewById(Window.ID_ANDROID_CONTENT)
-        fabMaskLayout =
-            FabMaskChatLayoutBinding.inflate(layoutInflater, windowContent, false).root
-        fabMaskButton = fabMaskLayout.findViewById(R.id.fab_main)
-        fabViews.add(fabMaskLayout.findViewById(R.id.fab_chat))
-        fabViews.add(fabMaskLayout.findViewById(R.id.fab_meeting))
-        fabViews.add(fabMaskLayout.findViewById(R.id.text_chat))
-        fabViews.add(fabMaskLayout.findViewById(R.id.text_meeting))
-        fabMaskLayout.setOnClickListener { fabMainClickCallback() }
-        fabMaskButton.setOnClickListener { fabMainClickCallback() }
-        fabMaskLayout.findViewById<View>(R.id.fab_chat).setOnClickListener {
-            fabMainClickCallback()
-            handler.postDelayed({ chooseAddContactDialog() }, FAB_MASK_OUT_DELAY)
-        }
-        fabMaskLayout.findViewById<View>(R.id.text_chat).setOnClickListener {
-            fabMainClickCallback()
-            handler.postDelayed({ chooseAddContactDialog() }, FAB_MASK_OUT_DELAY)
-        }
-        fabMaskLayout.findViewById<View>(R.id.fab_meeting).setOnClickListener {
-            fabMainClickCallback()
-            handler.postDelayed({ showMeetingOptionsPanel(false) }, FAB_MASK_OUT_DELAY)
-        }
-        fabMaskLayout.findViewById<View>(R.id.text_meeting).setOnClickListener {
-            fabMainClickCallback()
-            handler.postDelayed({ showMeetingOptionsPanel(false) }, FAB_MASK_OUT_DELAY)
-        }
-        if (isFabExpanded) {
-            expandFab()
-        }
-    }
-
-    private fun collapseFab() {
-        rotateFab(false)
-        showOut(fabViews)
-        // After animation completed, then remove mask.
-        handler.postDelayed({
-            removeMask()
-            fabButton.visibility = View.VISIBLE
-            isFabExpanded = false
-        }, FAB_MASK_OUT_DELAY)
-    }
-
-    private fun expandFab() {
-        fabButton.visibility = View.GONE
-        addMask()
-        // Need to do so, otherwise, fabMaskMain.background is null.
-        handler.post {
-            rotateFab(true)
-            showIn(fabViews)
-            isFabExpanded = true
-        }
-    }
-
-    /**
-     * Showing the full screen mask by adding the mask layout to the window content
-     */
-    private fun addMask() {
-        windowContent.addView(fabMaskLayout)
-    }
-
-    /**
-     * Removing the full screen mask
-     */
-    private fun removeMask() {
-        windowContent.removeView(fabMaskLayout)
-    }
-
-    private fun rotateFab(isExpand: Boolean) {
-        var rotate = FAB_DEFAULT_ANGEL
-        var color = Color.WHITE
-        var bkColor = ColorUtils.getThemeColor(this, MaterialR.attr.colorSecondary)
-        if (isExpand) {
-            rotate = FAB_ROTATE_ANGEL
-            color = Color.BLACK
-            bkColor = Color.WHITE
-        }
-        val rotateAnim = ObjectAnimator.ofFloat(
-            fabMaskButton, "rotation", rotate
-        )
-
-
-        // The tint of the icon in the middle of the FAB
-        val tintAnim = ObjectAnimator.ofArgb(
-            fabMaskButton.drawable.mutate(), "tint", color
-        )
-
-        // The background tint of the FAB
-        val backgroundTintAnim = ObjectAnimator.ofArgb(
-            fabMaskButton.background.mutate(), "tint", bkColor
-        )
-        val animatorSet = AnimatorSet()
-        animatorSet.duration = FAB_ANIM_DURATION
-        animatorSet.playTogether(rotateAnim, backgroundTintAnim, tintAnim)
-        animatorSet.start()
-    }
-
-    /**
-     * Hide the expanded FABs with animated transition
-     */
-    private fun showOut(fabViews: ArrayList<View>) {
-        for (i in fabViews.indices) {
-            val fab = fabViews[i]
-            fab.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(fab.height.toFloat())
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        fab.visibility = View.GONE
-                        super.onAnimationEnd(animation)
-                    }
-                }).alpha(ALPHA_TRANSPARENT)
-                .start()
-        }
-    }
-
-    /**
-     * Present the expanded FABs with animated transition
-     */
-    private fun showIn(fabViews: ArrayList<View>) {
-        for (i in fabViews.indices) {
-            val fab = fabViews[i]
-            fab.visibility = View.VISIBLE
-            fab.alpha = ALPHA_TRANSPARENT
-            fab.translationY = fab.height.toFloat()
-            fab.animate()
-                .setDuration(FAB_ANIM_DURATION)
-                .translationY(0f)
-                .setListener(object : AnimatorListenerAdapter() {})
-                .alpha(ALPHA_OPAQUE)
-                .start()
         }
     }
 
@@ -9759,13 +9594,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         var drawerMenuItem: MenuItem? = null
         private const val LINK_DIALOG_MEETING = 1
         private const val LINK_DIALOG_CHAT = 2
-        private const val FAB_ANIM_DURATION = 200L
-        private const val FAB_MASK_OUT_DELAY = 200L
-        private const val ALPHA_TRANSPARENT = 0f
-        private const val ALPHA_OPAQUE = 1f
-        private const val FAB_DEFAULT_ANGEL = 0f
-        private const val FAB_ROTATE_ANGEL = 135f
-        private const val KEY_IS_FAB_EXPANDED = "isFabExpanded"
         private var MEETING_TYPE: String = MeetingActivity.MEETING_ACTION_CREATE
     }
 }
