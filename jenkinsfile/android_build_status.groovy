@@ -20,9 +20,6 @@ DATA_UNIT_TEST_SUMMARY = ""
 APP_UNIT_TEST_RESULT = ""
 DOMAIN_UNIT_TEST_RESULT = ""
 DATA_UNIT_TEST_RESULT = ""
-APP_UNIT_TEST_REPORT_ARCHIVE = "app_unit_test_result_${env.GIT_COMMIT}.zip"
-DOMAIN_UNIT_TEST_REPORT_ARCHIVE = "domain_unit_test_result_${env.GIT_COMMIT}.zip"
-DATA_UNIT_TEST_REPORT_ARCHIVE = "data_unit_test_result_${env.GIT_COMMIT}.zip"
 
 APP_COVERAGE = ""
 DOMAIN_COVERAGE = ""
@@ -130,27 +127,16 @@ pipeline {
 
                     // upload unit test report if unit test fail
                     String unitTestResult = ""
-                    if (BUILD_STEP == "Unit Test") {
-                        def appUnitTestSummary = unitTestSummaryWithArchiveLink(
-                                "app/build/test-results/testGmsDebugUnitTest",
-                                "app/build/reports/tests/testGmsDebugUnitTest",
-                                APP_UNIT_TEST_REPORT_ARCHIVE
-                        )
-                        unitTestResult += "<br>App Unit Test: ${appUnitTestSummary}"
-
-                        def domainUnitTestSummary = unitTestSummaryWithArchiveLink(
-                                "domain/build/test-results/test",
-                                "domain/build/reports/tests/test",
-                                DOMAIN_UNIT_TEST_REPORT_ARCHIVE
-                        )
-                        unitTestResult += "<br>Domain Unit Test: ${domainUnitTestSummary}"
-
-                        def dataUnitTestSummary = unitTestSummaryWithArchiveLink(
-                                "data/build/test-results/testDebugUnitTest",
-                                "data/build/reports/tests/testDebugUnitTest",
-                                DATA_UNIT_TEST_REPORT_ARCHIVE
-                        )
-                        unitTestResult += "<br>Data Unit Test: ${dataUnitTestSummary}"
+                    if (BUILD_STEP == "Unit Test and Code Coverage") {
+                        if (!APP_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>App Unit Test: ${APP_UNIT_TEST_RESULT}"
+                        }
+                        if (!DOMAIN_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>Domain Unit Test: ${DOMAIN_UNIT_TEST_RESULT}"
+                        }
+                        if (!DATA_UNIT_TEST_RESULT.isEmpty()) {
+                            unitTestResult += "<br>Data Unit Test: ${DATA_UNIT_TEST_RESULT}"
+                        }
                     }
 
                     def failureMessage = ":x: Build Failed" +
@@ -252,7 +238,6 @@ pipeline {
                     }
                     steps {
                         script {
-                            BUILD_STEP = 'Build APK (GMS+QA)'
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
@@ -273,6 +258,13 @@ pipeline {
                     """
                         }
                     }
+                    post {
+                        failure {
+                            script {
+                                BUILD_STEP = "Build APK (GMS+QA)"
+                            }
+                        }
+                    }
                 } //stage('Build APK (GMS+QA)')
 
                 stage('Unit Test and Code Coverage') {
@@ -282,7 +274,6 @@ pipeline {
                     }
                     steps {
                         script {
-                            BUILD_STEP = "Unit Test and Code Coverage"
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
@@ -291,21 +282,32 @@ pipeline {
                                 sh "./gradlew clean"
 
                                 // domain coverage
-                                sh "./gradlew domain:jacocoTestReport"
-                                sh "ls -l $WORKSPACE/domain/build/reports/jacoco/test/"
+                                try {
+                                    sh "./gradlew domain:jacocoTestReport"
+                                } finally {
+                                    DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                                }
                                 DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
                                 println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
 
                                 // data coverage
-                                sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                                try {
+                                    sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                                } finally {
+                                    DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
+                                }
                                 DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
                                 println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
                                 // run coverage for app module
-                                sh "./gradlew app:createUnitTestCoverageReport"
-
+                                try {
+                                    sh "./gradlew app:createUnitTestCoverageReport"
+                                } finally {
+                                    APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                                }
                                 APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                                 println("APP_COVERAGE = ${APP_COVERAGE}")
+
 
                                 sh "./gradlew feature:devicecenter:testDebugUnitTest"
 
@@ -319,9 +321,6 @@ pipeline {
                                 APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                                 DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
                                 DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-                                APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
-                                DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
-                                DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
 
                                 // Compare Coverage
                                 withCredentials([
@@ -349,6 +348,13 @@ pipeline {
                             }
                         }
                     }
+                    post {
+                        failure {
+                            script {
+                                BUILD_STEP = "Unit Test and Code Coverage"
+                            }
+                        }
+                    }
                 } //stage('Unit Test and Code Coverage')
 
                 stage('Lint Check') {
@@ -359,7 +365,6 @@ pipeline {
                     steps {
                         // Run Lint and analyse the results
                         script {
-                            BUILD_STEP = "Lint Check"
                             common.downloadDependencyLibForSdk()
                         }
 
@@ -375,6 +380,13 @@ pipeline {
                                 archiveLintReports()
 
                                 JSON_LINT_REPORT_LINK = common.uploadFileToGitLab(LINT_REPORT_ARCHIVE)
+                            }
+                        }
+                    }
+                    post {
+                        failure {
+                            script {
+                                BUILD_STEP = "Lint Check"
                             }
                         }
                     }
