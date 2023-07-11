@@ -23,7 +23,6 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.data.gateway.PermissionGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
@@ -118,7 +117,6 @@ class CameraUploadsWorkerTest {
 
     private val permissionsGateway: PermissionGateway = mock()
     private val isNotEnoughQuota: IsNotEnoughQuota = mock()
-    private val megaApi: MegaApiGateway = mock()
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase = mock()
@@ -229,7 +227,6 @@ class CameraUploadsWorkerTest {
             ),
             permissionsGateway = permissionsGateway,
             isNotEnoughQuota = isNotEnoughQuota,
-            megaApi = megaApi,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             isPrimaryFolderPathValidUseCase = isPrimaryFolderPathValidUseCase,
             isSecondaryFolderSetUseCase = isSecondaryFolderSetUseCase,

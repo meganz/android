@@ -47,7 +47,6 @@ import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.data.gateway.PermissionGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
@@ -137,15 +136,12 @@ import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.time.Instant
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
-import kotlin.math.roundToInt
 
 
 /**
@@ -157,7 +153,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val permissionsGateway: PermissionGateway,
     private val isNotEnoughQuota: IsNotEnoughQuota,
-    private val megaApi: MegaApiGateway,
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val isPrimaryFolderPathValidUseCase: IsPrimaryFolderPathValidUseCase,
     private val isSecondaryFolderSetUseCase: IsSecondaryFolderSetUseCase,
@@ -473,11 +468,11 @@ class CameraUploadsWorker @AssistedInject constructor(
 
 
     /**
-     * Cancels a pending [MegaTransfer] through [CancelTransferByTagUseCase],
+     * Cancels a pending [Transfer] through [CancelTransferByTagUseCase],
      * and call [resetTotalUploadsUseCase] after every cancellation to reset the total uploads if
      * there are no more pending uploads
      *
-     * @param transfer the [MegaTransfer] to be cancelled
+     * @param transfer the [Transfer] to be cancelled
      */
     private suspend fun cancelPendingTransfer(transfer: Transfer) {
         runCatching { cancelTransferByTagUseCase(transfer.tag) }
@@ -489,7 +484,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Cancels all pending [MegaTransfer] items through [CancelAllUploadTransfersUseCase],
+     * Cancels all pending [Transfer] items through [CancelAllUploadTransfersUseCase],
      * and call [resetTotalUploadsUseCase] afterwards
      */
     private suspend fun cancelAllPendingTransfers() {
@@ -806,7 +801,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                                 newNodeParent = parent,
                                 newNodeName = record.fileName.orEmpty(),
                             )
-                            updateUpload()
+                            updateUploadCount()
                         })
                     }
                 }
@@ -873,8 +868,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }.retryWhen { cause, attempt ->
                     if (cause is NotEnoughStorageException) {
                         if (attempt >= 60) {
-                            @Suppress("DEPRECATION")
-                            if (megaApi.numPendingUploads == 0) {
+                            if (cameraUploadState.pendingToUpload == 0) {
                                 showNotEnoughStorageNotification()
                                 Timber.w("Stop service due to out of space issue")
                                 endService(aborted = true)
@@ -1016,8 +1010,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Perform a copy operation through [CopyNodeUseCase]
      *
-     * @param nodeToCopy The [MegaNode] to be copied
-     * @param newNodeParent the [MegaNode] that [nodeToCopy] will be moved to
+     * @param nodeToCopy The [Node] to be copied
+     * @param newNodeParent the [Node] that [nodeToCopy] will be moved to
      * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
      */
     private suspend fun handleCopyNode(
@@ -1052,10 +1046,8 @@ class CameraUploadsWorker @AssistedInject constructor(
                     isSecondary = isSecondary,
                 )
             }
-            updateUpload()
         }.onFailure { error ->
             Timber.e("Copy node error: $error")
-            updateUpload()
         }
 
     }
@@ -1485,7 +1477,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
-        updateUpload()
+        updateUploadCount()
     }
 
     /**
@@ -1505,15 +1497,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
     }
 
-    private suspend fun updateUpload() {
+    private suspend fun updateUploadCount() {
+        cameraUploadState.totalUploaded++
         updateProgressNotification()
 
-        cameraUploadState.totalUploaded++
-        @Suppress("DEPRECATION")
         Timber.d(
             "Total to upload: ${cameraUploadState.totalToUpload} " +
                     "Total uploaded: ${cameraUploadState.totalUploaded} " +
-                    "Pending uploads: ${megaApi.numPendingUploads}"
+                    "Pending uploads: ${cameraUploadState.pendingToUpload}"
 
         )
     }
@@ -1691,53 +1682,40 @@ class CameraUploadsWorker @AssistedInject constructor(
             return
         }
 
-        @Suppress("DEPRECATION") val pendingTransfers = megaApi.numPendingUploads
-        @Suppress("DEPRECATION") val totalTransfers = megaApi.totalUploads
-        @Suppress("DEPRECATION") val totalSizePendingTransfer = megaApi.totalUploadBytes
-        @Suppress("DEPRECATION") val totalSizeTransferred = megaApi.totalUploadedBytes
+        with(cameraUploadState) {
+            val totalUploadBytes = totalUploadBytes
+            val totalUploadedBytes = totalUploadedBytes
+            val totalUploaded = totalUploaded
+            val totalToUpload = totalToUpload
+            val pendingToUpload = pendingToUpload
+            val progressPercent = progress
 
-        val progressPercent = if (totalSizePendingTransfer == 0L) {
-            0
-        } else {
-            (totalSizeTransferred.toDouble() / totalSizePendingTransfer * 100).roundToInt()
-        }
-        val message: String
-        if (totalTransfers == 0) {
-            message = context.getString(R.string.download_preparing_files)
-        } else {
-            val inProgress = if (pendingTransfers == 0) {
-                totalTransfers
-            } else {
-                totalTransfers - pendingTransfers + 1
+            val message = when (totalToUpload) {
+                0 -> context.getString(R.string.download_preparing_files)
+                else -> {
+                    context.getString(
+                        if (areTransfersPausedUseCase())
+                            R.string.upload_service_notification_paused
+                        else
+                            R.string.upload_service_notification,
+                        totalUploaded,
+                        totalToUpload
+                    )
+                }
             }
+            val info =
+                stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
 
-            broadcastProgress(progressPercent, pendingTransfers)
+            broadcastProgress(progressPercent, pendingToUpload)
 
-            message = if (areTransfersPausedUseCase()) {
-                context.getString(
-                    R.string.upload_service_notification_paused,
-                    inProgress,
-                    totalTransfers
-                )
-            } else {
-                context.getString(
-                    R.string.upload_service_notification,
-                    inProgress,
-                    totalTransfers
-                )
-            }
+            showProgressNotification(
+                progressPercent,
+                defaultPendingIntent,
+                message,
+                info,
+                context.getString(R.string.settings_camera_notif_title)
+            )
         }
-
-        val info =
-            stringWrapper.getProgressSize(totalSizeTransferred, totalSizePendingTransfer)
-
-        showProgressNotification(
-            progressPercent,
-            defaultPendingIntent,
-            message,
-            info,
-            context.getString(R.string.settings_camera_notif_title)
-        )
     }
 
     private fun createNotification(
