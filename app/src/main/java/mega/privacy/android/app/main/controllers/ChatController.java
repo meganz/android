@@ -304,6 +304,11 @@ public class ChatController {
 
 
     public String createManagementString(MegaChatMessage message, MegaChatRoom chatRoom) {
+        if (message == null) {
+            Timber.w("Null MegaChatMessage");
+            return null;
+        }
+
         Timber.d("MessageID: %d, Chat ID: %d", message.getMsgId(), chatRoom.getChatId());
         long userHandle = message.getUserHandle();
 
@@ -633,13 +638,6 @@ public class ChatController {
                 }
             }
         }
-    }
-
-    public String createManagementString(AndroidMegaChatMessage androidMessage, MegaChatRoom chatRoom) {
-        Timber.d("Message ID: %d, Chat ID: %d", androidMessage.getMessage().getMsgId(), chatRoom.getChatId());
-
-        MegaChatMessage message = androidMessage.getMessage();
-        return createManagementString(message, chatRoom);
     }
 
     /**
