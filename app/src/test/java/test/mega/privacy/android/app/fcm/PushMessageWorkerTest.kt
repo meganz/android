@@ -2,6 +2,7 @@ package test.mega.privacy.android.app.fcm
 
 
 import android.content.Context
+import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -30,22 +31,20 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
-import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
-import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
-import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationBehaviourUseCase
-import mega.privacy.android.domain.usecase.notifications.LegacyPushReceivedUseCase
+import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
+import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -71,7 +70,7 @@ class PushMessageWorkerTest {
     private lateinit var workDatabase: WorkDatabase
 
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
-    private val pushReceivedUseCase = mock<LegacyPushReceivedUseCase>()
+    private val pushReceivedUseCase = mock<PushReceivedUseCase>()
     private val retryPendingConnectionsUseCase = mock<RetryPendingConnectionsUseCase>()
     private val pushMessageMapper = mock<PushMessageMapper>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
@@ -82,12 +81,8 @@ class PushMessageWorkerTest {
     private val notificationManager = mock<NotificationManagerCompat>()
     private val isChatNotifiableUseCase = mock<IsChatNotifiableUseCase>()
     private val getChatRoom = mock<GetChatRoom>()
-    private val getChatMessageUseCase = mock<GetChatMessageUseCase>()
-    private val getMessageSenderNameUseCase = mock<GetMessageSenderNameUseCase>()
-    private val getUserAvatarUseCase = mock<GetUserAvatarUseCase>()
-    private val getUserAvatarColorUseCase = mock<GetUserAvatarColorUseCase>()
-    private val getChatMessageNotificationBehaviourUseCase =
-        mock<GetChatMessageNotificationBehaviourUseCase>()
+    private val getChatMessageNotificationDataUseCase =
+        mock<GetChatMessageNotificationDataUseCase>()
     private val fileDurationMapper = mock<FileDurationMapper>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
@@ -136,12 +131,8 @@ class PushMessageWorkerTest {
             notificationManager = notificationManager,
             isChatNotifiableUseCase = isChatNotifiableUseCase,
             getChatRoom = getChatRoom,
-            getChatMessageUseCase = getChatMessageUseCase,
-            getMessageSenderNameUseCase = getMessageSenderNameUseCase,
-            getUserAvatarUseCase = getUserAvatarUseCase,
-            getUserAvatarColorUseCase = getUserAvatarColorUseCase,
-            getChatMessageNotificationBehaviourUseCase = getChatMessageNotificationBehaviourUseCase,
             fileDurationMapper = fileDurationMapper,
+            getChatMessageNotificationDataUseCase = getChatMessageNotificationDataUseCase,
             ioDispatcher = ioDispatcher
         )
 
@@ -167,7 +158,7 @@ class PushMessageWorkerTest {
     @Test
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
         whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
-        whenever(pushReceivedUseCase.invoke(any())).thenReturn(mock())
+        whenever(pushReceivedUseCase.invoke(any(), any())).thenReturn(Unit)
 
         underTest.doWork()
         verify(retryPendingConnectionsUseCase).invoke(false)
@@ -208,16 +199,16 @@ class PushMessageWorkerTest {
         }
 
     @Test
-    fun `test that ChatPushMessage are triggered as expected`() {
+    fun `test that ChatPushMessage is triggered as expected and getChatMessageNotificationDataUseCase is not called when chat is not notifiable`() {
         runTest {
-            whenever(pushMessageMapper(any())).thenReturn(PushMessage.ChatPushMessage(true, 1L, 2L))
-            val request = mock<ChatRequest> {
-                on { chatHandle }.thenReturn(null)
-            }
-            whenever(pushReceivedUseCase(true)).thenReturn(request)
+            val push = PushMessage.ChatPushMessage(true, 1L, 2L)
+            whenever(pushMessageMapper(any())).thenReturn(push)
+            whenever(pushReceivedUseCase(push.shouldBeep, push.chatId)).thenReturn(Unit)
+            whenever(isChatNotifiableUseCase(push.chatId)).thenReturn(false)
             val result = underTest.doWork()
 
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
+            verifyNoInteractions(getChatMessageNotificationDataUseCase)
         }
     }
 

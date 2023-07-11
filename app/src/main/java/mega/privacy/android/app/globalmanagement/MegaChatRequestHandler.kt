@@ -146,21 +146,6 @@ class MegaChatRequestHandler @Inject constructor(
             } else {
                 Timber.d("Disable chat finish logout")
             }
-        } else if (request.type == MegaChatRequest.TYPE_PUSH_RECEIVED) {
-            Timber.d("TYPE_PUSH_RECEIVED: %d__%s", e.errorCode, e.errorString)
-
-            //Temporary HMS code to show pushes until AND-13803 is resolved.
-            if (isHMS()) {
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    Timber.d("OK:TYPE_PUSH_RECEIVED")
-                    if (!megaApi.isEphemeralPlusPlus) {
-                        ChatAdvancedNotificationBuilder.newInstance(application)
-                            .generateChatNotification(chatRequestMapper(request))
-                    }
-                } else {
-                    Timber.w("Error TYPE_PUSH_RECEIVED: %s", e.errorString)
-                }
-            }
         } else if (request.type == MegaChatRequest.TYPE_AUTOJOIN_PUBLIC_CHAT) {
             chatManagement.removeJoiningChatId(request.chatHandle)
             chatManagement.removeJoiningChatId(request.userHandle)

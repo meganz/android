@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -85,16 +86,22 @@ internal class DefaultPushesRepository @Inject constructor(
             }
         }
 
-    override suspend fun pushReceived(beep: Boolean, chatId: Long): ChatRequest =
+    override suspend fun pushReceived(beep: Boolean, chatId: Long) =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApi.pushReceived(
-                    beep,
-                    chatId,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestPushReceivedCompleted(continuation)
-                    )
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                        Timber.d("PushMessageWorker onRequestPushReceivedCompleted")
+                        if (error.errorCode == MegaChatError.ERROR_OK && !megaApi.isEphemeralPlusPlus) {
+                            continuation.resumeWith(Result.success(Unit))
+                        } else {
+                            continuation.failWithError(error, "onRequestPushReceivedCompleted")
+                        }
+                    }
                 )
+                megaChatApi.pushReceived(beep, chatId, listener)
+
+                continuation.invokeOnCancellation { megaChatApi.removeRequestListener(listener) }
             }
         }
 

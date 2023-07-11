@@ -372,16 +372,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     }
 
     /**
-     * Is recent chat visible
-     */
-    val isRecentChatVisible: Boolean
-        get() = if (activityLifecycleHandler.isActivityVisible) {
-            recentChatVisible
-        } else {
-            false
-        }
-
-    /**
      * Send signal presence activity
      *
      */
@@ -556,8 +546,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         @JvmStatic
         var isEnabledGeoLocation = false
 
-        private var recentChatVisible = false
-
         /**
          * Url confirmation link
          */
@@ -632,17 +620,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         @JvmStatic
         fun setHeartBeatAlive(heartBeatAlive: Boolean) {
             isIsHeartBeatAlive = heartBeatAlive
-        }
-
-        /**
-         * Set recent chat visible
-         *
-         * @param recentChatVisible
-         */
-        @JvmStatic
-        fun setRecentChatVisible(recentChatVisible: Boolean) {
-            Timber.d("setRecentChatVisible: %s", recentChatVisible)
-            this.recentChatVisible = recentChatVisible
         }
 
         /**

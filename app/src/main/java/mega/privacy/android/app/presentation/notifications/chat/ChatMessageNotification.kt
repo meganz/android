@@ -1,15 +1,14 @@
 package mega.privacy.android.app.presentation.notifications.chat
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.Person
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
@@ -19,13 +18,15 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.FileDurationMapper
-import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatMessage
+import mega.privacy.android.domain.entity.chat.ChatMessageStatus
 import mega.privacy.android.domain.entity.chat.ChatMessageType
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ContainsMetaType
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.entity.settings.ChatSettings
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -36,26 +37,26 @@ import java.io.File
  */
 internal object ChatMessageNotification {
 
-    private const val XIAOMI_MANUFACTURER = "xiaomi"
     private const val GROUP_KEY = "Karere"
 
     fun show(
         context: Context,
-        chat: ChatRoom,
-        msg: ChatMessage,
-        senderName: String,
-        senderAvatar: File?,
-        senderAvatarColor: Int,
-        notificationBehaviour: NotificationBehaviour,
+        chatMessageNotificationData: ChatMessageNotificationData,
         fileDurationMapper: FileDurationMapper,
-    ) {
+    ) = with(chatMessageNotificationData) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationId = MegaApiJava.userHandleToBase64(msg.msgId).hashCode()
+
+        if (msg.isDeleted || msg.status == ChatMessageStatus.SEEN) {
+            notificationManager.cancel(notificationId)
+            return@with
+        }
 
         val intent = Intent(context, ManagerActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-            putExtra(Constants.CHAT_ID, chat.chatId)
+            putExtra(Constants.CHAT_ID, chat?.chatId)
         }
 
         val pendingIntent = PendingIntent.getActivity(
@@ -66,47 +67,58 @@ internal object ChatMessageNotification {
         )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
-        val title = EmojiUtilsShortcodes.emojify(chat.title)
+        val title = EmojiUtilsShortcodes.emojify(chat?.title)
         val msgContent =
             if (msg.type == ChatMessageType.CALL_ENDED) {
                 context.getString(R.string.missed_call_notification_title)
             } else {
                 EmojiUtilsShortcodes.emojify(
-                    getmsgContent(
+                    getMsgContent(
                         context,
                         msg,
-                        senderName,
+                        senderName.orEmpty(),
                         fileDurationMapper
                     )
                 )
             }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            || !XIAOMI_MANUFACTURER.equals(Build.MANUFACTURER, ignoreCase = true)
-        ) {
-            val largeIcon = getAvatar(context, senderAvatar, chat, senderAvatarColor)
-            val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    Constants.NOTIFICATION_CHANNEL_CHAT_ID,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_NAME,
-                    NotificationManager.IMPORTANCE_LOW
-                ).apply {
-                    setShowBadge(true)
-                    enableVibration(false)
-                }
+        val largeIcon =
+            getAvatar(
+                context,
+                senderAvatar,
+                chat ?: return@with,
+                senderAvatarColor ?: return@with
+            )?.let {
+                Util.getCircleBitmap(it)
+            }
 
-                notificationManager.createNotificationChannel(channel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                Constants.NOTIFICATION_CHANNEL_CHAT_ID,
+                Constants.NOTIFICATION_CHANNEL_CHAT_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                setShowBadge(true)
+                enableVibration(false)
+            }
 
-                @Suppress("DEPRECATION")
-                val messagingStyleContent = NotificationCompat.MessagingStyle(title).also {
-                    it.addMessage(msgContent, msg.timestamp, senderName)
-                    it.conversationTitle = title
-                }
+            notificationManager.createNotificationChannel(channel)
+        }
 
-                NotificationCompat.Builder(
-                    context,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_ID
-                ).apply {
+        val messagingStyleContent = NotificationCompat.MessagingStyle(
+            Person.Builder().apply { setName(title) }.build()
+        ).also {
+            it.addMessage(
+                msgContent,
+                msg.timestamp,
+                Person.Builder().apply { setName(senderName) }.build()
+            )
+            it.conversationTitle = title
+        }
+
+        val builder =
+            NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_CHAT_ID)
+                .apply {
                     setSmallIcon(R.drawable.ic_stat_notify)
                     setAutoCancel(true)
                     setShowWhen(true)
@@ -115,78 +127,18 @@ internal object ChatMessageNotification {
                     setStyle(messagingStyleContent)
                     setContentIntent(pendingIntent)
                     setWhen(msg.timestamp * 1000)
-                    notificationBehaviour.sound?.let { setSound(it.toUri()) } ?: setSilent(true)
-                    setChannelId(
-                        if (ChatSettings.VIBRATION_ON == notificationBehaviour.vibration) Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2
-                        else Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_NO_VIBRATE_ID
-                    )
+                    setOnlyAlertOnce(true)
+                    notificationBehaviour?.sound?.let { setSound(it.toUri()) }
+                        ?: setSilent(true)
+                    setChannelId(Constants.NOTIFICATION_CHANNEL_CHAT_SUMMARY_ID_V2)
                     priority = NotificationManager.IMPORTANCE_HIGH
                     largeIcon?.let { setLargeIcon(it) }
-                }.build()
-            } else {
-                @Suppress("DEPRECATION")
-                val contentStyle = Notification.MessagingStyle(title).also {
-                    it.addMessage(msgContent, msg.timestamp, senderName)
-                    it.conversationTitle = title
                 }
 
-                @Suppress("DEPRECATION")
-                Notification.Builder(context).apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    setAutoCancel(true)
-                    setShowWhen(true)
-                    setGroup(GROUP_KEY)
-                    setColor(notificationColor)
-                    style = contentStyle
-                    setContentIntent(pendingIntent)
-                    setWhen(msg.timestamp * 1000)
-                    notificationBehaviour.sound?.let { setSound(it.toUri()) }
-                    if (notificationBehaviour.vibration == ChatSettings.VIBRATION_ON) {
-                        setVibrate(longArrayOf(0, 500))
-                    }
-                    setPriority(Notification.PRIORITY_HIGH)
-                    largeIcon?.let { setLargeIcon(it) }
-                }.build()
-            }
-
-            notificationManager.notify(
-                MegaApiJava.userHandleToBase64(msg.msgId).hashCode(),
-                notification
-            )
-        } else {
-            val style = NotificationCompat.InboxStyle()
-
-            @Suppress("DEPRECATION")
-            val notification = NotificationCompat.Builder(context)
-                .apply {
-                    setSmallIcon(R.drawable.ic_stat_notify)
-                    setContentIntent(pendingIntent)
-                    setAutoCancel(true)
-                    color = notificationColor
-                    setShowWhen(true)
-                    notificationBehaviour.sound?.let {
-                        setSound(it.toUri())
-                    } ?: setSilent(true)
-                    if (notificationBehaviour.vibration == ChatSettings.VIBRATION_ON) {
-                        setVibrate(longArrayOf(0, 500))
-                    }
-                    setStyle(style)
-                    priority = NotificationManager.IMPORTANCE_HIGH
-                    style.addLine(
-                        if (chat.isGroup) {
-                            "$senderName @ $title: $msgContent"
-                        } else {
-                            "$title: $msgContent"
-                        }
-                    )
-                    setContentTitle(context.getString(R.string.app_name))
-                }.build()
-
-            notificationManager.notify(Constants.NOTIFICATION_SUMMARY_CHAT, notification)
-        }
+        notificationManager.notify(notificationId, builder.build())
     }
 
-    private fun getmsgContent(
+    private fun getMsgContent(
         context: Context,
         msg: ChatMessage,
         senderName: String,

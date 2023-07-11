@@ -2902,7 +2902,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             DrawerItem.CHAT -> {
                 setBottomNavigationMenuItemChecked(CHAT_BNV)
-                MegaApplication.setRecentChatVisible(true)
             }
 
             DrawerItem.PHOTOS -> {
@@ -3646,7 +3645,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun selectDrawerItemChat() {
-        MegaApplication.setRecentChatVisible(true)
         setToolbarTitle()
         chatTabsFragment = chatsFragment
         if (chatTabsFragment == null) {
@@ -3859,7 +3857,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         // Homepage may hide the Appbar before
         appBarLayout.visibility = View.VISIBLE
         drawerItem = item
-        MegaApplication.setRecentChatVisible(false)
         Util.resetActionBar(supportActionBar)
         updateTransfersWidget()
         if (drawerItem == DrawerItem.TRANSFERS) {

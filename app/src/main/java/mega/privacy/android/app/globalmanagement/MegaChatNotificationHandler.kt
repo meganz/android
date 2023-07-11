@@ -1,17 +1,25 @@
 package mega.privacy.android.app.globalmanagement
 
+import android.Manifest
 import android.app.Application
-import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.RingtoneManager
+import android.os.Build
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.megachat.BadgeIntentService
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
+import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.GetNotificationCountUseCase
+import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
+import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
+import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
@@ -34,6 +42,11 @@ class MegaChatNotificationHandler @Inject constructor(
     private val application: Application,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val getNotificationCountUseCase: GetNotificationCountUseCase,
+    private val notificationManager: NotificationManagerCompat,
+    private val pushReceivedUseCase: PushReceivedUseCase,
+    private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
+    private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
+    private val fileDurationMapper: FileDurationMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : MegaChatNotificationListenerInterface {
     /**
@@ -48,53 +61,89 @@ class MegaChatNotificationHandler @Inject constructor(
 
         updateAppBadge()
 
-        if (MegaApplication.openChatId == chatId) {
+        val seenMessage = msg?.status == MegaChatMessage.STATUS_SEEN
+
+        if (MegaApplication.openChatId == chatId && !seenMessage) {
             Timber.d("Do not update/show notification - opened chat")
             return
         }
 
-        if (MegaApplication.getInstance().isRecentChatVisible) {
-            Timber.d("Do not show notification - recent chats shown")
-            return
-        }
-
-        if (activityLifecycleHandler.isActivityVisible) {
-            try {
-                msg ?: return
-                val notificationManager =
-                    application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(Constants.NOTIFICATION_GENERAL_PUSH_CHAT)
-                if (msg.status == MegaChatMessage.STATUS_NOT_SEEN) {
-                    if (msg.type == MegaChatMessage.TYPE_NORMAL
-                        || msg.type == MegaChatMessage.TYPE_CONTACT_ATTACHMENT
-                        || msg.type == MegaChatMessage.TYPE_NODE_ATTACHMENT
-                        || msg.type == MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT
-                    ) {
-                        if (msg.isDeleted) {
+        msg?.apply {
+            val shouldBeep = if (status == MegaChatMessage.STATUS_NOT_SEEN) {
+                when (type) {
+                    MegaChatMessage.TYPE_NORMAL, MegaChatMessage.TYPE_CONTACT_ATTACHMENT,
+                    MegaChatMessage.TYPE_NODE_ATTACHMENT, MegaChatMessage.TYPE_REVOKE_NODE_ATTACHMENT,
+                    -> {
+                        if (isDeleted) {
                             Timber.d("Message deleted")
-                            megaChatApi.pushReceived(false)
-                        } else if (msg.isEdited) {
+                            false
+                        } else if (isEdited) {
                             Timber.d("Message edited")
-                            megaChatApi.pushReceived(false)
+                            false
                         } else {
                             Timber.d("New normal message")
-                            megaChatApi.pushReceived(true)
+                            true
                         }
-                    } else if (msg.type == MegaChatMessage.TYPE_TRUNCATE) {
-                        Timber.d("New TRUNCATE message")
-                        megaChatApi.pushReceived(false)
                     }
-                } else {
-                    Timber.d("Message SEEN")
-                    megaChatApi.pushReceived(false)
+
+                    MegaChatMessage.TYPE_TRUNCATE -> {
+                        Timber.d("New TRUNCATE message")
+                        false
+                    }
+
+                    else -> {
+                        false
+                    }
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "EXCEPTION when showing chat notification")
+            } else {
+                Timber.d("Message SEEN")
+                false
             }
-        } else {
-            Timber.d("Do not notify chat messages: app in background")
-        }
+
+            Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msg?.msgId")
+
+            applicationScope.launch {
+                runCatching {
+                    pushReceivedUseCase(shouldBeep, chatId)
+                }.onSuccess {
+                    if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
+                        return@launch
+
+                    val data = getChatMessageNotificationDataUseCase(
+                        shouldBeep,
+                        chatId,
+                        msgId,
+                        RingtoneManager.getActualDefaultRingtoneUri(
+                            application,
+                            RingtoneManager.TYPE_NOTIFICATION
+                        ).toString()
+                    ) ?: return@launch
+
+                    ChatMessageNotification.show(
+                        application,
+                        data,
+                        fileDurationMapper
+                    )
+                }.onFailure { error -> Timber.e(error) }
+            }
+        } ?: Timber.w("Message is null, no way to notify")
     }
+
+    /**
+     * Check if notifications are enabled and required permissions are granted
+     *
+     * @return  True if are enabled, false otherwise
+     */
+    private fun areNotificationsEnabled(): Boolean =
+        notificationManager.areNotificationsEnabled() &&
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    ActivityCompat.checkSelfPermission(
+                        application,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) == PackageManager.PERMISSION_GRANTED
+                } else {
+                    true
+                }
 
     /**
      * Update app badge

@@ -20,10 +20,12 @@ class GetMessageSenderNameUseCase @Inject constructor(
      * @return The sender name if any.
      */
     suspend operator fun invoke(userHandle: Long, chatId: Long) =
-        getUserAliasUseCase(userHandle) ?: getSenderName(userHandle, chatId)
+        runCatching { getUserAliasUseCase(userHandle) }.getOrNull()
+            ?: getSenderName(userHandle, chatId)
 
     private suspend fun getSenderName(userHandle: Long, chatId: Long): String? {
-        participantsRepository.loadUserAttributes(chatId, listOf(userHandle))
+        runCatching { participantsRepository.loadUserAttributes(chatId, listOf(userHandle)) }
+
         return participantsRepository.getUserFullNameFromCache(userHandle)
             ?: participantsRepository.getUserEmailFromCache(userHandle)
     }

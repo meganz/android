@@ -7,8 +7,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.RingtoneManager
 import android.os.Build
+import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -25,6 +25,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
+import mega.privacy.android.app.presentation.notifications.chat.ChatMessageNotification
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
@@ -34,16 +35,12 @@ import mega.privacy.android.domain.entity.pushes.PushMessage.*
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.notifications.LegacyPushReceivedUseCase
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
-import mega.privacy.android.domain.usecase.avatar.GetUserAvatarColorUseCase
-import mega.privacy.android.domain.usecase.avatar.GetUserAvatarUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.domain.usecase.chat.GetMessageSenderNameUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
-import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationBehaviourUseCase
+import mega.privacy.android.domain.usecase.notifications.GetChatMessageNotificationDataUseCase
+import mega.privacy.android.domain.usecase.notifications.PushReceivedUseCase
 import timber.log.Timber
 
 /**
@@ -59,7 +56,7 @@ class PushMessageWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val pushReceivedUseCase: LegacyPushReceivedUseCase,
+    private val pushReceivedUseCase: PushReceivedUseCase,
     private val retryPendingConnectionsUseCase: RetryPendingConnectionsUseCase,
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
@@ -69,12 +66,8 @@ class PushMessageWorker @AssistedInject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
     private val getChatRoom: GetChatRoom,
-    private val getChatMessageUseCase: GetChatMessageUseCase,
-    private val getMessageSenderNameUseCase: GetMessageSenderNameUseCase,
-    private val getUserAvatarUseCase: GetUserAvatarUseCase,
-    private val getUserAvatarColorUseCase: GetUserAvatarColorUseCase,
-    private val getChatMessageNotificationBehaviourUseCase: GetChatMessageNotificationBehaviourUseCase,
     private val fileDurationMapper: FileDurationMapper,
+    private val getChatMessageNotificationDataUseCase: GetChatMessageNotificationDataUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -114,44 +107,37 @@ class PushMessageWorker @AssistedInject constructor(
 
             when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
                 is ChatPushMessage -> {
-                    runCatching { pushReceivedUseCase(pushMessage.shouldBeep) }
-                        .onSuccess { request ->
-                            request.chatHandle?.let { chatId ->
-                                if (isChatNotifiableUseCase(chatId) && areNotificationsEnabled()) {
-                                    getChatMessageUseCase(
-                                        chatId,
-                                        pushMessage.msgId
-                                    )?.let { message ->
-                                        val chatRoom = getChatRoom(chatId)
-                                            ?: return@withContext Result.failure()
+                    with(pushMessage) {
+                        Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msgId")
 
-                                        val senderName =
-                                            getMessageSenderNameUseCase(message.userHandle, chatId)
-                                        val senderAvatar = getUserAvatarUseCase(message.userHandle)
-                                        val senderAvatarColor =
-                                            getUserAvatarColorUseCase(message.userHandle)
-                                        val notificationBehaviour =
-                                            getChatMessageNotificationBehaviourUseCase(
-                                                pushMessage.shouldBeep,
-                                                RingtoneManager.getActualDefaultRingtoneUri(
-                                                    applicationContext,
-                                                    RingtoneManager.TYPE_NOTIFICATION
-                                                ).toString()
-                                            )
-                                    }
-                                }
-                            }
-
-                            //Replace with new ChatMessageNotification and previous data
-                            if (areNotificationsEnabled()) {
-                                ChatAdvancedNotificationBuilder.newInstance(applicationContext)
-                                    .generateChatNotification(request)
-                            }
+                        if (chatId == -1L || msgId == -1L) {
+                            Timber.d("Message should be managed in onChatNotification")
+                            return@withContext Result.success()
                         }
-                        .onFailure { error ->
+
+                        runCatching {
+                            pushReceivedUseCase(shouldBeep, chatId)
+                        }.onSuccess {
+                            if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
+                                return@with
+
+                            val data = getChatMessageNotificationDataUseCase(
+                                shouldBeep,
+                                chatId,
+                                msgId,
+                                DEFAULT_NOTIFICATION_URI.toString()
+                            ) ?: return@withContext Result.failure()
+
+                            ChatMessageNotification.show(
+                                applicationContext,
+                                data,
+                                fileDurationMapper
+                            )
+                        }.onFailure { error ->
                             Timber.e(error)
                             return@withContext Result.failure()
                         }
+                    }
                 }
 
                 is ScheduledMeetingPushMessage -> {
