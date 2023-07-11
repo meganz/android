@@ -29,9 +29,9 @@
     <dimen name="width_image_pending_message_three_digits">36dp</dimen>
     <dimen name="width_image_pending_message_four_digits">44dp</dimen>
 
-    <dimen name="elevation_fab_chat">6dp</dimen>
-    <dimen name="translationZ_fab_chat">12dp</dimen>
-    <dimen name="marginTop_fab_chat">0dp</dimen>
+    <dimen name="elevation_fab_chat">0dp</dimen>
+    <dimen name="translationZ_fab_chat">0dp</dimen>
+    <dimen name="marginTop_fab_chat">10dp</dimen>
 
     <dimen name="emoji_grid_view_column_width">35dp</dimen>
     <dimen name="emoji_grid_view_spacing">6dp</dimen>
