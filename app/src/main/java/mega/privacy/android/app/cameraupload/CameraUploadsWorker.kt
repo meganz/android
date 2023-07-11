@@ -79,7 +79,6 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
@@ -167,7 +166,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase,
     private val clearSyncRecords: ClearSyncRecords,
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
-    private val getSyncRecordByPath: GetSyncRecordByPath,
     private val getPendingSyncRecords: GetPendingSyncRecords,
     private val compressedVideoPending: CompressedVideoPending,
     private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus,
@@ -277,6 +275,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Time in milliseconds to flag the last update of the notification
      * Used to prevent updating the notification too often
      */
+    @Volatile
     private var lastUpdated: Long = 0
 
     /**
@@ -719,7 +718,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             null
         }
-        cameraUploadState.totalUploaded = 0
         processMediaForUploadUseCase(
             primaryUploadNode.id,
             secondaryUploadNode?.id,
@@ -786,36 +784,31 @@ class CameraUploadsWorker @AssistedInject constructor(
         startHeartbeat(finalList)
 
         for (record in finalList) {
-            val parent =
-                (if (record.isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
+            val parentNodeId =
+                (if (record.isSecondary) secondaryUploadNode?.id else primaryUploadNode?.id)
+                    ?: continue
             val shouldBeSkipped = createTemporaryFileIfNeeded(record)
             if (shouldBeSkipped) continue
             if (record.isCopyOnly) {
                 Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
-                record.nodeHandle?.let { nodeHandle ->
-                    getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
-                        cameraUploadState.totalToUpload++
-                        uploadFileAsyncList.add(launch {
-                            handleCopyNode(
-                                nodeToCopy = nodeToCopy,
-                                newNodeParent = parent,
-                                newNodeName = record.fileName.orEmpty(),
-                            )
-                            updateUploadCount()
-                        })
-                    }
-                }
+                updateToUploadCount(record)
+                uploadFileAsyncList.add(launch {
+                    copyNode(
+                        record = record,
+                        parentNodeId = parentNodeId,
+                    )
+                })
             } else {
                 val fileToUpload = getFileToUpload(record, isCompressedVideo)
                 fileToUpload?.let {
-                    cameraUploadState.totalToUpload++
+                    updateToUploadCount(record)
                     val lastModified = getLastModifiedTime(record)
 
                     // If the local file path exists, call the Use Case to upload the file
                     uploadFileAsyncList.add(launch {
                         startUploadUseCase(
                             localPath = it.path,
-                            parentNodeId = parent.id,
+                            parentNodeId = parentNodeId,
                             fileName = record.fileName,
                             modificationTime = lastModified / 1000,
                             appData = Constants.APP_DATA_CU,
@@ -823,7 +816,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                             shouldStartFirst = false,
                         ).conflate().collect { globalTransfer ->
                             // Handle the GlobalTransfer emitted by the Use Case
-                            onGlobalTransferUpdated(globalTransfer)
+                            onGlobalTransferUpdated(globalTransfer, record)
                         }
                     })
                 } ?: run {
@@ -868,7 +861,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }.retryWhen { cause, attempt ->
                     if (cause is NotEnoughStorageException) {
                         if (attempt >= 60) {
-                            if (cameraUploadState.pendingToUpload == 0) {
+                            if (cameraUploadState.totalPendingCount == 0) {
                                 showNotEnoughStorageNotification()
                                 Timber.w("Stop service due to out of space issue")
                                 endService(aborted = true)
@@ -907,27 +900,15 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun startHeartbeat(finalList: List<SyncRecord>) {
         if (finalList.isNotEmpty()) {
             with(cameraUploadState) {
-                finalList.forEach { record ->
-                    val bytes = record.localPath?.let { File(it).length() } ?: 0L
-                    if (record.isSecondary) {
-                        secondaryPendingUploads++
-                        secondaryTotalUploadBytes += bytes
-                    } else {
-                        primaryPendingUploads++
-                        primaryTotalUploadBytes += bytes
-                    }
-                }
-                totalNumber = finalList.size
-
                 updateCameraUploadsBackupUseCase(
                     context.getString(R.string.section_photo_sync),
                     BackupState.ACTIVE
-                ) { lastPrimaryTimeStamp = Instant.now().epochSecond }
+                ) { primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond }
 
                 updateMediaUploadsBackupUseCase(
                     context.getString(R.string.section_secondary_media_uploads),
                     BackupState.ACTIVE
-                ) { lastSecondaryTimeStamp = Instant.now().epochSecond }
+                ) { secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond }
             }
 
             sendBackupHeartbeatJob =
@@ -944,10 +925,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @param globalTransfer The [TransferEvent] emitted from the Use Case
      */
-    private suspend fun onGlobalTransferUpdated(globalTransfer: TransferEvent) {
+    private suspend fun onGlobalTransferUpdated(globalTransfer: TransferEvent, record: SyncRecord) {
         when (globalTransfer) {
-            is TransferEvent.TransferFinishEvent -> onTransferFinished(globalTransfer)
-            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(globalTransfer)
+            is TransferEvent.TransferFinishEvent -> onTransferFinished(globalTransfer, record)
+            is TransferEvent.TransferUpdateEvent -> onTransferUpdated(globalTransfer, record)
             is TransferEvent.TransferTemporaryErrorEvent -> onTransferTemporaryError(globalTransfer)
             // No further action necessary for these Scenarios
             is TransferEvent.TransferStartEvent,
@@ -961,7 +942,10 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @param globalTransfer [TransferEvent.TransferFinishEvent]
      */
-    private suspend fun onTransferFinished(globalTransfer: TransferEvent.TransferFinishEvent) {
+    private suspend fun onTransferFinished(
+        globalTransfer: TransferEvent.TransferFinishEvent,
+        record: SyncRecord,
+    ) {
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
 
@@ -971,7 +955,8 @@ class CameraUploadsWorker @AssistedInject constructor(
                     "Image Size: ${transfer.transferredBytes}"
         )
         try {
-            transferFinished(transfer, error)
+            updateUploadedCountAfterTransfer(record, transfer)
+            transferFinished(transfer, error, record)
         } catch (th: Throwable) {
             Timber.e(th)
             th.printStackTrace()
@@ -983,10 +968,13 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * @param globalTransfer [TransferEvent.TransferFinishEvent]
      */
-    private suspend fun onTransferUpdated(globalTransfer: TransferEvent.TransferUpdateEvent) {
+    private suspend fun onTransferUpdated(
+        globalTransfer: TransferEvent.TransferUpdateEvent,
+        record: SyncRecord,
+    ) {
         val transfer = globalTransfer.transfer
         runCatching {
-            updateProgressNotification()
+            updateUploadedCountAfterTransfer(record, transfer)
         }.onFailure {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
             cancelPendingTransfer(transfer)
@@ -1010,62 +998,44 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Perform a copy operation through [CopyNodeUseCase]
      *
-     * @param nodeToCopy The [Node] to be copied
-     * @param newNodeParent the [Node] that [nodeToCopy] will be moved to
-     * @param newNodeName the new name for [nodeToCopy] once it is moved to [newNodeParent]
+     * @param record the [SyncRecord] associated to the node to copy
+     * @param parentNodeId the [NodeId] that the node will be moved to
      */
-    private suspend fun handleCopyNode(
-        nodeToCopy: Node,
-        newNodeParent: Node,
-        newNodeName: String,
+    private suspend fun copyNode(
+        record: SyncRecord,
+        parentNodeId: NodeId,
     ) {
         runCatching {
-            copyNodeUseCase(
-                nodeToCopy = nodeToCopy.id,
-                newNodeParent = newNodeParent.id,
-                newNodeName = newNodeName,
-            )
-        }.onSuccess { nodeId ->
-            Timber.d("Copy node successful")
-            (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
-                val fingerprint = retrievedNode.fingerprint
-                val isSecondary = retrievedNode.parentId == NodeId(
-                    getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
-                )
-                // Delete the Camera Upload sync record by fingerprint
-                fingerprint?.let {
-                    deleteSyncRecordByFingerprint(
-                        originalPrint = fingerprint,
-                        newPrint = fingerprint,
-                        isSecondary = isSecondary,
+            record.nodeHandle?.let { nodeHandle ->
+                getNodeByIdUseCase(NodeId(nodeHandle))?.let { nodeToCopy ->
+                    val nodeId = copyNodeUseCase(
+                        nodeToCopy = nodeToCopy.id,
+                        newNodeParent = parentNodeId,
+                        newNodeName = record.fileName.orEmpty(),
                     )
+                    (getNodeByIdUseCase(nodeId) as? TypedFileNode)?.let { retrievedNode ->
+                        val fingerprint = retrievedNode.fingerprint
+                        val isSecondary = retrievedNode.parentId == NodeId(
+                            getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)
+                        )
+                        // Delete the Camera Upload sync record by fingerprint
+                        fingerprint?.let {
+                            deleteSyncRecordByFingerprint(
+                                originalPrint = fingerprint,
+                                newPrint = fingerprint,
+                                isSecondary = isSecondary,
+                            )
+                        }
+                        updateUploadedCountAfterCopy(record)
+
+                        Timber.d("Copy node successful")
+                    }
                 }
-                // Update information when the file is copied to the target node
-                updateStateOnUpload(
-                    node = retrievedNode,
-                    isSecondary = isSecondary,
-                )
             }
         }.onFailure { error ->
             Timber.e("Copy node error: $error")
         }
 
-    }
-
-    private fun updateStateOnUpload(node: TypedFileNode, isSecondary: Boolean) {
-        with(cameraUploadState) {
-            if (isSecondary) {
-                secondaryPendingUploads--
-                secondaryTotalUploadedBytes += node.size
-                lastSecondaryTimeStamp = Instant.now().epochSecond
-                lastSecondaryHandle = node.id.longValue
-            } else {
-                primaryPendingUploads--
-                primaryTotalUploadedBytes += node.size
-                lastPrimaryTimeStamp = Instant.now().epochSecond
-                lastPrimaryHandle = node.id.longValue
-            }
-        }
     }
 
     private fun getLastModifiedTime(file: SyncRecord): Long {
@@ -1077,19 +1047,18 @@ class CameraUploadsWorker @AssistedInject constructor(
         Timber.d("Stopping foreground!")
         resetTotalUploadsUseCase()
         with(cameraUploadState) {
-            cameraUploadState.totalUploaded = 0
-            cameraUploadState.totalToUpload = 0
+            resetUploadsCounts()
             reportUploadFinishedUseCase(
-                lastPrimaryNodeHandle = lastPrimaryHandle,
-                lastSecondaryNodeHandle = lastSecondaryHandle,
+                lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
+                lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
                 updatePrimaryTimeStamp = {
                     Instant.now().epochSecond.also {
-                        lastPrimaryTimeStamp = it
+                        primaryCameraUploadsState.lastTimestamp = it
                     }
                 },
                 updateSecondaryTimeStamp = {
                     Instant.now().epochSecond.also {
-                        lastSecondaryTimeStamp = it
+                        secondaryCameraUploadsState.lastTimestamp = it
                     }
                 })
         }
@@ -1247,8 +1216,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // Reset properties
         lastUpdated = 0
-        cameraUploadState.totalUploaded = 0
-        cameraUploadState.totalToUpload = 0
         missingAttributesChecked = false
         // Clear sync records if needed
         clearSyncRecords()
@@ -1347,18 +1314,18 @@ class CameraUploadsWorker @AssistedInject constructor(
         // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
         with(cameraUploadState) {
             reportUploadInterruptedUseCase(
-                pendingPrimaryUploads = primaryPendingUploads,
-                pendingSecondaryUploads = secondaryPendingUploads,
-                lastPrimaryNodeHandle = lastPrimaryHandle,
-                lastSecondaryNodeHandle = lastSecondaryHandle,
+                pendingPrimaryUploads = primaryCameraUploadsState.pendingCount,
+                pendingSecondaryUploads = secondaryCameraUploadsState.pendingCount,
+                lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
+                lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
                 updatePrimaryTimeStamp = {
                     Instant.now().epochSecond.also {
-                        lastPrimaryTimeStamp = it
+                        primaryCameraUploadsState.lastTimestamp = it
                     }
                 },
                 updateSecondaryTimeStamp = {
                     Instant.now().epochSecond.also {
-                        lastSecondaryTimeStamp = it
+                        secondaryCameraUploadsState.lastTimestamp = it
                     }
                 })
         }
@@ -1384,11 +1351,11 @@ class CameraUploadsWorker @AssistedInject constructor(
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
         sendCameraUploadsBackupHeartBeatUseCase(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-            lastNodeHandle = cameraUploadState.lastPrimaryHandle,
+            lastNodeHandle = cameraUploadState.primaryCameraUploadsState.lastHandle,
         )
         sendMediaUploadsBackupHeartBeatUseCase(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-            lastNodeHandle = cameraUploadState.lastSecondaryHandle,
+            lastNodeHandle = cameraUploadState.secondaryCameraUploadsState.lastHandle,
         )
     }
 
@@ -1397,7 +1364,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         notificationManager.cancel(notificationId)
     }
 
-    private suspend fun transferFinished(transfer: Transfer, e: MegaException) {
+    private suspend fun transferFinished(transfer: Transfer, e: MegaException, record: SyncRecord) {
         val path = transfer.localPath
         if (transfer.state == TransferState.STATE_COMPLETED) {
             val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, context)
@@ -1407,67 +1374,58 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("Image Sync API_OK")
             val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
-            val isSecondary =
-                node?.parentId == NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
-            val record = getSyncRecordByPath(path, isSecondary)
-            if (record != null) {
-                node?.let { nonNullNode ->
-                    updateStateOnUpload(
-                        node = nonNullNode,
-                        isSecondary = record.isSecondary,
-                    )
-                    handleSetOriginalFingerprint(
-                        nodeId = nonNullNode.id,
-                        originalFingerprint = record.originFingerprint.orEmpty(),
-                    )
-                    record.latitude?.let { latitude ->
-                        record.longitude?.let { longitude ->
-                            setCoordinatesUseCase(
-                                nodeId = nonNullNode.id,
-                                latitude = latitude.toDouble(),
-                                longitude = longitude.toDouble(),
-                            )
-                        }
+            node?.let { nonNullNode ->
+                handleSetOriginalFingerprint(
+                    nodeId = nonNullNode.id,
+                    originalFingerprint = record.originFingerprint.orEmpty(),
+                )
+                record.latitude?.let { latitude ->
+                    record.longitude?.let { longitude ->
+                        setCoordinatesUseCase(
+                            nodeId = nonNullNode.id,
+                            latitude = latitude.toDouble(),
+                            longitude = longitude.toDouble(),
+                        )
                     }
                 }
-                val src = record.localPath?.let { File(it) }
-                if (src != null && src.exists()) {
-                    Timber.d("Creating preview")
-                    val previewDir = PreviewUtils.getPreviewFolder(context)
-                    val preview = File(
-                        previewDir,
-                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
-                    )
-                    val thumbDir = ThumbnailUtils.getThumbFolder(context)
-                    val thumb = File(
-                        thumbDir,
-                        MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
-                    )
-                    if (FileUtil.isVideoFile(path)) {
-                        val img = record.localPath?.let { File(it) }
-                        if (!preview.exists()) {
-                            ImageProcessor.createVideoPreview(
-                                context,
-                                img,
-                                preview
-                            )
-                        }
-                        ImageProcessor.createThumbnail(img, thumb)
-                    } else if (MimeTypeList.typeForName(path).isImage) {
-                        if (!preview.exists()) {
-                            ImageProcessor.createImagePreview(src, preview)
-                        }
-                        ImageProcessor.createThumbnail(src, thumb)
+            }
+            val src = record.localPath?.let { File(it) }
+            if (src != null && src.exists()) {
+                Timber.d("Creating preview")
+                val previewDir = PreviewUtils.getPreviewFolder(context)
+                val preview = File(
+                    previewDir,
+                    MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
+                )
+                val thumbDir = ThumbnailUtils.getThumbFolder(context)
+                val thumb = File(
+                    thumbDir,
+                    MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
+                )
+                if (FileUtil.isVideoFile(path)) {
+                    val img = record.localPath?.let { File(it) }
+                    if (!preview.exists()) {
+                        ImageProcessor.createVideoPreview(
+                            context,
+                            img,
+                            preview
+                        )
                     }
+                    ImageProcessor.createThumbnail(img, thumb)
+                } else if (MimeTypeList.typeForName(path).isImage) {
+                    if (!preview.exists()) {
+                        ImageProcessor.createImagePreview(src, preview)
+                    }
+                    ImageProcessor.createThumbnail(src, thumb)
                 }
-                // delete database record
-                deleteSyncRecord(path, isSecondary)
-                // delete temp files
-                if (path.startsWith(tempRoot)) {
-                    val temp = File(path)
-                    if (temp.exists()) {
-                        temp.delete()
-                    }
+            }
+            // delete database record
+            deleteSyncRecord(path, record.isSecondary)
+            // delete temp files
+            if (path.startsWith(tempRoot)) {
+                val temp = File(path)
+                if (temp.exists()) {
+                    temp.delete()
                 }
             }
         } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
@@ -1477,7 +1435,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
-        updateUploadCount()
     }
 
     /**
@@ -1497,16 +1454,122 @@ class CameraUploadsWorker @AssistedInject constructor(
         }.onFailure { error -> Timber.e("Set original fingerprint error: $error") }
     }
 
-    private suspend fun updateUploadCount() {
-        cameraUploadState.totalUploaded++
+    /**
+     *  Update total to upload count
+     *
+     *  @param record the [SyncRecord] associated to the file to transfer
+     */
+    private suspend fun updateToUploadCount(
+        record: SyncRecord,
+    ) {
+        with(cameraUploadState) {
+            val bytes = record.localPath?.let { File(it).length() } ?: 0L
+            if (record.isSecondary) {
+                secondaryCameraUploadsState.toUploadCount++
+                secondaryCameraUploadsState.bytesToUploadCount += bytes
+            } else {
+                primaryCameraUploadsState.toUploadCount++
+                primaryCameraUploadsState.bytesToUploadCount += bytes
+            }
+        }
         updateProgressNotification()
+    }
 
-        Timber.d(
-            "Total to upload: ${cameraUploadState.totalToUpload} " +
-                    "Total uploaded: ${cameraUploadState.totalUploaded} " +
-                    "Pending uploads: ${cameraUploadState.pendingToUpload}"
-
+    /**
+     *  Update total uploaded count after copying a node
+     *
+     *  @param record the [SyncRecord] associated to the file to transfer
+     */
+    private suspend fun updateUploadedCountAfterCopy(
+        record: SyncRecord,
+    ) {
+        val cameraUploadFolderType =
+            if (record.isSecondary) CameraUploadFolderType.Secondary
+            else CameraUploadFolderType.Primary
+        val isFinished = true
+        val nodeHandle = record.nodeHandle
+        val localPath = record.localPath
+        val bytesTransferred = record.localPath?.let { File(it).length() }
+        updateUploadedCount(
+            cameraUploadFolderType,
+            isFinished,
+            nodeHandle,
+            localPath,
+            bytesTransferred
         )
+    }
+
+    /**
+     *  Update total uploaded count after a transfer update or finish
+     *
+     *  @param record the [SyncRecord] associated to the file to transfer
+     *  @param transfer the [Transfer] associated to the file to transfer.
+     *                  The transfer can be ongoing or finished.
+     */
+    private suspend fun updateUploadedCountAfterTransfer(
+        record: SyncRecord,
+        transfer: Transfer,
+    ) {
+        val cameraUploadFolderType =
+            if (record.isSecondary) CameraUploadFolderType.Secondary
+            else CameraUploadFolderType.Primary
+        val isFinished = transfer.isFinished
+        val nodeHandle = transfer.nodeHandle
+        val localPath = transfer.localPath
+        val bytesTransferred = transfer.transferredBytes
+        updateUploadedCount(
+            cameraUploadFolderType,
+            isFinished,
+            nodeHandle,
+            localPath,
+            bytesTransferred
+        )
+    }
+
+    /**
+     *  Update total uploaded count after copying a node or after a transfer update or finish
+     *
+     *  @param cameraUploadFolderType primary or secondary
+     *  @param isFinished true if the transfer is finished. When copying, this value is always true
+     *  @param nodeHandle the node handle associated to the transfer or the node copied
+     *  @param localPath the local path of the files. It is used to identifies the bytes transferred
+     *                   for a unique filed transferred
+     *  @param bytesTransferred the bytes transferred for this file
+     */
+    private suspend fun updateUploadedCount(
+        cameraUploadFolderType: CameraUploadFolderType,
+        isFinished: Boolean,
+        nodeHandle: Long?,
+        localPath: String?,
+        bytesTransferred: Long?,
+    ) {
+        with(cameraUploadState) {
+            when (cameraUploadFolderType) {
+                CameraUploadFolderType.Primary -> {
+                    with(primaryCameraUploadsState) {
+                        if (isFinished) {
+                            uploadedCount++
+                            lastTimestamp = Instant.now().epochSecond
+                            nodeHandle?.let { lastHandle = it }
+                        }
+                        localPath?.let { bytesUploadedTable[localPath] = bytesTransferred }
+                    }
+                }
+
+                else -> {
+                    with(secondaryCameraUploadsState) {
+                        if (isFinished) {
+                            uploadedCount++
+                            lastTimestamp = Instant.now().epochSecond
+                            nodeHandle?.let { lastHandle = it }
+                        }
+                        localPath?.let { bytesUploadedTable[localPath] = bytesTransferred }
+                    }
+                }
+            }
+        }
+
+        updateProgressNotification()
     }
 
     /**
@@ -1523,8 +1586,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
             resetTotalUploadsUseCase()
-            cameraUploadState.totalUploaded = 0
-            cameraUploadState.totalToUpload = 0
+            cameraUploadState.resetUploadsCounts()
             totalVideoSize = getTotalVideoSizeInMB(fullList)
             Timber.d("Total videos count are ${fullList.size}, $totalVideoSize MB to Conversion")
             if (shouldStartVideoCompression(totalVideoSize)) {
@@ -1683,12 +1745,21 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
         with(cameraUploadState) {
-            val totalUploadBytes = totalUploadBytes
-            val totalUploadedBytes = totalUploadedBytes
-            val totalUploaded = totalUploaded
-            val totalToUpload = totalToUpload
-            val pendingToUpload = pendingToUpload
-            val progressPercent = progress
+            Timber.d(
+                "Total to upload: $totalToUploadCount " +
+                        "Total uploaded: $totalUploadedCount " +
+                        "Pending uploads: $totalPendingCount " +
+                        "bytes to upload: $totalBytesToUploadCount " +
+                        "bytes uploaded: $totalBytesUploadedCount " +
+                        "progress: $totalProgress"
+            )
+
+            val totalUploadBytes = totalBytesToUploadCount
+            val totalUploadedBytes = totalBytesUploadedCount
+            val totalUploaded = totalUploadedCount
+            val totalToUpload = totalToUploadCount
+            val pendingToUpload = totalPendingCount
+            val progressPercent = totalProgress
 
             val message = when (totalToUpload) {
                 0 -> context.getString(R.string.download_preparing_files)

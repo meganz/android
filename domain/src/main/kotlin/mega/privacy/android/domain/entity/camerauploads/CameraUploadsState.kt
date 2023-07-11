@@ -3,63 +3,47 @@ package mega.privacy.android.domain.entity.camerauploads
 import kotlin.math.roundToInt
 
 /**
- * To hold Camera UploadState
- * @property primaryPendingUploads
- * @property secondaryPendingUploads
- * @property lastPrimaryTimeStamp
- * @property lastSecondaryTimeStamp
- * @property lastPrimaryHandle
- * @property lastSecondaryHandle
- * @property primaryTotalUploadBytes
- * @property secondaryTotalUploadBytes
- * @property primaryTotalUploadedBytes
- * @property secondaryTotalUploadedBytes
- * @property totalToUpload
- * @property totalUploaded
- * @property totalNumber
+ * Camera Uploads State
+ * @property primaryCameraUploadsState state of primary folder
+ * @property secondaryCameraUploadsState state of secondary folder
+ * @property totalToUploadCount total number of files to upload
+ * @property totalUploadedCount total number of files uploaded
+ * @property totalPendingCount total number of files remaining to be uploaded
+ * @property totalBytesToUploadCount Total number of bytes to upload
+ * @property totalBytesUploadedCount Total number of bytes uploaded
+ * @property totalProgress current progress of the camera uploads process. A [Int] between 0 and 100
  */
 data class CameraUploadsState(
-    var primaryPendingUploads: Int = 0,
-    var secondaryPendingUploads: Int = 0,
-    var lastPrimaryTimeStamp: Long = -1,
-    var lastSecondaryTimeStamp: Long = -1,
-    var lastPrimaryHandle: Long = -1,
-    var lastSecondaryHandle: Long = -1,
-    var primaryTotalUploadBytes: Long = 0,
-    var secondaryTotalUploadBytes: Long = 0,
-    var primaryTotalUploadedBytes: Long = 0,
-    var secondaryTotalUploadedBytes: Long = 0,
-    var totalToUpload: Int = 0,
-    var totalUploaded: Int = 0,
-    var totalNumber: Int = 0,
+    var primaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
+    var secondaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
 ) {
-    /**
-     *  Number of files pending to be uploaded
-     */
-    val pendingToUpload: Int
-        get() = totalToUpload - totalUploaded
+    val totalToUploadCount: Int
+        get() = primaryCameraUploadsState.toUploadCount + secondaryCameraUploadsState.toUploadCount
 
-    /**
-     *  Total number of bytes to be uploaded
-     */
-    val totalUploadBytes: Long
-        get() = primaryTotalUploadBytes + secondaryTotalUploadBytes
+    val totalUploadedCount: Int
+        get() = primaryCameraUploadsState.uploadedCount + secondaryCameraUploadsState.uploadedCount
 
-    /**
-     *  Total number of bytes uploaded
-     */
-    val totalUploadedBytes: Long
-        get() = primaryTotalUploadedBytes + secondaryTotalUploadedBytes
+    val totalPendingCount: Int
+        get() = totalToUploadCount - totalUploadedCount
 
+    val totalBytesToUploadCount: Long
+        get() = primaryCameraUploadsState.bytesToUploadCount + secondaryCameraUploadsState.bytesToUploadCount
 
-    /**
-     *  Current progress of the Camera uploads
-     */
-    val progress: Int
+    val totalBytesUploadedCount: Long
+        get() = primaryCameraUploadsState.bytesUploadedCount + secondaryCameraUploadsState.bytesUploadedCount
+
+    val totalProgress: Int
         get() =
-            when (totalUploadBytes) {
+            when (totalBytesToUploadCount) {
                 0L -> 0
-                else -> ((totalUploadedBytes.toDouble() / totalUploadBytes) * 100).roundToInt()
+                else -> ((totalBytesUploadedCount.toDouble() / totalBytesToUploadCount) * 100).roundToInt()
             }
 
+    /**
+     *  Reset the upload counts
+     */
+    fun resetUploadsCounts() {
+        primaryCameraUploadsState.resetUploadsCounts()
+        secondaryCameraUploadsState.resetUploadsCounts()
+    }
 }

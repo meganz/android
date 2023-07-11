@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
@@ -34,13 +35,21 @@ internal class SendBackupHeartBeatSyncUseCaseTest {
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     private val fakeCameraUploadsState = CameraUploadsState(
-        primaryTotalUploadBytes = 69L,
-        secondaryTotalUploadBytes = 69L,
+        primaryCameraUploadsState = CameraUploadsFolderState(
+            bytesToUploadCount = 69L,
+        ),
+        secondaryCameraUploadsState = CameraUploadsFolderState(
+            bytesToUploadCount = 69L,
+        ),
     )
 
     private val doNotSyncCameraUploadsState = CameraUploadsState(
-        primaryTotalUploadBytes = 0L,
-        secondaryTotalUploadBytes = 0L,
+        primaryCameraUploadsState = CameraUploadsFolderState(
+            bytesToUploadCount = 0L,
+        ),
+        secondaryCameraUploadsState = CameraUploadsFolderState(
+            bytesToUploadCount = 0L,
+        ),
     )
 
     private val fakeBackup = Backup(

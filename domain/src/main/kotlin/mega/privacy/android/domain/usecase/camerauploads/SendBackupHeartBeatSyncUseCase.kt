@@ -4,6 +4,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
+import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFolderState
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsState
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import java.util.concurrent.TimeUnit
@@ -31,15 +33,17 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
             emit(Unit)
             cameraUploadRepository.getCuBackUp()?.let {
                 sendCameraUploadsHeartbeatIfNeeded(
-                    cameraUploadsState = cameraUploadsState,
+                    cameraUploadsFolderState = cameraUploadsState.primaryCameraUploadsState,
                     backup = it,
+                    cameraUploadsFolderType = CameraUploadFolderType.Primary
                 )
             }
 
             cameraUploadRepository.getMuBackUp()?.let {
-                sendMediaUploadsHeartbeatIfNeeded(
-                    cameraUploadsState = cameraUploadsState,
+                sendCameraUploadsHeartbeatIfNeeded(
+                    cameraUploadsFolderState = cameraUploadsState.secondaryCameraUploadsState,
                     backup = it,
+                    cameraUploadsFolderType = CameraUploadFolderType.Secondary
                 )
             }
             delay(TimeUnit.SECONDS.toMillis(ACTIVE_HEARTBEAT_INTERVAL_SECONDS))
@@ -47,52 +51,38 @@ class SendBackupHeartBeatSyncUseCase @Inject constructor(private val cameraUploa
     }
 
     private suspend fun sendCameraUploadsHeartbeatIfNeeded(
-        cameraUploadsState: CameraUploadsState,
+        cameraUploadsFolderState: CameraUploadsFolderState,
         backup: Backup,
+        cameraUploadsFolderType: CameraUploadFolderType,
     ) {
-        with(cameraUploadsState) {
-            if (shouldSendCameraUploadsHeartbeat(cameraUploadsState, backup)) {
+        with(cameraUploadsFolderState) {
+            if (shouldSendCameraUploadsHeartbeat(this, backup, cameraUploadsFolderType)) {
                 cameraUploadRepository.sendBackupHeartbeatSync(
                     backupId = backup.backupId,
-                    progress = (primaryTotalUploadedBytes / primaryTotalUploadBytes.toFloat() * 100).toInt(),
-                    ups = primaryPendingUploads,
+                    progress = progress,
+                    ups = pendingCount,
                     downs = 0,
-                    timeStamp = lastPrimaryTimeStamp,
-                    lastNode = lastPrimaryHandle,
-                )
-            }
-        }
-    }
-
-    private suspend fun sendMediaUploadsHeartbeatIfNeeded(
-        cameraUploadsState: CameraUploadsState,
-        backup: Backup,
-    ) {
-        with(cameraUploadsState) {
-            if (shouldSendMediaUploadsHeartbeat(cameraUploadsState, backup)) {
-                cameraUploadRepository.sendBackupHeartbeatSync(
-                    backupId = backup.backupId,
-                    progress = (secondaryTotalUploadedBytes / secondaryTotalUploadBytes.toFloat() * 100).toInt(),
-                    ups = secondaryPendingUploads,
-                    downs = 0,
-                    timeStamp = lastSecondaryTimeStamp,
-                    lastNode = lastSecondaryHandle,
+                    timeStamp = lastTimestamp,
+                    lastNode = lastHandle,
                 )
             }
         }
     }
 
     private suspend fun shouldSendCameraUploadsHeartbeat(
-        cameraUploadsState: CameraUploadsState,
+        cameraUploadsFolderState: CameraUploadsFolderState,
         backup: Backup,
-    ) = cameraUploadRepository.isCameraUploadsEnabled() &&
-            cameraUploadsState.primaryTotalUploadBytes != 0L &&
-            backup.state != BackupState.PAUSE_UPLOADS
+        cameraUploadFolderType: CameraUploadFolderType,
+    ): Boolean {
+        val isEnabled = when (cameraUploadFolderType) {
+            CameraUploadFolderType.Primary ->
+                cameraUploadRepository.isCameraUploadsEnabled()
 
-    private suspend fun shouldSendMediaUploadsHeartbeat(
-        cameraUploadsState: CameraUploadsState,
-        backup: Backup,
-    ) = cameraUploadRepository.isSecondaryMediaFolderEnabled() &&
-            cameraUploadsState.secondaryTotalUploadBytes != 0L &&
-            backup.state != BackupState.PAUSE_UPLOADS
+            CameraUploadFolderType.Secondary ->
+                cameraUploadRepository.isSecondaryMediaFolderEnabled()
+        }
+        return isEnabled &&
+                cameraUploadsFolderState.bytesToUploadCount != 0L &&
+                backup.state != BackupState.PAUSE_UPLOADS
+    }
 }

@@ -37,7 +37,6 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
@@ -132,7 +131,6 @@ class CameraUploadsWorkerTest {
     private val setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase = mock()
     private val clearSyncRecords: ClearSyncRecords = mock()
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase = mock()
-    private val getSyncRecordByPath: GetSyncRecordByPath = mock()
     private val getPendingSyncRecords: GetPendingSyncRecords = mock()
     private val compressedVideoPending: CompressedVideoPending = mock()
     private val getVideoSyncRecordsByStatus: GetVideoSyncRecordsByStatus = mock()
@@ -241,7 +239,6 @@ class CameraUploadsWorkerTest {
             setSecondaryFolderLocalPathUseCase = setSecondaryFolderLocalPathUseCase,
             clearSyncRecords = clearSyncRecords,
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
-            getSyncRecordByPath = getSyncRecordByPath,
             getPendingSyncRecords = getPendingSyncRecords,
             compressedVideoPending = compressedVideoPending,
             getVideoSyncRecordsByStatus = getVideoSyncRecordsByStatus,
