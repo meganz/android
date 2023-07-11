@@ -158,6 +158,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.ClearRubbishBinDialogFragment
 import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.StorageStatusDialogFragment
+import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -314,7 +315,6 @@ import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
@@ -665,8 +665,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
     }
-    private var isBusinessGraceAlertShown = false
-    private var businessGraceAlert: AlertDialog? = null
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var psaViewHolder: PsaViewHolder? = null
     private var openLinkDialog: AlertDialog? = null
@@ -742,11 +740,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
 
     private val fileBackupManager: FileBackupManager = initFileBackupManager()
-
-    private fun isFeatureEnabled(feature: Feature) =
-        enabledFeatures == null || enabledFeatures!!.contains(feature)
-
-    private var enabledFeatures: Set<Feature>? = null
     private var canVerifyPhoneNumber = false
 
     /**
@@ -919,7 +912,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 openLinkText?.text?.toString() ?: ""
             )
         }
-        outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown)
         outState.putInt(Constants.TYPE_CALL_PERMISSION, typesCameraPermission)
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink)
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
@@ -1971,8 +1963,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             "comesFromNotificationDeepBrowserTreeIncoming",
             Constants.INVALID_VALUE
         )
-        isBusinessGraceAlertShown =
-            savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false)
         typesCameraPermission = savedInstanceState.getInt(
             Constants.TYPE_CALL_PERMISSION,
             Constants.INVALID_TYPE_PERMISSIONS
@@ -2073,7 +2063,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.isPushNotificationSettingsUpdatedEvent) {
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
-            enabledFeatures = managerState.enabledFlags
             canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
             if (!canVerifyPhoneNumber) {
                 hideAddPhoneNumberButton()
@@ -2314,10 +2303,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (!isBusinessAccount) {
             return false
         }
-        if (isBusinessGraceAlertShown) {
-            showBusinessGraceAlert()
-            return true
-        }
         if (myAccountInfo.isBusinessAlertShown) {
             return false
         }
@@ -2337,31 +2322,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun showBusinessGraceAlert() {
-        Timber.d("showBusinessGraceAlert")
-        if (businessGraceAlert?.isShowing == true) {
-            return
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        val inflater: LayoutInflater = layoutInflater
-        val v = inflater.inflate(R.layout.dialog_business_grace_alert, null)
-        businessGraceAlert = builder.setView(v)
-            .setPositiveButton(R.string.general_dismiss) { _: DialogInterface?, _: Int ->
-                isBusinessGraceAlertShown = false
-                myAccountInfo.isBusinessAlertShown = isBusinessGraceAlertShown
-                try {
-                    businessGraceAlert?.dismiss()
-                } catch (e: Exception) {
-                    Timber.w(e, "Exception dismissing businessGraceAlert")
-                }
-            }
-            .create()
-        businessGraceAlert?.setCanceledOnTouchOutside(false)
-        try {
-            businessGraceAlert?.show()
-        } catch (e: Exception) {
-            Timber.w(e, "Exception showing businessGraceAlert")
-        }
-        isBusinessGraceAlertShown = true
+        if (supportFragmentManager.findFragmentByTag(BusinessGraceDialogFragment.TAG) != null) return
+        BusinessGraceDialogFragment().show(supportFragmentManager, BusinessGraceDialogFragment.TAG)
     }
 
     private fun openContactLink(handle: Long) {
@@ -9773,7 +9735,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         const val TRANSFERS_TAB = "TRANSFERS_TAB"
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"
-        private const val BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN"
         const val NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT"
         const val JOINING_CHAT_LINK = "JOINING_CHAT_LINK"
         const val LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK"
