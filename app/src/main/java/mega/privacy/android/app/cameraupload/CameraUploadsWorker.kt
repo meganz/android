@@ -624,9 +624,12 @@ class CameraUploadsWorker @AssistedInject constructor(
      *
      * false if both conditions are not met
      */
-    private suspend fun areFoldersEstablished(): Boolean =
-        (isPrimaryFolderEstablished() && !isSecondaryFolderEnabled()) ||
-                (isPrimaryFolderEstablished() && (isSecondaryFolderEnabled() && isSecondaryFolderEstablished()))
+    private suspend fun areFoldersEstablished(): Boolean {
+        val isPrimaryFolderEstablished = isPrimaryFolderEstablished()
+        val isSecondaryFolderEnabled = isSecondaryFolderEnabled()
+        return (isPrimaryFolderEstablished && !isSecondaryFolderEnabled) ||
+                (isPrimaryFolderEstablished && isSecondaryFolderEstablished())
+    }
 
     /**
      * Checks whether the Primary Folder is established
@@ -656,10 +659,8 @@ class CameraUploadsWorker @AssistedInject constructor(
             return false
         }
         val isSecondaryFolderInRubbish = isNodeInRubbishOrDeletedUseCase(getSecondaryFolderHandle())
-        val result =
-            !isSecondaryFolderInRubbish || (getSecondaryFolderHandle() != MegaApiJava.INVALID_HANDLE)
-        Timber.d("Secondary Folder Established $result")
-        return result
+        Timber.d("Secondary Folder Established ${!isSecondaryFolderInRubbish}")
+        return !isSecondaryFolderInRubbish
     }
 
     /**
