@@ -165,7 +165,7 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
+        activity?.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.fragment_chat_tabs, menu)
                 menu.findItem(R.id.menu_search)?.setupSearchView(viewModel::setSearchQuery)
