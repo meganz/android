@@ -431,9 +431,10 @@ class TransfersManagement @Inject constructor(
      * @param transfer  Transfer to check.
      */
     fun checkScanningTransfer(transfer: Transfer, check: Check) = synchronized(this) {
+        val transfers = scanningTransfers.toList()
         when (check) {
             Check.ON_START -> {
-                for (data in scanningTransfers) {
+                for (data in transfers) {
                     data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
                         if (!isFolder || transfer.state == TransferState.STATE_COMPLETED) {
                             removeProcessedScanningTransfer()
@@ -448,7 +449,7 @@ class TransfersManagement @Inject constructor(
             }
 
             Check.ON_UPDATE -> {
-                for (data in scanningTransfers) {
+                for (data in transfers) {
                     data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
                         if (transfer.stage == TransferStage.STAGE_TRANSFERRING_FILES
                             || transfer.state == TransferState.STATE_COMPLETED
@@ -464,7 +465,7 @@ class TransfersManagement @Inject constructor(
             }
 
             Check.ON_FINISH -> {
-                for (data in scanningTransfers) {
+                for (data in transfers) {
                     data.takeIf { it.isTheSameTransfer(transfer) }?.apply {
                         removeProcessedScanningTransfer()
                         return@synchronized
