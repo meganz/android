@@ -97,4 +97,11 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.arch.core.test)
     testImplementation(testlib.test.core.ktx)
+    testImplementation(testlib.mockito)
+    testImplementation(testlib.mockito.kotlin)
+    testImplementation(testlib.mockito.android)
+
+    testRuntimeOnly(testlib.junit.jupiter.engine)
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
 }
