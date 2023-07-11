@@ -8,8 +8,7 @@ package mega.privacy.android.domain.entity.sync
  */
 enum class SyncType {
     /**
-     * Represents an invalid Sync, equivalent to INVALID = -1. This is also returned if no
-     * matching value for MegaBackupInfo.type is found
+     * Represents an invalid Sync, equivalent to INVALID = -1 in the SDK
      */
     INVALID,
 
