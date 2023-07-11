@@ -24,7 +24,7 @@ class SyncTypeMapperTest {
         underTest = SyncTypeMapper()
     }
 
-    @ParameterizedTest(name = " when sdkType is {0}, then syncType is {1}")
+    @ParameterizedTest(name = "when sdkType is {0}, then syncType is {1}")
     @MethodSource("provideParameters")
     fun `test that the mapping is correct`(sdkType: Int, syncType: SyncType) {
         assertThat(underTest(sdkType)).isEqualTo(syncType)
