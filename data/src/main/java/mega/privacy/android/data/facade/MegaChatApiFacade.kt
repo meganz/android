@@ -66,11 +66,6 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun pushReceived(
         beep: Boolean,
-        listener: MegaChatRequestListenerInterface?,
-    ) = chatApi.pushReceived(beep, listener)
-
-    override fun pushReceived(
-        beep: Boolean,
         chatId: Long,
         listener: MegaChatRequestListenerInterface?,
     ) = chatApi.pushReceived(beep, chatId, listener)

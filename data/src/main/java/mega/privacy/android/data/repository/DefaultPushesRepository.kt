@@ -12,7 +12,6 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
-import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.PushesRepository
 import nz.mega.sdk.MegaChatError
@@ -74,18 +73,6 @@ internal class DefaultPushesRepository @Inject constructor(
             .apply()
     }
 
-    override suspend fun pushReceived(beep: Boolean): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApi.pushReceived(
-                    beep,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestPushReceivedCompleted(continuation)
-                    )
-                )
-            }
-        }
-
     override suspend fun pushReceived(beep: Boolean, chatId: Long) =
         withContext(ioDispatcher) {
             suspendCancellableCoroutine { continuation ->
@@ -109,20 +96,6 @@ internal class DefaultPushesRepository @Inject constructor(
         context.getSharedPreferences(PUSH_TOKEN, Context.MODE_PRIVATE).edit()
             .clear().apply()
     }
-
-    private fun onRequestPushReceivedCompleted(continuation: Continuation<ChatRequest>) =
-        { request: MegaChatRequest, error: MegaChatError ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("PushMessageWorker onRequestPushReceivedCompleted")
-                if (!megaApi.isEphemeralPlusPlus) {
-                    continuation.resumeWith(Result.success(chatRequestMapper(request)))
-                } else {
-                    continuation.failWithError(error, "onRequestPushReceivedCompleted")
-                }
-            } else {
-                continuation.failWithError(error, "onRequestPushReceivedCompleted")
-            }
-        }
 
     override suspend fun broadcastPushNotificationSettings() = withContext(ioDispatcher) {
         appEventGateway.broadcastPushNotificationSettings()

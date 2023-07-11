@@ -74,14 +74,6 @@ interface MegaChatApiGateway {
      * Notifies a push has been received.
      *
      * @param beep      True if should beep, false otherwise.
-     * @param listener  Listener.
-     */
-    fun pushReceived(beep: Boolean, listener: MegaChatRequestListenerInterface?)
-
-    /**
-     * Notifies a push has been received.
-     *
-     * @param beep      True if should beep, false otherwise.
      * @param chatId    Chat identifier.
      * @param listener  Listener.
      */

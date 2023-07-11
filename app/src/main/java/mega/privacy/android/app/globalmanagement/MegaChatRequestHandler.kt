@@ -7,9 +7,7 @@ import kotlinx.coroutines.launch
 import me.leolin.shortcutbadger.ShortcutBadger
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
 import mega.privacy.android.app.main.megachat.BadgeIntentService
-import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isHMS
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.psa.PsaManager
