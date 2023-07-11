@@ -41,7 +41,7 @@ class CreateChatNotificationChannelsUseCase @Inject constructor(
             newChannels.add(
                 NotificationChannelCompat.Builder(
                     NOTIFICATION_CHANNEL_CHAT_ID,
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
                 ).setName(NOTIFICATION_CHANNEL_CHAT_NAME).build()
             )
         }

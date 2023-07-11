@@ -2,7 +2,6 @@ package test.mega.privacy.android.app.fcm
 
 
 import android.content.Context
-import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -24,22 +23,18 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.fcm.CreateChatNotificationChannelsUseCase
 import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.app.notifications.ScheduledMeetingPushMessageNotification
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.domain.entity.CallsMeetingReminders
-import mega.privacy.android.domain.entity.chat.ChatMessage
-import mega.privacy.android.domain.entity.notifications.ChatMessageNotificationData
 import mega.privacy.android.domain.entity.pushes.PushMessage
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.RetryPendingConnectionsUseCase
-import mega.privacy.android.domain.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.domain.usecase.chat.IsChatNotifiableUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
@@ -76,7 +71,6 @@ class PushMessageWorkerTest {
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val scheduledMeetingPushMessageNotification =
         mock<ScheduledMeetingPushMessageNotification>()
-    private val createNotificationChannels = mock<CreateChatNotificationChannelsUseCase>()
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val notificationManager = mock<NotificationManagerCompat>()
     private val isChatNotifiableUseCase = mock<IsChatNotifiableUseCase>()
@@ -126,7 +120,6 @@ class PushMessageWorkerTest {
             pushMessageMapper = pushMessageMapper,
             initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             scheduledMeetingPushMessageNotification = scheduledMeetingPushMessageNotification,
-            createNotificationChannels = createNotificationChannels,
             callsPreferencesGateway = callsPreferencesGateway,
             notificationManager = notificationManager,
             isChatNotifiableUseCase = isChatNotifiableUseCase,

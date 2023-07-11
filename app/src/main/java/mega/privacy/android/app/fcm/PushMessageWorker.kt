@@ -61,7 +61,6 @@ class PushMessageWorker @AssistedInject constructor(
     private val pushMessageMapper: PushMessageMapper,
     private val initialiseMegaChatUseCase: InitialiseMegaChatUseCase,
     private val scheduledMeetingPushMessageNotification: ScheduledMeetingPushMessageNotification,
-    private val createNotificationChannels: CreateChatNotificationChannelsUseCase,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val notificationManager: NotificationManagerCompat,
     private val isChatNotifiableUseCase: IsChatNotifiableUseCase,
@@ -72,102 +71,91 @@ class PushMessageWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     @SuppressLint("MissingPermission")
-    override suspend fun doWork(): Result =
-        withContext(ioDispatcher) {
-            // legacy support, other places need to know logging in happen
-            if (MegaApplication.isLoggingIn) {
-                Timber.w("Logging already running.")
-                return@withContext Result.failure()
-            }
-
-            MegaApplication.isLoggingIn = true
-            val loginResult = runCatching { backgroundFastLoginUseCase() }
-            MegaApplication.isLoggingIn = false
-
-            if (loginResult.isSuccess) {
-                Timber.d("Fast login success.")
-                runCatching { retryPendingConnectionsUseCase(disconnect = false) }
-                    .recoverCatching { error ->
-                        if (error is ChatNotInitializedErrorStatus) {
-                            Timber.d("chat engine not ready. try to initialise megachat.")
-                            initialiseMegaChatUseCase(loginResult.getOrDefault(""))
-                        } else {
-                            Timber.w(error)
-                        }
-                    }.onFailure { error ->
-                        Timber.e("Initialise MEGAChat failed: $error")
-                        return@withContext Result.failure()
-                    }
-            } else {
-                Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
-                return@withContext Result.failure()
-            }
-
-            createChatNotificationChannels()
-
-            when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
-                is ChatPushMessage -> {
-                    with(pushMessage) {
-                        Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msgId")
-
-                        if (chatId == -1L || msgId == -1L) {
-                            Timber.d("Message should be managed in onChatNotification")
-                            return@withContext Result.success()
-                        }
-
-                        runCatching {
-                            pushReceivedUseCase(shouldBeep, chatId)
-                        }.onSuccess {
-                            if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
-                                return@with
-
-                            val data = getChatMessageNotificationDataUseCase(
-                                shouldBeep,
-                                chatId,
-                                msgId,
-                                DEFAULT_NOTIFICATION_URI.toString()
-                            ) ?: return@withContext Result.failure()
-
-                            ChatMessageNotification.show(
-                                applicationContext,
-                                data,
-                                fileDurationMapper
-                            )
-                        }.onFailure { error ->
-                            Timber.e(error)
-                            return@withContext Result.failure()
-                        }
-                    }
-                }
-
-                is ScheduledMeetingPushMessage -> {
-                    if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
-                        runCatching {
-                            scheduledMeetingPushMessageNotification.show(
-                                applicationContext,
-                                pushMessage.updateTitle()
-                            )
-                        }.onFailure { error ->
-                            Timber.e(error)
-                            return@withContext Result.failure()
-                        }
-                    }
-                }
-
-                else -> {
-                    Timber.w("Unsupported Push Message type")
-                }
-            }
-
-            Result.success()
+    override suspend fun doWork(): Result = withContext(ioDispatcher) {
+        // legacy support, other places need to know logging in happen
+        if (MegaApplication.isLoggingIn) {
+            Timber.w("Logging already running.")
+            return@withContext Result.failure()
         }
 
-    /**
-     * Create chat notification channels if needed
-     */
-    private fun createChatNotificationChannels() {
-        runCatching { createNotificationChannels.invoke() }
-            .onFailure(Timber.Forest::e)
+        MegaApplication.isLoggingIn = true
+        val loginResult = runCatching { backgroundFastLoginUseCase() }
+        MegaApplication.isLoggingIn = false
+
+        if (loginResult.isSuccess) {
+            Timber.d("Fast login success.")
+            runCatching { retryPendingConnectionsUseCase(disconnect = false) }
+                .recoverCatching { error ->
+                    if (error is ChatNotInitializedErrorStatus) {
+                        Timber.d("chat engine not ready. try to initialise megachat.")
+                        initialiseMegaChatUseCase(loginResult.getOrDefault(""))
+                    } else {
+                        Timber.w(error)
+                    }
+                }.onFailure { error ->
+                    Timber.e("Initialise MEGAChat failed: $error")
+                    return@withContext Result.failure()
+                }
+        } else {
+            Timber.e("Fast login error: ${loginResult.exceptionOrNull()}")
+            return@withContext Result.failure()
+        }
+
+        when (val pushMessage = getPushMessageFromWorkerData(inputData)) {
+            is ChatPushMessage -> {
+                with(pushMessage) {
+                    Timber.d("Should beep: $shouldBeep, Chat: $chatId, message: $msgId")
+
+                    if (chatId == -1L || msgId == -1L) {
+                        Timber.d("Message should be managed in onChatNotification")
+                        return@withContext Result.success()
+                    }
+
+                    runCatching {
+                        pushReceivedUseCase(shouldBeep, chatId)
+                    }.onSuccess {
+                        if (!isChatNotifiableUseCase(chatId) || !areNotificationsEnabled())
+                            return@with
+
+                        val data = getChatMessageNotificationDataUseCase(
+                            shouldBeep,
+                            chatId,
+                            msgId,
+                            DEFAULT_NOTIFICATION_URI.toString()
+                        ) ?: return@withContext Result.failure()
+
+                        ChatMessageNotification.show(
+                            applicationContext,
+                            data,
+                            fileDurationMapper
+                        )
+                    }.onFailure { error ->
+                        Timber.e(error)
+                        return@withContext Result.failure()
+                    }
+                }
+            }
+
+            is ScheduledMeetingPushMessage -> {
+                if (areNotificationsEnabled() && areMeetingRemindersEnabled()) {
+                    runCatching {
+                        scheduledMeetingPushMessageNotification.show(
+                            applicationContext,
+                            pushMessage.updateTitle()
+                        )
+                    }.onFailure { error ->
+                        Timber.e(error)
+                        return@withContext Result.failure()
+                    }
+                }
+            }
+
+            else -> {
+                Timber.w("Unsupported Push Message type")
+            }
+        }
+
+        Result.success()
     }
 
     /**

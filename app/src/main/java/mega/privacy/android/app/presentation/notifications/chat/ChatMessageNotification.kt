@@ -92,19 +92,6 @@ internal object ChatMessageNotification {
                 Util.getCircleBitmap(it)
             }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                Constants.NOTIFICATION_CHANNEL_CHAT_ID,
-                Constants.NOTIFICATION_CHANNEL_CHAT_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                setShowBadge(true)
-                enableVibration(false)
-            }
-
-            notificationManager.createNotificationChannel(channel)
-        }
-
         val messagingStyleContent = NotificationCompat.MessagingStyle(
             Person.Builder().apply { setName(title) }.build()
         ).also {

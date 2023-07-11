@@ -21,8 +21,11 @@ import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
+import mega.privacy.android.app.fcm.CreateChatNotificationChannelsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
@@ -50,6 +53,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -122,6 +126,14 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     lateinit var getCallSoundsUseCase: GetCallSoundsUseCase
+
+
+    @ApplicationScope
+    @Inject
+    lateinit var applicationScope: CoroutineScope
+
+    @Inject
+    lateinit var createNotificationChannelsUseCase: CreateChatNotificationChannelsUseCase
 
     @Inject
     lateinit var themeModeState: ThemeModeState
@@ -235,6 +247,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         ContextUtils.initialize(applicationContext)
 
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
+
+        applicationScope.launch { createNotificationChannelsUseCase() }
     }
 
     override fun newImageLoader(): ImageLoader {
