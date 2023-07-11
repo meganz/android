@@ -412,7 +412,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 if (state.value.isWeekdays()) OccurrenceFrequencyType.Weekly else state.value.rulesSelected.freq
 
             val newUntil =
-                if (state.value.rulesSelected.until < state.value.startDate.toEpochSecond()) state.value.startDate.toEpochSecond() else state.value.rulesSelected.until
+                if (state.value.rulesSelected.until > 0 && state.value.rulesSelected.until < state.value.startDate.toEpochSecond()) state.value.startDate.toEpochSecond() else state.value.rulesSelected.until
 
             _state.update { state ->
                 state.copy(
@@ -429,6 +429,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             sendEmails = state.enabledSendCalendarInviteOption,
                             isEmpty = false
                         )
+
+                        Timber.d("Rules selected: ${state.rulesSelected}")
 
                         createChatroomAndSchedMeetingUseCase(
                             peerList = state.getParticipantsIds(),
@@ -453,6 +455,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                         state.copy(isCreatingMeeting = false)
                     }
                 }.onSuccess {
+                    Timber.d("Scheduled meeting created")
+                    _state.update { state ->
+                        state.copy(isCreatingMeeting = false)
+                    }
+
                     it.chatHandle?.let { id ->
                         if (state.value.enabledMeetingLinkOption) {
                             createMeetingLink(id)
@@ -752,6 +759,7 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             (newRules.freq == OccurrenceFrequencyType.Monthly && newMonthDayOption != -1)
                     )
 
+            Timber.d("Check valid recurrence: $isValidRecurrence. Current rules ${state.rulesSelected}, new rules $newRules")
 
             state.copy(
                 customRecurrenceState = state.customRecurrenceState.copy(
