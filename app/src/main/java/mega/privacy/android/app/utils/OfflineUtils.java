@@ -603,6 +603,12 @@ public class OfflineUtils {
         Timber.d("Test insert C: %s", checkInsert);
     }
 
+    /**
+     * existsOffline
+     * @param context current context
+     * @deprecated Use HasOfflineFilesUseCase instead
+     */
+    @Deprecated
     public static boolean existsOffline(Context context) {
         File offlineFolder = OfflineUtils.getOfflineFolder(context, OFFLINE_DIR);
         return isFileAvailable(offlineFolder)
