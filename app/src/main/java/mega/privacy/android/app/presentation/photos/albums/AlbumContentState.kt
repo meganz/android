@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.photos.albums
 
 data class AlbumContentState(
+    val isLoadingPhotos: Boolean = true,
     val isAddingPhotos: Boolean = false,
     val totalAddedPhotos: Int = 0,
     /** A temporary field to support compatibility between view and compose architecture. */

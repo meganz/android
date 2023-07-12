@@ -114,7 +114,7 @@ fun AlbumContentScreen(
         albumsState.currentMediaType,
         albumsState.currentSort,
     ) {
-        albumsState.currentAlbum?.let { album ->
+        val photos = albumsState.currentAlbum?.let { album ->
             val sourcePhotos = albumsState.albums.getAlbumPhotos(album)
             if (sourcePhotos.isFilterable()) {
                 sourcePhotos
@@ -127,6 +127,9 @@ fun AlbumContentScreen(
                     .applySortBy(currentSort = albumsState.currentSort)
             }
         }.orEmpty()
+
+        albumContentViewModel.setIsLoadingCompleted()
+        photos
     }
 
     if (albumsState.showDeleteAlbumsConfirmation) {
@@ -173,7 +176,7 @@ fun AlbumContentScreen(
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {
                 MegaLinearProgressIndicator()
             }
-        } else if (albumContentState.isAddingPhotos) {
+        } else if (albumContentState.isLoadingPhotos || albumContentState.isAddingPhotos) {
             MegaCircularProgressIndicator(
                 modifier = Modifier
                     .size(44.dp)

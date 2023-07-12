@@ -30,6 +30,12 @@ class AlbumContentViewModel @Inject constructor(
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
 
+    fun setIsLoadingCompleted() {
+        _state.update {
+            it.copy(isLoadingPhotos = false)
+        }
+    }
+
     fun observePhotosRemovingProgress(albumId: AlbumId) {
         observeAlbumPhotosRemovingProgress(albumId)
             .onEach(::handlePhotosRemovingProgress)
