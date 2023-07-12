@@ -107,19 +107,15 @@ import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathVali
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ReportUploadFinishedUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ReportUploadInterruptedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStateUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -205,13 +201,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
-    private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase,
-    private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase,
-    private val updateCameraUploadsBackupUseCase: UpdateCameraUploadsBackupUseCase,
-    private val updateMediaUploadsBackupUseCase: UpdateMediaUploadsBackupUseCase,
+    private val updateCameraUploadsBackupStateUseCase: UpdateCameraUploadsBackupStateUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
-    private val reportUploadFinishedUseCase: ReportUploadFinishedUseCase,
-    private val reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase,
+    private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase,
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
     private val completedTransferMapper: LegacyCompletedTransferMapper,
     private val setCoordinatesUseCase: SetCoordinatesUseCase,
@@ -1033,16 +1025,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun onQueueComplete() {
         Timber.d("Stopping foreground!")
         resetTotalUploadsUseCase()
-        with(cameraUploadState) {
-            resetUploadsCounts()
-            updateLastTimestamp()
-            reportUploadFinishedUseCase(
-                lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
-                lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
-                lastPrimaryTimestamp = primaryCameraUploadsState.lastTimestamp,
-                lastSecondaryTimestamp = secondaryCameraUploadsState.lastTimestamp,
-            )
-        }
+        cameraUploadState.resetUploadsCounts()
     }
 
     /**
@@ -1286,17 +1269,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         updateBackupState(BackupState.TEMPORARILY_DISABLED)
 
         // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
-        with(cameraUploadState) {
-            updateLastTimestamp()
-            reportUploadInterruptedUseCase(
-                pendingPrimaryUploads = primaryCameraUploadsState.pendingCount,
-                pendingSecondaryUploads = secondaryCameraUploadsState.pendingCount,
-                lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
-                lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
-                lastPrimaryTimestamp = primaryCameraUploadsState.lastTimestamp,
-                lastSecondaryTimestamp = secondaryCameraUploadsState.lastTimestamp,
-            )
-        }
+        updateBackupHeartbeatStatus(HeartbeatStatus.INACTIVE)
     }
 
     /**
@@ -1307,14 +1280,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun sendTransfersUpToDateInfoToBackupCenter() {
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
-        sendCameraUploadsBackupHeartBeatUseCase(
-            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-            lastNodeHandle = cameraUploadState.primaryCameraUploadsState.lastHandle,
-        )
-        sendMediaUploadsBackupHeartBeatUseCase(
-            heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
-            lastNodeHandle = cameraUploadState.secondaryCameraUploadsState.lastHandle,
-        )
+        updateBackupHeartbeatStatus(HeartbeatStatus.UP_TO_DATE)
     }
 
     private fun cancelNotification() {
@@ -1908,15 +1874,24 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  @param backupState
      */
     private suspend fun updateBackupState(backupState: BackupState) {
-        updateCameraUploadsBackupUseCase(
-            context.getString(R.string.section_photo_sync),
-            backupState
-        )
-
-        updateMediaUploadsBackupUseCase(
-            context.getString(R.string.section_secondary_media_uploads),
-            backupState
+        updateCameraUploadsBackupStateUseCase(
+            backupState = backupState,
+            primaryFolderName = context.getString(R.string.section_photo_sync),
+            secondaryFolderName = context.getString(R.string.section_secondary_media_uploads)
         )
         updateLastTimestamp()
+    }
+
+    /**
+     * Update the backup heartbeat status
+     *
+     * @param heartbeatStatus
+     */
+    private suspend fun updateBackupHeartbeatStatus(heartbeatStatus: HeartbeatStatus) {
+        updateLastTimestamp()
+        updateCameraUploadsBackupHeartbeatStatusUseCase(
+            heartbeatStatus = heartbeatStatus,
+            cameraUploadsState = cameraUploadState,
+        )
     }
 }

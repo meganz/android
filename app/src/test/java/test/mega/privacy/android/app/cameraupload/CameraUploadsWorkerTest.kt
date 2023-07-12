@@ -65,19 +65,15 @@ import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathVali
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessMediaForUploadUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ReportUploadFinishedUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ReportUploadInterruptedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendBackupHeartBeatSyncUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetOriginalFingerprintUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateMediaUploadsBackupUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStateUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -174,15 +170,9 @@ class CameraUploadsWorkerTest {
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase =
         mock()
-    private val sendCameraUploadsBackupHeartBeatUseCase: SendCameraUploadsBackupHeartBeatUseCase =
-        mock()
-    private val sendMediaUploadsBackupHeartBeatUseCase: SendMediaUploadsBackupHeartBeatUseCase =
-        mock()
-    private val updateCameraUploadsBackupUseCase: UpdateCameraUploadsBackupUseCase = mock()
-    private val updateMediaUploadsBackupUseCase: UpdateMediaUploadsBackupUseCase = mock()
+    private val updateCameraUploadsBackupStateUseCase: UpdateCameraUploadsBackupStateUseCase = mock()
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase = mock()
-    private val reportUploadFinishedUseCase: ReportUploadFinishedUseCase = mock()
-    private val reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase = mock()
+    private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase = mock()
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase = mock()
     private val completedTransferMapper: LegacyCompletedTransferMapper = mock()
     private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
@@ -279,13 +269,9 @@ class CameraUploadsWorkerTest {
             broadcastCameraUploadProgress = broadcastCameraUploadProgress,
             scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
             createTempFileAndRemoveCoordinatesUseCase = createTempFileAndRemoveCoordinatesUseCase,
-            sendCameraUploadsBackupHeartBeatUseCase = sendCameraUploadsBackupHeartBeatUseCase,
-            sendMediaUploadsBackupHeartBeatUseCase = sendMediaUploadsBackupHeartBeatUseCase,
-            updateCameraUploadsBackupUseCase = updateCameraUploadsBackupUseCase,
-            updateMediaUploadsBackupUseCase = updateMediaUploadsBackupUseCase,
+            updateCameraUploadsBackupStateUseCase = updateCameraUploadsBackupStateUseCase,
             sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,
-            reportUploadFinishedUseCase = reportUploadFinishedUseCase,
-            reportUploadInterruptedUseCase = reportUploadInterruptedUseCase,
+            updateCameraUploadsBackupHeartbeatStatusUseCase = updateCameraUploadsBackupHeartbeatStatusUseCase,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
             completedTransferMapper = completedTransferMapper,
             setCoordinatesUseCase = setCoordinatesUseCase,
