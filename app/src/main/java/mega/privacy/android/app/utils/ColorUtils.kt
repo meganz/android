@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import com.google.android.material.R as MaterialR
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -7,7 +8,6 @@ import android.graphics.Color
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.os.Build.VERSION_CODES
 import android.view.View
 import android.view.Window
 import android.view.WindowInsetsController
@@ -18,7 +18,6 @@ import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatDrawableManager
 import androidx.appcompat.widget.DrawableUtils
 import androidx.core.content.ContextCompat
@@ -28,7 +27,6 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.MaterialShapeUtils
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
-import com.google.android.material.R as MaterialR
 import kotlin.math.roundToInt
 
 
@@ -157,7 +155,6 @@ object ColorUtils {
      * @param elevation Elevation value of the view
      */
     @JvmStatic
-    @RequiresApi(VERSION_CODES.LOLLIPOP)
     fun View.setElevationWithColor(elevation: Float) {
         if (elevation != 0F) {
             setBackgroundColor(getColorForElevation(context, elevation))
