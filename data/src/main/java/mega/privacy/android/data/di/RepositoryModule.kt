@@ -36,6 +36,7 @@ import mega.privacy.android.data.repository.DefaultTimeSystemRepository
 import mega.privacy.android.data.repository.DefaultTransfersRepository
 import mega.privacy.android.data.repository.DefaultVerificationRepository
 import mega.privacy.android.data.repository.EnvironmentRepositoryImpl
+import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
@@ -63,6 +64,7 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.FeatureFlagRepository
+import mega.privacy.android.domain.repository.FileLinkRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
@@ -235,5 +237,8 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindCancelTokenRepository(implementation: DefaultCancelTokenRepository): CancelTokenRepository
+
+    @Binds
+    abstract fun bindFileLinkRepository(implementation: FileLinkRepositoryImpl): FileLinkRepository
 
 }
