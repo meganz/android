@@ -314,7 +314,7 @@
             android:name=".presentation.testpassword.TestPasswordActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".main.FileLinkActivity"
+            android:name=".presentation.filelink.FileLinkActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".OpenPasswordLinkActivity"

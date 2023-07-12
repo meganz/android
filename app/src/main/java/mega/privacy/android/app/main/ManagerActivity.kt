@@ -189,6 +189,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.inbox.InboxFragment

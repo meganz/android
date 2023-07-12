@@ -81,7 +81,9 @@
 
 
 
-    <include layout="@layout/content_file_link_info_activity" />
+    <include
+        android:id="@+id/content_file_link"
+        layout="@layout/content_file_link_info_activity" />
     <!--Buttons-->
     <RelativeLayout
         android:id="@+id/buttons_layout"

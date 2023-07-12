@@ -26,7 +26,7 @@ import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
-import mega.privacy.android.app.main.FileLinkActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity

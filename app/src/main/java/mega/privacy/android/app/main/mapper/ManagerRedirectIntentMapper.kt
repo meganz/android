@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
-import mega.privacy.android.app.main.FileLinkActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.login.LoginActivity
