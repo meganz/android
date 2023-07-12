@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main.adapters;
 
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
@@ -97,7 +95,7 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             int position = getAdapterPosition();
             if (callback != null && position >= 0 && position < contactData.size()) {
                 InvitationContactInfo invitationContactInfo = contactData.get(position);
-                if (invitationContactInfo.getType() == TYPE_MEGA_CONTACT || invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
+                if (invitationContactInfo.getType() == TYPE_PHONE_CONTACT) {
                     if (!invitationContactInfo.hasMultipleContactInfos()) {
                         boolean isSelected = !invitationContactInfo.isHighlighted();
                         invitationContactInfo.setHighlighted(isSelected);
@@ -149,10 +147,8 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
     @Override
     public ViewHolderPhoneContacts onCreateViewHolder(ViewGroup parentView, int viewType) {
         switch (viewType) {
-            case TYPE_MEGA_CONTACT_HEADER:
             case TYPE_PHONE_CONTACT_HEADER:
                 return createHeaderHolder(parentView);
-            case TYPE_MEGA_CONTACT:
             case TYPE_PHONE_CONTACT:
             default:
                 return createContactHolder(parentView);
@@ -166,16 +162,8 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
             return;
 
         switch (contact.getType()) {
-            case TYPE_MEGA_CONTACT_HEADER:
-            case TYPE_PHONE_CONTACT_HEADER:
-                bindHeader(holder, contact);
-                break;
-            case TYPE_PHONE_CONTACT:
-                bindContact(holder, contact, false);
-                break;
-            case TYPE_MEGA_CONTACT:
-                bindContact(holder, contact, true);
-                break;
+            case TYPE_PHONE_CONTACT_HEADER -> bindHeader(holder, contact);
+            case TYPE_PHONE_CONTACT -> bindContact(holder, contact, false);
         }
     }
 
@@ -254,14 +242,6 @@ public class InvitationContactsAdapter extends RecyclerView.Adapter<InvitationCo
         Bitmap image = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_chat_avatar_select);
         if (image != null) {
             imageView.setImageBitmap(image);
-        }
-    }
-
-    private void setItemNormal(View view, Bitmap bitmap) {
-        Timber.d("setItemNormal");
-        if (bitmap != null) {
-            ImageView imageView = view.findViewById(R.id.contact_explorer_thumbnail);
-            imageView.setImageBitmap(bitmap);
         }
     }
 

@@ -731,11 +731,6 @@ interface MegaLocalStorageGateway {
     suspend fun clearBackups()
 
     /**
-     * Clear MegaContacts.
-     */
-    suspend fun clearMegaContacts()
-
-    /**
      * Load offline nodes
      *
      * @param path

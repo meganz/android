@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -886,7 +885,6 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).deleteAllSyncRecordsTypeAny()
             verify(localStorageGateway).clearChatSettings()
             verify(localStorageGateway).clearBackups()
-            verify(localStorageGateway).clearMegaContacts()
         }
 
     @Test

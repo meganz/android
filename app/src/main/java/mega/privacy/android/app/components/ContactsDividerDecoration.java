@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 
 public class ContactsDividerDecoration extends HeaderItemDecoration {
@@ -17,7 +16,7 @@ public class ContactsDividerDecoration extends HeaderItemDecoration {
 
     @Override
     protected void drawDivider(Canvas c, RecyclerView parent, View child, int viewType) {
-        if (viewType != TYPE_MEGA_CONTACT_HEADER && viewType != TYPE_PHONE_CONTACT_HEADER) {
+        if (viewType != TYPE_PHONE_CONTACT_HEADER) {
             drawDivider(c, parent, child);
         }
     }

@@ -636,7 +636,6 @@ internal class DefaultAccountRepository @Inject constructor(
             deleteAllSyncRecordsTypeAny()
             clearChatSettings()
             clearBackups()
-            clearMegaContacts()
         }
 
         callsPreferencesGateway.clearPreferences()

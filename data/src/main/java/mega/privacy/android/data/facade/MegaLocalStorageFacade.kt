@@ -406,8 +406,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearBackups() = dbHandler.clearBackups()
 
-    override suspend fun clearMegaContacts() = dbHandler.clearMegaContacts()
-
     override suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,

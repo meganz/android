@@ -215,7 +215,6 @@ interface DatabaseHandler {
     fun saveMyEmail(email: String?)
     fun saveMyFirstName(firstName: String?)
     fun saveMyLastName(lastName: String?)
-    fun clearMegaContacts()
     fun shouldAskForDisplayOver(): Boolean
     fun dontAskForDisplayOver()
     fun setNotificationSoundChat(sound: String?)

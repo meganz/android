@@ -2,10 +2,8 @@ package mega.privacy.android.app.main;
 
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_EMAIL;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MANUAL_INPUT_PHONE;
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT;
-import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_MEGA_CONTACT_HEADER;
 import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT;
-import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.main.InvitationContactInfo.TYPE_PHONE_CONTACT_HEADER;
 import static mega.privacy.android.app.utils.CallUtil.isNecessaryDisableLocalCamera;
 import static mega.privacy.android.app.utils.CallUtil.showConfirmationOpenCamera;
 import static mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR;
@@ -77,10 +75,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.AndroidEntryPoint;
-import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.ContactInfoListDialog;
@@ -90,10 +85,8 @@ import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
-import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
 import mega.privacy.android.app.utils.contacts.ContactsUtil;
-import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -103,14 +96,10 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener, MegaContactGetter.MegaContactUpdater {
-
-    @Inject
-    LegacyDatabaseHandler dbH;
+public class InviteContactActivity extends PasscodeActivity implements ContactInfoListDialog.OnMultipleSelectedListener, MegaRequestListenerInterface, InvitationContactsAdapter.OnItemClickListener, View.OnClickListener, TextWatcher, TextView.OnEditorActionListener {
 
     public static final int SCAN_QR_FOR_INVITE_CONTACTS = 1111;
     private static final String KEY_PHONE_CONTACTS = "KEY_PHONE_CONTACTS";
-    private static final String KEY_MEGA_CONTACTS = "KEY_MEGA_CONTACTS";
     private static final String KEY_ADDED_CONTACTS = "KEY_ADDED_CONTACTS";
     private static final String KEY_FILTERED_CONTACTS = "KEY_FILTERED_CONTACTS";
     private static final String KEY_TOTAL_CONTACTS = "KEY_TOTAL_CONTACTS";
@@ -120,7 +109,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private static final String CHECKED_INDEX = "CHECKED_INDEX";
     private static final String SELECTED_CONTACT_INFO = "SELECTED_CONTACT_INFO";
     private static final String UNSELECTED = "UNSELECTED";
-    private static final int ID_MEGA_CONTACTS_HEADER = -2;
     private static final int ID_PHONE_CONTACTS_HEADER = -1;
     private static final int USER_INDEX_NONE_EXIST = -1;
     private static final int MIN_LIST_SIZE_FOR_FAST_SCROLLER = 20;
@@ -141,7 +129,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private String inputString;
     private int defaultLocalContactAvatarColor;
     private InvitationContactsAdapter invitationContactsAdapter;
-    private ArrayList<InvitationContactInfo> phoneContacts, megaContacts, addedContacts, filteredContacts, totalContacts;
+    private ArrayList<InvitationContactInfo> phoneContacts, addedContacts, filteredContacts, totalContacts;
     private FilterContactsTask filterContactsTask;
     private FastScroller fastScroller;
     private FloatingActionButton fabButton;
@@ -150,8 +138,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private LinearLayout itemContainer;
     private Handler handler;
     private LayoutInflater inflater;
-    private boolean isGettingLocalContact, isGettingMegaContact, isPermissionGranted, isGetContactCompleted;
-    private MegaContactGetter megaContactGetter;
+    private boolean isGettingLocalContact, isPermissionGranted, isGetContactCompleted;
     private String contactLink;
 
     private ArrayList<String> contactsEmailsSelected, contactsPhoneSelected;
@@ -202,12 +189,8 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         addedContacts = new ArrayList<>();
         filteredContacts = new ArrayList<>();
         totalContacts = new ArrayList<>();
-        megaContacts = new ArrayList<>();
         contactsEmailsSelected = new ArrayList<>();
         contactsPhoneSelected = new ArrayList<>();
-
-        megaContactGetter = new MegaContactGetter(context);
-        megaContactGetter.setMegaContactUpdater(InviteContactActivity.this);
 
         Toolbar tB = findViewById(R.id.invite_contact_toolbar);
         tB.setVisibility(View.VISIBLE);
@@ -276,7 +259,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         if (isGetContactCompleted) {
             if (savedInstanceState != null) {
                 phoneContacts = savedInstanceState.getParcelableArrayList(KEY_PHONE_CONTACTS);
-                megaContacts = savedInstanceState.getParcelableArrayList(KEY_MEGA_CONTACTS);
                 addedContacts = savedInstanceState.getParcelableArrayList(KEY_ADDED_CONTACTS);
                 filteredContacts = savedInstanceState.getParcelableArrayList(KEY_FILTERED_CONTACTS);
                 totalContacts = savedInstanceState.getParcelableArrayList(KEY_TOTAL_CONTACTS);
@@ -319,17 +301,17 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
         MegaRequestListenerInterface getContactLinkCallback = new MegaRequestListenerInterface() {
             @Override
-            public void onRequestStart(MegaApiJava api, MegaRequest request) {
+            public void onRequestStart(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
             }
 
             @Override
-            public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+            public void onRequestUpdate(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
             }
 
             @Override
-            public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+            public void onRequestFinish(@NonNull MegaApiJava api, MegaRequest request, @NonNull MegaError e) {
                 if (request.getType() == MegaRequest.TYPE_CONTACT_LINK_CREATE && e.getErrorCode() == MegaError.API_OK) {
                     contactLink = CONTACT_LINK_BASE_URL + MegaApiAndroid.handleToBase64(request.getNodeHandle());
                 } else {
@@ -339,7 +321,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             }
 
             @Override
-            public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+            public void onRequestTemporaryError(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError e) {
                 Timber.w("Create contact link temp error.");
                 contactLink = "";
             }
@@ -388,35 +370,10 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     @Override
-    public synchronized void onFinish(List<MegaContactGetter.MegaContact> contacts) {
-        isGettingMegaContact = false;
-        isGetContactCompleted = true;
-        clearLists();
-        megaContacts.addAll(megaContactToContactInfo(contacts));
-        fillUpLists();
-        onGetContactCompleted();
-    }
-
-    @Override
-    public void onException(int errorCode, String requestString) {
-        isGettingMegaContact = false;
-        isGetContactCompleted = true;
-        onGetContactCompleted();
-    }
-
-    @Override
-    public void noContacts() {
-        isGettingMegaContact = false;
-        isGetContactCompleted = true;
-        onGetContactCompleted();
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         Timber.d("onSaveInstanceState");
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_PHONE_CONTACTS, phoneContacts);
-        outState.putParcelableArrayList(KEY_MEGA_CONTACTS, megaContacts);
         outState.putParcelableArrayList(KEY_ADDED_CONTACTS, addedContacts);
         outState.putParcelableArrayList(KEY_FILTERED_CONTACTS, filteredContacts);
         outState.putParcelableArrayList(KEY_TOTAL_CONTACTS, totalContacts);
@@ -743,7 +700,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             id = select.getId();
             addedContacts.remove(select);
         }
-        controlHighlited(id);
+        controlHighlighted(id);
         refreshComponents(selected.size() > toRemove.size());
     }
 
@@ -785,39 +742,15 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         handler.postDelayed(() -> scrollView.fullScroll(android.view.View.FOCUS_RIGHT), 100);
     }
 
-    private ArrayList<InvitationContactInfo> megaContactToContactInfo(List<MegaContactGetter.MegaContact> megaContacts) {
-        Timber.d("megaContactToContactInfo %s", megaContacts.size());
-        ArrayList<InvitationContactInfo> result = new ArrayList<>();
-        if (megaContacts.size() > 0) {
-            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER);
-            result.add(megaContactHeader);
-        } else {
-            return result;
-        }
-
-        for (MegaContactGetter.MegaContact contact : megaContacts) {
-            long id = contact.getHandle();
-            String name = contact.getLocalName();
-            String email = contact.getEmail();
-            String handle = contact.getId();
-            InvitationContactInfo info = new InvitationContactInfo(id, name, TYPE_MEGA_CONTACT, null, email, getColorAvatar(handle));
-            info.setHandle(handle);
-            result.add(info);
-        }
-
-        return result;
-    }
-
     private ArrayList<InvitationContactInfo> localContactToContactInfo(List<ContactsUtil.LocalContact> localContacts) {
         Timber.d("megaContactToContactInfo %s", localContacts.size());
         ArrayList<InvitationContactInfo> result = new ArrayList<>();
         if (localContacts.size() > 0) {
-            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER);
+            InvitationContactInfo megaContactHeader = new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_PHONE_CONTACT_HEADER);
             result.add(megaContactHeader);
         } else {
             return result;
         }
-        List<MegaContactGetter.MegaContact> megaContacts = dbH.getMegaContacts();
         for (ContactsUtil.LocalContact contact : localContacts) {
             long id = contact.getId();
             String name = contact.getName();
@@ -825,14 +758,11 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             int phoneCount = phoneNumberList.size();
             List<String> emailList = contact.getEmailList();
             int emailCount = emailList.size();
-            ContactsFilter.filterOutMegaUsers(this, megaContacts, phoneNumberList);
-            ContactsFilter.filterOutMegaUsers(this, megaContacts, emailList);
             // if the local contact has any phone number or email found on MEGA, ignore it.
             if (phoneNumberList.size() < phoneCount || emailList.size() < emailCount) {
                 continue;
             }
 
-            ContactsFilter.filterOutMyself(megaApi, emailList);
             ContactsFilter.filterOutContacts(megaApi, emailList);
             ContactsFilter.filterOutPendingContacts(megaApi, emailList);
             phoneNumberList.addAll(emailList);
@@ -845,14 +775,8 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         return result;
     }
 
-    private void getMegaContact() {
-        //clear cache
-        isGettingMegaContact = true;
-        megaContactGetter.getMegaContacts(megaApi, TimeUtils.DAY, this);
-    }
-
     private void onGetContactCompleted() {
-        if (isGettingLocalContact || isGettingMegaContact) {
+        if (isGettingLocalContact) {
             return;
         }
         progressBar.setVisibility(View.GONE);
@@ -878,7 +802,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
             //add new value
             List<ContactsUtil.LocalContact> rawLocalContacts = ContactsUtil.getLocalContactList(getBaseContext());
-            filteredContacts.addAll(megaContacts);
             phoneContacts.addAll(localContactToContactInfo(rawLocalContacts));
             filteredContacts.addAll(phoneContacts);
 
@@ -892,12 +815,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
             Timber.d("onPostExecute GetPhoneContactsTask");
             isGettingLocalContact = false;
             onGetContactCompleted();
-            // no need to invite the contacts that has already been on MEGA to get invitation bonus.
-            if (!fromAchievement) {
-                getMegaContact();
-            } else {
-                isGetContactCompleted = true;
-            }
         }
     }
 
@@ -908,7 +825,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         protected Void doInBackground(Void... voids) {
             Timber.d("FilterContactsTask doInBackground");
             String query = inputString == null ? null : inputString.toLowerCase();
-            ArrayList<InvitationContactInfo> megaContacts = new ArrayList<>();
             ArrayList<InvitationContactInfo> phoneContacts = new ArrayList<>();
 
             if (query != null && !query.equals("")) {
@@ -922,20 +838,14 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                     if (name.contains(query) || displayLabel.contains(query) || nameWithoutSpace.contains(query)) {
                         if (type == TYPE_PHONE_CONTACT) {
                             phoneContacts.add(invitationContactInfo);
-                        } else if (type == TYPE_MEGA_CONTACT) {
-                            megaContacts.add(invitationContactInfo);
-                        }
+                        } 
                     }
                 }
                 filteredContacts.clear();
 
                 //add header
-                if (megaContacts.size() > 0) {
-                    filteredContacts.add(new InvitationContactInfo(ID_MEGA_CONTACTS_HEADER, getString(R.string.contacts_mega), TYPE_MEGA_CONTACT_HEADER));
-                    filteredContacts.addAll(megaContacts);
-                }
                 if (phoneContacts.size() > 0) {
-                    filteredContacts.add(new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_MEGA_CONTACT_HEADER));
+                    filteredContacts.add(new InvitationContactInfo(ID_PHONE_CONTACTS_HEADER, getString(R.string.contacts_phone), TYPE_PHONE_CONTACT_HEADER));
                     filteredContacts.addAll(phoneContacts);
                 }
             } else {
@@ -973,22 +883,18 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         rowView.setLayoutParams(params);
         rowView.setId(id);
         rowView.setClickable(true);
-        rowView.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                InvitationContactInfo invitationContactInfo = addedContacts.get(v.getId());
-                addedContacts.remove(id);
-                if (invitationContactInfo.hasMultipleContactInfos()) {
-                    controlHighlited(invitationContactInfo.getId());
-                } else {
-                    invitationContactInfo.setHighlighted(false);
-                }
-                refreshAddedContactsView(false);
-                refreshInviteContactButton();
-                refreshList();
-                setTitleAB();
+        rowView.setOnClickListener(v -> {
+            InvitationContactInfo invitationContactInfo = addedContacts.get(v.getId());
+            addedContacts.remove(id);
+            if (invitationContactInfo.hasMultipleContactInfos()) {
+                controlHighlighted(invitationContactInfo.getId());
+            } else {
+                invitationContactInfo.setHighlighted(false);
             }
+            refreshAddedContactsView(false);
+            refreshInviteContactButton();
+            refreshList();
+            setTitleAB();
         });
 
         TextView displayName = rowView.findViewById(R.id.contact_name);
@@ -996,17 +902,17 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         return rowView;
     }
 
-    private void controlHighlited(long id) {
-        boolean shouldHighlited = false;
+    private void controlHighlighted(long id) {
+        boolean shouldHighlighted = false;
         for (InvitationContactInfo added : addedContacts) {
             if (added.getId() == id) {
-                shouldHighlited = true;
+                shouldHighlighted = true;
                 break;
             }
         }
         for (InvitationContactInfo temp : invitationContactsAdapter.getData()) {
             if (temp.getId() == id) {
-                temp.setHighlighted(shouldHighlited);
+                temp.setHighlighted(shouldHighlighted);
             }
         }
     }
@@ -1087,14 +993,14 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     private void invitePhoneContacts(ArrayList<String> phoneNumbers) {
         Timber.d("invitePhoneContacts");
-        StringBuilder recipents = new StringBuilder("smsto:");
+        StringBuilder recipient = new StringBuilder("smsto:");
         for (String phone : phoneNumbers) {
-            recipents.append(phone);
-            recipents.append(";");
+            recipient.append(phone);
+            recipient.append(";");
             Timber.d("setResultPhoneContacts: %s", phone);
         }
         String smsBody = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
-        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipents.toString()));
+        Intent smsIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse(recipient.toString()));
         smsIntent.putExtra("sms_body", smsBody);
         startActivity(smsIntent);
     }
@@ -1104,17 +1010,17 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private int numberNotSent;
 
     @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
+    public void onRequestStart(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+    public void onRequestUpdate(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
 
     }
 
     @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestFinish(@NonNull MegaApiJava api, MegaRequest request, @NonNull MegaError e) {
         if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT) {
             Timber.d("MegaRequest.TYPE_INVITE_CONTACT finished: %s", request.getNumber());
             if (e.getErrorCode() == MegaError.API_OK) {
@@ -1173,7 +1079,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestTemporaryError(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError e) {
 
     }
 
@@ -1224,18 +1130,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     private void enableFabButton(Boolean enableFabButton) {
         Timber.d("enableFabButton: %s", enableFabButton);
         fabButton.setEnabled(enableFabButton);
-    }
-
-    private void clearLists() {
-        totalContacts.clear();
-        filteredContacts.clear();
-        megaContacts.clear();
-    }
-
-    private void fillUpLists() {
-        filteredContacts.addAll(megaContacts);
-        filteredContacts.addAll(phoneContacts);
-        totalContacts.addAll(filteredContacts);
     }
 
     /**

@@ -299,11 +299,9 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDial
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
-import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.UploadUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.billing.PaymentUtils.updateSubscriptionLevel
-import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -995,8 +993,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         Timber.d("retryChatPendingConnections()")
         megaChatApi.retryPendingConnections(false, null)
         MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
-        //sync local contacts to see who's on mega.
-        checkContacts()
+
         val display: Display = windowManager.defaultDisplay
         display.getMetrics(outMetrics)
         if (checkDatabaseValues()) return
@@ -1394,18 +1391,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             else prefs?.firstTime.toBoolean()
 
         return false
-    }
-
-    private fun checkContacts() {
-        if (hasPermissions(
-                this,
-                Manifest.permission.READ_CONTACTS
-            ) && viewModel.getStorageState() !== StorageState.PayWall
-        ) {
-            Timber.d("sync mega contacts")
-            val getter = MegaContactGetter(this)
-            getter.getMegaContacts(megaApi, TimeUtils.WEEK, this)
-        }
     }
 
     private fun handleDuplicateLaunches(): Boolean {

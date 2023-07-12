@@ -31,7 +31,6 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
@@ -249,7 +248,6 @@ class SqliteDatabaseHandler @Inject constructor(
         db.execSQL(CREATE_NEW_PENDING_MSG_TABLE)
 
         db.execSQL(CREATE_SYNC_RECORDS_TABLE)
-        db.execSQL(CREATE_MEGA_CONTACTS_TABLE)
         db.execSQL(CREATE_SD_TRANSFERS_TABLE)
         db.execSQL(CREATE_BACKUP_TABLE)
     }
@@ -531,7 +529,6 @@ class SqliteDatabaseHandler @Inject constructor(
             )
         }
         if (oldVersion <= 47) {
-            db.execSQL(CREATE_MEGA_CONTACTS_TABLE)
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SHOW_INVITE_BANNER TEXT;")
             db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_SHOW_INVITE_BANNER = '${encrypt("true")}';")
         }
@@ -1221,131 +1218,6 @@ class SqliteDatabaseHandler @Inject constructor(
             }
             return userCredentials
         }
-
-    override fun batchInsertMegaContacts(contacts: List<MegaContact>?) {
-        if (contacts == null || contacts.isEmpty()) {
-            Timber.w("Empty MEGA contacts list.")
-            return
-        }
-        Timber.d("Contacts size is: %s", contacts.size)
-        db.beginTransaction()
-        try {
-            var values: ContentValues
-            for ((id, handle, localName, email, normalizedPhoneNumber) in contacts) {
-                values = ContentValues().apply {
-                    put(
-                        KEY_MEGA_CONTACTS_ID, encrypt(
-                            id
-                        )
-                    )
-                    put(
-                        KEY_MEGA_CONTACTS_HANDLE, encrypt(
-                            handle.toString()
-                        )
-                    )
-                    put(
-                        KEY_MEGA_CONTACTS_LOCAL_NAME, encrypt(
-                            localName
-                        )
-                    )
-                    put(
-                        KEY_MEGA_CONTACTS_EMAIL, encrypt(
-                            email
-                        )
-                    )
-                    put(
-                        KEY_MEGA_CONTACTS_PHONE_NUMBER, encrypt(
-                            normalizedPhoneNumber
-                        )
-                    )
-                }
-                db.insert(TABLE_MEGA_CONTACTS, null, values)
-            }
-            db.setTransactionSuccessful()
-        } finally {
-            db.endTransaction()
-        }
-    }
-
-    override val megaContacts: ArrayList<MegaContact>
-        get() {
-            val sql = "SELECT * FROM $TABLE_MEGA_CONTACTS"
-            val contacts = ArrayList<MegaContact>()
-            try {
-                db.rawQuery(sql, null)?.use { cursor ->
-                    var contact: MegaContact
-                    while (cursor.moveToNext()) {
-                        contact = MegaContact()
-                        try {
-                            val id =
-                                cursor.getString(cursor.getColumnIndexOrThrow(KEY_MEGA_CONTACTS_ID))
-                            contact.id = decrypt(id)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.e(
-                                exception,
-                                "Exception getting MEGA contact ID. Contact will not be included"
-                            )
-                            continue
-                        }
-                        try {
-                            val handle =
-                                cursor.getString(
-                                    cursor.getColumnIndexOrThrow(
-                                        KEY_MEGA_CONTACTS_HANDLE
-                                    )
-                                )
-                            contact.handle = decrypt(handle)?.toLong() ?: 0
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.e(
-                                exception,
-                                "Exception getting MEGA contact handle. Contact will not be included"
-                            )
-                            continue
-                        }
-                        try {
-                            val localName = cursor.getString(
-                                cursor.getColumnIndexOrThrow(
-                                    KEY_MEGA_CONTACTS_LOCAL_NAME
-                                )
-                            )
-                            contact.localName = decrypt(localName)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.w(exception, "Exception getting MEGA contact local name")
-                        }
-                        try {
-                            val email =
-                                cursor.getString(
-                                    cursor.getColumnIndexOrThrow(
-                                        KEY_MEGA_CONTACTS_EMAIL
-                                    )
-                                )
-                            contact.email = decrypt(email)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.w(exception, "Exception getting MEGA contact email")
-                        }
-                        try {
-                            val phoneNumber = cursor.getString(
-                                cursor.getColumnIndexOrThrow(
-                                    KEY_MEGA_CONTACTS_PHONE_NUMBER
-                                )
-                            )
-                            contact.normalizedPhoneNumber = decrypt(phoneNumber)
-                        } catch (exception: IllegalArgumentException) {
-                            Timber.w(exception, "Exception getting MEGA contact phone number")
-                        }
-                        contacts.add(contact)
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return contacts
-        }
-
-    override fun clearMegaContacts() {
-        Timber.d("delete table %s", TABLE_MEGA_CONTACTS)
-        db.execSQL("DELETE FROM $TABLE_MEGA_CONTACTS")
-    }
 
     override val ephemeral: EphemeralCredentials?
         get() {
@@ -4891,12 +4763,8 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val TABLE_CHAT_SETTINGS = "chatsettings"
         private const val TABLE_COMPLETED_TRANSFERS = "completedtransfers"
         private const val TABLE_EPHEMERAL = "ephemeral"
-        private const val TABLE_PENDING_MSG = "pendingmsg"
-        private const val TABLE_MSG_NODES = "msgnodes"
-        private const val TABLE_NODE_ATTACHMENTS = "nodeattachments"
         private const val TABLE_PENDING_MSG_SINGLE = "pendingmsgsingle"
         private const val TABLE_SYNC_RECORDS = "syncrecords"
-        private const val TABLE_MEGA_CONTACTS = "megacontacts"
         private const val TABLE_SD_TRANSFERS = "sdtransfers"
         const val TABLE_BACKUPS = "backups"
         private const val KEY_ID = "id"
@@ -5007,15 +4875,6 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val KEY_FIRST_LOGIN_CHAT = "firstloginchat"
         private const val KEY_AUTO_PLAY = "autoplay"
         private const val KEY_ID_CHAT = "idchat"
-        private const val KEY_MSG_TIMESTAMP = "timestamp"
-        private const val KEY_ID_TEMP_KARERE = "idtempkarere"
-        private const val KEY_STATE = "state"
-        private const val KEY_ID_PENDING_MSG = "idpendingmsg"
-        private const val KEY_ID_NODE = "idnode"
-        private const val KEY_FILE_PATH = "filepath"
-        private const val KEY_FILE_NAME = "filename"
-        private const val KEY_FILE_FINGERPRINT = "filefingerprint"
-        private const val KEY_NODE_HANDLE = "nodehandle"
 
         //columns for table sync records
         private const val KEY_SYNC_FILEPATH_ORI = "sync_filepath_origin"
@@ -5062,20 +4921,7 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val KEY_PENDING_MSG_FINGERPRINT = "filefingerprint"
         private const val KEY_PENDING_MSG_TRANSFER_TAG = "transfertag"
         private const val KEY_PENDING_MSG_STATE = "state"
-        private const val KEY_MEGA_CONTACTS_ID = "userid"
-        private const val KEY_MEGA_CONTACTS_HANDLE = "handle"
-        private const val KEY_MEGA_CONTACTS_LOCAL_NAME = "localname"
-        private const val KEY_MEGA_CONTACTS_EMAIL = "email"
-        private const val KEY_MEGA_CONTACTS_PHONE_NUMBER = "phonenumber"
-        private const val KEY_SHOW_SMS_VERIFICATION_DIALOG = "showSmsVerificationDialog"
-        private const val CREATE_MEGA_CONTACTS_TABLE =
-            "CREATE TABLE IF NOT EXISTS $TABLE_MEGA_CONTACTS(" +
-                    "$KEY_ID INTEGER PRIMARY KEY, " +
-                    "$KEY_MEGA_CONTACTS_ID TEXT," +
-                    "$KEY_MEGA_CONTACTS_HANDLE TEXT," +
-                    "$KEY_MEGA_CONTACTS_LOCAL_NAME TEXT," +
-                    "$KEY_MEGA_CONTACTS_EMAIL TEXT," +
-                    "$KEY_MEGA_CONTACTS_PHONE_NUMBER TEXT)"
+
         private const val KEY_SD_TRANSFERS_TAG = "sdtransfertag"
         private const val KEY_SD_TRANSFERS_NAME = "sdtransfername"
         private const val KEY_SD_TRANSFERS_SIZE = "sdtransfersize"

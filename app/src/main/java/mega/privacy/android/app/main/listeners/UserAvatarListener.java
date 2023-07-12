@@ -7,9 +7,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import androidx.annotation.NonNull;
+
 import java.io.File;
 
-import mega.privacy.android.app.main.adapters.ContactsHorizontalAdapter;
 import mega.privacy.android.app.main.adapters.LastContactsAdapter;
 import mega.privacy.android.app.main.adapters.MegaContactsAdapter;
 import mega.privacy.android.app.utils.ThumbnailUtils;
@@ -29,16 +30,12 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
         this.holder = holder;
     }
 
-    public UserAvatarListener(Context context) {
-        this.context = context;
+    @Override
+    public void onRequestStart(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
     }
 
     @Override
-    public void onRequestStart(MegaApiJava api, MegaRequest request) {
-    }
-
-    @Override
-    public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestFinish(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError e) {
         if (holder == null || holder.contactMail == null) {
             Timber.w("Holder or mail is NULL");
             return;
@@ -64,8 +61,6 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
                                 ((MegaContactsAdapter.ViewHolderContactsList) holder).imageView.setImageBitmap(bitmap);
                             } else if (holder instanceof LastContactsAdapter.ViewHolder) {
                                 ((LastContactsAdapter.ViewHolder) holder).avatarImage.setImageBitmap(bitmap);
-                            } else if (holder instanceof ContactsHorizontalAdapter.ContactViewHolder) {
-                                ((ContactsHorizontalAdapter.ContactViewHolder) holder).avatar.setImageBitmap(bitmap);
                             }
                         }
                     }
@@ -75,11 +70,11 @@ public class UserAvatarListener implements MegaRequestListenerInterface {
     }
 
     @Override
-    public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+    public void onRequestTemporaryError(@NonNull MegaApiJava api, @NonNull MegaRequest request, @NonNull MegaError e) {
     }
 
     @Override
-    public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+    public void onRequestUpdate(@NonNull MegaApiJava api, @NonNull MegaRequest request) {
     }
 
 }

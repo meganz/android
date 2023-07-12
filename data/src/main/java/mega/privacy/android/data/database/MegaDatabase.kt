@@ -51,6 +51,11 @@ internal abstract class MegaDatabase : RoomDatabase() {
                 }
             }
         }
-        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69)
+        private val MIGRATION_70_71 = object : Migration(70, 71) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("DROP TABLE IF EXISTS megacontacts")
+            }
+        }
+        val MIGRATIONS = arrayOf(MIGRATION_67_68, MIGRATION_68_69, MIGRATION_70_71)
     }
 }
