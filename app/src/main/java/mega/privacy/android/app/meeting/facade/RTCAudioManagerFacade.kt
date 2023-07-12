@@ -127,7 +127,7 @@ class RTCAudioManagerFacade @Inject constructor(
     override fun startProximitySensor(listener: OnProximitySensorListener) {
         rtcAudioManager?.apply {
             if (startProximitySensor()) {
-                setOnProximitySensorListener(listener)
+                proximitySensorListener = listener
             }
         }
     }
@@ -137,7 +137,7 @@ class RTCAudioManagerFacade @Inject constructor(
     }
 
     override fun muteOrUnMute(mute: Boolean) {
-        rtcAudioManagerRingInCall?.muteOrUnmuteIncomingCall(mute)
+        rtcAudioManagerRingInCall?.muteOrUnMuteIncomingCall(mute)
     }
 
     override fun updateSpeakerStatus(isSpeakerOn: Boolean, typeStatus: Int) {

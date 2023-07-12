@@ -340,7 +340,6 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity;
 import mega.privacy.android.app.interfaces.AttachNodeToChatListener;
 import mega.privacy.android.app.interfaces.ChatManagementCallback;
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener;
-import mega.privacy.android.app.interfaces.OnProximitySensorListener;
 import mega.privacy.android.app.interfaces.SnackbarShower;
 import mega.privacy.android.app.interfaces.StoreDataBeforeForward;
 import mega.privacy.android.app.listeners.CreateChatListener;
@@ -9677,15 +9676,12 @@ public class ChatActivity extends PasscodeActivity
             activateSpeaker();
         }
 
-        rtcAudioManager.setOnProximitySensorListener(new OnProximitySensorListener() {
-            @Override
-            public void needToUpdate(boolean isNear) {
-                if (!speakerWasActivated && !isNear) {
-                    adapter.pausePlaybackInProgress();
-                } else if (speakerWasActivated && isNear) {
-                    adapter.refreshVoiceClipPlayback();
-                    speakerWasActivated = false;
-                }
+        rtcAudioManager.setProximitySensorListener(isNear -> {
+            if (!speakerWasActivated && !isNear) {
+                adapter.pausePlaybackInProgress();
+            } else if (speakerWasActivated && isNear) {
+                adapter.refreshVoiceClipPlayback();
+                speakerWasActivated = false;
             }
         });
     }
