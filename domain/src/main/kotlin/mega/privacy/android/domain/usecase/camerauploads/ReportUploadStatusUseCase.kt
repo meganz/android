@@ -9,7 +9,9 @@ import javax.inject.Inject
  * Report Camera Uploads Status Backup Heart Beat Use Case
  * @param cameraUploadRepository [CameraUploadRepository]
  */
-class ReportUploadStatusUseCase @Inject constructor(private val cameraUploadRepository: CameraUploadRepository) {
+class ReportUploadStatusUseCase @Inject constructor(
+    private val cameraUploadRepository: CameraUploadRepository,
+) {
 
     /**
      * Invocation function
@@ -17,27 +19,26 @@ class ReportUploadStatusUseCase @Inject constructor(private val cameraUploadRepo
      * @param heartbeatStatus           Heartbeat status
      * @param pendingUploads            Pending uploads
      * @param lastNodeHandle            Last node handle to be synced
-     * @param updateTimeStamp           Update time stamp in camera uploads worker
+     * @param lastTimestamp             Last time stamp in camera uploads worker
      */
     suspend operator fun invoke(
         cameraUploadFolderType: CameraUploadFolderType,
         heartbeatStatus: HeartbeatStatus,
         pendingUploads: Int,
         lastNodeHandle: Long,
-        updateTimeStamp: () -> Long,
+        lastTimestamp: Long,
     ) {
         if (lastNodeHandle != cameraUploadRepository.getInvalidHandle()) {
             when (cameraUploadFolderType) {
                 CameraUploadFolderType.Primary -> cameraUploadRepository.getCuBackUpId()
                 CameraUploadFolderType.Secondary -> cameraUploadRepository.getMuBackUpId()
             }?.let { backupId ->
-                val newTimestamp = updateTimeStamp()
                 cameraUploadRepository.sendBackupHeartbeat(
                     backupId = backupId,
                     heartbeatStatus = heartbeatStatus,
                     ups = pendingUploads,
                     downs = 0,
-                    ts = newTimestamp,
+                    ts = lastTimestamp,
                     lastNode = lastNodeHandle,
                 )
             }

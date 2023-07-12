@@ -15,12 +15,10 @@ class UpdateCameraUploadsBackupUseCase @Inject constructor(
     /**
      * @param backupName        Backup folder name
      * @param backupState       Backup state
-     * @param updateTimeStamp   Update time stamp if required
      */
     suspend operator fun invoke(
         backupName: String,
         backupState: BackupState,
-        updateTimeStamp: () -> Unit = {},
     ) {
         if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.getCuBackUp()?.let { backup ->
@@ -33,7 +31,6 @@ class UpdateCameraUploadsBackupUseCase @Inject constructor(
                     )
                 }
             }
-            updateTimeStamp()
         }
     }
 }

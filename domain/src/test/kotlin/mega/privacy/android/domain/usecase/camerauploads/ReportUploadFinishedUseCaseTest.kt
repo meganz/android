@@ -41,8 +41,8 @@ internal class ReportUploadFinishedUseCaseTest {
             underTest(
                 lastPrimaryNodeHandle = 1L,
                 lastSecondaryNodeHandle = 2L,
-                updatePrimaryTimeStamp = { 1L },
-                updateSecondaryTimeStamp = { 2L }
+                lastPrimaryTimestamp = 1L,
+                lastSecondaryTimestamp = 1L,
             )
             verify(reportUploadStatusUseCase, times(2)).invoke(
                 any(), any(), any(), any(), any()

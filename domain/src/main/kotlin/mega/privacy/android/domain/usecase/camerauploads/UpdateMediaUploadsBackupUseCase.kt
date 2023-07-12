@@ -15,12 +15,10 @@ class UpdateMediaUploadsBackupUseCase @Inject constructor(
     /**
      * @param backupName        Backup folder name
      * @param backupState       Backup state
-     * @param updateTimeStamp   Update time stamp if required
      */
     suspend operator fun invoke(
         backupName: String,
         backupState: BackupState,
-        updateTimeStamp: () -> Unit = {},
     ) {
         if (cameraUploadRepository.isSecondaryMediaFolderEnabled()) {
             cameraUploadRepository.getMuBackUp()?.let { backup ->
@@ -33,7 +31,6 @@ class UpdateMediaUploadsBackupUseCase @Inject constructor(
                     )
                 }
             }
-            updateTimeStamp()
         }
     }
 }

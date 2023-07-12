@@ -767,21 +767,15 @@ class CameraUploadsWorker @AssistedInject constructor(
         // BackupState.PAUSE_UPLOADS
         if (areTransfersPausedUseCase()) {
             Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
-            updateCameraUploadsBackupUseCase(
-                context.getString(R.string.section_photo_sync),
-                BackupState.PAUSE_UPLOADS
-            )
-            updateMediaUploadsBackupUseCase(
-                context.getString(R.string.section_secondary_media_uploads),
-                BackupState.PAUSE_UPLOADS
-            )
+            updateBackupState(BackupState.PAUSE_UPLOADS)
         }
+
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         val secondaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
 
-        startHeartbeat(finalList)
+        startHeartbeat()
 
         for (record in finalList) {
             val parentNodeId =
@@ -897,27 +891,15 @@ class CameraUploadsWorker @AssistedInject constructor(
         return shouldBeSkipped
     }
 
-    private suspend fun startHeartbeat(finalList: List<SyncRecord>) {
-        if (finalList.isNotEmpty()) {
-            with(cameraUploadState) {
-                updateCameraUploadsBackupUseCase(
-                    context.getString(R.string.section_photo_sync),
-                    BackupState.ACTIVE
-                ) { primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond }
+    private suspend fun startHeartbeat() {
+        updateBackupState(BackupState.ACTIVE)
 
-                updateMediaUploadsBackupUseCase(
-                    context.getString(R.string.section_secondary_media_uploads),
-                    BackupState.ACTIVE
-                ) { secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond }
+        sendBackupHeartbeatJob =
+            scope?.launch(ioDispatcher) {
+                sendBackupHeartBeatSyncUseCase(cameraUploadState)
+                    .catch { Timber.e(it) }
+                    .collect()
             }
-
-            sendBackupHeartbeatJob =
-                scope?.launch(ioDispatcher) {
-                    sendBackupHeartBeatSyncUseCase(cameraUploadState)
-                        .catch { Timber.e(it) }
-                        .collect()
-                }
-        }
     }
 
     /**
@@ -1048,19 +1030,13 @@ class CameraUploadsWorker @AssistedInject constructor(
         resetTotalUploadsUseCase()
         with(cameraUploadState) {
             resetUploadsCounts()
+            updateLastTimestamp()
             reportUploadFinishedUseCase(
                 lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
                 lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
-                updatePrimaryTimeStamp = {
-                    Instant.now().epochSecond.also {
-                        primaryCameraUploadsState.lastTimestamp = it
-                    }
-                },
-                updateSecondaryTimeStamp = {
-                    Instant.now().epochSecond.also {
-                        secondaryCameraUploadsState.lastTimestamp = it
-                    }
-                })
+                lastPrimaryTimestamp = primaryCameraUploadsState.lastTimestamp,
+                lastSecondaryTimestamp = secondaryCameraUploadsState.lastTimestamp,
+            )
         }
     }
 
@@ -1302,32 +1278,19 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private suspend fun sendTransfersInterruptedInfoToBackupCenter() {
         // Update both Primary and Secondary Folder Backup States to TEMPORARILY_DISABLED
-        updateCameraUploadsBackupUseCase(
-            context.getString(R.string.section_photo_sync),
-            BackupState.TEMPORARILY_DISABLED
-        )
-        updateMediaUploadsBackupUseCase(
-            context.getString(R.string.section_secondary_media_uploads),
-            BackupState.TEMPORARILY_DISABLED
-        )
+        updateBackupState(BackupState.TEMPORARILY_DISABLED)
 
         // Send an INACTIVE Heartbeat Status for both Primary and Secondary Folders
         with(cameraUploadState) {
+            updateLastTimestamp()
             reportUploadInterruptedUseCase(
                 pendingPrimaryUploads = primaryCameraUploadsState.pendingCount,
                 pendingSecondaryUploads = secondaryCameraUploadsState.pendingCount,
                 lastPrimaryNodeHandle = primaryCameraUploadsState.lastHandle,
                 lastSecondaryNodeHandle = secondaryCameraUploadsState.lastHandle,
-                updatePrimaryTimeStamp = {
-                    Instant.now().epochSecond.also {
-                        primaryCameraUploadsState.lastTimestamp = it
-                    }
-                },
-                updateSecondaryTimeStamp = {
-                    Instant.now().epochSecond.also {
-                        secondaryCameraUploadsState.lastTimestamp = it
-                    }
-                })
+                lastPrimaryTimestamp = primaryCameraUploadsState.lastTimestamp,
+                lastSecondaryTimestamp = secondaryCameraUploadsState.lastTimestamp,
+            )
         }
     }
 
@@ -1338,16 +1301,6 @@ class CameraUploadsWorker @AssistedInject constructor(
      * One particular case where these states are sent is when the user "Cancel all" uploads
      */
     private suspend fun sendTransfersUpToDateInfoToBackupCenter() {
-        // Update both Primary and Secondary Backup States to ACTIVE
-        updateCameraUploadsBackupUseCase(
-            context.getString(R.string.section_photo_sync),
-            BackupState.ACTIVE
-        )
-        updateMediaUploadsBackupUseCase(
-            context.getString(R.string.section_secondary_media_uploads),
-            BackupState.ACTIVE
-        )
-
         // Update both Primary and Secondary Heartbeat Statuses to UP_TO_DATE
         sendCameraUploadsBackupHeartBeatUseCase(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
@@ -1570,6 +1523,33 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
 
         updateProgressNotification()
+    }
+
+    /**
+     * Update the timestamp of the last actions
+     * This timestamp is updated when :
+     * - the backup state is updated
+     * - the heartbeat status is updated due to interrupted or finished process
+     * - a transfer finished
+     *
+     * @param cameraUploadFolderType Whether primary or secondary folder.
+     *                               If null, both folder timestamps are updated
+     */
+    private fun updateLastTimestamp(cameraUploadFolderType: CameraUploadFolderType? = null) {
+        with(cameraUploadState) {
+            when (cameraUploadFolderType) {
+                CameraUploadFolderType.Primary ->
+                    primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
+
+                CameraUploadFolderType.Secondary ->
+                    secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
+
+                else -> {
+                    primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
+                    secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
+                }
+            }
+        }
     }
 
     /**
@@ -1905,5 +1885,23 @@ class CameraUploadsWorker @AssistedInject constructor(
         val message = context.getString(R.string.message_out_of_space)
         val notification = createNotification(title, message, pendingIntent, true)
         notificationManager.notify(Constants.NOTIFICATION_NOT_ENOUGH_STORAGE, notification)
+    }
+
+    /**
+     *  Update backup state
+     *
+     *  @param backupState
+     */
+    private suspend fun updateBackupState(backupState: BackupState) {
+        updateCameraUploadsBackupUseCase(
+            context.getString(R.string.section_photo_sync),
+            backupState
+        )
+
+        updateMediaUploadsBackupUseCase(
+            context.getString(R.string.section_secondary_media_uploads),
+            backupState
+        )
+        updateLastTimestamp()
     }
 }

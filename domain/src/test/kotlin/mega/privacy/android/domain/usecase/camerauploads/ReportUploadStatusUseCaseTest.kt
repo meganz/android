@@ -54,7 +54,7 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = 1L,
-                updateTimeStamp = { 60L }
+                lastTimestamp = 60L,
             )
             verify(cameraUploadRepository).sendBackupHeartbeat(
                 any(), any(), any(),
@@ -71,7 +71,7 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = 1L,
-                updateTimeStamp = { 60L }
+                lastTimestamp = 60L,
             )
             verify(cameraUploadRepository).sendBackupHeartbeat(
                 any(), any(), any(),
@@ -88,7 +88,7 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = 1L,
-                updateTimeStamp = { 60L }
+                lastTimestamp = 60L,
             )
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
@@ -105,7 +105,7 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = 1L,
-                updateTimeStamp = { 60L }
+                lastTimestamp = 60L,
             )
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
@@ -121,7 +121,7 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = invalidHandle,
-                updateTimeStamp = { 60L }
+                lastTimestamp = 60L,
             )
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
                 any(), any(), any(),
