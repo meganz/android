@@ -32,6 +32,7 @@ import mega.privacy.android.app.databinding.ActivityPasscodeBinding
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PasscodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.utils.Constants.PIN_4
 import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
@@ -102,7 +103,7 @@ class PasscodeLockActivity : BaseActivity() {
     private var fingerprintSkipped = false
     private var forgetPasscode = false
     private var passwordAlreadyTyped = false
-    private val viewModel by viewModels<PasscodeLockViewModel>()
+    private val viewModel by viewModels<LogoutViewModel>()
 
     /**
      * Handle events when a Back Press is detected

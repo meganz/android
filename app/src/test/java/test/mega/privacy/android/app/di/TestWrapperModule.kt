@@ -11,6 +11,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
@@ -57,6 +58,9 @@ object TestWrapperModule {
 
     @Provides
     fun providesFileUtilWrapper(): FileUtilWrapper = mock()
+
+    @Provides
+    fun provideSetLogoutFlagWrapper(): SetLogoutFlagWrapper = mock()
 
     @Provides
     fun provideStringWrapper(): StringWrapper = mock()
