@@ -3,6 +3,7 @@ package mega.privacy.android.core.ui.theme.extensions
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 //The correct name format to create new extension function is {textStyle][Number][FontWeight],i.e:body1Medium
 
@@ -29,3 +30,9 @@ val Typography.subtitle2medium: TextStyle
  */
 val Typography.body2medium: TextStyle
     get() = body2.copy(fontWeight = FontWeight.Medium)
+
+/**
+ * Body 2 medium weight
+ */
+val Typography.body3: TextStyle
+    get() = body2.copy(fontSize = 13.sp, lineHeight = 17.sp, letterSpacing = 0.03.sp)
