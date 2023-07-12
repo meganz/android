@@ -292,7 +292,7 @@
         <item quantity="one">Скачивание началось</item>
         <item quantity="few">Начато %1$d скачивания</item>
         <item quantity="many">Начато %1$d скачиваний</item>
-        <item quantity="other">Начато %1$d скачиваний</item>
+        <item quantity="other">Начато %1$d скачивания</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_finish">
@@ -5334,7 +5334,7 @@
     <!-- Confirmation dialog message to clear the meeting history -->
     <string name="meetings_clear_history_confirmation_dialog_message">Действительно удалить всю историю этой встречи?</string>
     <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
-    <string name="meetings_mute_notifications_dialog_title">Отключить уведомления встречи на</string>
+    <string name="meetings_mute_notifications_dialog_title">Отключить звук уведомлений встречи на</string>
     <!-- Confirmation dialog title to leave a meeting -->
     <string name="meetings_leave_meeting_confirmation_dialog_title">Покинуть встречу?</string>
     <!-- Album import rename album title -->
@@ -5427,21 +5427,21 @@
     <!-- Dropdown menu text to choose the Tuesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_tuesday_monthly_section_sentence_middle">вторник</string>
     <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
-    <string name="meetings_custom_recurrence_wednesday_monthly_section">среду</string>
+    <string name="meetings_custom_recurrence_wednesday_monthly_section">среда</string>
     <!-- Dropdown menu text to choose the Wednesday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
-    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">среду</string>
+    <string name="meetings_custom_recurrence_wednesday_monthly_section_sentence_middle">среда</string>
     <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
     <string name="meetings_custom_recurrence_thursday_monthly_section">четверг</string>
     <!-- Dropdown menu text to choose the Thursday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_thursday_monthly_section_sentence_middle">четверг</string>
     <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
-    <string name="meetings_custom_recurrence_friday_monthly_section">пятницу</string>
+    <string name="meetings_custom_recurrence_friday_monthly_section">пятница</string>
     <!-- Dropdown menu text to choose the Friday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
-    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">пятницу</string>
+    <string name="meetings_custom_recurrence_friday_monthly_section_sentence_middle">пятница</string>
     <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
-    <string name="meetings_custom_recurrence_saturday_monthly_section">субботу</string>
+    <string name="meetings_custom_recurrence_saturday_monthly_section">суббота</string>
     <!-- Dropdown menu text to choose the Saturday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
-    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">субботу</string>
+    <string name="meetings_custom_recurrence_saturday_monthly_section_sentence_middle">суббота</string>
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
     <string name="meetings_custom_recurrence_sunday_monthly_section">воскресенье</string>
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
@@ -5493,18 +5493,24 @@
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="one">Каждый месяц в день %2$d</item>
+        <item quantity="few">Каждые %1$s месяца в день %2$d</item>
+        <item quantity="many">Каждые %1$s месяцев в день %2$d</item>
+        <item quantity="other">Каждые %1$s месяца в день %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="one">Скачивание началось</item>
+        <item quantity="few">Начато %1$d скачивания</item>
+        <item quantity="many">Начато %1$d скачиваний</item>
+        <item quantity="other">Начато %1$d скачивания</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="one">Скачивание завершено</item>
+        <item quantity="few">Завершено %1$d скачивания</item>
+        <item quantity="many">Завершено %1$d скачиваний</item>
+        <item quantity="other">Завершено %1$d скачивания</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Заканчивается</string>

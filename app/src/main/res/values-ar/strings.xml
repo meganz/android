@@ -5667,7 +5667,7 @@
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">برو Pro فقط</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">الوصول إلى الرابط</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_subtitle_link_access">يمكن لأي شخص لديه هذا الرابط عرض بياناتك وتنزيلها</string>
     <!-- Text of setting expiry date to link-->
@@ -5681,11 +5681,11 @@
     <!-- Album import link label -->
     <string name="album_import_link">رابط الألبوم</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">لا يمكن الوصول إلى الألبوم</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">تم حذف رابط الألبوم أو حذف الألبوم. اتصل بالشخص الذي شارك الرابط معك.</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">حسنًا، فهمت ذلك</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">صوتي</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -5697,7 +5697,7 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">وفر حتى 16٪ مع الفواتير السنوية</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]مساحة التخزين:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->

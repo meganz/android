@@ -4750,9 +4750,9 @@
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
     <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">Anda sudah memiliki langganan berulang untuk paket ini</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">Tidak dapat menyimpan album</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">Anda tidak memiliki cukup penyimpanan untuk menyimpan album ini ke drive Cloud anda. Tingkatkan sekarang untuk mendapatkan lebih banyak penyimpanan.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">Hari</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4795,43 +4795,35 @@
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">Kelima</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="other">%1$s pertama dari setiap %2$d bulan</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="other">%1$s kedua dari setiap %2$d bulan</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="other">%1$s ketiga dari setiap %2$d bulan</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="other">%1$s keempat dari setiap %2$d bulan</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="other">%1$s kelima dari setiap %2$d bulan</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">Setiap %1$s bulan pada hari %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="other">%1$d unduhan dimulai</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="other">%1$d unduhan selesai</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Akhiri pengulangan</string>

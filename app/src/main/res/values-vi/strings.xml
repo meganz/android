@@ -1467,7 +1467,7 @@
     <!-- Title of the field email when a new contact is created to upload -->
     <string name="new_file_email_when_uploading">Địa chỉ email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
-    <string name="forward_menu_item">Chuyển tin nhắn</string>
+    <string name="forward_menu_item">Chuyển tiếp</string>
     <!-- name of the button to attach file from MEGA to another app -->
     <string name="general_attach">Đính kèm</string>
     <!-- Error shown when the user left a name empty -->
@@ -4815,18 +4815,15 @@
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">Mỗi %1$s tháng vào ngày %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="other">%1$d mục tải&#160;xuống đã được bắt&#160;đầu</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="other">%1$d mục tải&#160;xuống đã hoàn&#160;tất</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Ngừng tái&#160;diễn</string>

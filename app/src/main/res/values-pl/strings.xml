@@ -3605,7 +3605,7 @@
     <!-- Subtitle of the settings page where the start screen can be chosen. -->
     <string name="configure_start_screen">Skonfiguruj domyślny ekran startowy</string>
     <!-- Homepage section. -->
-    <string name="home_section">Start</string>
+    <string name="home_section">Strona główna</string>
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">Pokaż aktywność</string>
     <!-- Text informing the recent activity is hidden. -->
@@ -5493,8 +5493,10 @@
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="one">Co miesiąc w dniu %2$d</item>
+        <item quantity="few">Co %1$s miesięcy w dniu %2$d</item>
+        <item quantity="many">Co %1$s miesięcy w dniu %2$d</item>
+        <item quantity="other">Co %1$s miesięcy w dniu %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">

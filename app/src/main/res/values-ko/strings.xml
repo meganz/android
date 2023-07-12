@@ -3632,7 +3632,7 @@
     <!-- Button of the dialog that indicates that you are alone in the call, displayed on the chat screen and call screen. Allows to stay on the call -->
     <string name="calls_call_screen_button_to_stay_alone_in_call">통화 유지</string>
     <!-- Report issue setting name-->
-    <string name="settings_help_report_issue">문제 보고</string>
+    <string name="settings_help_report_issue">문제 신고</string>
     <!-- Report issue fragment instructions-->
     <string name="settings_help_report_issue_instructions">당신의 피드백이 MEGA의 개선을 돕습니다. 겪으신 문제를 명확히 설명해주세요. 자세히 설명할 수록, 우리가 문제를 해결하는 것이 쉬워집니다.</string>
     <!-- Hint text for the description field on the report issue screen-->
@@ -4590,9 +4590,9 @@
     <!-- Title of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_title">파일을 열 수 없습니다</string>
     <!-- Description of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
-    <string name="dialog_taken_down_folder_description"></string>
+    <string name="dialog_taken_down_folder_description">이 폴더는 [A]게시중단 지침 정책[/A]에 따라 게시 중단 되었습니다. 만약 우리가 실수했다고 생각하면 이 게시중단에 대해 항의할 수 있습니다.</string>
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
-    <string name="dialog_taken_down_file_description"></string>
+    <string name="dialog_taken_down_file_description">이 파일은 [A]게시중단 지침 정책[/A]에 따라 게시 중단 되었습니다. 만약 우리가 실수했다고 생각하면 이 게시중단에 대해 항의할 수 있습니다.</string>
     <!-- Text of the button to show the dialog to update to pro -->
     <string name="general_pro_only">Pro 전용</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->

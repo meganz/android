@@ -5267,18 +5267,21 @@
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="one">Le %2$d de chaque mois</item>
+        <item quantity="many">Le %2$d, tous les %1$s de mois</item>
+        <item quantity="other">Le %2$d, tous les %1$s&#160;mois</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="one">Le téléchargement est lancé</item>
+        <item quantity="many">%1$d de téléchargements sont lancés</item>
+        <item quantity="other">%1$d&#160;téléchargements sont lancés</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="one">Le téléchargement est terminé</item>
+        <item quantity="many">%1$d de téléchargements sont terminés</item>
+        <item quantity="other">%1$d&#160;téléchargements sont terminés</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">Fin de la récurrence</string>
