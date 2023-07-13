@@ -181,6 +181,22 @@ sealed class NameCollision : Serializable {
                     parentHandle = parentHandle,
                     isFile = node.isFile
                 )
+
+            @JvmStatic
+            fun getCopyCollision(
+                nameCollision: NodeNameCollision
+            ): Copy =
+                Copy(
+                    collisionHandle = nameCollision.collisionHandle,
+                    nodeHandle = nameCollision.nodeHandle,
+                    name = nameCollision.name,
+                    size = nameCollision.size,
+                    childFolderCount = nameCollision.childFolderCount,
+                    childFileCount = nameCollision.childFileCount,
+                    lastModified = nameCollision.lastModified,
+                    parentHandle = nameCollision.parentHandle,
+                    isFile = nameCollision.isFile,
+                )
         }
     }
 
