@@ -30,6 +30,7 @@ import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -1049,5 +1050,130 @@ class DefaultContactsRepositoryTest {
                 )
             )
             assertThat(underTest.getIncomingContactRequests().size).isEqualTo(1)
+        }
+
+    @Test
+    fun `test that getContactLink returns correctly when calling api gateway returns successfully and contacts return the list contain visible user`() =
+        runTest {
+            val myEmail = "myEmail@mega.co.nz"
+            val myParentHandle = 1L
+            val myNodeHandle = 2L
+            val myName = "Name"
+            val myText = "Text"
+            val request = mock<MegaRequest> {
+                on { email }.thenReturn(myEmail)
+                on { parentHandle }.thenReturn(myParentHandle)
+                on { nodeHandle }.thenReturn(myNodeHandle)
+                on { name }.thenReturn(myName)
+                on { text }.thenReturn(myText)
+            }
+            val user = mock<MegaUser> {
+                on { email }.thenReturn(myEmail)
+                on { visibility }.thenReturn(MegaUser.VISIBILITY_VISIBLE)
+            }
+            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                    .onRequestFinish(mock(), request, success)
+            }
+            whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
+            assertThat(underTest.getContactLink(1L)).isEqualTo(
+                ContactLink(
+                    isContact = true,
+                    email = request.email,
+                    contactHandle = request.parentHandle,
+                    contactLinkHandle = request.nodeHandle,
+                    fullName = "${request.name} ${request.text}"
+                )
+            )
+        }
+
+    @Test
+    fun `test that getContactLink returns correctly when calling api gateway returns successfully and contacts return the list contain inactive user`() =
+        runTest {
+            val myEmail = "myEmail@mega.co.nz"
+            val myParentHandle = 1L
+            val myNodeHandle = 2L
+            val myName = "Name"
+            val myText = "Text"
+            val request = mock<MegaRequest> {
+                on { email }.thenReturn(myEmail)
+                on { parentHandle }.thenReturn(myParentHandle)
+                on { nodeHandle }.thenReturn(myNodeHandle)
+                on { name }.thenReturn(myName)
+                on { text }.thenReturn(myText)
+            }
+            val user = mock<MegaUser> {
+                on { email }.thenReturn(myEmail)
+                on { visibility }.thenReturn(MegaUser.VISIBILITY_INACTIVE)
+            }
+            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                    .onRequestFinish(mock(), request, success)
+            }
+            whenever(megaApiGateway.getContacts()).thenReturn(listOf(user))
+            assertThat(underTest.getContactLink(1L)).isEqualTo(
+                ContactLink(
+                    isContact = false,
+                    email = request.email,
+                    contactHandle = request.parentHandle,
+                    contactLinkHandle = request.nodeHandle,
+                    fullName = "${request.name} ${request.text}"
+                )
+            )
+        }
+
+    @Test
+    fun `test that getContactLink returns correctly when calling api gateway returns successfully and contacts return the list empty`() =
+        runTest {
+            val myEmail = "myEmail@mega.co.nz"
+            val myParentHandle = 1L
+            val myNodeHandle = 2L
+            val myName = "Name"
+            val myText = "Text"
+            val request = mock<MegaRequest> {
+                on { email }.thenReturn(myEmail)
+                on { parentHandle }.thenReturn(myParentHandle)
+                on { nodeHandle }.thenReturn(myNodeHandle)
+                on { name }.thenReturn(myName)
+                on { text }.thenReturn(myText)
+            }
+            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                    .onRequestFinish(mock(), request, success)
+            }
+            whenever(megaApiGateway.getContacts()).thenReturn(emptyList())
+            assertThat(underTest.getContactLink(1L)).isEqualTo(
+                ContactLink(
+                    isContact = false,
+                    email = request.email,
+                    contactHandle = request.parentHandle,
+                    contactLinkHandle = request.nodeHandle,
+                    fullName = "${request.name} ${request.text}"
+                )
+            )
+        }
+
+    @Test
+    fun `test that getContactLink returns correctly when calling api gateway returns API_EEXIST`() =
+        runTest {
+            val request = mock<MegaRequest>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
+            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                    .onRequestFinish(mock(), request, error)
+            }
+            assertThat(underTest.getContactLink(1L))
+                .isEqualTo(ContactLink(isContact = false,))
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that getContactLink throws MegaException when calling api gateway returns failed`() =
+        runTest {
+            val request = mock<MegaRequest>()
+            whenever(megaApiGateway.getContactLink(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                    .onRequestFinish(mock(), request, error)
+            }
+            underTest.getContactLink(1L)
         }
 }

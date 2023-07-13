@@ -43,6 +43,7 @@ import mega.privacy.android.data.wrapper.ContactWrapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -785,4 +786,37 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getIncomingContactRequests()?.map(contactRequestMapper).orEmpty()
         }
+
+    override suspend fun getContactLink(userHandle: Long) = withContext(ioDispatcher) {
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    when (error.errorCode) {
+                        MegaError.API_OK -> continuation.resumeWith(
+                            Result.success(
+                                ContactLink(
+                                    email = request.email,
+                                    contactHandle = request.parentHandle,
+                                    contactLinkHandle = request.nodeHandle,
+                                    fullName = "${request.name} ${request.text}"
+                                )
+                            )
+                        )
+
+                        MegaError.API_EEXIST -> continuation.resumeWith(
+                            Result.success(ContactLink(isContact = false))
+                        )
+
+                        else -> continuation.failWithError(error, "getContactLink")
+
+                    }
+                },
+            )
+            megaApiGateway.getContactLink(userHandle, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+        val isContact = !result.email.isNullOrBlank() && megaApiGateway.getContacts()
+            .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }
+        return@withContext result.copy(isContact = isContact)
+    }
 }
