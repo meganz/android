@@ -25,13 +25,11 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
-import mega.privacy.android.domain.usecase.DefaultCreateCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
@@ -427,11 +425,4 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCompressVideos(resetTotalUploads: DefaultCompressVideos): CompressVideos
-
-
-    /**
-     * Provide the [CreateCameraUploadTemporaryRootDirectory] implementation
-     */
-    @Binds
-    abstract fun bindCreateCameraUploadTemporaryRootDirectory(implementation: DefaultCreateCameraUploadTemporaryRootDirectory): CreateCameraUploadTemporaryRootDirectory
 }

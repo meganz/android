@@ -71,7 +71,7 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
@@ -201,7 +201,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val compressVideos: CompressVideos,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
-    private val createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory,
+    private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase,
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase,
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
@@ -1196,7 +1196,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         // Clear sync records if needed
         clearSyncRecords()
         // Create temp root folder
-        runCatching { tempRoot = createCameraUploadTemporaryRootDirectory() }
+        runCatching { tempRoot = createCameraUploadTemporaryRootDirectoryUseCase() }
             .onFailure {
                 Timber.w("Root path doesn't exist")
                 throw it

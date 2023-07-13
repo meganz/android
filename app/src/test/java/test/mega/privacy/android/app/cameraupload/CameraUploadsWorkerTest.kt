@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
@@ -166,7 +166,7 @@ class CameraUploadsWorkerTest {
     private val compressVideos: CompressVideos = mock()
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps = mock()
     private val disableMediaUploadSettings: DisableMediaUploadSettings = mock()
-    private val createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory =
+    private val createCameraUploadTemporaryRootDirectoryUseCase: CreateCameraUploadTemporaryRootDirectoryUseCase =
         mock()
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase: DeleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock()
@@ -274,7 +274,7 @@ class CameraUploadsWorkerTest {
             compressVideos = compressVideos,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             disableMediaUploadSettings = disableMediaUploadSettings,
-            createCameraUploadTemporaryRootDirectory = createCameraUploadTemporaryRootDirectory,
+            createCameraUploadTemporaryRootDirectoryUseCase = createCameraUploadTemporaryRootDirectoryUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase = deleteCameraUploadsTemporaryRootDirectoryUseCase,
             broadcastCameraUploadProgress = broadcastCameraUploadProgress,
             scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,

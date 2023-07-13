@@ -59,6 +59,12 @@ interface CacheGateway {
      */
     suspend fun getFullSizeCacheFolder(): File?
 
+
+    /**
+     * Return Camera Uploads Cache Folder
+     */
+    suspend fun getCameraUploadsCacheFolder(): File?
+
     /**
      * return the avatar file
      *

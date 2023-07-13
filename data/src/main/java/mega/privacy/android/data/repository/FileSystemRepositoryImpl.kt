@@ -12,7 +12,7 @@ import mega.privacy.android.data.extensions.APP_DATA_BACKGROUND_TRANSFER
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -59,7 +59,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property shareDataMapper
  * @property megaExceptionMapper
  * @property sortOrderIntMapper
- * @property cacheFolderGateway
+ * @property cacheGateway
  * @property nodeMapper
  * @property fileTypeInfoMapper
  * @property offlineNodeInformationMapper
@@ -78,7 +78,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
     private val nodeMapper: NodeMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper,
@@ -96,16 +96,23 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
         withContext(ioDispatcher) {
             getMegaNode(viewerNode)?.let { node ->
-                suspendCoroutine { continuation ->
-                    val file = cacheFolderGateway.getCacheFile(
-                        CacheFolderConstant.TEMPORARY_FOLDER,
-                        node.getFileName()
+                val file = cacheGateway.getCacheFile(
+                    CacheFolderConstant.TEMPORARY_FOLDER,
+                    node.getFileName()
+                ) ?: throw NullFileException()
+                suspendCancellableCoroutine { continuation ->
+                    val listener = OptionalMegaTransferListenerInterface(
+                        onTransferTemporaryError = { _, error ->
+                            continuation.failWithError(error, "downloadBackgroundFile")
+                        },
+                        onTransferFinish = { _, error ->
+                            if (error.errorCode == MegaError.API_OK) {
+                                continuation.resumeWith(Result.success(file.absolutePath))
+                            } else {
+                                continuation.failWithError(error, "downloadBackgroundFile")
+                            }
+                        }
                     )
-                    if (file == null) {
-                        continuation.resumeWith(Result.failure(NullFileException()))
-                        return@suspendCoroutine
-                    }
-
                     megaApiGateway.startDownload(
                         node = node,
                         localPath = file.absolutePath,
@@ -115,19 +122,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                         cancelToken = null,
                         collisionCheck = COLLISION_CHECK_FINGERPRINT,
                         collisionResolution = COLLISION_RESOLUTION_NEW_WITH_N,
-                        listener = OptionalMegaTransferListenerInterface(
-                            onTransferTemporaryError = { _, error ->
-                                continuation.failWithError(error, "downloadBackgroundFile")
-                            },
-                            onTransferFinish = { _, error ->
-                                if (error.errorCode == MegaError.API_OK) {
-                                    continuation.resumeWith(Result.success(file.absolutePath))
-                                } else {
-                                    continuation.failWithError(error, "downloadBackgroundFile")
-                                }
-                            }
-                        )
+                        listener = listener
                     )
+
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeTransferListener(
+                            listener
+                        )
+                    }
                 }
             } ?: throw NullPointerException()
         }
@@ -267,12 +269,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCameraUploadsTemporaryRootDirectory() =
         withContext(ioDispatcher + NonCancellable) {
-            val cameraUploadsCacheFolder = cacheFolderGateway.getCameraUploadsCacheFolder()
-            fileGateway.deleteDirectory(path = "${cameraUploadsCacheFolder.absolutePath}${File.separator}")
+            val cameraUploadsCacheFolder = cacheGateway.getCameraUploadsCacheFolder()
+            fileGateway.deleteDirectory(path = "${cameraUploadsCacheFolder?.absolutePath}${File.separator}")
         }
 
-    override val cacheDir: File
-        get() = cacheFolderGateway.cacheDir
+    override suspend fun createCameraUploadTemporaryRootDirectory() =
+        withContext(ioDispatcher) {
+            cacheGateway.getCameraUploadsCacheFolder()
+        }
 
     override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
         megaApiGateway.getFingerprint(filePath)

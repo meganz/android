@@ -35,8 +35,6 @@ internal class CacheFolderFacade @Inject constructor(
 
     companion object {
         private const val CHAT_TEMPORARY_FOLDER = "chatTempMEGA"
-        private const val AVATAR_FOLDER = "avatarsMEGA"
-        private const val CAMERA_UPLOADS_CACHE_FOLDER = "cu"
     }
 
     override fun getCacheFolder(folderName: String): File? =
@@ -117,10 +115,4 @@ internal class CacheFolderFacade @Inject constructor(
     }
 
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
-
-    override suspend fun getCameraUploadsCacheFolder(): File =
-        File(cacheDir, CAMERA_UPLOADS_CACHE_FOLDER)
-
-    override val cacheDir: File
-        get() = context.cacheDir
 }

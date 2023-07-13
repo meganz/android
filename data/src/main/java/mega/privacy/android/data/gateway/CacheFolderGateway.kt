@@ -78,16 +78,4 @@ interface CacheFolderGateway {
      * create a default download location file
      */
     suspend fun buildDefaultDownloadDir(): File
-
-    /**
-     * Returns the Camera Uploads Cache Folder
-     *
-     * @return A [File] representing the Camera Uploads Cache Folder
-     */
-    suspend fun getCameraUploadsCacheFolder(): File
-
-    /**
-     * Returns cache directory of the app
-     */
-    val cacheDir: File
 }

@@ -114,16 +114,16 @@ interface FileSystemRepository {
     suspend fun createDirectory(path: String): File
 
     /**
+     * Creates the temporary Camera Uploads root directory
+     */
+    suspend fun createCameraUploadTemporaryRootDirectory(): File?
+
+    /**
      * Recursively deletes the temporary Camera Uploads root directory
      *
      * @return true if the delete operation is successful, and false if otherwise
      */
     suspend fun deleteCameraUploadsTemporaryRootDirectory(): Boolean
-
-    /**
-     * Returns cache directory of the app
-     */
-    val cacheDir: File
 
     /**
      * Get the fingerprint of a file by path

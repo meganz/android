@@ -16,7 +16,7 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
-import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -205,10 +205,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCompressVideos() = mock<CompressVideos>()
-
-    @Provides
-    fun provideCreateCameraUploadTemporaryRootDirectory() =
-        mock<CreateCameraUploadTemporaryRootDirectory>()
 
     @Provides
     fun provideBroadcastCameraUploadProgress() =

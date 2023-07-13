@@ -7,7 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -64,7 +64,7 @@ internal class FileSystemRepositoryImplTest {
     private val shareDataMapper: ShareDataMapper = mock()
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
-    private val cacheFolderGateway: CacheFolderGateway = mock()
+    private val cacheGateway: CacheGateway = mock()
     private val nodeMapper: NodeMapper = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
@@ -87,7 +87,7 @@ internal class FileSystemRepositoryImplTest {
             shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
-            cacheFolderGateway = cacheFolderGateway,
+            cacheGateway = cacheGateway,
             nodeMapper = nodeMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             offlineNodeInformationMapper = offlineNodeInformationMapper,
@@ -111,7 +111,7 @@ internal class FileSystemRepositoryImplTest {
             shareDataMapper,
             megaExceptionMapper,
             sortOrderIntMapper,
-            cacheFolderGateway,
+            cacheGateway,
             nodeMapper,
             fileTypeInfoMapper,
             offlineNodeInformationMapper,
@@ -347,7 +347,7 @@ internal class FileSystemRepositoryImplTest {
     @ValueSource(booleans = [true, false])
     fun `test that the camera uploads temporary root directory could be deleted`(deleteRootDirectory: Boolean) =
         runTest {
-            whenever(cacheFolderGateway.getCameraUploadsCacheFolder()).thenReturn(mock())
+            whenever(cacheGateway.getCameraUploadsCacheFolder()).thenReturn(mock())
             whenever(fileGateway.deleteDirectory(any())).thenReturn(deleteRootDirectory)
 
             assertThat(underTest.deleteCameraUploadsTemporaryRootDirectory()).isEqualTo(

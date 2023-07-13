@@ -62,6 +62,9 @@ internal class CacheGatewayImpl @Inject constructor(
     override suspend fun getFullSizeCacheFolder(): File? =
         getOrCreateCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
 
+    override suspend fun getCameraUploadsCacheFolder(): File? =
+        getOrCreateCacheFolder(CacheFolderConstant.CAMERA_UPLOADS_CACHE_FOLDER)
+
     override suspend fun buildAvatarFile(fileName: String?) =
         fileName?.let { getCacheFile(CacheFolderConstant.AVATAR_FOLDER, it) }
 
