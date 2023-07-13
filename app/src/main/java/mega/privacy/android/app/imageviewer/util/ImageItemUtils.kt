@@ -33,6 +33,7 @@ fun ImageItem.shouldShowDownloadOption(): Boolean =
 fun ImageItem.shouldShowOfflineOption(): Boolean =
     this !is ImageItem.OfflineNode && nodeItem?.node?.isTakenDown != true
             && nodeItem?.isFromRubbishBin != true
+            && nodeItem?.node?.isForeign != true
 
 fun ImageItem.shouldShowManageLinkOption(): Boolean =
     this !is ImageItem.ChatNode && nodeItem?.hasOwnerAccess == true
@@ -47,7 +48,7 @@ fun ImageItem.shouldShowSendToContactOption(isUserLoggedIn: Boolean): Boolean =
             && nodeItem?.isExternalNode != true
 
 fun ImageItem.shouldShowShareOption(): Boolean =
-    nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true
+    nodeItem?.node?.isTakenDown != true && nodeItem?.isFromRubbishBin != true && nodeItem?.node?.isForeign != true
             && (this is ImageItem.OfflineNode
             || nodeItem?.hasOwnerAccess == true
             || this !is ImageItem.PublicNode)

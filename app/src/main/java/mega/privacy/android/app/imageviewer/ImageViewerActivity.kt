@@ -653,7 +653,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
                     file != null -> {
                         trackOnShareClicked()
-                        FileUtil.shareFile(this, file)
+                        FileUtil.shareFile(this, file, imageItem.nodeItem?.node?.name)
                     }
 
                     imageItem is ImageItem.PublicNode -> {

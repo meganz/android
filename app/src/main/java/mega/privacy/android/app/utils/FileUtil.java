@@ -725,10 +725,13 @@ public class FileUtil {
      * @param context current Context.
      * @param file    file to share.
      */
-    public static void shareFile(Context context, File file) {
+    public static void shareFile(Context context, File file, String fileName) {
         Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
         shareIntent.setType(MimeTypeList.typeForName(file.getName()).getType() + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
+        if (fileName != null && !fileName.isBlank()) {
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, fileName);
+        }
         // To avoid java.lang.SecurityException: Permission Denial
         shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));

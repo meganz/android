@@ -232,7 +232,7 @@ object MegaNodeUtil {
             val path = getLocalFile(node)
 
             if (!path.isNullOrBlank() && !node.isFolder) {
-                shareFile(context, File(path))
+                shareFile(context, File(path), node.name)
             } else if (node.isExported) {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.putExtra(Intent.EXTRA_SUBJECT, node.name)

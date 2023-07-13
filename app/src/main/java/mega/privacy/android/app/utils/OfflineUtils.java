@@ -675,7 +675,7 @@ public class OfflineUtils {
                 shareNode(context, MegaApplication.getInstance().getMegaApi().getNodeByHandle(Long.parseLong(node.getHandle())));
             }
         } else {
-            shareFile(context, getOfflineFile(context, node));
+            shareFile(context, getOfflineFile(context, node), node.getName());
         }
     }
 

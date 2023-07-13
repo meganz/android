@@ -339,6 +339,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         OfflineUtils.shareOfflineNode(context, imageItem.handle)
                     }
 
+                    file != null -> {
+                        trackOnShareClicked()
+                        FileUtil.shareFile(context, file, node?.name)
+                    }
+
                     imageItem is ImageItem.PublicNode -> {
                         trackOnShareClicked()
                         MegaNodeUtil.shareLink(requireActivity(), imageItem.nodePublicLink)
@@ -348,15 +353,11 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         trackOnShareClicked()
                         viewModel.exportNode(node).observe(viewLifecycleOwner) { link ->
                             if (!link.isNullOrBlank()) {
-                                MegaNodeUtil.shareNode(requireActivity(), node)
+                                MegaNodeUtil.shareLink(requireActivity(), link)
                             }
                         }
                     }
 
-                    file != null -> {
-                        trackOnShareClicked()
-                        FileUtil.shareFile(context, file)
-                    }
                 }
             }
 

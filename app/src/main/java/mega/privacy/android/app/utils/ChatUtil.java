@@ -1658,7 +1658,7 @@ public class ChatUtil {
         String path = getLocalFile(node);
         if (!isTextEmpty(path)) {
             Timber.d("Node is downloaded, so share the file");
-            shareFile(context, new File(path));
+            shareFile(context, new File(path), node.getName());
         } else if (node.isExported()) {
             Timber.d("Node is exported, so share the public link");
             startShareIntent(context, new Intent(android.content.Intent.ACTION_SEND), node.getPublicLink());
