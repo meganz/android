@@ -8,8 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +24,8 @@ import com.budiyev.android.codescanner.CodeScanner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.Result
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogAcceptContactBinding
@@ -61,13 +61,7 @@ class ScanCodeFragment : Fragment() {
     private val uiState: ScanCodeState
         get() = viewModel.state.value
 
-    private var handler: Handler? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        Timber.d("onCreate")
-        super.onCreate(savedInstanceState)
-        handler = Handler(Looper.getMainLooper())
-    }
+    private var previewJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,12 +82,20 @@ class ScanCodeFragment : Fragment() {
     override fun onResume() {
         Timber.d("onResume")
         super.onResume()
-        codeScanner?.startPreview()
+        delayStartPreview()
+    }
+
+    private fun delayStartPreview() {
+        previewJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(START_PREVIEW_DELAY)
+            codeScanner?.startPreview()
+        }
     }
 
     override fun onPause() {
         Timber.d("onPause")
         super.onPause()
+        previewJob?.cancel()
         codeScanner?.releaseResources()
     }
 
@@ -155,10 +157,7 @@ class ScanCodeFragment : Fragment() {
                 Timber.w("Start preview error:${error.message}, retry:${mStartPreviewRetried + 1}")
 
                 if (mStartPreviewRetried++ < START_PREVIEW_RETRY) {
-                    handler?.postDelayed(
-                        { codeScanner?.startPreview() },
-                        START_PREVIEW_DELAY.toLong()
-                    )
+                    delayStartPreview()
                 } else {
                     Timber.e("Start preview failed")
                 }
@@ -423,7 +422,7 @@ class ScanCodeFragment : Fragment() {
         // the megaChatApi.disableVideo() is async call. A simply way to solve the issue is
         // setErrorCallback for CodeScanner. If error occurs, retry in 300ms. Retry 5 times max.
         private const val START_PREVIEW_RETRY = 5
-        private const val START_PREVIEW_DELAY = 300
+        private const val START_PREVIEW_DELAY = 300L
 
         /**
          * New instance of ScanCodeFragment
