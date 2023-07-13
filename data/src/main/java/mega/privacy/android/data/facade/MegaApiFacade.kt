@@ -1269,4 +1269,7 @@ internal class MegaApiFacade @Inject constructor(
             megaApi.exportNode(node, listener)
         }
     }
+
+    override fun setDeviceName(deviceName: String, listener: MegaRequestListenerInterface?) =
+        megaApi.setDeviceName(deviceName, listener)
 }

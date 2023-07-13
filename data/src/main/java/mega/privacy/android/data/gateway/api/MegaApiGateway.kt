@@ -2647,4 +2647,18 @@ interface MegaApiGateway {
         expireTime: Long?,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Sets device name
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     *
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_DEVICE_NAMES
+     * - MegaRequest::getName - Returns device name.
+     *
+     * @param deviceName String with device name
+     * @param listener   MegaRequestListener to track this request
+     */
+    fun setDeviceName(deviceName: String, listener: MegaRequestListenerInterface?)
 }
