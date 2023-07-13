@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Use case for broadcasting if transfers are paused.
  *
  */
-class BroadcastPausedTransfers @Inject constructor(private val transferRepository: TransferRepository) {
+class BroadcastPausedTransfersUseCase @Inject constructor(private val transferRepository: TransferRepository) {
 
     /**
      * Invoke.

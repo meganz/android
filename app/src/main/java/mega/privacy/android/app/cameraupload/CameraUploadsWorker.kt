@@ -128,7 +128,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -180,7 +180,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val monitorPausedTransfers: MonitorPausedTransfers,
+    private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorBatteryInfo: MonitorBatteryInfo,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
@@ -407,7 +407,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
-            monitorPausedTransfers().collect {
+            monitorPausedTransfersUseCase().collect {
                 updateProgressNotification()
             }
         }

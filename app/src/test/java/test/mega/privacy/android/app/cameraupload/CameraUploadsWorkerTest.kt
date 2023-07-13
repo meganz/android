@@ -86,7 +86,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -144,7 +144,7 @@ class CameraUploadsWorkerTest {
     private val setSecondarySyncHandle: SetSecondarySyncHandle = mock()
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase = mock()
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase = mock()
-    private val monitorPausedTransfers: MonitorPausedTransfers = mock()
+    private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val monitorBatteryInfo: MonitorBatteryInfo = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
@@ -253,7 +253,7 @@ class CameraUploadsWorkerTest {
             getDefaultNodeHandleUseCase = getDefaultNodeHandleUseCase,
             areTransfersPausedUseCase = areTransfersPausedUseCase,
             ioDispatcher = ioDispatcher,
-            monitorPausedTransfers = monitorPausedTransfers,
+            monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorBatteryInfo = monitorBatteryInfo,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,

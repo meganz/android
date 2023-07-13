@@ -68,7 +68,7 @@ import mega.privacy.android.domain.usecase.transfer.BroadcastTransfersFinishedUs
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -115,7 +115,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     lateinit var chatPreferencesGateway: ChatPreferencesGateway
 
     @Inject
-    lateinit var monitorPausedTransfers: MonitorPausedTransfers
+    lateinit var monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase
 
     @Inject
     lateinit var broadcastTransfersFinishedUseCase: BroadcastTransfersFinishedUseCase
@@ -195,7 +195,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         startForeground()
 
         monitorPausedTransfersJob = sharingScope.launch {
-            monitorPausedTransfers().collectLatest {
+            monitorPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 Handler(Looper.getMainLooper()).postDelayed(
                     { updateProgressNotification(true) },

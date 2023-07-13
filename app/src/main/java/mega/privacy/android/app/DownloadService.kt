@@ -84,7 +84,7 @@ import mega.privacy.android.domain.usecase.transfer.CancelAllDownloadTransfersUs
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
-import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -144,7 +144,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
 
     @Inject
-    lateinit var monitorPausedTransfers: MonitorPausedTransfers
+    lateinit var monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase
 
     @Inject
     lateinit var monitorStopTransfersWorkUseCase: MonitorStopTransfersWorkUseCase
@@ -261,7 +261,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
     private fun setReceivers() {
 
         lifecycleScope.launch {
-            monitorPausedTransfers().collectLatest {
+            monitorPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
                 updateProgressNotification(true)

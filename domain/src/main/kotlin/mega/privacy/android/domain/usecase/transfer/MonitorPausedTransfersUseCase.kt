@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Use case for monitoring paused transfers.
  *
  */
-class MonitorPausedTransfers @Inject constructor(private val transferRepository: TransferRepository) {
+class MonitorPausedTransfersUseCase @Inject constructor(private val transferRepository: TransferRepository) {
 
     /**
      * Invoke

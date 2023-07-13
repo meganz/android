@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfers
+import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
 import javax.inject.Inject
 
@@ -39,7 +39,7 @@ import javax.inject.Inject
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
  * @property areAllTransfersPaused                  [AreAllTransfersPaused]
- * @property broadcastPausedTransfers               [BroadcastPausedTransfers]
+ * @property broadcastPausedTransfersUseCase               [BroadcastPausedTransfersUseCase]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -49,7 +49,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPaused: AreAllTransfersPaused,
-    private val broadcastPausedTransfers: BroadcastPausedTransfers,
+    private val broadcastPausedTransfersUseCase: BroadcastPausedTransfersUseCase,
     private val transfersInfoMapper: TransfersInfoMapper,
     private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -148,7 +148,7 @@ class TransfersManagementViewModel @Inject constructor(
             if (paused) {
                 _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
                 if (shouldBroadcast) {
-                    broadcastPausedTransfers()
+                    broadcastPausedTransfersUseCase()
                 }
             } else {
                 checkTransfersInfo(TransferType.NONE, false)
