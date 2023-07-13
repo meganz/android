@@ -2182,7 +2182,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (result.conflictNodes.isNotEmpty()) {
             nameCollisionActivityContract
                 ?.launch(ArrayList(result.conflictNodes.values.map {
-                    NameCollision.Movement.getMovementCollision(it)
+                    when (result.type) {
+                        NodeNameCollisionType.RESTORE,
+                        NodeNameCollisionType.MOVE,
+                        -> NameCollision.Movement.getMovementCollision(it)
+
+                        NodeNameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(it)
+                    }
                 }))
         }
         if (result.noConflictNodes.isNotEmpty()) {
