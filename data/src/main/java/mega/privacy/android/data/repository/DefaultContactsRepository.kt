@@ -617,14 +617,25 @@ internal class DefaultContactsRepository @Inject constructor(
         message: String?,
     ): InviteContactRequest = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            megaApiGateway.inviteContact(email,
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request: MegaRequest, error: MegaError ->
+                    continuation.resumeWith(runCatching {
+                        inviteContactRequestMapper(
+                            error,
+                            request.email,
+                            megaApiGateway.outgoingContactRequests()
+                        )
+                    })
+                }
+            )
+            megaApiGateway.inviteContact(
+                email,
                 handle,
                 message,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { _: MegaRequest, error: MegaError ->
-                        continuation.resumeWith(Result.success(inviteContactRequestMapper(error)))
-                    }
-                ))
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 

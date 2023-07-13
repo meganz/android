@@ -633,16 +633,28 @@ class DefaultContactsRepositoryTest {
 
     @Test
     fun `test that successful invite contact returns Sent enum value`() = runTest {
-
+        val myEmail = "myEmail@mega.co.nz"
+        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
+        val request = mock<MegaRequest> {
+            on { email }.thenReturn(myEmail)
+        }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
         val expectedResult = InviteContactRequest.Sent
 
+
         whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
             ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), mock(), megaError
+                mock(), request, megaError
             )
         }
-        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
+        whenever(
+            inviteContactRequestMapper(
+                megaError,
+                myEmail,
+                outgoingContactRequests
+            )
+        ).thenReturn(expectedResult)
 
         val result = underTest.inviteContact(userEmail, userHandle, null)
         assertThat(result).isEqualTo(expectedResult)
@@ -650,16 +662,27 @@ class DefaultContactsRepositoryTest {
 
     @Test
     fun `test that inviting existing contact returns AlreadyContact enum value`() = runTest {
-
+        val myEmail = "myEmail@mega.co.nz"
+        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
+        val request = mock<MegaRequest> {
+            on { email }.thenReturn(myEmail)
+        }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
         val expectedResult = InviteContactRequest.AlreadyContact
 
         whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
             ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), mock(), megaError
+                mock(), request, megaError
             )
         }
-        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
+        whenever(
+            inviteContactRequestMapper(
+                megaError,
+                myEmail,
+                outgoingContactRequests
+            )
+        ).thenReturn(expectedResult)
 
         val result = underTest.inviteContact(userEmail, userHandle, null)
         assertThat(result).isEqualTo(expectedResult)
@@ -667,37 +690,58 @@ class DefaultContactsRepositoryTest {
 
     @Test
     fun `test that inviting contact with self email returns InvalidEmail enum value`() = runTest {
-
+        val myEmail = "myEmail@mega.co.nz"
+        val outgoingContactRequests = arrayListOf<MegaContactRequest>()
+        val request = mock<MegaRequest> {
+            on { email }.thenReturn(myEmail)
+        }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
         val expectedResult = InviteContactRequest.InvalidEmail
 
         whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
             ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), mock(), megaError
+                mock(), request, megaError
             )
         }
-        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
+        whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
+        whenever(
+            inviteContactRequestMapper(
+                megaError,
+                myEmail,
+                outgoingContactRequests
+            )
+        ).thenReturn(expectedResult)
 
         val result = underTest.inviteContact(userEmail, userHandle, null)
         assertThat(result).isEqualTo(expectedResult)
     }
 
-    @Test
-    fun `test that error on inviting contact returns InvalidStatus enum value`() = runTest {
+    @Test(expected = MegaException::class)
+    fun `test that error on inviting contact throw MegaException when mapper throw exception`() =
+        runTest {
+            val myEmail = "myEmail@mega.co.nz"
+            val outgoingContactRequests = arrayListOf<MegaContactRequest>()
+            val request = mock<MegaRequest> {
+                on { email }.thenReturn(myEmail)
+            }
+            val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EACCESS) }
 
-        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EACCESS) }
-        val expectedResult = InviteContactRequest.InvalidStatus
+            whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(), request, megaError
+                )
+            }
+            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(outgoingContactRequests)
+            whenever(
+                inviteContactRequestMapper(
+                    megaError,
+                    myEmail,
+                    outgoingContactRequests
+                )
+            ).thenThrow(MegaException::class.java)
 
-        whenever(megaApiGateway.inviteContact(any(), any(), anyOrNull(), any())).thenAnswer {
-            ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), mock(), megaError
-            )
+            underTest.inviteContact(userEmail, userHandle, null)
         }
-        whenever(inviteContactRequestMapper(megaError)).thenReturn(expectedResult)
-
-        val result = underTest.inviteContact(userEmail, userHandle, null)
-        assertThat(result).isEqualTo(expectedResult)
-    }
 
     @Test
     fun `test that updateCurrentUserFirstName return correct value when calling API returns success`() =
@@ -1163,7 +1207,7 @@ class DefaultContactsRepositoryTest {
                     .onRequestFinish(mock(), request, error)
             }
             assertThat(underTest.getContactLink(1L))
-                .isEqualTo(ContactLink(isContact = false,))
+                .isEqualTo(ContactLink(isContact = false))
         }
 
     @Test(expected = MegaException::class)

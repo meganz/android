@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
 import mega.privacy.android.app.presentation.extensions.printEmail
-import mega.privacy.android.app.presentation.extensions.success
 import mega.privacy.android.app.presentation.qrcode.scan.model.ScanCodeState
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
-import mega.privacy.android.domain.usecase.contact.InviteContact
+import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScanCodeViewModel @Inject constructor(
     private val queryScannedContactLink: QueryScannedContactLink,
-    private val inviteContact: InviteContact,
+    private val inviteContactUseCase: InviteContactUseCase,
 ) : ViewModel() {
 
     /**
@@ -117,6 +117,7 @@ class ScanCodeViewModel @Inject constructor(
                         Timber.d("Contact link query ${handle}_${email}_${contactName}_${avatarFile}")
                         showInviteDialog(this)
                     }
+
                     QRCodeQueryResults.CONTACT_QUERY_EEXIST -> {
                         showInviteResultDialog(
                             qrCodeQueryResult.dialogTitle,
@@ -125,6 +126,7 @@ class ScanCodeViewModel @Inject constructor(
                             printEmail = true
                         )
                     }
+
                     else -> {
                         showInviteResultDialog(
                             qrCodeQueryResult.dialogTitle,
@@ -143,13 +145,27 @@ class ScanCodeViewModel @Inject constructor(
      */
     fun sendInvite() {
         viewModelScope.launch {
-            val requestStatus = inviteContact(
-                state.value.email ?: "",
-                state.value.scannedContactLinkResult?.handle ?: -1,
-                null
-            )
-            requestStatus.run {
-                showInviteResultDialog(dialogTitle, dialogContent, success, printEmail)
+            runCatching {
+                inviteContactUseCase(
+                    state.value.email ?: "",
+                    state.value.scannedContactLinkResult?.handle ?: -1,
+                    null
+                )
+            }.onSuccess { request ->
+                showInviteResultDialog(
+                    title = request.dialogTitle,
+                    text = request.dialogContent,
+                    success = true,
+                    printEmail = request.printEmail
+                )
+            }.onFailure {
+                Timber.e(it)
+                showInviteResultDialog(
+                    title = R.string.invite_not_sent,
+                    text = R.string.invite_not_sent_text_error,
+                    success = false,
+                    printEmail = false
+                )
             }
         }
     }

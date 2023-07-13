@@ -24,7 +24,6 @@ import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
-import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 
 /**
@@ -82,10 +81,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetCurrentUserLastName(contactsRepository: ContactsRepository): GetCurrentUserLastName =
             GetCurrentUserLastName(contactsRepository::getCurrentUserLastName)
-
-        @Provides
-        fun provideInviteContact(contactsRepository: ContactsRepository): InviteContact =
-            InviteContact(contactsRepository::inviteContact)
 
         @Provides
         fun provideGetUserFirstName(contactsRepository: ContactsRepository): GetUserFirstName =

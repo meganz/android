@@ -14,7 +14,7 @@ import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
-import mega.privacy.android.domain.usecase.contact.InviteContact
+import mega.privacy.android.domain.usecase.contact.InviteContactUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLink
 import org.junit.Before
 import org.junit.Rule
@@ -31,7 +31,7 @@ class ScanCodeViewModelTest {
 
     private lateinit var underTest: ScanCodeViewModel
     private val queryScannedContactLink = mock<QueryScannedContactLink>()
-    private val inviteContact = mock<InviteContact>()
+    private val inviteContactUseCase = mock<InviteContactUseCase>()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -43,7 +43,7 @@ class ScanCodeViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ScanCodeViewModel(queryScannedContactLink, inviteContact)
+        underTest = ScanCodeViewModel(queryScannedContactLink, inviteContactUseCase)
     }
 
     @Test
@@ -259,7 +259,7 @@ class ScanCodeViewModelTest {
     @Test
     fun `test that on sending invite and on result Sent show invite result dialog values are updated`() =
         runTest {
-            whenever(inviteContact(any(), any(), anyOrNull())).thenReturn(InviteContactRequest.Sent)
+            whenever(inviteContactUseCase(any(), any(), anyOrNull())).thenReturn(InviteContactRequest.Sent)
             underTest.state.test {
                 awaitItem()
                 underTest.sendInvite()
@@ -274,7 +274,7 @@ class ScanCodeViewModelTest {
     @Test
     fun `test that on sending invite and on result InvalidEmail show invite result dialog values are updated`() =
         runTest {
-            whenever(inviteContact(any(), any(), anyOrNull()))
+            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
                 .thenReturn(InviteContactRequest.InvalidEmail)
 
             underTest.state.test {
@@ -291,7 +291,7 @@ class ScanCodeViewModelTest {
     @Test
     fun `test that on sending invite and on result AlreadyContact show invite result dialog values are updated`() =
         runTest {
-            whenever(inviteContact(any(), any(), anyOrNull()))
+            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
                 .thenReturn(InviteContactRequest.AlreadyContact)
 
             underTest.state.test {
@@ -306,10 +306,10 @@ class ScanCodeViewModelTest {
         }
 
     @Test
-    fun `test that on sending invite and on result InvalidStatus show invite result dialog values are updated`() =
+    fun `test that show invite result dialog values are updated when sending invite throw exception`() =
         runTest {
-            whenever(inviteContact(any(), any(), anyOrNull()))
-                .thenReturn(InviteContactRequest.InvalidStatus)
+            whenever(inviteContactUseCase(any(), any(), anyOrNull()))
+                .thenAnswer { throw RuntimeException() }
 
             underTest.state.test {
                 awaitItem()

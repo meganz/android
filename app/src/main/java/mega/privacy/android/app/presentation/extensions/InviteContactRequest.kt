@@ -12,7 +12,7 @@ internal val InviteContactRequest.dialogTitle: Int
 internal val InviteContactRequest.dialogContent: Int
     get() = when (this) {
         InviteContactRequest.Sent -> R.string.invite_sent_text
-        InviteContactRequest.AlreadyContact -> R.string.invite_not_sent_text_already_contact
+        InviteContactRequest.AlreadyContact, InviteContactRequest.AlreadySent -> R.string.invite_not_sent_text_already_contact
         InviteContactRequest.InvalidEmail -> R.string.error_own_email_as_contact
         else -> R.string.invite_not_sent_text_error
     }
