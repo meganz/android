@@ -22,9 +22,14 @@ sealed class FileInfoJobInProgressState(
 ) {
 
     /**
-     * [String] to set a custom message if needed
+     * [String] to set a custom error message if needed
      */
     open fun customErrorMessage(context: Context, exception: Throwable?): String? = null
+
+    /**
+     * [String] to set a custom success message if needed
+     */
+    open fun customSuccessMessage(context: Context): String? = null
 
     /**
      * The node is loading its properties
@@ -100,10 +105,19 @@ sealed class FileInfoJobInProgressState(
     }
 
     /**
+     * Sdk is processing the node to prepare the download.
+     */
+    object ProcessingFiles : FileInfoJobInProgressState(null, null, null) {
+        override fun customSuccessMessage(context: Context): String {
+            return context.resources.getQuantityString(R.plurals.download_started, 1, 1)
+        }
+    }
+
+    /**
      * Permission for outgoing shares of the node will be changed
      */
     sealed class ChangeSharePermission(
-        @StringRes progressMessage: Int?,
+        @StringRes progressMessage: Int,
         @StringRes successMessage: Int?,
         @StringRes failMessage: Int?,
     ) :

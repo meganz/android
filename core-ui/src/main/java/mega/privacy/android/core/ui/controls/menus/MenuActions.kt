@@ -46,6 +46,7 @@ fun MenuActions(
     dropDownIcon: Painter,
     tint: Color,
     onActionClick: (MenuAction) -> Unit,
+    enabled: Boolean = true,
 ) {
     val sortedActions = actions.sortedBy { it.orderInCategory }
     val visible = sortedActions
@@ -55,7 +56,8 @@ fun MenuActions(
         IconButtonForAction(
             menuAction = it,
             tint = tint,
-            onActionClick = onActionClick
+            onActionClick = onActionClick,
+            enabled = enabled,
         )
     }
     sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
@@ -64,6 +66,7 @@ fun MenuActions(
             tint = tint,
             painter = dropDownIcon,
             onActionClick = onActionClick,
+            enabled = enabled,
         )
     }
 
@@ -74,13 +77,15 @@ private fun IconButtonForAction(
     menuAction: MenuActionWithIcon,
     tint: Color,
     onActionClick: (MenuAction) -> Unit,
+    enabled: Boolean = true,
 ) {
     IconButtonWithTooltip(
         iconPainter = menuAction.getIconPainter(),
         description = menuAction.getDescription(),
         tint = tint,
         onClick = { onActionClick(menuAction) },
-        modifier = Modifier.testTag(menuAction.getDescription())
+        modifier = Modifier.testTag(menuAction.getDescription()),
+        enabled = enabled,
     )
 }
 
@@ -90,6 +95,7 @@ private fun DropDown(
     tint: Color,
     painter: Painter,
     onActionClick: (MenuAction) -> Unit,
+    enabled: Boolean = true,
 ) {
     var showMoreMenu by remember {
         mutableStateOf(false)
@@ -99,7 +105,8 @@ private fun DropDown(
         description = stringResource(id = R.string.abc_action_menu_overflow_description),
         tint = tint,
         onClick = { showMoreMenu = !showMoreMenu },
-        modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE)
+        modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE),
+        enabled = enabled,
     )
 
     DropdownMenu(
@@ -129,6 +136,7 @@ private fun IconButtonWithTooltip(
     tint: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Box(modifier = modifier) {
         val showTooltip = remember { mutableStateOf(false) }
@@ -141,6 +149,7 @@ private fun IconButtonWithTooltip(
                     indication = rememberRipple(radius = 24.dp),
                     role = Role.Button,
                     onClick = onClick,
+                    enabled = enabled,
                     onLongClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         showTooltip.value = true

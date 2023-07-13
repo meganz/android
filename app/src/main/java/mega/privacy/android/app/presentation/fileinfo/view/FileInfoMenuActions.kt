@@ -20,6 +20,7 @@ internal fun RowScope.FileInfoMenuActions(
     actions: List<FileInfoMenuAction>,
     tint: Color,
     onActionClick: (FileInfoMenuAction) -> Unit,
+    enabled: Boolean = true,
 ) = MenuActions(
     actions = actions,
     maxActionsToShow = MENU_ACTIONS_TO_SHOW,
@@ -27,7 +28,8 @@ internal fun RowScope.FileInfoMenuActions(
     tint = tint,
     onActionClick = {
         (it as FileInfoMenuAction).let(onActionClick)
-    }
+    },
+    enabled = enabled,
 )
 
 @CombinedThemePreviews

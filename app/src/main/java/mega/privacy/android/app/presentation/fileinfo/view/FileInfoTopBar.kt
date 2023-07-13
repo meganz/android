@@ -41,6 +41,7 @@ internal fun FileInfoTopBar(
     titleAlpha: Float = 1f,
     onBackPressed: () -> Unit,
     onActionClick: (FileInfoMenuAction) -> Unit,
+    enabled: Boolean = true,
 ) {
     val backgroundAlpha = (opacityTransitionDelta * 10).coerceIn(0f, 1f)
     val elevationFactor = ((opacityTransitionDelta - 0.1f) * 2).coerceIn(0f, 1f)
@@ -67,7 +68,7 @@ internal fun FileInfoTopBar(
             )
         },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
+            IconButton(onClick = onBackPressed, enabled = enabled) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
@@ -79,7 +80,8 @@ internal fun FileInfoTopBar(
             FileInfoMenuActions(
                 actions = actions,
                 tint = tintColor,
-                onActionClick = onActionClick
+                onActionClick = onActionClick,
+                enabled = enabled,
             )
         },
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = backgroundAlpha),

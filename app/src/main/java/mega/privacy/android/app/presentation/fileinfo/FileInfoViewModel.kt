@@ -9,7 +9,11 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -49,6 +53,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -87,6 +92,7 @@ import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * View Model class for [FileInfoActivity]
@@ -156,6 +162,7 @@ class FileInfoViewModel @Inject constructor(
     private var versions: List<Node>? = null
     private val monitoringJobs = ArrayList<Job?>()
     private val monitoringMutex = Mutex()
+    private var currentInProgressJob: Job? = null
 
     /**
      * the [NodeId] of the current node for this screen
@@ -165,7 +172,12 @@ class FileInfoViewModel @Inject constructor(
     /**
      * Sets the node and updates its state
      */
-    fun setNode(handleNode: Long) {
+    fun setNode(handleNode: Long, forceUpdate: Boolean = false) {
+        if (this::typedNode.isInitialized && handleNode == nodeId.longValue && !forceUpdate) {
+            //do not need to update on screen rotation, for instance
+            Timber.d("No need to update as it's the same node $handleNode")
+            return
+        }
         Timber.d("FileInfoViewModel node set $handleNode")
         viewModelScope.launch {
             runCatching {
@@ -610,7 +622,7 @@ class FileInfoViewModel @Inject constructor(
                     return@any false
                 }
                 if (updateNode) {
-                    setNode(typedNode.id.longValue)
+                    setNode(typedNode.id.longValue, forceUpdate = true)
                 }
             }
         }
@@ -853,7 +865,7 @@ class FileInfoViewModel @Inject constructor(
             _uiState.update {
                 it.copy(jobInProgressState = progressState)
             }
-            viewModelScope.launch {
+            currentInProgressJob = viewModelScope.launch {
                 val result = block()
                 // if there's a result, the job has finished, (for instance: collision detected returns null because it handles the ui update)
                 if (result != null) {
@@ -920,21 +932,60 @@ class FileInfoViewModel @Inject constructor(
      * It checks the feature flag and start downloading the node with the appropriate use case or launch an one off event to start legacy download
      */
     fun startDownloadNode() {
-        viewModelScope.launch {
+        currentInProgressJob = viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
-                    getDefaultDownloadPathForNodeUseCase(parent)?.let { path ->
-                        startDownloadUseCase(
-                            destinationPath = path,
-                            nodes = listOf(typedNode),
-                            appData = null,
-                            isHighPriority = false
-                        ).collect {}
+                if (checkAndHandleIsDeviceConnected()) {
+                    _uiState.update {
+                        it.copy(jobInProgressState = FileInfoJobInProgressState.ProcessingFiles)
                     }
+                    var lastError: Throwable? = null
+                    val processed =
+                        (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
+                            getDefaultDownloadPathForNodeUseCase(parent)?.let { path ->
+                                startDownloadUseCase(
+                                    destinationPath = path,
+                                    nodes = listOf(typedNode),
+                                    appData = null,
+                                    isHighPriority = false
+                                ).catch {
+                                    lastError = it
+                                    Timber.e(it)
+                                }.onEach {
+                                    when (it) {
+                                        DownloadNodesEvent.NotSufficientSpace -> {
+                                            _uiState.updateEventAndClearProgress(
+                                                FileInfoOneOffViewEvent.Message.NotSufficientSpace
+                                            )
+                                        }
+
+                                        else -> Timber.d("Start download event received: $it")
+                                    }
+                                }.onCompletion {
+                                    if (it is CancellationException) {
+                                        _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.Message.TransferCancelled)
+                                    }
+                                }.firstOrNull {
+                                    it == DownloadNodesEvent.FinishProcessingTransfers
+                                } != null
+                            }
+                        }
+                    _uiState.updateEventAndClearProgress(
+                        FileInfoOneOffViewEvent.Finished(
+                            jobFinished = FileInfoJobInProgressState.ProcessingFiles,
+                            exception = lastError?.takeIf { processed != true }
+                        ),
+                    )
                 }
             } else {
                 _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
             }
         }
+    }
+
+    /**
+     * Cancel current in progress job
+     */
+    fun cancelCurrentJob() {
+        currentInProgressJob?.cancel()
     }
 }

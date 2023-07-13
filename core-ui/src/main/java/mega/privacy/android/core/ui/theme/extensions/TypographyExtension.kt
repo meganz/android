@@ -32,7 +32,7 @@ val Typography.body2medium: TextStyle
     get() = body2.copy(fontWeight = FontWeight.Medium)
 
 /**
- * Body 2 medium weight
+ * Body 3
  */
 val Typography.body3: TextStyle
     get() = body2.copy(fontSize = 13.sp, lineHeight = 17.sp, letterSpacing = 0.03.sp)

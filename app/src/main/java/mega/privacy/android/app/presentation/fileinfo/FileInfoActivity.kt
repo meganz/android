@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -42,6 +43,8 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.presentation.settings.SettingsActivity
+import mega.privacy.android.app.presentation.settings.model.TargetPreference
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -161,6 +164,7 @@ class FileInfoActivity : BaseActivity() {
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
+                    onTransferCancelled = viewModel::cancelCurrentJob,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }
@@ -472,8 +476,8 @@ class FileInfoActivity : BaseActivity() {
 
             is FileInfoOneOffViewEvent.Finished -> {
                 if (event.exception == null) {
-                    event.jobFinished.successMessage?.let {
-                        snackBarHostState.showSnackbar(getString(it))
+                    event.successMessage(this)?.let {
+                        snackBarHostState.showSnackbar(it)
                     }
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
                 } else {
@@ -486,7 +490,17 @@ class FileInfoActivity : BaseActivity() {
                 }
             }
 
-            is FileInfoOneOffViewEvent.Message -> snackBarHostState.showSnackbar(getString(event.message))
+            is FileInfoOneOffViewEvent.Message -> {
+                //show snack bar with an optional action
+                val result = snackBarHostState.showSnackbar(
+                    getString(event.message),
+                    event.action?.let { getString(it) }
+                )
+                if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
+                    consumeEvent(event.actionEvent, snackBarHostState)
+                }
+            }
+
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             FileInfoOneOffViewEvent.StartLegacyDownload -> {
                 nodeSaver.saveNode(
@@ -496,6 +510,10 @@ class FileInfoActivity : BaseActivity() {
                     fromMediaViewer = false,
                     needSerialize = false
                 )
+            }
+
+            FileInfoOneOffViewEvent.GoToFileManagement -> {
+                startActivity(SettingsActivity.getIntent(this, TargetPreference.Storage))
             }
         }
     }

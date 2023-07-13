@@ -255,7 +255,7 @@ internal class FileInfoViewModelTest {
         runTest {
             for (n in 0..5) {
                 whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(n)
-                underTest.setNode(node.handle)
+                underTest.setNode(node.handle, true)
                 Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
         }
@@ -265,7 +265,7 @@ internal class FileInfoViewModelTest {
         runTest {
             suspend fun verify(isNodeInInbox: Boolean) {
                 whenever(isNodeInInboxUseCase(NODE_HANDLE)).thenReturn(isNodeInInbox)
-                underTest.setNode(node.handle)
+                underTest.setNode(node.handle, true)
                 Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
             }
             verify(true)
@@ -277,7 +277,7 @@ internal class FileInfoViewModelTest {
         runTest {
             suspend fun verify(isNodeInRubbish: Boolean) {
                 whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(isNodeInRubbish)
-                underTest.setNode(node.handle)
+                underTest.setNode(node.handle, true)
                 underTest.uiState.test {
                     val state = awaitItem()
                     Truth.assertThat(state.isNodeInRubbish).isEqualTo(isNodeInRubbish)
@@ -291,7 +291,7 @@ internal class FileInfoViewModelTest {
     fun `test showHistoryVersions is true if the node contains one version`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
@@ -299,7 +299,7 @@ internal class FileInfoViewModelTest {
     fun `test showHistoryVersions is true if the node contains more than one version`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(2)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
@@ -307,7 +307,7 @@ internal class FileInfoViewModelTest {
     fun `test showHistoryVersions is false if the node contains no versions`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
         }
 
@@ -334,7 +334,7 @@ internal class FileInfoViewModelTest {
     fun `test CollisionDetected event is launched when a collision is found while moving`() =
         runTest {
             mockCollisionMoving()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.moveNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
@@ -343,7 +343,7 @@ internal class FileInfoViewModelTest {
     fun `test CollisionDetected event is launched when a collision is found while copying`() =
         runTest {
             mockCollisionCopying()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
@@ -353,7 +353,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
                 .thenThrow(RuntimeException::class.java)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
         }
@@ -362,7 +362,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMoving event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockMoveSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -373,7 +373,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMoving event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockMoveFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -384,7 +384,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockMoveToRubbishSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -395,7 +395,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockMoveToRubbishFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -406,7 +406,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeleting event is launched without exceptions when the delete finished successfully`() =
         runTest {
             mockDeleteSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -417,7 +417,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeleting event is launched with the proper exceptions when the delete finished with an error`() =
         runTest {
             mockDeleteFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -428,7 +428,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedCopying event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockCopySuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -439,7 +439,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedCopying event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockCopyFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -450,7 +450,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeletingVersions event is launched without exceptions when the delete versions finished successfully`() =
         runTest {
             mockDeleteVersionsSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -461,7 +461,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeletingVersions event is launched with the proper exceptions when the delete versions finished with an error`() =
         runTest {
             mockDeleteVersionsFailure(null)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -476,7 +476,7 @@ internal class FileInfoViewModelTest {
             val errors = 3
             val total = 5
             mockDeleteVersionsFailure(total, errors)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -492,7 +492,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying successfully, and unset at the end`() =
         runTest {
             mockCopySuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -500,7 +500,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying with an error, and unset at the end`() =
         runTest {
             mockCopyFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -508,7 +508,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying and Name conflict found, and unset at the end`() =
         runTest {
             mockCollisionCopying()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -516,7 +516,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving successfully, and unset at the end`() =
         runTest {
             mockMoveSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -524,7 +524,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving with an error, and unset at the end`() =
         runTest {
             mockMoveFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -532,7 +532,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving and Name conflict found, and unset at the end`() =
         runTest {
             mockCollisionMoving()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -540,7 +540,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving to rubbish successfully, and unset at the end`() =
         runTest {
             mockMoveToRubbishSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
@@ -548,7 +548,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving to rubbish with an error, and unset at the end`() =
         runTest {
             mockMoveToRubbishFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
@@ -556,7 +556,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting successfully, and unset at the end`() =
         runTest {
             mockDeleteSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileDeletingAndUnset()
         }
 
@@ -564,7 +564,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting with an error, and unset at the end`() =
         runTest {
             mockDeleteSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileDeletingAndUnset()
         }
 
@@ -572,7 +572,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting versions successfully, and unset at the end`() =
         runTest {
             mockDeleteVersionsSuccess()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileDeletingVersionsAndUnset()
         }
 
@@ -580,7 +580,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting versions with an error, and unset at the end`() =
         runTest {
             mockDeleteVersionsFailure()
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             testProgressIsSetWhileDeletingVersionsAndUnset()
         }
 
@@ -602,7 +602,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.hasPreview).thenReturn(true)
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo(previewUri)
@@ -620,7 +620,7 @@ internal class FileInfoViewModelTest {
             )
         }
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.uiState.test {
             Truth.assertThat(cancelAndConsumeRemainingEvents().any { it is Event.Error }).isFalse()
         }
@@ -630,7 +630,7 @@ internal class FileInfoViewModelTest {
     fun `test thumbnail is assigned when node is updated and there are no preview`() = runTest {
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo("file:$thumbUri")
@@ -643,7 +643,7 @@ internal class FileInfoViewModelTest {
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
         whenever(typedFileNode.hasPreview).thenReturn(true)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo(previewUri)
@@ -654,7 +654,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test getContactItemFromInShareFolder is invoked when the node is a Folder`() = runTest {
         val folderNode = mockFolder()
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         //first quick fetch
         verify(getContactItemFromInShareFolder).invoke(folderNode, false)
         //second not cached slow fetch
@@ -667,7 +667,7 @@ internal class FileInfoViewModelTest {
         whenever(monitorNodeUpdatesById.invoke(folderNode.id)).thenReturn(
             flowOf(listOf(NodeChanges.Owner))
         )
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         //check 2 invocations: first invocation when node is set, second one the update itself
         verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode, true)
     }
@@ -698,7 +698,7 @@ internal class FileInfoViewModelTest {
             whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
                 flowOf(listOf(NodeChanges.Inshare))
             )
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             Truth.assertThat(underTest.uiState.value.accessPermission)
                 .isEqualTo(expectedChanged)
             verify(getNodeAccessPermission, times(2)).invoke(nodeId)
@@ -706,7 +706,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test getNodeLocationInfo fetches node location when its set`() = runTest {
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         verify(getNodeLocationInfo, times(1)).invoke(typedFileNode)
     }
 
@@ -717,13 +717,13 @@ internal class FileInfoViewModelTest {
                 flowOf(listOf(NodeChanges.Parent))
             )
             .thenReturn(emptyFlow()) //second time we don't want to emit another update to avoid a circular call in this test
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         verify(getNodeLocationInfo, times(2)).invoke(typedFileNode)
     }
 
     @Test
     fun `test getOutShares is fetched when node is set`() = runTest {
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         verify(getOutShares, times(1)).invoke(nodeId)
     }
 
@@ -733,7 +733,7 @@ internal class FileInfoViewModelTest {
         val expected = mock<List<ContactPermission>>()
         whenever(getOutShares.invoke(nodeId)).thenReturn(expectedDeprecated)
         whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         Truth.assertThat(underTest.uiState.value.outSharesDeprecated).isEqualTo(expectedDeprecated)
         Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
     }
@@ -743,7 +743,7 @@ internal class FileInfoViewModelTest {
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
             flowOf(listOf(NodeChanges.Outshare))
         )
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         verify(getOutShares, times(2)).invoke(nodeId)
     }
 
@@ -759,7 +759,7 @@ internal class FileInfoViewModelTest {
                 on { changes }.thenReturn(updateChanges)
             }
             whenever(monitorContactUpdates.invoke()).thenReturn(flowOf(update))
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             verify(getOutShares, times(2)).invoke(nodeId)
             verify(getNodeOutSharesUseCase, times(2)).invoke(nodeId)
         }
@@ -768,7 +768,7 @@ internal class FileInfoViewModelTest {
     fun `test isAvailableOffline result is set on uiState`() = runTest {
         val expected = true
         whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(expected)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         Truth.assertThat(underTest.uiState.value.isAvailableOffline).isEqualTo(expected)
     }
 
@@ -777,7 +777,7 @@ internal class FileInfoViewModelTest {
         mockMonitorStorageStateEvent(StorageState.Green)
         val expected = true
         whenever(isAvailableOffline.invoke(any())).thenReturn(false)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.availableOfflineChanged(expected, activity)
         underTest.uiState.mapNotNull { it.isAvailableOffline }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expected)
@@ -790,7 +790,7 @@ internal class FileInfoViewModelTest {
     fun `test availableOfflineChanged does nothing if getState`() = runTest {
         mockMonitorStorageStateEvent(StorageState.PayWall)
         whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.availableOfflineChanged(true, activity)
         verifyNoInteractions(setNodeAvailableOffline)
     }
@@ -798,7 +798,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test when stopSharing is called then disableExport use case is called`() =
         runTest {
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.stopSharing()
             verify(stopSharingNode, times(1)).invoke(nodeId)
         }
@@ -832,7 +832,7 @@ internal class FileInfoViewModelTest {
         val link = "https://megalink"
         val exportedData = ExportedData(link, 100L)
         whenever(typedFileNode.exportedData).thenReturn(exportedData)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         underTest.copyPublicLink()
         verify(clipboardGateway, times(1)).setClip(Constants.COPIED_TEXT_LABEL, link)
     }
@@ -840,7 +840,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test that when initiate remove node on a node in the rubbish bin then the Delete confirmation action is set`() =
         runTest {
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(false)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
                 Truth.assertThat(awaitItem()).isEqualTo(FileInfoExtraAction.ConfirmRemove.Delete)
@@ -853,7 +853,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(-1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(-1)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
                 Truth.assertThat(awaitItem())
@@ -868,7 +868,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(nodeId.longValue)
             whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
                 Truth.assertThat(awaitItem())
@@ -883,7 +883,7 @@ internal class FileInfoViewModelTest {
             whenever(getPrimarySyncHandleUseCase()).thenReturn(-1L)
             whenever(getSecondarySyncHandleUseCase()).thenReturn(nodeId.longValue)
             whenever(isSecondaryFolderEnabled()).thenReturn(true)
-            underTest.setNode(node.handle)
+            underTest.setNode(node.handle, true)
             underTest.initiateRemoveNode(true)
             underTest.uiState.mapNotNull { it.requiredExtraAction }.test {
                 Truth.assertThat(awaitItem())
@@ -1057,7 +1057,7 @@ internal class FileInfoViewModelTest {
 
     private suspend fun mockDeleteSuccess() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenReturn(Unit)
     }
 
@@ -1080,7 +1080,7 @@ internal class FileInfoViewModelTest {
 
     private suspend fun mockDeleteFailure() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
-        underTest.setNode(node.handle)
+        underTest.setNode(node.handle, true)
         whenever(deleteNodeByHandleUseCase.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 

@@ -89,8 +89,10 @@ class MenuActionsTest {
             actions,
             defaultAmount,
             painterResource(id = R.drawable.ic_menu_more),
-            Color.Black
-        ) {}
+            Color.Black,
+            {},
+            enabled = true,
+        )
 
     private class MenuActionWithIconForTest(val title: String) : MenuActionWithIcon {
         @Composable
