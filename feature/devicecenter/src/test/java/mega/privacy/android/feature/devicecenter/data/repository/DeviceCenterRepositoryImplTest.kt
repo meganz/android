@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.devicecenter.data.repository
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -15,6 +16,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullAndEmptySource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -91,5 +95,13 @@ internal class DeviceCenterRepositoryImplTest {
                 e = megaResponse,
             )
         }
+    }
+
+    @ParameterizedTest(name = "deviceId: \"{0}\"")
+    @NullAndEmptySource
+    @ValueSource(strings = ["12345-6789"])
+    fun `test that get device id returns the current device id`(deviceId: String?) = runTest {
+        whenever(megaApiGateway.getDeviceId()).thenReturn(deviceId)
+        assertThat(underTest.getDeviceId()).isEqualTo(deviceId)
     }
 }

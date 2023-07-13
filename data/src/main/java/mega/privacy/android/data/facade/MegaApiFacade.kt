@@ -1272,4 +1272,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun setDeviceName(deviceName: String, listener: MegaRequestListenerInterface?) =
         megaApi.setDeviceName(deviceName, listener)
+
+    override fun getDeviceId() = megaApi.deviceId
 }

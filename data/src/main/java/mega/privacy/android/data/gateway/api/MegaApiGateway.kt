@@ -2661,4 +2661,13 @@ interface MegaApiGateway {
      * @param listener   MegaRequestListener to track this request
      */
     fun setDeviceName(deviceName: String, listener: MegaRequestListenerInterface?)
+
+    /**
+     * Returns the id of this device
+     *
+     * You take the ownership of the returned value.
+     *
+     * @return The id of this device
+     */
+    fun getDeviceId(): String?
 }

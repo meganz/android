@@ -11,4 +11,11 @@ interface DeviceCenterRepository {
      * @param deviceName The Device Name
      */
     suspend fun setDeviceName(deviceName: String)
+
+    /**
+     * Retrieves the Device ID of the current Device
+     *
+     * @return the Device ID
+     */
+    suspend fun getDeviceId(): String?
 }

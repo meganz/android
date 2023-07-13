@@ -62,4 +62,6 @@ internal class DeviceCenterRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getDeviceId() = megaApiGateway.getDeviceId()
 }
