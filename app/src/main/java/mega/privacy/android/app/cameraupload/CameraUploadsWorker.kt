@@ -26,11 +26,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.MegaApplication
@@ -231,6 +231,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val notificationChannelName =
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
+        private const val CONCURRENT_UPLOADS_LIMIT = 16
     }
 
 
@@ -327,6 +328,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private var areUploadsPaused: Boolean = false
 
+    /**
+     * In order to not overload the memory of the app,
+     * limit the number of concurrent uploads to [CONCURRENT_UPLOADS_LIMIT]
+     */
+    private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
 
     override suspend fun doWork() = coroutineScope {
         Timber.d("Start CU Worker")
@@ -769,8 +775,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     ) = coroutineScope {
         areUploadsPaused = areTransfersPausedUseCase()
 
-        val uploadFileAsyncList = mutableListOf<Job>()
-
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         val secondaryUploadNode =
@@ -778,6 +782,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         startHeartbeat()
 
+        val uploadFileAsyncList = mutableListOf<Job>()
         for (record in finalList) {
             val parentNodeId =
                 (if (record.isSecondary) secondaryUploadNode?.id else primaryUploadNode?.id)
@@ -785,22 +790,23 @@ class CameraUploadsWorker @AssistedInject constructor(
             val shouldBeSkipped = createTemporaryFileIfNeeded(record)
             if (shouldBeSkipped) continue
             if (record.isCopyOnly) {
-                Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
                 updateToUploadCount(record)
                 uploadFileAsyncList.add(launch {
+                    semaphore.acquire()
+                    Timber.d("Copy from node, file timestamp is: ${record.timestamp}")
+                    updateToUploadCount(record)
                     copyNode(
                         record = record,
                         parentNodeId = parentNodeId,
                     )
+                    semaphore.release()
                 })
             } else {
-                val fileToUpload = getFileToUpload(record, isCompressedVideo)
-                fileToUpload?.let {
-                    updateToUploadCount(record)
-                    val lastModified = getLastModifiedTime(record)
-
-                    // If the local file path exists, call the Use Case to upload the file
-                    uploadFileAsyncList.add(launch {
+                uploadFileAsyncList.add(launch {
+                    semaphore.acquire()
+                    getFileToUpload(record, isCompressedVideo)?.let {
+                        updateToUploadCount(record)
+                        val lastModified = getLastModifiedTime(record)
                         startUploadUseCase(
                             localPath = it.path,
                             parentNodeId = parentNodeId,
@@ -809,17 +815,21 @@ class CameraUploadsWorker @AssistedInject constructor(
                             appData = Constants.APP_DATA_CU,
                             isSourceTemporary = false,
                             shouldStartFirst = false,
-                        ).conflate().collect { globalTransfer ->
-                            // Handle the GlobalTransfer emitted by the Use Case
+                        ).collect { globalTransfer ->
                             onGlobalTransferUpdated(globalTransfer, record)
+
+                            if (globalTransfer is TransferEvent.TransferFinishEvent) {
+                                semaphore.release()
+                            }
                         }
-                    })
-                } ?: run {
-                    Timber.d("Local file is unavailable, delete record from database.")
-                    record.localPath?.let {
-                        deleteSyncRecord(it, record.isSecondary)
+                    } ?: run {
+                        Timber.d("Local file is unavailable, delete record from database.")
+                        record.localPath?.let {
+                            deleteSyncRecord(it, record.isSecondary)
+                        }
+                        semaphore.release()
                     }
-                }
+                })
             }
         }
         uploadFileAsyncList.joinAll()
