@@ -4284,6 +4284,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showEnable2FADialog() {
         Timber.d("newAccount: %s", newAccount)
         newAccount = false
+        if (supportFragmentManager.findFragmentByTag(Enable2FADialogFragment.TAG) != null) return
         Enable2FADialogFragment().show(supportFragmentManager, Enable2FADialogFragment.TAG)
     }
 
