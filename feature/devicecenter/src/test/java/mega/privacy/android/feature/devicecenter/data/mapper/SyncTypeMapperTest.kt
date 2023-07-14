@@ -16,7 +16,7 @@ import java.util.stream.Stream
  * Test class for [SyncTypeMapper]
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SyncTypeMapperTest {
+internal class SyncTypeMapperTest {
     private lateinit var underTest: SyncTypeMapper
 
     @BeforeAll
