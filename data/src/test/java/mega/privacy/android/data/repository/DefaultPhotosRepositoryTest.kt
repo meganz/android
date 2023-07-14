@@ -6,7 +6,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -49,9 +50,10 @@ class DefaultPhotosRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
-    private val cacheFolderFacade = mock<CacheFolderGateway> {
-        on { getCacheFolder(any()) }.thenReturn(null)
+    private val cacheGateway = mock<CacheGateway> {
+        onBlocking { getOrCreateCacheFolder(any()) }.thenReturn(null)
     }
+    private val fileGateway = mock<FileGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val dateUtilWrapper = mock<DateUtilWrapper> {
         on { fromEpoch(any()) }.thenReturn(LocalDateTime.now())
@@ -238,7 +240,8 @@ class DefaultPhotosRepositoryTest {
         megaApiFolder = megaApiFolder,
         appScope = coroutineScope,
         ioDispatcher = UnconfinedTestDispatcher(),
-        cacheFolderFacade = cacheFolderFacade,
+        cacheGateway = cacheGateway,
+        fileGateway = fileGateway,
         megaLocalStorageFacade = megaLocalStorageGateway,
         dateUtilFacade = dateUtilWrapper,
         imageMapper = imageMapper,

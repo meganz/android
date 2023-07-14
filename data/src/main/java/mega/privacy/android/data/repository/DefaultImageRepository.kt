@@ -337,15 +337,15 @@ internal class DefaultImageRepository @Inject constructor(
             )
         }
 
-    override suspend fun getThumbnailPath(): String? = withContext(ioDispatcher) {
+    override suspend fun getThumbnailCacheFolderPath(): String? = withContext(ioDispatcher) {
         cacheGateway.getThumbnailCacheFolder()?.path
     }
 
-    override suspend fun getPreviewPath(): String? = withContext(ioDispatcher) {
+    override suspend fun getPreviewCacheFolderPath(): String? = withContext(ioDispatcher) {
         cacheGateway.getPreviewCacheFolder()?.path
     }
 
-    override suspend fun getFullImagePath(): String? = withContext(ioDispatcher) {
+    override suspend fun getFullSizeCacheFolderPath(): String? = withContext(ioDispatcher) {
         cacheGateway.getFullSizeCacheFolder()?.path
     }
 

@@ -24,7 +24,8 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.getValueFor
 import mega.privacy.android.data.extensions.toException
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -66,7 +67,7 @@ import kotlin.coroutines.resumeWithException
  *
  * @property megaApiFacade MegaApiGateway
  * @property ioDispatcher CoroutineDispatcher
- * @property cacheFolderFacade CacheFolderGateway
+ * @property cacheGateway CacheFolderGateway
  * @property megaLocalStorageFacade MegaLocalStorageGateway
  * @property imageMapper ImageMapper
  * @property videoMapper VideoMapper
@@ -79,7 +80,8 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val cacheFolderFacade: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
+    private val fileGateway: FileGateway,
     private val megaLocalStorageFacade: MegaLocalStorageGateway,
     private val dateUtilFacade: DateUtilWrapper,
     private val imageMapper: ImageMapper,
@@ -165,7 +167,7 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     override suspend fun buildDefaultDownloadDir(): File = withContext(ioDispatcher) {
-        cacheFolderFacade.buildDefaultDownloadDir()
+        fileGateway.buildDefaultDownloadDir()
     }
 
     override suspend fun getCameraUploadFolderId(): Long? = withContext(ioDispatcher) {
@@ -437,7 +439,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      * @param megaNode MegaNode
      * @return Photo / Image
      */
-    private fun mapMegaNodeToImage(megaNode: MegaNode, albumPhotoId: Long? = null) =
+    private suspend fun mapMegaNodeToImage(megaNode: MegaNode, albumPhotoId: Long? = null) =
         imageMapper(
             megaNode.handle,
             albumPhotoId,
@@ -457,7 +459,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      * @param megaNode MegaNode
      * @return Photo / Video
      */
-    private fun mapMegaNodeToVideo(megaNode: MegaNode, albumPhotoId: Long? = null) =
+    private suspend fun mapMegaNodeToVideo(megaNode: MegaNode, albumPhotoId: Long? = null) =
         videoMapper(
             megaNode.handle,
             albumPhotoId,
@@ -472,20 +474,20 @@ internal class DefaultPhotosRepository @Inject constructor(
             megaNode.size,
         )
 
-    private fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {
+    private suspend fun getThumbnailCacheFilePath(megaNode: MegaNode): String? {
         if (thumbnailFolderPath == null) {
             thumbnailFolderPath =
-                cacheFolderFacade.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
+                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
         }
         return thumbnailFolderPath?.let {
             "$it${File.separator}${megaNode.getThumbnailFileName()}"
         }
     }
 
-    private fun getPreviewCacheFilePath(megaNode: MegaNode): String? {
+    private suspend fun getPreviewCacheFilePath(megaNode: MegaNode): String? {
         if (previewFolderPath == null) {
             previewFolderPath =
-                cacheFolderFacade.getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
+                cacheGateway.getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
         }
         return previewFolderPath?.let {
             "$it${File.separator}${megaNode.getPreviewFileName()}"

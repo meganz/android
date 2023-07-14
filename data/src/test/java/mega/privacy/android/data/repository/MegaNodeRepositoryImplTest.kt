@@ -38,7 +38,6 @@ class MegaNodeRepositoryImplTest {
             shareDataMapper = mock(),
             megaExceptionMapper = mock(),
             sortOrderIntMapper = mock(),
-            cacheFolderGateway = mock(),
             nodeMapper = mock(),
             fileTypeInfoMapper = mock(),
             offlineNodeInformationMapper = mock(),

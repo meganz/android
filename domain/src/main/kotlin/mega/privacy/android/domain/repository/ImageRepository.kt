@@ -116,19 +116,19 @@ interface ImageRepository {
     ): ImageResult
 
     /**
-     * Get Thumbnail Cache Path
+     * Get Thumbnail Cache Folder Path
      */
-    suspend fun getThumbnailPath(): String?
+    suspend fun getThumbnailCacheFolderPath(): String?
 
     /**
-     * Get Preview Cache Path
+     * Get Preview Cache Folder Path
      */
-    suspend fun getPreviewPath(): String?
+    suspend fun getPreviewCacheFolderPath(): String?
 
     /**
-     * Get Full Image Cache Path
+     * Get Full Image Cache Folder Path
      */
-    suspend fun getFullImagePath(): String?
+    suspend fun getFullSizeCacheFolderPath(): String?
 
     /**
      * Get ImageNode given Node Handle

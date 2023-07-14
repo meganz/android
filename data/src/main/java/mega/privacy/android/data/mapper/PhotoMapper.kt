@@ -1,15 +1,14 @@
 package mega.privacy.android.data.mapper
 
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.repository.ImageRepository
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.time.LocalDateTime
@@ -106,17 +105,9 @@ class PhotoMapper @Inject constructor(
     private val videoMapper: VideoMapper,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val dateUtilFacade: DateUtilWrapper,
-    private val cacheFolderFacade: CacheFolderGateway,
+    private val imageRepository: ImageRepository,
 ) {
-    private val thumbnailFolderPath: String? by lazy {
-        cacheFolderFacade.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.path
-    }
-
-    private val previewFolderPath: String? by lazy {
-        cacheFolderFacade.getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.path
-    }
-
-    operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
+    suspend operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
         return when (val fileType = fileTypeInfoMapper(node)) {
             is ImageFileTypeInfo -> {
                 imageMapper(
@@ -156,14 +147,14 @@ class PhotoMapper @Inject constructor(
         }
     }
 
-    private fun getThumbnailFilePath(node: MegaNode): String? {
-        return thumbnailFolderPath?.let { path ->
+    private suspend fun getThumbnailFilePath(node: MegaNode): String? {
+        return imageRepository.getThumbnailCacheFolderPath()?.let { path ->
             "$path${File.separator}${node.getThumbnailFileName()}"
         }
     }
 
-    private fun getPreviewFilePath(node: MegaNode): String? {
-        return previewFolderPath?.let { path ->
+    private suspend fun getPreviewFilePath(node: MegaNode): String? {
+        return imageRepository.getPreviewCacheFolderPath()?.let { path ->
             "$path${File.separator}${node.getPreviewFileName()}"
         }
     }
