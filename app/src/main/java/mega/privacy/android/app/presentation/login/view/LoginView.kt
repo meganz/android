@@ -59,6 +59,7 @@ import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.twofactorauthentication.view.CircularProgress
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -473,15 +474,6 @@ private fun TwoFactorAuthentication(
     }
 }
 
-@Composable
-private fun CircularProgress(testTag: String, modifier: Modifier = Modifier) =
-    CircularProgressIndicator(
-        modifier = modifier
-            .padding(top = 10.dp)
-            .size(72.dp)
-            .testTag(testTag),
-        color = MaterialTheme.colors.secondary
-    )
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewEmptyLoginView")

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.twofactorauthentication.view
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -11,6 +12,7 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,8 +27,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
+import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
+import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.SetupScreen
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
@@ -43,11 +47,18 @@ fun TwoFactorAuthenticationView(
     openPlayStore: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
+    on2FAPinChanged: (String, Int) -> Unit,
+    on2FAChanged: (String) -> Unit,
+    onFirstTime2FAConsumed: () -> Unit,
+    on2FAPinReset: () -> Unit,
 ) {
 
-    val currentScreen = remember { mutableStateOf(ScreenType.InitialisationScreen) }
+    val currentScreen =
+        remember { mutableStateOf(ScreenType.InitialisationScreen) }
+
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
     onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(enabled = true) {
@@ -58,7 +69,8 @@ fun TwoFactorAuthenticationView(
                     currentScreen.value = ScreenType.InitialisationScreen
                 }
 
-                ScreenType.VerificationScreen -> {
+                ScreenType.AuthenticationScreen -> {
+                    on2FAPinReset()
                     currentScreen.value = ScreenType.SetupScreen
                 }
 
@@ -70,7 +82,8 @@ fun TwoFactorAuthenticationView(
 
     })
     Scaffold(
-        scaffoldState = rememberScaffoldState(),
+        modifier = Modifier.imePadding(),
+        scaffoldState = scaffoldState,
         backgroundColor = MaterialTheme.colors.primary,
         topBar = {
             SimpleTopAppBar(
@@ -86,14 +99,14 @@ fun TwoFactorAuthenticationView(
                 Snackbar(
                     modifier = Modifier.testTag(Constants.SNACKBAR_TEST_TAG),
                     snackbarData = data,
-                    backgroundColor = MaterialTheme.colors.black_white
+                    backgroundColor = MaterialTheme.colors.black_white,
                 )
             }
         }
     )
     { padding ->
         val seedErrorMessage = stringResource(id = R.string.qr_seed_text_error)
-
+        val enableAuthErrorMessage = stringResource(id = R.string.error_enable_2fa)
         val onBeginSetupClicked: () -> Unit = {
             if (uiState.is2FAFetchCompleted && uiState.seed.isNullOrEmpty()) {
                 coroutineScope.launch {
@@ -118,7 +131,7 @@ fun TwoFactorAuthenticationView(
                     qrCodeMapper = qrCodeMapper,
                     seedsList = uiState.seed?.toSeedArray(),
                     onNextClicked = {
-                        currentScreen.value = ScreenType.VerificationScreen
+                        currentScreen.value = ScreenType.AuthenticationScreen
                     },
                     openPlayStore = openPlayStore,
                     isIntentAvailable = isIntentAvailable,
@@ -127,14 +140,34 @@ fun TwoFactorAuthenticationView(
                 )
             }
 
-            ScreenType.VerificationScreen -> {
-
+            ScreenType.AuthenticationScreen -> {
+                AuthenticationScreen(
+                    uiState = uiState,
+                    on2FAPinChanged = on2FAPinChanged,
+                    on2FAChanged = on2FAChanged,
+                    onFirstTime2FAConsumed = onFirstTime2FAConsumed
+                )
             }
 
-            ScreenType.VerificationPassedScreen -> {
-
+            ScreenType.AuthenticationCompletedScreen -> {
+                //AND-16831:Create Authentication Completed screen
             }
         }
 
+
+        when (uiState.authenticationState) {
+            AuthenticationState.Passed -> {
+                currentScreen.value = ScreenType.AuthenticationCompletedScreen
+            }
+
+            AuthenticationState.Error,
+            -> {
+                LaunchedEffect(key1 = uiState.authenticationState) {
+                    snackBarHostState.showSnackbar(enableAuthErrorMessage)
+                }
+            }
+
+            else -> {}
+        }
     }
 }

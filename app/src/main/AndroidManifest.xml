@@ -414,7 +414,8 @@
         <activity
             android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
-            android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity" />
+            android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".presentation.verifytwofactor.VerifyTwoFactorActivity" />
         <activity

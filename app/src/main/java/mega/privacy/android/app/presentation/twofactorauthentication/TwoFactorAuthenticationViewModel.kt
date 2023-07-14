@@ -4,11 +4,15 @@ import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -43,6 +47,44 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
 
     init {
         getMasterKeyStatus()
+    }
+
+
+    private fun updateTwoFAState(twoFA: List<String>) {
+        _uiState.update { state ->
+            state.copy(
+                twoFAPin = twoFA,
+                authenticationState = AuthenticationState.Fixed
+                    .takeUnless { state.authenticationState == AuthenticationState.Failed }
+            )
+        }
+    }
+
+    /**
+     * Sets isFirstTime2FA as consumed.
+     */
+    fun onFirstTime2FAConsumed() =
+        _uiState.update { state -> state.copy(isFirstTime2FA = consumed) }
+
+    /**
+     * Updates 2FA code in state.
+     */
+    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.let {
+        updateTwoFAState(it)
+        submitMultiFactorAuthPin(twoFA)
+    }
+
+    /**
+     * Updates a pin of the 2FA code in state.
+     */
+    fun on2FAPinChanged(pin: String, index: Int) {
+        val updated2FA =
+            uiState.value.twoFAPin.getUpdatedTwoFactorAuthentication(pin = pin, index = index)
+
+        updateTwoFAState(updated2FA)
+        updated2FA.getTwoFactorAuthentication()?.apply {
+            submitMultiFactorAuthPin(this)
+        }
     }
 
     /**
@@ -141,6 +183,17 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     }
 
     /**
+     * Sets the state of the authentication pin to default state
+     */
+    fun on2FAPinReset() = _uiState.update {
+        it.copy(
+            isFirstTime2FA = triggered,
+            twoFAPin = listOf("", "", "", "", "", ""),
+            authenticationState = AuthenticationState.Fixed
+        )
+    }
+
+    /**
      * Triggers multi factor authentication validation for the user
      * @param pin the 6 digit code required for validation process
      */
@@ -149,6 +202,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isPinSubmitted = false,
+                    authenticationState = AuthenticationState.Checking
                 )
             }
             runCatching {
@@ -157,18 +211,19 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isPinSubmitted = true,
-                        authenticationState = AuthenticationState.AuthenticationPassed
+                        authenticationState = AuthenticationState.Passed
                     )
                 }
             }.onFailure { e ->
                 _uiState.update {
                     it.copy(
+                        isFirstTime2FA = consumed,
                         isPinSubmitted = true,
                         authenticationState =
                         if (e is EnableMultiFactorAuthException)
-                            AuthenticationState.AuthenticationFailed
+                            AuthenticationState.Failed
                         else
-                            AuthenticationState.AuthenticationError,
+                            AuthenticationState.Error,
                     )
                 }
             }

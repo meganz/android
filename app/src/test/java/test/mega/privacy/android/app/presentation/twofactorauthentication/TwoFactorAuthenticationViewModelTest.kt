@@ -86,18 +86,18 @@ internal class TwoFactorAuthenticationViewModelTest {
     }
 
     @Test
-    fun `test that authenticationState should be AuthenticationPassed when submitting multi factor authentication code is successful`() =
+    fun `test that authenticationState should be Passed when submitting multi factor authentication code is successful`() =
         runTest {
             whenever(enableMultiFactorAuth(any())).thenReturn(true)
             underTest.submitMultiFactorAuthPin("")
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.authenticationState).isEqualTo(AuthenticationState.AuthenticationPassed)
+                assertThat(state.authenticationState).isEqualTo(AuthenticationState.Passed)
             }
         }
 
     @Test
-    fun `test that authenticationState should be AuthenticationFailed when wrong multi factor authentication pin get submitted`() =
+    fun `test that authenticationState should be Failed when wrong multi factor authentication pin get submitted`() =
         runTest {
             val fakeErrorCode = Random.nextInt()
             whenever(enableMultiFactorAuth(any()))
@@ -110,12 +110,12 @@ internal class TwoFactorAuthenticationViewModelTest {
             underTest.submitMultiFactorAuthPin("")
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.authenticationState).isEqualTo(AuthenticationState.AuthenticationFailed)
+                assertThat(state.authenticationState).isEqualTo(AuthenticationState.Failed)
             }
         }
 
     @Test
-    fun `test that when multi factor authentication returns error should return AuthenticationError state`() =
+    fun `test that when multi factor authentication returns error should return Error state`() =
         runTest {
             val fakeErrorCode = Random.nextInt()
             whenever(enableMultiFactorAuth(any()))
@@ -128,7 +128,7 @@ internal class TwoFactorAuthenticationViewModelTest {
             underTest.submitMultiFactorAuthPin("")
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.authenticationState).isEqualTo(AuthenticationState.AuthenticationError)
+                assertThat(state.authenticationState).isEqualTo(AuthenticationState.Error)
             }
         }
 

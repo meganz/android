@@ -547,34 +547,36 @@ class LoginViewModel @Inject constructor(
     /**
      * Login with 2FA.
      */
-    private fun performLoginWith2FA(pin2FA: String) = viewModelScope.launch {
-        MegaApplication.isLoggingIn = true
-        _state.update { state -> state.copy(multiFactorAuthState = MultiFactorAuthState.Checking) }
+    private fun performLoginWith2FA(pin2FA: String) {
+        viewModelScope.launch {
+            MegaApplication.isLoggingIn = true
+            _state.update { state -> state.copy(multiFactorAuthState = MultiFactorAuthState.Checking) }
 
-        with(state.value) {
-            runCatching {
-                loginWith2FAUseCase(
-                    accountSession?.email ?: return@launch,
-                    password ?: return@launch,
-                    pin2FA,
-                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-                ).collectLatest { status ->
-                    status.checkStatus()
-                }
-            }.onFailure { exception ->
-                MegaApplication.isLoggingIn = false
-                if (exception !is LoginException) return@onFailure
-
-                if (exception is LoginWrongMultiFactorAuth) {
-                    _state.update {
-                        it.copy(
-                            isLoginInProgress = false,
-                            is2FARequired = true,
-                            multiFactorAuthState = MultiFactorAuthState.Failed
-                        )
+            with(state.value) {
+                runCatching {
+                    loginWith2FAUseCase(
+                        accountSession?.email ?: return@launch,
+                        password ?: return@launch,
+                        pin2FA,
+                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                    ).collectLatest { status ->
+                        status.checkStatus()
                     }
-                } else {
-                    exception.loginFailed(true)
+                }.onFailure { exception ->
+                    MegaApplication.isLoggingIn = false
+                    if (exception !is LoginException) return@onFailure
+
+                    if (exception is LoginWrongMultiFactorAuth) {
+                        _state.update {
+                            it.copy(
+                                isLoginInProgress = false,
+                                is2FARequired = true,
+                                multiFactorAuthState = MultiFactorAuthState.Failed
+                            )
+                        }
+                    } else {
+                        exception.loginFailed(true)
+                    }
                 }
             }
         }
@@ -770,8 +772,8 @@ class LoginViewModel @Inject constructor(
     /**
      * Updates 2FA code in state.
      */
-    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.apply {
-        updateTwoFAState(this)
+    fun on2FAChanged(twoFA: String) = twoFA.getTwoFactorAuthentication()?.let {
+        updateTwoFAState(it)
         performLoginWith2FA(twoFA)
     }
 

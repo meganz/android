@@ -164,6 +164,10 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             isIntentAvailable = { isIntentAvailable(uiState.twoFactorAuthUrl) },
             onOpenInClicked = this::onOpenInClicked,
             openPlayStore = this::openPlayStore,
+            on2FAPinChanged = viewModel::on2FAPinChanged,
+            on2FAChanged = viewModel::on2FAChanged,
+            onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
+            on2FAPinReset = viewModel::on2FAPinReset,
         )
     }
 
@@ -853,14 +857,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         }
     }
 
-    private fun handleGetting2FACodeWithCompose(state: TwoFactorAuthenticationUIState) {
-        if (state.is2FAFetchCompleted) {
-            state.seed?.let {
-                setContentByCompose()
-            } ?: showSnackbar(getString(R.string.qr_seed_text_error))
-        }
-    }
-
     private fun handleGetting2FACode(state: TwoFactorAuthenticationUIState) {
         if (state.is2FAFetchCompleted) {
             state.seed?.let {
@@ -876,7 +872,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         with(state) {
             if (isPinSubmitted) {
                 when (authenticationState) {
-                    AuthenticationState.AuthenticationPassed -> {
+                    AuthenticationState.Passed -> {
                         confirm2FAIsShown = false
                         isEnabled2FA = true
                         rkSaved = isMasterKeyExported
@@ -888,13 +884,15 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                         }
                     }
 
-                    AuthenticationState.AuthenticationFailed -> {
+                    AuthenticationState.Failed -> {
                         showError()
                     }
 
-                    else -> {
+                    AuthenticationState.Error -> {
                         showSnackbar(getString(R.string.error_enable_2fa))
                     }
+
+                    else -> {}
                 }
             }
         }
