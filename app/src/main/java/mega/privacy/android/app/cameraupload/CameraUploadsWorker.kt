@@ -323,6 +323,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private var monitorStorageOverQuotaStatusJob: Job? = null
 
+    /**
+     * True if all transfers paused
+     */
+    private var areUploadsPaused: Boolean = false
+
 
     override suspend fun doWork() = coroutineScope {
         Timber.d("Start CU Worker")
@@ -408,6 +413,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
             monitorPausedTransfersUseCase().collect {
+                areUploadsPaused = it
+                updateBackupState(if (it) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
                 updateProgressNotification()
             }
         }
@@ -761,14 +768,9 @@ class CameraUploadsWorker @AssistedInject constructor(
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
     ) = coroutineScope {
+        areUploadsPaused = areTransfersPausedUseCase()
+
         val uploadFileAsyncList = mutableListOf<Job>()
-        // If the Service detects that all upload transfers are paused when turning on
-        // Camera Uploads, update the Primary and Secondary Folder Backup States to
-        // BackupState.PAUSE_UPLOADS
-        if (areTransfersPausedUseCase()) {
-            Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
-            updateBackupState(BackupState.PAUSE_UPLOADS)
-        }
 
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
@@ -892,7 +894,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun startHeartbeat() {
-        updateBackupState(BackupState.ACTIVE)
+        updateBackupState(if (areUploadsPaused) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
 
         sendBackupHeartbeatJob =
             scope?.launch(ioDispatcher) {
@@ -1745,7 +1747,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 0 -> context.getString(R.string.download_preparing_files)
                 else -> {
                     context.getString(
-                        if (areTransfersPausedUseCase())
+                        if (areUploadsPaused)
                             R.string.upload_service_notification_paused
                         else
                             R.string.upload_service_notification,

@@ -118,7 +118,8 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorPausedTransfers() = pausedTransfers.asSharedFlow()
 
-    override suspend fun broadcastPausedTransfers() = pausedTransfers.emit(true)
+    override suspend fun broadcastPausedTransfers(isPaused: Boolean) =
+        pausedTransfers.emit(isPaused)
 
     override suspend fun broadcastPushNotificationSettings() =
         pushNotificationSettingsUpdate.emit(true)

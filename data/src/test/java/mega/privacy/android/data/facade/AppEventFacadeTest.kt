@@ -10,18 +10,20 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaTransfer
-import org.junit.Before
-import org.junit.Test
-import kotlin.contracts.ExperimentalContracts
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@ExperimentalContracts
+@ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AppEventFacadeTest {
 
     private lateinit var underTest: AppEventGateway
     private lateinit var coroutineScope: CoroutineScope
 
-    @Before
+    @BeforeAll
     fun setUp() {
         coroutineScope = TestScope(UnconfinedTestDispatcher())
         underTest = AppEventFacade(
@@ -29,11 +31,13 @@ class AppEventFacadeTest {
         )
     }
 
-    @Test
-    fun `test that broadcast upload pause state fires an event`() = runTest {
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that broadcast upload pause state fires an event`(isPaused: Boolean) = runTest {
         underTest.monitorPausedTransfers().test {
-            underTest.broadcastPausedTransfers()
-            assertThat(awaitItem()).isTrue()
+            underTest.broadcastPausedTransfers(isPaused)
+            assertThat(awaitItem()).isEqualTo(isPaused)
         }
     }
 

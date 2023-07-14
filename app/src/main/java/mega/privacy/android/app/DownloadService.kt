@@ -264,7 +264,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
             monitorPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
-                updateProgressNotification(true)
+                updateProgressNotification(it)
             }
         }
 

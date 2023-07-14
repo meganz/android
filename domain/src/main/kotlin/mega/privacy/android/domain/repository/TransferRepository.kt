@@ -193,8 +193,10 @@ interface TransferRepository {
 
     /**
      * Broadcasts paused transfers.
+     *
+     * @param isPaused true if all transfers are paused
      */
-    suspend fun broadcastPausedTransfers()
+    suspend fun broadcastPausedTransfers(isPaused: Boolean)
 
     /**
      * Get in progress transfers

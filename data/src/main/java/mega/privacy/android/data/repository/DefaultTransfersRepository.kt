@@ -324,7 +324,9 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorPausedTransfers() = appEventGateway.monitorPausedTransfers()
 
-    override suspend fun broadcastPausedTransfers() = appEventGateway.broadcastPausedTransfers()
+    override suspend fun broadcastPausedTransfers(isPaused: Boolean) = withContext(ioDispatcher) {
+        appEventGateway.broadcastPausedTransfers(isPaused)
+    }
 
     override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
         val transfers = mutableListOf<Transfer>()

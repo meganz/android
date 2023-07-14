@@ -11,6 +11,9 @@ class BroadcastPausedTransfersUseCase @Inject constructor(private val transferRe
 
     /**
      * Invoke.
+     *
+     * @param isPaused true if all transfers are paused
      */
-    suspend operator fun invoke() = transferRepository.broadcastPausedTransfers()
+    suspend operator fun invoke(isPaused: Boolean) =
+        transferRepository.broadcastPausedTransfers(isPaused)
 }

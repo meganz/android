@@ -11,9 +11,7 @@ import android.graphics.Bitmap
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
@@ -23,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
@@ -197,10 +196,8 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         monitorPausedTransfersJob = sharingScope.launch {
             monitorPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
-                Handler(Looper.getMainLooper()).postDelayed(
-                    { updateProgressNotification(true) },
-                    TransfersManagement.WAIT_TIME_BEFORE_UPDATE
-                )
+                delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
+                updateProgressNotification(it)
             }
         }
 

@@ -146,8 +146,10 @@ internal interface AppEventGateway {
 
     /**
      * Broadcast paused transfers.
+     *
+     * @param isPaused true if all transfers are paused
      */
-    suspend fun broadcastPausedTransfers()
+    suspend fun broadcastPausedTransfers(isPaused: Boolean)
 
     /**
      * Monitor camera upload folder icon update

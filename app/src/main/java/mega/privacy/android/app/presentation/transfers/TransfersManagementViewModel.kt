@@ -22,12 +22,12 @@ import mega.privacy.android.domain.entity.TransfersSizeInfo
 import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
 import javax.inject.Inject
 
@@ -78,7 +78,7 @@ class TransfersManagementViewModel @Inject constructor(
                     getPendingDownloadAndUpload(transfersInfo)
                 }
         }
-        checkTransfersState(false)
+        checkTransfersState()
     }
 
     /**
@@ -143,16 +143,14 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks if transfers are paused.
      */
-    fun checkTransfersState(shouldBroadcast: Boolean = true) = viewModelScope.launch {
+    fun checkTransfersState() = viewModelScope.launch {
         areAllTransfersPaused().let { paused ->
             if (paused) {
                 _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
-                if (shouldBroadcast) {
-                    broadcastPausedTransfersUseCase()
-                }
             } else {
                 checkTransfersInfo(TransferType.NONE, false)
             }
+            broadcastPausedTransfersUseCase(paused)
         }
     }
 
