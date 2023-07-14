@@ -32,11 +32,14 @@ import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetNodeByFingerprintAndParentNodeUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,6 +65,7 @@ class NameCollisionViewModel @Inject constructor(
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val moveRequestMessageMapper: MoveRequestMessageMapper,
+    private val getNodeByFingerprintAndParentNodeUseCase: GetNodeByFingerprintAndParentNodeUseCase,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -106,10 +110,21 @@ class NameCollisionViewModel @Inject constructor(
         }
     }
 
-    private fun setCopyToOrigin(collision: NameCollision.Copy) {
-        val node = getNodeUseCase.get(collision.nodeHandle).blockingGetOrNull()
-        if (node?.parentHandle == collision.parentHandle) {
-            isCopyToOrigin = true
+    private fun setCopyToOrigin(collision: NameCollision.Copy, action: () -> Unit) {
+        getNodeUseCase.get(collision.nodeHandle).blockingGetOrNull()?.let { node ->
+            isCopyToOrigin = node.parentHandle == collision.parentHandle
+        } ?: MegaNode.unserialize(collision.serializedNode)?.let { node ->
+            if (!node.isForeign) {
+                viewModelScope.launch {
+                    getNodeByFingerprintAndParentNodeUseCase(
+                        node.fingerprint,
+                        NodeId(collision.parentHandle)
+                    )?.let {
+                        isCopyToOrigin = it.parentId.longValue == collision.parentHandle
+                        action.invoke()
+                    }
+                }
+            }
         }
     }
 
@@ -119,9 +134,15 @@ class NameCollisionViewModel @Inject constructor(
      * @param collision [NameCollision] to resolve.
      */
     fun setSingleData(collision: NameCollision, context: Context) {
-        if (collision is NameCollision.Copy)
-            setCopyToOrigin(collision)
-        getCurrentCollision(collision, context, true)
+        viewModelScope.launch {
+            runCatching {
+                if (collision is NameCollision.Copy) {
+                    setCopyToOrigin(collision) { getCurrentCollision(collision, context, true) }
+                } else {
+                    getCurrentCollision(collision, context, true)
+                }
+            }.onFailure { Timber.e("Exception setting single data $it") }
+        }
     }
 
     /**
@@ -169,9 +190,19 @@ class NameCollisionViewModel @Inject constructor(
      * @param context       Required Context for uploads.
      */
     fun setData(collisions: ArrayList<NameCollision>, context: Context) {
-        val firstCollision = collisions[0]
-        if (firstCollision is NameCollision.Copy)
-            setCopyToOrigin(firstCollision)
+        viewModelScope.launch {
+            runCatching {
+                val firstCollision = collisions[0]
+                if (firstCollision is NameCollision.Copy) {
+                    setCopyToOrigin(firstCollision) { getCollisionResult(collisions, context) }
+                } else {
+                    getCollisionResult(collisions, context)
+                }
+            }.onFailure { Timber.e("Exception setting data $it") }
+        }
+    }
+
+    private fun getCollisionResult(collisions: ArrayList<NameCollision>, context: Context) =
         getNameCollisionResultUseCase.reorder(collisions)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -193,7 +224,6 @@ class NameCollisionViewModel @Inject constructor(
                 }
             )
             .addTo(composite)
-    }
 
     /**
      * Gets the list with complete data of pending collisions.

@@ -163,6 +163,7 @@ class LegacyCopyNodeUseCase @Inject constructor(
             }
         } else {
             getMegaNode((collisionResult.nameCollision as NameCollision.Copy).nodeHandle)
+                ?: MegaNode.unserialize(collisionResult.nameCollision.serializedNode)
         } ?: throw MegaNodeException.NodeDoesNotExistsException()
 
 

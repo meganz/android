@@ -139,6 +139,7 @@ sealed class NameCollision : Serializable {
      * @property lastModified
      * @property parentHandle
      * @property isFile
+     * @property serializedNode
      * @constructor Create empty Copy
      */
     data class Copy constructor(
@@ -151,6 +152,7 @@ sealed class NameCollision : Serializable {
         override val lastModified: Long,
         override val parentHandle: Long,
         override val isFile: Boolean,
+        val serializedNode: String? = null,
     ) : NameCollision() {
 
         companion object {
@@ -179,12 +181,13 @@ sealed class NameCollision : Serializable {
                     childFileCount = childFileCount,
                     lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                     parentHandle = parentHandle,
-                    isFile = node.isFile
+                    isFile = node.isFile,
+                    serializedNode = node.serialize(),
                 )
 
             @JvmStatic
             fun getCopyCollision(
-                nameCollision: NodeNameCollision
+                nameCollision: NodeNameCollision,
             ): Copy =
                 Copy(
                     collisionHandle = nameCollision.collisionHandle,
@@ -319,7 +322,7 @@ sealed class NameCollision : Serializable {
 
             @JvmStatic
             fun getMovementCollision(
-                nameCollision: NodeNameCollision
+                nameCollision: NodeNameCollision,
             ): Movement = Movement(
                 collisionHandle = nameCollision.collisionHandle,
                 nodeHandle = nameCollision.nodeHandle,

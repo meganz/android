@@ -9,17 +9,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.namecollision.NameCollisionViewModel
-import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
-import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.LegacyMoveNodeUseCase
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
-import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
-import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -47,19 +38,20 @@ internal class NameCollisionViewModelTest {
     private val getFileVersionsOption = mock<GetFileVersionsOption>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
 
-    internal fun initUnderTest() {
+    private fun initUnderTest() {
         underTest = NameCollisionViewModel(
             getFileVersionsOption = getFileVersionsOption,
-            getNameCollisionResultUseCase = mock<GetNameCollisionResultUseCase>(),
-            uploadUseCase = mock<UploadUseCase>(),
-            legacyMoveNodeUseCase = mock<LegacyMoveNodeUseCase>(),
-            legacyCopyNodeUseCase = mock<LegacyCopyNodeUseCase>(),
+            getNameCollisionResultUseCase = mock(),
+            uploadUseCase = mock(),
+            legacyMoveNodeUseCase = mock(),
+            legacyCopyNodeUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
-            getNodeUseCase = mock<GetNodeUseCase>(),
-            setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>(),
-            setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>(),
-            copyRequestMessageMapper = mock<CopyRequestMessageMapper>(),
-            moveRequestMessageMapper = mock<MoveRequestMessageMapper>(),
+            getNodeUseCase = mock(),
+            setCopyLatestTargetPathUseCase = mock(),
+            setMoveLatestTargetPathUseCase = mock(),
+            copyRequestMessageMapper = mock(),
+            moveRequestMessageMapper = mock(),
+            getNodeByFingerprintAndParentNodeUseCase = mock()
         )
     }
 
@@ -69,7 +61,7 @@ internal class NameCollisionViewModelTest {
     }
 
     @Test
-    internal fun `test that an exception in getfileVersionsOption is caught`() =
+    internal fun `test that an exception in getFileVersionsOption is caught`() =
         withCoroutineExceptions {
             runTest {
                 monitorUserUpdates.stub {

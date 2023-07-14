@@ -681,9 +681,11 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
                         val list = ArrayList<NameCollision>()
                         list.add(collision)
                         nameCollisionActivityContract?.launch(list)
+                        statusDialog?.dismiss()
                     }
                 ) { throwable: Throwable? ->
                     if (throwable is ParentDoesNotExistException) {
+                        statusDialog?.dismiss()
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
                             getString(R.string.general_error),
