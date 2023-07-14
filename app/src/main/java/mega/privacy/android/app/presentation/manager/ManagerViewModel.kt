@@ -99,7 +99,6 @@ import javax.inject.Inject
  * @property areCameraUploadsFoldersInRubbishBinUseCase
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
- * @property broadcastUploadPauseState
  * @property getExtendedAccountDetail
  * @property getPricing
  * @property getFullAccountInfoUseCase
@@ -139,7 +138,6 @@ class ManagerViewModel @Inject constructor(
     private val areCameraUploadsFoldersInRubbishBinUseCase: AreCameraUploadsFoldersInRubbishBinUseCase,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getFullAccountInfoUseCase: GetFullAccountInfoUseCase,
     private val getActiveSubscriptionUseCase: GetActiveSubscriptionUseCase,
@@ -533,15 +531,6 @@ class ManagerViewModel @Inject constructor(
             )
         if (areCameraFoldersInRubbishBin) {
             stopCameraUploads(shouldReschedule = true)
-        }
-    }
-
-    /**
-     * broadcast upload pause status
-     */
-    fun broadcastUploadPauseStatus() {
-        viewModelScope.launch {
-            broadcastUploadPauseState()
         }
     }
 

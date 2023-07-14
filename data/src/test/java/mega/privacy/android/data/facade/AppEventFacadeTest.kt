@@ -31,8 +31,8 @@ class AppEventFacadeTest {
 
     @Test
     fun `test that broadcast upload pause state fires an event`() = runTest {
-        underTest.monitorCameraUploadPauseState.test {
-            underTest.broadcastUploadPauseState()
+        underTest.monitorPausedTransfers().test {
+            underTest.broadcastPausedTransfers()
             assertThat(awaitItem()).isTrue()
         }
     }

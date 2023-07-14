@@ -85,7 +85,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -129,6 +128,7 @@ import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -180,7 +180,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val monitorCameraUploadPauseState: MonitorCameraUploadPauseState,
+    private val monitorPausedTransfers: MonitorPausedTransfers,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorBatteryInfo: MonitorBatteryInfo,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
@@ -407,7 +407,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
-            monitorCameraUploadPauseState().collect {
+            monitorPausedTransfers().collect {
                 updateProgressNotification()
             }
         }

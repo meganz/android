@@ -272,7 +272,6 @@ class ManagerViewModelTest {
             areCameraUploadsFoldersInRubbishBinUseCase = areCameraUploadsFoldersInRubbishBinUseCase,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
             getFullAccountInfoUseCase = getFullAccountInfoUseCase,
             getActiveSubscriptionUseCase = mock(),

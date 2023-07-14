@@ -24,7 +24,6 @@ internal class AppEventFacade @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : AppEventGateway {
 
-    private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
     private val cameraUploadFolderIconUpdate = MutableSharedFlow<CameraUploadFolderIconUpdate>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
@@ -53,17 +52,11 @@ internal class AppEventFacade @Inject constructor(
     private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransfer>()
     private val _monitorRefreshSession = MutableSharedFlow<Unit>()
 
-    override val monitorCameraUploadPauseState =
-        _monitorCameraUploadPauseState.toSharedFlow(appScope)
-
     override val monitorCameraUploadProgress =
         _monitorCameraUploadProgress.toSharedFlow(appScope)
 
     override val monitorCompletedTransfer =
         _monitorCompletedTransfer.toSharedFlow(appScope)
-
-    override suspend fun broadcastUploadPauseState() =
-        _monitorCameraUploadPauseState.emit(true)
 
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
         _monitorCameraUploadProgress.emit(Pair(progress, pending))

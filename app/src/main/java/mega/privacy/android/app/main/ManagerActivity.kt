@@ -7948,7 +7948,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             MegaRequest.TYPE_PAUSE_TRANSFERS -> {
                 Timber.d("MegaRequest.TYPE_PAUSE_TRANSFERS")
                 //force update the pause notification to prevent missed onTransferUpdate
-                viewModel.broadcastUploadPauseStatus()
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidgetState()
                     if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {

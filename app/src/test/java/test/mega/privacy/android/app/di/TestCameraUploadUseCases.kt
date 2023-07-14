@@ -9,7 +9,6 @@ import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
-import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
@@ -35,7 +34,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RenamePrimaryFolder
@@ -184,12 +182,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideRestoreSecondaryTimestamps() = mock<RestoreSecondaryTimestamps>()
-
-    @Provides
-    fun provideMonitorCameraUploadPauseState() = mock<MonitorCameraUploadPauseState>()
-
-    @Provides
-    fun provideBroadcastUploadPauseState() = mock<BroadcastUploadPauseState>()
 
     @Provides
     fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()

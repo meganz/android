@@ -18,7 +18,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
-import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.ClearSyncRecords
@@ -66,7 +65,6 @@ import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
-import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RenamePrimaryFolder
@@ -233,25 +231,11 @@ abstract class CameraUploadUseCases {
             ClearCacheDirectory(cameraUploadRepository::clearCacheDirectory)
 
         /**
-         * Provide the [MonitorCameraUploadPauseState] implementation
-         */
-        @Provides
-        fun provideMonitorCameraUploadPauseState(cameraUploadRepository: CameraUploadRepository): MonitorCameraUploadPauseState =
-            MonitorCameraUploadPauseState(cameraUploadRepository::monitorCameraUploadPauseState)
-
-        /**
          * Provide the [MonitorCameraUploadProgress] implementation
          */
         @Provides
         fun provideMonitorCameraUploadProgress(cameraUploadRepository: CameraUploadRepository): MonitorCameraUploadProgress =
             MonitorCameraUploadProgress(cameraUploadRepository::monitorCameraUploadProgress)
-
-        /**
-         * Provide the [BroadcastUploadPauseState] implementation
-         */
-        @Provides
-        fun provideBroadcastUploadPauseState(cameraUploadRepository: CameraUploadRepository): BroadcastUploadPauseState =
-            BroadcastUploadPauseState(cameraUploadRepository::broadcastUploadPauseState)
 
         /**
          * Provide the [BroadcastCameraUploadProgress] implementation

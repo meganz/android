@@ -10,11 +10,6 @@ import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 internal interface AppEventGateway {
 
     /**
-     * monitor upload service pause State
-     */
-    val monitorCameraUploadPauseState: Flow<Boolean>
-
-    /**
      * Monitor camera upload progress
      *
      * The value returned is a Pair of
@@ -28,11 +23,6 @@ internal interface AppEventGateway {
      * Monitor completed transfer
      */
     val monitorCompletedTransfer: Flow<CompletedTransfer>
-
-    /**
-     * Broadcast upload pause state
-     */
-    suspend fun broadcastUploadPauseState()
 
     /**
      * Broadcast camera upload progress

@@ -531,11 +531,6 @@ interface CameraUploadRepository {
     suspend fun getCameraUploadsSyncHandles(): Pair<Long, Long>?
 
     /**
-     * monitor upload service pause State
-     */
-    fun monitorCameraUploadPauseState(): Flow<Boolean>
-
-    /**
      * Monitor camera upload progress
      *
      * @return a flow of Pair of
@@ -543,11 +538,6 @@ interface CameraUploadRepository {
      *         [Int] value representing pending elements waiting for upload
      */
     fun monitorCameraUploadProgress(): Flow<Pair<Int, Int>>
-
-    /**
-     * Broadcast upload pause state
-     */
-    suspend fun broadcastUploadPauseState()
 
     /**
      * Broadcast camera upload progress
