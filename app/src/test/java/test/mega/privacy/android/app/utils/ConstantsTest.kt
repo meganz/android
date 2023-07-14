@@ -1,7 +1,16 @@
 package test.mega.privacy.android.app.utils
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ACCOUNT_INVITATION_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CONFIRMATION_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.PENDING_CONTACTS_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.Util.matchRegexs
 import org.junit.Test
 
@@ -9,23 +18,6 @@ import org.junit.Test
  * Unit tests for Constants class.
  */
 class ConstantsTest {
-
-    /**
-     * test Regex of Constants.MEGA_REGEXS
-     */
-    @Test
-    fun test_Constants_MEGA_REGEXS() {
-        assertThat(matchRegexs("https://mega.co.nz/", MEGA_REGEXS)).isTrue()
-        assertThat(matchRegexs("https://mega.co.nz/xxx", MEGA_REGEXS)).isTrue()
-        assertThat(matchRegexs("https://mega.co.nz", MEGA_REGEXS)).isFalse()
-        assertThat(matchRegexs("https://mega.co.nzx", MEGA_REGEXS)).isTrue()
-
-        assertThat(matchRegexs("https://mega.nz/", MEGA_REGEXS)).isTrue()
-        assertThat(matchRegexs("https://mega.nz/xxx", MEGA_REGEXS)).isTrue()
-        assertThat(matchRegexs("https://mega.nzxxx", MEGA_REGEXS)).isTrue()
-        assertThat(matchRegexs("https://mega.nz", MEGA_REGEXS)).isFalse()
-    }
-
     /**
      * test Regex of Constants.FILE_LINK_REGEXS
      */
