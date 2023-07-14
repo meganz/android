@@ -116,7 +116,8 @@ class FolderLinkViewTest {
             FolderLinkState(
                 isNodesFetched = true,
                 nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
-                hasDbCredentials = true
+                hasDbCredentials = true,
+                hasMediaItem = true
             )
         )
         composeTestRule.onNodeWithTag(MEDIA_DISCOVERY_TAG).assertIsDisplayed()

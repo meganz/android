@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
@@ -80,6 +81,7 @@ class FolderLinkViewModelTest {
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
     private val getPricing: GetPricing = mock()
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -117,7 +119,8 @@ class FolderLinkViewModelTest {
             areAchievementsEnabledUseCase,
             getAccountTypeUseCase,
             getCurrentUserEmail,
-            getPricing
+            getPricing,
+            containsMediaItemUseCase
         )
     }
 

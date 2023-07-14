@@ -268,7 +268,7 @@ internal fun FolderLinkView(
                     getThumbnail = thumbnailViewModel::getPublicNodeThumbnail,
                     onLinkClicked = onLinkClicked,
                     onDisputeTakeDownClicked = onDisputeTakeDownClicked,
-                    showMediaDiscoveryButton = true,
+                    showMediaDiscoveryButton = state.hasMediaItem,
                     onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
                 )
                 ImportDownloadView(
