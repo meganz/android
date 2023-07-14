@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
@@ -46,7 +46,7 @@ internal class DefaultSettingsRepositoryTest {
     private val chatPreferencesGateway: ChatPreferencesGateway = mock()
     private val callsPreferencesGateway: CallsPreferencesGateway = mock()
     private val appPreferencesGateway: AppPreferencesGateway = mock()
-    private val cacheFolderGateway: CacheFolderGateway = mock()
+    private val fileGateway: FileGateway = mock()
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
     private val startScreenMapper: StartScreenMapper = mock()
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway = mock()
@@ -63,7 +63,7 @@ internal class DefaultSettingsRepositoryTest {
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,
             appPreferencesGateway = appPreferencesGateway,
-            cacheFolderGateway = cacheFolderGateway,
+            fileGateway = fileGateway,
             uiPreferencesGateway = uiPreferencesGateway,
             startScreenMapper = startScreenMapper,
             cameraTimestampsPreferenceGateway = cameraTimestampsPreferenceGateway,

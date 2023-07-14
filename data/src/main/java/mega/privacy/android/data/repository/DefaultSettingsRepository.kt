@@ -15,7 +15,7 @@ import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
@@ -57,7 +57,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatPreferencesGateway [ChatPreferencesGateway]
  * @property callsPreferencesGateway [CallsPreferencesGateway]
  * @property appPreferencesGateway [AppPreferencesGateway]
- * @property cacheFolderGateway [CacheFolderGateway]
+ * @property fileGateway [FileGateway]
  * @property uiPreferencesGateway [UIPreferencesGateway]
  * @property startScreenMapper [StartScreenMapper]
  * @property cameraTimestampsPreferenceGateway [CameraTimestampsPreferenceGateway]
@@ -73,7 +73,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val chatPreferencesGateway: ChatPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val appPreferencesGateway: AppPreferencesGateway,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val fileGateway: FileGateway,
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
@@ -89,7 +89,7 @@ internal class DefaultSettingsRepository @Inject constructor(
         if (databaseHandler.preferences == null) {
             Timber.w("databaseHandler.preferences is NULL")
             databaseHandler.setStorageAskAlways(true)
-            val defaultDownloadLocation = cacheFolderGateway.buildDefaultDownloadDir()
+            val defaultDownloadLocation = fileGateway.buildDefaultDownloadDir()
             defaultDownloadLocation.mkdirs()
             databaseHandler.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
         }
@@ -189,7 +189,7 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setStorageAskAlways(isStorageAskAlways)
 
     override suspend fun setDefaultStorageDownloadLocation() {
-        val defaultDownloadLocation = cacheFolderGateway.buildDefaultDownloadDir()
+        val defaultDownloadLocation = fileGateway.buildDefaultDownloadDir()
         defaultDownloadLocation.mkdirs()
         megaLocalStorageGateway.setStorageDownloadLocation(defaultDownloadLocation.absolutePath)
     }
@@ -390,7 +390,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     }
 
     override suspend fun buildDefaultDownloadDir(): File {
-        return cacheFolderGateway.buildDefaultDownloadDir()
+        return fileGateway.buildDefaultDownloadDir()
     }
 
     override suspend fun isMobileDataAllowed() = withContext(ioDispatcher) {

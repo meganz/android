@@ -21,7 +21,7 @@ import mega.privacy.android.data.extensions.getDecodedAliases
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -71,7 +71,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaApiGateway           [MegaApiGateway]
  * @property megaChatApiGateway       [MegaChatApiGateway]
  * @property ioDispatcher             [CoroutineDispatcher]
- * @property cacheFolderGateway       [CacheFolderGateway]
+ * @property cacheGateway             [CacheGateway]
  * @property contactRequestMapper     [ContactRequestMapper]
  * @property userLastGreenMapper      [UserLastGreenMapper]
  * @property userUpdateMapper         [UserUpdateMapper]
@@ -86,7 +86,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val cacheFolderGateway: CacheFolderGateway,
+    private val cacheGateway: CacheGateway,
     private val contactRequestMapper: ContactRequestMapper,
     private val userLastGreenMapper: UserLastGreenMapper,
     private val userUpdateMapper: UserUpdateMapper,
@@ -212,7 +212,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getAvatarUri(email: String): String? =
         runCatching {
             val avatarFile =
-                cacheFolderGateway.getCacheFile(
+                cacheGateway.getCacheFile(
                     CacheFolderConstant.AVATAR_FOLDER,
                     email + FileConstant.JPG_EXTENSION
                 )
@@ -226,7 +226,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun deleteAvatar(email: String) {
         withContext(ioDispatcher) {
             val avatarFile =
-                cacheFolderGateway.getCacheFile(
+                cacheGateway.getCacheFile(
                     CacheFolderConstant.AVATAR_FOLDER,
                     email + FileConstant.JPG_EXTENSION
                 )
@@ -433,7 +433,7 @@ internal class DefaultContactsRepository @Inject constructor(
         val avatarUri = if (skipCache) {
             getAvatarUri(megaUser.email)
         } else {
-            cacheFolderGateway.getCacheFile(
+            cacheGateway.getCacheFile(
                 folderName = CacheFolderConstant.AVATAR_FOLDER,
                 fileName = megaUser.email + FileConstant.JPG_EXTENSION
             )?.takeIf { it.exists() }?.absolutePath

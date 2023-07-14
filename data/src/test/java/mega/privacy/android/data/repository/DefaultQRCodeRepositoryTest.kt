@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -31,7 +31,7 @@ class DefaultQRCodeRepositoryTest {
 
     private lateinit var underTest: DefaultQRCodeRepository
     private val testCoroutineDispatcher = StandardTestDispatcher()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val cacheGateway = mock<CacheGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
     private val scannedContactLinkResultMapper = mock<ScannedContactLinkResultMapper>()
@@ -41,7 +41,7 @@ class DefaultQRCodeRepositoryTest {
         Dispatchers.setMain(testCoroutineDispatcher)
         underTest =
             DefaultQRCodeRepository(
-                cacheFolderGateway = cacheFolderGateway,
+                cacheGateway = cacheGateway,
                 megaApiGateway = megaApiGateway,
                 megaLocalStorageGateway = megaLocalStorageGateway,
                 scannedContactLinkResultMapper = scannedContactLinkResultMapper,
@@ -55,7 +55,7 @@ class DefaultQRCodeRepositoryTest {
         runTest {
             val fileName = "fileName"
             underTest.getQRFile(fileName)
-            verify(cacheFolderGateway).getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
+            verify(cacheGateway).getCacheFile(CacheFolderConstant.QR_FOLDER, fileName)
         }
 
     @Test

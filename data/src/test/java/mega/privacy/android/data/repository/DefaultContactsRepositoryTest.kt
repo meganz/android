@@ -10,7 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -69,7 +69,7 @@ class DefaultContactsRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
-    private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val cacheGateway = mock<CacheGateway>()
     private val contactRequestMapper = mock<ContactRequestMapper>()
     private val userLastGreenMapper = mock<UserLastGreenMapper>()
     private val userUpdateMapper = mock<UserUpdateMapper>()
@@ -112,7 +112,7 @@ class DefaultContactsRepositoryTest {
             megaApiGateway = megaApiGateway,
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = testDispatcher,
-            cacheFolderGateway = cacheFolderGateway,
+            cacheGateway = cacheGateway,
             contactRequestMapper = contactRequestMapper,
             userLastGreenMapper = userLastGreenMapper,
             userUpdateMapper = userUpdateMapper,
@@ -953,7 +953,7 @@ class DefaultContactsRepositoryTest {
         whenever(megaChatApiGateway.getUserEmailFromCache(any())).thenReturn(userEmail)
         whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(expectedFullName)
         whenever(megaChatApiGateway.getUserOnlineStatus(any())).thenReturn(expectedStatus)
-        whenever(cacheFolderGateway.getCacheFile(any(), any())).thenReturn(cacheFile)
+        whenever(cacheGateway.getCacheFile(any(), any())).thenReturn(cacheFile)
         whenever(megaChatApiGateway.getUserAliasFromCache(any())).thenReturn(testName)
 
         val expectedContactData = contactDataMapper(expectedFullName, testName, avatarUri)
