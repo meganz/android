@@ -69,6 +69,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
@@ -81,6 +82,8 @@ import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
+import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
+import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
@@ -139,6 +142,9 @@ class FileInfoViewModel @Inject constructor(
     private val getDefaultDownloadPathForNodeUseCase: GetDefaultDownloadPathForNodeUseCase,
     private val startDownloadUseCase: StartDownloadUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase,
+    private val getOfflineFileUseCase: GetOfflineFileUseCase,
+    private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -317,11 +323,15 @@ class FileInfoViewModel @Inject constructor(
             it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
         }
         viewModelScope.launch {
-            setNodeAvailableOffline(
-                typedNode.id,
-                availableOffline,
-                activity
-            )
+            if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                startDownloadForOffline()
+            } else {
+                setNodeAvailableOffline(
+                    typedNode.id,
+                    availableOffline,
+                    activity
+                )
+            }
             updateState {
                 it.copy(
                     oneOffViewEvent = if (!availableOffline) triggered(FileInfoOneOffViewEvent.Message.RemovedOffline) else consumed(),
@@ -934,52 +944,71 @@ class FileInfoViewModel @Inject constructor(
     fun startDownloadNode() {
         currentInProgressJob = viewModelScope.launch {
             if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                if (checkAndHandleIsDeviceConnected()) {
-                    _uiState.update {
-                        it.copy(jobInProgressState = FileInfoJobInProgressState.ProcessingFiles)
+                startDownloadNode {
+                    (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
+                        getDefaultDownloadPathForNodeUseCase(parent)
                     }
-                    var lastError: Throwable? = null
-                    val processed =
-                        (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
-                            getDefaultDownloadPathForNodeUseCase(parent)?.let { path ->
-                                startDownloadUseCase(
-                                    destinationPath = path,
-                                    nodes = listOf(typedNode),
-                                    appData = null,
-                                    isHighPriority = false
-                                ).catch {
-                                    lastError = it
-                                    Timber.e(it)
-                                }.onEach {
-                                    when (it) {
-                                        DownloadNodesEvent.NotSufficientSpace -> {
-                                            _uiState.updateEventAndClearProgress(
-                                                FileInfoOneOffViewEvent.Message.NotSufficientSpace
-                                            )
-                                        }
-
-                                        else -> Timber.d("Start download event received: $it")
-                                    }
-                                }.onCompletion {
-                                    if (it is CancellationException) {
-                                        _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.Message.TransferCancelled)
-                                    }
-                                }.firstOrNull {
-                                    it == DownloadNodesEvent.FinishProcessingTransfers
-                                } != null
-                            }
-                        }
-                    _uiState.updateEventAndClearProgress(
-                        FileInfoOneOffViewEvent.Finished(
-                            jobFinished = FileInfoJobInProgressState.ProcessingFiles,
-                            exception = lastError?.takeIf { processed != true }
-                        ),
-                    )
                 }
             } else {
                 _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
             }
         }
+    }
+
+    private fun startDownloadForOffline() {
+        currentInProgressJob = viewModelScope.launch {
+            startDownloadNode(
+                getPath = { getOfflineFileUseCase(getOfflineNodeInformationUseCase(typedNode)).path },
+                toDoAfterProcessing = { saveOfflineNodeInformationUseCase(nodeId) }
+            )
+        }
+    }
+
+    private suspend fun startDownloadNode(
+        toDoAfterProcessing: (suspend () -> Unit)? = null,
+        getPath: suspend () -> String?,
+    ) {
+        if (!checkAndHandleIsDeviceConnected()) {
+            return
+        }
+        _uiState.update {
+            it.copy(jobInProgressState = FileInfoJobInProgressState.ProcessingFiles)
+        }
+        var lastError: Throwable? = null
+        val processed = runCatching { getPath() }.getOrNull()?.let { path ->
+            startDownloadUseCase(
+                destinationPath = path,
+                nodes = listOf(typedNode),
+                appData = null,
+                isHighPriority = false
+            ).catch {
+                lastError = it
+                Timber.e(it)
+            }.onEach {
+                when (it) {
+                    DownloadNodesEvent.NotSufficientSpace -> {
+                        _uiState.updateEventAndClearProgress(
+                            FileInfoOneOffViewEvent.Message.NotSufficientSpace
+                        )
+                    }
+
+                    else -> Timber.d("Start download event received: $it")
+                }
+            }.onCompletion {
+                if (it is CancellationException) {
+                    _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.Message.TransferCancelled)
+                }
+            }.firstOrNull {
+                it == DownloadNodesEvent.FinishProcessingTransfers
+            } != null
+        }
+        if (processed == true) toDoAfterProcessing?.invoke()
+        _uiState.updateEventAndClearProgress(
+            FileInfoOneOffViewEvent.Finished(
+                jobFinished = FileInfoJobInProgressState.ProcessingFiles,
+                exception = lastError?.takeIf { processed != true }
+            ),
+        )
     }
 
     /**
