@@ -221,6 +221,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         if (sourcePhotos == null) {
             _state.update {
                 it.copy(
+                    loadPhotosDone = true,
                     uiPhotoList = uiPhotoList,
                     shouldBack = shouldBack(uiPhotoList),
                     yearsCardList = yearsCardList,
@@ -231,6 +232,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         } else {
             _state.update {
                 it.copy(
+                    loadPhotosDone = true,
                     sourcePhotos = sourcePhotos,
                     uiPhotoList = uiPhotoList,
                     shouldBack = shouldBack(uiPhotoList),

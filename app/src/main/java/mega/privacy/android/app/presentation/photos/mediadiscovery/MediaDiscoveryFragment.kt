@@ -64,6 +64,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDi
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.view.PhotosSkeletonView
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
@@ -253,10 +254,14 @@ class MediaDiscoveryFragment : Fragment() {
             )
         }
 
-        if (uiState.uiPhotoList.isNotEmpty()) {
-            MDView(uiState)
+        if (uiState.loadPhotosDone) {
+            if (uiState.uiPhotoList.isNotEmpty()) {
+                MDView(uiState)
+            } else {
+                EmptyView(uiState.currentMediaType)
+            }
         } else {
-            EmptyView(uiState.currentMediaType)
+            PhotosSkeletonView()
         }
     }
 

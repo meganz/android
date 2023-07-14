@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property copyResultText
  * @property isConnectedToNetwork
  * @property hasDbCredentials
+ * @property loadPhotosDone
  */
 data class MediaDiscoveryViewState(
     val sourcePhotos: List<Photo> = emptyList(),
@@ -56,4 +57,5 @@ data class MediaDiscoveryViewState(
     val copyResultText: String? = null,
     val isConnectedToNetwork: Boolean = true,
     val hasDbCredentials: Boolean = true,
+    val loadPhotosDone: Boolean = false,
 )

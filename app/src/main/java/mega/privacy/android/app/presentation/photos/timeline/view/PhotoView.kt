@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -33,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
@@ -50,32 +50,37 @@ fun PhotoView(
     onClick: (Photo) -> Unit,
     onLongPress: (Photo) -> Unit,
     downloadPhoto: PhotoDownload,
+    modifier: Modifier = Modifier,
 ) {
-    var modifier = remember {
+    var photoBoxModifier = remember {
         when (currentZoomLevel) {
-            ZoomLevel.Grid_1 -> Modifier
+            ZoomLevel.Grid_1 -> modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp)
-            ZoomLevel.Grid_3 -> Modifier
+
+            ZoomLevel.Grid_3 -> modifier
                 .fillMaxSize()
                 .padding(all = 1.5.dp)
-            ZoomLevel.Grid_5 -> Modifier
+
+            ZoomLevel.Grid_5 -> modifier
                 .fillMaxSize()
                 .padding(all = 1.dp)
         }
     }
 
     if (isSelected) {
-        modifier = modifier
-            .border(BorderStroke(
-                width = 2.dp,
-                color = colorResource(id = R.color.teal_300)),
+        photoBoxModifier = photoBoxModifier
+            .border(
+                BorderStroke(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.teal_300)
+                ),
                 shape = RoundedCornerShape(4.dp)
             )
             .clip(RoundedCornerShape(4.dp))
     }
 
-    Box(modifier = modifier) {
+    Box(modifier = photoBoxModifier) {
         PhotoCoverView(
             photo = photo,
             currentZoomLevel = currentZoomLevel,
@@ -105,7 +110,6 @@ fun PhotoView(
                     .align(Alignment.TopEnd)
                     .padding(10.dp),
                 tint = Color.Unspecified
-
             )
         }
     }
@@ -154,17 +158,19 @@ fun PhotoCoverView(
                     )
                 }
             }
+
             is Photo.Video -> {
                 PhotoImageView(
                     photo = photo,
                     isPreview = isDownloadPreview,
                     downloadPhoto = downloadPhoto
                 )
-                Spacer(modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        color = colorResource(id = R.color.grey_alpha_032)
-                    )
+                Spacer(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            color = colorResource(id = R.color.grey_alpha_032)
+                        )
                 )
 
                 Text(

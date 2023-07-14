@@ -79,76 +79,113 @@ fun TimelineView(
 
     if (timelineViewState.enableCameraUploadPageShowing) {
         enableCUView()
-    } else if (timelineViewState.loadPhotosDone && timelineViewState.currentShowingPhotos.isEmpty()) {
-        emptyView()
     } else {
-        LaunchedEffect(timelineViewState.scrollStartIndex, timelineViewState.scrollStartOffset) {
-            lazyGridState.scrollToItem(
-                timelineViewState.scrollStartIndex,
-                timelineViewState.scrollStartOffset
-            )
+        if (timelineViewState.loadPhotosDone) {
+            if (timelineViewState.currentShowingPhotos.isEmpty()) {
+                emptyView()
+            } else {
+                HandlePhotosGridView(
+                    timelineViewState = timelineViewState,
+                    lazyGridState = lazyGridState,
+                    onTextButtonClick = onTextButtonClick,
+                    isBarVisible = isBarVisible,
+                    isScrollingDown = isScrollingDown,
+                    photosGridView = photosGridView,
+                    photoDownload = photoDownload,
+                    onFABClick = onFABClick,
+                    onCardClick = onCardClick,
+                    onTimeBarTabSelected = onTimeBarTabSelected,
+                )
+            }
+        } else {
+            //show skeleton view.
+            PhotosSkeletonView()
         }
-        // Load Photos
-        Box {
-            when (timelineViewState.selectedTimeBarTab) {
-                TimeBarTab.All -> {
-                    Column {
-                        if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
-                            EnableCameraUploadButton(onClick = onTextButtonClick) {
-                                isBarVisible || !isScrollingDown
-                            }
+    }
+}
+
+@Composable
+private fun HandlePhotosGridView(
+    timelineViewState: TimelineViewState,
+    lazyGridState: LazyGridState,
+    onTextButtonClick: () -> Unit,
+    isBarVisible: Boolean,
+    isScrollingDown: Boolean,
+    photosGridView: @Composable () -> Unit,
+    photoDownload: PhotoDownload,
+    onFABClick: () -> Unit,
+    onCardClick: (DateCard) -> Unit,
+    onTimeBarTabSelected: (TimeBarTab) -> Unit,
+) {
+    LaunchedEffect(
+        timelineViewState.scrollStartIndex,
+        timelineViewState.scrollStartOffset
+    ) {
+        lazyGridState.scrollToItem(
+            timelineViewState.scrollStartIndex,
+            timelineViewState.scrollStartOffset
+        )
+    }
+    // Load Photos
+    Box {
+        when (timelineViewState.selectedTimeBarTab) {
+            TimeBarTab.All -> {
+                Column {
+                    if (timelineViewState.enableCameraUploadButtonShowing && timelineViewState.selectedPhotoCount == 0) {
+                        EnableCameraUploadButton(onClick = onTextButtonClick) {
+                            isBarVisible || !isScrollingDown
                         }
+                    }
 
-                        if (timelineViewState.progressBarShowing) {
-                            CameraUploadProgressBar(timelineViewState = timelineViewState) {
-                                isBarVisible || !isScrollingDown
-                            }
+                    if (timelineViewState.progressBarShowing) {
+                        CameraUploadProgressBar(timelineViewState = timelineViewState) {
+                            isBarVisible || !isScrollingDown
                         }
-
-                        photosGridView()
                     }
-                }
 
-                else -> {
-                    val dateCards = when (timelineViewState.selectedTimeBarTab) {
-                        TimeBarTab.Years -> timelineViewState.yearsCardPhotos
-                        TimeBarTab.Months -> timelineViewState.monthsCardPhotos
-                        TimeBarTab.Days -> timelineViewState.daysCardPhotos
-                        else -> timelineViewState.daysCardPhotos
-                    }
-                    CardListView(
-                        state = lazyGridState,
-                        dateCards = dateCards,
-                        photoDownload = photoDownload,
-                        onCardClick = onCardClick,
-                    )
+                    photosGridView()
                 }
             }
 
-            if (timelineViewState.selectedPhotoCount == 0) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.BottomEnd,
-                ) {
-                    val scrollInProgress by remember {
-                        derivedStateOf { lazyGridState.isScrollInProgress }
-                    }
-                    // We don't want to show the FAB if filter and source are default
-                    if (
-                        timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
-                    ) {
-                        FilterFAB(timelineViewState = timelineViewState, onClick = onFABClick) {
-                            !scrollInProgress
-                        }
-                    }
+            else -> {
+                val dateCards = when (timelineViewState.selectedTimeBarTab) {
+                    TimeBarTab.Years -> timelineViewState.yearsCardPhotos
+                    TimeBarTab.Months -> timelineViewState.monthsCardPhotos
+                    TimeBarTab.Days -> timelineViewState.daysCardPhotos
+                    else -> timelineViewState.daysCardPhotos
+                }
+                CardListView(
+                    state = lazyGridState,
+                    dateCards = dateCards,
+                    photoDownload = photoDownload,
+                    onCardClick = onCardClick,
+                )
+            }
+        }
 
-                    TimeSwitchBar(
-                        timeBarTabs = timelineViewState.timeBarTabs,
-                        onTimeBarTabSelected = onTimeBarTabSelected,
-                        selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
-                    ) {
-                        isBarVisible || !isScrollingDown
+        if (timelineViewState.selectedPhotoCount == 0) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomEnd,
+            ) {
+                val scrollInProgress by remember {
+                    derivedStateOf { lazyGridState.isScrollInProgress }
+                }
+                // We don't want to show the FAB if filter and source are default
+                if (
+                    timelineViewState.applyFilterMediaType != ApplyFilterMediaType.ALL_MEDIA_IN_CD_AND_CU
+                ) {
+                    FilterFAB(timelineViewState = timelineViewState, onClick = onFABClick) {
+                        !scrollInProgress
                     }
+                }
+
+                TimeSwitchBar(
+                    timeBarTabs = timelineViewState.timeBarTabs,
+                    onTimeBarTabSelected = onTimeBarTabSelected,
+                    selectedTimeBarTab = timelineViewState.selectedTimeBarTab,
+                ) {
+                    isBarVisible || !isScrollingDown
                 }
             }
         }

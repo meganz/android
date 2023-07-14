@@ -24,9 +24,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
-import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.domain.entity.photos.Photo
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
@@ -84,7 +84,7 @@ fun PhotosGridView(
                     currentZoomLevel = timelineViewState.currentZoomLevel,
                     onClick = onClick,
                     onLongPress = onLongPress,
-                    downloadPhoto = downloadPhoto
+                    downloadPhoto = downloadPhoto,
                 )
             } else if (item is PhotoListItem.Separator) {
                 Text(
