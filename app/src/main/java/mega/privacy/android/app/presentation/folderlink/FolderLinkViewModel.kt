@@ -59,6 +59,7 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
@@ -96,6 +97,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val getPricing: GetPricing,
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
 ) : ViewModel() {
 
     /**
@@ -376,6 +378,7 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { fetchFolderNodesUseCase(folderSubHandle) }
                 .onSuccess { result ->
+                    val hasMediaItem = containsMediaItemUseCase(result.childrenNodes)
                     _state.update {
                         it.copy(
                             isNodesFetched = true,
@@ -386,6 +389,7 @@ class FolderLinkViewModel @Inject constructor(
                                     isInvisible = false,
                                 )
                             },
+                            hasMediaItem = hasMediaItem,
                             rootNode = result.rootNode,
                             parentNode = result.parentNode,
                             title = result.rootNode?.name ?: ""
@@ -490,6 +494,7 @@ class FolderLinkViewModel @Inject constructor(
                             )
                         }
                             .onSuccess { children ->
+                                val hasMediaItem = containsMediaItemUseCase(children)
                                 _state.update {
                                     it.copy(
                                         nodesList = children.map { typedNode ->
@@ -499,6 +504,7 @@ class FolderLinkViewModel @Inject constructor(
                                                 isInvisible = false,
                                             )
                                         },
+                                        hasMediaItem = hasMediaItem,
                                         parentNode = newParentNode,
                                         title = newParentNode.name
                                     )
@@ -600,12 +606,14 @@ class FolderLinkViewModel @Inject constructor(
         viewModelScope.launch {
             val children = getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null)
             _state.update {
+                val hasMediaItem = containsMediaItemUseCase(children)
                 it.copy(
                     parentNode = addNodeType(nodeUIItem.node as FolderNode) as TypedFolderNode,
                     title = nodeUIItem.name,
                     nodesList = children.map { childNode ->
                         NodeUIItem(childNode, isSelected = false, isInvisible = false)
-                    }
+                    },
+                    hasMediaItem = hasMediaItem
                 )
             }
         }

@@ -27,6 +27,7 @@ import nz.mega.sdk.MegaNode
  * @property copyThrowable              Throwable error on copy
  * @property shouldLogin                Whether to show login screen
  * @property hasDbCredentials           Whether db credentials are valid
+ * @property hasMediaItem               Whether current folder has any image/video
  * @property nodesList                  List of nodes to show
  * @property rootNode                   Root node
  * @property parentNode                 Parent node of the nodes shown
@@ -58,6 +59,7 @@ data class FolderLinkState(
     val copyResultText: String? = null,
     val shouldLogin: Boolean? = null,
     val hasDbCredentials: Boolean = false,
+    val hasMediaItem: Boolean = false,
     val nodesList: List<NodeUIItem<TypedNode>> = listOf(),
     val rootNode: TypedFolderNode? = null,
     val parentNode: TypedFolderNode? = null,

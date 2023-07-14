@@ -187,11 +187,11 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
     private fun onEnterMediaDiscoveryClick() {
         viewModel.clearAllSelection()
-        val mediaHandle = viewModel.state.value.rootNode?.id?.longValue ?: -1
+        val mediaHandle = viewModel.state.value.parentNode?.id?.longValue ?: -1
         MediaDiscoveryActivity.startMDActivity(
             context = this@FolderLinkComposeActivity,
             mediaHandle = mediaHandle,
-            folderName = supportActionBar?.title.toString(),
+            folderName = viewModel.state.value.title,
             isOpenByMDIcon = true
         )
     }
