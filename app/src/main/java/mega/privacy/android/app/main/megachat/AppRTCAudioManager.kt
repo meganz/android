@@ -409,7 +409,7 @@ class AppRTCAudioManager private constructor(
 
     private fun stopVibration() {
         try {
-            if (vibrator == null || vibrator?.hasVibrator() == false) {
+            if (vibrator == null || vibrator?.hasVibrator() == true) {
                 Timber.d("Canceling vibration...")
                 vibrator?.cancel()
                 vibrator = null
