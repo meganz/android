@@ -96,6 +96,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
                 savedInstanceState.getBoolean(IS_CANCEL_TRANSFERS_SHOWN, false) -> {
                     showCancelTransfersDialog()
                 }
+
                 transfersManagement.shouldShowScanningTransfersDialog() -> {
                     showScanningTransfersDialog()
                 }
@@ -129,7 +130,9 @@ open class TransfersManagementActivity : PasscodeActivity() {
             Lifecycle.State.CREATED
         ) {
             if (it is TransferEvent.TransferTemporaryErrorEvent) {
-                handleTransferTemporaryError(it.transfer, it.error)
+                it.error?.let { error ->
+                    handleTransferTemporaryError(it.transfer, error)
+                }
             }
         }
     }

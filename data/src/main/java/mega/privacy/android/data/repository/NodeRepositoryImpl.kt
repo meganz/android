@@ -13,7 +13,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toException
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -431,11 +430,9 @@ internal class NodeRepositoryImpl @Inject constructor(
 
         return withContext(ioDispatcher) {
             if (node != null && targetNode != null) {
-                megaExceptionMapper(
-                    megaApiGateway.checkMoveErrorExtended(
-                        node,
-                        targetNode
-                    )
+                megaApiGateway.checkMoveErrorExtended(
+                    node,
+                    targetNode
                 ).errorCode != MegaError.API_OK
             } else {
                 false

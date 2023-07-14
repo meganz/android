@@ -69,6 +69,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.BroadcastOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -1356,11 +1357,11 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
 
     private suspend fun doOnTransferFinish(
         transfer: Transfer,
-        error: MegaException,
+        error: MegaException?,
     ) = withContext(ioDispatcher) {
         Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.type)
         if (transfer.isStreamingTransfer) return@withContext
-        if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+        if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
         transfersManagement.checkScanningTransfer(transfer, TransfersManagement.Check.ON_FINISH)
@@ -1408,7 +1409,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
             }
             cancel()
         } else {
-            if (error.errorCode == MegaError.API_OK) {
+            if (error == null) {
                 Timber.d("Download OK - Node handle: %s", transfer.nodeHandle)
                 if (isVoiceClip) {
                     resultTransfersVoiceClip(
@@ -1468,7 +1469,8 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
                     refreshOfflineFragment()
                     refreshSettingsFragment()
                 }
-            } else {
+            }
+            error?.let {
                 Timber.e("Download ERROR: %s", transfer.nodeHandle)
                 if (isVoiceClip) {
                     resultTransfersVoiceClip(
@@ -1493,6 +1495,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
                     }
                 }
             }
+
         }
         if (isVoiceClip || isBackgroundTransfer) return@withContext
         if (getNumPendingDownloadsNonBackgroundUseCase() <= 0 && transfersCount == 0) {
@@ -1565,15 +1568,15 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
 
     private suspend fun doOnTransferTemporaryError(
         transfer: Transfer,
-        e: MegaException,
+        e: MegaException?,
     ) = withContext(ioDispatcher) {
         Timber.w(
-            "Download Temporary Error - Node Handle: ${transfer.nodeHandle} Error: ${e.errorCode} ${e.errorString}"
+            "Download Temporary Error - Node Handle: ${transfer.nodeHandle} Error: ${e?.errorCode} ${e?.errorString}"
         )
         if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
             return@withContext
         }
-        if (e.errorCode == MegaError.API_EOVERQUOTA) {
+        if (e is QuotaExceededMegaException) {
             if (e.value != 0L) {
                 Timber.w("TRANSFER OVERQUOTA ERROR: %s", e.errorCode)
                 checkTransferOverQuota(true)

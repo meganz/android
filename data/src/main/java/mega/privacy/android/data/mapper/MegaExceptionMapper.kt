@@ -1,12 +1,32 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import nz.mega.sdk.MegaError
+import javax.inject.Inject
 
 /**
  * [MegaError] to [MegaException] mapper
  */
-typealias MegaExceptionMapper = (@JvmSuppressWildcards MegaError) -> @JvmSuppressWildcards MegaException
+internal class MegaExceptionMapper @Inject constructor() {
+    operator fun invoke(error: MegaError, methodName: String? = null) = when (error.errorCode) {
+        MegaError.API_EOVERQUOTA -> {
+            QuotaExceededMegaException(
+                error.errorCode,
+                error.errorString,
+                error.value,
+                methodName
+            )
+        }
 
-internal fun toMegaExceptionModel(error: MegaError) =
-    MegaException(error.errorCode, error.errorString, error.value)
+        MegaError.API_EGOINGOVERQUOTA -> NotEnoughQuotaMegaException(
+            error.errorCode,
+            error.errorString,
+            error.value,
+            methodName
+        )
+
+        else -> MegaException(error.errorCode, error.errorString, error.value, methodName)
+    }
+}

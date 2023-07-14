@@ -134,7 +134,6 @@ import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -214,7 +213,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val reportUploadFinishedUseCase: ReportUploadFinishedUseCase,
     private val reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase,
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
-    private val legacyCompletedTransferMapper: LegacyCompletedTransferMapper,
+    private val completedTransferMapper: LegacyCompletedTransferMapper,
     private val setCoordinatesUseCase: SetCoordinatesUseCase,
     private val isChargingUseCase: IsChargingUseCase,
     private val stringWrapper: StringWrapper,
@@ -932,12 +931,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     ) {
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
-
-        Timber.d(
-            "Image Sync Finished, Error Code: ${error.errorCode}, " +
-                    "Image Handle: ${transfer.nodeHandle}, " +
-                    "Image Size: ${transfer.transferredBytes}"
-        )
         try {
             updateUploadedCountAfterTransfer(record, transfer)
             transferFinished(transfer, error, record)
@@ -1319,15 +1312,31 @@ class CameraUploadsWorker @AssistedInject constructor(
         notificationManager.cancel(notificationId)
     }
 
-    private suspend fun transferFinished(transfer: Transfer, e: MegaException, record: SyncRecord) {
+    private suspend fun transferFinished(
+        transfer: Transfer,
+        error: MegaException?,
+        record: SyncRecord,
+    ) {
         val path = transfer.localPath
         if (transfer.state == TransferState.STATE_COMPLETED) {
-            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, context)
-            addCompletedTransferUseCase(legacyCompletedTransferMapper(androidCompletedTransfer))
+            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, error, context)
+            addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
         }
-
-        if (e.errorCode == MegaError.API_OK) {
-            Timber.d("Image Sync API_OK")
+        error?.let {
+            Timber.d("Image Sync Finished, Error Code: ${it.errorCode}")
+            if (error is QuotaExceededMegaException) {
+                Timber.w("Over quota error: ${error.errorCode}")
+                showStorageOverQuotaNotification()
+                endService(aborted = true)
+            } else {
+                Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, it.errorString)
+            }
+        } ?: run {
+            Timber.d(
+                "Image Sync Finished" +
+                        "Image Handle: ${transfer.nodeHandle}, " +
+                        "Image Size: ${transfer.transferredBytes}"
+            )
             val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
             node?.let { nonNullNode ->
                 handleSetOriginalFingerprint(
@@ -1383,12 +1392,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                     temp.delete()
                 }
             }
-        } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
-            Timber.w("Over quota error: %s", e.errorCode)
-            showStorageOverQuotaNotification()
-            endService(aborted = true)
-        } else {
-            Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
     }
 

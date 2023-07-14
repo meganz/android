@@ -1000,10 +1000,10 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             ?.onFailure { err -> Timber.e(err, "EXCEPTION") }
     }
 
-    private fun onTransferTemporaryError(transfer: Transfer, e: MegaException) {
-        Timber.w("Handle: ${transfer.nodeHandle}. Upload Temporary Error: ${e.errorString}__${e.errorCode}".trimIndent())
+    private fun onTransferTemporaryError(transfer: Transfer, e: MegaException?) {
+        Timber.w("Handle: ${transfer.nodeHandle}. Upload Temporary Error: ${e?.errorString}__${e?.errorCode}".trimIndent())
 
-        when (e.errorCode) {
+        when (e?.errorCode) {
             MegaError.API_EOVERQUOTA, MegaError.API_EGOINGOVERQUOTA -> {
                 isOverQuota = if (e.errorCode == MegaError.API_EOVERQUOTA) {
                     Constants.OVERQUOTA_STORAGE_STATE
@@ -1026,9 +1026,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     private suspend fun onTransferFinish(
         transfer: Transfer,
-        error: MegaException,
+        error: MegaException?,
     ) = with(transfer) {
-        if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+        if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
 
@@ -1066,7 +1066,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                 )
             }
         } else {
-            if (error.errorCode == MegaError.API_OK) {
+            if (error == null) {
                 Timber.d("Upload OK: $nodeHandle")
 
                 if (FileUtil.isVideoFile(localPath)) {

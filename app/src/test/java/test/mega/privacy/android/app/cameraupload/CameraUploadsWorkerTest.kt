@@ -184,7 +184,7 @@ class CameraUploadsWorkerTest {
     private val reportUploadFinishedUseCase: ReportUploadFinishedUseCase = mock()
     private val reportUploadInterruptedUseCase: ReportUploadInterruptedUseCase = mock()
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase = mock()
-    private val legacyCompletedTransferMapper: LegacyCompletedTransferMapper = mock()
+    private val completedTransferMapper: LegacyCompletedTransferMapper = mock()
     private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
     private val isChargingUseCase: IsChargingUseCase = mock()
     private val stringWrapper: StringWrapper = mock()
@@ -287,7 +287,7 @@ class CameraUploadsWorkerTest {
             reportUploadFinishedUseCase = reportUploadFinishedUseCase,
             reportUploadInterruptedUseCase = reportUploadInterruptedUseCase,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
-            legacyCompletedTransferMapper = legacyCompletedTransferMapper,
+            completedTransferMapper = completedTransferMapper,
             setCoordinatesUseCase = setCoordinatesUseCase,
             isChargingUseCase = isChargingUseCase,
             stringWrapper = stringWrapper,

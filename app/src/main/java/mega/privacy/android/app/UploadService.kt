@@ -63,6 +63,8 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.TransfersFinishedState
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.account.qr.CheckUploadedQRCodeFileUseCase
@@ -794,11 +796,11 @@ internal class UploadService : LifecycleService() {
 
     private suspend fun doOnTransferFinish(
         transfer: Transfer,
-        error: MegaException,
+        error: MegaException?,
     ) = with(transfer) {
         Timber.d("Path: $localPath, Size: $transferredBytes")
 
-        if (error.errorCode == MegaError.API_EBUSINESSPASTDUE) {
+        if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))
         }
 
@@ -813,7 +815,7 @@ internal class UploadService : LifecycleService() {
                 val message =
                     getCreationOrEditorText(
                         appData = appData,
-                        isSuccess = error.errorCode == MegaError.API_OK,
+                        isSuccess = error == null,
                         context = this@UploadService
                     )
                 sendBroadcast(
@@ -846,7 +848,7 @@ internal class UploadService : LifecycleService() {
                 CacheFolderManager.TEMPORARY_FOLDER
             )
         } else {
-            if (error.errorCode == MegaError.API_OK) {
+            if (error == null) {
                 if (!isFolderTransfer) {
                     if (transferredBytes == 0L) {
                         alreadyUploaded++
@@ -1020,9 +1022,9 @@ internal class UploadService : LifecycleService() {
                 Timber.e(
                     "Upload Error: ${fileName}_${error.errorCode}___${error.errorString}"
                 )
-                if (error.errorCode == MegaError.API_EOVERQUOTA && !isForeignOverQuota) {
+                if (error is QuotaExceededMegaException && !isForeignOverQuota) {
                     isOverQuota = Constants.OVERQUOTA_STORAGE_STATE
-                } else if (error.errorCode == MegaError.API_EGOINGOVERQUOTA) {
+                } else if (error is NotEnoughQuotaMegaException) {
                     isOverQuota = Constants.PRE_OVERQUOTA_STORAGE_STATE
                 }
             }
@@ -1033,7 +1035,7 @@ internal class UploadService : LifecycleService() {
                     .onFailure { Timber.w("Exception checking uploaded QR code file.") }
             }
 
-            if (error.errorCode == MegaError.API_OK) {
+            if (error == null) {
                 // Get the uploaded file from cache root directory.
                 getCacheFileAsync("", fileName)
                     ?.takeIf { it.exists() }
@@ -1086,10 +1088,10 @@ internal class UploadService : LifecycleService() {
         }
     }
 
-    private fun doOnTransferTemporaryError(transfer: Transfer, e: MegaException) {
-        Timber.w("onTransferTemporaryError: ${e.errorString}__${e.errorCode}")
+    private fun doOnTransferTemporaryError(transfer: Transfer, e: MegaException?) {
+        Timber.w("onTransferTemporaryError: ${e?.errorString}__${e?.errorCode}")
 
-        when (e.errorCode) {
+        when (e?.errorCode) {
             MegaError.API_EOVERQUOTA, MegaError.API_EGOINGOVERQUOTA -> {
                 if (!transfer.isForeignOverQuota) {
                     isOverQuota = if (e.errorCode == MegaError.API_EOVERQUOTA) {

@@ -26,7 +26,7 @@ sealed class TransferEvent(open val transfer: Transfer) {
      */
     data class TransferFinishEvent(
         override val transfer: Transfer,
-        val error: MegaException,
+        val error: MegaException?,
     ) : TransferEvent(transfer)
 
     /**
@@ -45,7 +45,7 @@ sealed class TransferEvent(open val transfer: Transfer) {
      */
     data class TransferTemporaryErrorEvent(
         override val transfer: Transfer,
-        val error: MegaException,
+        val error: MegaException?,
     ) : TransferEvent(transfer)
 
     /**

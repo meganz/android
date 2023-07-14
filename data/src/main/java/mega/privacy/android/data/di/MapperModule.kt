@@ -25,7 +25,6 @@ import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
@@ -79,7 +78,6 @@ import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
-import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
@@ -159,12 +157,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
-
-        /**
-         * Provide mega exception mapper
-         */
-        @Provides
-        fun provideMegaExceptionMapper(): MegaExceptionMapper = ::toMegaExceptionModel
 
         /**
          * Provide images mapper

@@ -66,7 +66,7 @@ class AndroidCompletedTransfer {
         parentHandle = transfer.parentHandle
     }
 
-    constructor(transfer: Transfer, error: MegaException, context: Context) {
+    constructor(transfer: Transfer, error: MegaException?, context: Context) {
         fileName = transfer.fileName
         type = transfer.type.mapTransferType()
         state = transfer.state.mapTransferState()
@@ -74,12 +74,14 @@ class AndroidCompletedTransfer {
         nodeHandle = transfer.nodeHandle.toString()
         path = getTransferPath(transfer.parentPath, transfer.nodeHandle, transfer.parentHandle)
         timeStamp = System.currentTimeMillis()
-        this.error = getErrorString(
-            transfer.isForeignOverQuota,
-            error.errorCode,
-            context.getString(error.getErrorStringId()),
-            context
-        )
+        this.error = error?.let {
+            getErrorString(
+                transfer.isForeignOverQuota,
+                it.errorCode,
+                context.getString(error.getErrorStringId()),
+                context
+            )
+        }
         originalPath = transfer.localPath
         parentHandle = transfer.parentHandle
     }
