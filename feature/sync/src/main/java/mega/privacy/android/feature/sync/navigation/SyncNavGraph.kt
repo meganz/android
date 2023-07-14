@@ -43,6 +43,7 @@ internal fun NavGraphBuilder.syncNavGraph(navController: NavController) {
         }
         composable(route = syncList) {
             SyncListRoute(
+                hiltViewModel(),
                 addFolderClicked = {
                     navController.navigate(syncNewFolderRoute)
                 }

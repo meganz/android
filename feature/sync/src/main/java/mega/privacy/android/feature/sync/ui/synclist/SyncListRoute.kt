@@ -3,49 +3,27 @@ package mega.privacy.android.feature.sync.ui.synclist
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import mega.privacy.android.feature.sync.ui.synclist.SyncListAction.CardExpanded
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.feature.sync.ui.model.SyncStatus
-import mega.privacy.android.feature.sync.ui.model.SyncUiItem
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun SyncListRoute(
-    addFolderClicked: () -> Unit
+internal fun SyncListRoute(
+    viewModel: SyncListViewModel,
+    addFolderClicked: () -> Unit,
 ) {
-    var state by remember { mutableStateOf(SyncListState(fakeData())) }
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     SyncListScreen(
         Modifier.padding(16.dp),
         syncUiItems = state.syncUiItems,
         cardExpanded = { syncUiItem, expanded ->
-            state = state.copy(
-                syncUiItems = state.syncUiItems.map {
-                    if (it.id == syncUiItem.id) {
-                        it.copy(expanded = expanded)
-                    } else {
-                        it
-                    }
-                }
-            )
+            viewModel.handleAction(CardExpanded(syncUiItem, expanded))
         },
         removeFolderClicked = {
-
+            viewModel.handleAction(SyncListAction.RemoveFolderClicked(it))
         },
         addFolderClicked = addFolderClicked
     )
 }
-
-private fun fakeData() = listOf(
-    SyncUiItem(
-        1,
-        folderPairName = "folderPair 1",
-        status = SyncStatus.SYNCING,
-        deviceStoragePath = "Sync",
-        megaStoragePath = "papers",
-        method = "Two way sync",
-        expanded = false,
-    )
-)

@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.sync.data.mock;
 
+import static mega.privacy.android.feature.sync.data.mock.MegaSync.SyncRunningState.RUNSTATE_RUNNING;
+
 /*
  * Mock class to avoid dependency on real Sync SDK
+ * This class will be removed in next MR since real Sync SDK is now added
  */
 public class MegaSync {
 
@@ -30,11 +33,11 @@ public class MegaSync {
     }
 
     public int getType() {
-        return 1234;
+        return SyncType.TYPE_TWOWAY.swigValue;
     }
 
     public int getRunState() {
-        return 1234;
+        return RUNSTATE_RUNNING.swigValue;
     }
 
     public final static class SyncType {
