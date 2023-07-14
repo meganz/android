@@ -68,6 +68,9 @@ class PsaWebBrowser : Fragment() {
         this.psaId = psaId
 
         try {
+            if (!Util.matchRegexs(url, Constants.MEGA_REGEXS)) {
+                throw RuntimeException("PsaWebBrowser (Psa id: $psaId): Vulnerable/Malicious Url detected: $url")
+            }
             val megaApi = MegaApplication.getInstance().megaApi
             val myUserHandle = megaApi.myUserHandle ?: return
 

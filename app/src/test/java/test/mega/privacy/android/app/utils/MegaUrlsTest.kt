@@ -51,6 +51,9 @@ class MegaUrlsTest {
         Arguments.of("https://mega.com/"),
         Arguments.of("https://mega.com"),
         Arguments.of("http://mega.nz/"),
+        Arguments.of("https://mega.co.nz//@attacker.com"),
+        Arguments.of("https://mega.co.nz//////@attacker.com"),
+        Arguments.of("https://mega.co.nz\\\\@attacker.com"),
         Arguments.of("https://hahdasjdhas.com/"),
     )
 }

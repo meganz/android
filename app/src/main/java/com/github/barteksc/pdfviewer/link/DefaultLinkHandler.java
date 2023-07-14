@@ -15,13 +15,17 @@
  */
 package com.github.barteksc.pdfviewer.link;
 
+import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
+import static mega.privacy.android.app.utils.Util.matchRegexs;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
+
+import timber.log.Timber;
 
 public class DefaultLinkHandler implements LinkHandler {
 
@@ -45,13 +49,18 @@ public class DefaultLinkHandler implements LinkHandler {
     }
 
     private void handleUri(String uri) {
+        if (!matchRegexs(uri, MEGA_REGEXS)) {
+            Timber.e(TAG, "Vulnerable/Malicious Url detected: %s", uri);
+            return;
+        }
+
         Uri parsedUri = Uri.parse(uri);
-        Intent intent = new Intent(Intent.ACTION_VIEW, parsedUri);
         Context context = pdfView.getContext();
+        Intent intent = new Intent(Intent.ACTION_VIEW, parsedUri);
         if (intent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(intent);
         } else {
-            Log.w(TAG, "No activity found for URI: " + uri);
+            Timber.w(TAG, "No activity found for URI: %s", uri);
         }
     }
 

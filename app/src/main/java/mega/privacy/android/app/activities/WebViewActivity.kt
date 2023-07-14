@@ -64,6 +64,13 @@ class WebViewActivity : BaseActivity() {
             finish()
         }
 
+        val url = intent.dataString
+
+        if (!Util.matchRegexs(url, MEGA_REGEXS)) {
+            Timber.e("WebViewActivity::onCreate", "Vulnerable/Malicious Url detected: $url")
+            finish()
+        }
+
         binding = ActivityWebViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -83,6 +90,15 @@ class WebViewActivity : BaseActivity() {
             webViewClient = object : WebViewClient() {
                 @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
+                    if (!Util.matchRegexs(url, MEGA_REGEXS)) {
+                        Timber.e(
+                            "WebViewActivity::shouldOverrideUrlLoading",
+                            "Vulnerable/Malicious Url detected: $url"
+                        )
+                        finish()
+                        return false
+                    }
+
                     view.loadUrl(url)
                     return true
                 }
@@ -105,8 +121,6 @@ class WebViewActivity : BaseActivity() {
                     return if (hasAllPermissions()) launchChooserIntent() else false
                 }
             }
-
-            val url = intent.dataString
 
             if (Util.matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
