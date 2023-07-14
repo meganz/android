@@ -5840,7 +5840,7 @@ public class ChatActivity extends PasscodeActivity
 
         if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
             checkIfInvitationIsAlreadySent(email, name);
-        } else if (!chatRoom.isGroup() && megaChatApi.getUserEmailFromCache(0).equals(email)) {
+        } else if (!chatRoom.isGroup() && email != null && email.equals(megaChatApi.getUserEmailFromCache(0))) {
             showGroupOrContactInfoActivity();
         } else {
             ContactUtil.openContactInfoActivity(this, email);
