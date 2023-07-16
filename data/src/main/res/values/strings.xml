@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="section_photo_sync" />
+    <string name="settings_camera_notif_initializing_title" />
+    <string name="settings_camera_notif_checking_title" />
+    <string name="title_out_of_space" />
+    <string name="message_out_of_space" />
+    <string name="error_not_enough_free_space" />
+    <string name="camera_notif_primary_local_unavailable" />
+    <string name="camera_notif_secondary_local_unavailable" />
+    <string name="section_secondary_media_uploads" />
+    <string name="title_compression_size_over_limit" />
+    <string name="message_compression_size_over_limit" />
+    <string name="label_file_size_mega_byte" />
+    <string name="message_compress_video" />
+    <string name="title_compress_video" />
+    <string name="download_preparing_files" />
+    <string name="upload_service_notification_paused" />
+    <string name="upload_service_notification" />
+    <string name="settings_camera_notif_title" />
+    <string name="download_show_info" />
+    <string name="overquota_alert_title" />
+</resources>
