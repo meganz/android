@@ -2670,4 +2670,22 @@ interface MegaApiGateway {
      * @return The id of this device
      */
     fun getDeviceId(): String?
+
+    /**
+     * Get if AB test flag is active
+     *
+     * @param flag the AB test flag name for API
+     */
+    fun getABTestValue(flag: String): Long
+
+    /**
+     * Send request to API to activate specific AB test flag
+     *
+     * @param flag the AB test flag name for API
+     * @param listener MegaRequestListener to track this request
+     */
+    fun sendABTestActive(
+        flag: String,
+        listener: MegaRequestListenerInterface,
+    )
 }

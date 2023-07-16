@@ -1274,4 +1274,10 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.setDeviceName(deviceName, listener)
 
     override fun getDeviceId() = megaApi.deviceId
+
+    override fun getABTestValue(flag: String): Long = megaApi.getABTestValue(flag)
+
+    override fun sendABTestActive(flag: String, listener: MegaRequestListenerInterface) {
+        megaApi.sendABTestActive(flag, listener)
+    }
 }
