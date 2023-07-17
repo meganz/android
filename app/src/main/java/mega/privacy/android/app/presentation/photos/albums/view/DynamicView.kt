@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -44,10 +44,13 @@ internal fun DynamicView(
         }
     }
 
-    LazyColumn(state = lazyListState) {
+    LazyColumn(
+        state = lazyListState,
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+    ) {
         this.items(
             dynamicList,
-            key = { it.key }
+            key = { it.key },
         ) { item ->
             when (item) {
                 is AlbumPhotoItem.BigSmall2Item -> {
@@ -60,6 +63,7 @@ internal fun DynamicView(
                         selectedPhotos = selectedPhotos
                     )
                 }
+
                 is AlbumPhotoItem.Small3Item -> {
                     Photos3SmallItems(
                         size = smallWidth,
@@ -70,6 +74,7 @@ internal fun DynamicView(
                         selectedPhotos = selectedPhotos
                     )
                 }
+
                 is AlbumPhotoItem.Small2BigItem -> {
                     Photos2SmallBigItems(
                         size = smallWidth,

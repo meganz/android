@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.view
 
+import mega.privacy.android.core.R as CoreUiR
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.view.isSelected
@@ -51,30 +51,47 @@ internal fun PhotosBig2SmallItems(
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
 ) {
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            AlbumPhotoContainer(
-                onClick = onClick,
-                onLongPress = onLongPress,
-                albumPhotoView = {
-                    AlbumPhotoView(
-                        width = size * 2,
-                        height = size * 2 + gap,
-                        photo = photos[0],
-                        photoDownload = photoDownload,
-                        isPreview = true,
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        AlbumPhotoContainer(
+            onClick = onClick,
+            onLongPress = onLongPress,
+            albumPhotoView = {
+                AlbumPhotoView(
+                    width = size * 2,
+                    height = size * 2 + gap,
+                    photo = photos[0],
+                    photoDownload = photoDownload,
+                    isPreview = true,
+                )
+            },
+            photo = photos[0],
+            isSelected = photos[0] in selectedPhotos
+        )
+        if (photos.size >= 2) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                AlbumPhotoContainer(
+                    onClick = onClick,
+                    onLongPress = onLongPress,
+                    albumPhotoView = {
+                        AlbumPhotoView(
+                            width = size,
+                            height = size,
+                            photo = photos[1],
+                            photoDownload = photoDownload,
+                        )
+                    },
+                    photo = photos[1],
+                    isSelected = photos[1] in selectedPhotos
+                )
+                if (photos.size == 3) {
+                    Spacer(
+                        modifier = Modifier.height(1.dp)
                     )
-                },
-                photo = photos[0],
-                isSelected = photos[0] in selectedPhotos
-            )
-            if (photos.size >= 2) {
-                Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
-                ) {
                     AlbumPhotoContainer(
                         onClick = onClick,
                         onLongPress = onLongPress,
@@ -82,38 +99,16 @@ internal fun PhotosBig2SmallItems(
                             AlbumPhotoView(
                                 width = size,
                                 height = size,
-                                photo = photos[1],
+                                photo = photos[2],
                                 photoDownload = photoDownload,
                             )
                         },
-                        photo = photos[1],
-                        isSelected = photos[1] in selectedPhotos
+                        photo = photos[2],
+                        isSelected = photos[2] in selectedPhotos
                     )
-                    if (photos.size == 3) {
-                        Spacer(
-                            modifier = Modifier.height(1.dp)
-                        )
-                        AlbumPhotoContainer(
-                            onClick = onClick,
-                            onLongPress = onLongPress,
-                            albumPhotoView = {
-                                AlbumPhotoView(
-                                    width = size,
-                                    height = size,
-                                    photo = photos[2],
-                                    photoDownload = photoDownload,
-                                )
-                            },
-                            photo = photos[2],
-                            isSelected = photos[2] in selectedPhotos
-                        )
-                    }
                 }
             }
         }
-        Spacer(
-            modifier = Modifier.height(1.dp)
-        )
     }
 }
 
@@ -126,10 +121,76 @@ internal fun Photos3SmallItems(
     onLongPress: (Photo) -> Unit = {},
     selectedPhotos: Set<Photo>,
 ) {
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        AlbumPhotoContainer(
+            onClick = onClick,
+            onLongPress = onLongPress,
+            albumPhotoView = {
+                AlbumPhotoView(
+                    width = size,
+                    height = size,
+                    photo = photos[0],
+                    photoDownload = downloadPhoto,
+                )
+            },
+            photo = photos[0],
+            isSelected = photos[0] in selectedPhotos
+        )
+        if (photos.size >= 2) {
+            AlbumPhotoContainer(
+                onClick = onClick,
+                onLongPress = onLongPress,
+                albumPhotoView = {
+                    AlbumPhotoView(
+                        width = size,
+                        height = size,
+                        photo = photos[1],
+                        photoDownload = downloadPhoto,
+                    )
+                },
+                photo = photos[1],
+                isSelected = photos[1] in selectedPhotos
+            )
+            if (photos.size == 2) {
+                Spacer(modifier = Modifier.size(size))
+            }
+        }
+        if (photos.size == 3) {
+            AlbumPhotoContainer(
+                onClick = onClick,
+                onLongPress = onLongPress,
+                albumPhotoView = {
+                    AlbumPhotoView(
+                        width = size,
+                        height = size,
+                        photo = photos[2],
+                        photoDownload = downloadPhoto,
+                    )
+                },
+                photo = photos[2],
+                isSelected = photos[2] in selectedPhotos
+            )
+        }
+    }
+}
+
+@Composable
+internal fun Photos2SmallBigItems(
+    size: Dp, photos: List<Photo>,
+    downloadPhoto: PhotoDownload,
+    onClick: (Photo) -> Unit = {},
+    onLongPress: (Photo) -> Unit = {},
+    selectedPhotos: Set<Photo>,
+) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             AlbumPhotoContainer(
                 onClick = onClick,
@@ -145,26 +206,11 @@ internal fun Photos3SmallItems(
                 photo = photos[0],
                 isSelected = photos[0] in selectedPhotos
             )
-            if (photos.size >= 2) {
-                AlbumPhotoContainer(
-                    onClick = onClick,
-                    onLongPress = onLongPress,
-                    albumPhotoView = {
-                        AlbumPhotoView(
-                            width = size,
-                            height = size,
-                            photo = photos[1],
-                            photoDownload = downloadPhoto,
-                        )
-                    },
-                    photo = photos[1],
-                    isSelected = photos[1] in selectedPhotos
-                )
-                if (photos.size == 2) {
-                    Spacer(modifier = Modifier.size(size))
-                }
-            }
+
             if (photos.size == 3) {
+                Spacer(
+                    modifier = Modifier.height(1.dp)
+                )
                 AlbumPhotoContainer(
                     onClick = onClick,
                     onLongPress = onLongPress,
@@ -181,84 +227,23 @@ internal fun Photos3SmallItems(
                 )
             }
         }
-        Spacer(
-            modifier = Modifier.height(1.dp)
-        )
-    }
-}
-
-@Composable
-internal fun Photos2SmallBigItems(
-    size: Dp, photos: List<Photo>,
-    downloadPhoto: PhotoDownload,
-    onClick: (Photo) -> Unit = {},
-    onLongPress: (Photo) -> Unit = {},
-    selectedPhotos: Set<Photo>,
-) {
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                AlbumPhotoContainer(
-                    onClick = onClick,
-                    onLongPress = onLongPress,
-                    albumPhotoView = {
-                        AlbumPhotoView(
-                            width = size,
-                            height = size,
-                            photo = photos[0],
-                            photoDownload = downloadPhoto,
-                        )
-                    },
-                    photo = photos[0],
-                    isSelected = photos[0] in selectedPhotos
-                )
-
-                if (photos.size == 3) {
-                    Spacer(
-                        modifier = Modifier.height(1.dp)
+        if (photos.size >= 2) {
+            AlbumPhotoContainer(
+                onClick = onClick,
+                onLongPress = onLongPress,
+                albumPhotoView = {
+                    AlbumPhotoView(
+                        width = size * 2,
+                        height = size * 2 + gap,
+                        photo = photos[1],
+                        photoDownload = downloadPhoto,
+                        isPreview = true,
                     )
-                    AlbumPhotoContainer(
-                        onClick = onClick,
-                        onLongPress = onLongPress,
-                        albumPhotoView = {
-                            AlbumPhotoView(
-                                width = size,
-                                height = size,
-                                photo = photos[2],
-                                photoDownload = downloadPhoto,
-                            )
-                        },
-                        photo = photos[2],
-                        isSelected = photos[2] in selectedPhotos
-                    )
-                }
-            }
-            if (photos.size >= 2) {
-                AlbumPhotoContainer(
-                    onClick = onClick,
-                    onLongPress = onLongPress,
-                    albumPhotoView = {
-                        AlbumPhotoView(
-                            width = size * 2,
-                            height = size * 2 + gap,
-                            photo = photos[1],
-                            photoDownload = downloadPhoto,
-                            isPreview = true,
-                        )
-                    },
-                    photo = photos[1],
-                    isSelected = photos[1] in selectedPhotos
-                )
-            }
+                },
+                photo = photos[1],
+                isSelected = photos[1] in selectedPhotos
+            )
         }
-        Spacer(
-            modifier = Modifier.height(1.dp)
-        )
     }
 }
 
@@ -301,11 +286,12 @@ private fun AlbumPhotoContainer(
             )
         }
         if (photo is Photo.Video) {
-            Spacer(modifier = Modifier
-                .matchParentSize()
-                .background(
-                    color = grey_alpha_032
-                )
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        color = grey_alpha_032
+                    )
             )
 
             Text(

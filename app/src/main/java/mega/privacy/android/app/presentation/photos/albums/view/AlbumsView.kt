@@ -23,13 +23,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -73,10 +71,10 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
+import mega.privacy.android.app.presentation.photos.timeline.view.AlbumListSkeletonView
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaDialog
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
 import mega.privacy.android.core.ui.theme.caption
@@ -369,15 +367,7 @@ fun AlbumsView(
                 }
             }
         } else {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-                content = {
-                    MegaCircularProgressIndicator(
-                        modifier = Modifier.size(44.dp)
-                    )
-                },
-            )
+            AlbumListSkeletonView()
         }
     }
 

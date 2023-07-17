@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -48,6 +47,7 @@ import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.presentation.photos.albums.view.RemoveLinksConfirmationDialog
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
+import mega.privacy.android.app.presentation.photos.timeline.view.AlbumContentSkeletonView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDialog
@@ -55,7 +55,6 @@ import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.core.ui.controls.MegaEmptyView
-import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgressIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.dark_grey
@@ -177,11 +176,7 @@ fun AlbumContentScreen(
                 MegaLinearProgressIndicator()
             }
         } else if (albumContentState.isLoadingPhotos || albumContentState.isAddingPhotos) {
-            MegaCircularProgressIndicator(
-                modifier = Modifier
-                    .size(44.dp)
-                    .align(Alignment.Center)
-            )
+            AlbumContentSkeletonView(smallWidth = smallWidth)
         } else {
             when (albumsState.currentAlbum) {
                 Album.FavouriteAlbum -> MegaEmptyView(
