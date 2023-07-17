@@ -37,6 +37,8 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shockwave.pdfium.PdfDocument.Bookmark
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -72,6 +74,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -118,6 +121,13 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
+
+    /**
+     * Application scope
+     */
+    @ApplicationScope
+    @Inject
+    lateinit var applicationScope: CoroutineScope
 
     private lateinit var binding: ActivityPdfviewerBinding
 
@@ -1600,11 +1610,14 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             intent.getBooleanExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, false)
         megaApi.removeTransferListener(this)
         megaApi.removeGlobalListener(this)
-        if (needStopHttpServer) {
-            megaApi.httpServerStop()
-        }
-        if (needStopHttpServer) {
-            megaApiFolder.httpServerStop()
+        applicationScope.launch {
+            if (needStopHttpServer) {
+                megaApi.httpServerStop()
+            }
+            if (needStopHttpServer) {
+                megaApiFolder.httpServerStop()
+            }
+            Timber.d("PdfViewerActivity::HttpServerStop")
         }
         handler?.removeCallbacksAndMessages(null)
         unregisterReceiver(receiverToFinish)
