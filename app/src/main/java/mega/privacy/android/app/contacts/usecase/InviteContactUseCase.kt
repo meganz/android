@@ -1,15 +1,13 @@
 package mega.privacy.android.app.contacts.usecase
 
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.ErrorUtils.toThrowable
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.AFFILIATE_TYPE_CONTACT
 import nz.mega.sdk.MegaContactRequest
-import nz.mega.sdk.MegaContactRequest.*
-import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EEXIST
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUser
@@ -43,13 +41,6 @@ class InviteContactUseCase @Inject constructor(
         val contactLinkHandle: Long? = null,
         val fullName: String? = null
     )
-
-    /**
-     * Invite result for invite() method containing all possible states.
-     */
-    enum class InviteResult {
-        SENT, RESENT, DELETED, ALREADY_SENT, ALREADY_CONTACT, INVALID_EMAIL, UNKNOWN_ERROR
-    }
 
     /**
      * Get information about a contact link
@@ -96,61 +87,6 @@ class InviteContactUseCase @Inject constructor(
                     Timber.e(error.toThrowable())
                 }
             ))
-        }
-
-    /**
-     * Invite another person to be your MEGA contact using a contact link handle
-     *
-     * @param contactLinkHandle Contact link handle of the other account
-     * @param email             Email of the new contact
-     * @param message           Message for the user
-     * @return                  InviteResult
-     */
-    @JvmOverloads
-    fun invite(
-        contactLinkHandle: Long,
-        email: String,
-        message: String? = null
-    ): Single<InviteResult> =
-        Single.create { emitter ->
-            megaApi.inviteContact(
-                email,
-                message,
-                INVITE_ACTION_ADD,
-                contactLinkHandle,
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = { request, error ->
-                        if (emitter.isDisposed) return@OptionalMegaRequestListenerInterface
-
-                        when {
-                            request.number == INVITE_ACTION_REMIND.toLong() -> {
-                                emitter.onSuccess(InviteResult.RESENT)
-                            }
-                            error.errorCode == API_OK && request.number == INVITE_ACTION_ADD.toLong() -> {
-                                emitter.onSuccess(InviteResult.SENT)
-                            }
-                            error.errorCode == API_OK && request.number == INVITE_ACTION_DELETE.toLong() -> {
-                                emitter.onSuccess(InviteResult.DELETED)
-                            }
-                            error.errorCode == API_EEXIST -> {
-                                if (megaApi.outgoingContactRequests.any { it.targetEmail == request.email }) {
-                                    emitter.onSuccess(InviteResult.ALREADY_SENT)
-                                } else {
-                                    emitter.onSuccess(InviteResult.ALREADY_CONTACT)
-                                }
-                            }
-                            request.number == INVITE_ACTION_ADD.toLong() && error.errorCode == MegaError.API_EARGS -> {
-                                emitter.onSuccess(InviteResult.INVALID_EMAIL)
-                            }
-                            else -> {
-                                emitter.onError(error.toThrowable())
-                            }
-                        }
-                    },
-                    onRequestTemporaryError = { _, error ->
-                        Timber.e(error.toThrowable())
-                    }
-                ))
         }
 
     /**

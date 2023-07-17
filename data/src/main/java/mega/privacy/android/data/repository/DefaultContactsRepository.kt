@@ -803,16 +803,22 @@ internal class DefaultContactsRepository @Inject constructor(
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->
                     when (error.errorCode) {
-                        MegaError.API_OK -> continuation.resumeWith(
-                            Result.success(
-                                ContactLink(
-                                    email = request.email,
-                                    contactHandle = request.parentHandle,
-                                    contactLinkHandle = request.nodeHandle,
-                                    fullName = "${request.name} ${request.text}"
+                        MegaError.API_OK -> {
+                            databaseHandler.setLastPublicHandle(request.nodeHandle)
+                            databaseHandler.setLastPublicHandleTimeStamp()
+                            databaseHandler.lastPublicHandleType =
+                                MegaApiJava.AFFILIATE_TYPE_CONTACT
+                            continuation.resumeWith(
+                                Result.success(
+                                    ContactLink(
+                                        email = request.email,
+                                        contactHandle = request.parentHandle,
+                                        contactLinkHandle = request.nodeHandle,
+                                        fullName = "${request.name} ${request.text}"
+                                    )
                                 )
                             )
-                        )
+                        }
 
                         MegaError.API_EEXIST -> continuation.resumeWith(
                             Result.success(ContactLink(isContact = false))

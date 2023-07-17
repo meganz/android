@@ -154,6 +154,7 @@ import mega.privacy.android.app.main.dialog.Enable2FADialogFragment
 import mega.privacy.android.app.main.dialog.StorageStatusDialogFragment
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessGraceDialogFragment
 import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
+import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
@@ -506,7 +507,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private var confirmationTransfersDialog: AlertDialog? = null
     private var reconnectDialog: AlertDialog? = null
-    private var inviteContactDialog: AlertDialog? = null
 
     private lateinit var navigationDrawerAddPhoneContainer: RelativeLayout
     private var orientationSaved = 0
@@ -2308,113 +2308,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.w("Not valid contact handle")
             return
         }
-        dismissAlertDialogIfExists(openLinkDialog)
-        Timber.d("Handle to invite a contact: %s", handle)
-        inviteContactUseCase.getContactLink(handle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { result: InviteContactUseCase.ContactLinkResult ->
-                    showContactInviteDialog(
-                        result.contactLinkHandle,
-                        result.fullName,
-                        result.email,
-                        result.isContact
-                    )
-                },
-                { throwable: Throwable -> Timber.e(throwable) }
-            )
-            .addTo(composite)
-    }
-
-    /**
-     * Show contact invite dialog.
-     *
-     * @param linkHandle User link handle for the invitation
-     * @param fullName   User full name
-     * @param email      User email
-     * @param isContact  Flag to check whether is contact or not
-     */
-    private fun showContactInviteDialog(
-        linkHandle: Long?,
-        fullName: String?,
-        email: String?,
-        isContact: Boolean,
-    ) {
-        if (linkHandle == null) return
-        if (fullName == null) return
-        if (email == null) return
-        if (inviteContactDialog != null && inviteContactDialog?.isShowing == true) return
-        val message: String
-        val buttonText: String
-        if (isContact) {
-            message = getString(R.string.context_contact_already_exists, email)
-            buttonText = getString(R.string.contact_view)
-        } else {
-            message = getString(R.string.invite_not_sent)
-            buttonText = getString(R.string.contact_invite)
-        }
-        inviteContactDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(fullName)
-            .setMessage(message)
-            .setNegativeButton(R.string.general_cancel, null)
-            .setPositiveButton(buttonText) { dialog: DialogInterface, _: Int ->
-                if (isContact) {
-                    ContactUtil.openContactInfoActivity(this, email)
-                } else {
-                    sendContactInvitation(linkHandle, email)
-                }
-                dialog.dismiss()
-                inviteContactDialog = null
-            }
-            .create()
-        inviteContactDialog?.show()
-    }
-
-    /**
-     * Send contact invitation to specific user and show specific SnackBar.
-     *
-     * @param contactLinkHandle User link handle for invitation
-     * @param email             User email
-     */
-    private fun sendContactInvitation(contactLinkHandle: Long, email: String) {
-        inviteContactUseCase.invite(contactLinkHandle, email)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result: InviteContactUseCase.InviteResult?, throwable: Throwable? ->
-                var snackbarMessage: String? = getString(
-                    R.string.general_error
-                )
-                if (throwable == null) {
-                    when (result) {
-                        InviteContactUseCase.InviteResult.SENT -> snackbarMessage =
-                            getString(R.string.context_contact_request_sent, email)
-
-                        InviteContactUseCase.InviteResult.RESENT -> snackbarMessage =
-                            getString(R.string.context_contact_invitation_resent)
-
-                        InviteContactUseCase.InviteResult.DELETED -> snackbarMessage =
-                            getString(R.string.context_contact_invitation_deleted)
-
-                        InviteContactUseCase.InviteResult.ALREADY_SENT -> snackbarMessage =
-                            getString(R.string.invite_not_sent_already_sent, email)
-
-                        InviteContactUseCase.InviteResult.ALREADY_CONTACT -> snackbarMessage =
-                            getString(R.string.context_contact_already_exists, email)
-
-                        InviteContactUseCase.InviteResult.INVALID_EMAIL -> snackbarMessage =
-                            getString(R.string.error_own_email_as_contact)
-
-                        else -> {}
-                    }
-                }
-                showSnackbar(
-                    Constants.SNACKBAR_TYPE,
-                    snackbarMessage,
-                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                )
-            }
-            .addTo(composite)
+        if (supportFragmentManager.findFragmentByTag(ContactLinkDialogFragment.TAG) != null) return
+        ContactLinkDialogFragment.newInstance(handle)
+            .show(supportFragmentManager, ContactLinkDialogFragment.TAG)
     }
 
     fun askForAccess() {
