@@ -14,9 +14,11 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.clouddrive.OptionItems
 import mega.privacy.android.app.presentation.clouddrive.model.OptionsItemInfo
@@ -71,6 +73,8 @@ class FileBrowserViewModelTest {
     private val monitorViewType: MonitorViewType = mock()
     private val setViewType: SetViewType = mock()
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase = mock()
+    private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
+    private val transfersManagement: TransfersManagement = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -95,7 +99,9 @@ class FileBrowserViewModelTest {
             monitorViewType = monitorViewType,
             getOptionsForToolbarMapper = getOptionsForToolbarMapper,
             handleOptionClickMapper = handleOptionClickMapper,
-            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase
+            monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
+            getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
+            transfersManagement = transfersManagement
         )
     }
 
@@ -442,4 +448,15 @@ class FileBrowserViewModelTest {
             Truth.assertThat(awaitItem().isPendingRefresh).isTrue()
         }
     }
+
+    @Test
+    fun `test that when transfer management quota is false then visibility for transfer in state is false`() =
+        runTest {
+            whenever(transfersManagement.isTransferOverQuotaBannerShown).thenReturn(false)
+            whenever(getBandWidthOverQuotaDelayUseCase()).thenReturn(10000)
+            underTest.changeTransferOverQuotaBannerVisibility()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().shouldShowBannerVisibility).isFalse()
+            }
+        }
 }

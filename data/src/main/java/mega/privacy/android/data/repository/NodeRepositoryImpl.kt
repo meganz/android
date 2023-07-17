@@ -653,4 +653,9 @@ internal class NodeRepositoryImpl @Inject constructor(
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
+
+    override suspend fun getBannerQuotaTime() =
+        withContext(ioDispatcher) {
+            megaApiGateway.getBannerQuotaTime()
+        }
 }

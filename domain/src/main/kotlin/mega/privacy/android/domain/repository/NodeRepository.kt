@@ -462,4 +462,9 @@ interface NodeRepository {
         nodeToExport: NodeId,
         expireTime: Long?,
     ): String
+
+    /**
+     * Get banner Quota Time
+     */
+    suspend fun getBannerQuotaTime(): Long
 }

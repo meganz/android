@@ -84,7 +84,6 @@ class FileBrowserComposeFragment : Fragment() {
 
     private var actionMode: ActionMode? = null
 
-
     /**
      * Application Theme Mode
      */
@@ -152,7 +151,12 @@ class FileBrowserComposeFragment : Fragment() {
                         onChangeViewTypeClick = fileBrowserViewModel::onChangeViewTypeClicked,
                         thumbnailViewModel = thumbnailViewModel,
                         onLinkClicked = ::navigateToLink,
-                        onDisputeTakeDownClicked = ::navigateToLink
+                        onDisputeTakeDownClicked = ::navigateToLink,
+                        onDismissClicked = fileBrowserViewModel::onBannerDismissClicked,
+                        onUpgradeClicked = {
+                            fileBrowserViewModel::onBannerDismissClicked
+                            (requireActivity() as? ManagerActivity)?.navigateToUpgradeAccount()
+                        }
                     )
                 }
                 performItemOptionsClick(uiState.optionsItemInfo)

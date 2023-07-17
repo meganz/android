@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
+import mega.privacy.android.app.domain.usecase.GetBandWidthOverQuotaDelayUseCase
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
+import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
@@ -54,6 +56,9 @@ import javax.inject.Inject
  * @param setViewType [SetViewType] to set view type
  * @param handleOptionClickMapper [HandleOptionClickMapper] handle option click click mapper
  * @param getOptionsForToolbarMapper [GetIntentToOpenFileMapper] to get toolbar options mapper
+ * @param monitorRefreshSessionUseCase [MonitorRefreshSessionUseCase]
+ * @param getBandWidthOverQuotaDelayUseCase [GetBandWidthOverQuotaDelayUseCase]
+ * @param transfersManagement [TransfersManagement]
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -70,6 +75,8 @@ class FileBrowserViewModel @Inject constructor(
     private val getOptionsForToolbarMapper: GetOptionsForToolbarMapper,
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
+    private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
+    private val transfersManagement: TransfersManagement
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -91,6 +98,7 @@ class FileBrowserViewModel @Inject constructor(
         monitorFileBrowserChildrenNodes()
         checkViewType()
         monitorRefreshSession()
+        changeTransferOverQuotaBannerVisibility()
     }
 
     private fun monitorRefreshSession() {
@@ -380,7 +388,22 @@ class FileBrowserViewModel @Inject constructor(
      *  Changes the Transfer Over Quota banner visibility based on certain conditions
      */
     fun changeTransferOverQuotaBannerVisibility() {
+        viewModelScope.launch {
+            val overQuotaBannerTimeDelay = getBandWidthOverQuotaDelayUseCase()
+            _state.update {
+                it.copy(
+                    shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
+                    bannerTimer = overQuotaBannerTimeDelay
+                )
+            }
+        }
+    }
 
+    /**
+     * OnBannerDismiss clicked
+     */
+    fun onBannerDismissClicked() {
+        changeTransferOverQuotaBannerVisibility()
     }
 
     /**

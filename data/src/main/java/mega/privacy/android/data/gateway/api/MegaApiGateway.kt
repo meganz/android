@@ -2688,4 +2688,9 @@ interface MegaApiGateway {
         flag: String,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Get banner quota time
+     */
+    suspend fun getBannerQuotaTime(): Long
 }
