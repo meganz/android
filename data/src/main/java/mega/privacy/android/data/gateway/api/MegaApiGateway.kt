@@ -2693,4 +2693,15 @@ interface MegaApiGateway {
      * Get banner quota time
      */
     suspend fun getBannerQuotaTime(): Long
+
+    /**
+     * Launches a request to stop sharing a file/folder
+     *
+     * @param node          MegaNode to stop sharing
+     * @param listener      MegaRequestListener to track this request
+     */
+    fun disableExport(
+        node: MegaNode,
+        listener: MegaRequestListenerInterface,
+    )
 }

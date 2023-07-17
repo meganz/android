@@ -658,4 +658,15 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getBannerQuotaTime()
         }
+
+    override suspend fun disableExport(nodeToDisable: NodeId) = withContext(ioDispatcher) {
+        val node = getMegaNodeByHandle(nodeToDisable, true)
+        requireNotNull(node) { "Node to disable export with handle ${nodeToDisable.longValue} not found" }
+
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("disableExport") { }
+            megaApiGateway.disableExport(node, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

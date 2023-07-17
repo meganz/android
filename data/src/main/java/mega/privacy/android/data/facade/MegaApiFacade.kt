@@ -1282,4 +1282,7 @@ internal class MegaApiFacade @Inject constructor(
     }
 
     override suspend fun getBannerQuotaTime() = megaApi.bandwidthOverquotaDelay
+
+    override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
+        megaApi.disableExport(node, listener)
 }

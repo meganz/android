@@ -467,4 +467,11 @@ interface NodeRepository {
      * Get banner Quota Time
      */
     suspend fun getBannerQuotaTime(): Long
+
+    /**
+     * Launches a request to stop sharing a file/folder
+     *
+     * @param nodeToDisable the node's [NodeId] to stop sharing
+     */
+    suspend fun disableExport(nodeToDisable: NodeId)
 }
