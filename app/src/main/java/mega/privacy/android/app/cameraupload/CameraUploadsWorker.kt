@@ -1,7 +1,6 @@
 package mega.privacy.android.app.cameraupload
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -214,14 +213,20 @@ class CameraUploadsWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
-        private const val FOLDER_REMINDER_PRIMARY = 1908
-        private const val FOLDER_REMINDER_SECONDARY = 1909
-        private const val OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "OVER_QUOTA_NOTIFICATION"
-        private const val LOW_BATTERY_LEVEL = 20
-        private const val notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS
-        private const val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
-        private const val notificationChannelName =
+        private const val NOTIFICATION_CHANNEL_ID =
+            Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
+        private const val NOTIFICATION_CHANNEL_NAME =
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
+        private const val NOTIFICATION_ID = Constants.NOTIFICATION_CAMERA_UPLOADS
+        private const val PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID = 1908
+        private const val SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID = 1909
+        private const val COMPRESSION_ERROR_NOTIFICATION_ID = 1910
+        private const val NOT_ENOUGH_STORAGE_NOTIFICATION_ID =
+            Constants.NOTIFICATION_NOT_ENOUGH_STORAGE
+        private const val OVER_STORAGE_QUOTA_NOTIFICATION_ID =
+            Constants.NOTIFICATION_STORAGE_OVERQUOTA
+
+        private const val LOW_BATTERY_LEVEL = 20
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
         private const val CONCURRENT_UPLOADS_LIMIT = 16
     }
@@ -333,13 +338,14 @@ class CameraUploadsWorker @AssistedInject constructor(
             Timber.d("Start CU Worker")
             scope = this
 
+            // Signal to not kill the worker if the app is killed
             setForegroundAsync(getForegroundInfo())
 
             withContext(ioDispatcher) {
                 initService()
                 if (hasMediaPermission() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")
-                    hideFolderPathNotifications()
+                    cancelNotifications()
                     checkUploadNodes()
                     startUploadAndCompression()
                     onQueueComplete()
@@ -358,33 +364,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        val notification = createNotification(
-            title = context.getString(R.string.section_photo_sync),
-            content = context.getString(R.string.settings_camera_notif_initializing_title),
-            intent = null,
-            isAutoCancel = false
-        )
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ForegroundInfo(
-                notificationId,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            )
-        } else {
-            ForegroundInfo(
-                notificationId,
-                notification
-            )
-        }
-    }
+    override suspend fun getForegroundInfo() = createCameraUploadsForegroundInfo()
 
     private fun monitorUploadPauseStatus() {
         monitorUploadPauseStatusJob = scope?.launch(ioDispatcher) {
             monitorPausedTransfersUseCase().collect {
                 areUploadsPaused = it
                 updateBackupState(if (it) BackupState.PAUSE_UPLOADS else BackupState.ACTIVE)
-                updateProgressNotification()
+                displayUploadProgressNotification()
             }
         }
     }
@@ -469,15 +456,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 resetTotalUploadsUseCase()
             }
             .onFailure { error -> Timber.e("Cancel all transfers error: $error") }
-    }
-
-    /**
-     * Instructs [notificationManager] to hide the Primary and/or Secondary Folder
-     * notifications if they exist
-     */
-    private fun hideFolderPathNotifications() {
-        notificationManager.cancel(FOLDER_REMINDER_PRIMARY)
-        notificationManager.cancel(FOLDER_REMINDER_SECONDARY)
     }
 
     /**
@@ -695,12 +673,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
-        showNotification(
-            context.getString(R.string.section_photo_sync),
-            context.getString(R.string.settings_camera_notif_checking_title),
-            defaultPendingIntent,
-            false
-        )
+        showCheckUploadsNotification()
 
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
@@ -737,19 +710,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 startParallelUpload(compressedList, isCompressedVideo = true)
             }
         }
-    }
-
-    private fun showNotEnoughStorageNotification() {
-        val title = context.getString(R.string.title_out_of_space)
-        val message = context.getString(R.string.error_not_enough_free_space)
-        val intent = Intent(context, ManagerActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        showNotification(title, message, pendingIntent, true)
     }
 
     private suspend fun startParallelUpload(
@@ -1023,10 +983,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Executes certain behavior when the Primary Folder is disabled
      */
     private suspend fun handlePrimaryFolderDisabled() {
-        displayFolderUnavailableNotification(
-            R.string.camera_notif_primary_local_unavailable,
-            FOLDER_REMINDER_PRIMARY
-        )
+        showFolderUnavailableNotification(CameraUploadFolderType.Primary)
         disableCameraUploadsUseCase()
         setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
@@ -1038,10 +995,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * Executes certain behavior when the Secondary Folder is disabled
      */
     private suspend fun handleSecondaryFolderDisabled() {
-        displayFolderUnavailableNotification(
-            R.string.camera_notif_secondary_local_unavailable,
-            FOLDER_REMINDER_SECONDARY
-        )
+        showFolderUnavailableNotification(CameraUploadFolderType.Secondary)
         // Disable Media Uploads only
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
@@ -1080,31 +1034,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         } else {
             Timber.e("isLoggingIn lock not available, cannot perform backgroundFastLogin. Stop process")
             return false
-        }
-    }
-
-    /**
-     * When Camera Uploads cannot launch due to the Folder being unavailable, display a Notification
-     * to inform the User
-     *
-     * @param resId  The content text of the notification. Here is the string's res id.
-     * @param notificationId Notification id, can cancel the notification by the same id when need.
-     */
-    private fun displayFolderUnavailableNotification(resId: Int, notificationId: Int) {
-        var isShowing = false
-        for (notification in notificationManager.activeNotifications) {
-            if (notification.id == notificationId) {
-                isShowing = true
-            }
-        }
-        if (!isShowing) {
-            val notification = createNotification(
-                context.getString(R.string.section_photo_sync),
-                context.getString(resId),
-                null,
-                false
-            )
-            notificationManager.notify(notificationId, notification)
         }
     }
 
@@ -1260,11 +1189,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         updateBackupHeartbeatStatus(HeartbeatStatus.UP_TO_DATE)
     }
 
-    private fun cancelNotification() {
-        Timber.d("Cancelling notification ID is %s", notificationId)
-        notificationManager.cancel(notificationId)
-    }
-
     private suspend fun transferFinished(
         transfer: Transfer,
         error: MegaException?,
@@ -1383,7 +1307,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 primaryCameraUploadsState.bytesToUploadCount += bytes
             }
         }
-        updateProgressNotification()
+        displayUploadProgressNotification()
     }
 
     /**
@@ -1480,7 +1404,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             }
         }
 
-        updateProgressNotification()
+        displayUploadProgressNotification()
     }
 
     /**
@@ -1579,21 +1503,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    @SuppressLint("StringFormatInvalid")
-    private suspend fun showVideoCompressionErrorNotification() {
-        val intent = Intent(context, ManagerActivity::class.java)
-        intent.action = Constants.ACTION_SHOW_SETTINGS
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val title = context.getString(R.string.title_compression_size_over_limit)
-        val size = getVideoCompressionSizeLimitUseCase()
-        val message = context.getString(
-            R.string.message_compression_size_over_limit,
-            context.getString(R.string.label_file_size_mega_byte, size.toString())
-        )
-        showNotification(title, message, pendingIntent, true)
-    }
-
     private fun getTotalVideoSizeInMB(records: List<SyncRecord>) =
         records.sumOf { it.localPath?.let { path -> File(path).length() } ?: 0 } / (1024 * 1024)
 
@@ -1611,7 +1520,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun onInsufficientSpace(records: List<SyncRecord>) {
         Timber.w("Insufficient space for video compression.")
         records.forEach { setRecordPendingOrRemove(it) }
-        showOutOfSpaceNotification()
+        showVideoCompressionOutOfSpaceNotification()
         endService(aborted = true)
     }
 
@@ -1623,13 +1532,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         currentFileIndex: Int,
         totalCount: Int,
     ) {
-        val message = context.getString(R.string.message_compress_video, "$progress%")
-        val subText = context.getString(
-            R.string.title_compress_video,
-            currentFileIndex,
-            totalCount
-        )
-        showProgressNotification(progress, defaultPendingIntent, message, subText, "")
+        showVideoCompressionProgressNotification(progress, currentFileIndex, totalCount)
     }
 
     /**
@@ -1673,7 +1576,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun updateProgressNotification() {
+    private suspend fun displayUploadProgressNotification() {
         // refresh UI every 1 seconds to avoid too much workload on main thread
         val now = System.currentTimeMillis()
         lastUpdated = if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS) {
@@ -1699,44 +1602,237 @@ class CameraUploadsWorker @AssistedInject constructor(
             val pendingToUpload = totalPendingCount
             val progressPercent = totalProgress
 
-            val message = when (totalToUpload) {
-                0 -> context.getString(R.string.download_preparing_files)
-                else -> {
-                    context.getString(
-                        if (areUploadsPaused)
-                            R.string.upload_service_notification_paused
-                        else
-                            R.string.upload_service_notification,
-                        totalUploaded,
-                        totalToUpload
-                    )
-                }
-            }
-            val info =
-                stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
-
             broadcastProgress(progressPercent, pendingToUpload)
-
-            showProgressNotification(
+            showUploadProgressNotification(
+                totalUploaded,
+                totalToUpload,
+                totalUploadedBytes,
+                totalUploadBytes,
                 progressPercent,
-                defaultPendingIntent,
-                message,
-                info,
-                context.getString(R.string.settings_camera_notif_title)
+                areUploadsPaused,
             )
         }
     }
 
+    /**
+     *  Display a notification for upload progress
+     */
+    private fun showUploadProgressNotification(
+        totalUploaded: Int,
+        totalToUpload: Int,
+        totalUploadedBytes: Long,
+        totalUploadBytes: Long,
+        progress: Int,
+        areUploadsPaused: Boolean,
+    ) {
+        val content = stringWrapper.getProgressSize(totalUploadedBytes, totalUploadBytes)
+        val notification = createNotification(
+            title = context.getString(
+                if (areUploadsPaused)
+                    R.string.upload_service_notification_paused
+                else
+                    R.string.upload_service_notification,
+                totalUploaded,
+                totalToUpload
+            ),
+            content = content,
+            subText = content,
+            intent = defaultPendingIntent,
+            isAutoCancel = false,
+            isOngoing = true,
+            progress = progress,
+        )
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification for video compression progress
+     */
+    private fun showVideoCompressionProgressNotification(
+        progress: Int,
+        currentFileIndex: Int,
+        totalCount: Int
+    ) {
+        val content = context.getString(
+            R.string.title_compress_video,
+            currentFileIndex,
+            totalCount
+        )
+        val notification = createNotification(
+            title = context.getString(R.string.message_compress_video, "$progress%"),
+            content = content,
+            subText = content,
+            intent = defaultPendingIntent,
+            isAutoCancel = false,
+            isOngoing = true,
+            progress = progress,
+        )
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification for checking files to upload
+     */
+    private fun showCheckUploadsNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.section_photo_sync),
+            content = context.getString(R.string.settings_camera_notif_checking_title),
+            intent = defaultPendingIntent,
+            isAutoCancel = false,
+            isOngoing = true,
+        )
+        notificationManager.notify(NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification in case the cloud storage does not have enough space
+     */
+    private fun showStorageOverQuotaNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.overquota_alert_title),
+            content = context.getString(R.string.download_show_info),
+            intent = PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_OVERQUOTA_STORAGE
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            ),
+        )
+        notificationManager.notify(OVER_STORAGE_QUOTA_NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification in case the device does not have enough local storage
+     *  for video compression
+     */
+    private fun showVideoCompressionOutOfSpaceNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.title_out_of_space),
+            content = context.getString(R.string.message_out_of_space),
+            intent = PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, ManagerActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            ),
+        )
+        notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification in case the device does not have enough local storage
+     *  for creating temporary files
+     */
+    private fun showNotEnoughStorageNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.title_out_of_space),
+            content = context.getString(R.string.error_not_enough_free_space),
+            intent = PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, ManagerActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE
+            ),
+        )
+        notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
+    }
+
+    /**
+     *  Display a notification in case an error happened during video compression
+     */
+    private suspend fun showVideoCompressionErrorNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.title_compression_size_over_limit),
+            content = context.getString(
+                R.string.message_compression_size_over_limit,
+                context.getString(
+                    R.string.label_file_size_mega_byte,
+                    getVideoCompressionSizeLimitUseCase().toString()
+                )
+            ),
+            intent = PendingIntent.getActivity(
+                context,
+                0,
+                Intent(context, ManagerActivity::class.java).apply {
+                    action = Constants.ACTION_SHOW_SETTINGS
+                },
+                PendingIntent.FLAG_IMMUTABLE
+            ),
+        )
+        notificationManager.notify(COMPRESSION_ERROR_NOTIFICATION_ID, notification)
+    }
+
+    /**
+     * When Camera Uploads cannot launch due to the Folder being unavailable, display a Notification
+     * to inform the User
+     *
+     * @param cameraUploadsFolderType
+     */
+    private fun showFolderUnavailableNotification(cameraUploadsFolderType: CameraUploadFolderType) {
+        val (resId, notificationId) = when (cameraUploadsFolderType) {
+            CameraUploadFolderType.Primary ->
+                Pair(
+                    R.string.camera_notif_primary_local_unavailable,
+                    PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID
+                )
+
+            CameraUploadFolderType.Secondary ->
+                Pair(
+                    R.string.camera_notif_secondary_local_unavailable,
+                    SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID
+                )
+        }
+
+        val isShown = notificationManager.activeNotifications.any { it.id == notificationId }
+        if (!isShown) {
+            val notification = createNotification(
+                title = context.getString(R.string.section_photo_sync),
+                content = context.getString(resId),
+                intent = PendingIntent.getActivity(
+                    context,
+                    0,
+                    Intent(context, ManagerActivity::class.java).apply {
+                        action = Constants.ACTION_SHOW_SETTINGS
+                    },
+                    PendingIntent.FLAG_IMMUTABLE
+                ),
+            )
+            notificationManager.notify(notificationId, notification)
+        }
+    }
+
+    /**
+     *  Create the [ForegroundInfo] used for the worker
+     */
+    private fun createCameraUploadsForegroundInfo(): ForegroundInfo {
+        val notification = createNotification(
+            title = context.getString(R.string.section_photo_sync),
+            content = context.getString(R.string.settings_camera_notif_initializing_title),
+            intent = null,
+            isAutoCancel = false,
+            isOngoing = true,
+        )
+        return createForegroundInfo(notification)
+    }
+
+    /**
+     *  Create a [Notification]
+     */
     private fun createNotification(
         title: String,
         content: String,
-        intent: PendingIntent?,
-        isAutoCancel: Boolean,
+        subText: String? = null,
+        intent: PendingIntent? = null,
+        isOngoing: Boolean = false,
+        progress: Int? = null,
+        isAutoCancel: Boolean = true,
     ): Notification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                notificationChannelId,
-                notificationChannelName,
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             channel.setShowBadge(false)
@@ -1744,105 +1840,56 @@ class CameraUploadsWorker @AssistedInject constructor(
             notificationManager.createNotificationChannel(channel)
         }
 
-        val builder = NotificationCompat.Builder(context, notificationChannelId)
-        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            .setOngoing(false)
-            .setContentTitle(title)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(content))
-            .setContentText(content)
-            .setOnlyAlertOnce(true)
-            .setAutoCancel(isAutoCancel)
-        if (intent != null) {
-            builder.setContentIntent(intent)
+        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID).apply {
+            setSmallIcon(R.drawable.ic_stat_camera_sync)
+            setOngoing(isOngoing)
+            setContentTitle(title)
+            setStyle(NotificationCompat.BigTextStyle().bigText(content))
+            setContentText(content)
+            setOnlyAlertOnce(true)
+            setAutoCancel(isAutoCancel)
+            intent?.let { setContentIntent(intent) }
+            progress?.let { setProgress(100, progress, false) }
+            subText?.let { setSubText(subText) }
         }
         return builder.build()
     }
 
-    private fun showNotification(
-        title: String,
-        content: String,
-        intent: PendingIntent?,
-        isAutoCancel: Boolean,
-    ) {
-        val notification = createNotification(title, content, intent, isAutoCancel)
-        notificationManager.notify(notificationId, notification)
-    }
-
-    private fun showProgressNotification(
-        progressPercent: Int,
-        pendingIntent: PendingIntent?,
-        message: String,
-        subText: String,
-        contentText: String,
-    ) {
-        val builder = NotificationCompat.Builder(context, notificationChannelId)
-        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            .setProgress(100, progressPercent, false)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(subText))
-            .setContentTitle(message)
-            .setContentText(contentText)
-            .setOnlyAlertOnce(true)
-            .setSubText(subText)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                notificationChannelId,
-                notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT
+    /**
+     * Create a [ForegroundInfo] based on [Notification]
+     */
+    private fun createForegroundInfo(notification: Notification) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
-            channel.setShowBadge(true)
-            channel.setSound(null, null)
-            notificationManager.createNotificationChannel(channel)
+        } else {
+            ForegroundInfo(
+                NOTIFICATION_ID,
+                notification
+            )
         }
-        notificationManager.notify(notificationId, builder.build())
-    }
 
-    private fun showStorageOverQuotaNotification() {
-        Timber.d("Show storage over quota notification.")
-        val contentText = context.getString(R.string.download_show_info)
-        val message = context.getString(R.string.overquota_alert_title)
-        val intent = Intent(context, ManagerActivity::class.java)
-        intent.action = Constants.ACTION_OVERQUOTA_STORAGE
-
-        val builder = NotificationCompat.Builder(context, OVER_QUOTA_NOTIFICATION_CHANNEL_ID)
-        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            .setContentIntent(
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            )
-            .setAutoCancel(true)
-            .setTicker(contentText)
-            .setContentTitle(message)
-            .setOngoing(false)
-            .setContentText(contentText)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                OVER_QUOTA_NOTIFICATION_CHANNEL_ID,
-                notificationChannelName,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.setShowBadge(true)
-            channel.setSound(null, null)
-            notificationManager.createNotificationChannel(channel)
+    /**
+     * Dismiss error notifications
+     */
+    private fun cancelNotifications() {
+        with(notificationManager) {
+            cancel(PRIMARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID)
+            cancel(SECONDARY_FOLDER_UNAVAILABLE_NOTIFICATION_ID)
+            cancel(COMPRESSION_ERROR_NOTIFICATION_ID)
+            cancel(NOT_ENOUGH_STORAGE_NOTIFICATION_ID)
+            cancel(OVER_STORAGE_QUOTA_NOTIFICATION_ID)
         }
-        notificationManager.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }
 
-    private fun showOutOfSpaceNotification() {
-        val intent = Intent(context, ManagerActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val title = context.getString(R.string.title_out_of_space)
-        val message = context.getString(R.string.message_out_of_space)
-        val notification = createNotification(title, message, pendingIntent, true)
-        notificationManager.notify(Constants.NOTIFICATION_NOT_ENOUGH_STORAGE, notification)
+    /**
+     * Dismiss progress notification
+     */
+    private fun cancelNotification() {
+        notificationManager.cancel(NOTIFICATION_ID)
     }
 
     /**
