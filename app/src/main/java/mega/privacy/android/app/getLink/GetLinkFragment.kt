@@ -203,6 +203,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 viewModel.resetLink()
             }
         }
+        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+            binding.keyText.text = uiState.key
+        }
     }
 
     override fun onResume() {
@@ -386,9 +389,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         binding.keyLayout.visibility = visibility
         binding.keySeparator.visibility = visibility
         binding.copyKeyIcon.visibility = visibility
-
-        binding.keyText.text =
-            if (binding.decryptedKeySwitch.isChecked) viewModel.getLinkKey() else null
     }
 
     /**

@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
@@ -57,11 +58,16 @@ class GetLinkViewModel @Inject constructor(
     private val _linkCopied: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
     val linkCopied = _linkCopied.asStateFlow()
 
+    private val _state = MutableStateFlow(GetLinkUiState())
+
+    /**
+     * Get Link Ui State
+     */
+    val state = _state.asStateFlow()
+
     private lateinit var linkFragmentTitle: String
     private var node: MegaNode? = null
     private var linkWithPassword: String? = null
-    private lateinit var linkWithoutKey: String
-    private lateinit var key: String
     private var isSendDecryptedKeySeparatelyEnabled = false
 
     fun getLink(): LiveData<String> = linkText
@@ -79,10 +85,6 @@ class GetLinkViewModel @Inject constructor(
     }
 
     fun getNode(): MegaNode? = node
-
-    fun getLinkWithoutKey(): String = linkWithoutKey
-
-    fun getLinkKey(): String = key
 
     fun getLinkWithPassword(): String? = linkWithPassword
 
@@ -164,7 +166,7 @@ class GetLinkViewModel @Inject constructor(
      * @param action Copy action to perform.
      */
     fun copyLinkKey(action: (Pair<String, String>) -> Unit) {
-        action.invoke(Pair(key, context.getString(R.string.key_copied_clipboard)))
+        action.invoke(Pair(state.value.key, context.getString(R.string.key_copied_clipboard)))
     }
 
     /**
@@ -245,9 +247,13 @@ class GetLinkViewModel @Inject constructor(
     private fun updateLink(handle: Long?) {
         node = handle?.let { megaApi.getNodeByHandle(it) }
         if (node?.isExported == true) {
-            val link = node?.publicLink
-            linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
-            key = LinksUtil.getKeyLink(link)
+            val link = node?.publicLink.orEmpty()
+            _state.update {
+                it.copy(
+                    key = LinksUtil.getKeyLink(link),
+                    linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
+                )
+            }
             updateLink()
         }
         expiryDate.value = if ((node?.expirationTime ?: 0) > 0) getExpiredDateText() else ""
@@ -259,7 +265,7 @@ class GetLinkViewModel @Inject constructor(
     private fun updateLink() {
         linkText.value = when {
             node?.isExported == false -> context.getString(R.string.link_request_status)
-            isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
+            isSendDecryptedKeySeparatelyEnabled -> state.value.linkWithoutKey
             !linkWithPassword.isNullOrEmpty() -> linkWithPassword
             else -> node?.publicLink
         }
@@ -313,7 +319,7 @@ class GetLinkViewModel @Inject constructor(
             if (!linkWithPassword.isNullOrEmpty()) {
                 data?.putExtra(Constants.EXTRA_PASSWORD, getPasswordText())
             } else {
-                data?.putExtra(Constants.EXTRA_KEY, key)
+                data?.putExtra(Constants.EXTRA_KEY, state.value.key)
             }
         }
 
@@ -330,7 +336,7 @@ class GetLinkViewModel @Inject constructor(
         if (!linkWithPassword.isNullOrEmpty()) context.getString(
             R.string.share_link_with_password, linkWithPassword, getPasswordText()
         )
-        else context.getString(R.string.share_link_with_key, linkWithoutKey, key)
+        else context.getString(R.string.share_link_with_key, state.value.linkWithoutKey, state.value.key)
 
     /**
      * Gets the link to share depending on the current enabled option. It can be:
@@ -342,7 +348,7 @@ class GetLinkViewModel @Inject constructor(
      */
     fun getLinkToShare(): String = when {
         !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
-        isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
+        isSendDecryptedKeySeparatelyEnabled -> state.value.linkWithoutKey
         else -> node?.publicLink.orEmpty()
     }
 
@@ -397,7 +403,7 @@ class GetLinkViewModel @Inject constructor(
     fun copyLink(isFirstTime: Boolean = false) {
         _linkCopied.value = Pair(
             when {
-                isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
+                isSendDecryptedKeySeparatelyEnabled -> state.value.linkWithoutKey
                 !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
                 else -> node?.publicLink.orEmpty()
             },
