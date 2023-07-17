@@ -2674,14 +2674,14 @@ interface MegaApiGateway {
     /**
      * Get if AB test flag is active
      *
-     * @param flag the AB test flag name for API
+     * @param flag the AB test flag name for API without 'ab_' prefix, which will added by SDK code
      */
     fun getABTestValue(flag: String): Long
 
     /**
      * Send request to API to activate specific AB test flag
      *
-     * @param flag the AB test flag name for API
+     * @param flag the AB test flag name for API without 'ab_' prefix, which will added by SDK code
      * @param listener MegaRequestListener to track this request
      */
     fun sendABTestActive(
