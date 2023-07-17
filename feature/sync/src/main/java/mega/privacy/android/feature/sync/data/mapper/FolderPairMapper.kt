@@ -1,9 +1,9 @@
 package mega.privacy.android.feature.sync.data.mapper
 
-import mega.privacy.android.feature.sync.data.mock.MegaSync
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import nz.mega.sdk.MegaSync
 import javax.inject.Inject
 
 /**

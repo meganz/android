@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.sync.data
 
-import mega.privacy.android.feature.sync.data.mock.MegaSync
-import mega.privacy.android.feature.sync.data.mock.MegaSyncList
+import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSyncList
 
 /**
  * Extension to bring the forEach method into MegaSyncList

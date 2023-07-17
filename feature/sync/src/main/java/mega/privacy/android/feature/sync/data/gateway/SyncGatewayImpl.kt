@@ -1,25 +1,26 @@
 package mega.privacy.android.feature.sync.data.gateway
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.feature.sync.data.forEach
-import mega.privacy.android.feature.sync.data.mock.MegaApiSyncMock
-import mega.privacy.android.feature.sync.data.mock.MegaApiSyncMock.GlobalUpdate
-import mega.privacy.android.feature.sync.data.mock.MegaSync
-import mega.privacy.android.feature.sync.data.mock.MegaSyncList
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaSync
+import nz.mega.sdk.MegaSyncList
 import javax.inject.Inject
 
 /**
  * Gateway implementation to access Sync API
+ * Note: commented code will be uncommented in a later MR
  *
  */
 internal class SyncGatewayImpl @Inject constructor(
-    private val megaApi: MegaApiSyncMock,
+    @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaApiGateway: MegaApiGateway,
 ) : SyncGateway {
 
     override suspend fun syncFolderPair(
@@ -36,41 +37,43 @@ internal class SyncGatewayImpl @Inject constructor(
                     }
                 }
             )
-            megaApi.syncFolder(
-                MegaSync.SyncType.TYPE_TWOWAY,
-                localPath,
-                null,
-                remoteFolderId,
-                null,
-                requestListener
-            )
+//            megaApi.syncFolder(
+//                MegaSync.SyncType.TYPE_TWOWAY,
+//                localPath,
+//                null,
+//                remoteFolderId,
+//                null,
+//                requestListener
+//            )
             continuation.invokeOnCancellation {
                 megaApi.removeRequestListener(requestListener)
             }
         }
 
     override suspend fun getFolderPairs(): MegaSyncList =
-        megaApi.syncs
+        TODO()
+//        megaApi.syncs
 
     override suspend fun removeFolderPairs() {
-        megaApi
-            .syncs
-            .forEach {
-                megaApi.removeSync(it.backupId)
-            }
+//        megaApi
+//            .syncs
+//            .forEach {
+//                megaApi.removeSync(it.backupId)
+//            }
     }
 
     override fun monitorSync(): Flow<MegaSync> =
-        megaApi
-            .globalUpdates
-            .filterIsInstance<GlobalUpdate.OnGlobalSyncStateChanged>()
-            .map { it.megaSync }
+        TODO()
+//        megaApiGateway
+//            .globalUpdates
+//            .filterIsInstance<GlobalUpdate.OnGlobalSyncStateChanged>()
+//            .map { it.megaSync }
 
     override fun resumeAllSyncs() {
-        megaApi.resumeAllSyncs()
+//        megaApi.resumeAllSyncs()
     }
 
     override fun pauseAllSyncs() {
-        megaApi.pauseAllSyncs()
+//        megaApi.pauseAllSyncs()
     }
 }

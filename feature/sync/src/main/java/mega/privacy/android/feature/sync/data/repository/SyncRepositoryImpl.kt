@@ -8,9 +8,9 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
-import mega.privacy.android.feature.sync.data.mock.MegaSyncList
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
+ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import nz.mega.sdk.MegaSyncList
 import javax.inject.Inject
 
 internal class SyncRepositoryImpl @Inject constructor(
