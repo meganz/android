@@ -3,7 +3,7 @@ MEGA Android Client
 
 A fully-featured client to access your Cloud Storage provided by MEGA.
 
-This document will guide you to build the application on a Linux machine with Android Studio.
+This document will guide you to build the application on a Linux/MacOS machine with Android Studio.
 
 ### 1. Setup development environment
 
@@ -162,7 +162,72 @@ boolean shouldUsePrebuiltSdk() {
 //    return usePrebuiltSdk == null || usePrebuiltSdk != "false"
 }
 ```
-### 11. Run the project
+
+### 11. Build mobile analytics library locally 
+**Note: You need to occasionally redo this section to make sure latest analytics library is used.**
+
+1. Download and build [Mobile Analytics](https://github.com/meganz/mobile-analytics) source code. 
+
+    ```shell
+    git clone --recursive https://github.com/meganz/mobile-analytics.git
+    cd mobile-analytics
+    git checkout main
+    ./gradlew assembleRelease
+    ```
+
+2. Copy below generated libraries to root of MEGA code
+- `shared/build/outputs/aar/shared-release.aar`
+- `analytics-core/build/outputs/aar/analytics-core-release.aar`
+- `analytics-annotations/build/outputs/aar/analytics-annotations-release.aar`
+
+3. Modify MEGA code to depend on local AAR files
+
+    1. In `app/build.gradle.kts`
+
+        change
+        ```kotlin
+            implementation(lib.mega.analytics)
+        ```
+        to
+
+        ```kotlin
+        //    implementation(lib.mega.analytics)
+            implementation(files("../shared-release.aar"))
+            implementation(files("../analytics-core-release.aar"))
+            implementation(files("../analytics-annotations-release.aar"))
+        ```
+
+    2. In `core-ui-test/build.gradle.kts`
+
+        change
+        ```kotlin
+            implementation(lib.mega.analytics)
+        ```
+        to
+        ```kotlin
+        //    implementation(lib.mega.analytics)
+            compileOnly(files("../shared-release.aar"))
+            compileOnly(files("../analytics-core-release.aar"))
+            compileOnly(files("../analytics-annotations-release.aar"))
+        ```
+
+    3. In `analytics/build.gradle.kts`
+
+        change
+        ```kotlin
+            // Analytics
+            implementation(lib.mega.analytics)
+        ```
+        to
+        ```kotlin
+            // Analytics
+        //    implementation(lib.mega.analytics)
+            compileOnly(files("../shared-release.aar"))
+            compileOnly(files("../analytics-core-release.aar"))
+            compileOnly(files("../analytics-annotations-release.aar"))
+        ```
+
+### 12. Run the project
 
 Open the project with Android Studio, let it build the project and hit _*Run*_.
 
