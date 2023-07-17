@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app
 
+import android.content.Intent
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.ShareInfo
@@ -36,7 +37,7 @@ class ShareInfoTest {
     ) {
         whenever(uri.path).thenReturn(uriPath)
 
-        val isUriProcessed = underTest.processUri(uri, mock())
+        val isUriProcessed = underTest.processUri(Intent.ACTION_SEND_MULTIPLE, uri, mock())
 
         assertThat(isUriProcessed).isFalse()
         assertThat(uri.path).isEqualTo(uriPath)

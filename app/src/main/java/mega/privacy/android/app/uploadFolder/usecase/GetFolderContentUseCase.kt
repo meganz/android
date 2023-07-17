@@ -165,7 +165,7 @@ class GetFolderContentUseCase @Inject constructor(
                     }
                 )
             } else {
-                val info = ShareInfo().apply { processUri(folderItem.uri, context) }
+                val info = ShareInfo().apply { processUri(null, folderItem.uri, context) }
 
                 emitter.onSuccess(
                     arrayListOf(

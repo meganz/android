@@ -123,7 +123,7 @@ public class ShareInfo implements Serializable {
             if (streamObject instanceof Uri) {
                 Timber.d("Instance of URI");
                 Timber.d(streamObject.toString());
-                shareInfo.processUri((Uri) streamObject, context);
+                shareInfo.processUri(intent.getAction(), (Uri) streamObject, context);
             } else if (streamObject == null) {
                 Timber.d("Stream object is null!");
                 return null;
@@ -154,7 +154,7 @@ public class ShareInfo implements Serializable {
                 return null;
             }
 
-            shareInfo.processUri(dataUri, context);
+            shareInfo.processUri(intent.getAction(), dataUri, context);
         }
         if (shareInfo.file == null) {
             Timber.w("Share info file is null");
@@ -195,7 +195,7 @@ public class ShareInfo implements Serializable {
                 continue;
             }
 
-            shareInfo.processUri(dataUri, context);
+            shareInfo.processUri(null, dataUri, context);
             result.add(shareInfo);
         }
 
@@ -213,10 +213,16 @@ public class ShareInfo implements Serializable {
      * this checks will be disable user's access to our app's private folder and uri that contains
      * path traversal
      * the different with `isPathInsecure` is this method removes spaces from the path
+     * it also checks if intent is received by external app trigger via ACTION_SEND / ACTION_SEND_MULTIPLE
      * eg: /data/data/ mega.privacy.android.app
      * */
-    private static boolean isPathMalformed(String path) {
-        return isPathInsecure(path.replace(" ", ""));
+    private static boolean isPathFromExternalAppMalformed(String action, String path) {
+        // Method to check if intent is received from external app with action: ACTION_SEND / ACTION_SEND_MULTIPLE
+        boolean isDataFromExternalApp = action != null &&
+                (action.equals(Intent.ACTION_SEND) || action.equals(Intent.ACTION_SEND_MULTIPLE));
+        String sanitized = path.replace(" ", "");
+
+        return isDataFromExternalApp && isPathInsecure(sanitized);
     }
 
     /*
@@ -237,7 +243,7 @@ public class ShareInfo implements Serializable {
                     continue;
                 Timber.d("Uri: %s", uri.toString());
                 ShareInfo info = new ShareInfo();
-                info.processUri(uri, context);
+                info.processUri(intent.getAction(), uri, context);
                 if (info.file == null) {
                     continue;
                 }
@@ -275,7 +281,7 @@ public class ShareInfo implements Serializable {
             }
             Timber.d("Uri: %s", uri.toString());
             ShareInfo info = new ShareInfo();
-            info.processUri(uri, context);
+            info.processUri(intent.getAction(), uri, context);
             if (info.file == null) {
                 Timber.w("continue -->info.file null");
                 continue;
@@ -290,10 +296,11 @@ public class ShareInfo implements Serializable {
 
     /*
      * Get info from Uri
+     * action is Intent.getAction()
      */
-    public boolean processUri(Uri uri, Context context) {
-        if (isPathMalformed(uri.getPath())) {
-            Timber.e("processUri: Uri is restricted: %s", uri);
+    public boolean processUri(String action, Uri uri, Context context) {
+        if (isPathFromExternalAppMalformed(action, uri.getPath())) {
+            Timber.e("processUri: Uri from external app is malformed: %s", uri);
             return false;
         }
 
