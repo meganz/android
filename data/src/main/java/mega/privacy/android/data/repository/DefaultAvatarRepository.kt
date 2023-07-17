@@ -97,8 +97,8 @@ internal class DefaultAvatarRepository @Inject constructor(
         return avatarFile
     }
 
-    override suspend fun getMyAvatarColor(): Int {
-        val user = megaApiGateway.getLoggedInUser() ?: return getColor(null)
+    override suspend fun getMyAvatarColor(): Int = withContext(ioDispatcher) {
+        val user = megaApiGateway.getLoggedInUser() ?: return@withContext getColor(null)
         val avatarFile = getMyAvatarFile()
         if (avatarFile != null) {
             val avatarBitmap = bitmapFactoryWrapper.decodeFile(
@@ -106,10 +106,10 @@ internal class DefaultAvatarRepository @Inject constructor(
                 BitmapFactory.Options()
             )
             if (avatarBitmap != null) {
-                return avatarWrapper.getDominantColor(avatarBitmap)
+                return@withContext avatarWrapper.getDominantColor(avatarBitmap)
             }
         }
-        return getColor(megaApiGateway.getUserAvatarColor(user))
+        return@withContext getColor(megaApiGateway.getUserAvatarColor(user))
     }
 
     override suspend fun getMyAvatarFile(isForceRefresh: Boolean): File? =
