@@ -11,6 +11,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.PublicNodeException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -111,5 +112,47 @@ class FileLinkRepositoryImplTest {
             }
 
             assertThrows<PublicNodeException.DecryptionKeyRequired> { underTest.getPublicNode(url) }
+        }
+
+    @Test
+    fun `test that encryptLinkWithPassword returns correctly when call encryptLinkWithPassword successfully`() =
+        runTest {
+            val url = "https://mega.co.nz/abc"
+            val encryptedLink = "https://mega.co.nz/abc/encrypted"
+            val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+            val request = mock<MegaRequest> { on { text }.thenReturn(encryptedLink) }
+
+            whenever(megaApiGateway.encryptLinkWithPassword(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    request,
+                    megaError
+                )
+            }
+
+            assertThat(underTest.encryptLinkWithPassword(url, "password"))
+                .isEqualTo(encryptedLink)
+        }
+
+    @Test
+    fun `test that encryptLinkWithPassword throw exception when call encryptLinkWithPassword returns failed`() =
+        runTest {
+            val megaError =
+                mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
+
+            whenever(megaApiGateway.encryptLinkWithPassword(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    megaError
+                )
+            }
+
+            assertThrows<MegaException> {
+                underTest.encryptLinkWithPassword(
+                    "https://mega.co.nz/abc",
+                    "password"
+                )
+            }
         }
 }

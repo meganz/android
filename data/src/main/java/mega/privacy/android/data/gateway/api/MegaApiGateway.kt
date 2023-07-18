@@ -2704,4 +2704,29 @@ interface MegaApiGateway {
         node: MegaNode,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Encrypt public link with password
+     *
+     *
+     * The associated request type with this request is MegaRequest::TYPE_PASSWORD_LINK
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getLink - Returns the public link to be encrypted
+     * - MegaRequest::getPassword - Returns the password to encrypt the link
+     * - MegaRequest::getFlag - Returns true
+     *
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Encrypted public link
+     *
+     * @param link     Public link to be encrypted, including encryption key for the link
+     * @param password Password to encrypt the link
+     * @param listener MegaRequestListener to track this request
+     */
+    fun encryptLinkWithPassword(
+        link: String,
+        password: String,
+        listener: MegaRequestListenerInterface,
+    )
 }

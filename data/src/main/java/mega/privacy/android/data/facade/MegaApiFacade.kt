@@ -1285,4 +1285,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
         megaApi.disableExport(node, listener)
+
+    override fun encryptLinkWithPassword(
+        link: String,
+        password: String,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.encryptLinkWithPassword(link, password, listener)
 }

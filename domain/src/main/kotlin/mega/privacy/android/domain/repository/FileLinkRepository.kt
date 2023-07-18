@@ -13,4 +13,12 @@ interface FileLinkRepository {
      * @param url Url of the public node
      */
     suspend fun getPublicNode(url: String): UnTypedNode
+
+    /**
+     * Encrypt link with password
+     *
+     * @param link
+     * @param password
+     */
+    suspend fun encryptLinkWithPassword(link: String, password: String): String
 }

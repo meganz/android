@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -57,4 +58,15 @@ internal class FileLinkRepositoryImpl @Inject constructor(
 
         nodeMapper(result.publicMegaNode)
     }
+
+    override suspend fun encryptLinkWithPassword(link: String, password: String): String =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("encryptLinkWithPassword") {
+                    it.text
+                }
+                megaApiGateway.encryptLinkWithPassword(link, password, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }
