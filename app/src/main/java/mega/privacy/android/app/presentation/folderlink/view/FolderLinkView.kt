@@ -289,7 +289,8 @@ internal fun FolderLinkView(
             nodeUIItem = state.moreOptionNode,
             showImport = state.hasDbCredentials,
             onImportClicked = onImportClicked,
-            onSaveToDeviceClicked = onSaveToDeviceClicked
+            onSaveToDeviceClicked = onSaveToDeviceClicked,
+            getThumbnail = thumbnailViewModel::getPublicNodeThumbnail,
         )
 
         if (state.storageStatusDialogState != null) {
