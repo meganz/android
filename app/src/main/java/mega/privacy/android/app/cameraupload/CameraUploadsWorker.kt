@@ -226,13 +226,6 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val CONCURRENT_UPLOADS_LIMIT = 16
     }
 
-
-    /**
-     * True if the camera uploads attributes have already been requested
-     * from the server
-     */
-    private var missingAttributesChecked = false
-
     /**
      * Notification manager used to display notifications
      */
@@ -247,9 +240,18 @@ class CameraUploadsWorker @AssistedInject constructor(
     private var deviceAboveMinimumBatteryLevel: Boolean = true
 
     /**
-     * Default pending intent used to redirect user when clicking on a notification
+     * Default notification pending intent
+     * that will redirect to the manager activity with a [Constants.ACTION_CANCEL_CAM_SYNC] action
      */
-    private var defaultPendingIntent: PendingIntent? = null
+    private val defaultPendingIntent: PendingIntent by lazy {
+        Intent(context, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_CANCEL_CAM_SYNC
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+        }.let {
+            PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
+        }
+    }
 
     /**
      * Temp root path used for generating temporary files in the CU process
@@ -327,63 +329,33 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
 
     override suspend fun doWork() = coroutineScope {
-        Timber.d("Start CU Worker")
         try {
+            Timber.d("Start CU Worker")
             scope = this
 
-            createDefaultNotificationPendingIntent()
             setForegroundAsync(getForegroundInfo())
 
-            val isNotEnoughQuota = isNotEnoughQuota()
-            val hasPermission = hasMediaPermission()
-
-            Timber.d("isNotEnoughQuota: $isNotEnoughQuota, hasMediaPermissions: $hasPermission")
-            if (!isNotEnoughQuota && hasPermission) {
-                Timber.d("No active process, start service")
-                withContext(ioDispatcher) {
-                    initService()
-                    val isLoginSuccessful = performCompleteFastLogin()
-                    if (isLoginSuccessful) {
-                        startWorker()
-                    }
-                    endService(aborted = !isLoginSuccessful)
-                    if (isLoginSuccessful) {
-                        Result.success()
-                    } else {
-                        Result.failure()
-                    }
+            withContext(ioDispatcher) {
+                initService()
+                if (hasMediaPermission() && isLoginSuccessful() && canRunCameraUploads()) {
+                    Timber.d("Calling startWorker() successful. Starting Camera Uploads")
+                    hideFolderPathNotifications()
+                    checkUploadNodes()
+                    startUploadAndCompression()
+                    onQueueComplete()
+                    endService()
+                    Result.success()
+                } else {
+                    Timber.w("Calling startWorker() failed. Proceed to handle error")
+                    endService(aborted = true)
+                    Result.failure()
                 }
-            } else {
-                Timber.d("Finished CU with Failure")
-                Result.failure()
             }
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
             endService(aborted = true)
             Result.failure()
         }
-    }
-
-    private fun hasMediaPermission(): Boolean {
-        val hasMediaPermissions =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                ) || permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
-                )
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                )
-            } else {
-                permissionsGateway.hasPermissions(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                )
-            }
-        return hasMediaPermissions
     }
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -500,19 +472,6 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     /**
-     * Function that starts the Camera Uploads functionality
-     */
-    private suspend fun startWorker() {
-        if (canRunCameraUploads()) {
-            Timber.d("Calling startWorker() successful. Starting Camera Uploads")
-            hideFolderPathNotifications()
-            startCameraUploads()
-        } else {
-            Timber.w("Calling startWorker() failed. Proceed to handle error")
-        }
-    }
-
-    /**
      * Instructs [notificationManager] to hide the Primary and/or Secondary Folder
      * notifications if they exist
      */
@@ -527,7 +486,8 @@ class CameraUploadsWorker @AssistedInject constructor(
      * @return true if all conditions have been met, and false if otherwise
      */
     private suspend fun canRunCameraUploads(): Boolean =
-        isCameraUploadsSyncEnabled()
+        isStorageQuotaExceeded().not()
+                && isCameraUploadsSyncEnabled()
                 && isWifiConstraintSatisfied()
                 && isDeviceAboveMinimumBatteryLevel()
                 && isPrimaryFolderValid()
@@ -535,6 +495,43 @@ class CameraUploadsWorker @AssistedInject constructor(
                 && areCameraUploadsSyncHandlesEstablished()
                 && areFoldersCheckedAndEstablished()
 
+    /**
+     * Check if the device has the required permission
+     *
+     * @return true if the device has the required permission
+     */
+    private fun hasMediaPermission(): Boolean {
+        val hasMediaPermissions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                ) || permissionsGateway.hasPermissions(
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                )
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                )
+            } else {
+                permissionsGateway.hasPermissions(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                )
+            }
+        return hasMediaPermissions.also {
+            Timber.d("Device has required permissions $it")
+        }
+    }
+
+    /**
+     * Check if the account has enough cloud storage space
+     *
+     * @return true if the device has not enough cloud storage space
+     */
+    private suspend fun isStorageQuotaExceeded() = isNotEnoughQuota().also {
+        Timber.d("isNotEnoughQuota $it")
+    }
 
     private fun isDeviceAboveMinimumBatteryLevel() = deviceAboveMinimumBatteryLevel.also {
         Timber.d("Device Battery level above $it")
@@ -696,19 +693,15 @@ class CameraUploadsWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun startCameraUploads() {
+    private suspend fun checkUploadNodes() {
+        Timber.d("Get Pending Files from Media Store Database")
         showNotification(
             context.getString(R.string.section_photo_sync),
             context.getString(R.string.settings_camera_notif_checking_title),
             defaultPendingIntent,
             false
         )
-        checkUploadNodes()
-        startUploadAndCompression()
-    }
 
-    private suspend fun checkUploadNodes() {
-        Timber.d("Get Pending Files from Media Store Database")
         val primaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         if (primaryUploadNode == null) {
@@ -744,8 +737,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 startParallelUpload(compressedList, isCompressedVideo = true)
             }
         }
-        onQueueComplete()
-        deleteCameraUploadsTemporaryRootDirectoryUseCase()
     }
 
     private fun showNotEnoughStorageNotification() {
@@ -1023,7 +1014,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun onQueueComplete() {
-        Timber.d("Stopping foreground!")
+        Timber.d("onQueueComplete")
         resetTotalUploadsUseCase()
         cameraUploadState.resetUploadsCounts()
     }
@@ -1062,7 +1053,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      * When the user is not logged in, perform a Complete Fast Login procedure
      * @return [Boolean] true if the login process successful otherwise false
      */
-    private suspend fun performCompleteFastLogin(): Boolean {
+    private suspend fun isLoginSuccessful(): Boolean {
         Timber.d("Waiting for the user to complete the Fast Login procedure")
 
         // arbitrary retry value
@@ -1180,7 +1171,6 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         // Reset properties
         lastUpdated = 0
-        missingAttributesChecked = false
         // Clear sync records if needed
         clearSyncRecords()
         // Create temp root folder
@@ -1189,20 +1179,6 @@ class CameraUploadsWorker @AssistedInject constructor(
                 Timber.w("Root path doesn't exist")
                 throw it
             }
-    }
-
-    /**
-     * Create a default notification pending intent
-     * that will redirect to the manager activity with a [Constants.ACTION_CANCEL_CAM_SYNC] action
-     */
-    private fun createDefaultNotificationPendingIntent() {
-        val intent = Intent(context, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_CANCEL_CAM_SYNC
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-        }
-        defaultPendingIntent =
-            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     /**
@@ -1218,6 +1194,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     ) = withContext(NonCancellable) {
         Timber.d("Finish Camera upload process: $cancelMessage")
 
+        deleteCameraUploadsTemporaryRootDirectoryUseCase()
         sendStatusToBackupCenter(aborted = aborted)
         cancelAllPendingTransfers()
         broadcastProgress(100, 0)

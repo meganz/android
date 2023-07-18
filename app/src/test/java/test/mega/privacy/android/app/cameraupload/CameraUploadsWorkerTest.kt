@@ -16,6 +16,7 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -90,6 +91,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.UUID
@@ -289,6 +291,11 @@ class CameraUploadsWorkerTest {
 
     @Test
     fun `test that worker returns error when quota is not enough`() = runTest {
+        whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(true))
+        whenever(monitorChargingStoppedState.invoke()).thenReturn(MutableStateFlow(false))
+        whenever(monitorBatteryInfo.invoke()).thenReturn(MutableStateFlow(mock()))
+        whenever(isChargingRequired.invoke(any())).thenReturn(false)
+        whenever(isWifiNotSatisfiedUseCase.invoke()).thenReturn(false)
         whenever(isNotEnoughQuota.invoke()).thenReturn(false)
         val result = underTest.doWork()
         Truth.assertThat(result).isEqualTo(ListenableWorker.Result.failure())
