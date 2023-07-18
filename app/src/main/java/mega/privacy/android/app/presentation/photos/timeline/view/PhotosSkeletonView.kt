@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -34,8 +36,14 @@ import mega.privacy.android.core.ui.theme.extensions.grey_050_grey_900
 
 @Composable
 internal fun PhotosSkeletonView() {
+    val columns =
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            3
+        } else {
+            5
+        }
     LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(columns),
         modifier = Modifier
             .fillMaxSize(),
         userScrollEnabled = false,
@@ -56,7 +64,7 @@ internal fun PhotosSkeletonView() {
             if (index % 7 == 0) {
                 Box {
                     Text(
-                        text = "Place holder",
+                        text = "Placeholder",
                         modifier = Modifier
                             .wrapContentSize()
                             .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
