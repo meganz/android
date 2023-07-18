@@ -49,6 +49,7 @@ import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.data.repository.filemanagement.ShareRepositoryImpl
+import mega.privacy.android.data.repository.security.PasscodeRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
@@ -69,7 +70,6 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NodeRepository
@@ -89,6 +89,8 @@ import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.repository.VerificationRepository
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
+import mega.privacy.android.domain.repository.security.PasscodeRepository
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -240,5 +242,9 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFileLinkRepository(implementation: FileLinkRepositoryImpl): FileLinkRepository
+
+    @Binds
+    abstract fun bindPasscodeRepository(implementation: PasscodeRepositoryImpl): PasscodeRepository
+
 
 }
