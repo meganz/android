@@ -24,7 +24,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * @param modifier
  */
 @Composable
-fun MenuHeaderListViewItem(
+fun MegaMenuActionHeader(
     text: String,
     modifier: Modifier = Modifier,
 ) {
@@ -52,7 +52,7 @@ internal const val MENU_HEADER_TEXT_TAG = "menu_list_view_header_item:text_title
 @Composable
 private fun PreviewMenuHeaderListViewItem() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MenuHeaderListViewItem(
+        MegaMenuActionHeader(
             text = "Menu item label test very big item check ellipsis on text",
         )
     }

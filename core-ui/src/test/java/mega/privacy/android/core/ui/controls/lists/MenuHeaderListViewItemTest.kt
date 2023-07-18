@@ -16,7 +16,7 @@ class MenuHeaderListViewItemTest {
     @Test
     fun `test that MenuHeaderListViewItem displays text when we pass text to MenuHeaderListViewItem`() {
         composeRule.setContent {
-            MenuHeaderListViewItem(
+            MegaMenuActionHeader(
                 text = "MenuHeaderListViewItem",
             )
         }
