@@ -28,15 +28,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R as CoreUiR
+import androidx.compose.runtime.State
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.folderInfo
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.ui.controls.images.ThumbnailView
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -44,6 +47,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import java.io.File
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -54,7 +58,16 @@ internal fun FolderLinkBottomSheetView(
     showImport: Boolean,
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    getThumbnail: ((handle: Long, onFinished: (file: File?) -> Unit) -> Unit),
 ) {
+    val imageState = nodeUIItem?.let {
+        produceState<File?>(initialValue = null) {
+            getThumbnail(it.id.longValue) { file ->
+                value = file
+            }
+        }
+    }
+    val fileIcon = MimeTypeList.typeForName(nodeUIItem?.node?.name).iconResourceId
     ModalBottomSheetLayout(
         sheetState = modalSheetState,
         scrimColor = black.copy(alpha = 0.32f),
@@ -65,7 +78,9 @@ internal fun FolderLinkBottomSheetView(
                 nodeUIItem = nodeUIItem,
                 showImport = showImport,
                 onImportClicked = onImportClicked,
-                onSaveToDeviceClicked = onSaveToDeviceClicked
+                onSaveToDeviceClicked = onSaveToDeviceClicked,
+                imageState = imageState,
+                icon = fileIcon
             )
         }
     ) {}
@@ -80,17 +95,14 @@ private fun BottomSheetContent(
     showImport: Boolean,
     onImportClicked: (NodeUIItem<TypedNode>?) -> Unit,
     onSaveToDeviceClicked: (NodeUIItem<TypedNode>?) -> Unit,
+    imageState: State<File?>?,
+    icon: Int,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        val imageResource = if (nodeUIItem != null && nodeUIItem.node is FileNode)
-            rememberAsyncImagePainter(model = nodeUIItem.node.thumbnailPath)
-        else
-            painterResource(id = CoreUiR.drawable.ic_folder_list)
-
         val infoText = nodeUIItem?.let {
             if (it.node is FolderNode) {
                 it.node.folderInfo()
@@ -106,13 +118,24 @@ private fun BottomSheetContent(
                 .height(72.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(5.dp)),
-                painter = imageResource,
-                contentDescription = "Image"
-            )
+            if (nodeUIItem != null && nodeUIItem.node is FileNode) {
+                ThumbnailView(
+                    contentDescription = "Image",
+                    imageFile = imageState?.value,
+                    defaultImage = icon,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                )
+            } else {
+                Image(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(5.dp)),
+                    painter = painterResource(id = CoreUiR.drawable.ic_folder_list),
+                    contentDescription = "Image"
+                )
+            }
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
                     text = nodeUIItem?.name ?: "",
