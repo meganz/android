@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.login
 
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.camerauploads.RemoveBackupFolderUseCase
 import javax.inject.Inject
 

@@ -69,7 +69,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
 import mega.privacy.android.domain.repository.ImageRepository
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import mega.privacy.android.domain.repository.NetworkRepository
 import mega.privacy.android.domain.repository.NodeRepository

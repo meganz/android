@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import javax.inject.Inject

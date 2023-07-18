@@ -4,7 +4,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import javax.inject.Inject
 

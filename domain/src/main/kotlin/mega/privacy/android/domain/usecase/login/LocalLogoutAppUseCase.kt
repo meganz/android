@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.login
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository

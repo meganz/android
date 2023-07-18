@@ -10,7 +10,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginRequireValidation
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.Before
 import org.junit.Test

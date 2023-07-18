@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.Before

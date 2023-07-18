@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.repository
+package mega.privacy.android.domain.repository.security
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate

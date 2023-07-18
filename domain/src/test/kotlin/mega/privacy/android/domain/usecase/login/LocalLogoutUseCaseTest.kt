@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase.login
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import mega.privacy.android.domain.usecase.ClearPsa
 import org.junit.Before
 import org.junit.Test

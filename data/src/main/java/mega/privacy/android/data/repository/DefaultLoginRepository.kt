@@ -39,7 +39,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.repository.security.LoginRepository
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
