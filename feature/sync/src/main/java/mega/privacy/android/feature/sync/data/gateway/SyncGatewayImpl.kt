@@ -1,10 +1,12 @@
 package mega.privacy.android.feature.sync.data.gateway
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.forEach
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
@@ -60,6 +62,10 @@ internal class SyncGatewayImpl @Inject constructor(
 //            .forEach {
 //                megaApi.removeSync(it.backupId)
 //            }
+    }
+
+    override suspend fun removeFolderPair(folderPairId: Long) {
+//        megaApi.removeSync(folderPairId)
     }
 
     override fun monitorSync(): Flow<MegaSync> =

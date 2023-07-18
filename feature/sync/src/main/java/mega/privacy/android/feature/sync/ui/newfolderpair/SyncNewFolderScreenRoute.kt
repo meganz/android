@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.LocalFolderSelected
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.FolderNameChanged
+import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction.NextClicked
 
 @Composable
 internal fun SyncNewFolderScreenRoute(
@@ -20,6 +21,9 @@ internal fun SyncNewFolderScreenRoute(
         localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
         folderNameChanged = { viewModel.handleAction(FolderNameChanged(it)) },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
-        syncClicked = { openNextScreen(state.value) }
+        syncClicked = {
+            viewModel.handleAction(NextClicked)
+            openNextScreen(state.value)
+        }
     )
 }

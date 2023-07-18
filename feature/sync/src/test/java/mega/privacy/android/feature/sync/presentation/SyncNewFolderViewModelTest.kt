@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -29,6 +31,7 @@ internal class SyncNewFolderViewModelTest {
 
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase = mock()
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase = mock()
+    private val syncFolderPairUseCase: SyncFolderPairUseCase = mock()
     private lateinit var underTest: SyncNewFolderViewModel
 
     @BeforeEach
@@ -85,10 +88,32 @@ internal class SyncNewFolderViewModelTest {
         assertThat(expectedState).isEqualTo(underTest.state.value)
     }
 
+    @Test
+    fun `test that next button create new folder pair`() = runTest {
+        val remoteFolder = RemoteFolder(123L, "someFolder")
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
+            flow {
+                emit(remoteFolder)
+            }
+        )
+        val state = SyncNewFolderState(
+            selectedMegaFolder = remoteFolder
+        )
+        initViewModel()
+
+        underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+        verify(syncFolderPairUseCase).invoke(
+            localPath = state.selectedLocalFolder,
+            remotePath = state.selectedMegaFolder!!
+        )
+    }
+
     private fun initViewModel() {
         underTest = SyncNewFolderViewModel(
             getExternalPathByContentUriUseCase,
-            monitorSelectedMegaFolderUseCase
+            monitorSelectedMegaFolderUseCase,
+            syncFolderPairUseCase
         )
     }
 }

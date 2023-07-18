@@ -63,6 +63,12 @@ internal class SyncRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun removeFolderPair(folderPairId: Long) {
+        withContext(ioDispatcher) {
+            syncGateway.removeFolderPair(folderPairId)
+        }
+    }
+
     override fun monitorSync(): Flow<FolderPair> =
         syncGateway
             .monitorSync()

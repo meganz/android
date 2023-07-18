@@ -12,6 +12,8 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncStatus
 import mega.privacy.android.feature.sync.ui.model.SyncUiItem
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -32,6 +35,7 @@ class SyncListViewModelTest {
 
     private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val syncUiItemMapper: SyncUiItemMapper = mock()
+    private val removeFolderPairUseCase: RemoveFolderPairUseCase = mock()
 
     private lateinit var underTest: SyncListViewModel
 
@@ -100,7 +104,27 @@ class SyncListViewModelTest {
         }
     }
 
+    @Test
+    fun `test that remove action removes folder pair`() = runTest {
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+        val folderPairId = 9999L
+        whenever(removeFolderPairUseCase(folderPairId)).thenReturn(Unit)
+        val expectedState = SyncListState(syncUiItems.map { it.copy(expanded = true) })
+
+        initViewModel()
+        underTest.handleAction(
+            SyncListAction.RemoveFolderClicked(folderPairId)
+        )
+
+        verify(removeFolderPairUseCase).invoke(folderPairId)
+    }
+
     private fun initViewModel() {
-        underTest = SyncListViewModel(getFolderPairsUseCase, syncUiItemMapper)
+        underTest = SyncListViewModel(
+            getFolderPairsUseCase,
+            syncUiItemMapper,
+            removeFolderPairUseCase,
+        )
     }
 }

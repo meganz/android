@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.file.GetExternalPathByContentUriUseCase
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.domain.usecase.SyncFolderPairUseCase
 import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncNewFolderViewModel @Inject constructor(
     private val getExternalPathByContentUriUseCase: GetExternalPathByContentUriUseCase,
     private val monitorSelectedMegaFolderUseCase: MonitorSelectedMegaFolderUseCase,
+    private val syncFolderPairUseCase: SyncFolderPairUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncNewFolderState())
@@ -47,6 +49,17 @@ internal class SyncNewFolderViewModel @Inject constructor(
             is SyncNewFolderAction.FolderNameChanged -> {
                 _state.update { state ->
                     state.copy(folderPairName = action.name)
+                }
+            }
+
+            is SyncNewFolderAction.NextClicked -> {
+                viewModelScope.launch {
+                    state.value.selectedMegaFolder?.let { remoteFolder ->
+                        syncFolderPairUseCase(
+                            localPath = state.value.selectedLocalFolder,
+                            remotePath = remoteFolder,
+                        )
+                    }
                 }
             }
         }
