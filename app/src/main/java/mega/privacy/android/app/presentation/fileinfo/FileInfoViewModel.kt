@@ -9,11 +9,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -22,7 +18,6 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -38,7 +33,6 @@ import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
 import mega.privacy.android.domain.entity.node.NodeChanges.Name
@@ -53,7 +47,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.entity.transfer.DownloadNodesEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -63,15 +56,13 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
-import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -82,20 +73,16 @@ import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
-import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
-import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * View Model class for [FileInfoActivity]
@@ -139,12 +126,7 @@ class FileInfoViewModel @Inject constructor(
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
-    private val getDefaultDownloadPathForNodeUseCase: GetDefaultDownloadPathForNodeUseCase,
-    private val startDownloadUseCase: StartDownloadUseCase,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getOfflineNodeInformationUseCase: GetOfflineNodeInformationUseCase,
-    private val getOfflineFileUseCase: GetOfflineFileUseCase,
-    private val saveOfflineNodeInformationUseCase: SaveOfflineNodeInformationUseCase,
+    private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -163,12 +145,12 @@ class FileInfoViewModel @Inject constructor(
     /**
      * the node whose information are displayed
      */
-    private lateinit var typedNode: TypedNode
+    lateinit var typedNode: TypedNode
+        private set
 
     private var versions: List<Node>? = null
     private val monitoringJobs = ArrayList<Job?>()
     private val monitoringMutex = Mutex()
-    private var currentInProgressJob: Job? = null
 
     /**
      * the [NodeId] of the current node for this screen
@@ -217,6 +199,7 @@ class FileInfoViewModel @Inject constructor(
                         monitorChildrenUpdates(),
                         monitorSharesContactUpdates(),
                         monitorOnlineState(),
+                        monitorOfflineUpdates()
                     )
                 )
             }
@@ -323,15 +306,11 @@ class FileInfoViewModel @Inject constructor(
             it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
         }
         viewModelScope.launch {
-            if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                startDownloadForOffline()
-            } else {
-                setNodeAvailableOffline(
-                    typedNode.id,
-                    availableOffline,
-                    activity
-                )
-            }
+            setNodeAvailableOffline(
+                typedNode.id,
+                availableOffline,
+                activity
+            )
             updateState {
                 it.copy(
                     oneOffViewEvent = if (!availableOffline) triggered(FileInfoOneOffViewEvent.Message.RemovedOffline) else consumed(),
@@ -695,6 +674,14 @@ class FileInfoViewModel @Inject constructor(
             }
         }
 
+    private fun monitorOfflineUpdates() = viewModelScope.launch {
+        monitorOfflineFileAvailabilityUseCase().filter { it == nodeId.longValue }.collect {
+            _uiState.update {
+                it.copy(isAvailableOffline = isAvailableOfflineUseCase(typedNode))
+            }
+        }
+    }
+
     private fun updateCurrentNodeStatus() {
         updateState { uiState ->
             val inShareOwnerContactItem = (typedNode as? TypedFolderNode)?.let {
@@ -875,7 +862,7 @@ class FileInfoViewModel @Inject constructor(
             _uiState.update {
                 it.copy(jobInProgressState = progressState)
             }
-            currentInProgressJob = viewModelScope.launch {
+            viewModelScope.launch {
                 val result = block()
                 // if there's a result, the job has finished, (for instance: collision detected returns null because it handles the ui update)
                 if (result != null) {
@@ -942,79 +929,6 @@ class FileInfoViewModel @Inject constructor(
      * It checks the feature flag and start downloading the node with the appropriate use case or launch an one off event to start legacy download
      */
     fun startDownloadNode() {
-        currentInProgressJob = viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
-                startDownloadNode {
-                    (getNodeByIdUseCase(typedNode.parentId) as? FolderNode)?.let { parent ->
-                        getDefaultDownloadPathForNodeUseCase(parent)
-                    }
-                }
-            } else {
-                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
-            }
-        }
-    }
-
-    private fun startDownloadForOffline() {
-        currentInProgressJob = viewModelScope.launch {
-            startDownloadNode(
-                getPath = { getOfflineFileUseCase(getOfflineNodeInformationUseCase(typedNode)).path },
-                toDoAfterProcessing = { saveOfflineNodeInformationUseCase(nodeId) }
-            )
-        }
-    }
-
-    private suspend fun startDownloadNode(
-        toDoAfterProcessing: (suspend () -> Unit)? = null,
-        getPath: suspend () -> String?,
-    ) {
-        if (!checkAndHandleIsDeviceConnected()) {
-            return
-        }
-        _uiState.update {
-            it.copy(jobInProgressState = FileInfoJobInProgressState.ProcessingFiles)
-        }
-        var lastError: Throwable? = null
-        val processed = runCatching { getPath() }.getOrNull()?.let { path ->
-            startDownloadUseCase(
-                destinationPath = path,
-                nodes = listOf(typedNode),
-                appData = null,
-                isHighPriority = false
-            ).catch {
-                lastError = it
-                Timber.e(it)
-            }.onEach {
-                when (it) {
-                    DownloadNodesEvent.NotSufficientSpace -> {
-                        _uiState.updateEventAndClearProgress(
-                            FileInfoOneOffViewEvent.Message.NotSufficientSpace
-                        )
-                    }
-
-                    else -> Timber.d("Start download event received: $it")
-                }
-            }.onCompletion {
-                if (it is CancellationException) {
-                    _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.Message.TransferCancelled)
-                }
-            }.firstOrNull {
-                it == DownloadNodesEvent.FinishProcessingTransfers
-            } != null
-        }
-        if (processed == true) toDoAfterProcessing?.invoke()
-        _uiState.updateEventAndClearProgress(
-            FileInfoOneOffViewEvent.Finished(
-                jobFinished = FileInfoJobInProgressState.ProcessingFiles,
-                exception = lastError?.takeIf { processed != true }
-            ),
-        )
-    }
-
-    /**
-     * Cancel current in progress job
-     */
-    fun cancelCurrentJob() {
-        currentInProgressJob?.cancel()
+        _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
     }
 }

@@ -38,33 +38,13 @@ sealed interface FileInfoOneOffViewEvent {
     /**
      * A message should be shown
      * @param message the [StringRes] of the message to be shown
-     * @param action the [StringRes] of the action, if any
-     * @param actionEvent the one off event to be triggered with the [action], if [action] is null this parameter will be ignored
      */
-    sealed class Message(
-        @StringRes val message: Int,
-        @StringRes val action: Int? = null,
-        val actionEvent: FileInfoOneOffViewEvent? = null,
-    ) : FileInfoOneOffViewEvent {
+    sealed class Message(@StringRes val message: Int) : FileInfoOneOffViewEvent {
 
         /**
          * Offline file has been removed
          */
         object RemovedOffline : Message(R.string.file_removed_offline)
-
-        /**
-         * Not sufficient space for save the node, either for offline or an ordinary download
-         */
-        object NotSufficientSpace : Message(
-            R.string.error_not_enough_free_space,
-            R.string.action_settings,
-            GoToFileManagement
-        )
-
-        /**
-         * Transfer cancelled by user action
-         */
-        object TransferCancelled : Message(R.string.transfers_cancelled)
     }
 
     /**
@@ -107,10 +87,5 @@ sealed interface FileInfoOneOffViewEvent {
      * The node download must be initiated using the legacy method
      */
     object StartLegacyDownload : FileInfoOneOffViewEvent
-
-    /**
-     * The user have chosen to go to settings to file management (from no sufficient disk space snack bar action)
-     */
-    object GoToFileManagement : FileInfoOneOffViewEvent
 }
 

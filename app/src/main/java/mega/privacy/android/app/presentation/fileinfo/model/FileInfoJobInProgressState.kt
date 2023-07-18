@@ -105,15 +105,6 @@ sealed class FileInfoJobInProgressState(
     }
 
     /**
-     * Sdk is processing the node to prepare the download.
-     */
-    object ProcessingFiles : FileInfoJobInProgressState(null, null, null) {
-        override fun customSuccessMessage(context: Context): String {
-            return context.resources.getQuantityString(R.plurals.download_started, 1, 1)
-        }
-    }
-
-    /**
      * Permission for outgoing shares of the node will be changed
      */
     sealed class ChangeSharePermission(

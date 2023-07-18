@@ -23,7 +23,6 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
@@ -46,7 +45,6 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -61,15 +59,13 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.downloads.GetDefaultDownloadPathForNodeUseCase
-import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -80,14 +76,11 @@ import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInInboxUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodeUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflineNodeInformationUseCase
-import mega.privacy.android.domain.usecase.offline.SaveOfflineNodeInformationUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
-import mega.privacy.android.domain.usecase.transfer.StartDownloadUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.After
@@ -98,7 +91,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -152,12 +144,8 @@ internal class FileInfoViewModelTest {
     private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
-    private val getDefaultDownloadPathForNodeUseCase = mock<GetDefaultDownloadPathForNodeUseCase>()
-    private val startDownloadUseCase = mock<StartDownloadUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
-    private val getOfflineNodeInformationUseCase = mock<GetOfflineNodeInformationUseCase>()
-    private val getOfflineFileUseCase = mock<GetOfflineFileUseCase>()
-    private val saveOfflineNodeInformationUseCase = mock<SaveOfflineNodeInformationUseCase>()
+    private val monitorOfflineFileAvailabilityUseCase =
+        mock<MonitorOfflineFileAvailabilityUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -216,12 +204,7 @@ internal class FileInfoViewModelTest {
             getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
-            getDefaultDownloadPathForNodeUseCase = getDefaultDownloadPathForNodeUseCase,
-            startDownloadUseCase = startDownloadUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            getOfflineFileUseCase = getOfflineFileUseCase,
-            getOfflineNodeInformationUseCase = getOfflineNodeInformationUseCase,
-            saveOfflineNodeInformationUseCase = saveOfflineNodeInformationUseCase,
+            monitorOfflineFileAvailabilityUseCase = monitorOfflineFileAvailabilityUseCase,
         )
     }
 
@@ -784,7 +767,6 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test availableOfflineChanged changes ui state accordingly`() = runTest {
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
         mockMonitorStorageStateEvent(StorageState.Green)
         val expected = true
         whenever(isAvailableOffline.invoke(any())).thenReturn(false)
@@ -947,64 +929,6 @@ internal class FileInfoViewModelTest {
                     .isEqualTo(actualSize + versionsSize)
             }
         }
-
-    @Test
-    fun `test that legacy download event is launched when download worker feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            underTest.startDownloadNode()
-            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
-                .isEqualTo(FileInfoOneOffViewEvent.StartLegacyDownload)
-        }
-
-    @Test
-    fun `test that start download use case is invoked when download worker feature flag is enabled`() =
-        runTest {
-            stubNodeForDownload()
-            whenever(getNodeByIdUseCase(parentId)).thenReturn(mock<TypedFolderNode>())
-            whenever(getDefaultDownloadPathForNodeUseCase(any())).thenReturn("path")
-            underTest.startDownloadNode()
-            verify(startDownloadUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        }
-
-    @Test
-    fun `test that legacy set node available offline use case is launched when availableOfflineChanged is set to true and download worker feature flag is disabled`() =
-        runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(false)
-            mockMonitorStorageStateEvent(StorageState.Green)
-            whenever(isAvailableOffline(any())).thenReturn(false)
-            underTest.setNode(node.handle, true)
-            underTest.availableOfflineChanged(true, activity)
-            verify(setNodeAvailableOffline, times(1)).invoke(nodeId, true, activity)
-        }
-
-    @Test
-    fun `test that start download use case is invoked when availableOfflineChanged is set to true and download worker feature flag is enabled`() =
-        runTest {
-            stubNodeForDownload()
-            mockMonitorStorageStateEvent(StorageState.Green)
-            whenever(isAvailableOffline(any())).thenReturn(false)
-            val file = mock<File>() {
-                on { path }.thenReturn("path")
-            }
-            whenever(getOfflineNodeInformationUseCase(any())).thenReturn(mock<OtherOfflineNodeInformation>())
-            whenever(getOfflineFileUseCase(any())).thenReturn(file)
-            underTest.setNode(node.handle, true)
-            underTest.availableOfflineChanged(true, activity)
-            verify(startDownloadUseCase).invoke(anyOrNull(), anyOrNull(), anyOrNull(), anyOrNull())
-        }
-
-    private suspend fun stubNodeForDownload() {
-        val node = mock<TypedFileNode> {
-            on { id }.thenReturn(nodeId)
-            on { name }.thenReturn("name")
-            on { parentId }.thenReturn(parentId)
-        }.also { folderNode ->
-            whenever(getNodeByIdUseCase.invoke(nodeId)).thenReturn(folderNode)
-        }
-        underTest.setNode(node.id.longValue)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)).thenReturn(true)
-    }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(

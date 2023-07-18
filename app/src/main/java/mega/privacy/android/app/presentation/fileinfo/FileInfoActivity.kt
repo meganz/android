@@ -9,7 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -18,8 +18,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -29,6 +31,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.controllers.NodeController
@@ -43,8 +46,8 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.ExtraActionDialog
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
-import mega.privacy.android.app.presentation.settings.SettingsActivity
-import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
+import mega.privacy.android.app.presentation.transfers.startdownload.view.StartDownloadTransferView
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -65,6 +68,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -75,6 +79,7 @@ import javax.inject.Inject
  *
  * @property passCodeFacade [PasscodeCheck] an injected component to enforce a Passcode security check
  * @property getThemeMode [GetThemeMode] application them mode
+ * @property getFeatureFlagValueUseCase to get feature flag of Download Worker
  */
 @AndroidEntryPoint
 class FileInfoActivity : BaseActivity() {
@@ -84,12 +89,16 @@ class FileInfoActivity : BaseActivity() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
+
     private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
 
     private val viewModel: FileInfoViewModel by viewModels()
+    private val startDownloadViewModel: StartDownloadTransfersViewModel by viewModels()
     private var adapterType = 0
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
@@ -151,8 +160,17 @@ class FileInfoActivity : BaseActivity() {
                     onBackPressed = onBackPressedDispatcher::onBackPressed,
                     onTakeDownLinkClick = this::navigateToLink,
                     onLocationClick = { this.navigateToLocation(uiState.nodeLocationInfo) },
-                    availableOfflineChanged = {
-                        viewModel.availableOfflineChanged(it, WeakReference(this))
+                    availableOfflineChanged = { availableOffline ->
+                        lifecycleScope.launch {
+                            if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                                startDownloadViewModel.startDownloadForOffline(viewModel.typedNode)
+                            } else {
+                                viewModel.availableOfflineChanged(
+                                    availableOffline,
+                                    WeakReference(this@FileInfoActivity)
+                                )
+                            }
+                        }
                     },
                     onVersionsClick = this::navigateToVersions,
                     onSharedWithContactClick = { this.navigateToUserDetails(it.contactItem) },
@@ -164,7 +182,6 @@ class FileInfoActivity : BaseActivity() {
                     onShowMoreSharedWithContactsClick = this::navigateToSharedContacts,
                     onPublicLinkCopyClick = viewModel::copyPublicLink,
                     onMenuActionClick = { handleAction(it, uiState) },
-                    onTransferCancelled = viewModel::cancelCurrentJob,
                     modifier = Modifier.semantics {
                         testTagsAsResourceId = true
                     }
@@ -177,6 +194,13 @@ class FileInfoActivity : BaseActivity() {
                         onDismiss = viewModel::extraActionFinished,
                     )
                 }
+                val downloadState by startDownloadViewModel.uiState.collectAsState()
+                StartDownloadTransferView(
+                    uiState = downloadState,
+                    onConsumed = startDownloadViewModel::consumeOneOffEvent,
+                    onCancelledConfirmed = startDownloadViewModel::cancelCurrentJob,
+                    snackBarHostState = snackBarHostState,
+                )
                 updateContactShareBottomSheet(uiState)
             }
         }
@@ -406,7 +430,13 @@ class FileInfoActivity : BaseActivity() {
 
     private fun downloadNode() {
         PermissionUtils.checkNotificationsPermission(this)
-        viewModel.startDownloadNode()
+        lifecycleScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                startDownloadViewModel.startDownloadNode(listOf(viewModel.typedNode))
+            } else {
+                viewModel.startDownloadNode()
+            }
+        }
     }
 
     private fun showConfirmLeaveDialog() {
@@ -491,14 +521,7 @@ class FileInfoActivity : BaseActivity() {
             }
 
             is FileInfoOneOffViewEvent.Message -> {
-                //show snack bar with an optional action
-                val result = snackBarHostState.showSnackbar(
-                    getString(event.message),
-                    event.action?.let { getString(it) }
-                )
-                if (result == SnackbarResult.ActionPerformed && event.actionEvent != null) {
-                    consumeEvent(event.actionEvent, snackBarHostState)
-                }
+                snackBarHostState.showSnackbar(getString(event.message))
             }
 
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
@@ -510,10 +533,6 @@ class FileInfoActivity : BaseActivity() {
                     fromMediaViewer = false,
                     needSerialize = false
                 )
-            }
-
-            FileInfoOneOffViewEvent.GoToFileManagement -> {
-                startActivity(SettingsActivity.getIntent(this, TargetPreference.Storage))
             }
         }
     }

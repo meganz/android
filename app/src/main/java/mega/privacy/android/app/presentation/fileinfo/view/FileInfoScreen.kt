@@ -39,10 +39,8 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
-import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
@@ -50,7 +48,6 @@ import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -76,7 +73,6 @@ internal fun FileInfoScreen(
     onShowMoreSharedWithContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
-    onTransferCancelled: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -202,17 +198,8 @@ internal fun FileInfoScreen(
                 }
             }
         }
-
-        when (viewState.jobInProgressState) {
-            null, FileInfoJobInProgressState.ProcessingFiles -> {
-                MinimumTimeVisibility(visible = viewState.jobInProgressState != null) {
-                    TransferInProgressDialog(onCancelConfirmed = onTransferCancelled)
-                }
-            }
-
-            else -> viewState.jobInProgressState.progressMessage?.let {
-                LoadingDialog(text = stringResource(id = it))
-            }
+        viewState.jobInProgressState?.progressMessage?.let {
+            LoadingDialog(text = stringResource(id = it))
         }
     }
 }
@@ -248,7 +235,6 @@ private fun FileInfoScreenPreview(
             onShowMoreSharedWithContactsClick = {},
             onPublicLinkCopyClick = {},
             onLocationClick = {},
-            onTransferCancelled = {},
             onMenuActionClick = { action ->
                 when (action) {
                     FileInfoMenuAction.SelectionModeAction.ClearSelection -> {
