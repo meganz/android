@@ -34,8 +34,15 @@ class MegaUrlsTest {
         Arguments.of("https://mega.co.nz?sort=10"),
         Arguments.of("https://mega.co.nz/home"),
         Arguments.of("https://mega.nz/home"),
+        Arguments.of("https://mega.io/home"),
         Arguments.of("https://mega.co.nz/#testing"),
         Arguments.of("https://mega.nz/#testing"),
+        Arguments.of("https://help.mega.io?sort=DESC"),
+        Arguments.of("https://help.mega.io/chat"),
+        Arguments.of("https://help.mega.co.nz/chat"),
+        Arguments.of("https://help.mega.nz/chat"),
+        Arguments.of("https://help.mega.nz/chat?sort=DESC"),
+        Arguments.of("https://help.mega.io/chats-meetings/meetings/schedule-oneoff-recurring-meeting"),
     )
 
     private fun blockedUrl(): Stream<Arguments> = Stream.of(
@@ -51,9 +58,14 @@ class MegaUrlsTest {
         Arguments.of("https://mega.com/"),
         Arguments.of("https://mega.com"),
         Arguments.of("http://mega.nz/"),
+        Arguments.of("http://help.mega.io/"),
         Arguments.of("https://mega.co.nz//@attacker.com"),
         Arguments.of("https://mega.co.nz//////@attacker.com"),
         Arguments.of("https://mega.co.nz\\\\@attacker.com"),
         Arguments.of("https://hahdasjdhas.com/"),
+        Arguments.of("https://help.mega.nz@attacker.com"),
+        Arguments.of("https://attacker.mega.com/"),
+        Arguments.of("https://attackermega.nz/"),
+        Arguments.of("https://attackermega.nz/home"),
     )
 }

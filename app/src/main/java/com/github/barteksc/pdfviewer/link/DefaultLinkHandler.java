@@ -15,9 +15,6 @@
  */
 package com.github.barteksc.pdfviewer.link;
 
-import static mega.privacy.android.app.utils.Constants.MEGA_REGEXS;
-import static mega.privacy.android.app.utils.Util.matchRegexs;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -49,11 +46,6 @@ public class DefaultLinkHandler implements LinkHandler {
     }
 
     private void handleUri(String uri) {
-        if (!matchRegexs(uri, MEGA_REGEXS)) {
-            Timber.e(TAG, "Vulnerable/Malicious Url detected: %s", uri);
-            return;
-        }
-
         Uri parsedUri = Uri.parse(uri);
         Context context = pdfView.getContext();
         Intent intent = new Intent(Intent.ACTION_VIEW, parsedUri);

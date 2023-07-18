@@ -38,7 +38,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class WebViewActivity : BaseActivity() {
-
     companion object {
         private const val IMAGE_CONTENT_TYPE = 0
         private const val VIDEO_CONTENT_TYPE = 1

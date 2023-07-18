@@ -600,7 +600,8 @@ public class Constants {
     public static final String SEPARATOR = File.separator;
 
     public static final String[] MEGA_REGEXS = {
-        "^https://(?:mega\\.co\\.nz|mega\\.nz)(?:\\/|\\?).[^.]+$"
+            "^https://(?:mega\\.co\\.nz|mega\\.nz|mega\\.io)(?:\\/|\\?).[^.]+$",
+            "^https://[^.]+\\.(?:mega\\.co\\.nz|mega\\.nz|mega\\.io)(?:\\/|\\?).[^.]+$"
     };
 
     public static final String[] FILE_LINK_REGEXS = {
