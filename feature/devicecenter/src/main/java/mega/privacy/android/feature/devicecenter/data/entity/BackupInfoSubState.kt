@@ -1,10 +1,10 @@
 package mega.privacy.android.feature.devicecenter.data.entity
 
 /**
- * Enum class representing the different Sync Sub States mapped from
+ * Enum class representing the different Backup Sub States mapped from
  * [nz.mega.sdk.MegaBackupInfo.substate]
  */
-enum class SyncSubState {
+enum class BackupInfoSubState {
 
     /**
      * Represents a Sub State that has no Error
