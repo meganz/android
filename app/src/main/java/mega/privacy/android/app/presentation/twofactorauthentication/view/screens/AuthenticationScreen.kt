@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.twofactorauthentication.view.scree
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,16 +13,16 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import de.palm.composestateevents.StateEvent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
-import mega.privacy.android.app.presentation.twofactorauthentication.view.CircularProgress
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
+import mega.privacy.android.core.ui.controls.progressindicator.MegaCircularProgressIndicator
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -72,9 +71,10 @@ internal fun AuthenticationScreen(
         }
     }
     if (isChecking2FA) {
-        CircularProgress(
-            testTag = TWO_FA_PROGRESS_TEST_TAG,
-            modifier = Modifier.align(Alignment.Center)
+        MegaCircularProgressIndicator(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .testTag(TWO_FA_PROGRESS_TEST_TAG)
         )
     }
 }

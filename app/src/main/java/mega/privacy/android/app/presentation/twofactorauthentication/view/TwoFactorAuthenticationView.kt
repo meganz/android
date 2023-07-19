@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view
 
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.OnBackPressedDispatcher
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -18,10 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
@@ -30,6 +32,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.extensions.
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
+import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationCompletedScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.SetupScreen
@@ -38,7 +41,7 @@ import mega.privacy.android.core.ui.theme.extensions.black_white
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun TwoFactorAuthenticationView(
+internal fun TwoFactorAuthenticationView(
     uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
     qrCodeMapper: QRCodeMapper,
@@ -51,6 +54,9 @@ fun TwoFactorAuthenticationView(
     on2FAChanged: (String) -> Unit,
     onFirstTime2FAConsumed: () -> Unit,
     on2FAPinReset: () -> Unit,
+    onExportRkClicked: () -> Unit,
+    onDismissClicked: () -> Unit,
+    onIsRkExportSuccessfullyConsumed: () -> Unit,
 ) {
 
     val currentScreen =
@@ -105,12 +111,11 @@ fun TwoFactorAuthenticationView(
         }
     )
     { padding ->
-        val seedErrorMessage = stringResource(id = R.string.qr_seed_text_error)
-        val enableAuthErrorMessage = stringResource(id = R.string.error_enable_2fa)
+        val context = LocalContext.current
         val onBeginSetupClicked: () -> Unit = {
             if (uiState.is2FAFetchCompleted && uiState.seed.isNullOrEmpty()) {
                 coroutineScope.launch {
-                    snackBarHostState.showSnackbar(seedErrorMessage)
+                    snackBarHostState.showSnackbar(context.resources.getString(R.string.qr_seed_text_error))
                 }
             } else {
                 currentScreen.value = ScreenType.SetupScreen
@@ -150,10 +155,28 @@ fun TwoFactorAuthenticationView(
             }
 
             ScreenType.AuthenticationCompletedScreen -> {
-                //AND-16831:Create Authentication Completed screen
+                AuthenticationCompletedScreen(
+                    isMasterKeyExported = uiState.isMasterKeyExported,
+                    onExportRkClicked = onExportRkClicked,
+                    onDismissClicked = onDismissClicked
+                )
             }
         }
 
+        EventEffect(
+            event = uiState.isRkExportedSuccessfully,
+            onConsumed = onIsRkExportSuccessfullyConsumed
+        ) { isExported ->
+            if (isExported) {
+                Toast.makeText(
+                    context,
+                    context.resources.getString(R.string.save_MK_confirmation),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                snackBarHostState.showSnackbar(context.resources.getString(R.string.general_text_error))
+            }
+        }
 
         when (uiState.authenticationState) {
             AuthenticationState.Passed -> {
@@ -163,7 +186,7 @@ fun TwoFactorAuthenticationView(
             AuthenticationState.Error,
             -> {
                 LaunchedEffect(key1 = uiState.authenticationState) {
-                    snackBarHostState.showSnackbar(enableAuthErrorMessage)
+                    snackBarHostState.showSnackbar(context.resources.getString(R.string.error_enable_2fa))
                 }
             }
 

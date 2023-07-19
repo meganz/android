@@ -153,7 +153,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         getFeatureFlagValueUseCase(AppFeatures.TwoFactorAuthenticationCompose)
 
     @Composable
-    fun TwoFactorAuthenticationScreen(isDarkMode: Boolean) {
+    private fun TwoFactorAuthenticationScreen(isDarkMode: Boolean) {
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         TwoFactorAuthenticationView(
             uiState = uiState,
@@ -168,6 +168,12 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             on2FAChanged = viewModel::on2FAChanged,
             onFirstTime2FAConsumed = viewModel::onFirstTime2FAConsumed,
             on2FAPinReset = viewModel::on2FAPinReset,
+            onExportRkClicked = { chooseRecoverySaveLocation() },
+            onDismissClicked = {
+                update2FASetting()
+                finish()
+            },
+            onIsRkExportSuccessfullyConsumed = viewModel::onIsRkExportSuccessfullyConsumed
         )
     }
 
@@ -415,6 +421,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
                 finish()
+                viewModel.setIsRkExportSuccessfully(true)
                 toast(R.string.save_MK_confirmation)
             }
 

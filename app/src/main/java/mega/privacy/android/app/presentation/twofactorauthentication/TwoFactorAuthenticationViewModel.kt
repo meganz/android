@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
@@ -88,12 +89,27 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     }
 
     /**
+     * Updates the Recovery key in state
+     */
+    fun setIsRkExportSuccessfully(isExported: Boolean) =
+        _uiState.update { it.copy(isRkExportedSuccessfully = triggered(isExported)) }
+
+    /**
+     * Updates the Recovery key in state
+     */
+    fun onIsRkExportSuccessfullyConsumed() =
+        _uiState.update { it.copy(isRkExportedSuccessfully = consumed()) }
+
+
+    /**
      * Exports the Recovery Key
      */
     suspend fun getRecoveryKey(): String? {
         return getExportMasterKeyUseCase().also { key ->
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExportedUseCase()
+            } else {
+                setIsRkExportSuccessfully(false)
             }
         }
     }

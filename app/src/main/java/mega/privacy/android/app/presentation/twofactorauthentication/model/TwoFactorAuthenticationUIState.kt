@@ -2,12 +2,15 @@ package mega.privacy.android.app.presentation.twofactorauthentication.model
 
 import android.graphics.Bitmap
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 
 
 /**
  * UI State for Two Factor authentication activity
  * @param is2FAFetchCompleted UI state to check if fetching the 2FA code was completed or not
+ * @param isRkExportedSuccessfully UI state to check if exporting the RK was exported successfully or not
  * @param seed The seed that show in the UI as 13 unique codes
  * @param twoFAPin Typed 2FA pin provided by the authentication App from the user
  * @param isFirstTime2FA True if it is the first time the 2FA is requested.
@@ -21,6 +24,7 @@ import de.palm.composestateevents.triggered
  */
 data class TwoFactorAuthenticationUIState(
     val is2FAFetchCompleted: Boolean = false,
+    val isRkExportedSuccessfully: StateEventWithContent<Boolean> = consumed(),
     val seed: String? = null,
     val twoFAPin: List<String> = listOf("", "", "", "", "", ""),
     val isFirstTime2FA: StateEvent = triggered,

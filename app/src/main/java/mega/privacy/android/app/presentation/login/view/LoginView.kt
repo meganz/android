@@ -59,7 +59,6 @@ import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
-import mega.privacy.android.app.presentation.twofactorauthentication.view.CircularProgress
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -69,7 +68,6 @@ import mega.privacy.android.core.ui.controls.progressindicator.MegaLinearProgres
 import mega.privacy.android.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.red_600_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -393,7 +391,7 @@ private fun LoginInProgress(
                     }
                 }
             }
-            CircularProgress(testTag = LOGIN_PROGRESS_TEST_TAG)
+            MegaCircularProgressIndicator(modifier = Modifier.testTag(LOGIN_PROGRESS_TEST_TAG))
             fetchNodesUpdate?.temporaryError?.let {
                 LoginInProgressText(
                     stringId = it.messageId,
@@ -467,9 +465,10 @@ private fun TwoFactorAuthentication(
     }
 
     if (isChecking2FA) {
-        CircularProgress(
-            testTag = TWO_FA_PROGRESS_TEST_TAG,
-            modifier = Modifier.align(Alignment.Center)
+        MegaCircularProgressIndicator(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .testTag(TWO_FA_PROGRESS_TEST_TAG)
         )
     }
 }
