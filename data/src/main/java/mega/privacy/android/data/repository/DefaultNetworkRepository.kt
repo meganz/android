@@ -43,16 +43,14 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     private val connectivityManager = getSystemService(context, ConnectivityManager::class.java)
 
-    override fun getCurrentConnectivityState() =
-        connectivityManager.getActiveNetworkCapabilities()
-            ?.takeIf { it.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) }
-            ?.let {
-                ConnectivityState.Connected(
-                    meteredConnection = !it.hasCapability(
-                        NetworkCapabilities.NET_CAPABILITY_NOT_METERED
-                    )
-                )
-            } ?: ConnectivityState.Disconnected
+    @Suppress("DEPRECATION")
+    override fun getCurrentConnectivityState(): ConnectivityState {
+        return if (connectivityManager?.activeNetworkInfo?.isConnected == true) ConnectivityState.Connected(
+            meteredConnection = connectivityManager.getActiveNetworkCapabilities()?.hasCapability(
+                NetworkCapabilities.NET_CAPABILITY_NOT_METERED
+            ) != true
+        ) else ConnectivityState.Disconnected
+    }
 
     private fun ConnectivityManager?.getActiveNetworkCapabilities(): NetworkCapabilities? =
         this?.activeNetwork?.let { network ->
