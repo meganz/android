@@ -7,7 +7,7 @@ import javax.inject.Inject
  *
  *  takes [Long] value from getABTestValue method and returns [Boolean]
  */
-internal class RemoteFeatureFlagValueMapper @Inject constructor() {
+internal class ABTestFeatureFlagValueMapper @Inject constructor() {
     /**
      *  Invoke
      *

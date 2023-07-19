@@ -9,12 +9,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class RemoteFeatureFlagValueMapperTest {
-    private lateinit var underTest: RemoteFeatureFlagValueMapper
+internal class ABTestFeatureFlagValueMapperTest {
+    private lateinit var underTest: ABTestFeatureFlagValueMapper
 
     @BeforeAll
     fun setup() {
-        underTest = RemoteFeatureFlagValueMapper()
+        underTest = ABTestFeatureFlagValueMapper()
     }
 
     @ParameterizedTest(name = "test that if abtestvalue is {0} the mapper returns {1}")
