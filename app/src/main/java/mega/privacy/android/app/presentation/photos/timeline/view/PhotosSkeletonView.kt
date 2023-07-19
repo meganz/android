@@ -86,8 +86,14 @@ internal fun PhotosSkeletonView() {
 
 @Composable
 internal fun AlbumListSkeletonView() {
+    val columns =
+        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            3
+        } else {
+            4
+        }
     LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(columns),
         modifier = Modifier
             .fillMaxSize(),
         userScrollEnabled = false,

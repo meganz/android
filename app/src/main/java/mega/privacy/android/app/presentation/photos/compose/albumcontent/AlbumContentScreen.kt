@@ -175,7 +175,7 @@ fun AlbumContentScreen(
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {
                 MegaLinearProgressIndicator()
             }
-        } else if (albumContentState.isLoadingPhotos || albumContentState.isAddingPhotos) {
+        } else if (albumContentState.isLoadingPhotos || !albumContentState.isAddingPhotosProgressCompleted) {
             AlbumContentSkeletonView(smallWidth = smallWidth)
         } else {
             when (albumsState.currentAlbum) {
