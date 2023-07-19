@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro Lite</string>
@@ -278,14 +278,6 @@
     <string name="option_decryption_key">解密密钥</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">正在准备文件</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="other">%1$d个下载已开始</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="other">%1$d个下载已完成</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="other">%1$d个上传已开始</item>
@@ -1346,8 +1338,6 @@
     <string name="error_revoking_node">发生错误。附件尚未移除</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">静音</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">消息</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">从</string>
     <!-- title of incoming shared folder notification -->
@@ -1394,8 +1384,6 @@
     <string name="title_referral_bonuses">邀请奖励</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">安装MEGA手机应用程序</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">添加手机号</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">注册奖励</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1422,14 +1410,10 @@
     <string name="paragraph_info_achievement_install_desktop">安装MEGA桌面应用程序后，您会获得%1$s免费存储空间，有效期为365天。MEGA桌面应用程序适用于Windows，macOS和大多数Linux发行版。</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">安装MEGA手机应用程序后，您会获得%1$s免费存储空间，有效期为365天。MEGA手机应用程序适用于iOS和Android平台。</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">验证手机号后，您会获得%1$s免费存储空间，有效期为365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">您已通过安装MEGA桌面应用程序获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">您已通过安装MEGA手机应用程序获得了%1$s的存储空间。</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">您已通过验证手机号获得了%1$s存储空间。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已收到%1$s的存储空间作为免费注册奖励。</string>
     <!-- menu items -->
@@ -1582,8 +1566,6 @@
     <string name="context_empty_contacts">[B]无[/B][A]联系人[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]无[/A][B]对话[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]正在加载[/A][B]对话&#8230; [/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]无 [/B][A]传入的共享文件夹[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1764,10 +1746,6 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s条未读消息</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="other">%1$d条未读聊天</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]正在加载[/A][B]消息&#8230;[/B]</string>
@@ -2409,8 +2387,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">您仍然可以在设备的设置中授予MEGA权限</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">如果您允许MEGA访问您的通讯录，则可以轻松地发现您的联系人。MEGA不会将这些数据用于任何其他目的，并且未经您的允许绝不会与您的联系人互动。</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="other">消息已转发</item>
@@ -2429,18 +2405,6 @@
     <plurals name="num_messages_not_send">
         <item quantity="other">%d条消息未发送到%d个聊天</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="other">在MEGA上发现%d位联系人</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">立即邀请联系人？</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">发现您在MEGA上的联系人</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">授予MEGA访问您的通讯录的权限，以发现您在MEGA上的联系人。</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">正在加载MEGA联系人&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">该内容未发送到%d个聊天</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2605,8 +2569,6 @@
     <string name="update_action_bucket">由%s[A]更新[/A]</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">我</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">添加手机号后可免费获得%1$s，您的联系人也更容易在MEGA上找到您。</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">添加手机号到您的MEGA帐户，您的联系人也更容易在MEGA上找到您。</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3581,8 +3543,6 @@
     <string name="warning_copy_and_rename">您所复制的文件将被重命名为：</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">复制并重命名</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">将此选项应用于接下来的%1$d个冲突</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">将目标文件夹与您要复制的文件夹合并。</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3747,8 +3707,6 @@
     <string name="settings_calls_preferences_sound_notifications">提示音通知</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">当有人加入或离开通话时播放提示音。</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">现在不用</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">文件已保存到云盘。</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
@@ -4714,18 +4672,17 @@
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">每</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">每个工作日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="other">每%1$d天</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
         <item quantity="other">链接已创建并复制到您的剪贴板</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <string name="meetings_custom_recurrence_occurs_on_section">发生于</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">周一</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
@@ -4742,20 +4699,18 @@
     <string name="meetings_custom_recurrence_sunday_option">周日</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="other">%1$s，每%2$d周</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="other">%1$s和%2$s，每%3$d周</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">您已经拥有此方案的定期订阅</string>
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">无法保存相册</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">您没有足够的存储空间将此相册保存到云盘。立即升级以获得更多存储空间。</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">日</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4798,33 +4753,27 @@
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">第五个</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d个月的第一个%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d个月的第二个%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d个月的第三个%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d个月的第四个%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="other">每%2$d个月的第五个%1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">每%1$s个月的%2$d日</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">

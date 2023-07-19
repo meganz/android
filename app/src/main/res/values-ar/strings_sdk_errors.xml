@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">غير مكتمل/ة</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">خطأ مفتاح/فك التشفير غير صالح</string>
+    <string name="api_ekey">خطأ في فك التشفير</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">معرف جلسة غير صالح</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

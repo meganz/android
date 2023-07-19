@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Incompleto</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Chiave non valida/Errore di decrittazione</string>
+    <string name="api_ekey">Errore di decrittazione</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID di sessione invalido</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">ไม่สมบูรณ์</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">คีย์ไม่ถูกต้อง/การถอดรหัสผิดพลาด</string>
+    <string name="api_ekey">ข้อผิดพลาดในการถอดรหัสลับ</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">ID เซสชั่นไม่ถูกต้อง</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

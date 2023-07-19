@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -278,14 +278,6 @@
     <string name="option_decryption_key">解密金鑰</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">正在準備檔案</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="other">%1$d個下載已開始</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="other">%1$d個下載已完成</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="other">%1$d個上傳已開始</item>
@@ -1346,8 +1338,6 @@
     <string name="error_revoking_node">發生錯誤，附件尚未移除</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">靜音</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">訊息</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">從</string>
     <!-- title of incoming shared folder notification -->
@@ -1394,8 +1384,6 @@
     <string name="title_referral_bonuses">邀請獎勵</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">安裝MEGA手機應用程式</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">新增手機號碼</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1422,14 +1410,10 @@
     <string name="paragraph_info_achievement_install_desktop">當您安裝MEGA桌面應用程式時，您可免費獲得%1$s的儲存空間，有效期為365天。 MEGA桌面應用程式可在Windows、macOS和大多數Linux發行版使用。</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">當您安裝MEGA手機應用程式時，您可以獲得%1$s免費儲存空間，有效期為365天。我們有提供iOS與Android版本的手機應用程式。</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">當您驗證您的手機號碼時您將免費獲得%1$s儲存空間，有效期為365天。</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">您已經安裝我們的MEGA桌面應用程式而獲得%1$s儲存空間過了。</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">您已經由安裝MEGA手機應用程式而獲得%1$s儲存空間獎勵。</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">您已經因為驗證您的手機號碼而獲得%1$s儲存空間獎勵。</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">您已經收到%1$s的儲存空間，這是免費的註冊獎勵喔。</string>
     <!-- menu items -->
@@ -1582,8 +1566,6 @@
     <string name="context_empty_contacts">[B]沒有[/B][A]聯絡人[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]沒有[/A] [B]對話[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]正在加載[/A] [B]對話⋯[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1764,10 +1746,6 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s則未讀訊息</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="other">%1$d則未讀對話訊息</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]正在加載[/A][B]訊息⋯[/B]</string>
@@ -2409,8 +2387,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s。%2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">您仍然可以在裝置的設定中授予MEGA權限</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">如果您允許MEGA存取您的通訊錄，您將可以更輕鬆地找到通訊錄中有在使用MEGA的聯絡人。MEGA不會將這些資料用於任何其他用途，並且未經您的同意絕不會與您的聯絡人互動。</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="other">訊息已轉發</item>
@@ -2429,18 +2405,6 @@
     <plurals name="num_messages_not_send">
         <item quantity="other">%d則訊息未發送到%d個對話中</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="other">在MEGA上找到%d個聯絡人</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">立即邀請聯絡人？</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">尋找您在MEGA上的聯絡人</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">授予MEGA存取您通訊錄的權限，以尋找有在使用MEGA的聯絡人。</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">正在加載MEGA聯絡人⋯</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">此內容未被傳送至%d個對話中</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2605,8 +2569,6 @@
     <string name="update_action_bucket">由%s[A]上傳[/A]</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">我</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">當您新增手機門號時可以免費獲得%1$s。這可以讓您的聯絡人更容易地在MEGA上找到您。</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">將您的手機門號加到MEGA。這可以讓您的聯絡人更容易的在MEGA上找到您。</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3581,8 +3543,6 @@
     <string name="warning_copy_and_rename">您複製的檔案將重新命名為：</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">複製並重新命名</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">將此選項套用於接下來的%1$d個衝突</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">將目的地資料夾與您複製的資料夾合併。</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3747,8 +3707,6 @@
     <string name="settings_calls_preferences_sound_notifications">聲音通知</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">當有人加入或離開通話時播放提示音</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">稍後再說</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">檔案已儲存到雲端硬碟。</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
@@ -3844,7 +3802,7 @@
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">已存在相同名稱相簿。請輸入不同的名稱。</string>
+    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
@@ -3956,7 +3914,7 @@
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">事件</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">每天發生</string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">每日發生</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
     <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">每週發生</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
@@ -3966,7 +3924,7 @@
     <!-- Label for scheduled monthly meetings -->
     <string name="meetings_list_scheduled_meeting_monthly_label">每月%s</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label">每天%s</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">每日%s</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加定期性會議，排定時間：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
@@ -3980,7 +3938,7 @@
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s取消[/A][B]會議和其所有事件[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s取消[/A][B]以下排定時間的事件：[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s已取消[/A][B]以下排定時間的事件：[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">這個連結並非使用您當前登入的帳戶生成。請登入與此連結相關連的帳戶以驗證您的電子郵件地址。</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
@@ -4564,9 +4522,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">記住偏好設定</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">裝置中心</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">裝置中心</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">每日</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4624,7 +4582,7 @@
     <!-- Title of Yearly tab, if user click on this tab the info related to yearly plans will be shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_tab_yearly">每年</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">按年計算最多可節省16%</string>
+    <string name="account_upgrade_account_label_save_up_to">按年計費最多可節省16%</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_storage">[B]空間：[/B][A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->

@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">완료되지 않음</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">잘못된 키/복호화 오류</string>
+    <string name="api_ekey">복호화 오류</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">세션 ID 오류</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

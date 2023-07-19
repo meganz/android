@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Nie zakończone</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Błędny klucz/Błąd deszyfrowania</string>
+    <string name="api_ekey">Błąd opisu</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Zły numer sesji</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

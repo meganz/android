@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -281,16 +281,6 @@
     <string name="option_decryption_key">Decoderingssleutel</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Bestanden voorbereiden</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="one">Download is gestart</item>
-        <item quantity="other">%1$d downloads zijn begonnen</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="one">Downloaden is voltooid</item>
-        <item quantity="other">%1$d downloads zijn voltooid</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="one">Upload is gestart</item>
@@ -1379,8 +1369,6 @@
     <string name="error_revoking_node">Fout. De bijlage was niet verwijderd</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Stil</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">berichten</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">vanaf</string>
     <!-- title of incoming shared folder notification -->
@@ -1427,8 +1415,6 @@
     <string name="title_referral_bonuses">Uitnodigingsbonussen</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Installeer een mobiele app</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">Telefoonnummer toevoegen</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Registratie bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1455,14 +1441,10 @@
     <string name="paragraph_info_achievement_install_desktop">Wanneer u de MEGA Desktop Applicatie installeert krijgt u %1$s aan extra opslag ruimte, geldig voor 365 dagen. De MEGA Desktop Applicatie is beschikbaar voor Windows, macOS en de meeste Linux distributies.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Wanneer u de MEGA Mobile Applicatie installeert, krijgt u %1$s gratis  opslagruimte, 365 dagen geldig. Wij bieden mobiele applicaties voor iOS en Android.</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Wanneer u uw telefoonnummer verifieert krijgt u %1$s aan extra opslagruimte, geldig voor 365 dagen.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s opslagruimte ontvangen voor het installeren van onze MEGA Desktop Applicatie.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">U heeft %1$s opslagruimte gekregen voor het installeren van de MEGA Mobile Applicatie.</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">U heeft %1$s opslagruimte ontvangen voor het verifiëren van uw telefoonnummer.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">U heeft %1$s opslag ruimte ontvangen als uw gratis registratie bonus.</string>
     <!-- menu items -->
@@ -1618,8 +1600,6 @@
     <string name="context_empty_contacts">[B]Geen [/B][A]contacten[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]Geen[/A] [B]gesprekken[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[B]Gesprekken[/B] [A]laden&#8230;[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Geen [/B][A]binnenkomende gedeelde mappen[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1808,11 +1788,6 @@
     <plurals name="number_unread_messages">
         <item quantity="one">%1$s ongelezen bericht</item>
         <item quantity="other">%1$s ongelezen berichten</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="one">%1$d ongelezen gesprek</item>
-        <item quantity="other">%1$d ongelezen berichten</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Berichten[/A] [B]Laden&#8230;[/B]</string>
@@ -2469,8 +2444,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">U kunt nog steeds MEGA-rechten verlenen in de instellingen van uw apparaat</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">Als u MEGA toegang geeft tot uw adresboek, zult u uw contacten gemakkelijker kunnen ontdekken. MEGA zal deze gegevens niet voor andere doeleinden gebruiken en zal nooit zonder uw toestemming met uw contacten communiceren.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Bericht doorgestuurd</item>
@@ -2493,19 +2466,6 @@
         <item quantity="one">%d bericht was niet verzonden naar %d gesprekken</item>
         <item quantity="other">%d berichten waren niet verzonden naar %d gesprekken</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="one">%d contact op mega gevonden</item>
-        <item quantity="other">%d contacten op MEGA gevonden</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">Contact nu uitnodigen?</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">Ontdek uw contacten op MEGA</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">Geef MEGA toegang tot uw adresboek om uw contacten op MEGA te ontdekken.</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">Contacten laden op MEGA&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">De inhoud was niet verzonden naar %d gesprekken</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2677,8 +2637,6 @@
     <string name="update_action_bucket">[A]Geupdate door [/A]%s</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">Mij</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">Ontvang %1$s gratis wanneer u uw telefoonnummer toevoegt. Hierdoor kunnen uw contacten u gemakkelijker vinden op MEGA.</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Voeg uw telefoonnummer toe tot MEGA. Dit maakt het makkelijker voor uw contacten u te vinden op MEGA.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3680,8 +3638,6 @@
     <string name="warning_copy_and_rename">Het bestand die u kopieert wordt hernoemt als:</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Kopiëren en hernoemen</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Pas deze optie toe op de volgende %1$d conflicten</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Voeg de map op de bestemming samen met de map die u kopieert.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3850,8 +3806,6 @@
     <string name="settings_calls_preferences_sound_notifications">Geluid notificaties</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Hoor een geluid wanneer iemand aansluit of de oproep verlaat.</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">Niet nu</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">Bestand opgeslagen naar Cloud schijf.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->

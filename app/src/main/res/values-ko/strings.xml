@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -278,14 +278,6 @@
     <string name="option_decryption_key">복호화 키</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">파일 준비 중</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="other">다운로드 %1$d개 시작</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="other">다운로드 %1$d개 완료</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="other">업로드 %1$d개 시작</item>
@@ -1346,8 +1338,6 @@
     <string name="error_revoking_node">오류. 첨부물이 제거되지 않았습니다</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">조용히</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">메시지</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">폴더가 공유됨, 공유자</string>
     <!-- title of incoming shared folder notification -->
@@ -1394,8 +1384,6 @@
     <string name="title_referral_bonuses">초대 보너스</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">MEGA 모바일 앱 설치</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">전화번호 추가</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1422,14 +1410,10 @@
     <string name="paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다. MEGA 데스크톱 앱은 Windows, macOS 그리고 대부분의 Linux 배포판에서 이용 가능합니다.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하면 365일간 이용 가능한 %1$s의 무료 저장 공간을 받게 됩니다. iOS와 Android에서 모바일 앱을 이용할 수 있습니다.</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하면 %1$s의 무료 저장 공간을 받게 되며, 365일간 이용 가능합니다.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">MEGA 데스크톱 앱을 설치하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">MEGA 모바일 앱을 설치하여 저장소 공간 %1$s를 받았습니다.</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">휴대 전화 번호를 인증하여 %1$s의 저장 공간을 받았습니다.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">당신은 무료 가입 보너스로 %1$s의 저장 공간을 받았습니다.</string>
     <!-- menu items -->
@@ -1582,8 +1566,6 @@
     <string name="context_empty_contacts">[A]연락처[/A] [B]없음[/B]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[B]대화[/B] [A]없음[/A]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[B]대화[/B] [A]불러오는 중&#8230;[/A]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[A]들어오는 공유 폴더[/A] [B]없음[/B]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1764,10 +1746,6 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s개의 읽지 않은 메시지</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="other">%1$d개의 읽지 않은 대화</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[B]메시지[/B] [A]불러오는 중&#8230;[/A]</string>
@@ -2409,8 +2387,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">장치 설정에서 MEGA 권한을 허용할 수 있습니다</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">MEGA가 당신의 주소록에 접근할 수 있도록 해주면, 당신은 더 쉽게 당신의 지인들을 찾을 수 있습니다. MEGA는 당신의 동의 없이 이 데이터를 다른 목적으로 사용하고 당신의 지인들과 상호작용하지 않을 것입니다.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="other">전달된 메시지</item>
@@ -2429,18 +2405,6 @@
     <plurals name="num_messages_not_send">
         <item quantity="other">%d개의 메시지가 %d개의 대화에 전송되지 않았습니다</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="other">MEGA에서 %d개의 연락처 찾음</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">지금 연락처를 초대할까요?</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">MEGA에서 지인들 찾기</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">MEGA가 MEGA 상의 당신의 지인들을 찾을 수 있도록 주소록에 대한 접근을 허용해주세요.</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">MEGA에서 연락처 불러오는 중&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">항목이 %d개의 대화에 전송되지 않았습니다</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2605,8 +2569,6 @@
     <string name="update_action_bucket">[A]수정인[/A] %s</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">나</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">전화번호를 추가하고 %1$s를 무료로 받으세요. 이것은 당신의 지인들이 MEGA에서 당신을 쉽게 찾도록 해줍니다.</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">MEGA에 전화번호를 추가하세요. 이것은 당신의 지인들이 당신을 MEGA에서 더 쉽게 찾도록 해줍니다.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3581,8 +3543,6 @@
     <string name="warning_copy_and_rename">복사하려는 파일이 다음과 같이 변경됩니다:</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">복사하고 이름 바꾸기</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">다음 %1$d개의 충돌에도 이 선택 적용</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">복사하려는 폴더와 대상 위치의 폴더를 합칩니다.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3747,8 +3707,6 @@
     <string name="settings_calls_preferences_sound_notifications">소리 알림</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">누군가 통화에 참여하거나 떠날 때 소리를 듣습니다.</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">나중에</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">파일이 클라우드 드라이브에 저장되었습니다.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
@@ -4648,7 +4606,7 @@
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;자동 백업</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Pro&#160;Lite는 최대 90일, Pro&#160;I, II, 그리고 III은 최대 365일 되돌리기 기능 (출시 예정)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
     <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;7일과 10년 사이의 휴지통 비우기 예약</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4741,20 +4699,18 @@
     <string name="meetings_custom_recurrence_sunday_option">토</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="other">매 %2$d주마다 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="other">매 %3$d주마다 %1$s 그리고 %2$s</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">이미 이 요금제에 대한 반복 구독이 있습니다</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">사진첩을 저장할 수 없습니다</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">클라우드 드라이브에 이 사진첩을 저장할 충분한 공간이 없습니다. 더 많은 저장소를 받으려면 지금 업그레이드 하세요.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">일</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4797,43 +4753,35 @@
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">다섯번째</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="other">매 %2$d개월마다 첫번째 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="other">매 %2$d개월마다 두번째 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="other">매 %2$d개월마다 세번째 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="other">매 %2$d개월마다 네번째 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="other">매 %2$d개월마다 다섯번째 %1$s</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">매 %1$s개월마다 %2$d번째 날</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="other">다운로드 %1$d개 시작</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="other">다운로드 %1$d개 완료</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">되풀이 종료</string>

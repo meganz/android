@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -278,14 +278,6 @@
     <string name="option_decryption_key">คีย์ถอดรหัสลับ</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">กำลังเตรียมการไฟล์</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="other">ดาวน์โหลด %1$d รายการได้เริ่มต้นแล้ว</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="other">ดาวน์โหลด %1$d รายการเสร็จสิ้นแล้ว</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="other">อัปโหลด %1$d รายการได้เริ่มต้นแล้ว</item>
@@ -1346,8 +1338,6 @@
     <string name="error_revoking_node">ผิดพลาด ยังไม่ได้นำไฟล์แนบออก</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">เงียบ</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">ข้อความ</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">จาก</string>
     <!-- title of incoming shared folder notification -->
@@ -1394,8 +1384,6 @@
     <string name="title_referral_bonuses">โบนัสคำเชิญ</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">ติดตั้งแอป MEGA บนมือถือ</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">เพิ่มหมายเลขโทรศัพท์</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">โบนัสการลงทะเบียน</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1422,14 +1410,10 @@
     <string name="paragraph_info_achievement_install_desktop">เมื่อคุณติดตั้งแอป MEGA บนเดสก์ท็อป คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุใช้งาน 365 วัน แอป MEGA บนเดสก์ท็อปสามารถใช้ได้ทั้ง Windows, macOS และ Linux distros เป็นส่วนใหญ่</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">เมื่อคุณติดตั้งแอป MEGA บนมือถือ คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุการใช้งาน 365 วัน เรามีให้บริการทั้งแอปมือถือ iOS และ Android</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">เมื่อคุณตรวจสอบหมายเลขโทรศัพท์ คุณจะได้รับพื้นที่เก็บข้อมูลฟรี %1$s มีอายุใช้งาน 365 วัน</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการติดตั้งแอป MEGA ของเราบนเดสก์ท็อป</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">คุณได้รับพื้นที่จัดเก็บ %1$s จากการติดตั้งแอป MEGA บนมือถือ</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">คุณได้รับพื้นที่เก็บข้อมูล %1$s จากการตรวจสอบหมายเลขโทรศัพท์ของคุณ</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">คุณได้รับพื้นที่เก็บข้อมูลขนาด %1$s เป็นโบนัสการลงทะเบียนฟรีของคุณ</string>
     <!-- menu items -->
@@ -1582,8 +1566,6 @@
     <string name="context_empty_contacts">[B]ไม่มี[/B][A]ผู้ติดต่อ[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]ไม่มี[/A][B]การสนทนา[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]กำลังโหลด[/A][B]การสนทนา&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]ไม่มี[/B][A]โฟลเดอร์ที่แชร์ขาเข้า[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1764,10 +1746,6 @@
     <!-- Subtitle to show the number of unread messages on a chat, unread messages -->
     <plurals name="number_unread_messages">
         <item quantity="other">%1$s ข้อความที่ยังไม่ได้อ่าน</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="other">%1$d ยังไม่ได้อ่านแชท</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]กำลังโหลด[/A][B]ข้อความ&#8230;[/B]</string>
@@ -2409,8 +2387,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">คุณยังสามารถให้สิทธิ์ MEGA ในการตั้งค่าอุปกรณ์ของคุณได้</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">หากคุณอนุญาตให้ MEGA เข้าถึงสมุดรายชื่อของคุณ คุณจะสามารถค้นหาผู้ติดต่อของคุณได้ง่ายขึ้น MEGA จะไม่ใช้ข้อมูลนี้เพื่อวัตถุประสงค์อื่นใด และจะไม่มีการโต้ตอบกับผู้ติดต่อของคุณโดยไม่ได้รับความยินยอมจากคุณ</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="other">ส่งข้อความแล้ว</item>
@@ -2429,18 +2405,6 @@
     <plurals name="num_messages_not_send">
         <item quantity="other">ไม่ได้ส่ง %d ข้อความถึงแชทของ %d</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="other">พบ %d ผู้ติดต่อใน MEGA</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">เชิญผู้ติดต่อตอนนี้หรือไม่</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">ค้นหาผู้ติดต่อของคุณใน MEGA</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">ให้สิทธิ์ MEGA ในการเข้าถึงสมุดรายชื่อเพื่อค้นหาผู้ติดต่อของคุณใน MEGA</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">กำลังโหลดผู้ติดต่อใน MEGA&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">เนื้อหาไม่ได้ถูกส่งไปยังแชท %d</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2605,8 +2569,6 @@
     <string name="update_action_bucket">[A]อัปเดตโดย [/A]%s</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">ฉัน</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">รับ %1$s ฟรีเมื่อคุณเพิ่มหมายเลขโทรศัพท์ สิ่งนี้ทำให้ผู้ติดต่อของคุณ สามารถหาคุณเจอได้ง่ายขึ้นใน MEGA</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">เพิ่มหมายเลขโทรศัพท์ของคุณเข้าไปยัง MEGA จะช่วยให้ผู้ติดต่อสามารถหาคุณเจอได้ง่ายขึ้นใน MEGA</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3581,8 +3543,6 @@
     <string name="warning_copy_and_rename">ไฟล์ที่คุณกำลังคัดลอกจะเปลี่ยนชื่อเป็น:</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">คัดลอกและเปลี่ยนชื่อ</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">ใช้ตัวเลือกนี้กับข้อขัดแย้ง %1$d ในครั้งต่อไป</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">รวมโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3747,8 +3707,6 @@
     <string name="settings_calls_preferences_sound_notifications">แจ้งเตือนด้วยเสียง</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">ให้ส่งเสียงเมื่อมีคนเข้าร่วมหรือวางสาย</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">ไม่ใช่ตอนนี้</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">บันทึกไฟล์ไปยังคลาวด์ไดรฟ์แล้ว</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
