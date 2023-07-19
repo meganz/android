@@ -583,6 +583,13 @@ class ManagerViewModel @Inject constructor(
     }
 
     /**
+     * Mark handle show2f a dialog
+     */
+    fun markHandleShow2FADialog() {
+        _state.update { state -> state.copy(show2FADialog = false) }
+    }
+
+    /**
      * Active subscription in local cache
      */
     val activeSubscription: MegaPurchase? get() = getActiveSubscriptionUseCase()
