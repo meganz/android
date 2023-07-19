@@ -31,7 +31,7 @@
     <!-- Label to show that an error related with an Incomplete SDK operation. -->
     <string name="api_eincomplete">Unvollständig</string>
     <!-- Label to show that an error related with the decryption process of a node occurs during a SDK operation. -->
-    <string name="api_ekey">Krypto-Fehler</string>
+    <string name="api_ekey">Fehler bei der Entschlüsselung</string>
     <!-- Label to show that an error related with a bad session ID occurs during a SDK operation. -->
     <string name="api_esid">Ungültige Session-ID</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->

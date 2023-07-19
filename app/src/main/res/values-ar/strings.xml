@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">برو لايت Pro&#160;Lite</string>
@@ -293,24 +293,6 @@
     <string name="option_decryption_key">مفتاح فك التشفير</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">جاري تحضير الملفات</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="zero">%1$d لم يتم البدء بأي عملية تنزيل</item>
-        <item quantity="one">عملية تنزيل واحدة تم البدء بها</item>
-        <item quantity="two">%1$d عمليتا تنزيل تم البدء بهما</item>
-        <item quantity="few">%1$d عمليات تنزيل تم البدء بها</item>
-        <item quantity="many">%1$d عملية تنزيل تم البدء بها</item>
-        <item quantity="other">%1$d عملية تنزيل تم البدء بها</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="zero">تم الانتهاء من %1$d عملية تنزيل</item>
-        <item quantity="one">انتهى التنزيل</item>
-        <item quantity="two">تم الانتهاء من %1$d عمليتي تنزيل</item>
-        <item quantity="few">تم الانتهاء من %1$d عمليات تنزيل</item>
-        <item quantity="many">تم الانتهاء من %1$d عملية تنزيل</item>
-        <item quantity="other">تم الانتهاء من %1$d عملية تنزيل</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="zero">تم بدء %1$d عملية ترفيع</item>
@@ -1511,8 +1493,6 @@
     <string name="error_revoking_node">خطأ. المرفقات لم تتم إزالتها</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">صامت</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">الرسائل</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">من</string>
     <!-- title of incoming shared folder notification -->
@@ -1559,8 +1539,6 @@
     <string name="title_referral_bonuses">مكافآت الدعوة</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">تثبيت تطبيق ميغا MEGA mobile</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">إضافة رقم هاتف</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">مكافآت التسجيل</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1587,14 +1565,10 @@
     <string name="paragraph_info_achievement_install_desktop">عند تثبيت تطبيق ميغا MEGA للحاسب المكتبي، ستحصل على %1$s من مساحة التخزين المجانية الصالحة لمدة 365 يومًا. يتوفر تطبيق ميغا MEGA للحاسب المكتبي لنظام التشغيل ويندوز Windows و ماك macOS ومعظم إصدارات لينوكس Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">عند تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile ، تحصل على %1$s من مساحة التخزين المجانية صالحة لمدة 365 يومًا. نحن نقدم تطبيقات الأجهزة المحمولة لنظامي التشغيل أي أو اس iOS و اندرويد Android.</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">عند التحقق من رقم هاتفك تحصل على %1$s مساحة تخزين مجانية صالحة لمدة 365 يومًا.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">لقد تلقيت %1$s مساحة تخزين لتثبيت تطبيق ميغا MEGA للحاسب المكتبي.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">لقد تلقيت %1$s من مساحة تخزين لتثبيتك تطبيق ميغا للهاتف المحمول MEGA mobile.</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">لقد تلقيت %1$s مساحة تخزين لقيامك بالتحقق من رقم هاتفك.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">لقد تلقيت %1$s من مساحة تخزين كمكافأة تسجيل مجانية.</string>
     <!-- menu items -->
@@ -1762,8 +1736,6 @@
     <string name="context_empty_contacts">[B]لا يوجد [/B][A]جهات اتصال[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]لاتوجد[/A] [B]محادثات[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]جاري تحميل[/A] [B]المحادثات&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]لا يوجد [/B][A]مجلدات مشاركة واردة[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1985,15 +1957,6 @@
         <item quantity="many">%1$s رسالة غير مقروءة</item>
         <item quantity="other">%1$s رسالة غير مقروءة</item>
     </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="zero">%1$d محادثة غير مقروءة</item>
-        <item quantity="one">%1$d محادثة غير مقروءة</item>
-        <item quantity="two">%1$d محادثتان غير مقروءتان</item>
-        <item quantity="few">%1$d محادثات غير مقروءة</item>
-        <item quantity="many">%1$d محادثة غير مقروءة</item>
-        <item quantity="other">%1$d محادثة غير مقروءة</item>
-    </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]جاري تحميل[/A] [B]الرسائل&#8230; [/B]</string>
     <!-- Title of the category Security options on Settings section -->
@@ -2084,7 +2047,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">في المرة القادمة التي تسجل فيها الدخول الى حسابك سيطلب منك إدخال رمز من 6 أرقام ستزود به من تطبيق المصادقة الخاص بك.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">يرجى حفظ <b>مفتاح الاستعادة</b> الخاص بك في مكان آمن لتجنب المشاكل في حالة فقد الوصول إلى التطبيق الخاص بك أو إذا كنت ترغب في تعطيل المصادقة المزدوجة.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">الرمز غير صالح</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2709,8 +2672,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">لا يزال بإمكانك منح أذونات ميغا MEGA في إعدادات جهازك</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">إذا سمحت لميغا MEGA بالوصول إلى دفتر العناوين الخاص بك، فستتمكن من اكتشاف جهات الاتصال الخاصة بك بسهولة أكبر. لن تستخدم ميغا MEGA هذه البيانات لأي غرض آخر ولن تتفاعل أبداً مع جهات الاتصال الخاصة بك دون موافقتك.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="zero">تم إعادة توجيه الرسالة</item>
@@ -2749,23 +2710,6 @@
         <item quantity="many">لم يتم إرسال %d رسالة إلى%d محادثة</item>
         <item quantity="other">لم يتم إرسال %d رسالة إلى %d محادثة</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="zero">تم العثور على %d جهة اتصال على ميغا MEGA</item>
-        <item quantity="one">تم العثور على %d جهة اتصال على ميغا MEGA</item>
-        <item quantity="two">تم العثور على %d جهتي اتصال على ميغا MEGA</item>
-        <item quantity="few">تم العثور على %d جهات اتصال على ميغا MEGA</item>
-        <item quantity="many">تم العثور على %d جهة اتصال على ميغا MEGA</item>
-        <item quantity="other">تم العثور على %d جهة اتصال على ميغا MEGA</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">دعوة جهة الاتصال الآن؟</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">اكتشف جهات الاتصال الخاصة بك على ميغا MEGA</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">امنح ميغا MEGA حق الوصول إلى دفتر العناوين الخاص بك لاكتشاف جهات الاتصال الخاصة بك على ميغا MEGA.</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">جارٍ تحميل جهات الاتصال على ميغا MEGA&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">لم يتم ارسال المحتوى إلى %d محادثات</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2965,8 +2909,6 @@
     <string name="update_action_bucket">[A]تم التحديث بواسطة [/A]%s</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">أنا</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">احصل على %1$s مجاناً عند إضافة رقم هاتفك. هذا يسهل على جهات الاتصال الخاصة بك العثور عليك على ميغا MEGA.</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">أضف رقم هاتفك إلى ميغا MEGA. هذا يسهل على جهات الاتصال الخاصة بك العثور عليك على ميغا MEGA.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -4076,8 +4018,6 @@
     <string name="warning_copy_and_rename">الملف الذي نسخته سيتم إعادة تسميته إلى:</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">انسخ وغير الاسم</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">قم بتطبيق هذا الخيار على %1$d تعارضات التالية</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">ادمج المجلد الموجود في الوجهة مع المجلد الذي تنسخه.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4262,8 +4202,6 @@
     <string name="settings_calls_preferences_sound_notifications">إشعارات صوتية</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">تسمع صوتًا عندما ينضم شخص ما إلى مكالمة أو يغادرها.</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">ليس الآن</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">تم حفظ الملف في السواقة السحابية.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
@@ -4471,7 +4409,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">استئناف الفيديو؟</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">سيتم استئناف “%1$s” من عند %2$s.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">استئناف</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -5653,8 +5591,12 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">شهرياً</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="zero">بعض الأشهر ليس لديها %1$d يوم. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
+        <item quantity="one">بعض الأشهر ليس لديها %1$d يوم. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
+        <item quantity="two">بعض الأشهر ليس لديها %1$d يومين. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
+        <item quantity="few">بعض الأشهر ليس لديها %1$d أيام. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
+        <item quantity="many">بعض الأشهر ليس لديها %1$d يوماً. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
+        <item quantity="other">بعض الأشهر ليس لديها %1$d يوم. بالنسبة لهذه الأشهر سيتم تحديد موعد التكرار في اليوم الأخير من الشهر.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">لا يمكن فتح المجلد</string>
@@ -5699,11 +5641,11 @@
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
     <string name="account_upgrade_account_pro_plan_info_storage">[B]مساحة التخزين:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]تراسل معطيات:[/B][A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/شهر[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/سنة[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">موصي به</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
@@ -5711,25 +5653,25 @@
     <!-- Title of description of features, which are available for users, if they buy plan. -->
     <string name="account_upgrade_account_description_title_features">ميزات باقات برو Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;روابط محمية بكلمة-مرور</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;روابط مع تواريخ انتهاء الصلاحية</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;تشارك تراسل المعطيات</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;نسخ احتياطية تلقائية</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226; &#160; ترجيع لمدة تصل إلى 90 يومًا على برو لايت Pro&#160;Lite وما يصل إلى 365 يومًا برو Pro&#160;I و II و III (قريبًا)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;جدولة سلة المحذوفات بين 7 أيام و 10 سنوات</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">اشتري برو لايت Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">اشتر برو Pro I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">اشتر برو Pro II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">اشتر برو Pro III</string>
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">شروط الخدمة</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
@@ -5738,8 +5680,12 @@
     <string name="cloud_drive_subtitle_link_access_password">يمكن فقط للأشخاص الذين لديهم كلمة المرور فتح الرابط</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Apply to the duplicate</item>
-        <item quantity="other">Apply to all %1$d duplicates</item>
+        <item quantity="zero">طبق على كل الـ %1$d مكرر</item>
+        <item quantity="one">طبق على المكرر</item>
+        <item quantity="two">طبق على الـ %1$d مكررين</item>
+        <item quantity="few">طبق على كل الـ %1$d  المكررين</item>
+        <item quantity="many">طبق على كل الـ %1$d المكررين</item>
+        <item quantity="other">طبق على كل الـ %1$d المكررين</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">معلومات</string>
@@ -5760,15 +5706,15 @@
     <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
     <string name="meetings_mute_notifications_dialog_title">كتم صوت إشعارات الاجتماع لمدة</string>
     <!-- Confirmation dialog title to leave a meeting -->
-    <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
+    <string name="meetings_leave_meeting_confirmation_dialog_title">غادر الاجتماع؟</string>
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">إعادة تسمية الألبوم</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">يوجد بالفعل ألبوم باسم ”%1$s“ في ألبوماتك. أدخل اسمًا جديدًا للألبوم الذي تقوم بحفظه.</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">أدخل اسم الألبوم</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">يمكنك ترقية اشتراكك الحالي على [A]صفحة التسعير[/A] الخاصة بنا.</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="zero">يمكن لأي شخص لديه هذا الرابط عرض بياناتك وتنزيلها</item>
@@ -5781,21 +5727,25 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">حفظ في السواقة السحابية</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">جاري الحفظ...</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">تم حفظ ”%1$s“ في السواقة السحابية.</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">لا يمكن حفظ ”%1$s“ في السواقة السحابية. حاول مرة أخرى لاحقًا وإذا استمرت المشكلة اتصل بالشخص الذي شارك الرابط معك.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">أيام الأسبوع</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">يتكرر كل</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">كل أيام الأسبوع</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="zero">كل %1$d يوم</item>
+        <item quantity="one">يومياً</item>
+        <item quantity="two">كل %1$d يومين</item>
+        <item quantity="few">كل %1$d  أيام</item>
+        <item quantity="many">كل %1$d يوماً</item>
+        <item quantity="other">كل %1$d يوم</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
@@ -5824,20 +5774,28 @@
     <string name="meetings_custom_recurrence_sunday_option">أ</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="zero">%1$s، كل %2$d أسبوع</item>
+        <item quantity="one">%1$s، كل أسبوع</item>
+        <item quantity="two">%1$s، كل %2$d أسبوعين</item>
+        <item quantity="few">%1$s، كل %2$d أسابيع</item>
+        <item quantity="many">%1$s، كل %2$d أسبوعاً</item>
+        <item quantity="other">%1$s، كل%2$d أسبوع</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="zero">%1$s و %2$s، كل %3$d أسبوع</item>
+        <item quantity="one">%1$s و %2$s، أسبوعياً</item>
+        <item quantity="two">%1$s و %2$s، كل %3$d أسبوعين</item>
+        <item quantity="few">%1$s و %2$sكل %3$d أسابيع</item>
+        <item quantity="many">%1$s و %2$s، كل %3$d أسبوعاً</item>
+        <item quantity="other">%1$s و %2$s، كل %3$d أسبوع</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">لديك بالفعل اشتراك متكرر لهذه الباقة</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">لا يمكن حفظ الألبوم</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">ليس لديك مساحة تخزين كافية لحفظ هذا الألبوم على سواقتك السحابية. قم بالترقية الآن للحصول على المزيد من مساحة التخزين.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">يوم</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -5880,43 +5838,75 @@
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">الخامس</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="zero">أول %1$s من كل %2$d شهر</item>
+        <item quantity="one">أول %1$s من كل شهر</item>
+        <item quantity="two">أول %1$s من كل %2$d شهرين</item>
+        <item quantity="few">أول %1$s من كل %2$d أشهر</item>
+        <item quantity="many">أول %1$s من كل %2$d شهراً</item>
+        <item quantity="other">أول %1$s من كل %2$d شهر</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="zero">ثاني %1$s من كل %2$d شهر</item>
+        <item quantity="one">ثاني %1$s من كل شهر</item>
+        <item quantity="two">ثاني %1$s من كل %2$d شهرين</item>
+        <item quantity="few">ثاني %1$s من كل %2$d أشهر</item>
+        <item quantity="many">ثاني %1$s من كل %2$d شهراً</item>
+        <item quantity="other">ثاني %1$s من كل %2$d شهر</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="zero">ثالث %1$s من كل %2$d شهر</item>
+        <item quantity="one">ثالث %1$s من كل شهر</item>
+        <item quantity="two">ثالث %1$s من كل %2$d شهرين</item>
+        <item quantity="few">ثالث %1$s من كل %2$d أشهر</item>
+        <item quantity="many">ثالث %1$s من كل %2$d شهراً</item>
+        <item quantity="other">ثالث %1$s من كل %2$d شهر</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="zero">رابع %1$s من كل %2$d شهر</item>
+        <item quantity="one">رابع %1$s من كل شهر</item>
+        <item quantity="two">رابع %1$s من كل %2$d شهرين</item>
+        <item quantity="few">رابع %1$s من كل %2$d أشهر</item>
+        <item quantity="many">رابع %1$s من كل %2$d شهراً</item>
+        <item quantity="other">رابع %1$s من كل %2$d شهر</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="zero">خامس %1$s من كل %2$d شهر</item>
+        <item quantity="one">خامس %1$s من كل شهر</item>
+        <item quantity="two">خامس %1$s من كل %2$d شهرين</item>
+        <item quantity="few">خامس %1$s من كل %2$d أشهر</item>
+        <item quantity="many">خامس %1$s من كل %2$d شهراً</item>
+        <item quantity="other">خامس %1$s من كل %2$d شهر</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="zero">كل %1$s شهر في اليوم %2$d</item>
+        <item quantity="one">كل شهر في اليوم %2$d</item>
+        <item quantity="two">كل %1$s شهرين في اليوم %2$d</item>
+        <item quantity="few">كل %1$s أشهر في اليوم %2$d</item>
+        <item quantity="many">كل %1$s شهراً في اليوم %2$d</item>
+        <item quantity="other">كل %1$s شهر في اليوم %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="zero">%1$d عملية تنزيل تم البدء بها</item>
+        <item quantity="one">بدء عملية التنزيل</item>
+        <item quantity="two">%1$d عمليتا تنزيل تم البدء بهما</item>
+        <item quantity="few">%1$d عمليات تنزيل تم البدء بهم</item>
+        <item quantity="many">%1$d عملية تنزيل تم البدء بها</item>
+        <item quantity="other">%1$d عملية تنزيل تم البدء بها</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="zero">%1$d عملية تنزيل مكتملة</item>
+        <item quantity="one">تم اكمال عملية تنزيل</item>
+        <item quantity="two">%1$d عمليتا تنزيل مكتملة</item>
+        <item quantity="few">%1$d عمليات تنزيل مكتملة</item>
+        <item quantity="many">%1$d عملية تنزيل مكتملة</item>
+        <item quantity="other">%1$d عملية تنزيل مكتملة</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">إنهاء التكرار</string>

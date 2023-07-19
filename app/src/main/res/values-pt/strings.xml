@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -284,18 +284,6 @@
     <string name="option_decryption_key">Chave de decodificação</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Preparando arquivos</string>
-    <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_began">
-        <item quantity="one">Download iniciado</item>
-        <item quantity="many">%1$d downloads foram iniciados</item>
-        <item quantity="other">%1$d downloads foram iniciados</item>
-    </plurals>
-    <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
-    <plurals name="download_finish">
-        <item quantity="one">O download foi concluído</item>
-        <item quantity="many">%1$d downloads foram concluídos</item>
-        <item quantity="other">%1$d downloads foram concluídos</item>
-    </plurals>
     <!-- Message when many uploads start. Plural more than 1 file. Placeholder is for include the number of uploads in runtime. -->
     <plurals name="upload_began">
         <item quantity="one">Upload iniciado</item>
@@ -1412,8 +1400,6 @@
     <string name="error_revoking_node">Erro. O anexo não foi removido.</string>
     <!-- Message sound option when no sound has been selected for chat notifications -->
     <string name="settings_chat_silent_sound_not">Silenciar</string>
-    <!-- messages string in chat notification -->
-    <string name="messages_chat_notification">mensagens</string>
     <!-- part of the string in incoming shared folder notification -->
     <string name="incoming_folder_notification">de</string>
     <!-- title of incoming shared folder notification -->
@@ -1460,8 +1446,6 @@
     <string name="title_referral_bonuses">Bônus de indicação</string>
     <!-- Title of the section for install a mobile app in achivements section (maximum 31 chars) -->
     <string name="title_install_app">Instalar o nosso aplicativo para celular</string>
-    <!-- Title of the section for add phone number in achivements section (maximum 30 chars) -->
-    <string name="title_add_phone">Adicionar número de telefone</string>
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bônus de registro</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
@@ -1488,14 +1472,10 @@
     <string name="paragraph_info_achievement_install_desktop">Ao instalar o aplicativo para desktop do MEGA, você recebe grátis %1$s de espaço de armazenamento, válidos por 365 dias. O aplicativo para desktop do MEGA está disponível para Windows, macOS e a maioria das distribuições Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">Ao instalar o aplicativo do MEGA para dispositivos móveis, você recebe grátis %1$s de espaço de armazenamento válido por 365 dias. Oferecemos aplicativos para dispositivos móveis com iOS e Android.</string>
-    <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="paragraph_info_achievement_add_phone">Ao verificar o seu número de telefone, você vai obter %1$s de espaço de armazenamento gratuito, válidos por 365 dias.</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para desktop.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Você recebeu %1$s de espaço de armazenamento por instalar o aplicativo do MEGA para dispositivos móveis.</string>
-    <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
-    <string name="result_paragraph_info_achievement_add_phone">Você recebeu %1$s de espaço de armazenamento por confirmar o seu número de telefone.</string>
     <!-- info paragraph about the completed achievement registration -->
     <string name="result_paragraph_info_achievement_registration">Você recebeu %1$s de espaço de armazenamento como bônus gratuito pelo seu registro.</string>
     <!-- menu items -->
@@ -1654,8 +1634,6 @@
     <string name="context_empty_contacts">[B]Não há [/B][A]contatos[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]Não há[/A] [B]chats[/B]</string>
-    <!-- Message shown when the chat is section is loading the conversations -->
-    <string name="recent_chat_loading_conversations">[A]Carregando[/A] [B]chats&#8230;[/B]</string>
     <!-- Text of the empty screen when there are not elements in Incoming -->
     <string name="context_empty_incoming">[B]Não há [/B][A]pastas compartilhadas comigo[/A]</string>
     <!-- Text of the empty screen when there are not elements in Outgoing -->
@@ -1852,12 +1830,6 @@
         <item quantity="one">%1$s mensagem não lida</item>
         <item quantity="many">%1$s mensagens não lidas</item>
         <item quantity="other">%1$s mensagens não lidas</item>
-    </plurals>
-    <!-- Notification title to show the number of unread chats, unread messages -->
-    <plurals name="plural_number_messages_chat_notification">
-        <item quantity="one">%1$d chat não lido</item>
-        <item quantity="many">%1$d chats não lidos</item>
-        <item quantity="other">%1$d chats não lidos</item>
     </plurals>
     <!-- Message shown when a chat is opened and the messages are being recovered -->
     <string name="chat_loading_messages">[A]Carregando[/A] [B]mensagens&#8230;[/B]</string>
@@ -2529,8 +2501,6 @@
     <string name="second_row_info_item_shared_file_chat">%1$s . %2$s</string>
     <!-- After the user ticketed ’Don’t ask again’ on permission request dialog and denied, tell the user, he/she can still grant MEGA the permission in system settings. -->
     <string name="on_permanently_denied">Você ainda pode conceder as permissões ao MEGA nas configurações do seu dispositivo</string>
-    <!-- Explain why MEGA needs the reading contacts permission when users deny to grant MEGA the permission. -->
-    <string name="explanation_for_contacts_permission">Se você permitir que o MEGA acesse o seu catálogo de endereços, poderá descobrir os seus contatos mais facilmente. O MEGA não utilizará esses dados para nenhum outro propósito e nunca irá interagir com os seus contatos sem o seu consentimento.</string>
     <!-- Confirmation message after forwarding one or several messages, version items -->
     <plurals name="messages_forwarded_success_plural">
         <item quantity="one">Mensagem encaminhada</item>
@@ -2557,20 +2527,6 @@
         <item quantity="many">%d mensagens não foram enviadas para %d chats</item>
         <item quantity="other">%d mensagens não foram enviadas para %d chats</item>
     </plurals>
-    <!-- How many local contacts have been on MEGA, Plural of local contact. 2 contacts -->
-    <plurals name="quantity_of_local_contact">
-        <item quantity="one">%d contato já está no MEGA</item>
-        <item quantity="many">%d contatos já estão no MEGA</item>
-        <item quantity="other">%d contatos já estão no MEGA</item>
-    </plurals>
-    <!-- Label displayed on the top of the chat list if none of user’s phone contacts have a MEGA account. In other case here would appear all the user’s phone contacts that have a MEGA account. -->
-    <string name="no_local_contacts_on_mega">Adicionar um contato?</string>
-    <!-- To see whom in your local contacts has been on MEGA -->
-    <string name="see_local_contacts_on_mega">Encontre os seus contatos no MEGA</string>
-    <!-- In APP, text used to ask for access to contacts -->
-    <string name="grant_mega_access_contacts">Permita que o MEGA acesse o seu catálogo de endereços para descobrir quais dos seus contatos já estão no MEGA.</string>
-    <!-- Getting registered contacts -->
-    <string name="get_registered_contacts">Carregando contatos no MEGA&#8230;</string>
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">O conteúdo não foi enviado para %d chats</string>
     <!-- Label shown when a new group chat has been created correctly -->
@@ -2749,8 +2705,6 @@
     <string name="update_action_bucket">[A]atualizado por [/A]%s</string>
     <!-- Used in recents list screen to indicate an action done by me -->
     <string name="bucket_word_me">Eu</string>
-    <!-- Text to explain the benefits of adding phone number to achievement enabled users. Placeholder 1: bonus storage space e.g. 20GB -->
-    <string name="sms_add_phone_number_dialog_msg_achievement_user">Obtenha %1$s grátis ao adicionar o seu número de telefone, e assim os seus contatos poderão encontrar você no MEGA com mais facilidade.</string>
     <!-- Text to explain the benefits of adding phone number to non achievement users -->
     <string name="sms_add_phone_number_dialog_msg_non_achievement_user">Adicione o seu número de telefone ao MEGA, e assim os seus contatos o encontrarão com mais facilidade.</string>
     <!-- Error message when trying to record a voice message while on a call in progress -->
@@ -3779,8 +3733,6 @@
     <string name="warning_copy_and_rename">O arquivo que você está copiando será renomeado como:</string>
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Copiar com um nome diferente</string>
-    <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Usar esta opção nos próximos %1$d conflitos</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Combinar a pasta já existente no destino com a pasta que você está copiando.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3953,8 +3905,6 @@
     <string name="settings_calls_preferences_sound_notifications">Notificações sonoras</string>
     <!-- Text for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications_text">Ouvir um som quando alguém entra ou sai de uma chamada.</string>
-    <!-- Not now button for request contact access message box -->
-    <string name="chat_recent_chat_not_now_btn">Agora não</string>
     <!-- Text indicating a text file was saved to Cloud drive -->
     <string name="text_editor_creation_success">Arquivo salvo na Nuvem de arquivos.</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
