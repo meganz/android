@@ -300,7 +300,6 @@ class MeetingActivityViewModel @Inject constructor(
      * we are setting isLoggingRunning true hence it will not be navigated to login page
      */
     fun logout() = viewModelScope.launch {
-        MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
         }.onSuccess {
@@ -311,7 +310,6 @@ class MeetingActivityViewModel @Inject constructor(
                 _state.update { it.copy(shouldLaunchLeftMeetingActivity = logoutFinished) }
             }
         }.onFailure {
-            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

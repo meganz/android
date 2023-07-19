@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity.Companion.KEY_IS_LOGOUT
@@ -237,11 +236,9 @@ class TestPasswordViewModel @Inject constructor(
      * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
      */
     fun logout() = viewModelScope.launch {
-        MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
         }.onFailure {
-            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

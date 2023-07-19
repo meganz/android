@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.verifytwofactor
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import timber.log.Timber
@@ -25,11 +24,9 @@ class VerifyTwoFactorViewModel @Inject constructor(
      * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
      */
     fun logout() = viewModelScope.launch {
-        MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
         }.onFailure {
-            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

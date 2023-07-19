@@ -34,7 +34,6 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
@@ -47,6 +46,7 @@ import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
@@ -1211,11 +1211,9 @@ class MyAccountViewModel @Inject constructor(
      * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
      */
     private fun logout() = viewModelScope.launch {
-        MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
         }.onFailure {
-            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

@@ -17,6 +17,7 @@ import mega.privacy.android.app.databinding.ActivityWeakAccountProtectionAlertBi
 import mega.privacy.android.app.listeners.ResendVerificationEmailListener
 import mega.privacy.android.app.listeners.WhyAmIBlockedListener
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.utils.Constants
 import timber.log.Timber
 
@@ -26,7 +27,7 @@ import timber.log.Timber
 @AndroidEntryPoint
 class WeakAccountProtectionAlertActivity : PasscodeActivity(), View.OnClickListener {
 
-    private val viewModel by viewModels<WeakAccountProtectionViewModel>()
+    private val viewModel by viewModels<LogoutViewModel>()
 
     private lateinit var activityWeakAccountProtectionAlertBinding: ActivityWeakAccountProtectionAlertBinding
 

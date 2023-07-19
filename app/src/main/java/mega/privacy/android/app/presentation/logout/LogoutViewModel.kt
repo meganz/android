@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.logout.model.LogoutState
-import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
@@ -20,7 +19,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LogoutViewModel @Inject constructor(
-    private val setLogoutFlag: SetLogoutFlagWrapper,
     private val logoutUseCase: LogoutUseCase,
     private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
@@ -53,11 +51,9 @@ class LogoutViewModel @Inject constructor(
      * Logout
      */
     fun logout() = viewModelScope.launch {
-        setLogoutFlag(true)
         runCatching {
             logoutUseCase()
         }.onFailure {
-            setLogoutFlag(false)
             Timber.d("Error on logout $it")
         }
     }

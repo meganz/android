@@ -68,13 +68,11 @@ class OpenLinkViewModel @Inject constructor(
      * logic is handled at [MegaChatRequestHandler] onRequestFinished callback
      */
     fun logout() = viewModelScope.launch {
-        MegaApplication.isLoggingOut = true
         runCatching {
             logoutUseCase()
         }.onSuccess {
             logoutConfirmed()
         }.onFailure {
-            MegaApplication.isLoggingOut = false
             Timber.d("Error on logout $it")
         }
     }

@@ -56,7 +56,6 @@ internal class LogoutViewModelTest {
 
     private fun initialiseUnderTest() {
         underTest = LogoutViewModel(
-            setLogoutFlag = mock(),
             logoutUseCase = logoutUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
             ongoingTransfersExistUseCase = ongoingTransfersExistUseCase,

@@ -17,8 +17,14 @@ class LogoutUseCase @Inject constructor(
      * Invoke
      */
     suspend operator fun invoke() {
-        removeBackupFolderUseCase(CameraUploadFolderType.Primary)
-        removeBackupFolderUseCase(CameraUploadFolderType.Secondary)
-        loginRepository.logout()
+        loginRepository.setLogoutInProgressFlag(true)
+        runCatching {
+            removeBackupFolderUseCase(CameraUploadFolderType.Primary)
+            removeBackupFolderUseCase(CameraUploadFolderType.Secondary)
+            loginRepository.logout()
+        }.onFailure {
+            loginRepository.setLogoutInProgressFlag(false)
+            throw it
+        }
     }
 }
