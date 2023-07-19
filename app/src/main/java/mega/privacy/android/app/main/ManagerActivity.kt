@@ -2078,6 +2078,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             //Show 2FA dialog to the user on Second Launch after sign up
             if (managerState.show2FADialog) {
                 showEnable2FADialog()
+                viewModel.markHandleShow2FADialog()
             }
 
             if (managerState.titleChatArchivedEvent != null) {
