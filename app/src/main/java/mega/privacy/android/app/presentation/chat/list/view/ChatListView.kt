@@ -83,7 +83,7 @@ private fun ListView(
                 if (!hasBeenTouched && motionEvent.action == MotionEvent.ACTION_DOWN) {
                     hasBeenTouched = true
                 }
-                true
+                false
             },
     ) {
         itemsIndexed(
