@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,10 +26,14 @@ internal class UnlockPasscodeUseCaseTest {
     private lateinit var underTest: UnlockPasscodeUseCase
 
     private val passcodeRepository = mock<PasscodeRepository>()
+    private val logoutUseCase = mock<LogoutUseCase>()
 
     @BeforeEach
     internal fun setUp() {
-        underTest = UnlockPasscodeUseCase(passcodeRepository = passcodeRepository)
+        underTest = UnlockPasscodeUseCase(
+            passcodeRepository = passcodeRepository,
+            logoutUseCase = logoutUseCase,
+        )
     }
 
     @Test
@@ -117,6 +122,26 @@ internal class UnlockPasscodeUseCaseTest {
             verifyBlocking(passcodeRepository) {
                 passcodeRepository.setLocked(false)
             }
+        }
+
+    @ParameterizedTest
+    @MethodSource("getArgs")
+    internal fun `test that a tenth failed check calls the logout use case`(request: UnlockPasscodeRequest) =
+        runTest {
+            Mockito.clearInvocations(passcodeRepository, logoutUseCase)
+            val initialCount = 9
+            passcodeRepository.stub {
+                on { monitorFailedAttempts() }.thenReturn(flow {
+                    emit(initialCount)
+                    awaitCancellation()
+                })
+                onBlocking { checkPasscode(any()) }.thenReturn(false)
+                onBlocking { checkPassword(any()) }.thenReturn(false)
+            }
+
+            underTest.invoke(request)
+
+            verifyBlocking(logoutUseCase) { invoke() }
         }
 
     private fun getArgs(): Stream<UnlockPasscodeRequest> = Stream.of(

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.passcode
 import kotlinx.coroutines.flow.firstOrNull
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.repository.security.PasscodeRepository
+import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import javax.inject.Inject
 
 /**
@@ -10,6 +11,7 @@ import javax.inject.Inject
  */
 class UnlockPasscodeUseCase @Inject constructor(
     private val passcodeRepository: PasscodeRepository,
+    private val logoutUseCase: LogoutUseCase,
 ) {
     /**
      * Invoke
@@ -27,7 +29,11 @@ class UnlockPasscodeUseCase @Inject constructor(
             passcodeRepository.setLocked(false)
         } else {
             val failedAttempts = passcodeRepository.monitorFailedAttempts().firstOrNull() ?: 0
-            passcodeRepository.setFailedAttempts(failedAttempts + 1)
+            if (failedAttempts >= 9) {
+                logoutUseCase()
+            } else {
+                passcodeRepository.setFailedAttempts(failedAttempts + 1)
+            }
         }
     }
 }
