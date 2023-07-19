@@ -37,9 +37,7 @@ data class CameraUploadsFolderState(
         get() =
             when (bytesToUploadCount) {
                 0L -> 0
-                else -> ((bytesUploadedCount / bytesToUploadCount) / 100)
-                    .toDouble()
-                    .roundToInt()
+                else -> ((bytesUploadedCount.toDouble() / bytesToUploadCount) * 100).roundToInt()
             }
 
     /**

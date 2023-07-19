@@ -66,9 +66,7 @@ class CameraUploadsFolderStateTest {
         val bytesFinishedUploadedCount = 100L
 
         val expected =
-            ((bytesToUploadCount) / (bytesFinishedUploadedCount + fileA.second + fileB.second)) / 100
-                .toDouble()
-                .roundToInt()
+            (((bytesFinishedUploadedCount + fileA.second + fileB.second).toDouble() / (bytesToUploadCount)) * 100).roundToInt()
 
         with(underTest) {
             this.bytesToUploadCount = bytesToUploadCount
@@ -79,6 +77,4 @@ class CameraUploadsFolderStateTest {
 
         assertThat(underTest.progress).isEqualTo(expected)
     }
-
-
 }
