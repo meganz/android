@@ -27,7 +27,8 @@ import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
-import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapper
+import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapperImpl
+import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -56,6 +57,10 @@ abstract class UtilWrapperModule {
 
     @Binds
     abstract fun bindGetNodeLocation(implementation: DefaultGetNodeLocationInfo): GetNodeLocationInfo
+
+    @Binds
+    abstract fun bindSetLogoutFlagWrapper(implementation: SetLogoutFlagWrapperImpl): SetLogoutFlagWrapper
+
 
     companion object {
 
@@ -125,9 +130,6 @@ abstract class UtilWrapperModule {
          */
         @Provides
         fun providesFileUtilWrapper() = object : FileUtilWrapper {}
-
-        @Provides
-        fun provideSetLogoutFlagWrapper() = object : SetLogoutFlagWrapper {}
 
         /**
          * Provides the [StringWrapper]

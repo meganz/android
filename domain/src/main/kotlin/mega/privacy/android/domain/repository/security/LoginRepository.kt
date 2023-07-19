@@ -149,4 +149,11 @@ interface LoginRepository {
      *
      */
     suspend fun shouldShowPasswordReminderDialog(atLogin: Boolean): Boolean
+
+    /**
+     * Set logout in progress flag
+     *
+     * @param inProgress
+     */
+    fun setLogoutInProgressFlag(inProgress: Boolean)
 }

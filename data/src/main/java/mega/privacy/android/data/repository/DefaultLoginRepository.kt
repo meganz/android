@@ -15,6 +15,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.toException
+import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -65,6 +66,7 @@ internal class DefaultLoginRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
+    private val setLogoutFlagWrapper: SetLogoutFlagWrapper,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -385,6 +387,8 @@ internal class DefaultLoginRepository @Inject constructor(
                 }
             }
         }
+
+    override fun setLogoutInProgressFlag(inProgress: Boolean) = setLogoutFlagWrapper(inProgress)
 
     companion object {
         internal const val FETCH_NODES_ERROR_TIMER = 10000L

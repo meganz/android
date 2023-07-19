@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.logout.model.LogoutState
-import mega.privacy.android.app.utils.wrapper.SetLogoutFlagWrapper
+import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase

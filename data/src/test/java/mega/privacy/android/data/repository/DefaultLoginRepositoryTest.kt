@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -37,9 +38,10 @@ import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
@@ -56,6 +58,9 @@ class DefaultLoginRepositoryTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val fetchNodesUpdateMapper = mock<FetchNodesUpdateMapper>()
+    private val setLogoutFlagWrapper = mock<SetLogoutFlagWrapper>()
+
+
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
 
@@ -64,7 +69,7 @@ class DefaultLoginRepositoryTest {
     private val pin2F = "123456"
     private val session = "k251rn435k"
 
-    @Before
+    @BeforeEach
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = DefaultLoginRepository(
@@ -74,39 +79,40 @@ class DefaultLoginRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
             fetchNodesUpdateMapper = fetchNodesUpdateMapper,
-            applicationScope = testScope
+            applicationScope = testScope,
+            setLogoutFlagWrapper = setLogoutFlagWrapper
         )
     }
 
-    @After
+    @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
     }
 
-    @Test(expected = ChatNotInitializedErrorStatus::class)
+    @Test
     fun `test that initMega throws ChatNotInitializedException when megaChat init state is INIT_NOT_DONE and init result is INIT_ERROR`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_NOT_DONE)
             whenever(megaChatApiGateway.init(any())).thenReturn(MegaChatApi.INIT_ERROR)
 
-            underTest.initMegaChat("session_id")
+            assertThrows<ChatNotInitializedErrorStatus> { underTest.initMegaChat("session_id") }
         }
 
-    @Test(expected = ChatNotInitializedErrorStatus::class)
+    @Test
     fun `test that initMega throws ChatNotInitializedException when megaChat init state is INIT_ERROR and init result is INIT_ERROR`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_ERROR)
             whenever(megaChatApiGateway.init(any())).thenReturn(MegaChatApi.INIT_ERROR)
 
-            underTest.initMegaChat("session_id")
+            assertThrows<ChatNotInitializedErrorStatus> { underTest.initMegaChat("session_id") }
         }
 
 
-    @Test(expected = ChatLoggingOutException::class)
+    @Test
     fun `test that initMega throws ChatNotInitializedException when megaChat initState is INIT_TERMINATED`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_TERMINATED)
-            underTest.initMegaChat("session_id")
+            assertThrows<ChatLoggingOutException> { underTest.initMegaChat("session_id") }
         }
 
     @Test
@@ -130,31 +136,32 @@ class DefaultLoginRepositoryTest {
         verify(appEventGateway).monitorLogout()
     }
 
-    @Test(expected = ChatNotInitializedErrorStatus::class)
+    @Test
     fun `test that initMegaChat without session throws ChatNotInitializedException ErrorStatus when megaChat init state is INIT_NOT_DONE and init result is INIT_ERROR`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_NOT_DONE)
             whenever(megaChatApiGateway.init(null)).thenReturn(MegaChatApi.INIT_ERROR)
 
-            underTest.initMegaChat()
+            assertThrows<ChatNotInitializedErrorStatus> { underTest.initMegaChat() }
+
         }
 
-    @Test(expected = ChatNotInitializedErrorStatus::class)
+    @Test
     fun `test that initMegaChat without session throws ChatNotInitializedException ErrorStatus when megaChat init state is INIT_ERROR and init result is INIT_ERROR`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_NOT_DONE)
             whenever(megaChatApiGateway.init(null)).thenReturn(MegaChatApi.INIT_ERROR)
 
-            underTest.initMegaChat()
+            assertThrows<ChatNotInitializedErrorStatus> { underTest.initMegaChat() }
         }
 
-    @Test(expected = ChatNotInitializedUnknownStatus::class)
+    @Test
     fun `test that initMegaChat without session throws ChatNotInitializedException UnknownStatus when megaChat init state is INIT_NOT_DONE and init result is INIT_NOT_DONE`() =
         runTest {
             whenever(megaChatApiGateway.initState).thenReturn(MegaChatApi.INIT_NOT_DONE)
             whenever(megaChatApiGateway.init(null)).thenReturn(MegaChatApi.INIT_NOT_DONE)
 
-            underTest.initMegaChat()
+            assertThrows<ChatNotInitializedUnknownStatus> { underTest.initMegaChat() }
         }
 
     @Test
@@ -651,4 +658,12 @@ class DefaultLoginRepositoryTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that set logout flag calls the wrapper`() {
+        val inProgress = true
+        underTest.setLogoutInProgressFlag(inProgress)
+
+        verify(setLogoutFlagWrapper).invoke(inProgress)
+    }
 }
