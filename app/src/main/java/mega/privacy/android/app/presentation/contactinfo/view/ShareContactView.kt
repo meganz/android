@@ -37,7 +37,7 @@ internal fun ShareContactView() = Column {
     ) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_share_to_contact),
+                painter = painterResource(id = R.drawable.ic_share_contact),
                 contentDescription = null,
                 tint = MaterialTheme.colors.textColorSecondary,
             )

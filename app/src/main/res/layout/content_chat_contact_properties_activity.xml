@@ -94,7 +94,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_chat_fill"
+                        android:src="@drawable/ic_chat_outline"
                         app:tint="?attr/colorSecondary" />
 
                     <TextView
@@ -130,7 +130,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_call"
+                        android:src="@drawable/ic_phone"
                         app:tint="?attr/colorSecondary" />
 
                     <TextView
@@ -166,7 +166,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerHorizontal="true"
                         android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_video"
+                        android:src="@drawable/ic_video_outline"
                         app:tint="?attr/colorSecondary" />
 
                     <TextView
@@ -198,8 +198,20 @@
             android:id="@+id/shared_folders_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_gravity="start|center_vertical"
-            android:layout_marginStart="72dp">
+            android:layout_gravity="start|center_vertical">
+
+            <ImageView
+                android:id="@+id/chat_contact_properties_incoming_shares_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_incoming_share"
+                app:tint="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/chat_contact_properties_shared_folders_label"
@@ -207,6 +219,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_gravity="start|center_vertical"
+                android:layout_toEndOf="@+id/chat_contact_properties_incoming_shares_icon"
+                android:layout_marginStart="16dp"
                 android:text="@string/title_incoming_shares_explorer"
                 android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
@@ -246,12 +260,22 @@
             android:id="@+id/notifications_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginStart="72dp"
             android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/chat_contact_properties_chat_notification_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_bell"
+                app:tint="?android:attr/textColorSecondary" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_gravity="center">
 
                 <TextView
@@ -312,7 +336,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_share_to_contact"
+                android:src="@drawable/ic_contact_share"
                 app:tint="?android:attr/textColorSecondary" />
 
             <TextView
@@ -351,7 +375,7 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:src="@drawable/ic_credentials"
+                android:src="@drawable/ic_verify_credential"
                 app:tint="?android:attr/textColorPrimary" />
 
             <RelativeLayout
@@ -419,7 +443,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_share"
+                android:src="@drawable/ic_shared_files"
                 app:tint="?android:attr/textColorSecondary" />
 
             <TextView
@@ -463,7 +487,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start|center_vertical"
                     android:layout_marginEnd="32dp"
-                    android:src="@drawable/ic_clear_history"
+                    android:src="@drawable/ic_clear_chat_history"
                     app:tint="?android:attr/textColorSecondary"
                     android:contentDescription="@string/title_properties_manage_chat" />
 
@@ -510,7 +534,7 @@
                 android:layout_centerVertical="true"
                 android:layout_gravity="start|center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_r_remove"
+                android:src="@drawable/ic_remove_contact"
                 app:tint="@color/red_600_red_300" />
 
             <TextView

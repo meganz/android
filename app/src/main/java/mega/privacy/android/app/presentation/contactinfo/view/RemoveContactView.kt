@@ -33,7 +33,7 @@ internal fun RemoveContact() {
     ) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_r_remove),
+                painter = painterResource(id = R.drawable.ic_remove_contact),
                 contentDescription = null,
                 tint = MaterialTheme.colors.red_600_red_300,
             )

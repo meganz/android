@@ -39,7 +39,7 @@ internal fun VerifyCredentialsView(isVerified: Boolean) = Column {
     ) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_credentials),
+                painter = painterResource(id = R.drawable.ic_verify_credential),
                 contentDescription = null,
                 tint = MaterialTheme.colors.textColorPrimary,
             )

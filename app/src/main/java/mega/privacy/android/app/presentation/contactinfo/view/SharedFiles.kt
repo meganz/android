@@ -46,7 +46,7 @@ internal fun ShareFilesView(isChatRoomExists: Boolean) =
             ) {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_share),
+                        painter = painterResource(id = R.drawable.ic_shared_files),
                         contentDescription = null,
                         tint = MaterialTheme.colors.textColorSecondary,
                     )

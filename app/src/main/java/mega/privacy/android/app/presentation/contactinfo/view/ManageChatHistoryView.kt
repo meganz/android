@@ -46,7 +46,7 @@ internal fun ManageChatHistory(isChatRoomExists: Boolean) =
             ) {
                 IconButton(onClick = { /*TODO*/ }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_clear_history),
+                        painter = painterResource(id = R.drawable.ic_clear_chat_history),
                         contentDescription = null,
                         tint = MaterialTheme.colors.textColorSecondary
                     )

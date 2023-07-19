@@ -32,7 +32,7 @@ internal fun ChatOptions() = Row(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_chat_fill),
+                painter = painterResource(id = R.drawable.ic_chat_outline),
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
@@ -46,7 +46,7 @@ internal fun ChatOptions() = Row(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(0.dp)) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_call),
+                painter = painterResource(id = R.drawable.ic_phone),
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
@@ -60,7 +60,7 @@ internal fun ChatOptions() = Row(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         IconButton(onClick = { /*TODO*/ }) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_video),
+                painter = painterResource(id = R.drawable.ic_video_outline),
                 contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
