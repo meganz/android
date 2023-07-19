@@ -261,17 +261,16 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                             viewModel.resetShowCopyResult()
                         }
 
-                        it.isLoginComplete && it.isNodesFetched -> {}
                         it.askForDecryptionKeyDialog -> {
                             askForDecryptionKeyDialog()
                         }
 
-                        else -> {
-                            if (it.errorDialogTitle != -1 && it.errorDialogContent != -1) {
-                                Timber.w("Show error dialog")
-                                showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
-                            }
+                        it.errorDialogTitle != -1 && it.errorDialogContent != -1 -> {
+                            Timber.w("Show error dialog")
+                            showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
                         }
+
+                        else -> {}
                     }
                 }
             }
