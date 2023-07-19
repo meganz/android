@@ -102,17 +102,6 @@ import nz.mega.sdk.MegaHandleList;
 import timber.log.Timber;
 
 public class CallUtil {
-    /**
-     * Method for opening the Meeting Activity when the meeting is outgoing or in progress call
-     *
-     * @param context Context*
-     */
-    public static void openMeetingToCreate(Context context) {
-        Timber.d("Open create a meeting screen");
-        Intent meetingIntent = new Intent(context, MeetingActivity.class);
-        meetingIntent.setAction(MEETING_ACTION_CREATE);
-        context.startActivity(meetingIntent);
-    }
 
     /**
      * Method for opening the Meeting Activity when the meeting is outgoing or in progress call

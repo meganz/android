@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.ChatStatus
  * @property currentCallChatId
  * @property searchQuery
  * @property snackBar
+ * @property isParticipatingInChatCallResult
  * @constructor Create empty Chat tab state
  */
 data class ChatsTabState constructor(
@@ -24,4 +25,5 @@ data class ChatsTabState constructor(
     val currentCallChatId: Long? = null,
     val searchQuery: String? = null,
     val snackBar: SnackBarItem? = null,
+    val isParticipatingInChatCallResult: Boolean? = null,
 )

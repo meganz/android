@@ -820,24 +820,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     permissionsFragment?.setNextPermission()
                 }
             }
-
-            Constants.REQUEST_BT_CONNECT -> {
-                Timber.d("get Bluetooth Connect permission")
-                if (permissions.isEmpty()) {
-                    return
-                }
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (MEETING_TYPE == MeetingActivity.MEETING_ACTION_CREATE) {
-                        CallUtil.openMeetingToCreate(this)
-                    }
-                } else {
-                    showSnackbar(
-                        Constants.PERMISSIONS_TYPE,
-                        getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
-                        MegaApiJava.INVALID_HANDLE
-                    )
-                }
-            }
         }
     }
 
@@ -5836,43 +5818,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onCreateMeeting() {
-        MEETING_TYPE = MeetingActivity.MEETING_ACTION_CREATE
-        if (CallUtil.participatingInACall()) {
-            CallUtil.showConfirmationInACall(
-                this,
-                getString(R.string.ongoing_call_content),
-                passcodeManagement
-            )
-        } else {
-            // For android 12, need android.permission.BLUETOOTH_CONNECT permission
-            if (requestBluetoothPermission()) return
-            CallUtil.openMeetingToCreate(this)
-        }
+        chatsFragment?.onCreateMeeting()
     }
 
     override fun onScheduleMeeting() {
         val scheduleMeetingIntent = Intent(this, CreateScheduledMeetingActivity::class.java)
         startActivity(scheduleMeetingIntent)
-    }
-
-    /**
-     * Request Bluetooth Connect Permission for Meeting and Call when SDK >= 31
-     *
-     * @return false : permission granted, needn't request / true: should request permission
-     */
-    private fun requestBluetoothPermission(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val hasPermission: Boolean = hasPermissions(this, Manifest.permission.BLUETOOTH_CONNECT)
-            if (!hasPermission) {
-                requestPermission(
-                    this,
-                    Constants.REQUEST_BT_CONNECT,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                )
-                return true
-            }
-        }
-        return false
     }
 
     fun showConfirmationRemoveAllSharingContacts(shares: List<MegaNode?>) {

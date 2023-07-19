@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.chat.list
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -8,10 +11,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -31,10 +36,12 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
@@ -47,6 +54,7 @@ import mega.privacy.android.domain.usecase.GetThemeMode
 import mega.privacy.mobile.analytics.event.ChatScreenEvent
 import mega.privacy.mobile.analytics.event.ChatsTabEvent
 import mega.privacy.mobile.analytics.event.MeetingsTabEvent
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import javax.inject.Inject
 
@@ -65,10 +73,26 @@ class ChatTabsFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    @Inject
+    lateinit var passcodeManagement: PasscodeManagement
+
     private var actionMode: ActionMode? = null
     private var currentTab: ChatTab = ChatTab.CHATS
 
     private val viewModel by viewModels<ChatTabsViewModel>()
+
+    private val bluetoothPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
+            if (isGrant) {
+                openMeetingToCreate()
+            } else {
+                (activity as? BaseActivity)?.showSnackbar(
+                    Constants.PERMISSIONS_TYPE,
+                    getString(R.string.meeting_bluetooth_connect_required_permissions_warning),
+                    MegaApiJava.INVALID_HANDLE
+                )
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -135,6 +159,10 @@ class ChatTabsFragment : Fragment() {
                 )
                 viewModel.updateSnackBar(null)
             }
+
+            state.isParticipatingInChatCallResult?.let { isInCall ->
+                handleUserInCall(isInCall)
+            }
         }
 
         view.post {
@@ -146,6 +174,23 @@ class ChatTabsFragment : Fragment() {
             }
             setupMenu()
         }
+    }
+
+    private fun handleUserInCall(isInCall: Boolean) {
+        if (isInCall) {
+            CallUtil.showConfirmationInACall(
+                requireContext(),
+                getString(R.string.ongoing_call_content),
+                passcodeManagement
+            )
+        } else {
+            if (hasBluetoothPermission()) {
+                openMeetingToCreate()
+            } else {
+                bluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+        }
+        viewModel.markHandleIsParticipatingInChatCall()
     }
 
     override fun onResume() {
@@ -214,6 +259,26 @@ class ChatTabsFragment : Fragment() {
      */
     fun isMeetingTabShown(): Boolean =
         currentTab == ChatTab.MEETINGS
+
+    /**
+     * On create meeting
+     */
+    fun onCreateMeeting() {
+        viewModel.checkParticipatingInChatCall()
+    }
+
+    private fun openMeetingToCreate() {
+        val meetingIntent = Intent(context, MeetingActivity::class.java).apply {
+            action = MeetingActivity.MEETING_ACTION_CREATE
+        }
+        startActivity(meetingIntent)
+    }
+
+    private fun hasBluetoothPermission() =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S || ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.BLUETOOTH_CONNECT
+        ) == PackageManager.PERMISSION_GRANTED
 
     /**
      * Launch chat call screen

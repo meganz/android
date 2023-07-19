@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
+import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRingingUseCase
 import timber.log.Timber
@@ -77,7 +78,8 @@ class ChatTabsViewModel @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
-    private val clearChatHistoryUseCase: ClearChatHistoryUseCase
+    private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
+    private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -395,5 +397,27 @@ class ChatTabsViewModel @Inject constructor(
                 Timber.e(exception)
             }
         }
+    }
+
+    /**
+     * Check participating in chat call
+     */
+    fun checkParticipatingInChatCall() {
+        viewModelScope.launch {
+            runCatching {
+                isParticipatingInChatCallUseCase()
+            }.onSuccess { isInCall ->
+                state.update { it.copy(isParticipatingInChatCallResult = isInCall) }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Mark handle is participating in chat call
+     */
+    fun markHandleIsParticipatingInChatCall() {
+        state.update { it.copy(isParticipatingInChatCallResult = null) }
     }
 }
