@@ -27,46 +27,46 @@ class ChatRoomItemMapper @Inject constructor() {
         return when {
             chatRoom.isMeeting -> {
                 ChatRoomItem.MeetingChatRoomItem(
+                    isPublic = chatRoom.isPublic,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
                     unreadCount = chatRoom.unreadCount,
+                    hasPermissions = hasPermissions,
                     isActive = chatRoom.isActive,
                     isArchived = chatRoom.isArchived,
-                    isPublic = chatRoom.isPublic,
-                    hasPermissions = hasPermissions,
-                    highlight = highLight,
                     lastTimestamp = chatRoom.lastTimestamp,
+                    highlight = highLight,
                 )
             }
 
             chatRoom.isGroup -> {
                 ChatRoomItem.GroupChatRoomItem(
+                    isPublic = chatRoom.isPublic,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
                     unreadCount = chatRoom.unreadCount,
+                    hasPermissions = hasPermissions,
                     isActive = chatRoom.isActive,
                     isArchived = chatRoom.isArchived,
-                    isPublic = chatRoom.isPublic,
-                    hasPermissions = hasPermissions,
-                    highlight = highLight,
                     lastTimestamp = chatRoom.lastTimestamp,
+                    highlight = highLight,
                 )
             }
 
             else -> {
                 ChatRoomItem.IndividualChatRoomItem(
+                    peerHandle = chatRoom.peerHandle,
                     chatId = chatRoom.chatId,
                     title = chatRoom.title,
                     isLastMessageVoiceClip = isLastMessageVoiceClip,
                     unreadCount = chatRoom.unreadCount,
+                    hasPermissions = hasPermissions,
                     isActive = chatRoom.isActive,
                     isArchived = chatRoom.isArchived,
-                    hasPermissions = hasPermissions,
-                    highlight = highLight,
                     lastTimestamp = chatRoom.lastTimestamp,
-                    peerHandle = chatRoom.peerHandle,
+                    highlight = highLight,
                 )
             }
         }

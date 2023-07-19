@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property title
  * @property lastMessage
  * @property isLastMessageVoiceClip
- * @property isLastMessageGeolocation
  * @property currentCallStatus
  * @property unreadCount
  * @property hasPermissions
@@ -27,7 +26,6 @@ sealed class ChatRoomItem(
     open val title: String,
     open val lastMessage: String? = null,
     open val isLastMessageVoiceClip: Boolean = false,
-    open val isLastMessageGeolocation: Boolean = false,
     open val currentCallStatus: ChatRoomItemStatus? = null,
     open val unreadCount: Int = 0,
     open val hasPermissions: Boolean = false,
@@ -51,7 +49,6 @@ sealed class ChatRoomItem(
      * @property title
      * @property lastMessage
      * @property isLastMessageVoiceClip
-     * @property isLastMessageGeolocation
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -64,7 +61,7 @@ sealed class ChatRoomItem(
      * @property header
      * @constructor Create empty Individual chat room item
      */
-    data class IndividualChatRoomItem(
+    data class IndividualChatRoomItem constructor(
         val userStatus: UserStatus? = null,
         val avatar: ChatAvatarItem? = null,
         val peerHandle: Long? = null,
@@ -73,7 +70,6 @@ sealed class ChatRoomItem(
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val isLastMessageGeolocation: Boolean = false,
         override val currentCallStatus: ChatRoomItemStatus? = null,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -85,9 +81,9 @@ sealed class ChatRoomItem(
         override val highlight: Boolean = false,
         override val header: String? = null,
     ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, isLastMessageGeolocation,
-        currentCallStatus, unreadCount, hasPermissions, isActive, isMuted, isArchived,
-        lastTimestamp, lastTimestampFormatted, highlight, header
+        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+        unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
+        lastTimestampFormatted, highlight, header
     )
 
     /**
@@ -99,7 +95,6 @@ sealed class ChatRoomItem(
      * @property title
      * @property lastMessage
      * @property isLastMessageVoiceClip
-     * @property isLastMessageGeolocation
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -112,14 +107,13 @@ sealed class ChatRoomItem(
      * @property header
      * @constructor Create empty Group chat room item
      */
-    data class GroupChatRoomItem(
+    data class GroupChatRoomItem constructor(
         val isPublic: Boolean = false,
         val avatars: List<ChatAvatarItem>? = null,
         override val chatId: Long,
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val isLastMessageGeolocation: Boolean = false,
         override val currentCallStatus: ChatRoomItemStatus? = null,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -131,9 +125,9 @@ sealed class ChatRoomItem(
         override val highlight: Boolean = false,
         override val header: String? = null,
     ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, isLastMessageGeolocation,
-        currentCallStatus, unreadCount, hasPermissions, isActive, isMuted, isArchived,
-        lastTimestamp, lastTimestampFormatted, highlight, header
+        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+        unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
+        lastTimestampFormatted, highlight, header
     )
 
     /**
@@ -153,7 +147,6 @@ sealed class ChatRoomItem(
      * @property title
      * @property lastMessage
      * @property isLastMessageVoiceClip
-     * @property isLastMessageGeolocation
      * @property currentCallStatus
      * @property unreadCount
      * @property hasPermissions
@@ -166,7 +159,7 @@ sealed class ChatRoomItem(
      * @property header
      * @constructor Create empty Meeting chat room item
      */
-    data class MeetingChatRoomItem(
+    data class MeetingChatRoomItem constructor(
         val schedId: Long? = null,
         val isPending: Boolean = false,
         val isRecurringDaily: Boolean = false,
@@ -181,7 +174,6 @@ sealed class ChatRoomItem(
         override val title: String,
         override val lastMessage: String? = null,
         override val isLastMessageVoiceClip: Boolean = false,
-        override val isLastMessageGeolocation: Boolean = false,
         override val currentCallStatus: ChatRoomItemStatus? = null,
         override val unreadCount: Int = 0,
         override val hasPermissions: Boolean = false,
@@ -193,9 +185,9 @@ sealed class ChatRoomItem(
         override val highlight: Boolean = false,
         override val header: String? = null,
     ) : ChatRoomItem(
-        chatId, title, lastMessage, isLastMessageVoiceClip, isLastMessageGeolocation,
-        currentCallStatus, unreadCount, hasPermissions, isActive, isMuted, isArchived,
-        lastTimestamp, lastTimestampFormatted, highlight, header
+        chatId, title, lastMessage, isLastMessageVoiceClip, currentCallStatus,
+        unreadCount, hasPermissions, isActive, isMuted, isArchived, lastTimestamp,
+        lastTimestampFormatted, highlight, header
     ) {
 
         /**
@@ -258,7 +250,6 @@ sealed class ChatRoomItem(
         title: String = this.title,
         lastMessage: String? = this.lastMessage,
         isLastMessageVoiceClip: Boolean = this.isLastMessageVoiceClip,
-        isLastMessageGeolocation: Boolean = this.isLastMessageGeolocation,
         currentCall: ChatRoomItemStatus? = this.currentCallStatus,
         unreadCount: Int = this.unreadCount,
         hasPermissions: Boolean = this.hasPermissions,
@@ -288,7 +279,6 @@ sealed class ChatRoomItem(
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            isLastMessageGeolocation = isLastMessageGeolocation,
             currentCallStatus = currentCall,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
@@ -310,7 +300,6 @@ sealed class ChatRoomItem(
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            isLastMessageGeolocation = isLastMessageGeolocation,
             currentCallStatus = currentCall,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,
@@ -330,7 +319,6 @@ sealed class ChatRoomItem(
             title = title,
             lastMessage = lastMessage,
             isLastMessageVoiceClip = isLastMessageVoiceClip,
-            isLastMessageGeolocation = isLastMessageGeolocation,
             currentCallStatus = currentCall,
             unreadCount = unreadCount,
             hasPermissions = hasPermissions,

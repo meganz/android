@@ -245,13 +245,8 @@ internal fun ChatRoomItemView(
         }
 
         Icon(
-            imageVector = ImageVector.vectorResource(
-                id = if (item.isLastMessageVoiceClip)
-                    R.drawable.ic_chat_audio
-                else
-                    R.drawable.ic_chat_location
-            ),
-            contentDescription = "Last message location icon",
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_chat_audio),
+            contentDescription = "Last message audio icon",
             tint = MaterialTheme.colors.textColorSecondary,
             modifier = Modifier
                 .size(16.dp)
@@ -260,7 +255,7 @@ internal fun ChatRoomItemView(
                     top.linkTo(titleText.bottom)
                     bottom.linkTo(bottomText.top)
                     visibility =
-                        if (!isLoading && (item.isLastMessageVoiceClip || item.isLastMessageGeolocation))
+                        if (!isLoading && item.isLastMessageVoiceClip)
                             Visibility.Visible
                         else
                             Visibility.Gone

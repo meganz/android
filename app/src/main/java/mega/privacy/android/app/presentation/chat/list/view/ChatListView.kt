@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
+import android.view.MotionEvent
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -12,8 +13,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -55,6 +58,7 @@ fun ChatListView(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ListView(
     modifier: Modifier = Modifier,
@@ -69,16 +73,24 @@ private fun ListView(
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
+    var hasBeenTouched by remember { mutableStateOf(false) }
 
     LazyColumn(
         state = listState,
-        modifier = modifier.testTag("ListView"),
+        modifier = modifier
+            .testTag("ListView")
+            .pointerInteropFilter { motionEvent ->
+                if (!hasBeenTouched && motionEvent.action == MotionEvent.ACTION_DOWN) {
+                    hasBeenTouched = true
+                }
+                true
+            },
     ) {
         itemsIndexed(
             items = items,
             key = { _, item -> item.chatId }
         ) { index: Int, item: ChatRoomItem ->
-            item.header?.takeIf { it.isNotBlank() }?.let { header ->
+            item.header?.takeIf(String::isNotBlank)?.let { header ->
                 if (index != 0) ChatDivider(startPadding = 16.dp)
                 ChatRoomItemHeaderView(text = header)
             } ?: run {
@@ -109,6 +121,12 @@ private fun ListView(
 
     LaunchedEffect(selectedIds) {
         selectionEnabled = selectedIds.isNotEmpty()
+    }
+
+    LaunchedEffect(items) {
+        if (!hasBeenTouched) {
+            listState.scrollToItem(0)
+        }
     }
 }
 

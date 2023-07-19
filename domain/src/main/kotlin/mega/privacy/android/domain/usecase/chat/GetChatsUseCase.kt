@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase.chat
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -101,12 +103,14 @@ class GetChatsUseCase @Inject constructor(
 
             emitAll(
                 merge(
-                    chats.updateFields(
-                        mutex,
-                        chatRoomType,
-                        lastMessage,
-                        lastTimeMapper,
-                        meetingTimeMapper
+                    merge(
+                        *chats.updateFields(
+                            mutex,
+                            chatRoomType,
+                            lastMessage,
+                            lastTimeMapper,
+                            meetingTimeMapper
+                        ).toTypedArray()
                     ),
                     chats.monitorMutedChats(mutex, chatRoomType),
                     chats.monitorChatCalls(mutex, chatRoomType),
@@ -148,9 +152,9 @@ class GetChatsUseCase @Inject constructor(
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
-    ): Flow<List<ChatRoomItem>> =
-        flow {
-            values.toList().forEach { currentItem ->
+    ): List<Flow<List<ChatRoomItem>>> =
+        values.toList().map { currentItem ->
+            flow {
                 val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
                 if (currentItem != newItem) {
                     mutex.withLock {
@@ -174,16 +178,25 @@ class GetChatsUseCase @Inject constructor(
     private suspend fun ChatRoomItem.updateChatFields(
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
-    ): ChatRoomItem = copyChatRoomItem(
-        isMuted = isChatMuted(chatId),
-        isLastMessageGeolocation = isLastMessageGeolocation(chatId),
-        lastMessage = runCatching { getLastMessage(chatId) }.getOrNull(),
-        lastTimestampFormatted = runCatching { lastTimeMapper(lastTimestamp) }.getOrNull(),
-        currentCall = getCurrentCall(chatId),
-        avatarItems = getParticipantsAvatar(chatId),
-        userStatus = getUserOnlineStatus(),
-        peerEmail = getUserEmail(),
-    )
+    ): ChatRoomItem = coroutineScope {
+        val avatarItems = async { getParticipantsAvatar(chatId) }
+        val isMuted = async { isChatMuted(chatId) }
+        val lastMessage = async { runCatching { getLastMessage(chatId) }.getOrNull() }
+        val lastTimestampFormatted = async { runCatching { lastTimeMapper(lastTimestamp) }.getOrNull() }
+        val currentCall = async { getCurrentCall(chatId) }
+        val userStatus = async { getUserOnlineStatus() }
+        val peerEmail = async { getUserEmail() }
+
+        copyChatRoomItem(
+            avatarItems = avatarItems.await(),
+            isMuted = isMuted.await(),
+            lastMessage = lastMessage.await(),
+            lastTimestampFormatted = lastTimestampFormatted.await(),
+            currentCall = currentCall.await(),
+            userStatus = userStatus.await(),
+            peerEmail = peerEmail.await(),
+        )
+    }
 
     private suspend fun ChatRoomItem.updateMeetingFields(
         chatRoomType: ChatRoomType,
@@ -193,13 +206,13 @@ class GetChatsUseCase @Inject constructor(
             getMeetingScheduleData(chatId, meetingTimeMapper)?.let { schedMeetingData ->
                 copyChatRoomItem(
                     schedId = schedMeetingData.schedId,
-                    scheduledStartTimestamp = schedMeetingData.scheduledStartTimestamp,
-                    scheduledEndTimestamp = schedMeetingData.scheduledEndTimestamp,
-                    scheduledTimestampFormatted = schedMeetingData.scheduledTimestampFormatted,
+                    isPending = schedMeetingData.isPending,
                     isRecurringDaily = schedMeetingData.isRecurringDaily,
                     isRecurringWeekly = schedMeetingData.isRecurringWeekly,
                     isRecurringMonthly = schedMeetingData.isRecurringMonthly,
-                    isPending = schedMeetingData.isPending,
+                    scheduledStartTimestamp = schedMeetingData.scheduledStartTimestamp,
+                    scheduledEndTimestamp = schedMeetingData.scheduledEndTimestamp,
+                    scheduledTimestampFormatted = schedMeetingData.scheduledTimestampFormatted,
                 )
             } ?: this
         } else this
@@ -276,12 +289,12 @@ class GetChatsUseCase @Inject constructor(
                             get(chatId)?.let { currentItem ->
                                 val newItem = currentItem.copyChatRoomItem(
                                     schedId = schedData.schedId,
-                                    scheduledStartTimestamp = schedData.scheduledStartTimestamp,
-                                    scheduledEndTimestamp = schedData.scheduledEndTimestamp,
+                                    isPending = schedData.isPending,
                                     isRecurringDaily = schedData.isRecurringDaily,
                                     isRecurringWeekly = schedData.isRecurringWeekly,
                                     isRecurringMonthly = schedData.isRecurringMonthly,
-                                    isPending = schedData.isPending,
+                                    scheduledStartTimestamp = schedData.scheduledStartTimestamp,
+                                    scheduledEndTimestamp = schedData.scheduledEndTimestamp,
                                 )
                                 if (currentItem != newItem) {
                                     put(currentItem.chatId, newItem)

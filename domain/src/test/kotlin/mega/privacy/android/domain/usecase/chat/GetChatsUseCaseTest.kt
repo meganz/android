@@ -111,7 +111,6 @@ internal class GetChatsUseCaseTest {
             whenever(chatRepository.getMeetingChatRooms()).thenReturn(chatRooms)
             whenever(chatRepository.getArchivedChatRooms()).thenReturn(chatRooms)
             whenever(chatRepository.isChatNotifiable(any())).thenReturn(Random.nextBoolean())
-            whenever(chatRepository.isChatLastMessageGeolocation(any())).thenReturn(Random.nextBoolean())
             whenever(getChatCall(any())).thenReturn(null)
             whenever(getChatGroupAvatarUseCase(any())).thenReturn(null)
             whenever(getUserOnlineStatusByHandleUseCase(any())).thenReturn(null)
@@ -219,26 +218,6 @@ internal class GetChatsUseCaseTest {
         ).take(2).last()
 
         verify(chatRepository, times(chatRooms.size)).isChatNotifiable(anyLong())
-    }
-
-    @Test
-    fun `test that isChatLastMessageGeolocation is called accordingly`() = runTest {
-        val chatRoomType = GetChatsUseCase.ChatRoomType.NON_MEETINGS
-
-        whenever(chatRoomItemMapper(any())).thenAnswer {
-            val chatRoom = ((it.arguments[0]) as CombinedChatRoom)
-            ChatRoomItem.GroupChatRoomItem(chatId = chatRoom.chatId, title = chatRoom.title)
-        }
-
-        underTest.invoke(
-            chatRoomType = chatRoomType,
-            lastMessage = lastMessage,
-            lastTimeMapper = lastTimeMapper,
-            meetingTimeMapper = meetingTimeMapper,
-            headerTimeMapper = headerTimeMapper,
-        ).take(2).last()
-
-        verify(chatRepository, times(chatRooms.size)).isChatLastMessageGeolocation(anyLong())
     }
 
     @Test
