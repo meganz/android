@@ -93,13 +93,7 @@ internal class DefaultNetworkRepository @Inject constructor(
             ) {
                 super.onCapabilitiesChanged(network, networkCapabilities)
                 Timber.d("onCapabilitiesChanged")
-                trySend(
-                    ConnectivityState.Connected(
-                        meteredConnection = !networkCapabilities.hasCapability(
-                            NetworkCapabilities.NET_CAPABILITY_NOT_METERED
-                        )
-                    )
-                )
+                trySend(getCurrentConnectivityState())
             }
         }
         connectivityManager?.registerNetworkCallback(networkRequest, callback)
