@@ -11,8 +11,6 @@ SDK_BRANCH = 'develop'
 MEGACHAT_BRANCH = 'develop'
 SDK_COMMIT = ""
 MEGACHAT_COMMIT = ""
-SDK_TAG = ""
-MEGACHAT_TAG = ""
 
 APP_UNIT_TEST_SUMMARY = ""
 DOMAIN_UNIT_TEST_SUMMARY = ""
@@ -42,12 +40,6 @@ ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
  * common.groovy file with common methods
  */
 def common
-
-/**
- * Flag to decide whether we do clean before build SDK.
- * Possible values: yes|no
- */
-REBUILD_SDK = "no"
 
 pipeline {
     agent { label 'mac-jenkins-slave-android || mac-jenkins-slave' }
@@ -81,12 +73,11 @@ pipeline {
     post {
         failure {
             script {
-
                 common = load('jenkinsfile/common.groovy')
 
                 common.downloadJenkinsConsoleLog(CONSOLE_LOG_FILE)
 
-                if (triggerByDeliverQaCmd() || triggerByDeliverQaCmd()) {
+                if (triggerByDeliverQaCmd()) {
                     if (common.hasGitLabMergeRequest()) {
                         String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
@@ -98,6 +89,9 @@ pipeline {
                         slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
                         slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                     }
+                } else if (triggerByPushToDevelop()) {
+                    slackSend color: 'danger', message: firebaseUploadFailureMessage("\n")
+                    slackUploadFile filePath: 'console.txt', initialComment: 'Jenkins Log'
                 } else if (triggerByPublishSdkCmd()) {
                     String jsonJenkinsLog = common.uploadFileToGitLab(CONSOLE_LOG_FILE)
 
@@ -108,7 +102,7 @@ pipeline {
                             def jsonSdkLog = common.uploadFileToGitLab(SDK_LOG_FILE_NAME)
                             sdkBuildMessage = "<br/>SDK BuildLog:\t${jsonSdkLog}"
                         } else {
-                            sdkBuildMessage = "<br/>SDK Build log not valid"
+                            sdkBuildMessage = "<br/>SDK Build log not available."
                         }
                     }
 
@@ -130,6 +124,8 @@ pipeline {
                 if (triggerByDeliverQaCmd() || triggerByUploadCoverage()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>"))
+                } else if (triggerByPushToDevelop()) {
+                    slackSend color: "good", message: firebaseUploadSuccessMessage("\n")
                 } else if (triggerByPublishSdkCmd()) {
                     slackSend color: "good", message: publishSdkSuccessMessage("\n")
                     common.sendToMR(publishSdkSuccessMessage("<br/>"))
@@ -137,9 +133,7 @@ pipeline {
             }
         }
         cleanup {
-            // Delete whole workspace after each successful build, to save Jenkins storage
-            // We do not clean workspace if build fails, for a chance to investigate the crime scene.
-            cleanWs(cleanWhenFailure: false)
+            cleanWs(cleanWhenFailure: true)
         }
     }
     stages {
@@ -155,13 +149,17 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
+                expression {
+                    triggerByDeliverQaCmd() ||
+                            triggerByPublishSdkCmd() ||
+                            triggerByUploadCoverage() ||
+                            triggerByPushToDevelop()
+                }
             }
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
                     checkSDKVersion()
-                    REBUILD_SDK = getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
@@ -206,7 +204,6 @@ pipeline {
                         }
                     }
                 }
-
             }
         }
 
@@ -228,12 +225,12 @@ pipeline {
                             ls -lh
                         """
                 }
-
             }
         }
+
         stage('Download Google Map API Key') {
             when {
-                expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() }
+                expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -273,7 +270,6 @@ pipeline {
                             """
                     }
                 }
-
             }
         }
 
@@ -342,20 +338,10 @@ pipeline {
                 }
             }
         }
-        stage('Clean Android build') {
-            when {
-                expression { triggerByDeliverQaCmd() || triggerByUploadCoverage() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Clean Android'
-                    sh './gradlew clean'
-                }
-            }
-        }
+
         stage('Enable Permanent Logging') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -369,7 +355,7 @@ pipeline {
         }
         stage('Build APK(GMS)') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -380,7 +366,7 @@ pipeline {
         }
         stage('Sign APK(GMS)') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -403,12 +389,11 @@ pipeline {
                             """
                     }
                 }
-
             }
         }
         stage('Upload APK(GMS) to Firebase') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -434,7 +419,7 @@ pipeline {
         }
         stage('Build QA APK(GMS)') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -450,7 +435,7 @@ pipeline {
 
         stage('Upload QA APK(GMS) to Firebase') {
             when {
-                expression { triggerByDeliverQaCmd() }
+                expression { triggerByDeliverQaCmd() || triggerByPushToDevelop() }
             }
             steps {
                 script {
@@ -469,37 +454,6 @@ pipeline {
                             sh './gradlew appDistributionUploadGmsQa'
                         }
                     }
-                }
-            }
-        }
-
-        stage('Clean up Android') {
-            when {
-                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Clean Up Android'
-
-                    sh """                    
-                        cd ${WORKSPACE}
-                        ./gradlew clean
-                    """
-                }
-            }
-        }
-        stage('Clean up SDK') {
-            when {
-                expression { triggerByDeliverQaCmd() || triggerByPublishSdkCmd() || triggerByUploadCoverage() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Clean Up SDK'
-
-                    sh """
-                        cd ${WORKSPACE}/sdk/src/main/jni
-                        bash build.sh clean
-                    """
                 }
             }
         }
@@ -572,7 +526,6 @@ pipeline {
                         sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"$WORKSPACE/coverage_summary.txt\" \"${targetPath}/coverage_summary.txt\""
                     }
                 }
-
             }
         }
     }
@@ -592,7 +545,7 @@ private String firebaseUploadFailureMessage(String lineBreak) {
             "${lineBreak}Author:\t${gitlabUserName}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}"
     if (env.gitlabActionType == "PUSH") {
-        message += "${lineBreak}Trigger Reason: git PUSH"
+        message += "${lineBreak}Trigger Reason: git PUSH to ${gitlabTargetBranch}"
     } else if (env.gitlabActionType == "NOTE") {
         message += "${lineBreak}Trigger Reason: MR comment (${gitlabTriggerPhrase})"
     }
@@ -650,7 +603,7 @@ private boolean isDefined(String value) {
  * @return The success message to be sent
  */
 private String firebaseUploadSuccessMessage(String lineBreak) {
-    return ":rocket: Android APK Build uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
+    return ":rocket: Android APK uploaded successfully to Firebase AppDistribution!(${env.BUILD_NUMBER})" +
             "${lineBreak}Version:\t${readAppVersion()}" +
             "${lineBreak}Last Commit Msg:\t${lastCommitMessage()}" +
             "${lineBreak}Target Branch:\t${gitlabTargetBranch}" +
@@ -705,6 +658,14 @@ private boolean triggerByPublishSdkCmd() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.startsWith(PUBLISH_SDK_CMD)
+}
+
+/**
+ * Check if build is triggered by a git push to "develop" branch.
+ */
+private boolean triggerByPushToDevelop() {
+    return env.gitlabActionType == "PUSH" &&
+            gitlabTargetBranch == "develop"
 }
 
 /**
@@ -825,7 +786,7 @@ String readReleaseNotes() {
     String baseRelNotes = "Triggered by: $gitlabUserName" +
             "\nTrigger Reason: ${getTriggerReason()}" +
             "\nBranch: $gitlabSourceBranch " +
-            "\nLast 5 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -5", returnStdout: true).trim()}"
+            "\nLast 10 git commits:\n${sh(script: "git log --pretty=format:\"(%h,%an)%x09%s\" -10", returnStdout: true).trim()}"
 
     String customRelNotes = parseCommandParameter()["notes"]
     if (!customRelNotes.isEmpty()) {
