@@ -23,7 +23,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -62,7 +61,7 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AlbumContentScreen(
     photoDownloaderViewModel: PhotoDownloaderViewModel,
@@ -175,7 +174,11 @@ fun AlbumContentScreen(
             if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {
                 MegaLinearProgressIndicator()
             }
-        } else if (albumContentState.isLoadingPhotos || !albumContentState.isAddingPhotosProgressCompleted) {
+        } else if (
+            albumsState.currentUIAlbum?.isLoadingDone == false ||
+            albumContentState.isLoadingPhotos ||
+            albumContentState.isAddingPhotos
+        ) {
             AlbumContentSkeletonView(smallWidth = smallWidth)
         } else {
             when (albumsState.currentAlbum) {

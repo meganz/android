@@ -8,6 +8,6 @@ import mega.privacy.android.domain.entity.photos.Photo
  * UIAlbumMapper
  */
 interface UIAlbumMapper {
-    operator fun invoke(photos: List<Photo>, album: Album): UIAlbum
+    operator fun invoke(photos: List<Photo>, album: Album, isLoadingDone: Boolean = false): UIAlbum
 }
 

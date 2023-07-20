@@ -132,7 +132,7 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { true },
             )
 
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourite"),
                     count = 0,
@@ -141,7 +141,7 @@ class AlbumsViewModelTest {
                     id = Album.FavouriteAlbum
                 )
             )
-            whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("GIFs"),
                     count = 0,
@@ -150,7 +150,7 @@ class AlbumsViewModelTest {
                     id = Album.GifAlbum
                 )
             )
-            whenever(uiAlbumMapper(any(), eq(Album.RawAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("RAW"),
                     count = 0,
@@ -177,7 +177,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { false },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
@@ -186,7 +186,7 @@ class AlbumsViewModelTest {
                 id = Album.FavouriteAlbum
             )
         )
-        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
@@ -214,7 +214,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { false },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
@@ -242,7 +242,7 @@ class AlbumsViewModelTest {
             Album.RawAlbum to { true },
         )
 
-        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
@@ -251,7 +251,7 @@ class AlbumsViewModelTest {
                 id = Album.FavouriteAlbum
             )
         )
-        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.GifAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
@@ -260,7 +260,7 @@ class AlbumsViewModelTest {
                 id = Album.GifAlbum
             )
         )
-        whenever(uiAlbumMapper(any(), eq(Album.RawAlbum))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(Album.RawAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("RAW"),
                 count = 0,
@@ -298,7 +298,7 @@ class AlbumsViewModelTest {
             createImage(id = 2L, modificationTime = LocalDateTime.MIN)
         )
 
-        whenever(uiAlbumMapper(testPhotosList, Album.FavouriteAlbum)).thenReturn(
+        whenever(uiAlbumMapper(eq(testPhotosList), eq(Album.FavouriteAlbum), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle("Favourites"),
                 count = testPhotosList.size,
@@ -326,7 +326,7 @@ class AlbumsViewModelTest {
         val newAlbum3 =
             createUserAlbum(id = AlbumId(3L), title = "Album 3", creationTime = 300L)
 
-        whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum1.title),
                 count = 0,
@@ -336,7 +336,7 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(uiAlbumMapper(any(), eq(newAlbum2))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(newAlbum2), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum2.title),
                 count = 0,
@@ -346,7 +346,7 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(uiAlbumMapper(any(), eq(newAlbum3))).thenReturn(
+        whenever(uiAlbumMapper(any(), eq(newAlbum3), any())).thenReturn(
             UIAlbum(
                 title = AlbumTitle.StringTitle(newAlbum3.title),
                 count = 0,
@@ -425,7 +425,7 @@ class AlbumsViewModelTest {
         runTest {
             val expectedName = "New album (1)"
             val newUserAlbum = createUserAlbum(title = "New album")
-            whenever(uiAlbumMapper(any(), eq(newUserAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(newUserAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newUserAlbum.title),
                     count = 0,
@@ -461,7 +461,7 @@ class AlbumsViewModelTest {
             val newAlbum2 =
                 createUserAlbum(id = AlbumId(2L), title = "New album (1)", modificationTime = 2L)
 
-            whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,
@@ -471,7 +471,7 @@ class AlbumsViewModelTest {
                 )
             )
 
-            whenever(uiAlbumMapper(any(), eq(newAlbum2))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(newAlbum2), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum2.title),
                     count = 0,
@@ -510,7 +510,7 @@ class AlbumsViewModelTest {
             )
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
@@ -546,7 +546,7 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { false },
             )
 
-            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
@@ -598,7 +598,7 @@ class AlbumsViewModelTest {
             val newAlbum1 = createUserAlbum(title = testAlbumName)
 
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
-            whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
+            whenever(uiAlbumMapper(any(), eq(newAlbum1), any())).thenReturn(
                 UIAlbum(
                     title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,

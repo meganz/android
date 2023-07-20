@@ -13,7 +13,7 @@ import javax.inject.Inject
 class DefaultUIAlbumMapper @Inject constructor() :
     UIAlbumMapper {
 
-    override fun invoke(photos: List<Photo>, album: Album): UIAlbum {
+    override fun invoke(photos: List<Photo>, album: Album, isLoadingDone: Boolean): UIAlbum {
         val title = when (album) {
             Album.FavouriteAlbum -> AlbumTitle.ResourceTitle(R.string.title_favourites_album)
             Album.GifAlbum -> AlbumTitle.ResourceTitle(R.string.photos_album_title_gif)
@@ -32,6 +32,7 @@ class DefaultUIAlbumMapper @Inject constructor() :
             },
             photos = photos,
             id = album,
+            isLoadingDone = isLoadingDone,
         )
     }
 }

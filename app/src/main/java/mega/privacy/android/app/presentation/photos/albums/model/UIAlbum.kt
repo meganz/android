@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property count          The count of photos items inside the album
  * @property coverPhoto     The selected photos used as the cover
  * @property photos         The list of all photos in the albums
+ * @property isLoadingDone  To indicate if the loading of the UIAlbum is done
  */
 data class UIAlbum(
     val id: Album,
@@ -18,6 +19,7 @@ data class UIAlbum(
     val count: Int,
     val coverPhoto: Photo?,
     val photos: List<Photo>,
+    val isLoadingDone: Boolean = false,
 )
 
 /**

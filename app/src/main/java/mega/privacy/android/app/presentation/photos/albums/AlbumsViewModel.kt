@@ -216,7 +216,7 @@ class AlbumsViewModel @Inject constructor(
 
         val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
             if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                uiAlbumMapper(photos, uiAlbum.id)
+                uiAlbumMapper(photos, uiAlbum.id, true)
             } else {
                 uiAlbum
             }
