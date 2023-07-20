@@ -23,12 +23,18 @@ interface PasscodeRepository {
     suspend fun setFailedAttempts(attempts: Int)
 
     /**
-     * Check passcode
+     * Set passcode
      *
      * @param passcode
-     * @return true if correct, else false
      */
-    suspend fun checkPasscode(passcode: String): Boolean
+    suspend fun setPasscode(passcode: String?)
+
+    /**
+     * Get passcode
+     *
+     * @return The current passcode if it exists
+     */
+    suspend fun getPasscode(): String?
 
     /**
      * Check password

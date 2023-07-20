@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
+import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.usecase.login.LogoutUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -27,33 +28,37 @@ internal class UnlockPasscodeUseCaseTest {
 
     private val passcodeRepository = mock<PasscodeRepository>()
     private val logoutUseCase = mock<LogoutUseCase>()
+    private val checkPasscodeUseCase = mock<CheckPasscodeUseCase>()
+    private val accountRepository = mock<AccountRepository>()
 
     @BeforeEach
     internal fun setUp() {
         underTest = UnlockPasscodeUseCase(
             passcodeRepository = passcodeRepository,
             logoutUseCase = logoutUseCase,
+            checkPasscodeUseCase = checkPasscodeUseCase,
+            accountRepository = accountRepository,
         )
     }
 
     @Test
     internal fun `test that passcode requests call the passcode check`() = runTest {
-        passcodeRepository.stub {
-            onBlocking { checkPasscode(any()) }.thenReturn(true)
+        checkPasscodeUseCase.stub {
+            onBlocking { invoke(any()) }.thenReturn(true)
         }
         val expected = "passcode"
         underTest(UnlockPasscodeRequest.PasscodeRequest(expected))
-        verify(passcodeRepository).checkPasscode(expected)
+        verify(checkPasscodeUseCase).invoke(expected)
     }
 
     @Test
     internal fun `test that password requests call the password check`() = runTest {
-        passcodeRepository.stub {
-            onBlocking { checkPassword(any()) }.thenReturn(true)
+        accountRepository.stub {
+            onBlocking { isCurrentPassword(any()) }.thenReturn(true)
         }
         val expected = "password"
         underTest(UnlockPasscodeRequest.PasswordRequest(expected))
-        verify(passcodeRepository).checkPassword(expected)
+        verify(accountRepository).isCurrentPassword(expected)
     }
 
     @ParameterizedTest
@@ -67,8 +72,12 @@ internal class UnlockPasscodeUseCaseTest {
                     emit(initialCount)
                     awaitCancellation()
                 })
-                onBlocking { checkPasscode(any()) }.thenReturn(false)
-                onBlocking { checkPassword(any()) }.thenReturn(false)
+            }
+            accountRepository.stub {
+                onBlocking { isCurrentPassword(any()) }.thenReturn(false)
+            }
+            checkPasscodeUseCase.stub {
+                onBlocking { invoke(any()) }.thenReturn(false)
             }
 
             underTest.invoke(request)
@@ -91,8 +100,12 @@ internal class UnlockPasscodeUseCaseTest {
                     emit(initialCount)
                     awaitCancellation()
                 })
-                onBlocking { checkPasscode(any()) }.thenReturn(true)
-                onBlocking { checkPassword(any()) }.thenReturn(true)
+            }
+            accountRepository.stub {
+                onBlocking { isCurrentPassword(any()) }.thenReturn(true)
+            }
+            checkPasscodeUseCase.stub {
+                onBlocking { invoke(any()) }.thenReturn(true)
             }
 
             underTest.invoke(request)
@@ -113,8 +126,13 @@ internal class UnlockPasscodeUseCaseTest {
                     emit(initialCount)
                     awaitCancellation()
                 })
-                onBlocking { checkPasscode(any()) }.thenReturn(true)
-                onBlocking { checkPassword(any()) }.thenReturn(true)
+            }
+            accountRepository.stub {
+                onBlocking { isCurrentPassword(any()) }.thenReturn(true)
+            }
+
+            checkPasscodeUseCase.stub {
+                onBlocking { invoke(any()) }.thenReturn(true)
             }
 
             underTest.invoke(request)
@@ -135,8 +153,13 @@ internal class UnlockPasscodeUseCaseTest {
                     emit(initialCount)
                     awaitCancellation()
                 })
-                onBlocking { checkPasscode(any()) }.thenReturn(false)
-                onBlocking { checkPassword(any()) }.thenReturn(false)
+            }
+            accountRepository.stub {
+                onBlocking { isCurrentPassword(any()) }.thenReturn(false)
+            }
+
+            checkPasscodeUseCase.stub {
+                onBlocking { invoke(any()) }.thenReturn(false)
             }
 
             underTest.invoke(request)

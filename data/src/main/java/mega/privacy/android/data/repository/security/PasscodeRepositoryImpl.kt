@@ -13,7 +13,11 @@ internal class PasscodeRepositoryImpl @Inject constructor() : PasscodeRepository
         TODO("Not yet implemented")
     }
 
-    override suspend fun checkPasscode(passcode: String): Boolean {
+    override suspend fun setPasscode(passcode: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getPasscode(): String? {
         TODO("Not yet implemented")
     }
 
@@ -28,5 +32,6 @@ internal class PasscodeRepositoryImpl @Inject constructor() : PasscodeRepository
     override fun monitorLockState(): Flow<Boolean> {
         TODO("Not yet implemented")
     }
+
 
 }
