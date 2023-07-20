@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.lists.MegaMenuAction
 import mega.privacy.android.core.ui.controls.lists.MegaMenuActionHeader
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -93,7 +94,7 @@ private fun MegaActionMenuBottomSheetLayoutPreview() {
             sheetBody = {
                 LazyColumn {
                     items(100) {
-                        MegaMenuAction(text = "title $it")
+                        MegaMenuAction(text = "title $it", icon = R.drawable.ic_folder_list)
                     }
                 }
             }) {

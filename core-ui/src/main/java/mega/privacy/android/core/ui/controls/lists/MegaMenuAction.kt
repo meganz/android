@@ -40,12 +40,11 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * @param text list item title
  * @param icon list icon if null the list will not be having prefix icon
  * @param addIconPadding should be true if we need to leave icon space before text
- * @param hasSwitch true if list item has switch
- * @param isChecked sets the default switch value
  * @param isDestructive if true the text will be displayed in destructive(red) colors
  * @param addSeparator if true divider will be drawn below the item
  * @param dividerPadding padding start for the divider below menu action
  * @param onActionClicked trigger item click on menu action
+ * @param trailingItem composable widget which will be placed at the trailing end
  * @param modifier
  */
 @Composable
@@ -55,11 +54,10 @@ fun MegaMenuAction(
     @DrawableRes icon: Int? = null,
     addIconPadding: Boolean = true,
     isDestructive: Boolean = false,
-    hasSwitch: Boolean = false,
-    isChecked: Boolean = false,
     addSeparator: Boolean = true,
     dividerPadding: Dp = 72.dp,
     onActionClicked: (() -> Unit)? = null,
+    trailingItem: (@Composable () -> Unit)? = null,
 ) {
     Column {
         Row(
@@ -78,7 +76,7 @@ fun MegaMenuAction(
                 Icon(
                     modifier = Modifier
                         .testTag(MENU_ITEM_ICON_TAG)
-                        .padding(end = 16.dp)
+                        .padding(end = 32.dp)
                         .size(size = 24.dp),
                     painter = painterResource(id = icon),
                     contentDescription = null,
@@ -100,15 +98,7 @@ fun MegaMenuAction(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            if (hasSwitch) {
-                MegaSwitch(
-                    modifier = Modifier.testTag(MENU_ITEM_SWITCH_TAG),
-                    checked = isChecked,
-                    onCheckedChange = {
-                        onActionClicked?.invoke()
-                    }
-                )
-            }
+            trailingItem?.invoke()
         }
         if (addSeparator) {
             Divider(modifier = Modifier.padding(start = dividerPadding))
@@ -143,20 +133,39 @@ private fun PreviewMegaMenuActionWithSwitch(
         MegaMenuAction(
             text = "Menu Item",
             icon = R.drawable.ic_folder_list,
-            hasSwitch = hasSwitch,
+        ) {
+            MegaSwitch(
+                modifier = Modifier.testTag(MENU_ITEM_SWITCH_TAG),
+                checked = true,
+                onCheckedChange = {}
+            )
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PreviewMegaMenuActionWithoutIcon() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        MegaMenuAction(
+            text = "Menu Item",
         )
     }
 }
 
 @CombinedThemePreviews
 @Composable
-private fun PreviewMegaMenuActionWithoutIcon(
-    @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
-) {
+private fun PreviewMegaMenuActionWithTextButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         MegaMenuAction(
             text = "Menu Item",
-            hasSwitch = hasSwitch,
-        )
+            icon = R.drawable.ic_folder_list,
+        ) {
+            Text(
+                text = "Button",
+                style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.secondary,
+            )
+        }
     }
 }
