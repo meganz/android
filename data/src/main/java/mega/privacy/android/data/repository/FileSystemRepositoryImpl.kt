@@ -44,6 +44,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
 import java.io.File
+import java.net.URLConnection
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -310,5 +311,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getExternalPathByContentUri(uri: String): String? =
         withContext(ioDispatcher) {
             fileGateway.getExternalPathByContentUri(uri)
+        }
+
+    override suspend fun getGuessContentTypeFromName(localPath: String): String? =
+        withContext(ioDispatcher) {
+            URLConnection.guessContentTypeFromName(localPath)
         }
 }

@@ -521,6 +521,13 @@ public class FileUtil {
         outputStream.close();
     }
 
+    /**
+     * Checks if the file is a video file.
+     *
+     * @param path Local path of the file.
+     * @deprecated use @link{#IsVideoFileUseCase} instead.
+     */
+    @Deprecated()
     public static boolean isVideoFile(String path) {
         Timber.d("isVideoFile: %s", path);
         try {

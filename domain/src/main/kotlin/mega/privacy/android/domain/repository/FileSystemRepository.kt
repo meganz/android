@@ -180,4 +180,13 @@ interface FileSystemRepository {
      * Returns an external storage path based on content Uri
      */
     suspend fun getExternalPathByContentUri(uri: String): String?
+
+    /**
+     * Tries to determine the content type of an object,
+     * based on the specified "file" component of a URL.
+     *
+     * @param localPath Local path of the file
+     * @return The content type of an object if any.
+     */
+    suspend fun getGuessContentTypeFromName(localPath: String): String?
 }
