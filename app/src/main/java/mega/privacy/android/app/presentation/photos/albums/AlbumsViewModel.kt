@@ -96,7 +96,7 @@ class AlbumsViewModel @Inject constructor(
                         }.takeIf {
                             shouldAddAlbum(it, key)
                         }?.let {
-                            uiAlbumMapper(it, key)
+                            uiAlbumMapper(it, key, isLoadingDone = true)
                         }
                     }
                 }.collectLatest { systemAlbums ->
@@ -181,7 +181,7 @@ class AlbumsViewModel @Inject constructor(
             val uiAlbum = userUIAlbums.firstOrNull { uiAlbum ->
                 (uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id
             }
-            uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum)
+            uiAlbumMapper(uiAlbum?.photos.orEmpty(), userAlbum, isLoadingDone = true)
         }.sortedByDescending { (it.id as? Album.UserAlbum)?.creationTime }
 
         systemUIAlbums + updatedUserUIAlbums
@@ -216,7 +216,7 @@ class AlbumsViewModel @Inject constructor(
 
         val updatedUserUIAlbums = userUIAlbums.map { uiAlbum ->
             if ((uiAlbum.id as? Album.UserAlbum)?.id == userAlbum.id) {
-                uiAlbumMapper(photos, uiAlbum.id, true)
+                uiAlbumMapper(photos, uiAlbum.id, isLoadingDone = true)
             } else {
                 uiAlbum
             }
