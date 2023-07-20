@@ -4522,9 +4522,9 @@
     <!-- Text prompt for a checkbox to remember the Timeline filter preferences  -->
     <string name="photos_timeline_filter_remember_preferences">จำตัวเลือกการกำหนดลักษณะนี้ไว้</string>
     <!-- Title of the "Device center" feature in the Home Side Menu and the Device Center feature itself. -->
-    <string name="home_side_menu_device_center_title">Device centre</string>
+    <string name="home_side_menu_device_center_title">ศูนย์อุปกรณ์</string>
     <!-- The Toolbar Title of the Device Center feature, which is displayed when the User enters the feature and the List of Devices are shown. -->
-    <string name="device_center_list_of_devices_toolbar_title">Device centre</string>
+    <string name="device_center_list_of_devices_toolbar_title">ศูนย์อุปกรณ์</string>
     <!-- Every day option in dialog to set a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_recurrence_dialog_every_day_option">ทุกวัน</string>
     <!-- Every week option in dialog to set a recurrence in Schedule meeting screen -->
@@ -4563,7 +4563,7 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">ตั้งรหัสผ่าน</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link updated. Copy again.</string>
+    <string name="general_link_updated_copy_again">อัปเดตลิงก์แล้ว คัดลอกใหม่อีกครั้ง</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
     <!-- Album import link label -->
@@ -4623,7 +4623,7 @@
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this link can view and download your data</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
-    <string name="cloud_drive_subtitle_link_access_password">Only people with the password can open the link</string>
+    <string name="cloud_drive_subtitle_link_access_password">เฉพาะผู้ที่มีรหัสผ่านเท่านั้นที่สามารถเปิดลิงก์ได้</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
         <item quantity="one">Apply to the duplicate</item>
@@ -4659,8 +4659,7 @@
     <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Anyone with this link can view and download your data</item>
-        <item quantity="other">Anyone with these links can view and download your data</item>
+        <item quantity="other">ใครก็ตามที่มีลิงก์เหล่านี้ สามารถดูและดาวน์โหลดข้อมูลของคุณได้</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">บันทึกไปยังคลาวด์ไดรฟ์</string>
@@ -4683,8 +4682,7 @@
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
-        <item quantity="one">Link created and copied to your clipboard</item>
-        <item quantity="other">Links created and copied to your clipboard</item>
+        <item quantity="other">ทำการสร้างลิงก์และคัดลอกไปที่คลิปบอร์ดของคุณแล้ว</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
@@ -4799,7 +4797,7 @@
         <item quantity="other">%1$d downloads complete</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_end_recurrence_label">End recurrence</string>
+    <string name="meetings_schedule_meeting_end_recurrence_label">เวลาสิ้นสุดกิจวัตร</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">สิ้นสุดที่</string>
 </resources>
