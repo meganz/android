@@ -7264,10 +7264,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         overQuotaAlert: Boolean,
         preWarning: Boolean,
     ) {
-        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-            StorageStatusDialogFragment.newInstance(storageState, overQuotaAlert, preWarning)
-                .show(supportFragmentManager, StorageStatusDialogFragment.TAG)
-        }
+        StorageStatusDialogFragment.newInstance(storageState, overQuotaAlert, preWarning)
+            .show(supportFragmentManager, StorageStatusDialogFragment.TAG)
     }
 
     private fun refreshOfflineNodes() {

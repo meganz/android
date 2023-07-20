@@ -11,10 +11,12 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.NotificationsRepository
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Use case to monitor the latest state of [StorageStateEvent]
  */
+@Singleton
 class MonitorStorageStateEventUseCase @Inject constructor(
     private val notificationsRepository: NotificationsRepository,
     @ApplicationScope private val scope: CoroutineScope,
