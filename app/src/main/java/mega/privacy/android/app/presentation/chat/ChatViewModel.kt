@@ -36,6 +36,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
@@ -50,6 +51,7 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -116,6 +118,7 @@ class ChatViewModel @Inject constructor(
     private val monitorJoinedSuccessfullyUseCase: MonitorJoinedSuccessfullyUseCase,
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val leaveChat: LeaveChat,
+    private val getContactLinkUseCase: GetContactLinkUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -220,6 +223,7 @@ class ChatViewModel @Inject constructor(
             _state.value.schedId == null || _state.value.schedId == megaChatApiGateway.getChatInvalidHandle() -> startCall(
                 video = video
             )
+
             _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
             _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> answerCall(
                 _state.value.chatId,
@@ -305,10 +309,12 @@ class ChatViewModel @Inject constructor(
                                     scheduledMeetingStatus = when (call.status) {
                                         ChatCallStatus.UserNoPresent ->
                                             ScheduledMeetingStatus.NotJoined(call.duration)
+
                                         ChatCallStatus.Connecting,
                                         ChatCallStatus.Joining,
                                         ChatCallStatus.InProgress,
                                         -> ScheduledMeetingStatus.Joined(call.duration)
+
                                         else -> ScheduledMeetingStatus.NotStarted
                                     }
                                 }
@@ -353,10 +359,12 @@ class ChatViewModel @Inject constructor(
                         val scheduledMeetingStatus = when (call.status) {
                             ChatCallStatus.UserNoPresent ->
                                 ScheduledMeetingStatus.NotJoined(call.duration)
+
                             ChatCallStatus.Connecting,
                             ChatCallStatus.Joining,
                             ChatCallStatus.InProgress,
                             -> ScheduledMeetingStatus.Joined(call.duration)
+
                             else -> ScheduledMeetingStatus.NotStarted
                         }
                         _state.update {
@@ -588,4 +596,22 @@ class ChatViewModel @Inject constructor(
      */
     fun onChatArchivedEventConsumed() =
         _state.update { it.copy(titleChatArchivedEvent = null) }
+
+    /**
+     * Get contact link by handle
+     */
+    fun getContactLinkByHandle(
+        userHandle: Long,
+        onLoadContactLink: (contactLink: ContactLink) -> Unit,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                getContactLinkUseCase(userHandle)
+            }.onSuccess { contactLink ->
+                onLoadContactLink(contactLink)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
 }

@@ -151,6 +151,8 @@ import java.util.Map;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -184,6 +186,7 @@ import mega.privacy.android.app.utils.MeetingUtil;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting;
+import mega.privacy.android.domain.entity.contacts.ContactLink;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
@@ -274,7 +277,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private ArrayList<Uri> animationsPlaying = new ArrayList<>();
 
-    private InviteContactUseCase inviteContactUseCase;
     private GetAvatarUseCase getAvatarUseCase;
     private GetNodeUseCase getNodeUseCase;
 
@@ -629,7 +631,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                            ArrayList<AndroidMegaChatMessage> _messages,
                            ArrayList<MessageVoiceClip> _messagesPlaying,
                            ArrayList<RemovedMessage> _removedMessages,
-                           RecyclerView _listView, InviteContactUseCase inviteContactUseCase,
+                           RecyclerView _listView,
                            GetAvatarUseCase getAvatarUseCase, GetNodeUseCase getNodeUseCase,
                            ChatViewModel viewModel, MegaApiAndroid megaApi,
                            MegaChatApiAndroid megaChatApi, LegacyDatabaseHandler dbH) {
@@ -640,7 +642,6 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.chatRoom = chatRoom;
         this.removedMessages = _removedMessages;
         this.messagesPlaying = _messagesPlaying;
-        this.inviteContactUseCase = inviteContactUseCase;
         this.getAvatarUseCase = getAvatarUseCase;
         this.getNodeUseCase = getNodeUseCase;
         this.viewModel =  viewModel;
@@ -1833,18 +1834,14 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     if (androidMessage.getContactLinkResult() != null) {
                         bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                     } else {
-                        inviteContactUseCase.getContactLink(getContactLinkHandle(contactLink))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe((contactLinkResult, throwable) -> {
-                                    if (throwable == null) {
-                                        androidMessage.setContactLinkResult(contactLinkResult);
+                        viewModel.getContactLinkByHandle(getContactLinkHandle(contactLink), contactLinkResult -> {
+                            androidMessage.setContactLinkResult(contactLinkResult);
 
-                                        if (position == holder.getBindingAdapterPosition()) {
-                                            bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
-                                        }
-                                    }
-                                });
+                            if (position == holder.getBindingAdapterPosition()) {
+                                bindContactLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                            }
+                            return Unit.INSTANCE;
+                        });
                     }
                 } else {
                     bindNormalMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -5466,7 +5463,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private void bindContactLinkMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
         Timber.d("bindContactLinkMessage");
 
-        InviteContactUseCase.ContactLinkResult result = androidMessage.getContactLinkResult();
+        ContactLink result = androidMessage.getContactLinkResult();
         MegaChatMessage message = androidMessage.getMessage();
         boolean isLandscape = context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         boolean isOwnMessage = message.getUserHandle() == myUserHandle;
@@ -6476,7 +6473,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
      * @param holder     ViewHolder where the avatar has to be set.
      * @param ownMessage True if the message is own, false otherwise.
      */
-    private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage, InviteContactUseCase.ContactLinkResult result) {
+    private void setContactLinkAvatar(ViewHolderMessageChat holder, boolean ownMessage, ContactLink result) {
         if (result == null
                 || result.getContactHandle() == null
                 || result.getEmail() == null
@@ -7719,7 +7716,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 ((ChatActivity) context).itemClick(currentPositionInAdapter, dimens);
             } else {
                 int positionInMessages = currentPositionInAdapter - 1;
-                InviteContactUseCase.ContactLinkResult result = messages.get(positionInMessages).getContactLinkResult();
+                ContactLink result = messages.get(positionInMessages).getContactLinkResult();
                 ((ChatActivity) context).openContactLinkMessage(result);
             }
         }

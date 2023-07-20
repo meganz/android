@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.chat.ChatViewModel
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.contacts.ContactLink
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.usecase.chat.BroadcastChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -38,6 +40,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
 class ChatViewModelTest {
@@ -62,6 +65,7 @@ class ChatViewModelTest {
     private val monitorChatCallUpdates: MonitorChatCallUpdates = mock()
     private val endCallUseCase: EndCallUseCase = mock()
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
+    private val getContactLinkUseCase: GetContactLinkUseCase = mock()
     private val deviceGateway: DeviceGateway = mock()
     private val monitorUpdatePushNotificationSettingsUseCase =
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
@@ -107,6 +111,7 @@ class ChatViewModelTest {
             monitorJoinedSuccessfullyUseCase = monitorJoinedSuccessfullyUseCase,
             monitorLeaveChatUseCase = monitorLeaveChatUseCase,
             leaveChat = leaveChat,
+            getContactLinkUseCase = getContactLinkUseCase,
         )
     }
 
@@ -188,4 +193,14 @@ class ChatViewModelTest {
                 Truth.assertThat(state.joiningOrLeavingAction).isNull()
             }
         }
+
+    @Test
+    fun `test that callback invoke when call getContactLinkByHandle success`() = runTest {
+        val contactLink = mock<ContactLink>()
+        val userHandler = 1L
+        whenever(getContactLinkUseCase(userHandler)).thenReturn(contactLink)
+        underTest.getContactLinkByHandle(userHandler) {
+            Truth.assertThat(it).isEqualTo(contactLink)
+        }
+    }
 }

@@ -411,6 +411,7 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
+import mega.privacy.android.domain.entity.contacts.ContactLink;
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -5814,7 +5815,7 @@ public class ChatActivity extends PasscodeActivity
      *
      * @param contactLinkResult All the data of the contact link.
      */
-    public void openContactLinkMessage(InviteContactUseCase.ContactLinkResult contactLinkResult) {
+    public void openContactLinkMessage(ContactLink contactLinkResult) {
         String email = contactLinkResult.getEmail();
         if (email == null) {
             Timber.d("Email is null");
@@ -7088,7 +7089,7 @@ public class ChatActivity extends PasscodeActivity
                 //Create adapter
                 if (adapter == null) {
                     adapter = new MegaChatAdapter(this, chatRoom, messages,
-                            messagesPlaying, removedMessages, listView, inviteContactUseCase,
+                            messagesPlaying, removedMessages, listView,
                             getAvatarUseCase, getNodeUseCase, viewModel, megaApi, megaChatApi, dbH);
 
                     adapter.setHasStableIds(true);
@@ -8085,7 +8086,7 @@ public class ChatActivity extends PasscodeActivity
     private void createAdapter() {
         //Create adapter
         adapter = new MegaChatAdapter(this, chatRoom, messages, messagesPlaying,
-                removedMessages, listView, inviteContactUseCase, getAvatarUseCase, getNodeUseCase,
+                removedMessages, listView, getAvatarUseCase, getNodeUseCase,
                 viewModel, megaApi, megaChatApi, dbH);
 
         adapter.setHasStableIds(true);
