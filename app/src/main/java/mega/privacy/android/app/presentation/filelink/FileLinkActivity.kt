@@ -19,6 +19,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -26,11 +27,10 @@ import androidx.lifecycle.Lifecycle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityFileLinkBinding
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
@@ -40,16 +40,12 @@ import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.DecryptAlertDialog.DecryptDialogListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ChildDoesNotExistsException
-import mega.privacy.android.app.usecase.exception.MegaNodeException.ParentDoesNotExistException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
@@ -61,7 +57,6 @@ import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -142,7 +137,7 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
             if (document == null) {
                 importClicked = true
             } else {
-                checkCollisionBeforeCopying()
+                viewModel.handleImportNode(document, toHandle)
             }
         }
 
@@ -164,17 +159,7 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
         super.onCreate(savedInstanceState)
 
         intent?.let { url = it.dataString }
-        if (dbH.credentials != null && (megaApi.rootNode == null)) {
-            Timber.d("Refresh session - sdk or karere")
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            intent.data = Uri.parse(url)
-            intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
-            finish()
-            return
-        }
+        viewModel.checkLoginRequired()
 
         savedInstanceState?.let { nodeSaver.restoreState(savedInstanceState) }
         binding = ActivityFileLinkBinding.inflate(layoutInflater)
@@ -227,6 +212,7 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
 
         url?.let { importLink(it) } ?: Timber.w("url NULL")
         binding.fileLinkFragmentContainer.post { cookieDialogHandler.showDialogIfNeeded(this) }
+        setupObserver()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -260,6 +246,48 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
             R.id.share_link -> shareLink(this, url)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setupObserver() {
+        this.collectFlow(viewModel.state) {
+            when {
+                it.shouldLogin == true -> {
+                    showLoginScreen()
+                }
+
+                it.copySuccess -> {
+                    launchManagerActivity()
+                }
+
+                it.copyThrowable != null -> {
+                    if (!manageCopyMoveException(it.copyThrowable)) {
+                        showSnackbar(it.snackBarMessageId)
+                        launchManagerActivity()
+                    } else {
+                        viewModel.resetCopy()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun launchManagerActivity() {
+        startActivity(
+            Intent(this@FileLinkActivity, ManagerActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        )
+        finish()
+    }
+
+    private fun showLoginScreen() {
+        Timber.d("Refresh session - sdk or karere")
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+        intent.data = Uri.parse(url)
+        intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        finish()
     }
 
     /**
@@ -519,7 +547,9 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
                             }
                             trySetupCollapsingToolbar()
                             if (importClicked) {
-                                checkCollisionBeforeCopying()
+                                target?.handle?.let { targetHandle ->
+                                    viewModel.handleImportNode(document, targetHandle)
+                                } ?: Timber.e("TargetNode null")
                             }
 
                         } ?: {
@@ -666,62 +696,6 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
         val intent = Intent(this, FileExplorerActivity::class.java)
         intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
         selectImportFolderLauncher.launch(intent)
-    }
-
-    /**
-     * Checks if there is any name collision before copying the node.
-     */
-    private fun checkCollisionBeforeCopying() {
-        composite.add(
-            checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { collision: NameCollision ->
-                        val list = ArrayList<NameCollision>()
-                        list.add(collision)
-                        nameCollisionActivityContract?.launch(list)
-                        statusDialog?.dismiss()
-                    }
-                ) { throwable: Throwable? ->
-                    if (throwable is ParentDoesNotExistException) {
-                        statusDialog?.dismiss()
-                        showSnackbar(
-                            Constants.SNACKBAR_TYPE,
-                            getString(R.string.general_error),
-                            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                        )
-                    } else if (throwable is ChildDoesNotExistsException) {
-                        copyNode()
-                    }
-                })
-    }
-
-    /**
-     * Copies a node.
-     */
-    private fun copyNode() {
-        composite.add(
-            legacyCopyNodeUseCase.copy(document, target, null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    startActivity(
-                        Intent(this, ManagerActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    )
-                    finish()
-                }
-                ) { copyThrowable: Throwable? ->
-                    if (!manageCopyMoveException(copyThrowable)) {
-                        showSnackbar(Constants.SNACKBAR_TYPE, getString(R.string.context_no_copied))
-                        startActivity(
-                            Intent(this, ManagerActivity::class.java)
-                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        )
-                        finish()
-                    }
-                })
     }
 
     /**
@@ -914,6 +888,13 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
      */
     fun showSnackbar(type: Int, s: String?) {
         showSnackbar(type, binding.fileLinkFragmentContainer, s)
+    }
+
+    /**
+     * Show snackbar
+     */
+    fun showSnackbar(@StringRes message: Int) {
+        showSnackbar(Constants.SNACKBAR_TYPE, binding.fileLinkFragmentContainer, getString(message))
     }
 
     override fun onRequestPermissionsResult(

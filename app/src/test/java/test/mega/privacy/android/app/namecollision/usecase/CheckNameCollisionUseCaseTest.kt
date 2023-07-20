@@ -204,4 +204,33 @@ internal class CheckNameCollisionUseCaseTest {
                 }
         }
 
+    @Test
+    internal fun `test that check with node, parentHandle and collision type copy returns the correct result`() =
+        runTest {
+            val expected = 1234L
+            val parentNodeHandle = 12345L
+            val parentNode = mock<MegaNode>()
+            val child = mock<MegaNode> {
+                on { handle }.thenReturn(expected)
+            }
+            val folders = 4
+            val files = 20
+            megaApiGateway.stub {
+                onBlocking { getChildNode(anyOrNull(), anyOrNull()) }.thenReturn(child)
+                onBlocking { getNumChildFolders(any()) }.thenReturn(folders)
+                onBlocking { getNumChildFiles(any()) }.thenReturn(files)
+                onBlocking { getMegaNodeByHandle(parentNodeHandle) }.thenReturn(parentNode)
+            }
+            underTest.check(
+                node = mock { on { name }.thenReturn("name") },
+                parentNode = parentNode,
+                type = NameCollisionType.COPY,
+            ).test()
+                .assertValue {
+                    it is NameCollision.Copy
+                            && it.childFolderCount == folders
+                            && it.childFileCount == files
+                }
+        }
+
 }
