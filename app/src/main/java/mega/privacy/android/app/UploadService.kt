@@ -80,6 +80,7 @@ import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCas
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.GetCurrentUploadSpeedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -100,12 +101,6 @@ internal class UploadService : LifecycleService() {
      */
     @Inject
     lateinit var transfersManagement: TransfersManagement
-
-    /**
-     * database handler
-     */
-    @Inject
-    lateinit var dbH: LegacyDatabaseHandler
 
     /**
      * MegaApi
@@ -172,6 +167,9 @@ internal class UploadService : LifecycleService() {
 
     @Inject
     lateinit var getTransferDataUseCase: GetTransferDataUseCase
+
+    @Inject
+    lateinit var getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase
 
     private val intentFlow = MutableSharedFlow<Intent>()
 
@@ -708,7 +706,7 @@ internal class UploadService : LifecycleService() {
         if (total > 0) {
             inProgressTemp = inProgress * 100
             progressPercent = (inProgressTemp / total).toInt()
-            showRating(total, megaApi.currentUploadSpeed)
+            showRating(total)
         }
         val message = getMessageForProgressNotification(inProgress, pausedTransfers)
         Timber.d("updateProgressNotification $progressPercent $message")
@@ -724,14 +722,17 @@ internal class UploadService : LifecycleService() {
      * Determine if should show the rating page to users
      *
      * @param total              the total size of uploading file
-     * @param currentUploadSpeed current uploading speed
      */
-    private fun showRating(total: Long, currentUploadSpeed: Int) {
-        if (!isRatingShowed) {
-            RatingHandlerImpl(this)
-                .showRatingBaseOnSpeedAndSize(total, currentUploadSpeed.toLong()) {
-                    isRatingShowed = true
-                }
+    private fun showRating(total: Long) {
+        applicationScope.launch {
+            val currentUploadSpeed = getCurrentUploadSpeedUseCase()
+
+            if (!isRatingShowed) {
+                RatingHandlerImpl(this@UploadService)
+                    .showRatingBaseOnSpeedAndSize(total, currentUploadSpeed) {
+                        isRatingShowed = true
+                    }
+            }
         }
     }
 

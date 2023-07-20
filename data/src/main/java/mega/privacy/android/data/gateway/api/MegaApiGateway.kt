@@ -2729,4 +2729,9 @@ interface MegaApiGateway {
         password: String,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Current upload speed
+     */
+    val currentUploadSpeed: Int
 }

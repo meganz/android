@@ -409,4 +409,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getCurrentActiveTransferTotalsByType(transferType)
         }
+
+    override suspend fun getCurrentUploadSpeed() = withContext(ioDispatcher) {
+        megaApiGateway.currentUploadSpeed
+    }
 }

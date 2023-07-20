@@ -1291,4 +1291,7 @@ internal class MegaApiFacade @Inject constructor(
         password: String,
         listener: MegaRequestListenerInterface
     ) = megaApi.encryptLinkWithPassword(link, password, listener)
+
+    override val currentUploadSpeed: Int
+        get() = megaApi.currentUploadSpeed
 }

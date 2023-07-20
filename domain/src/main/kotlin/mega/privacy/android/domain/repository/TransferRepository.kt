@@ -347,4 +347,11 @@ interface TransferRepository {
      * @return the current active transfer totals
      */
     suspend fun getCurrentActiveTransferTotalsByType(transferType: TransferType): ActiveTransferTotals
+
+    /**
+     * Get current upload speed.
+     *
+     * @return Current upload speed.
+     */
+    suspend fun getCurrentUploadSpeed(): Int
 }
