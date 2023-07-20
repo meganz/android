@@ -50,7 +50,7 @@ data class ScanningTransferData(
      */
     fun isTheSameTransfer(transfer: Transfer): Boolean =
         if (transferTag != INVALID_VALUE) transferTag == transfer.tag
-        else transferType == transfer.type.mapTransferType() && isFolder == transfer.isFolderTransfer
+        else transferType == transfer.transferType.mapTransferType() && isFolder == transfer.isFolderTransfer
                 && (isTheSameUpload(transfer) || isTheSameDownload(transfer))
 
     /**

@@ -42,7 +42,7 @@ internal class TransferMapperTest {
             on { notificationNumber }.thenReturn(Random.nextLong())
         }
         val expected = Transfer(
-            type = TransferType.TYPE_DOWNLOAD,
+            transferType = TransferType.TYPE_DOWNLOAD,
             transferredBytes = megaTransfer.transferredBytes,
             totalBytes = megaTransfer.totalBytes,
             localPath = megaTransfer.path.orEmpty(),

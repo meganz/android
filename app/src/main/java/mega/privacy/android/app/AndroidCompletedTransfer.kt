@@ -68,7 +68,7 @@ class AndroidCompletedTransfer {
 
     constructor(transfer: Transfer, error: MegaException?, context: Context) {
         fileName = transfer.fileName
-        type = transfer.type.mapTransferType()
+        type = transfer.transferType.mapTransferType()
         state = transfer.state.mapTransferState()
         size = Util.getSizeString(transfer.totalBytes, context)
         nodeHandle = transfer.nodeHandle.toString()

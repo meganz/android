@@ -10,7 +10,6 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
@@ -25,7 +24,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferDao: CompletedTransferDao,
     private val activeTransferDao: ActiveTransferDao,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
-    private val activeTransferMapper: ActiveTransferMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val activeTransferTotalsMapper: ActiveTransferTotalsMapper,
     private val encryptData: EncryptData,
@@ -101,17 +99,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
         completedTransferDao.getCompletedTransfersCount()
 
     override suspend fun getActiveTransferByTag(tag: Int) =
-        activeTransferDao.getActiveTransferByTag(tag)?.let { activeTransferMapper(it) }
+        activeTransferDao.getActiveTransferByTag(tag)?.let { it }
 
     override fun getActiveTransfersByType(transferType: TransferType) =
         activeTransferDao.getActiveTransfersByType(transferType).map { activeTransferEntities ->
-            activeTransferEntities.map { activeTransferMapper(it) }
+            activeTransferEntities.map { it }
         }
 
     override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.getCurrentActiveTransfersByType(transferType).map {
-            activeTransferMapper(it)
-        }
+        activeTransferDao.getCurrentActiveTransfersByType(transferType).map { it }
 
     override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
         activeTransferDao.insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))

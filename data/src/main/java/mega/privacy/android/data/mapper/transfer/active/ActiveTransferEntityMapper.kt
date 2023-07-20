@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import javax.inject.Inject
 
 internal class ActiveTransferEntityMapper @Inject constructor() {
-    suspend operator fun invoke(activeTransfer: ActiveTransfer) = with(activeTransfer) {
+    operator fun invoke(activeTransfer: ActiveTransfer) = with(activeTransfer) {
         ActiveTransferEntity(
             tag = tag,
             transferType = transferType,

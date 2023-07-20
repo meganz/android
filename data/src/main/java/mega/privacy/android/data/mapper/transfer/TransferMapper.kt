@@ -19,7 +19,7 @@ internal class TransferMapper @Inject constructor(
      * @param transfer [MegaTransfer]
      */
     operator fun invoke(transfer: MegaTransfer) = Transfer(
-        type = transfer.type.mapTransferType(),
+        transferType = transfer.type.mapTransferType(),
         transferredBytes = transfer.transferredBytes,
         totalBytes = transfer.totalBytes,
         localPath = transfer.path.orEmpty(),

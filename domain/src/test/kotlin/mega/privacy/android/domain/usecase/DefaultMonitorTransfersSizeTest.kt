@@ -27,7 +27,7 @@ internal class DefaultMonitorTransfersSizeTest {
     private val globalTransferFlow = MutableSharedFlow<TransferEvent>()
     private val transferRepository = mock<TransferRepository>()
     private val transfer = Transfer(
-        type = TransferType.TYPE_DOWNLOAD,
+        transferType = TransferType.TYPE_DOWNLOAD,
         transferredBytes = 2000L,
         totalBytes = 1000L,
         localPath = "localPath",
@@ -58,7 +58,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit Upload TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_UPLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(type = TransferType.TYPE_UPLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_UPLOAD))
             underTest = DefaultMonitorTransfersSize(
                 repository = transferRepository
             )
@@ -79,7 +79,7 @@ internal class DefaultMonitorTransfersSizeTest {
     fun `when monitorTransferEvents emit Download TransferUpdateEvent then the transfer size info equal to transfer size and transferType is TYPE_DOWNLOAD`() =
         runTest {
             val event =
-                TransferEvent.TransferUpdateEvent(transfer.copy(type = TransferType.TYPE_DOWNLOAD))
+                TransferEvent.TransferUpdateEvent(transfer.copy(transferType = TransferType.TYPE_DOWNLOAD))
             underTest = DefaultMonitorTransfersSize(
                 repository = transferRepository
             )
@@ -112,7 +112,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
             collectJob.cancel()
         }
 
@@ -132,7 +132,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
             collectJob.cancel()
         }
 
@@ -152,7 +152,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
             collectJob.cancel()
         }
 
@@ -175,7 +175,7 @@ internal class DefaultMonitorTransfersSizeTest {
             globalTransferFlow.emit(event)
             assertEquals(transfersSizeInfo.value.totalSizePendingTransfer, transfer.totalBytes)
             assertEquals(transfersSizeInfo.value.totalSizeTransferred, transfer.transferredBytes)
-            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
             collectJob.cancel()
         }
 
@@ -205,7 +205,7 @@ internal class DefaultMonitorTransfersSizeTest {
                 transfersSizeInfo.value.totalSizeTransferred,
                 transfer.transferredBytes * 3
             )
-            assertEquals(transfersSizeInfo.value.transferType, transfer.type)
+            assertEquals(transfersSizeInfo.value.transferType, transfer.transferType)
             collectJob.cancel()
         }
 }

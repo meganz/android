@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import mega.privacy.android.data.database.MegaDatabaseConstant
+import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 
 /**
@@ -24,13 +25,13 @@ import mega.privacy.android.domain.entity.transfer.TransferType
 internal data class ActiveTransferEntity(
     @PrimaryKey
     @ColumnInfo(name = "tag")
-    val tag: Int,
+    override val tag: Int,
     @ColumnInfo(name = "transfer_type")
-    val transferType: TransferType,
+    override val transferType: TransferType,
     @ColumnInfo(name = "total_bytes")
-    val totalBytes: Long,
+    override val totalBytes: Long,
     @ColumnInfo(name = "transferred_bytes")
-    val transferredBytes: Long,
+    override val transferredBytes: Long,
     @ColumnInfo(name = "is_finished")
-    val isFinished: Boolean,
-)
+    override val isFinished: Boolean,
+) : ActiveTransfer

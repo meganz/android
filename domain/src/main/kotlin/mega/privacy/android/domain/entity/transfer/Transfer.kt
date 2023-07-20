@@ -5,7 +5,7 @@ import java.math.BigInteger
 /**
  * Data class used as model for MegaTransfer.
  *
- * @property type [TransferType]
+ * @property transferType [TransferType]
  * @property transferredBytes Transferred bytes during this transfer.
  * @property totalBytes Total bytes to be transferred to complete the transfer.
  * @property localPath Local path related to this transfer.
@@ -40,20 +40,20 @@ import java.math.BigInteger
  * @property notificationNumber Returns the notification number of the SDK when this MEGATransfer was generated.
  */
 data class Transfer(
-    val type: TransferType,
-    val transferredBytes: Long,
-    val totalBytes: Long,
+    override val transferType: TransferType,
+    override val transferredBytes: Long,
+    override val totalBytes: Long,
     val localPath: String,
     val parentPath: String,
     val nodeHandle: Long,
     val parentHandle: Long,
     val fileName: String,
     val stage: TransferStage,
-    val tag: Int,
+    override val tag: Int,
     val speed: Long,
     val isForeignOverQuota: Boolean,
     val isStreamingTransfer: Boolean,
-    val isFinished: Boolean,
+    override val isFinished: Boolean,
     val isFolderTransfer: Boolean,
     @Deprecated(message = "use transferAppData")
     val appData: String,
@@ -61,7 +61,7 @@ data class Transfer(
     val state: TransferState,
     val priority: BigInteger,
     val notificationNumber: Long,
-) {
+) : ActiveTransfer {
     /**
      * Is voice clip.
      *

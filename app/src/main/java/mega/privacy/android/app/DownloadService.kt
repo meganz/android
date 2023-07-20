@@ -279,7 +279,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         lifecycleScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
-                    it.transfer.type == TransferType.TYPE_DOWNLOAD
+                    it.transfer.transferType == TransferType.TYPE_DOWNLOAD
                 }
                 .catch {
                     Timber.e(it)
@@ -1359,7 +1359,7 @@ internal class DownloadService : LifecycleService(), MegaRequestListenerInterfac
         transfer: Transfer,
         error: MegaException?,
     ) = withContext(ioDispatcher) {
-        Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.type)
+        Timber.d("Node handle: " + transfer.nodeHandle + ", Type = " + transfer.transferType)
         if (transfer.isStreamingTransfer) return@withContext
         if (error?.errorCode == MegaError.API_EBUSINESSPASTDUE) {
             sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED))

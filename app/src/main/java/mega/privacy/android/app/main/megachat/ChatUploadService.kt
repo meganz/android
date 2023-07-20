@@ -204,7 +204,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         monitorTransferEventsJob = sharingScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
-                    it.transfer.type == TransferType.TYPE_UPLOAD && it.transfer.isChatUpload()
+                    it.transfer.transferType == TransferType.TYPE_UPLOAD && it.transfer.isChatUpload()
                 }
                 .catch { Timber.e(it) }
                 .collect { transferEvent ->

@@ -245,7 +245,7 @@ internal class UploadService : LifecycleService() {
         monitorTransferEventsJob = applicationScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
-                    it.transfer.type == TransferType.TYPE_UPLOAD
+                    it.transfer.transferType == TransferType.TYPE_UPLOAD
                             && !it.transfer.isCUUpload() && !it.transfer.isChatUpload()
                 }
                 .catch { Timber.e(it) }

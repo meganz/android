@@ -13,7 +13,6 @@ import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -38,7 +37,6 @@ internal class MegaLocalRoomFacadeTest {
     private val completedTransferModelMapper = mock<CompletedTransferModelMapper>()
     private val encryptData = mock<EncryptData>()
     private val activeTransferDao = mock<ActiveTransferDao>()
-    private val activeTransferMapper = mock<ActiveTransferMapper>()
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
 
@@ -51,7 +49,6 @@ internal class MegaLocalRoomFacadeTest {
             completedTransferDao,
             activeTransferDao,
             completedTransferModelMapper,
-            activeTransferMapper,
             activeTransferEntityMapper,
             activeTransferTotalsMapper,
             encryptData,
@@ -68,7 +65,6 @@ internal class MegaLocalRoomFacadeTest {
             completedTransferModelMapper,
             encryptData,
             activeTransferDao,
-            activeTransferMapper,
             activeTransferEntityMapper,
         )
     }

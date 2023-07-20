@@ -103,7 +103,7 @@ class MegaTransfersAdapter(
         }
         holder.textViewFileName.text = transfer.fileName
         val isItemChecked = isItemChecked(transfer)
-        when (transfer.type) {
+        when (transfer.transferType) {
             TransferType.TYPE_DOWNLOAD -> {
                 holder.progressText.setTextColor(
                     ContextCompat.getColor(
@@ -226,8 +226,8 @@ class MegaTransfersAdapter(
                 TransferState.STATE_QUEUED,
                 -> {
                     when {
-                        (transfer.type == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
-                                || (transfer.type == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
+                        (transfer.transferType == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
+                                || (transfer.transferType == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
                         -> {
                             holder.progressText.setTextColor(
                                 ContextCompat.getColor(
@@ -238,7 +238,7 @@ class MegaTransfersAdapter(
                             holder.progressText.text = String.format(
                                 "%s %s",
                                 getProgress(transfer),
-                                if (transfer.type == TransferType.TYPE_DOWNLOAD)
+                                if (transfer.transferType == TransferType.TYPE_DOWNLOAD)
                                     context.getString(R.string.label_transfer_over_quota)
                                 else
                                     context.getString(R.string.label_storage_over_quota)

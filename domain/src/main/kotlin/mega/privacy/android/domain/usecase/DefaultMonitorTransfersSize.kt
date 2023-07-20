@@ -39,7 +39,7 @@ class DefaultMonitorTransfersSize @Inject constructor(
                 transferMap.clear()
             }
             TransfersSizeInfo(
-                transferType = transfer.type,
+                transferType = transfer.transferType,
                 totalSizePendingTransfer = totalBytes,
                 totalSizeTransferred = totalTransferred
             )
