@@ -4,12 +4,12 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import javax.inject.Inject
 
 /**
- * Is video file use case
+ * Is image file use case
  *
  * @property fileSystemRepository
- * @constructor Create empty Is video file use case
+ * @constructor Create empty Is image file use case
  */
-class IsVideoFileUseCase @Inject constructor(
+class IsImageFileUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
 ) {
 
@@ -17,8 +17,8 @@ class IsVideoFileUseCase @Inject constructor(
      * Invoke
      *
      * @param localPath
-     * @return True if the file is a video, false otherwise.
+     * @return True if the file is an image, false otherwise.
      */
     suspend operator fun invoke(localPath: String) =
-        fileSystemRepository.getGuessContentTypeFromName(localPath)?.startsWith("video") == true
+        fileSystemRepository.getGuessContentTypeFromName(localPath)?.startsWith("image") == true
 }
