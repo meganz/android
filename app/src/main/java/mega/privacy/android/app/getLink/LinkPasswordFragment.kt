@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
@@ -199,7 +200,9 @@ class LinkPasswordFragment : Fragment(), Scrollable {
     }
 
     private fun setupObservers() {
-        viewModel.getPassword().observe(viewLifecycleOwner, ::onPasswordSet)
+        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+            onPasswordSet(uiState.password)
+        }
     }
 
     /**

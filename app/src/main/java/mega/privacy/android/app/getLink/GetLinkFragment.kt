@@ -195,7 +195,6 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private fun setupObservers() {
         viewModel.getLink().observe(viewLifecycleOwner, ::updateLink)
         viewModel.getExpiryDate().observe(viewLifecycleOwner, ::updateExpiryDate)
-        viewModel.getPassword().observe(viewLifecycleOwner, ::updatePassword)
 
         viewLifecycleOwner.collectFlow(viewModel.linkCopied) {
             it?.let { pair ->
@@ -205,6 +204,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             binding.keyText.text = uiState.key
+            updatePassword(uiState.password)
         }
     }
 
