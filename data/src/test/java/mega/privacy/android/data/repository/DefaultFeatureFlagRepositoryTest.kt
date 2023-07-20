@@ -9,8 +9,8 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.repository.FeatureFlagRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -20,6 +20,8 @@ class DefaultFeatureFlagRepositoryTest {
     private lateinit var underTest: FeatureFlagRepository
 
     private val defaultProviderMock =
+        mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
+    private val secondaryDefaultProviderMock =
         mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
     private val configurationFileProviderMock =
         mock<FeatureFlagValueProvider> { onBlocking { isEnabled(any()) }.thenReturn(null) }
@@ -39,11 +41,18 @@ class DefaultFeatureFlagRepositoryTest {
     )
 
     private val featureFlagValueProviders = providerMocks.mapKeys {
-        FeatureFlagPriorityKey(FeatureFlagValueProvider::class,
-            it.key)
-    }
+        FeatureFlagPriorityKey(
+            implementingClass = FeatureFlagValueProvider::class,
+            priority = it.key
+        )
+    }.plus(
+        FeatureFlagPriorityKey(
+            implementingClass = FakeFeatureFlagValueProvider::class,
+            priority = FeatureFlagValuePriority.Default
+        ) to secondaryDefaultProviderMock
+    )
 
-    @Before
+    @BeforeEach
     fun setUp() {
         underTest = DefaultFeatureFlagRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
@@ -71,4 +80,17 @@ class DefaultFeatureFlagRepositoryTest {
         whenever(configurationFileProviderMock.isEnabled(feature)).thenReturn(false)
         assertThat(underTest.getFeatureValue(feature)).isFalse()
     }
+
+    @Test
+    internal fun `test that all providers for a given priority are used`() = runTest {
+        val primaryFeature = mock<Feature>()
+        val secondaryFeature = mock<Feature>()
+        whenever(defaultProviderMock.isEnabled(primaryFeature)).thenReturn(true)
+        whenever(secondaryDefaultProviderMock.isEnabled(secondaryFeature)).thenReturn(true)
+
+        assertThat(underTest.getFeatureValue(primaryFeature)).isTrue()
+        assertThat(underTest.getFeatureValue(secondaryFeature)).isTrue()
+    }
 }
+
+private interface FakeFeatureFlagValueProvider : FeatureFlagValueProvider
