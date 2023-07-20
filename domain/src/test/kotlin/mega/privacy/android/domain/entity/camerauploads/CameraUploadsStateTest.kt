@@ -81,19 +81,26 @@ internal class CameraUploadsStateTest {
 
     @Test
     fun `test that totalBytesUploaded returns the sum of primaryBytesUploaded and secondaryBytesUploaded`() {
-        val fileA: Pair<String, Long> = Pair("pathA", 10000000L / 2)
-        val fileB: Pair<String, Long> = Pair("pathB", 10000000L / 2)
-        val primaryBytesUploaded = fileA.second + fileB.second
-        val fileC: Pair<String, Long> = Pair("pathC", 2000000L / 2)
-        val fileD: Pair<String, Long> = Pair("pathD", 2000000L / 2)
-        val secondaryBytesUploaded = fileC.second + fileD.second
+        val fileA = 1 to 10000000L / 2
+        val fileB = 2 to 10000000L / 2
+        val primaryBytesFinishedUploadedCount = 1000L
+        val primaryBytesUploaded =
+            primaryBytesFinishedUploadedCount + fileA.second + fileB.second
+        val fileC = 3 to 2000000L / 2
+        val fileD = 4 to 2000000L / 2
+        val secondaryBytesFinishedUploadedCount = 2000L
+        val secondaryBytesUploaded =
+            secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
         val expected = primaryBytesUploaded + secondaryBytesUploaded
 
         with(underTest) {
-            primaryCameraUploadsState.bytesUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesUploadedTable[fileB.first] = fileB.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileD.first] = fileD.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
+            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
+            secondaryCameraUploadsState.bytesFinishedUploadedCount =
+                secondaryBytesFinishedUploadedCount
         }
 
         assertThat(underTest.totalBytesUploadedCount).isEqualTo(expected)
@@ -115,14 +122,18 @@ internal class CameraUploadsStateTest {
 
     @Test
     fun `test that progress returns the correct progress if totalUploadBytes is not 0L`() {
-        val primaryBytesToUpload = 1000L
-        val secondaryBytesToUpload = 1000L
-        val fileA: Pair<String, Long> = Pair("pathA", 500L / 2)
-        val fileB: Pair<String, Long> = Pair("pathB", 500L / 2)
-        val primaryBytesUploaded = fileA.second + fileB.second
-        val fileC: Pair<String, Long> = Pair("pathC", 500L / 2)
-        val fileD: Pair<String, Long> = Pair("pathD", 500L / 2)
-        val secondaryBytesUploaded = fileC.second + fileD.second
+        val primaryBytesToUpload = 2000L
+        val secondaryBytesToUpload = 2000L
+        val fileA = 1 to 500L / 2
+        val fileB = 2 to 500L / 2
+        val primaryBytesFinishedUploadedCount = 1000L
+        val primaryBytesUploaded =
+            primaryBytesFinishedUploadedCount + fileA.second + fileB.second
+        val fileC = 3 to 500L / 2
+        val fileD = 4 to 500L / 2
+        val secondaryBytesFinishedUploadedCount = 2000L
+        val secondaryBytesUploaded =
+            secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
         val expected =
             (((primaryBytesUploaded + secondaryBytesUploaded).toDouble() / (primaryBytesToUpload + secondaryBytesToUpload)) * 100)
                 .roundToInt()
@@ -130,10 +141,13 @@ internal class CameraUploadsStateTest {
         with(underTest) {
             primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
             secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-            primaryCameraUploadsState.bytesUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesUploadedTable[fileB.first] = fileB.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileD.first] = fileD.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
+            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
+            secondaryCameraUploadsState.bytesFinishedUploadedCount =
+                secondaryBytesFinishedUploadedCount
         }
 
         assertThat(underTest.totalProgress).isEqualTo(expected)
@@ -147,10 +161,12 @@ internal class CameraUploadsStateTest {
         val secondaryUploaded = 10
         val primaryBytesToUpload = 2000L
         val secondaryBytesToUpload = 1000L
-        val fileA: Pair<String, Long> = Pair("pathA", 500L / 2)
-        val fileB: Pair<String, Long> = Pair("pathB", 500L / 2)
-        val fileC: Pair<String, Long> = Pair("pathC", 500L / 2)
-        val fileD: Pair<String, Long> = Pair("pathD", 500L / 2)
+        val fileA = 1 to 500L / 2
+        val fileB = 2 to 500L / 2
+        val fileC = 3 to 500L / 2
+        val fileD = 4 to 500L / 2
+        val primaryBytesFinishedUploadedCount = 1000L
+        val secondaryBytesFinishedUploadedCount = 2000L
 
         with(underTest) {
             primaryCameraUploadsState.toUploadCount = primaryToUpload
@@ -159,10 +175,13 @@ internal class CameraUploadsStateTest {
             secondaryCameraUploadsState.uploadedCount = secondaryUploaded
             primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
             secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-            primaryCameraUploadsState.bytesUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesUploadedTable[fileB.first] = fileB.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesUploadedTable[fileD.first] = fileD.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
+            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
+            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
+            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
+            secondaryCameraUploadsState.bytesFinishedUploadedCount =
+                secondaryBytesFinishedUploadedCount
         }
 
         underTest.resetUploadsCounts()
@@ -176,6 +195,8 @@ internal class CameraUploadsStateTest {
             assertThat(secondaryCameraUploadsState.bytesToUploadCount).isEqualTo(0)
             assertThat(primaryCameraUploadsState.bytesUploadedCount).isEqualTo(0)
             assertThat(secondaryCameraUploadsState.bytesUploadedCount).isEqualTo(0)
+            assertThat(primaryCameraUploadsState.bytesFinishedUploadedCount).isEqualTo(0)
+            assertThat(secondaryCameraUploadsState.bytesFinishedUploadedCount).isEqualTo(0)
         }
     }
 

@@ -11,7 +11,9 @@ import kotlin.math.roundToInt
  * @property toUploadCount Number of files to upload
  * @property uploadedCount Number of files uploaded
  * @property bytesToUploadCount Number of bytes to upload
- * @property bytesUploadedTable Number of files uploaded per upload. Each upload is identified with the local path.
+ * @property bytesFinishedUploadedCount Number of bytes uploaded that corresponds to finished uploads
+ * @property bytesInProgressUploadedTable Number of bytes uploaded per upload that is in progress. Each upload is identified with the local path.
+ *                                        Once an upload is finished, the item is removed from this table and the bytes are added to bytesFinishedUploadedCount
  * @property bytesUploadedCount Number of bytes uploaded
  * @property pendingCount Number of files remaining to be uploaded
  * @property progress current progress of Camera Uploads process for the folder. A [Int] between 0 and 100
@@ -22,10 +24,11 @@ data class CameraUploadsFolderState(
     var toUploadCount: Int = 0,
     var uploadedCount: Int = 0,
     var bytesToUploadCount: Long = 0,
-    var bytesUploadedTable: Hashtable<String, Long> = Hashtable()
+    var bytesFinishedUploadedCount: Long = 0,
+    var bytesInProgressUploadedTable: Hashtable<Int, Long> = Hashtable()
 ) {
     val bytesUploadedCount: Long
-        get() = bytesUploadedTable.values.sum()
+        get() = bytesFinishedUploadedCount + bytesInProgressUploadedTable.values.sum()
 
     val pendingCount: Int
         get() = toUploadCount - uploadedCount
@@ -46,6 +49,7 @@ data class CameraUploadsFolderState(
         toUploadCount = 0
         uploadedCount = 0
         bytesToUploadCount = 0
-        bytesUploadedTable.clear()
+        bytesFinishedUploadedCount = 0
+        bytesInProgressUploadedTable.clear()
     }
 }

@@ -1323,13 +1323,13 @@ class CameraUploadsWorker @AssistedInject constructor(
             else CameraUploadFolderType.Primary
         val isFinished = true
         val nodeHandle = record.nodeHandle
-        val localPath = record.localPath
-        val bytesTransferred = record.localPath?.let { File(it).length() }
+        val recordId = record.id
+        val bytesTransferred = record.localPath?.let { File(it).length() } ?: 0L
         updateUploadedCount(
             cameraUploadFolderType,
             isFinished,
             nodeHandle,
-            localPath,
+            recordId,
             bytesTransferred
         )
     }
@@ -1350,13 +1350,13 @@ class CameraUploadsWorker @AssistedInject constructor(
             else CameraUploadFolderType.Primary
         val isFinished = transfer.isFinished
         val nodeHandle = transfer.nodeHandle
-        val localPath = transfer.localPath
+        val recordId = record.id
         val bytesTransferred = transfer.transferredBytes
         updateUploadedCount(
             cameraUploadFolderType,
             isFinished,
             nodeHandle,
-            localPath,
+            recordId,
             bytesTransferred
         )
     }
@@ -1367,16 +1367,16 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  @param cameraUploadFolderType primary or secondary
      *  @param isFinished true if the transfer is finished. When copying, this value is always true
      *  @param nodeHandle the node handle associated to the transfer or the node copied
-     *  @param localPath the local path of the files. It is used to identifies the bytes transferred
-     *                   for a unique filed transferred
+     *  @param recordId the recordId associated to the file uploaded.
+     *                  It is used to identifies the bytes transferred for a unique filed transferred
      *  @param bytesTransferred the bytes transferred for this file
      */
     private suspend fun updateUploadedCount(
         cameraUploadFolderType: CameraUploadFolderType,
         isFinished: Boolean,
         nodeHandle: Long?,
-        localPath: String?,
-        bytesTransferred: Long?,
+        recordId: Int?,
+        bytesTransferred: Long,
     ) {
         with(cameraUploadState) {
             when (cameraUploadFolderType) {
@@ -1386,8 +1386,13 @@ class CameraUploadsWorker @AssistedInject constructor(
                             uploadedCount++
                             lastTimestamp = Instant.now().epochSecond
                             nodeHandle?.let { lastHandle = it }
+                            recordId?.let { bytesInProgressUploadedTable.remove(it) }
+                            bytesFinishedUploadedCount += bytesTransferred
+                        } else {
+                            recordId?.let {
+                                bytesInProgressUploadedTable[it] = bytesTransferred
+                            }
                         }
-                        localPath?.let { bytesUploadedTable[localPath] = bytesTransferred }
                     }
                 }
 
@@ -1397,8 +1402,13 @@ class CameraUploadsWorker @AssistedInject constructor(
                             uploadedCount++
                             lastTimestamp = Instant.now().epochSecond
                             nodeHandle?.let { lastHandle = it }
+                            recordId?.let { bytesInProgressUploadedTable.remove(it) }
+                            bytesFinishedUploadedCount += bytesTransferred
+                        } else {
+                            recordId?.let {
+                                bytesInProgressUploadedTable[it] = bytesTransferred
+                            }
                         }
-                        localPath?.let { bytesUploadedTable[localPath] = bytesTransferred }
                     }
                 }
             }

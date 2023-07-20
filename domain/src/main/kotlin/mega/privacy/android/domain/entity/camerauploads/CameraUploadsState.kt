@@ -14,8 +14,8 @@ import kotlin.math.roundToInt
  * @property totalProgress current progress of the camera uploads process. A [Int] between 0 and 100
  */
 data class CameraUploadsState(
-    var primaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
-    var secondaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
+    val primaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
+    val secondaryCameraUploadsState: CameraUploadsFolderState = CameraUploadsFolderState(),
 ) {
     val totalToUploadCount: Int
         get() = primaryCameraUploadsState.toUploadCount + secondaryCameraUploadsState.toUploadCount

@@ -44,13 +44,15 @@ class CameraUploadsFolderStateTest {
 
     @Test
     fun `test that totalUploadedCount is equal to the sum of bytes transferred`() {
-        val fileA: Pair<String, Long> = Pair("pathA", 1000)
-        val fileB: Pair<String, Long> = Pair("pathB", 2000)
-        val expected = fileA.second + fileB.second
+        val fileA = 1 to 1000L
+        val fileB = 2 to 2000L
+        val bytesFinishedUploadedCount = 100L
+        val expected = bytesFinishedUploadedCount + fileA.second + fileB.second
 
         with(underTest) {
-            this.bytesUploadedTable[fileA.first] = fileA.second
-            this.bytesUploadedTable[fileB.first] = fileB.second
+            this.bytesFinishedUploadedCount = bytesFinishedUploadedCount
+            this.bytesInProgressUploadedTable[fileA.first] = fileA.second
+            this.bytesInProgressUploadedTable[fileB.first] = fileB.second
         }
 
         assertThat(underTest.bytesUploadedCount).isEqualTo(expected)
@@ -59,18 +61,20 @@ class CameraUploadsFolderStateTest {
     @Test
     fun `test that when bytesToUploadCount is not 0 then progress returns the current progress`() {
         val bytesToUploadCount = 1000L
-        val fileA: Pair<String, Long> = Pair("pathA", 250)
-        val fileB: Pair<String, Long> = Pair("pathB", 250)
+        val fileA = 1 to 250L
+        val fileB = 2 to 250L
+        val bytesFinishedUploadedCount = 100L
 
         val expected =
-            ((bytesToUploadCount) / (fileA.second + fileB.second)) / 100
+            ((bytesToUploadCount) / (bytesFinishedUploadedCount + fileA.second + fileB.second)) / 100
                 .toDouble()
                 .roundToInt()
 
         with(underTest) {
             this.bytesToUploadCount = bytesToUploadCount
-            this.bytesUploadedTable[fileA.first] = fileA.second
-            this.bytesUploadedTable[fileB.first] = fileB.second
+            this.bytesFinishedUploadedCount = bytesFinishedUploadedCount
+            this.bytesInProgressUploadedTable[fileA.first] = fileA.second
+            this.bytesInProgressUploadedTable[fileB.first] = fileB.second
         }
 
         assertThat(underTest.progress).isEqualTo(expected)
