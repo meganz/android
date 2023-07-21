@@ -70,7 +70,7 @@
                 android:id="@+id/option_share_contact"
                 style="@style/BottomSheetOption"
                 android:text="@string/context_send_contact"
-                app:drawableStartCompat="@drawable/ic_share_to_contact" />
+                app:drawableStartCompat="@drawable/ic_share_contact" />
 
             <TextView
                 android:id="@+id/option_share_folder"

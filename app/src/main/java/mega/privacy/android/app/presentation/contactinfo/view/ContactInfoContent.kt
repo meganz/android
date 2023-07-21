@@ -65,7 +65,7 @@ internal fun ContactInfoContent(
     }
     MegaMenuAction(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = R.drawable.ic_share_contact
+        icon = R.drawable.ic_contact_share
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
