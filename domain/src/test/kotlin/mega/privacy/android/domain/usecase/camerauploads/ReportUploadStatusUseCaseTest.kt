@@ -25,13 +25,7 @@ internal class ReportUploadStatusUseCaseTest {
 
     private lateinit var underTest: ReportUploadStatusUseCase
 
-    private val invalidHandle = -1L
-
-    private val cameraUploadRepository = mock<CameraUploadRepository> {
-        onBlocking {
-            getInvalidHandle()
-        }.thenReturn(invalidHandle)
-    }
+    private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @BeforeAll
     fun setUp() {
@@ -41,12 +35,12 @@ internal class ReportUploadStatusUseCaseTest {
     }
 
     @BeforeEach
-    fun resetMock() {
+    fun resetMocks() {
         reset(cameraUploadRepository)
     }
 
     @Test
-    internal fun `test that camera uploads status is sent when handle is valid and backup id exists`() =
+    fun `test that camera uploads status is sent when the backup id exists`() =
         runTest {
             whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(69L)
             underTest(
@@ -63,7 +57,7 @@ internal class ReportUploadStatusUseCaseTest {
         }
 
     @Test
-    internal fun `test that media uploads status is sent when handle is valid and backup id exists`() =
+    fun `test that media uploads status is sent when the backup id exists`() =
         runTest {
             whenever(cameraUploadRepository.getMuBackUpId()).thenReturn(69L)
             underTest(
@@ -80,7 +74,7 @@ internal class ReportUploadStatusUseCaseTest {
         }
 
     @Test
-    internal fun `test that camera uploads status is not sent when handle is valid and backup id does not exist`() =
+    fun `test that camera uploads status is not sent when the backup id does not exist`() =
         runTest {
             whenever(cameraUploadRepository.getCuBackUpId()).thenReturn(null)
             underTest(
@@ -97,7 +91,7 @@ internal class ReportUploadStatusUseCaseTest {
         }
 
     @Test
-    internal fun `test that media uploads status is not sent when handle is valid and backup id does not exist`() =
+    fun `test that media uploads status is not sent when the backup id does not exist`() =
         runTest {
             whenever(cameraUploadRepository.getMuBackUpId()).thenReturn(null)
             underTest(
@@ -105,22 +99,6 @@ internal class ReportUploadStatusUseCaseTest {
                 heartbeatStatus = HeartbeatStatus.values().random(),
                 pendingUploads = 69,
                 lastNodeHandle = 1L,
-                lastTimestamp = 60L,
-            )
-            verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(
-                any(), any(), any(),
-                any(), any(), any()
-            )
-        }
-
-    @Test
-    internal fun `test that uploads status is not sent when handle is invalid`() =
-        runTest {
-            underTest(
-                CameraUploadFolderType.values().random(),
-                heartbeatStatus = HeartbeatStatus.values().random(),
-                pendingUploads = 69,
-                lastNodeHandle = invalidHandle,
                 lastTimestamp = 60L,
             )
             verify(cameraUploadRepository, times(0)).sendBackupHeartbeat(

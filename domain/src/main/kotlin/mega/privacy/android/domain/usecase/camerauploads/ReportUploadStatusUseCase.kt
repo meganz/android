@@ -28,20 +28,18 @@ class ReportUploadStatusUseCase @Inject constructor(
         lastNodeHandle: Long,
         lastTimestamp: Long,
     ) {
-        if (lastNodeHandle != cameraUploadRepository.getInvalidHandle()) {
-            when (cameraUploadFolderType) {
-                CameraUploadFolderType.Primary -> cameraUploadRepository.getCuBackUpId()
-                CameraUploadFolderType.Secondary -> cameraUploadRepository.getMuBackUpId()
-            }?.let { backupId ->
-                cameraUploadRepository.sendBackupHeartbeat(
-                    backupId = backupId,
-                    heartbeatStatus = heartbeatStatus,
-                    ups = pendingUploads,
-                    downs = 0,
-                    ts = lastTimestamp,
-                    lastNode = lastNodeHandle,
-                )
-            }
+        when (cameraUploadFolderType) {
+            CameraUploadFolderType.Primary -> cameraUploadRepository.getCuBackUpId()
+            CameraUploadFolderType.Secondary -> cameraUploadRepository.getMuBackUpId()
+        }?.let { backupId ->
+            cameraUploadRepository.sendBackupHeartbeat(
+                backupId = backupId,
+                heartbeatStatus = heartbeatStatus,
+                ups = pendingUploads,
+                downs = 0,
+                ts = lastTimestamp,
+                lastNode = lastNodeHandle,
+            )
         }
     }
 }
