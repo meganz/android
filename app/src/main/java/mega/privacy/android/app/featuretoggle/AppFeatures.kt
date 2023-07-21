@@ -15,6 +15,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enables the new compose passcode implementation
+     */
+    Passcode(
+        "Enables the new compose passcode implementation",
+        false,
+    ),
+
+    /**
      * Enables the options to cancel scheduled meeting and cancel an occurrence
      */
     CancelSchedMeeting(
