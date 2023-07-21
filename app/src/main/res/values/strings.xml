@@ -5036,6 +5036,8 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Cancel occurrence</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Start a meeting</string>
     <!--Description text from Meeting List screen empty view-->

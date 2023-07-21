@@ -1896,6 +1896,11 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 bindChatLinkMessage((ViewHolderMessageChat) holder, androidMessage, position);
                 break;
             }
+            case MegaChatMessage.TYPE_SCHED_MEETING: {
+                Timber.d("TYPE_SCHED_MEETING");
+                bindSchedMeetingMessage((ViewHolderMessageChat) holder, androidMessage, position);
+                break;
+            }
             case MegaChatMessage.TYPE_INVALID: {
                 Timber.w("TYPE_INVALID");
                 bindNoTypeMessage((ViewHolderMessageChat) holder, androidMessage, position);
@@ -6465,6 +6470,45 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ((ViewHolderMessageChat) holder).contentContactMessageContactName.setVisibility(View.GONE);
             ((ViewHolderMessageChat) holder).contentContactMessageContactEmail.setVisibility(View.GONE);
         }
+    }
+
+    public void bindSchedMeetingMessage(ViewHolderMessageChat holder, AndroidMegaChatMessage androidMessage, int position) {
+        Timber.d("bindSchedMeetingMessage");
+
+        MegaChatMessage message = androidMessage.getMessage();
+
+        holder.layoutAvatarMessages.setVisibility(View.GONE);
+        setContactMessageName(position, holder, message.getUserHandle(), true);
+
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            holder.titleContactMessage.setPadding(scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics), 0, 0, 0);
+        } else {
+            holder.titleContactMessage.setPadding(scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics), 0, 0, 0);
+        }
+
+        if (messages.get(position - 1).getInfoToShow() != -1) {
+            setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(), formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context), formatTime(message));
+        }
+
+        holder.ownMessageLayout.setVisibility(View.GONE);
+        holder.contactMessageLayout.setVisibility(View.VISIBLE);
+
+        holder.contentContactMessageLayout.setVisibility(View.GONE);
+        holder.contactManagementMessageLayout.setVisibility(View.VISIBLE);
+        holder.contactManagementMessageIcon.setVisibility(View.GONE);
+
+        RelativeLayout.LayoutParams paramsContactManagement = (RelativeLayout.LayoutParams) holder.contactManagementMessageText.getLayoutParams();
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            paramsContactManagement.leftMargin = scaleWidthPx(MANAGEMENT_MESSAGE_LAND, outMetrics);
+        } else {
+            paramsContactManagement.leftMargin = scaleWidthPx(MANAGEMENT_MESSAGE_PORT, outMetrics);
+        }
+        holder.contactManagementMessageText.setLayoutParams(paramsContactManagement);
+
+        holder.nameContactText.setVisibility(View.GONE);
+
+        String textToShow = String.format(context.getString(R.string.chat_chat_room_message_updated_scheduled_meeting), toCDATA(holder.fullNameTitle));
+        holder.contactManagementMessageText.setText(replaceFormatChatMessages(context, textToShow, true));
     }
 
     /**
