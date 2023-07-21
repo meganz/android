@@ -7,7 +7,7 @@ import javax.inject.Inject
  * Get GPS coordinates use case
  *
  * @property fileSystemRepository
- * @constructor Create empty Get g p s coordinates use case
+ * @constructor Create empty Get GPS coordinates use case
  */
 class GetGPSCoordinatesUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,

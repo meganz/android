@@ -1285,9 +1285,12 @@ internal class MegaApiFacade @Inject constructor(
     override fun encryptLinkWithPassword(
         link: String,
         password: String,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.encryptLinkWithPassword(link, password, listener)
 
     override val currentUploadSpeed: Int
         get() = megaApi.currentUploadSpeed
+
+    override suspend fun setNodeCoordinates(node: MegaNode, latitude: Double, longitude: Double) =
+        megaApi.setNodeCoordinates(node, latitude, longitude, null)
 }

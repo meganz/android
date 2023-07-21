@@ -2723,4 +2723,27 @@ interface MegaApiGateway {
      * Current upload speed
      */
     val currentUploadSpeed: Int
+
+    /**
+     * Set the GPS coordinates of image files as a node attribute.
+     *
+     * To remove the existing coordinates, set both the latitude and longitude to
+     * the value MegaNode::INVALID_COORDINATE.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_NODE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node that receive the attribute
+     * - MegaRequest::getFlag - Returns true (official attribute)
+     * - MegaRequest::getParamType - Returns MegaApi::NODE_ATTR_COORDINATES
+     * - MegaRequest::getNumDetails - Returns the longitude, scaled to integer in the range of [0, 2^24]
+     * - MegaRequest::getTransferTag() - Returns the latitude, scaled to integer in the range of [0, 2^24)
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param node      Node that will receive the information.
+     * @param latitude  Latitude in signed decimal degrees notation
+     * @param longitude Longitude in signed decimal degrees notation
+     */
+    suspend fun setNodeCoordinates(node: MegaNode, latitude: Double, longitude: Double)
 }

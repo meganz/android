@@ -669,4 +669,11 @@ internal class NodeRepositoryImpl @Inject constructor(
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    override suspend fun setNodeCoordinates(nodeId: NodeId, latitude: Double, longitude: Double) =
+        withContext(ioDispatcher) {
+            val node = getMegaNodeByHandle(nodeId, true)
+            requireNotNull(node) { "Node to disable export with handle ${nodeId.longValue} not found" }
+            megaApiGateway.setNodeCoordinates(node, latitude, longitude)
+        }
 }

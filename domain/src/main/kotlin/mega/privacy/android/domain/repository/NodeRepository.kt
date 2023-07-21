@@ -474,4 +474,16 @@ interface NodeRepository {
      * @param nodeToDisable the node's [NodeId] to stop sharing
      */
     suspend fun disableExport(nodeToDisable: NodeId)
+
+    /**
+     * Set the GPS coordinates of image files as a node attribute.
+     *
+     * To remove the existing coordinates, set both the latitude and longitude to
+     * the value MegaNode::INVALID_COORDINATE.
+     *
+     * @param nodeId    Node id that will receive the information.
+     * @param latitude  Latitude in signed decimal degrees notation
+     * @param longitude Longitude in signed decimal degrees notation
+     */
+    suspend fun setNodeCoordinates(nodeId: NodeId, latitude: Double, longitude: Double)
 }
