@@ -23,6 +23,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
+import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
@@ -36,7 +37,9 @@ import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
+import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -63,18 +66,22 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [ChatRepository]
  *
- * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property megaApiGateway                     [MegaApiGateway]
- * @property ioDispatcher                       [CoroutineDispatcher]
- * @property chatRequestMapper                  [ChatRequestMapper]
- * @property localStorageGateway                [MegaLocalStorageGateway]
- * @property chatRoomMapper                     [ChatRoomMapper]
- * @property combinedChatRoomMapper             [CombinedChatRoomMapper]
- * @property chatListItemMapper                 [ChatListItemMapper]
- * @property sharingScope                       [CoroutineScope]
- * @property ioDispatcher                       [CoroutineDispatcher]
- * @property megaChatPeerListMapper             [MegaChatPeerListMapper]
- * @property appEventGateway                    [AppEventGateway]
+ * @property megaChatApiGateway                     [MegaChatApiGateway]
+ * @property megaApiGateway                         [MegaApiGateway]
+ * @property chatRequestMapper                      [ChatRequestMapper]
+ * @property localStorageGateway                    [MegaLocalStorageGateway]
+ * @property chatRoomMapper                         [ChatRoomMapper]
+ * @property combinedChatRoomMapper                 [CombinedChatRoomMapper]
+ * @property chatListItemMapper                     [ChatListItemMapper]
+ * @property megaChatPeerListMapper                 [MegaChatPeerListMapper]
+ * @property chatConnectionStatusMapper             [ChatConnectionStatusMapper]
+ * @property connectionStateMapper                  [ConnectionStateMapper]
+ * @property chatMessageMapper                      [ChatMessageMapper]
+ * @property chatMessageNotificationBehaviourMapper [ChatMessageNotificationBehaviourMapper]
+ * @property chatHistoryLoadStatusMapper            [ChatHistoryLoadStatusMapper]
+ * @property sharingScope                           [CoroutineScope]
+ * @property ioDispatcher                           [CoroutineDispatcher]
+ * @property appEventGateway                        [AppEventGateway]
  */
 internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -89,6 +96,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val connectionStateMapper: ConnectionStateMapper,
     private val chatMessageMapper: ChatMessageMapper,
     private val chatMessageNotificationBehaviourMapper: ChatMessageNotificationBehaviourMapper,
+    private val chatHistoryLoadStatusMapper: ChatHistoryLoadStatusMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
@@ -381,6 +389,17 @@ internal class ChatRepositoryImpl @Inject constructor(
             .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
             .mapNotNull { it.chat }
             .map { chatRoomMapper(it) }
+            .flowOn(ioDispatcher)
+
+    override suspend fun loadMessages(chatId: Long, count: Int): ChatHistoryLoadStatus =
+        withContext(ioDispatcher) {
+            chatHistoryLoadStatusMapper(megaChatApiGateway.loadMessages(chatId, count))
+        }
+
+    override fun monitorOnMessageLoaded(chatId: Long): Flow<ChatMessage?> =
+        megaChatApiGateway.getChatRoomUpdates(chatId)
+            .filterIsInstance<ChatRoomUpdate.OnMessageLoaded>()
+            .map { it.msg?.let { message -> chatMessageMapper(message) } }
             .flowOn(ioDispatcher)
 
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =

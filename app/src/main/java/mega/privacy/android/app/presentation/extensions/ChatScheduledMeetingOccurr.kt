@@ -19,6 +19,17 @@ fun ChatScheduledMeetingOccurr.getDateFormatted(): String? {
 }
 
 /**
+ * Get day and month formatted
+ */
+fun ChatScheduledMeetingOccurr.getDayAndMonth(): String? {
+    startDateTime?.let {
+        return getDayAndMonthFormatter().format(it.toZonedDateTime())
+    }
+
+    return null
+}
+
+/**
  * Get time formatted
  */
 fun ChatScheduledMeetingOccurr.getTimeFormatted(is24HourFormat: Boolean): String {
@@ -42,4 +53,9 @@ private fun Long.toZonedDateTime(): ZonedDateTime =
 private fun getDateFormatter(): DateTimeFormatter =
     DateTimeFormatter
         .ofPattern("EEEE',' d MMMM")
+        .withZone(ZoneId.systemDefault())
+
+private fun getDayAndMonthFormatter(): DateTimeFormatter =
+    DateTimeFormatter
+        .ofPattern("d MMMM")
         .withZone(ZoneId.systemDefault())

@@ -60,6 +60,7 @@ import javax.inject.Inject
  * @property rtcAudioManagerGateway
  * @property getCurrentChatStatusUseCase
  * @property clearChatHistoryUseCase
+ * @property isParticipatingInChatCallUseCase
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -85,6 +86,9 @@ class ChatTabsViewModel @Inject constructor(
     private val state = MutableStateFlow(ChatsTabState())
     private var meetingsRequested = false
 
+    /**
+     * Get view model state
+     */
     fun getState(): StateFlow<ChatsTabState> = state
 
     init {

@@ -60,6 +60,7 @@ internal fun ChatRoomItemBottomSheetView(
     onUnarchiveClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
     onLeaveClick: () -> Unit = {},
+    isCancelSchedMeetingEnabled: Boolean,
 ) {
     if (item == null) {
         Text(
@@ -248,30 +249,43 @@ internal fun ChatRoomItemBottomSheetView(
                 onClick = onArchiveClick
             )
 
-            if (item is ChatRoomItem.MeetingChatRoomItem) {
-                ChatDivider()
-                MenuItem(
-                    modifier = Modifier.testTag("cancel"),
-                    res = R.drawable.ic_trash,
-                    text = R.string.general_cancel,
-                    description = "Cancel",
-                    tintRed = true,
-                    onClick = onCancelClick
-                )
-            } else if (item is ChatRoomItem.GroupChatRoomItem) {
-                ChatDivider()
-                MenuItem(
-                    modifier = Modifier.testTag("leave"),
-                    res = R.drawable.ic_log_out,
-                    text = R.string.general_leave,
-                    description = "Leave",
-                    tintRed = true,
-                    onClick = onLeaveClick
-                )
+            when {
+                canCancel(item, isCancelSchedMeetingEnabled) -> {
+                    ChatDivider()
+                    MenuItem(
+                        modifier = Modifier.testTag("cancel"),
+                        res = R.drawable.ic_trash,
+                        text = R.string.general_cancel,
+                        description = "Cancel",
+                        tintRed = true,
+                        onClick = onCancelClick
+                    )
+                }
+
+                item is ChatRoomItem.GroupChatRoomItem -> {
+                    ChatDivider()
+                    MenuItem(
+                        modifier = Modifier.testTag("leave"),
+                        res = R.drawable.ic_log_out,
+                        text = R.string.general_leave,
+                        description = "Leave",
+                        tintRed = true,
+                        onClick = onLeaveClick
+                    )
+                }
             }
         }
     }
 }
+
+/**
+ * Check if can cancel the scheduled meeting
+ *
+ * @param item  [ChatRoomItem] of the scheduled meeting
+ * @param isCancelSchedMeetingEnabled   Cancel scheduled meeting feature flag status
+ */
+private fun canCancel(item: ChatRoomItem?, isCancelSchedMeetingEnabled: Boolean): Boolean =
+    item is ChatRoomItem.MeetingChatRoomItem && item.isPending && item.hasPermissions && isCancelSchedMeetingEnabled
 
 @Composable
 private fun MenuItem(
@@ -333,6 +347,7 @@ private fun PreviewIndividualChatRoomItemBottomSheetView() {
             hasPermissions = true,
             isMuted = Random.nextBoolean(),
         ),
+        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -351,6 +366,7 @@ private fun PreviewGroupChatRoomItemBottomSheetView() {
             isMuted = Random.nextBoolean(),
             isPublic = Random.nextBoolean(),
         ),
+        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -371,6 +387,7 @@ private fun PreviewMeetingChatRoomItemBottomSheetView() {
             isRecurringMonthly = Random.nextBoolean(),
             isPublic = Random.nextBoolean(),
         ),
+        isCancelSchedMeetingEnabled = true,
     )
 }
 
@@ -389,5 +406,6 @@ private fun PreviewArchivedChatRoomItemBottomSheetView() {
             isMuted = Random.nextBoolean(),
             isArchived = true,
         ),
+        isCancelSchedMeetingEnabled = true,
     )
 }

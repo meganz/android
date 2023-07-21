@@ -1,12 +1,10 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -47,11 +44,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
-import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import androidx.activity.compose.BackHandler
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.runtime.rememberCoroutineScope
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
+import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
@@ -66,19 +70,44 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 /**
  * Recurring meeting info View
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun RecurringMeetingInfoView(
     state: RecurringMeetingInfoState,
+    managementState: ScheduledMeetingManagementState,
     onScrollChange: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
+    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
     onSeeMoreClicked: () -> Unit,
+    onCancelOccurrenceClicked: () -> Unit,
+    onConsumeSelectOccurrenceEvent: () -> Unit,
+    onResetSnackbarMessage: () -> Unit,
+    onCancelOccurrence: () -> Unit = {},
+    onCancelOccurrenceAndMeeting: () -> Unit = {},
+    onDismissDialog: () -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
-    val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true,
+    )
+
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch { modalSheetState.hide() }
+    }
+
+    EventEffect(
+        event = managementState.selectOccurrenceEvent,
+        onConsumed = onConsumeSelectOccurrenceEvent,
+        action = { modalSheetState.show() }
+    )
+
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
@@ -117,9 +146,44 @@ fun RecurringMeetingInfoView(
                 }
             }
         }
+
+        EventEffect(
+            event = managementState.snackbarMessageContent,
+            onConsumed = onResetSnackbarMessage
+        ) {
+            scaffoldState.snackbarHostState.showSnackbar(it)
+        }
     }
+
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
+
     onScrollChange(!firstItemVisible)
+
+    if (state.occurrencesList.size > 1 && managementState.displayDialog) {
+        managementState.selectedOccurrence?.let { occurrence ->
+            CancelScheduledMeetingOccurrenceDialog(
+                occurrence = occurrence,
+                onConfirm = onCancelOccurrence,
+                onDismiss = onDismissDialog,
+            )
+        }
+    }
+
+    managementState.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
+        CancelOccurrenceAndMeetingDialog(
+            isChatHistoryEmpty = isChatHistoryEmpty,
+            onConfirm = onCancelOccurrenceAndMeeting,
+            onDismiss = onDismissDialog,
+        )
+    }
+
+    RecurringMeetingOccurrenceBottomSheetView(
+        modalSheetState = modalSheetState,
+        coroutineScope = coroutineScope,
+        meetingState = state,
+        occurrence = managementState.selectedOccurrence,
+        onCancelClick = onCancelOccurrenceClicked,
+    )
 }
 
 /**
@@ -193,7 +257,7 @@ private fun OccurrenceItemView(
     modifier: Modifier = Modifier,
     state: RecurringMeetingInfoState,
     occurrence: ChatScheduledMeetingOccurr,
-    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit = {},
+    onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     Column {
@@ -235,7 +299,7 @@ private fun OccurrenceItemView(
                             .size(40.dp)
                             .background(Color.Transparent)
                     ) {
-                        RecurringMeetingAvatar(state = state)
+                        RecurringMeetingAvatarView(state = state)
                     }
                 }
                 Column(
@@ -266,10 +330,14 @@ private fun OccurrenceItemView(
                     .wrapContentSize(Alignment.CenterEnd)
             ) {
                 Row(modifier = Modifier.align(Alignment.Center)) {
-                    Icon(modifier = Modifier.padding(start = 30.dp, end = 20.dp),
+                    Icon(
+                        modifier = Modifier
+                            .padding(start = 30.dp, end = 20.dp)
+                            .clickable { onOccurrenceClicked(occurrence) },
                         painter = painterResource(id = CoreUiR.drawable.ic_dots_vertical_grey),
                         contentDescription = "Three dots icon",
-                        tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054)
+                        tint = grey_alpha_054.takeIf { isLight } ?: white_alpha_054
+                    )
                 }
             }
         }
@@ -277,60 +345,6 @@ private fun OccurrenceItemView(
         Divider(modifier = Modifier.padding(start = 16.dp),
             color = grey_alpha_012.takeIf { isLight } ?: white_alpha_012,
             thickness = 1.dp)
-    }
-}
-
-/**
- * Create meeting avatar view
- *
- * @param state     [RecurringMeetingInfoState]
- */
-@Composable
-private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
-    if (state.isEmptyMeeting()) {
-        state.schedTitle?.let {
-            ChatAvatarView(
-                avatarUri = null,
-                avatarPlaceholder = it,
-                avatarColor = null,
-                modifier = Modifier.border(1.dp, Color.White, CircleShape)
-            )
-        }
-    } else if (state.isSingleMeeting()) {
-        state.firstParticipant?.let { participant ->
-            ChatAvatarView(
-                avatarUri = participant.data.avatarUri,
-                avatarPlaceholder = participant.getAvatarFirstLetter(),
-                avatarColor = participant.defaultAvatarColor,
-                avatarTimestamp = participant.avatarUpdateTimestamp,
-                modifier = Modifier.border(1.dp, Color.White, CircleShape),
-            )
-        }
-    } else if (state.firstParticipant != null && state.secondParticipant != null) {
-        Box(
-            Modifier.fillMaxSize()
-        ) {
-            ChatAvatarView(
-                avatarUri = state.secondParticipant.data.avatarUri,
-                avatarPlaceholder = state.secondParticipant.getAvatarFirstLetter(),
-                avatarColor = state.secondParticipant.defaultAvatarColor,
-                avatarTimestamp = state.secondParticipant.avatarUpdateTimestamp,
-                modifier = Modifier
-                    .size(26.dp)
-                    .align(Alignment.BottomEnd)
-                    .border(1.dp, Color.White, CircleShape)
-            )
-            ChatAvatarView(
-                avatarUri = state.firstParticipant.data.avatarUri,
-                avatarPlaceholder = state.firstParticipant.getAvatarFirstLetter(),
-                avatarColor = state.firstParticipant.defaultAvatarColor,
-                avatarTimestamp = state.firstParticipant.avatarUpdateTimestamp,
-                modifier = Modifier
-                    .size(26.dp)
-                    .align(Alignment.TopStart)
-                    .border(1.dp, Color.White, CircleShape)
-            )
-        }
     }
 }
 

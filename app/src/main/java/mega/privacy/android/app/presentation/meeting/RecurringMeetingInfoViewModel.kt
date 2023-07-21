@@ -29,10 +29,10 @@ import javax.inject.Inject
 
 /**
  * RecurringMeetingInfoActivity view model.
- * @property monitorConnectivityUseCase                                    [MonitorConnectivityUseCase]
+ * @property monitorConnectivityUseCase                             [MonitorConnectivityUseCase]
  * @property getScheduledMeetingByChat                              [GetScheduledMeetingByChat]
  * @property fetchScheduledMeetingOccurrencesByChat                 [FetchScheduledMeetingOccurrencesByChat]
- * @property fetchNumberOfScheduledMeetingOccurrencesByChat        [FetchNumberOfScheduledMeetingOccurrencesByChat]
+ * @property fetchNumberOfScheduledMeetingOccurrencesByChat         [FetchNumberOfScheduledMeetingOccurrencesByChat]
  * @property getChatParticipants                                    [GetChatParticipants]
  * @property megaChatApiGateway                                     [MegaChatApiGateway]
  * @property monitorScheduledMeetingUpdates                         [MonitorScheduledMeetingUpdates]
@@ -149,12 +149,14 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                             state.value.occurrencesList.size
                         )
                     }
+
                     state.value.isEmptyOccurrencesList() -> {
                         fetchScheduledMeetingOccurrencesByChat(
                             state.value.chatId,
                             0
                         )
                     }
+
                     else -> state.value.occurrencesList.last().startDateTime?.let {
                         fetchScheduledMeetingOccurrencesByChat(state.value.chatId, it)
                     }
@@ -245,6 +247,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                     ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
                         scheduledMeetReceived = scheduledMeetReceived
                     )
+
                     ScheduledMeetingChanges.Title,
                     ScheduledMeetingChanges.RepetitionRules,
                     ->
@@ -257,6 +260,7 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 ScheduledMeetingChanges.RepetitionRules -> {
                                     var freq = OccurrenceFrequencyType.Invalid
                                     var until = 0L
@@ -273,10 +277,12 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 else -> {}
                             }
 
                         }
+
                     else -> {}
                 }
             }

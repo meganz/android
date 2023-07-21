@@ -471,11 +471,62 @@ internal class MegaChatApiFacade @Inject constructor(
         )
     }
 
+    override fun updateScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        title: String,
+        description: String,
+        cancelled: Boolean,
+        flags: MegaChatScheduledFlags?,
+        rules: MegaChatScheduledRules?,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.updateScheduledMeeting(
+            chatId,
+            schedId,
+            timezone,
+            startDate,
+            endDate,
+            title,
+            description,
+            cancelled,
+            flags,
+            rules,
+            listener
+        )
+    }
+
+    override fun updateScheduledMeetingOccurrence(
+        chatId: Long,
+        schedId: Long,
+        overrides: Long,
+        newStartDate: Long,
+        newEndDate: Long,
+        cancelled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.updateScheduledMeetingOccurrence(
+            chatId,
+            schedId,
+            overrides,
+            newStartDate,
+            newEndDate,
+            cancelled,
+            listener
+        )
+    }
+
     override fun getConnectedState() = chatApi.connectionState
 
     override fun getChatConnectionState(chatId: Long) = chatApi.getChatConnectionState(chatId)
 
     override suspend fun getNumUnreadChats() = chatApi.unreadChats
+
+    override suspend fun loadMessages(chatId: Long, count: Int) =
+        chatApi.loadMessages(chatId, count)
 
     override fun setOnlineStatus(status: Int, listener: MegaChatRequestListenerInterface) =
         chatApi.setOnlineStatus(status, listener)

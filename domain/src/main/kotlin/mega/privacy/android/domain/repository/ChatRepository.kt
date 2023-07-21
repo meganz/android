@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.NotificationBehaviour
 import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ChatHistoryLoadStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatMessage
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -209,6 +210,30 @@ interface ChatRepository {
      * @return          A flow of [ChatRoom]
      */
     fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
+
+    /**
+     * Load messages from a chat room
+     *
+     * @param chatId    Chat ID
+     * @param count     The number of requested messages to load (Range 1 - 256)
+     *
+     * @return The source of the messages that is going to be fetched. The possible values are:
+     *   - ChatHistoryLoadStatus::ERROR: history has to be fetched from server, but we are not logged in yet
+     *   - ChatHistoryLoadStatus::NONE: there's no more history available (not even in the server)
+     *   - ChatHistoryLoadStatus::LOCAL: messages will be fetched locally (RAM or DB)
+     *   - ChatHistoryLoadStatus::REMOTE: messages will be requested to the server. Expect some delay
+     *
+     * The value ChatHistoryLoadStatus::REMOTE can be used to show a progress bar accordingly when network operation occurs.
+     */
+    suspend fun loadMessages(chatId: Long, count: Int): ChatHistoryLoadStatus
+
+    /**
+     * Monitor message load on a chat room
+     *
+     * @param chatId    Chat ID.
+     * @return          A flow of [ChatMessage]
+     */
+    fun monitorOnMessageLoaded(chatId: Long): Flow<ChatMessage?>
 
     /**
      * Monitor updates on chat list item.

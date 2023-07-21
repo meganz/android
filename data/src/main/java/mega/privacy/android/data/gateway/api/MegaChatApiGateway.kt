@@ -695,6 +695,54 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Modify an existing scheduled meeting
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies the scheduled meeting
+     * @param timezone Timezone where we want to schedule the meeting
+     * @param startDate start date time of the meeting with the format (unix timestamp UTC)
+     * @param endDate end date time of the meeting with the format (unix timestamp UTC)
+     * @param title Null-terminated character string with the scheduled meeting title. Maximum allowed length is MegaChatScheduledMeeting::MAX_TITLE_LENGTH characters
+     * @param description Null-terminated character string with the scheduled meeting description. Maximum allowed length is MegaChatScheduledMeeting::MAX_DESC_LENGTH characters
+     * @param cancelled True if scheduled meeting is going to be cancelled
+     * @param flags Scheduled meeting flags to establish scheduled meetings flags like avoid email sending (Check MegaChatScheduledFlags class)
+     * @param rules Repetition rules for creating a recurrent meeting (Check MegaChatScheduledRules class)
+     */
+    fun updateScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        title: String,
+        description: String,
+        cancelled: Boolean,
+        flags: MegaChatScheduledFlags?,
+        rules: MegaChatScheduledRules?,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
+     * Modify an existing scheduled meeting occurrence
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies the scheduled meeting
+     * @param overrides start date time that along with schedId identifies the occurrence with the format (unix timestamp UTC)
+     * @param newStartDate new start date time of the occurrence with the format (unix timestamp UTC)
+     * @param newEndDate new end date time of the occurrence with the format (unix timestamp UTC)
+     * @param cancelled True if scheduled meeting occurrence is going to be cancelled
+     */
+    fun updateScheduledMeetingOccurrence(
+        chatId: Long,
+        schedId: Long,
+        overrides: Long,
+        newStartDate: Long,
+        newEndDate: Long,
+        cancelled: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Returns the current state of the connection
      *
      * It can be one of the following values:
@@ -726,6 +774,43 @@ interface MegaChatApiGateway {
      * @return Number of unread chats.
      */
     suspend fun getNumUnreadChats(): Int
+
+    /**
+     * Initiates fetching more history of the specified chatroom.
+     *
+     * The loaded messages will be notified one by one through the MegaChatRoomListener
+     * specified at MegaChatApi::openChatRoom (and through any other listener you may have
+     * registered by calling MegaChatApi::addChatRoomListener).
+     *
+     * The corresponding callback is MegaChatRoomListener::onMessageLoaded.
+     *
+     * Messages are always loaded and notified in strict order, from newest to oldest.
+     *
+     * The actual number of messages loaded can be less than "count". One reason is
+     * the history being shorter than requested, the other is due to internal protocol
+     * messages that are not intended to be displayed to the user. Additionally, if the fetch
+     * is local and there's no more history locally available, the number of messages could be
+     * lower too (and the next call to MegaChatApi::loadMessages will fetch messages from server).
+     *
+     * "count" has a maximum value of 256. If user requests more than 256 messages,
+     * only 256 messages will returned if exits
+     *
+     * When there are no more history available from the reported source of messages
+     * (local / remote), or when the requested "count" has been already loaded,
+     * the callback MegaChatRoomListener::onMessageLoaded will be called with a NULL message.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param count The number of requested messages to load (Range 1 - 256)
+     *
+     * @return Return the source of the messages that is going to be fetched. The possible values are:
+     *   - MegaChatApi::SOURCE_ERROR = -1: history has to be fetched from server, but we are not logged in yet
+     *   - MegaChatApi::SOURCE_NONE = 0: there's no more history available (not even in the server)
+     *   - MegaChatApi::SOURCE_LOCAL: messages will be fetched locally (RAM or DB)
+     *   - MegaChatApi::SOURCE_REMOTE: messages will be requested to the server. Expect some delay
+     *
+     * The value MegaChatApi::SOURCE_REMOTE can be used to show a progress bar accordingly when network operation occurs.
+     */
+    suspend fun loadMessages(chatId: Long, count: Int): Int
 
     /**
      * Set your online status.

@@ -4519,18 +4519,12 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
-    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
-    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
-    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
-    -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5012,6 +5006,36 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">End recurrence</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Ends</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">This meeting will be archived and all participants will be notified.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Don’t cancel</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Cancel and archive</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Cancel meeting</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Meeting cancelled and archived</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Meeting cancelled</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Only this occurrence will be cancelled. All the other occurrences will go ahead as scheduled.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Cancel occurrence and meeting?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Cancel occurrence</string>
     <!--Action text to start a conversation from Meeting List screen empty view-->
     <string name="meeting_list_empty_action">Start a meeting</string>
     <!--Description text from Meeting List screen empty view-->

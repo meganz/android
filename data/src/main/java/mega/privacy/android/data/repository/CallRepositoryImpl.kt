@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -321,6 +322,68 @@ internal class CallRepositoryImpl @Inject constructor(
                 attributes,
                 callback
             )
+        }
+    }
+
+    override suspend fun updateScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        title: String,
+        description: String,
+        cancelled: Boolean,
+        flags: ChatScheduledFlags?,
+        rules: ChatScheduledRules?,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.updateScheduledMeeting(
+                chatId,
+                schedId,
+                timezone,
+                startDate,
+                endDate,
+                title,
+                description,
+                cancelled,
+                megaChatScheduledMeetingFlagsMapper(flags),
+                megaChatScheduledMeetingRulesMapper(rules),
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun updateScheduledMeetingOccurrence(
+        chatId: Long,
+        schedId: Long,
+        overrides: Long,
+        newStartDate: Long,
+        newEndDate: Long,
+        cancelled: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.updateScheduledMeetingOccurrence(
+                chatId = chatId,
+                schedId = schedId,
+                overrides = overrides,
+                newStartDate = newStartDate,
+                newEndDate = newEndDate,
+                cancelled = cancelled,
+                listener = listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
         }
     }
 

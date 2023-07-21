@@ -17,6 +17,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.handles.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatGeolocationMapper
+import mega.privacy.android.data.mapper.chat.ChatHistoryLoadStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatMessageMapper
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
@@ -89,6 +90,7 @@ class ChatRepositoryImplTest {
         on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
     }
     private val appEventGateway = mock<AppEventGateway>()
+    private val chatHistoryLoadStatusMapper = mock<ChatHistoryLoadStatusMapper>()
 
     @Before
     fun setUp() {
@@ -110,6 +112,7 @@ class ChatRepositoryImplTest {
             chatConnectionStatusMapper = chatConnectionStatusMapper,
             chatMessageMapper = chatMessageMapper,
             appEventGateway = appEventGateway,
+            chatHistoryLoadStatusMapper = chatHistoryLoadStatusMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

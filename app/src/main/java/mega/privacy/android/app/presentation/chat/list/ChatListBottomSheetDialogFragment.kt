@@ -16,14 +16,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
@@ -33,6 +36,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -55,7 +59,13 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
+
     private val viewModel by viewModels<ChatTabsViewModel>({ requireParentFragment() })
+    private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>(
+        { requireParentFragment() })
+
     private val chatId by lazy {
         arguments?.getLong(Constants.CHAT_ID) ?: error("Invalid Chat Id")
     }
@@ -68,6 +78,9 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setContent {
+            val isCancelSchedMeetingEnabled = runBlocking {
+                getFeatureFlagUseCase(AppFeatures.CancelSchedMeeting)
+            }
             val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val item: ChatRoomItem? by viewModel.getChatRoom(chatId)
                 .collectAsStateWithLifecycle(null, viewLifecycleOwner, Lifecycle.State.STARTED)
@@ -81,8 +94,9 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     onMuteClick = { onMuteClick(true) },
                     onUnmuteClick = { onMuteClick(false) },
                     onArchiveClick = ::onArchiveClick,
-                    onCancelClick = ::showLeaveChatDialog,
-                    onLeaveClick = ::showLeaveChatDialog
+                    onCancelClick = ::onCancelClick,
+                    onLeaveClick = ::showLeaveChatDialog,
+                    isCancelSchedMeetingEnabled = isCancelSchedMeetingEnabled
                 )
             }
         }
@@ -91,6 +105,8 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         permissionsRequest = getCallPermissionsRequest()
+
+        scheduledMeetingManagementViewModel.monitorLoadedMessages(chatId)
     }
 
     private fun onStartMeetingClick() {
@@ -145,6 +161,11 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun onArchiveClick() {
         viewModel.archiveChats(chatId)
+        dismissAllowingStateLoss()
+    }
+
+    private fun onCancelClick() {
+        scheduledMeetingManagementViewModel.checkIfIsChatHistoryEmpty(chatId)
         dismissAllowingStateLoss()
     }
 

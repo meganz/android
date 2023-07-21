@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
@@ -44,6 +45,7 @@ import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivi
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
 import mega.privacy.android.app.utils.CallUtil
@@ -87,6 +89,7 @@ class ChatTabsFragment : Fragment() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
 
     private val viewModel by viewModels<ChatTabsViewModel>()
+    private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
 
     private val bluetoothPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGrant ->
@@ -130,14 +133,28 @@ class ChatTabsFragment : Fragment() {
             setContent {
                 val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
+                val managementState by scheduledMeetingManagementViewModel.state.collectAsState()
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     ChatTabsView(
                         state = chatsTabState,
+                        managementState = managementState,
                         onTabSelected = ::onTabSelected,
                         onItemClick = ::onItemClick,
                         onItemMoreClick = ::onItemMoreClick,
                         onItemSelected = ::onItemSelected,
                         onScrollInProgress = ::onScrollInProgress,
+                        onResetSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
+                        onCancelScheduledMeeting = {
+                            managementState.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
+                                if (isChatHistoryEmpty) {
+                                    scheduledMeetingManagementViewModel.cancelAndArchiveMeeting()
+                                } else {
+                                    scheduledMeetingManagementViewModel.cancelMeeting()
+                                }
+                            }
+                            onDismissDialog()
+                        },
+                        onDismissDialog = ::onDismissDialog,
                         onEmptyButtonClick = ::onEmptyButtonClick,
                     )
                 }
@@ -234,6 +251,7 @@ class ChatTabsFragment : Fragment() {
 
     override fun onDestroyView() {
         (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener(null)
+        scheduledMeetingManagementViewModel.stopMonitoringLoadMessages()
         super.onDestroyView()
     }
 
@@ -259,7 +277,9 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun onItemMoreClick(chatRoomItem: ChatRoomItem) {
-        ChatListBottomSheetDialogFragment.newInstance(chatRoomItem.chatId).show(childFragmentManager)
+        scheduledMeetingManagementViewModel.setChatId(chatRoomItem.chatId)
+        ChatListBottomSheetDialogFragment.newInstance(chatRoomItem.chatId)
+            .show(childFragmentManager)
     }
 
     private fun onItemSelected(chatId: Long) {
@@ -448,4 +468,12 @@ class ChatTabsFragment : Fragment() {
                 actionMode = null
             }
         }
+
+    private fun onDismissDialog() {
+        scheduledMeetingManagementViewModel.let {
+            it.setOnChatHistoryEmptyConsumed()
+            it.onResetSelectedOccurrence()
+            it.setOnChatIdConsumed()
+        }
+    }
 }

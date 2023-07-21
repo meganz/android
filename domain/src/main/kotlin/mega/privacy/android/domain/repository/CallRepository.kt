@@ -194,6 +194,52 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Modify an existing scheduled meeting
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies the scheduled meeting
+     * @param timezone Timezone where we want to schedule the meeting
+     * @param startDate start date time of the meeting with the format (unix timestamp UTC)
+     * @param endDate end date time of the meeting with the format (unix timestamp UTC)
+     * @param title Null-terminated character string with the scheduled meeting title. Maximum allowed length is MegaChatScheduledMeeting::MAX_TITLE_LENGTH characters
+     * @param description Null-terminated character string with the scheduled meeting description. Maximum allowed length is MegaChatScheduledMeeting::MAX_DESC_LENGTH characters
+     * @param cancelled True if scheduled meeting is going to be cancelled
+     * @param flags Scheduled meeting flags to establish scheduled meetings flags like avoid email sending (Check MegaChatScheduledFlags class)
+     * @param rules Repetition rules for creating a recurrent meeting (Check MegaChatScheduledRules class)
+     */
+    suspend fun updateScheduledMeeting(
+        chatId: Long,
+        schedId: Long,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        title: String,
+        description: String,
+        cancelled: Boolean,
+        flags: ChatScheduledFlags?,
+        rules: ChatScheduledRules?,
+    ): ChatRequest
+
+    /**
+     * Modify an existing scheduled meeting occurrence
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @param schedId MegaChatHandle that identifies the scheduled meeting
+     * @param overrides start date time that along with schedId identifies the occurrence with the format (unix timestamp UTC)
+     * @param newStartDate new start date time of the occurrence with the format (unix timestamp UTC)
+     * @param newEndDate new end date time of the occurrence with the format (unix timestamp UTC)
+     * @param cancelled True if scheduled meeting occurrence is going to be cancelled
+     */
+    suspend fun updateScheduledMeetingOccurrence(
+        chatId: Long,
+        schedId: Long,
+        overrides: Long,
+        newStartDate: Long,
+        newEndDate: Long,
+        cancelled: Boolean,
+    ): ChatRequest
+
+    /**
      * Monitor chat call updates
      *
      * @return A flow of [ChatCall]
