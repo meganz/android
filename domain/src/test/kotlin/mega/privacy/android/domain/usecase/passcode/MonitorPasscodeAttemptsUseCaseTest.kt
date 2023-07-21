@@ -31,4 +31,14 @@ internal class MonitorPasscodeAttemptsUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    internal fun `test that 0 is returned if the value is null`() = runTest {
+        passcodeRepository.stub { on { monitorFailedAttempts() }.thenReturn(flowOf(null)) }
+
+        underTest().test {
+            assertThat(awaitItem()).isEqualTo(0)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

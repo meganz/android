@@ -1,37 +1,38 @@
 package mega.privacy.android.data.repository.security
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import javax.inject.Inject
 
-internal class PasscodeRepositoryImpl @Inject constructor() : PasscodeRepository {
-    override fun monitorFailedAttempts(): Flow<Int> {
-        TODO("Not yet implemented")
+internal class PasscodeRepositoryImpl @Inject constructor(
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val passcodeStoreGateway: PasscodeStoreGateway,
+) : PasscodeRepository {
+    override fun monitorFailedAttempts() = passcodeStoreGateway.getFailedAttemptsFlow()
+        .flowOn(ioDispatcher)
+
+    override suspend fun setFailedAttempts(attempts: Int) = withContext(ioDispatcher) {
+        passcodeStoreGateway.setFailedAttempts(attempts)
     }
 
-    override suspend fun setFailedAttempts(attempts: Int) {
-        TODO("Not yet implemented")
+    override suspend fun setPasscode(passcode: String?) = withContext(ioDispatcher) {
+        passcodeStoreGateway.setPasscode(passcode)
     }
 
-    override suspend fun setPasscode(passcode: String?) {
-        TODO("Not yet implemented")
+    override suspend fun getPasscode() = withContext(ioDispatcher) {
+        passcodeStoreGateway.getPasscode()
     }
 
-    override suspend fun getPasscode(): String? {
-        TODO("Not yet implemented")
+    override suspend fun setLocked(locked: Boolean) = withContext(ioDispatcher) {
+        passcodeStoreGateway.setLockedState(locked)
     }
 
-    override suspend fun checkPassword(password: String): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setLocked(locked: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun monitorLockState(): Flow<Boolean> {
-        TODO("Not yet implemented")
-    }
+    override fun monitorLockState() = passcodeStoreGateway.getLockStateFlow()
+        .flowOn(ioDispatcher)
 
 
 }

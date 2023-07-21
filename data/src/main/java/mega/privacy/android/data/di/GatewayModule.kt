@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.BillingFacade
-import mega.privacy.android.data.gateway.CacheGatewayImpl
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
@@ -32,6 +31,7 @@ import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.data.gateway.BillingGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.CacheGatewayImpl
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
@@ -68,6 +68,7 @@ import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferenc
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
 import mega.privacy.android.data.preferences.AppInfoPreferencesDatastore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
@@ -82,6 +83,7 @@ import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataSt
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
+import mega.privacy.android.data.preferences.security.PasscodeDataStore
 import javax.inject.Singleton
 
 @Module
@@ -248,4 +250,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindEphemeralCredentialsGateway(implementation: EphemeralCredentialsDataStore): EphemeralCredentialsGateway
+
+    @Binds
+    abstract fun bindPasscodeStoreGateway(implementation: PasscodeDataStore): PasscodeStoreGateway
+
 }

@@ -12,7 +12,7 @@ interface PasscodeRepository {
      *
      * @return a count of failed attempts
      */
-    fun monitorFailedAttempts(): Flow<Int>
+    fun monitorFailedAttempts(): Flow<Int?>
 
 
     /**
@@ -37,14 +37,6 @@ interface PasscodeRepository {
     suspend fun getPasscode(): String?
 
     /**
-     * Check password
-     *
-     * @param password
-     * @return true if correct, else false
-     */
-    suspend fun checkPassword(password: String): Boolean
-
-    /**
      * Set locked
      *
      * @param locked
@@ -57,6 +49,6 @@ interface PasscodeRepository {
      *
      * @return flow of locked state - true for locked, false for not locked
      */
-    fun monitorLockState(): Flow<Boolean>
+    fun monitorLockState(): Flow<Boolean?>
 
 }
