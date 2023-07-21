@@ -189,4 +189,22 @@ interface FileSystemRepository {
      * @return The content type of an object if any.
      */
     suspend fun getGuessContentTypeFromName(localPath: String): String?
+
+    /**
+     * Get GPS coordinates from video file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
+
+    /**
+     * Get GPS coordinates from photo file
+     *
+     * @param filePath
+     *
+     * @return a pair with latitude and longitude coordinates
+     */
+    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
 }

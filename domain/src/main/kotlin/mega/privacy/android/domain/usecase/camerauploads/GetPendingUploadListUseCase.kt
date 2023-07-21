@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetGPSCoordinates
+import mega.privacy.android.domain.usecase.file.GetGPSCoordinatesUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -29,7 +29,7 @@ class GetPendingUploadListUseCase @Inject constructor(
     private val getFingerprintUseCase: GetFingerprintUseCase,
     private val mediaLocalPathExists: MediaLocalPathExists,
     private val shouldCompressVideo: ShouldCompressVideo,
-    private val getGPSCoordinates: GetGPSCoordinates,
+    private val getGPSCoordinatesUseCase: GetGPSCoordinatesUseCase,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val getNodeGPSCoordinatesUseCase: GetNodeGPSCoordinatesUseCase,
 ) {
@@ -58,12 +58,7 @@ class GetPendingUploadListUseCase @Inject constructor(
             }
 
             if (nodeExists == null) {
-                val gpsData = sourceFile?.let {
-                    getGPSCoordinates(
-                        it.absolutePath,
-                        isVideo
-                    )
-                }
+                val gpsData = sourceFile?.let { getGPSCoordinatesUseCase(it.absolutePath, isVideo) }
                 val record = SyncRecord(
                     0,
                     sourceFile?.absolutePath,

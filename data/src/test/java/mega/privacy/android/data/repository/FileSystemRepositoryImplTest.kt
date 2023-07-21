@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
@@ -35,6 +36,8 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -74,6 +77,7 @@ internal class FileSystemRepositoryImplTest {
     private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
     private val sdCardGateway = mock<SDCardGateway>()
+    private val fileAttributeGateway = mock<FileAttributeGateway>()
 
     @BeforeAll
     fun setUp() {
@@ -97,6 +101,7 @@ internal class FileSystemRepositoryImplTest {
             streamingGateway = streamingGateway,
             deviceGateway = deviceGateway,
             sdCardGateway = sdCardGateway,
+            fileAttributeGateway = fileAttributeGateway,
         )
     }
 
@@ -379,4 +384,29 @@ internal class FileSystemRepositoryImplTest {
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
             assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
+
+
+    @Nested
+    @DisplayName("GPS Coordinates")
+    inner class GPSCoordinatesTest {
+        @Test
+        fun `test that the video GPS coordinates are retrieved`() = runTest {
+            val testCoordinates = Pair(6F, 9F)
+
+            whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
+            assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
+        }
+
+        @Test
+        fun `test that the photo GPS coordinates are retrieved`() {
+            runTest {
+                val testCoordinates = Pair(6F, 9F)
+
+                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
+                    testCoordinates
+                )
+                assertThat(underTest.getPhotoGPSCoordinates("")).isEqualTo(testCoordinates)
+            }
+        }
+    }
 }

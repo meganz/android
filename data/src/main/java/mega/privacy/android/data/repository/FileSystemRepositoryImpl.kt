@@ -14,6 +14,7 @@ import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.SDCardGateway
@@ -68,6 +69,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatFilesFolderUserAttributeMapper
  * @property streamingGateway
  * @property sdCardGateway
+ * @property fileAttributeGateway
  */
 internal class FileSystemRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -89,6 +91,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val streamingGateway: StreamingGateway,
     private val deviceGateway: DeviceGateway,
     private val sdCardGateway: SDCardGateway,
+    private val fileAttributeGateway: FileAttributeGateway,
 ) : FileSystemRepository {
 
     override val localDCIMFolderPath: String
@@ -316,5 +319,15 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun getGuessContentTypeFromName(localPath: String): String? =
         withContext(ioDispatcher) {
             URLConnection.guessContentTypeFromName(localPath)
+        }
+
+    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =
+        withContext(ioDispatcher) {
+            fileAttributeGateway.getVideoGPSCoordinates(filePath)
+        }
+
+    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float> =
+        withContext(ioDispatcher) {
+            fileAttributeGateway.getPhotoGPSCoordinates(filePath)
         }
 }

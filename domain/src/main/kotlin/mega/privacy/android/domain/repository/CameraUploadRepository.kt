@@ -476,24 +476,6 @@ interface CameraUploadRepository {
     )
 
     /**
-     * Get GPS coordinates from video file
-     *
-     * @param filePath
-     *
-     * @return a pair with latitude and longitude coordinates
-     */
-    suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float>
-
-    /**
-     * Get GPS coordinates from photo file
-     *
-     * @param filePath
-     *
-     * @return a pair with latitude and longitude coordinates
-     */
-    suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float>
-
-    /**
      * This method is to clear Camera Sync Records from the Database
      *
      * @param clearCamSyncRecords the boolean setting whether to clean the cam record

@@ -14,7 +14,6 @@ import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
-import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
@@ -66,7 +65,6 @@ import kotlin.coroutines.Continuation
  *
  * @property localStorageGateway [MegaLocalStorageGateway]
  * @property megaApiGateway [MegaApiGateway]
- * @property fileAttributeGateway [FileAttributeGateway]
  * @property fileGateway [FileGateway]
  * @property cameraUploadMediaGateway [CameraUploadMediaGateway]
  * @property cacheGateway [CacheGateway]
@@ -86,7 +84,6 @@ import kotlin.coroutines.Continuation
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
-    private val fileAttributeGateway: FileAttributeGateway,
     private val fileGateway: FileGateway,
     private val cameraUploadMediaGateway: CameraUploadMediaGateway,
     private val cacheGateway: CacheGateway,
@@ -546,16 +543,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             return@let Pair(primaryHandle, secondaryHandle)
         }
     }
-
-    override suspend fun getVideoGPSCoordinates(filePath: String): Pair<Float, Float> =
-        withContext(ioDispatcher) {
-            fileAttributeGateway.getVideoGPSCoordinates(filePath)
-        }
-
-    override suspend fun getPhotoGPSCoordinates(filePath: String): Pair<Float, Float> =
-        withContext(ioDispatcher) {
-            fileAttributeGateway.getPhotoGPSCoordinates(filePath)
-        }
 
     override suspend fun saveShouldClearCamSyncRecords(clearCamSyncRecords: Boolean) =
         withContext(ioDispatcher) {

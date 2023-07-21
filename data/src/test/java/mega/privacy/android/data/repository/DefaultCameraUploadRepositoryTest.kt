@@ -74,7 +74,6 @@ class DefaultCameraUploadRepositoryTest {
 
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()
-    private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val fileGateway = mock<FileGateway>()
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
     private val workerGateway = mock<WorkerGateway>()
@@ -112,7 +111,6 @@ class DefaultCameraUploadRepositoryTest {
             localStorageGateway = localStorageGateway,
             megaApiGateway = megaApiGateway,
             cacheGateway = mock(),
-            fileAttributeGateway = fileAttributeGateway,
             fileGateway = fileGateway,
             cameraUploadMediaGateway = cameraUploadMediaGateway,
             workerGateway = workerGateway,
@@ -140,7 +138,6 @@ class DefaultCameraUploadRepositoryTest {
         reset(
             localStorageGateway,
             megaApiGateway,
-            fileAttributeGateway,
             fileGateway,
             cameraUploadMediaGateway,
             workerGateway,
@@ -818,30 +815,6 @@ class DefaultCameraUploadRepositoryTest {
 
                     cancelAndConsumeRemainingEvents()
                 }
-            }
-        }
-    }
-
-    @Nested
-    @DisplayName("GPS Coordinates")
-    inner class GPSCoordinatesTest {
-        @Test
-        fun `test that the video GPS coordinates are retrieved`() = runTest {
-            val testCoordinates = Pair(6F, 9F)
-
-            whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
-            assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
-        }
-
-        @Test
-        fun `test that the photo GPS coordinates are retrieved`() {
-            runTest {
-                val testCoordinates = Pair(6F, 9F)
-
-                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
-                    testCoordinates
-                )
-                assertThat(underTest.getPhotoGPSCoordinates("")).isEqualTo(testCoordinates)
             }
         }
     }

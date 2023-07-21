@@ -30,7 +30,6 @@ import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
 import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
@@ -53,7 +52,6 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
-import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
@@ -349,12 +347,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCompressedVideoPending(compressedVideoPending: DefaultCompressedVideoPending): CompressedVideoPending
-
-    /**
-     * Provide the [GetGPSCoordinates] implementation
-     */
-    @Binds
-    abstract fun bindGetGPSCoordinates(getGPSCoordinates: DefaultGetGPSCoordinates): GetGPSCoordinates
 
     /**
      * Provide the [IsChargingRequired] implementation
