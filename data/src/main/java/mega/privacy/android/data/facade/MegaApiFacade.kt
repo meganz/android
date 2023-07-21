@@ -1277,10 +1277,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getABTestValue(flag: String): Long = megaApi.getABTestValue(flag)
 
-    override fun sendABTestActive(flag: String, listener: MegaRequestListenerInterface) {
-        megaApi.sendABTestActive(flag, listener)
-    }
-
     override suspend fun getBannerQuotaTime() = megaApi.bandwidthOverquotaDelay
 
     override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
