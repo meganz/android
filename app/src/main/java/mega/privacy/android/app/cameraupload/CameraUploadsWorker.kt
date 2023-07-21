@@ -114,7 +114,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStateUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -135,7 +135,6 @@ import java.io.FileNotFoundException
 import java.time.Instant
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
-
 
 /**
  * Worker to run Camera Uploads
@@ -200,7 +199,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val broadcastCameraUploadProgress: BroadcastCameraUploadProgress,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase,
-    private val updateCameraUploadsBackupStateUseCase: UpdateCameraUploadsBackupStateUseCase,
+    private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase,
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase,
     private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase,
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase,
@@ -699,6 +698,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val finalList = getPendingSyncRecords().also {
             Timber.d("Total File to upload ${it.size}")
         }
+        startHeartbeat()
         if (finalList.isNotEmpty()) {
             startParallelUpload(finalList, isCompressedVideo = false)
         }
@@ -722,8 +722,6 @@ class CameraUploadsWorker @AssistedInject constructor(
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Primary)))
         val secondaryUploadNode =
             getNodeByIdUseCase(NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary)))
-
-        startHeartbeat()
 
         val uploadFileAsyncList = mutableListOf<Job>()
         for (record in finalList) {
@@ -1908,11 +1906,7 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  @param backupState
      */
     private suspend fun updateBackupState(backupState: BackupState) {
-        updateCameraUploadsBackupStateUseCase(
-            backupState = backupState,
-            primaryFolderName = context.getString(R.string.section_photo_sync),
-            secondaryFolderName = context.getString(R.string.section_secondary_media_uploads)
-        )
+        updateCameraUploadsBackupStatesUseCase(backupState)
         updateLastTimestamp()
     }
 

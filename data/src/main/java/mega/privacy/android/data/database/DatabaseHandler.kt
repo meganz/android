@@ -1,7 +1,6 @@
 package mega.privacy.android.data.database
 
 import android.database.sqlite.SQLiteDatabase
-import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -11,6 +10,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 
@@ -62,6 +62,7 @@ interface DatabaseHandler {
 
     @Deprecated("Call to MonitorEphemeralCredentialsUseCase instead")
     val ephemeral: EphemeralCredentials?
+
     /**
      * Gets preferences.
      *
@@ -355,7 +356,13 @@ interface DatabaseHandler {
     fun setShowInviteBanner(show: String)
     fun removeSDTransfer(tag: Int)
     fun setBackupAsOutdated(id: Long)
-    fun deleteBackupById(id: Long)
+
+    /**
+     * Delete a specific [Backup] from the Database
+     *
+     * @param backupId The Backup ID used to delete a specific [Backup] from the Database
+     */
+    fun deleteBackupById(backupId: Long)
     fun clearBackups()
 
     fun findNonContactByHandle(handle: String?): NonContactInfo?
@@ -400,9 +407,9 @@ interface DatabaseHandler {
     fun getBackupById(id: Long): Backup?
 
     /**
-     * update backup
+     * Given an updated [Backup] object, this updates a specific [Backup] in the Database
      *
-     * @param backup [Backup]
+     * @param backup the updated [Backup] object
      */
     fun updateBackup(backup: Backup)
 

@@ -5,29 +5,27 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import javax.inject.Inject
 
 /**
- * Use case for updating backup state for camera uploads
+ * Use Case to update the [BackupState] of the Primary Folder of Camera Uploads
+ *
+ * @property cameraUploadRepository [CameraUploadRepository]
+ * @property updateBackupStateUseCase [UpdateBackupStateUseCase]
  */
-class UpdateCameraUploadsBackupUseCase @Inject constructor(
+class UpdatePrimaryFolderBackupStateUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val updateBackupUseCase: UpdateBackupUseCase,
+    private val updateBackupStateUseCase: UpdateBackupStateUseCase,
 ) {
-
     /**
-     * @param backupName        Backup folder name
-     * @param backupState       Backup state
+     * Invocation function
+     *
+     * @param backupState The new [BackupState] of the Primary Folder
      */
-    suspend operator fun invoke(
-        backupName: String,
-        backupState: BackupState,
-    ) {
+    suspend operator fun invoke(backupState: BackupState) {
         if (cameraUploadRepository.isCameraUploadsEnabled()) {
             cameraUploadRepository.getCuBackUp()?.let { backup ->
                 if (backupState != backup.state && backup.backupId != cameraUploadRepository.getInvalidHandle()) {
-                    updateBackupUseCase(
+                    updateBackupStateUseCase(
                         backupId = backup.backupId,
-                        localFolder = null,
-                        backupName = backupName,
-                        backupState = backupState
+                        backupState = backupState,
                     )
                 }
             }

@@ -2542,7 +2542,7 @@ interface MegaApiGateway {
      */
     fun updateBackup(
         backupId: Long, backupType: Int, targetNode: Long, localFolder: String?,
-        backupName: String, state: Int, subState: Int,
+        backupName: String?, state: Int, subState: Int,
         listener: MegaRequestListenerInterface?,
     )
 

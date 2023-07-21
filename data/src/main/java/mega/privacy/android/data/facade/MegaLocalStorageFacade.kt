@@ -300,9 +300,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
     }
 
     override suspend fun setCamSyncLocalPath(path: String?) {
-        path?.let { it ->
-            dbHandler.setCamSyncLocalPath(it)
-        }
+        path?.let(dbHandler::setCamSyncLocalPath)
     }
 
     override suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean) {

@@ -26,6 +26,7 @@ import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.BackupStateIntMapper
+import mega.privacy.android.data.mapper.camerauploads.BackupStateMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.HeartbeatStatusIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -95,6 +96,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
+    private val backupStateMapper: BackupStateMapper,
     private val backupStateIntMapper: BackupStateIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
@@ -657,40 +659,14 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener("sendBackupHeartbeat") { }
             megaApiGateway.sendBackupHeartbeat(
-                backupId,
-                heartbeatStatus.value,
-                heartbeatStatusIntMapper(heartbeatStatus),
-                ups,
-                downs,
-                ts,
-                lastNode,
-                listener
-            )
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun updateBackup(
-        backupId: Long,
-        backupType: Int,
-        targetNode: Long,
-        localFolder: String?,
-        backupName: String,
-        state: BackupState,
-    ) = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("updateBackup") { it.parentHandle }
-            megaApiGateway.updateBackup(
-                backupId,
-                backupType,
-                targetNode,
-                localFolder,
-                backupName,
-                backupStateIntMapper(state),
-                MegaError.API_OK,
-                listener,
+                backupId = backupId,
+                status = heartbeatStatus.value,
+                progress = heartbeatStatusIntMapper(heartbeatStatus),
+                ups = ups,
+                downs = downs,
+                ts = ts,
+                lastNode = lastNode,
+                listener = listener,
             )
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
@@ -735,6 +711,55 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun getBackupById(id: Long) = withContext(ioDispatcher) {
         localStorageGateway.getBackupById(id)
     }
+
+    override suspend fun updateRemoteBackupState(
+        backupId: Long,
+        backupState: BackupState,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("updateRemoteBackupState") {
+                // Return the Backup State, represented as getAccess() in the SDK
+                backupStateMapper(it.access)
+            }
+            // Any values that should not be changed should be marked as null, -1 or -1L
+            megaApiGateway.updateBackup(
+                backupId = backupId,
+                backupType = getInvalidBackupType(),
+                targetNode = TARGET_NODE_NO_CHANGE,
+                localFolder = null,
+                backupName = null,
+                state = backupStateIntMapper(backupState),
+                subState = SUB_STATE_NO_CHANGE,
+                listener = listener,
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun updateRemoteBackupName(backupId: Long, backupName: String) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("updateRemoteBackupName") {
+                    return@getRequestListener
+                }
+                // Any values that should not be changed should be marked as null, -1 or -1L
+                megaApiGateway.updateBackup(
+                    backupId = backupId,
+                    backupType = getInvalidBackupType(),
+                    targetNode = TARGET_NODE_NO_CHANGE,
+                    localFolder = null,
+                    backupName = backupName,
+                    state = STATE_NO_CHANGE,
+                    subState = SUB_STATE_NO_CHANGE,
+                    listener = listener,
+                )
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 
     override suspend fun updateLocalBackup(backup: Backup) = withContext(ioDispatcher) {
         localStorageGateway.updateBackup(backup)
@@ -789,5 +814,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun setBackupAsOutdated(backupId: Long) = withContext(ioDispatcher) {
         localStorageGateway.setBackupAsOutdated(backupId)
+    }
+
+    private companion object {
+        private const val STATE_NO_CHANGE = -1
+        private const val SUB_STATE_NO_CHANGE = -1
+        private const val TARGET_NODE_NO_CHANGE = -1L
     }
 }

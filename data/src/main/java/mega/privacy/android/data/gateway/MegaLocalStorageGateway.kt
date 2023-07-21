@@ -774,8 +774,9 @@ interface MegaLocalStorageGateway {
     suspend fun getBackupById(id: Long): Backup?
 
     /**
-     * Update backup
-     * @param backup [Backup]
+     * Given an updated [Backup] object, this updates a specific [Backup] in the Database
+     *
+     * @param backup the updated [Backup] object
      */
     suspend fun updateBackup(backup: Backup)
 

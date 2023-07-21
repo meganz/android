@@ -1214,7 +1214,7 @@ internal class MegaApiFacade @Inject constructor(
         backupType: Int,
         targetNode: Long,
         localFolder: String?,
-        backupName: String,
+        backupName: String?,
         state: Int,
         subState: Int,
         listener: MegaRequestListenerInterface?,

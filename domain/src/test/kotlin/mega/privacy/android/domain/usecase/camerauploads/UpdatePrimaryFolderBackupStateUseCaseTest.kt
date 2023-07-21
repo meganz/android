@@ -9,8 +9,6 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -18,19 +16,18 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 /**
- * Test class for [UpdateCameraUploadsBackupUseCase]
+ * Test class for [UpdatePrimaryFolderBackupStateUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class UpdateCameraUploadsBackupUseCaseTest {
+internal class UpdatePrimaryFolderBackupStateUseCaseTest {
 
-    private lateinit var underTest: UpdateCameraUploadsBackupUseCase
-
-    private val invalidHandle = -1L
+    private lateinit var underTest: UpdatePrimaryFolderBackupStateUseCase
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val updateBackupStateUseCase = mock<UpdateBackupStateUseCase>()
 
-    private val updateBackupUseCase = mock<UpdateBackupUseCase>()
+    private val invalidHandle = -1L
 
     private val fakeBackup = Backup(
         backupId = 123L,
@@ -58,69 +55,66 @@ internal class UpdateCameraUploadsBackupUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = UpdateCameraUploadsBackupUseCase(
+        underTest = UpdatePrimaryFolderBackupStateUseCase(
             cameraUploadRepository = cameraUploadRepository,
-            updateBackupUseCase = updateBackupUseCase,
+            updateBackupStateUseCase = updateBackupStateUseCase,
         )
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(cameraUploadRepository, updateBackupUseCase)
+        reset(cameraUploadRepository, updateBackupStateUseCase)
     }
 
     @Test
-    internal fun `test that camera uploads status is updated when sync is enabled and backup id exists and is valid and has changed`() =
+    fun `test that the primary folder backup state is updated when sync is enabled and backup id exists and is valid and has changed`() =
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
-            underTest(
-                backupName = "", backupState = BackupState.ACTIVE
+
+            underTest(BackupState.ACTIVE)
+            verify(updateBackupStateUseCase).invoke(
+                backupId = fakeBackup.backupId,
+                backupState = BackupState.ACTIVE,
             )
-            verify(updateBackupUseCase).invoke(any(), anyOrNull(), any(), any())
         }
 
     @Test
-    internal fun `test that camera uploads status is not updated when sync is disabled`() =
+    fun `test that the primary folder backup state is not updated when sync is disabled`() =
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(false)
-            underTest(
-                backupName = "", backupState = BackupState.ACTIVE
-            )
-            verifyNoInteractions(updateBackupUseCase)
+            underTest(backupState = BackupState.ACTIVE)
+            verifyNoInteractions(updateBackupStateUseCase)
         }
 
     @Test
-    internal fun `test that camera uploads status is not updated when sync is enabled and backup id is invalid`() =
+    fun `test that the primary folder backup state is not updated when sync is enabled and backup id is invalid`() =
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getInvalidHandle()).thenReturn(invalidHandle)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(invalidBackup)
-            underTest(
-                backupName = "", backupState = BackupState.ACTIVE
-            )
-            verifyNoInteractions(updateBackupUseCase)
+
+            underTest(backupState = BackupState.ACTIVE)
+            verifyNoInteractions(updateBackupStateUseCase)
         }
 
     @Test
-    internal fun `test that camera uploads status is not updated when sync is enabled and backup id exists and is valid but not changed`() =
+    fun `test that the primary folder backup state is not updated when sync is enabled and backup id exists and is valid but not changed`() =
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(fakeBackup)
-            underTest(
-                backupName = "", backupState = BackupState.INVALID
-            )
-            verifyNoInteractions(updateBackupUseCase)
+
+            underTest(backupState = BackupState.INVALID)
+            verifyNoInteractions(updateBackupStateUseCase)
         }
 
     @Test
-    internal fun `test that camera uploads status is not updated when sync is enabled and backup is null`() =
+    fun `test that the primary folder backup state is not updated when sync is enabled and backup is null`() =
         runTest {
             whenever(cameraUploadRepository.isCameraUploadsEnabled()).thenReturn(true)
             whenever(cameraUploadRepository.getCuBackUp()).thenReturn(null)
-            underTest(
-                backupName = "", backupState = BackupState.INVALID
-            )
-            verifyNoInteractions(updateBackupUseCase)
+
+            underTest(backupState = BackupState.INVALID)
+            verifyNoInteractions(updateBackupStateUseCase)
         }
 }

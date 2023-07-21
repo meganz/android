@@ -654,23 +654,6 @@ interface CameraUploadRepository {
     )
 
     /**
-     * Update the information about a registered backup for Backup Centre
-     * @param backupId    backup id identifying the backup to be updated
-     * @param backupType  back up type requested for the service
-     * @param targetNode  MEGA folder to hold the backups
-     * @param localFolder Local path of the folder
-     * @param state       backup state
-     */
-    suspend fun updateBackup(
-        backupId: Long,
-        backupType: Int,
-        targetNode: Long,
-        localFolder: String?,
-        backupName: String,
-        state: BackupState,
-    ): Long
-
-    /**
      * Get Camera upload Backup
      * @return [Backup]
      */
@@ -690,10 +673,35 @@ interface CameraUploadRepository {
 
 
     /**
-     * Update backup
-     * @param backup [Backup]
+     * Updates a specific [Backup] locally in the Database
+     *
+     * @param backup The [Backup] to be updated in the Database
      */
     suspend fun updateLocalBackup(backup: Backup)
+
+    /**
+     * Updates the [BackupState] of a specific [Backup] remotely
+     *
+     * @param backupId The Backup ID that identifies the Backup to be updated
+     * @param backupState The new [backupState] of the Backup to be updated
+     *
+     * @return The [BackupState] returned when the API Response is successful
+     */
+    suspend fun updateRemoteBackupState(
+        backupId: Long,
+        backupState: BackupState,
+    ): BackupState
+
+    /**
+     * Updates the Backup Name of a specific [Backup] remotely
+     *
+     * @param backupId The Backup ID that identifies the Backup to be updated
+     * @param backupName The new Backup Name to be updated
+     */
+    suspend fun updateRemoteBackupName(
+        backupId: Long,
+        backupName: String,
+    )
 
     /**
      * Set the GPS coordinates of image files as a node attribute.

@@ -12,8 +12,6 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -32,7 +30,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
-    private val updateBackupUseCase = mock<UpdateBackupUseCase>()
+    private val updateBackupNameUseCase = mock<UpdateBackupNameUseCase>()
 
     private val testBackup = Backup(
         backupId = 123L,
@@ -51,12 +49,13 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
         underTest = UpdatePrimaryFolderBackupNameUseCase(
             cameraUploadRepository = cameraUploadRepository,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            updateBackupUseCase = updateBackupUseCase,
+            updateBackupNameUseCase = updateBackupNameUseCase,
         )
     }
 
     @BeforeEach
-    fun resetMocks() = reset(cameraUploadRepository, updateBackupUseCase)
+    fun resetMocks() =
+        reset(cameraUploadRepository, isCameraUploadsEnabledUseCase, updateBackupNameUseCase)
 
     @Test
     fun `test that the primary folder backup name is updated`() = runTest {
@@ -64,22 +63,12 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
         whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
         whenever(cameraUploadRepository.getCuBackUp()).thenReturn(testBackup)
-        whenever(
-            updateBackupUseCase(
-                backupId = any(),
-                localFolder = anyOrNull(),
-                backupName = any(),
-                backupState = any()
-            )
-        ).thenReturn(1L)
 
         underTest(testBackupName)
 
-        verify(updateBackupUseCase).invoke(
+        verify(updateBackupNameUseCase).invoke(
             backupId = testBackup.backupId,
-            localFolder = null,
             backupName = testBackupName,
-            backupState = BackupState.INVALID,
         )
     }
 
@@ -95,7 +84,7 @@ internal class UpdatePrimaryFolderBackupNameUseCaseTest {
 
         underTest(backupName)
 
-        verifyNoInteractions(updateBackupUseCase)
+        verifyNoInteractions(updateBackupNameUseCase)
     }
 
     private fun provideErrorParams() = Stream.of(

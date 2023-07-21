@@ -13,6 +13,11 @@ enum class BackupState(val value: Int) {
     INVALID(-1),
 
     /**
+     * An uninitialized Backup State
+     */
+    NOT_INITIALIZED(0),
+
+    /**
      * Active Backup State (Enabled)
      */
     ACTIVE(1),

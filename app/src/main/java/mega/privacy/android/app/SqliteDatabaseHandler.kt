@@ -39,7 +39,6 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
-import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
@@ -52,6 +51,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.entity.settings.ChatSettings.Companion.VIBRATION_ON
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -4541,12 +4541,29 @@ class SqliteDatabaseHandler @Inject constructor(
         return null
     }
 
-    override fun deleteBackupById(id: Long) {
-        db.execSQL(deleteSQL(id))
+    override fun deleteBackupById(backupId: Long) {
+        val deleteBackupByIdQuery =
+            "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(backupId.toString())}'"
+        db.execSQL(deleteBackupByIdQuery)
     }
 
     override fun updateBackup(backup: Backup) {
-        db.execSQL(updateSQL(backup))
+        val updateBackupQuery = "UPDATE $TABLE_BACKUPS SET " +
+                "$KEY_BACKUP_NAME = '${encrypt(backup.backupName)}', " +
+                "$KEY_BACKUP_TYPE = ${backup.backupType}, " +
+                "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
+                "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +
+                "$KEY_BACKUP_TARGET_NODE = '${encrypt(backup.targetNode.toString())}', " +
+                "$KEY_BACKUP_EX = '${encrypt(backup.isExcludeSubFolders.toString())}', " +
+                "$KEY_BACKUP_DEL = '${encrypt(backup.isDeleteEmptySubFolders.toString())}', " +
+                "$KEY_BACKUP_START_TIME = '${encrypt(backup.startTimestamp.toString())}', " +
+                "$KEY_BACKUP_LAST_TIME = '${encrypt(backup.lastFinishTimestamp.toString())}', " +
+                "$KEY_BACKUP_STATE = ${backup.state.value}, " +
+                "$KEY_BACKUP_SUB_STATE = ${backup.subState}, " +
+                "$KEY_BACKUP_EXTRA_DATA = '${encrypt(backup.extraData)}', " +
+                "$KEY_BACKUP_OUTDATED = '${encrypt(backup.outdated.toString())}'" +
+                "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
+        db.execSQL(updateBackupQuery)
     }
 
     override fun clearBackups() {
@@ -4724,33 +4741,6 @@ class SqliteDatabaseHandler @Inject constructor(
     private fun getColumnIndex(cursor: Cursor, columnName: String): Int {
         return cursor.getColumnIndex(columnName)
     }
-
-    /**
-     * @return A update SQL with a given backup object.
-     */
-    private fun updateSQL(backup: Backup) =
-        "UPDATE $TABLE_BACKUPS SET " +
-                "$KEY_BACKUP_NAME = '${encrypt(backup.backupName)}', " +
-                "$KEY_BACKUP_TYPE = ${backup.backupType}, " +
-                "$KEY_BACKUP_LOCAL_FOLDER = '${encrypt(backup.localFolder)}', " +
-                "$KEY_BACKUP_TARGET_NODE_PATH = '${encrypt(backup.targetFolderPath)}', " +
-                "$KEY_BACKUP_TARGET_NODE = '${encrypt(backup.targetNode.toString())}', " +
-                "$KEY_BACKUP_EX = '${encrypt(backup.isExcludeSubFolders.toString())}', " +
-                "$KEY_BACKUP_DEL = '${encrypt(backup.isDeleteEmptySubFolders.toString())}', " +
-                "$KEY_BACKUP_START_TIME = '${encrypt(backup.startTimestamp.toString())}', " +
-                "$KEY_BACKUP_LAST_TIME = '${encrypt(backup.lastFinishTimestamp.toString())}', " +
-                "$KEY_BACKUP_STATE = ${backup.state.value}, " +
-                "$KEY_BACKUP_SUB_STATE = ${backup.subState}, " +
-                "$KEY_BACKUP_EXTRA_DATA = '${encrypt(backup.extraData)}', " +
-                "$KEY_BACKUP_OUTDATED = '${encrypt(backup.outdated.toString())}'" +
-                "WHERE $KEY_BACKUP_ID = '${encrypt(backup.backupId.toString())}'"
-
-    /**
-     * @param id Backup id which is to be deleted.
-     * @return A delete backup SQL.
-     */
-    private fun deleteSQL(id: Long) =
-        "DELETE FROM $TABLE_BACKUPS WHERE $KEY_BACKUP_ID = '${encrypt(id.toString())}'"
 
     companion object {
         private const val DATABASE_VERSION = 68

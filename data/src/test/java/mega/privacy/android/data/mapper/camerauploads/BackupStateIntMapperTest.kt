@@ -15,6 +15,7 @@ internal class BackupStateIntMapperTest {
     fun `test that BackupState is mapped correctly`() =
         HashMap<BackupState, Int>().apply {
             put(BackupState.INVALID, -1)
+            put(BackupState.NOT_INITIALIZED, 0)
             put(BackupState.ACTIVE, 1)
             put(BackupState.FAILED, 2)
             put(BackupState.TEMPORARILY_DISABLED, 3)

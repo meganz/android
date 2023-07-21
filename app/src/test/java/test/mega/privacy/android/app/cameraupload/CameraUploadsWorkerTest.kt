@@ -74,7 +74,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
-import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStateUseCase
+import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -172,9 +172,11 @@ class CameraUploadsWorkerTest {
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase = mock()
     private val createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase =
         mock()
-    private val updateCameraUploadsBackupStateUseCase: UpdateCameraUploadsBackupStateUseCase = mock()
+    private val updateCameraUploadsBackupStatesUseCase: UpdateCameraUploadsBackupStatesUseCase =
+        mock()
     private val sendBackupHeartBeatSyncUseCase: SendBackupHeartBeatSyncUseCase = mock()
-    private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase = mock()
+    private val updateCameraUploadsBackupHeartbeatStatusUseCase: UpdateCameraUploadsBackupHeartbeatStatusUseCase =
+        mock()
     private val addCompletedTransferUseCase: AddCompletedTransferUseCase = mock()
     private val completedTransferMapper: LegacyCompletedTransferMapper = mock()
     private val setCoordinatesUseCase: SetCoordinatesUseCase = mock()
@@ -271,7 +273,7 @@ class CameraUploadsWorkerTest {
             broadcastCameraUploadProgress = broadcastCameraUploadProgress,
             scheduleCameraUploadUseCase = scheduleCameraUploadUseCase,
             createTempFileAndRemoveCoordinatesUseCase = createTempFileAndRemoveCoordinatesUseCase,
-            updateCameraUploadsBackupStateUseCase = updateCameraUploadsBackupStateUseCase,
+            updateCameraUploadsBackupStatesUseCase = updateCameraUploadsBackupStatesUseCase,
             sendBackupHeartBeatSyncUseCase = sendBackupHeartBeatSyncUseCase,
             updateCameraUploadsBackupHeartbeatStatusUseCase = updateCameraUploadsBackupHeartbeatStatusUseCase,
             addCompletedTransferUseCase = addCompletedTransferUseCase,
