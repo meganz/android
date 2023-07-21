@@ -41,6 +41,7 @@ import mega.privacy.android.app.mediaplayer.playlist.PlaylistAdapter.Companion.T
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
+import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result
@@ -625,47 +626,41 @@ class AudioPlayerServiceViewModel @Inject constructor(
         intent: Intent,
         firstPlayHandle: Long,
     ) {
-        with(intent) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE, MegaOffline::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                getParcelableArrayListExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
-            }
-        }?.let { offlineFiles ->
-            playlistItems.clear()
+        intent.parcelableArrayList<MegaOffline>(INTENT_EXTRA_KEY_ARRAY_OFFLINE)
+            ?.let { offlineFiles ->
+                playlistItems.clear()
 
-            val mediaItems = mutableListOf<MediaItem>()
-            var firstPlayIndex = 0
+                val mediaItems = mutableListOf<MediaItem>()
+                var firstPlayIndex = 0
 
-            offlineFiles.filter {
-                getOfflineFile(context, it).let { file ->
-                    isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
-                }
-            }.mapIndexed { currentIndex, megaOffline ->
-                mediaItems.add(
-                    mediaItemFromFile(getOfflineFile(context, megaOffline), megaOffline.handle)
-                )
-                if (megaOffline.handle.toLong() == firstPlayHandle) {
-                    firstPlayIndex = currentIndex
-                }
-
-                playlistItemMapper(
-                    megaOffline.handle.toLong(),
-                    megaOffline.name,
-                    offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
-                    currentIndex,
-                    TYPE_NEXT,
-                    megaOffline.getSize(context),
-                    0
-                )
-                    .let { playlistItem ->
-                        playlistItems.add(playlistItem)
+                offlineFiles.filter {
+                    getOfflineFile(context, it).let { file ->
+                        isFileAvailable(file) && file.isFile && filterByNodeName(it.name)
                     }
-            }
+                }.mapIndexed { currentIndex, megaOffline ->
+                    mediaItems.add(
+                        mediaItemFromFile(getOfflineFile(context, megaOffline), megaOffline.handle)
+                    )
+                    if (megaOffline.handle.toLong() == firstPlayHandle) {
+                        firstPlayIndex = currentIndex
+                    }
 
-            updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
-        }
+                    playlistItemMapper(
+                        megaOffline.handle.toLong(),
+                        megaOffline.name,
+                        offlineThumbnailFileWrapper.getThumbnailFile(context, megaOffline),
+                        currentIndex,
+                        TYPE_NEXT,
+                        megaOffline.getSize(context),
+                        0
+                    )
+                        .let { playlistItem ->
+                            playlistItems.add(playlistItem)
+                        }
+                }
+
+                updatePlaySources(mediaItems, playlistItems, firstPlayIndex)
+            }
     }
 
     /**

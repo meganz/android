@@ -3,6 +3,9 @@ package test.mega.privacy.android.app.presentation.mediaplayer
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -16,7 +19,11 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTI
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
+import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
+import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import nz.mega.sdk.MegaTransfer
+import org.junit.Ignore
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -25,6 +32,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorExtension
 
 @ExperimentalCoroutinesApi
@@ -32,7 +40,7 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class VideoPlayerViewModelTest {
     private lateinit var underTest: VideoPlayerViewModel
-
+    private val getGlobalTransferUseCase = mock<GetGlobalTransferUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
     private val expectedId = 123456L
@@ -42,13 +50,58 @@ internal class VideoPlayerViewModelTest {
     @BeforeAll
     fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher())
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
     }
 
     @BeforeEach
     fun setUp() {
+        whenever(getGlobalTransferUseCase.get()).thenAnswer {
+            Flowable.empty<GetGlobalTransferUseCase.Result>()
+        }
         underTest = VideoPlayerViewModel(
+            context = mock(),
+            mediaPlayerGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
             sendStatisticsMediaPlayerUseCase = mock(),
+            offlineThumbnailFileWrapper = mock(),
+            getGlobalTransferUseCase = getGlobalTransferUseCase,
+            playlistItemMapper = mock(),
+            trackPlaybackPositionUseCase = mock(),
+            monitorPlaybackTimesUseCase = mock(),
+            savePlaybackTimesUseCase = mock(),
+            deletePlaybackInformationUseCase = mock(),
+            megaApiFolderHttpServerSetMaxBufferSizeUseCase = mock(),
+            megaApiFolderHttpServerIsRunningUseCase = mock(),
+            megaApiFolderHttpServerStartUseCase = mock(),
+            megaApiFolderHttpServerStopUseCase = mock(),
+            megaApiHttpServerSetMaxBufferSizeUseCase = mock(),
+            megaApiHttpServerIsRunningUseCase = mock(),
+            megaApiHttpServerStartUseCase = mock(),
+            megaApiHttpServerStop = mock(),
+            areCredentialsNullUseCase = mock(),
+            getLocalFilePathUseCase = mock(),
+            getLocalFolderLinkFromMegaApiFolderUseCase = mock(),
+            getLocalFolderLinkFromMegaApiUseCase = mock(),
+            getLocalLinkFromMegaApiUseCase = mock(),
+            getInboxNodeUseCase = mock(),
+            getParentNodeFromMegaApiFolderUseCase = mock(),
+            getRootNodeUseCase = mock(),
+            getRootNodeFromMegaApiFolderUseCase = mock(),
+            getRubbishNodeUseCase = mock(),
+            getNodeByHandleUseCase = mock(),
+            getVideoNodesFromPublicLinksUseCase = mock(),
+            getVideoNodesFromInSharesUseCase = mock(),
+            getVideoNodesFromOutSharesUseCase = mock(),
+            getVideoNodesUseCase = mock(),
+            getVideoNodesByEmailUseCase = mock(),
+            getUserNameByEmailUseCase = mock(),
+            getVideosByParentHandleFromMegaApiFolderUseCase = mock(),
+            getVideoNodesByParentHandleUseCase = mock(),
+            getNodesByHandlesUseCase = mock(),
+            getFingerprintUseCase = mock(),
+            fileDurationMapper = mock(),
+            getSRTSubtitleFileListUseCase = mock(),
+            setVideoRepeatModeUseCase = mock(),
             savedStateHandle = savedStateHandle,
             monitorVideoRepeatModeUseCase = mock()
         )
@@ -61,12 +114,13 @@ internal class VideoPlayerViewModelTest {
     @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
+        RxAndroidPlugins.reset()
     }
 
     @Test
     internal fun `test that the initial state is returned`() = runTest {
         val expectedState = SubtitleDisplayState()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             assertThat(awaitItem()).isEqualTo(expectedState)
         }
     }
@@ -74,7 +128,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that showAddSubtitleDialog function is invoked`() = runTest {
         underTest.showAddSubtitleDialog()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val initial = awaitItem()
             assertThat(initial.isSubtitleShown).isFalse()
             assertThat(initial.isAddSubtitle).isFalse()
@@ -89,7 +143,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onAddedSubtitleOptionClicked function is invoked`() = runTest {
         underTest.onAddedSubtitleOptionClicked()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val initial = awaitItem()
             assertThat(initial.isSubtitleShown).isFalse()
             assertThat(initial.isSubtitleDialogShown).isFalse()
@@ -112,7 +166,7 @@ internal class VideoPlayerViewModelTest {
                 )
             )
             advanceUntilIdle()
-            underTest.state.test {
+            underTest.subtitleDisplayState.test {
                 val actual = awaitItem()
                 assertThat(actual.isSubtitleShown).isTrue()
                 assertThat(actual.isAddSubtitle).isTrue()
@@ -128,7 +182,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onAddSubtitleFile function is invoked when info is null`() = runTest {
         underTest.onAddSubtitleFile(null)
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()
@@ -148,7 +202,7 @@ internal class VideoPlayerViewModelTest {
             )
         )
         advanceUntilIdle()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isTrue()
             assertThat(actual.isAddSubtitle).isTrue()
@@ -162,7 +216,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onOffItemClicked function is invoked`() = runTest {
         underTest.onOffItemClicked()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()
@@ -174,7 +228,7 @@ internal class VideoPlayerViewModelTest {
     @Test
     internal fun `test that onDismissRequest function is invoked`() = runTest {
         underTest.onDismissRequest()
-        underTest.state.test {
+        underTest.subtitleDisplayState.test {
             val actual = awaitItem()
             assertThat(actual.isSubtitleShown).isFalse()
             assertThat(actual.isAddSubtitle).isFalse()

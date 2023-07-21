@@ -31,13 +31,13 @@ class PlaylistActionModeCallback(
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         if (item?.itemId == R.id.remove) {
-            removeSelections
+            removeSelections()
         }
         return true
     }
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         // When the action mode is finished, clear the selections
-        clearSelections
+        clearSelections()
     }
 }

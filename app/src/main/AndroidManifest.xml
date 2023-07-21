@@ -405,6 +405,7 @@
         <activity
             android:name=".mediaplayer.VideoPlayerActivity"
             android:windowSoftInputMode="adjustNothing"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"/>
         <activity
             android:name=".mediaplayer.AudioPlayerActivity"
@@ -519,10 +520,6 @@
             android:foregroundServiceType="dataSync" />
         <service
             android:name=".mediaplayer.service.AudioPlayerService"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
-        <service
-            android:name=".mediaplayer.service.VideoPlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
         <service

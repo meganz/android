@@ -34,6 +34,7 @@ import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
+import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
@@ -45,6 +46,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EVENT_NOT_ALLOW_PLAY
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
@@ -64,6 +66,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
@@ -71,6 +74,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import timber.log.Timber
 
 /**
@@ -87,6 +91,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private var takenDownDialog: AlertDialog? = null
 
     private var serviceGateway: MediaPlayerServiceGateway? = null
+    private var playerServiceGateway: PlayerServiceViewModelGateway? = null
 
     private val dragToExit by lazy {
         DragToExitSupport(
@@ -785,5 +790,194 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun stopPlayer() {
         serviceGateway?.stopPlayer()
         finish()
+    }
+
+    private fun refreshMenuOptionsVisibility() {
+        val menu = optionsMenu
+        if (menu == null) {
+            Timber.d("refreshMenuOptionsVisibility menu is null")
+            return
+        }
+
+        val currentFragmentId = navController.currentDestination?.id
+        if (currentFragmentId == null) {
+            Timber.d("refreshMenuOptionsVisibility currentFragment is null")
+            return
+        }
+
+        playerServiceGateway?.let {
+            it.getCurrentIntent()?.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+                ?.let { adapterType ->
+                    when (currentFragmentId) {
+                        R.id.playlist -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+                            searchMenuItem?.isVisible = true
+                            // Display the select option
+                            menu.findItem(R.id.select).isVisible = true
+                        }
+
+                        R.id.main_player, R.id.track_info -> {
+                            when {
+                                adapterType == OFFLINE_ADAPTER -> {
+                                    menu.toggleAllMenuItemsVisibility(false)
+
+                                    menu.findItem(R.id.properties).isVisible =
+                                        currentFragmentId == R.id.main_player
+
+                                    menu.findItem(R.id.share).isVisible =
+                                        currentFragmentId == R.id.main_player
+                                }
+
+                                adapterType == Constants.RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
+                                    megaApi.getNodeByHandle(
+                                        it.getCurrentPlayingHandle()
+                                    )
+                                ) -> {
+                                    menu.toggleAllMenuItemsVisibility(false)
+
+                                    menu.findItem(R.id.properties).isVisible =
+                                        currentFragmentId == R.id.main_player
+
+                                    val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+                                    moveToTrash.isVisible = true
+                                    moveToTrash.title = getString(R.string.context_remove)
+                                }
+
+                                adapterType == FROM_CHAT -> {
+                                    menu.toggleAllMenuItemsVisibility(false)
+
+                                    menu.findItem(R.id.save_to_device).isVisible = true
+                                    menu.findItem(R.id.chat_import).isVisible = true
+                                    menu.findItem(R.id.chat_save_for_offline).isVisible = true
+
+                                    menu.findItem(R.id.share).isVisible = false
+
+                                    menu.findItem(R.id.move_to_trash)?.let { moveToTrash ->
+                                        val pair = getChatMessage()
+                                        val message = pair.second
+
+                                        val canRemove = message != null
+                                                && message.userHandle == megaChatApi.myUserHandle
+                                                && message.isDeletable
+                                        moveToTrash.isVisible = canRemove
+                                        if (canRemove) {
+                                            moveToTrash.title = getString(R.string.context_remove)
+                                        }
+                                    }
+                                }
+
+                                adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER -> {
+                                    menu.toggleAllMenuItemsVisibility(false)
+
+                                    menu.findItem(R.id.save_to_device).isVisible = true
+                                    menu.findItem(R.id.share).isVisible = true
+                                }
+
+                                adapterType == FOLDER_LINK_ADAPTER
+                                        || adapterType == Constants.FROM_IMAGE_VIEWER
+                                        || adapterType == Constants.FROM_ALBUM_SHARING
+                                        || adapterType == Constants.VERSIONS_ADAPTER -> {
+                                    menu.toggleAllMenuItemsVisibility(false)
+                                    menu.findItem(R.id.save_to_device).isVisible = true
+                                }
+
+                                else -> {
+                                    val node = megaApi.getNodeByHandle(it.getCurrentPlayingHandle())
+                                    if (node == null) {
+                                        Timber.d("refreshMenuOptionsVisibility node is null")
+
+                                        menu.toggleAllMenuItemsVisibility(false)
+                                        return
+                                    }
+
+                                    menu.toggleAllMenuItemsVisibility(true)
+                                    searchMenuItem?.isVisible = false
+
+                                    menu.findItem(R.id.save_to_device).isVisible = true
+                                    // Hide the select, select all, and clear options
+                                    menu.findItem(R.id.select).isVisible = false
+                                    menu.findItem(R.id.remove).isVisible = false
+
+                                    menu.findItem(R.id.properties).isVisible =
+                                        currentFragmentId == R.id.main_player
+
+                                    menu.findItem(R.id.share).isVisible =
+                                        currentFragmentId == R.id.main_player
+                                                && MegaNodeUtil.showShareOption(
+                                            adapterType = adapterType,
+                                            isFolderLink = false,
+                                            handle = node.handle
+                                        )
+                                    menu.findItem(R.id.send_to_chat).isVisible = true
+
+                                    val access = megaApi.getAccess(node)
+                                    val isAccessOwner = access == MegaShare.ACCESS_OWNER
+
+                                    menu.findItem(R.id.get_link).isVisible =
+                                        isAccessOwner && !node.isExported
+                                    menu.findItem(R.id.remove_link).isVisible =
+                                        isAccessOwner && node.isExported
+
+                                    menu.findItem(R.id.chat_import).isVisible = false
+                                    menu.findItem(R.id.chat_save_for_offline).isVisible = false
+
+                                    when (access) {
+                                        MegaShare.ACCESS_READWRITE,
+                                        MegaShare.ACCESS_READ,
+                                        MegaShare.ACCESS_UNKNOWN,
+                                        -> {
+                                            menu.findItem(R.id.rename).isVisible = false
+                                            menu.findItem(R.id.move).isVisible = false
+                                        }
+
+                                        MegaShare.ACCESS_FULL,
+                                        MegaShare.ACCESS_OWNER,
+                                        -> {
+                                            menu.findItem(R.id.rename).isVisible = true
+                                            menu.findItem(R.id.move).isVisible = true
+                                        }
+                                    }
+
+                                    menu.findItem(R.id.move_to_trash).isVisible =
+                                        node.parentHandle != megaApi.rubbishNode?.handle
+                                                && (access == MegaShare.ACCESS_FULL
+                                                || access == MegaShare.ACCESS_OWNER)
+
+                                    menu.findItem(R.id.copy).isVisible = true
+                                }
+                            }
+                        }
+                    }
+
+                    // After establishing the Options menu, check if read-only properties should be applied
+                    checkIfShouldApplyReadOnlyState(menu)
+                } ?: run {
+                Timber.d("refreshMenuOptionsVisibility null adapterType")
+                menu.toggleAllMenuItemsVisibility(false)
+            }
+        } ?: run {
+            Timber.d("refreshMenuOptionsVisibility null service")
+            menu.toggleAllMenuItemsVisibility(false)
+        }
+    }
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * on the Options toolbar if the [MegaNode] is a Backup node.
+     *
+     * @param menu The Options Menu
+     */
+    private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
+        playerServiceGateway?.getCurrentPlayingHandle()?.let { playingHandle ->
+            megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                if (megaApi.isInInbox(node)) {
+                    with(menu) {
+                        findItem(R.id.move_to_trash).isVisible = false
+                        findItem(R.id.move).isVisible = false
+                        findItem(R.id.rename).isVisible = false
+                    }
+                }
+            }
+        }
     }
 }

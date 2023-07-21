@@ -1,9 +1,9 @@
 package mega.privacy.android.app.mediaplayer
 
-import android.content.ComponentName
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
+import android.content.IntentFilter
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
@@ -12,7 +12,6 @@ import android.database.ContentObserver
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.provider.Settings
 import android.provider.Settings.System.ACCELEROMETER_ROTATION
 import android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC
@@ -34,26 +33,35 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.updatePadding
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityVideoPlayerBinding
+import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceGateway
-import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceViewModelGateway
+import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_RESTART_PLAYBACK_POSITION
+import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_RESUME_PLAYBACK_POSITION
+import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
+import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
+import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
-import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
+import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
+import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragment
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
@@ -93,34 +101,61 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import org.jetbrains.anko.configuration
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Extending MediaPlayerActivity is to declare portrait in manifest,
  * to avoid crash when set requestedOrientation.
  */
+@AndroidEntryPoint
 class VideoPlayerActivity : MediaPlayerActivity() {
+    /**
+     * MediaPlayerGateway for video player
+     */
+    @VideoPlayer
+    @Inject
+    lateinit var mediaPlayerGateway: MediaPlayerGateway
+
     private lateinit var binding: ActivityVideoPlayerBinding
 
     private var viewingTrackInfo: TrackInfoFragmentArgs? = null
 
     private val videoViewModel: VideoPlayerViewModel by viewModels()
 
-    private var serviceBound = false
-
     private var takenDownDialog: AlertDialog? = null
 
     private var currentOrientation: Int = SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
-    private var serviceGateway: VideoPlayerServiceGateway? = null
+    private val requestOrientationUpdate = MutableLiveData<Pair<Int, Int>>()
+
+    private var mediaPlayerIntent: Intent? = null
+    private var isPlayingAfterReady = false
+    private var currentPlayingHandle: Long? = null
+
+    private var currentMediaPlaySources: MediaPlaySources? = null
+
+    private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
+                if (intent.getIntExtra(INTENT_KEY_STATE, -1) == STATE_HEADSET_UNPLUGGED) {
+                    mediaPlayerGateway.setPlayWhenReady(false)
+                }
+            }
+        }
+    }
 
     private val dragToExit by lazy {
         DragToExitSupport(
@@ -129,60 +164,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         ) {
             finish()
             overridePendingTransition(0, android.R.anim.fade_out)
-        }
-    }
-
-    private val connection = object : ServiceConnection {
-        override fun onServiceDisconnected(name: ComponentName?) {
-            serviceGateway = null
-            playerServiceGateway = null
-        }
-
-        /**
-         * Called after a successful bind with our AudioPlayerService.
-         */
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            if (service is MediaPlayerServiceBinder) {
-                serviceGateway = service.serviceGateway as? VideoPlayerServiceGateway
-                playerServiceGateway =
-                    service.playerServiceViewModelGateway as? VideoPlayerServiceViewModelGateway
-
-                refreshMenuOptionsVisibility()
-
-                collectFlow(service.serviceGateway.metadataUpdate()) {
-                    dragToExit.nodeChanged(
-                        service.playerServiceViewModelGateway.getCurrentPlayingHandle()
-                    )
-                }
-
-                serviceGateway?.let {
-                    collectFlow(it.videoSizeUpdate()) { (width, height) ->
-                        val rotationMode = Settings.System.getInt(
-                            contentResolver,
-                            ACCELEROMETER_ROTATION,
-                            SCREEN_BRIGHTNESS_MODE_MANUAL
-                        )
-
-                        currentOrientation =
-                            if (width > height) {
-                                SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                            } else {
-                                SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                            }
-
-                        requestedOrientation =
-                            if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                                SCREEN_ORIENTATION_SENSOR
-                            } else {
-                                currentOrientation
-                            }
-                    }
-                }
-
-                collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { errorCode ->
-                    this@VideoPlayerActivity.onError(errorCode)
-                }
-            }
         }
     }
 
@@ -238,27 +219,18 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 )
             collapseIcon?.setTint(Color.WHITE)
         }.post {
-            updateToolbar(videoViewModel.isLockUpdate.value)
+            updateToolbar(videoViewModel.screenLockState.value)
         }
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        createPlayer()
         setupToolbar()
         setupNavDestListener()
-
-        val playerServiceIntent = Intent(this, VideoPlayerService::class.java).putExtras(extras)
-
-        if (rebuildPlaylist && savedInstanceState == null) {
-            playerServiceIntent.setDataAndType(intent.data, intent.type)
-            startService(playerServiceIntent)
-        }
-
-        bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
-        serviceBound = true
-
         setupObserver()
+        initMediaData()
 
         if (savedInstanceState == null) {
             // post to next UI cycle so that MediaPlayerFragment's onCreateView is called
@@ -278,6 +250,136 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             .observe(this) {
                 showNotAllowPlayAlert()
             }
+        AudioPlayerService.pauseAudioPlayer(this)
+        registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
+    }
+
+    private fun createPlayer() {
+        with(videoViewModel) {
+            val nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit =
+                { title, artist, album ->
+                    val nodeName =
+                        getPlaylistItem(mediaPlayerGateway.getCurrentMediaItem()?.mediaId)?.nodeName
+                            ?: ""
+
+                    if (!(title.isNullOrEmpty() && artist.isNullOrEmpty()
+                                && album.isNullOrEmpty() && nodeName.isEmpty())
+                    ) {
+                        videoViewModel.updateMetadataState(Metadata(title, artist, album, nodeName))
+                        mediaPlayerGateway.invalidatePlayerNotification()
+                    }
+                }
+
+            val mediaPlayerCallback: MediaPlayerCallback = object : MediaPlayerCallback {
+                override fun onMediaItemTransitionCallback(
+                    handle: String?,
+                    isUpdateName: Boolean,
+                ) {
+                    handle?.let {
+                        setCurrentPlayingHandle(it.toLong())
+                        lifecycleScope.launch {
+                            monitorPlaybackTimes(it.toLong()) { positionInMs ->
+                                when (videoPlayType) {
+                                    VIDEO_TYPE_RESUME_PLAYBACK_POSITION ->
+                                        positionInMs?.let { position ->
+                                            mediaPlayerGateway.playerSeekToPositionInMs(position)
+                                        }
+
+                                    VIDEO_TYPE_RESTART_PLAYBACK_POSITION -> {
+                                        // Remove current playback history, if video type is restart
+                                        deletePlaybackInformation(it.toLong())
+                                    }
+
+                                    VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG -> {
+                                        // Detect the media item whether is transition by comparing
+                                        // currentPlayingHandle if is parameter handle
+                                        if (currentPlayingHandle != it.toLong()
+                                            && positionInMs != null && positionInMs > 0
+                                        ) {
+                                            // If the dialog is not showing before build sources,
+                                            // the video is paused before the dialog is dismissed.
+                                            isPlayingAfterReady = false
+                                            updateShowPlaybackPositionDialogState(
+                                                showPlaybackPositionDialogState.value.copy(
+                                                    showPlaybackDialog = true,
+                                                    mediaItemName = getPlaylistItem(it)?.nodeName,
+                                                    playbackPosition = positionInMs,
+                                                    isDialogShownBeforeBuildSources = false
+                                                )
+                                            )
+                                        } else {
+                                            // If currentPlayHandle is parameter handle and there is
+                                            // no playback history, the video is playing after ready
+                                            isPlayingAfterReady = true
+                                            // Set playWhenReady to be true to ensure the video is playing after ready
+                                            if (!mediaPlayerGateway.getPlayWhenReady()) {
+                                                mediaPlayerGateway.setPlayWhenReady(true)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (isUpdateName) {
+                            val nodeName = getPlaylistItem(it)?.nodeName ?: ""
+                            videoViewModel.updateMetadataState(Metadata(null, null, null, nodeName))
+                        }
+                        currentPlayingHandle = handle.toLong()
+                    }
+                }
+
+                override fun onShuffleModeEnabledChangedCallback(shuffleModeEnabled: Boolean) {
+                }
+
+                override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) {
+                    setVideoRepeatMode(repeatToggleMode)
+                }
+
+                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
+                    updateMediaPlaybackState(!playWhenReady)
+                }
+
+                override fun onPlaybackStateChangedCallback(state: Int) {
+                    val isPaused = videoViewModel.mediaPlaybackState.value
+                    when {
+                        state == MEDIA_PLAYER_STATE_ENDED && !isPaused -> {
+                            updateMediaPlaybackState(true)
+                        }
+
+                        state == MEDIA_PLAYER_STATE_READY -> {
+                            // This case is only for video player
+                            if (isPaused && mediaPlayerGateway.getPlayWhenReady()) {
+                                updateMediaPlaybackState(false)
+                                sendVideoPlayerActivatedEvent()
+                            } else {
+                                // Detect videoPlayType and isPlayingAfterReady after video is ready
+                                // If videoPlayType is VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG, and
+                                // isPlayingAfterReady is false, the video is paused after it's ready
+                                if (videoPlayType == VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
+                                    && !isPlayingAfterReady
+                                ) {
+                                    mediaPlayerGateway.setPlayWhenReady(false)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                override fun onPlayerErrorCallback() {
+                    onPlayerError()
+                }
+
+                override fun onVideoSizeCallback(videoWidth: Int, videoHeight: Int) {
+                    requestOrientationUpdate.value = Pair(videoWidth, videoHeight)
+                }
+            }
+
+            mediaPlayerGateway.createPlayer(
+                repeatToggleMode = videoRepeatToggleMode(),
+                nameChangeCallback = nameChangeCallback,
+                mediaPlayerCallback = mediaPlayerCallback
+            )
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -294,7 +396,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             onExceptionThrown().observe(this@VideoPlayerActivity, ::manageException)
 
             itemToRemove.observe(this@VideoPlayerActivity) { handle ->
-                playerServiceGateway?.removeItem(handle)
+                videoViewModel.removeItem(handle)
             }
 
             renameUpdate.observe(this@VideoPlayerActivity) { node ->
@@ -305,7 +407,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         snackbarShower = this@VideoPlayerActivity,
                         actionNodeCallback = object : ActionNodeCallback {
                             override fun finishRenameActionWithSuccess(newName: String) {
-                                playerServiceGateway?.updateItemName(it.handle, newName)
+                                videoViewModel.updateItemName(it.handle, newName)
                                 updateTrackInfoNodeNameIfNeeded(it.handle, newName)
                                 //Avoid the dialog is shown repeatedly when screen is rotated.
                                 viewModel.renameUpdate(null)
@@ -332,9 +434,9 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         )
 
                         ZIP_ADAPTER -> {
-                            val mediaItem = serviceGateway?.getCurrentMediaItem()
+                            val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
                             mediaItem?.localConfiguration?.uri?.let { uri ->
-                                playerServiceGateway?.getPlaylistItem(mediaItem.mediaId)
+                                videoViewModel.getPlaylistItem(mediaItem.mediaId)
                                     ?.let { playlistItem ->
                                         nodeSaver.saveUri(
                                             uri = uri,
@@ -442,8 +544,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                     videoViewModel.sendShareButtonClickedEvent()
                     when (adapterType) {
                         OFFLINE_ADAPTER, ZIP_ADAPTER -> {
-                            val mediaItem = serviceGateway?.getCurrentMediaItem()
-                            playerServiceGateway?.getPlaylistItem(mediaItem?.mediaId)?.nodeName
+                            val mediaItem = mediaPlayerGateway.getCurrentMediaItem()
+                            videoViewModel.getPlaylistItem(mediaItem?.mediaId)?.nodeName
                                 ?.let { nodeName ->
                                     mediaItem?.localConfiguration?.uri?.let { uri ->
                                         FileUtil.shareUri(this, nodeName, uri)
@@ -459,7 +561,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         else -> {
-                            playerServiceGateway?.run {
+                            videoViewModel.run {
                                 MegaNodeUtil.shareNode(
                                     context = this@VideoPlayerActivity,
                                     node = megaApi.getNodeByHandle(getCurrentPlayingHandle())
@@ -569,8 +671,102 @@ class VideoPlayerActivity : MediaPlayerActivity() {
             }
         }
 
-        collectFlow(videoViewModel.isLockUpdate) { isLock ->
-            updateToolbar(isLock)
+        with(videoViewModel) {
+            collectFlow(screenLockState) { isLock ->
+                updateToolbar(isLock)
+            }
+
+            collectFlow(playerSourcesState) { mediaPlaySources ->
+                if (mediaPlaySources.mediaItems.isNotEmpty()) {
+                    currentMediaPlaySources = mediaPlaySources
+                    playSource(mediaPlaySources)
+                }
+            }
+
+            collectFlow(mediaItemToRemoveState) { index ->
+                index?.let {
+                    mediaPlayerGateway.mediaItemRemoved(it)?.let { handle ->
+                        val nodeName = getPlaylistItem(handle)?.nodeName ?: ""
+                        videoViewModel.updateMetadataState(Metadata(null, null, null, nodeName))
+                    }
+                }
+            }
+
+            collectFlow(errorState) { errorCode ->
+                errorCode?.let {
+                    this@VideoPlayerActivity.onError(it)
+                }
+            }
+
+            collectFlow(screenOrientationState) { orientation ->
+                binding.toolbar.title = if (orientation == ORIENTATION_LANDSCAPE) {
+                    videoViewModel.metadataState.value.title
+                        ?: videoViewModel.metadataState.value.nodeName
+                } else {
+                    ""
+                }
+            }
+        }
+
+        collectFlow(videoViewModel.metadataState) { metadata ->
+            setToolbarTitle(
+                if (configuration.orientation == ORIENTATION_LANDSCAPE) {
+                    metadata.title ?: metadata.nodeName
+                } else {
+                    ""
+                }
+            )
+
+            dragToExit.nodeChanged(
+                videoViewModel.getCurrentPlayingHandle()
+            )
+        }
+
+        collectFlow(requestOrientationUpdate.asFlow()) { (width, height) ->
+            val rotationMode = Settings.System.getInt(
+                contentResolver,
+                ACCELEROMETER_ROTATION,
+                SCREEN_BRIGHTNESS_MODE_MANUAL
+            )
+
+            currentOrientation =
+                if (width > height) {
+                    SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                } else {
+                    SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                }
+
+            requestedOrientation =
+                if (rotationMode == SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                    SCREEN_ORIENTATION_SENSOR
+                } else {
+                    currentOrientation
+                }
+        }
+    }
+
+    private fun initMediaData() {
+        currentPlayingHandle = intent?.getLongExtra(
+            Constants.INTENT_EXTRA_KEY_HANDLE,
+            MegaApiJava.INVALID_HANDLE
+        )
+
+        videoViewModel.monitorPlaybackTimes(currentPlayingHandle) { positionInMs ->
+            // If the first video contains playback history, show dialog before build sources
+            if (positionInMs != null && positionInMs > 0) {
+                mediaPlayerIntent = intent
+                with(videoViewModel) {
+                    updateShowPlaybackPositionDialogState(
+                        showPlaybackPositionDialogState.value.copy(
+                            showPlaybackDialog = true,
+                            mediaItemName = intent?.getStringExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME),
+                            playbackPosition = positionInMs
+                        )
+                    )
+                }
+            } else {
+                videoViewModel.initVideoSources(intent)
+            }
         }
     }
 
@@ -642,20 +838,18 @@ class VideoPlayerActivity : MediaPlayerActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        videoViewModel.savePlaybackTimes()
+        videoViewModel.cancelSearch()
+        videoViewModel.clear()
         contentResolver.unregisterContentObserver(rotationContentObserver)
         if (isFinishing) {
-            serviceGateway?.mainPlayerUIClosed()
+            mediaPlayerGateway.playerStop()
+            mediaPlayerGateway.playerRelease()
             dragToExit.showPreviousHiddenThumbnail()
-        }
-        serviceGateway = null
-        if (serviceBound) {
-            unbindService(connection)
-        }
-        nodeSaver.destroy()
-        if (isFinishing) {
             AudioPlayerService.resumeAudioPlayer(this)
         }
+        unregisterReceiver(headsetPlugReceiver)
+        nodeSaver.destroy()
         AlertDialogUtil.dismissAlertDialogIfExists(takenDownDialog)
     }
 
@@ -675,7 +869,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                         }
 
                         override fun onQueryTextChange(newText: String): Boolean {
-                            playerServiceGateway?.searchQueryUpdate(newText)
+                            videoViewModel.searchQueryUpdate(newText)
                             return true
                         }
 
@@ -688,7 +882,7 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
 
                 override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                    playerServiceGateway?.searchQueryUpdate(null)
+                    videoViewModel.searchQueryUpdate(null)
                     return true
                 }
             })
@@ -700,9 +894,8 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val launchIntent = playerServiceGateway?.getCurrentIntent() ?: return false
-        val playingHandle = playerServiceGateway?.getCurrentPlayingHandle() ?: return false
-        val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+        val playingHandle = videoViewModel.getCurrentPlayingHandle()
+        val adapterType = intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
 
         when (item.itemId) {
             R.id.save_to_device,
@@ -729,12 +922,192 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                     menuId = item.itemId,
                     adapterType = adapterType,
                     playingHandle = playingHandle,
-                    launchIntent = launchIntent
+                    launchIntent = intent
                 )
                 return true
             }
         }
         return false
+    }
+
+    private fun refreshMenuOptionsVisibility() {
+        val menu = optionsMenu
+        if (menu == null) {
+            Timber.d("refreshMenuOptionsVisibility menu is null")
+            return
+        }
+
+        val currentFragmentId = navController.currentDestination?.id
+        if (currentFragmentId == null) {
+            Timber.d("refreshMenuOptionsVisibility currentFragment is null")
+            return
+        }
+
+        intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE).let { adapterType ->
+            when (currentFragmentId) {
+                R.id.playlist -> {
+                    menu.toggleAllMenuItemsVisibility(false)
+                    searchMenuItem?.isVisible = true
+                    // Display the select option
+                    menu.findItem(R.id.select).isVisible = true
+                }
+
+                R.id.main_player, R.id.track_info -> {
+                    when {
+                        adapterType == OFFLINE_ADAPTER -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.properties).isVisible =
+                                currentFragmentId == R.id.main_player
+
+                            menu.findItem(R.id.share).isVisible =
+                                currentFragmentId == R.id.main_player
+                        }
+
+                        adapterType == Constants.RUBBISH_BIN_ADAPTER || megaApi.isInRubbish(
+                            megaApi.getNodeByHandle(
+                                videoViewModel.getCurrentPlayingHandle()
+                            )
+                        ) -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.properties).isVisible =
+                                currentFragmentId == R.id.main_player
+
+                            val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
+                            moveToTrash.isVisible = true
+                            moveToTrash.title = getString(R.string.context_remove)
+                        }
+
+                        adapterType == FROM_CHAT -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            menu.findItem(R.id.chat_import).isVisible = true
+                            menu.findItem(R.id.chat_save_for_offline).isVisible = true
+
+                            menu.findItem(R.id.share).isVisible = false
+
+                            menu.findItem(R.id.move_to_trash)?.let { moveToTrash ->
+                                val pair = getChatMessage()
+                                val message = pair.second
+
+                                val canRemove = message != null
+                                        && message.userHandle == megaChatApi.myUserHandle
+                                        && message.isDeletable
+                                moveToTrash.isVisible = canRemove
+                                if (canRemove) {
+                                    moveToTrash.title = getString(R.string.context_remove)
+                                }
+                            }
+                        }
+
+                        adapterType == FILE_LINK_ADAPTER || adapterType == ZIP_ADAPTER -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            menu.findItem(R.id.share).isVisible = true
+                        }
+
+                        adapterType == FOLDER_LINK_ADAPTER
+                                || adapterType == Constants.FROM_IMAGE_VIEWER
+                                || adapterType == FROM_ALBUM_SHARING
+                                || adapterType == Constants.VERSIONS_ADAPTER -> {
+                            menu.toggleAllMenuItemsVisibility(false)
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                        }
+
+                        else -> {
+                            val node =
+                                megaApi.getNodeByHandle(videoViewModel.getCurrentPlayingHandle())
+                            if (node == null) {
+                                Timber.d("refreshMenuOptionsVisibility node is null")
+
+                                menu.toggleAllMenuItemsVisibility(false)
+                                return
+                            }
+
+                            menu.toggleAllMenuItemsVisibility(true)
+                            searchMenuItem?.isVisible = false
+
+                            menu.findItem(R.id.save_to_device).isVisible = true
+                            // Hide the select, select all, and clear options
+                            menu.findItem(R.id.select).isVisible = false
+                            menu.findItem(R.id.remove).isVisible = false
+
+                            menu.findItem(R.id.properties).isVisible =
+                                currentFragmentId == R.id.main_player
+
+                            menu.findItem(R.id.share).isVisible =
+                                currentFragmentId == R.id.main_player
+                                        && MegaNodeUtil.showShareOption(
+                                    adapterType = adapterType,
+                                    isFolderLink = false,
+                                    handle = node.handle
+                                )
+                            menu.findItem(R.id.send_to_chat).isVisible = true
+
+                            val access = megaApi.getAccess(node)
+                            val isAccessOwner = access == MegaShare.ACCESS_OWNER
+
+                            menu.findItem(R.id.get_link).isVisible =
+                                isAccessOwner && !node.isExported
+                            menu.findItem(R.id.remove_link).isVisible =
+                                isAccessOwner && node.isExported
+
+                            menu.findItem(R.id.chat_import).isVisible = false
+                            menu.findItem(R.id.chat_save_for_offline).isVisible = false
+
+                            when (access) {
+                                MegaShare.ACCESS_READWRITE,
+                                MegaShare.ACCESS_READ,
+                                MegaShare.ACCESS_UNKNOWN,
+                                -> {
+                                    menu.findItem(R.id.rename).isVisible = false
+                                    menu.findItem(R.id.move).isVisible = false
+                                }
+
+                                MegaShare.ACCESS_FULL,
+                                MegaShare.ACCESS_OWNER,
+                                -> {
+                                    menu.findItem(R.id.rename).isVisible = true
+                                    menu.findItem(R.id.move).isVisible = true
+                                }
+                            }
+
+                            menu.findItem(R.id.move_to_trash).isVisible =
+                                node.parentHandle != megaApi.rubbishNode?.handle
+                                        && (access == MegaShare.ACCESS_FULL
+                                        || access == MegaShare.ACCESS_OWNER)
+
+                            menu.findItem(R.id.copy).isVisible = true
+                        }
+                    }
+                }
+            }
+            // After establishing the Options menu, check if read-only properties should be applied
+            checkIfShouldApplyReadOnlyState(menu)
+        }
+    }
+
+    /**
+     * Checks and applies read-only restrictions (unable to Favourite, Rename, Move, or Move to Rubbish Bin)
+     * on the Options toolbar if the [MegaNode] is a Backup node.
+     *
+     * @param menu The Options Menu
+     */
+    private fun checkIfShouldApplyReadOnlyState(menu: Menu) {
+        videoViewModel.getCurrentPlayingHandle().let { playingHandle ->
+            megaApi.getNodeByHandle(playingHandle)?.let { node ->
+                if (megaApi.isInInbox(node)) {
+                    with(menu) {
+                        findItem(R.id.move_to_trash).isVisible = false
+                        findItem(R.id.move).isVisible = false
+                        findItem(R.id.rename).isVisible = false
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -1037,7 +1410,15 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     }
 
     private fun stopPlayer() {
-        serviceGateway?.stopPlayer()
+        mediaPlayerGateway.playerStop()
         finish()
+    }
+
+    companion object {
+        private const val MEDIA_PLAYER_STATE_ENDED = 4
+        private const val MEDIA_PLAYER_STATE_READY = 3
+
+        private const val INTENT_KEY_STATE = "state"
+        private const val STATE_HEADSET_UNPLUGGED = 0
     }
 }

@@ -13,10 +13,7 @@ import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.gateway.VideoPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerServiceViewModel
-import mega.privacy.android.app.mediaplayer.service.VideoPlayerServiceViewModel
 import mega.privacy.android.app.meeting.facade.CameraFacade
 import mega.privacy.android.app.meeting.facade.RTCAudioManagerFacade
 import mega.privacy.android.app.meeting.gateway.CameraGateway
@@ -73,12 +70,6 @@ abstract class GatewayModule {
      */
     @Binds
     abstract fun bindsAudioPlayerServiceViewModelGateway(implementation: AudioPlayerServiceViewModel): AudioPlayerServiceViewModelGateway
-
-    /**
-     * Provide VideoPlayerServiceViewModelGateway implementation
-     */
-    @Binds
-    abstract fun bindsVideoPlayerServiceViewModelGateway(implementation: VideoPlayerServiceViewModel): VideoPlayerServiceViewModelGateway
 
     @Binds
     @Singleton

@@ -193,4 +193,13 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     fun displayMetadata(metadata: Metadata) {
         trackName.text = metadata.title ?: metadata.nodeName
     }
+
+    /**
+     * Whether is showing track name
+     *
+     * @param isVisible true is show, otherwise is false
+     */
+    fun setTrackNameVisible(isVisible: Boolean) {
+        trackName.isVisible = isVisible
+    }
 }
