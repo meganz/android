@@ -20,9 +20,8 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TwoFactorAuthenticationFieldTest {
-
     @get:Rule
-    var composeRule = createComposeRule()
+    val composeRule = createComposeRule()
 
     private fun setupRule(
         twoFAPin: List<String> = listOf("", "", "", "", "", ""),

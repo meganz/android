@@ -22,27 +22,30 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.view.QRCode
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
+import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
@@ -51,18 +54,15 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.body1Medium
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
-import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.white_grey_700
 
 
 @Composable
-internal fun SetupScreen(
-    is2FAFetchCompleted: Boolean,
+internal fun AuthenticationSetupScreen(
+    uiState: TwoFactorAuthenticationUIState,
     isDarkMode: Boolean,
-    qrText: String,
     qrCodeMapper: QRCodeMapper,
-    seedsList: List<String>?,
     openPlayStore: () -> Unit,
     onNextClicked: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
@@ -70,8 +70,8 @@ internal fun SetupScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    if (is2FAFetchCompleted) {
-
+    if (uiState.is2FAFetchCompleted) {
+        val qrText = uiState.twoFactorAuthUrl
         var isNoAppAvailableDialogShown by remember { mutableStateOf(false) }
         if (isNoAppAvailableDialogShown) {
             AlertNoAppAvailableDialog(
@@ -89,18 +89,29 @@ internal fun SetupScreen(
             modifier = modifier
                 .background(MaterialTheme.colors.white_grey_700)
                 .fillMaxSize()
+                .testTag(CONTENT_TEST_TAG)
         ) {
-            InstructionBox(isDarkMode, openPlayStore)
+            InstructionBox(
+                modifier = Modifier.testTag(INSTRUCTIONS_TEST_TAG),
+                isDarkMode = isDarkMode,
+                openPlayStore = openPlayStore,
+            )
             Spacer(modifier = Modifier.height(20.dp))
             QRCode(
                 modifier = Modifier
                     .size(120.dp)
-                    .align(CenterHorizontally),
+                    .align(CenterHorizontally)
+                    .testTag(QR_CODE_TEST_TAG),
                 text = qrText,
                 qrCodeMapper = qrCodeMapper
             )
             Spacer(modifier = Modifier.height(20.dp))
-            SeedsBox(seedsList.orEmpty())
+            SeedsBox(
+                modifier = Modifier.testTag(
+                    SEED_BOX_TEST_TAG
+                ),
+                seedsList = uiState.seed?.toSeedArray().orEmpty()
+            )
             Spacer(modifier = Modifier.padding(top = 24.dp))
             Row(
                 Modifier
@@ -129,17 +140,19 @@ internal fun SetupScreen(
     } else {
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Center
         ) {
             MegaCircularProgressIndicator(
-                modifier = Modifier.size(50.dp),
+                modifier = Modifier
+                    .size(50.dp)
+                    .testTag(SETUP_PROGRESSBAR_TEST_TAG),
             )
         }
     }
 }
 
 @Composable
-private fun InstructionBox(
+internal fun InstructionBox(
     isDarkMode: Boolean,
     openPlayStore: () -> Unit,
     modifier: Modifier = Modifier,
@@ -159,8 +172,7 @@ private fun InstructionBox(
         )
     }
     Box(
-        modifier = modifier
-            .background(MaterialTheme.colors.primary)
+        modifier = modifier.background(MaterialTheme.colors.primary)
     ) {
         Column(modifier = Modifier.padding(vertical = 16.dp)) {
             Text(
@@ -182,47 +194,46 @@ private fun InstructionBox(
                         appendInlineContent("inlineContent", "[?]")
                     }
                 }
-            Row {
-                val inlineIcon = mapOf(
-                    Pair("inlineContent",
-                        InlineTextContent(
-                            placeholder = Placeholder(
-                                width = 20.sp,
-                                height = 20.sp,
-                                placeholderVerticalAlign = PlaceholderVerticalAlign.Center
-                            )
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_question_mark),
-                                "question mark icon",
-                                modifier = Modifier.clickable {
-                                    isAlertHelpDialogShown = true
-                                }
-                            )
-                        }
-                    )
-                )
-                Text(
-                    inlineContent = inlineIcon,
-                    text = explanationTextWithIcon,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp),
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.textColorPrimary,
 
+            val inlineIcon: Map<String, InlineTextContent> = mapOf(
+                "inlineContent" to InlineTextContent(
+                    placeholder = Placeholder(
+                        width = 20.sp,
+                        height = 20.sp,
+                        placeholderVerticalAlign = PlaceholderVerticalAlign.Center
                     )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_question_mark),
+                        contentDescription = "question mark icon",
+                        modifier = Modifier
+                            .testTag(QUESTION_MARK_ICON_TEST_TAG)
+                            .semantics { drawableId = R.drawable.ic_question_mark }
+                            .clickable {
+                                isAlertHelpDialogShown = true
+                            }
+                    )
+                })
+
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .testTag(INSTRUCTION_MESSAGE_TEST_TAG),
+                inlineContent = inlineIcon,
+                text = explanationTextWithIcon,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.textColorPrimary,
+            )
         }
     }
 }
 
 
 @Composable
-private fun SeedsBox(seedsList: List<String>) {
+private fun SeedsBox(seedsList: List<String>, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
             .background(
@@ -312,17 +323,29 @@ private fun AlertHelpDialog(
 @CombinedThemePreviews
 @Composable
 private fun PreviewSetupView() {
-    val seedsList = "eqfhcqxhiq4he6ahjqameqaheqwhrqaheqaheqaheqaheqaheqah".toSeedArray()
-    SetupScreen(
+    val uiState = TwoFactorAuthenticationUIState(
+        seed = "eqfhcqxhiq4he6ahjqameqaheqwhrqaheqaheqaheqaheqaheqah",
         is2FAFetchCompleted = true,
+        twoFactorAuthUrl = "123dsfsdfaf2e32"
+    )
+    AuthenticationSetupScreen(
+        uiState = uiState,
         isDarkMode = false,
-        qrText = "123dsfsdfaf2e32",
         qrCodeMapper = { _, _, _, _, _ ->
             Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
         },
-        seedsList = seedsList,
         isIntentAvailable = { true },
         onNextClicked = {},
         onOpenInClicked = {},
         openPlayStore = {})
 }
+
+internal const val CONTENT_TEST_TAG = "authentication_setup_screen:column_content_view"
+internal const val INSTRUCTIONS_TEST_TAG =
+    "authentication_setup_screen:mega_instruction_box_instructions"
+internal const val SEED_BOX_TEST_TAG = "authentication_setup_screen:mega_seed_box_codes"
+internal const val QR_CODE_TEST_TAG = "authentication_setup_screen:mega_qr_code_authentication_code"
+internal const val SETUP_PROGRESSBAR_TEST_TAG =
+    "authentication_setup_screen:mega_circular_progress_indicator_loading"
+internal const val QUESTION_MARK_ICON_TEST_TAG = "instruction_box:icon_question_mark"
+internal const val INSTRUCTION_MESSAGE_TEST_TAG = "instruction_box:text_message"

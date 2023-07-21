@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.extensions
 
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.core.text.isDigitsOnly
 import mega.privacy.android.app.presentation.twofactorauthentication.view.FIFTH_PIN
 import mega.privacy.android.app.presentation.twofactorauthentication.view.FIRST_PIN
@@ -111,3 +113,6 @@ internal fun List<String>.getUpdatedTwoFactorAuthentication(
             pin
         )
     }
+
+val DrawableResId = SemanticsPropertyKey<Int>("DrawableResId")
+var SemanticsPropertyReceiver.drawableId by DrawableResId

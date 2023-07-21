@@ -22,9 +22,8 @@ import test.mega.privacy.android.app.fromId
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
 class AuthenticationScreenTest {
-
     @get:Rule
-    var composeRule = createComposeRule()
+    val composeRule = createComposeRule()
 
     private fun setupRule(uiState: TwoFactorAuthenticationUIState = TwoFactorAuthenticationUIState()) {
         composeRule.setContent {

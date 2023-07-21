@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -13,6 +14,7 @@ import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.DrawableResId
 
 internal fun SemanticsNodeInteractionsProvider.onNodeWithText(
     @StringRes id: Int,
@@ -54,3 +56,8 @@ internal fun hasTextColor(color: Color): SemanticsMatcher = SemanticsMatcher(
         false
     }
 }
+
+internal fun hasDrawable(@DrawableRes id: Int): SemanticsMatcher =
+    SemanticsMatcher.expectValue(
+        DrawableResId, id
+    )

@@ -28,14 +28,13 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.ScreenType
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationCompletedScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationScreen
 import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.InitialisationScreen
-import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.SetupScreen
+import mega.privacy.android.app.presentation.twofactorauthentication.view.screens.AuthenticationSetupScreen
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.extensions.black_white
 
@@ -129,12 +128,10 @@ internal fun TwoFactorAuthenticationView(
             }
 
             ScreenType.SetupScreen -> {
-                SetupScreen(
-                    is2FAFetchCompleted = uiState.is2FAFetchCompleted,
+                AuthenticationSetupScreen(
+                    uiState = uiState,
                     isDarkMode = isDarkMode,
-                    qrText = uiState.twoFactorAuthUrl,
                     qrCodeMapper = qrCodeMapper,
-                    seedsList = uiState.seed?.toSeedArray(),
                     onNextClicked = {
                         currentScreen.value = ScreenType.AuthenticationScreen
                     },

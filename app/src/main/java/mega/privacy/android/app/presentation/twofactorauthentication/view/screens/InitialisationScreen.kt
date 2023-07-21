@@ -15,13 +15,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_800
@@ -50,6 +53,8 @@ internal fun InitialisationScreen(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .padding(vertical = 32.dp)
+                    .semantics { drawableId = R.drawable.ic_2fa }
+                    .testTag(LOCK_IMAGE_TEST_TAG)
             )
         }
         Spacer(modifier = Modifier.padding(top = 20.dp))
@@ -94,3 +99,5 @@ private fun PreviewInitialisationScreen() {
         modifier = Modifier.semantics { testTagsAsResourceId = true },
     )
 }
+
+internal const val LOCK_IMAGE_TEST_TAG = "initialisation_screen:image_lock"
