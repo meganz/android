@@ -79,9 +79,9 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
     }
 
     override fun onDestroy() {
-        scheduledMeetingManagementViewModel.let {
-            it.stopMonitoringLoadMessages()
-            it.setOnChatIdConsumed()
+        with(scheduledMeetingManagementViewModel) {
+            stopMonitoringLoadMessages()
+            setOnChatIdConsumed()
         }
         super.onDestroy()
     }

@@ -159,7 +159,7 @@ fun RecurringMeetingInfoView(
 
     onScrollChange(!firstItemVisible)
 
-    if (state.occurrencesList.size > 1 && managementState.displayDialog) {
+    if (state.occurrencesList.size > 1 && managementState.cancelOccurrenceTapped) {
         managementState.selectedOccurrence?.let { occurrence ->
             CancelScheduledMeetingOccurrenceDialog(
                 occurrence = occurrence,

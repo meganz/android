@@ -145,13 +145,7 @@ class ChatTabsFragment : Fragment() {
                         onScrollInProgress = ::onScrollInProgress,
                         onResetSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
                         onCancelScheduledMeeting = {
-                            managementState.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
-                                if (isChatHistoryEmpty) {
-                                    scheduledMeetingManagementViewModel.cancelAndArchiveMeeting()
-                                } else {
-                                    scheduledMeetingManagementViewModel.cancelMeeting()
-                                }
-                            }
+                            scheduledMeetingManagementViewModel.onCancelScheduledMeeting()
                             onDismissDialog()
                         },
                         onDismissDialog = ::onDismissDialog,

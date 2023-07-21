@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
  * @property selectOccurrenceEvent      Select [ChatScheduledMeetingOccurr] event
  * @property chatRoom                   [ChatRoom] of the scheduled meeting
  * @property snackbarMessageContent     State to show snackbar message
- * @property displayDialog              Indicates if display confirm dialog or not
+ * @property cancelOccurrenceTapped     Indicates if cancel occurrence option was tapped
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState constructor(
@@ -26,5 +26,5 @@ data class ScheduledMeetingManagementState constructor(
     val selectOccurrenceEvent: StateEvent = consumed,
     val chatRoom: ChatRoom? = null,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
-    val displayDialog: Boolean = false,
+    val cancelOccurrenceTapped: Boolean = false,
 )

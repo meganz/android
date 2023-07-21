@@ -116,13 +116,18 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     /**
      * Cancel occurrence option selected
      */
-    fun onCancelOccurrenceTap() = _state.update { state -> state.copy(displayDialog = true) }
+    fun onCancelOccurrenceTap() =
+        _state.update { state -> state.copy(cancelOccurrenceTapped = true) }
 
     /**
      * Reset selected occurrence
      */
-    fun onResetSelectedOccurrence() =
-        _state.update { state -> state.copy(selectedOccurrence = null, displayDialog = false) }
+    fun onResetSelectedOccurrence() = _state.update { state ->
+        state.copy(
+            selectedOccurrence = null,
+            cancelOccurrenceTapped = false
+        )
+    }
 
     /**
      * Consume select occurrence event
@@ -131,9 +136,22 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.update { state -> state.copy(selectOccurrenceEvent = consumed) }
 
     /**
+     * Cancel a scheduled meeting
+     */
+    fun onCancelScheduledMeeting() {
+        _state.value.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
+            if (isChatHistoryEmpty) {
+                cancelAndArchiveMeeting()
+            } else {
+                cancelMeeting()
+            }
+        }
+    }
+
+    /**
      * Cancel and archive a meeting
      */
-    fun cancelAndArchiveMeeting() = viewModelScope.launch {
+    private fun cancelAndArchiveMeeting() = viewModelScope.launch {
         runCatching {
             state.value.chatId?.let { chatId ->
                 cancelScheduledMeetingUseCase(chatId)
@@ -149,7 +167,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     /**
      * Cancel a meeting
      */
-    fun cancelMeeting() = viewModelScope.launch {
+    private fun cancelMeeting() = viewModelScope.launch {
         runCatching {
             state.value.chatId?.let { chatId -> cancelScheduledMeetingUseCase(chatId) }
         }.onSuccess {
