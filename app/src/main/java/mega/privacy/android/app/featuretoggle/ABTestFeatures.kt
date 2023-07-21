@@ -24,6 +24,17 @@ enum class ABTestFeatures(
     devtest(
         "Remote feature flag from API for any tests related to A/B testing",
         false
+    ),
+
+    /**
+     * To use remote feature flag 'ab_sus2023' from API
+     * this flag is part of real experiment related to Upgrade account screen
+     * DO NOT USE this flag anywhere else, except the Upgrade account screen
+     * criteria: every day 25% of users will be assigned to see either LegacyUpgradeAccountView or UpgradeAccountView (12.5% each respectively)
+     */
+    sus2023(
+        "Real experiment flag for Upgrade account screen",
+        false
     );
 
     companion object : FeatureFlagValueProvider {

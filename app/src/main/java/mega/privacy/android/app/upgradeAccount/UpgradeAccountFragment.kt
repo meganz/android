@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.ABTestFeatures
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.myAccount.MyAccountActivity
@@ -94,7 +95,7 @@ class UpgradeAccountFragment : Fragment() {
             .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         AndroidTheme(isDark = mode.isDarkMode()) {
             val useNewPlansPageUI by produceState(initialValue = false) {
-                value = getFeatureFlagUseCase(AppFeatures.PlansPageUpdate)
+                value = getFeatureFlagUseCase(ABTestFeatures.sus2023)
             }
             if (useNewPlansPageUI) {
                 UpgradeAccountView(
