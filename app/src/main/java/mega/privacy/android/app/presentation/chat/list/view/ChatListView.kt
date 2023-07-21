@@ -1,11 +1,24 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
-import android.content.res.Configuration
 import android.view.MotionEvent
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Surface
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,48 +26,74 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
-import mega.privacy.android.core.ui.controls.MegaEmptyView
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
-import java.util.Locale
 
+/**
+ * Chat list view
+ *
+ * @param modifier
+ * @param items
+ * @param selectedIds
+ * @param scrollToTop
+ * @param isMeetingView
+ * @param onItemClick
+ * @param onItemMoreClick
+ * @param onItemSelected
+ * @param onFirstItemVisible
+ * @param onScrollInProgress
+ * @param onEmptyButtonClick
+ */
 @Composable
 fun ChatListView(
     modifier: Modifier = Modifier,
     items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
+    isMeetingView: Boolean,
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
     onScrollInProgress: (Boolean) -> Unit = {},
+    onEmptyButtonClick: () -> Unit = {},
 ) {
-    if (items.isEmpty()) {
-        EmptyView(modifier = modifier)
-    } else {
-        ListView(
-            modifier = modifier,
-            items = items,
-            selectedIds = selectedIds,
-            scrollToTop = scrollToTop,
-            onItemClick = onItemClick,
-            onItemMoreClick = onItemMoreClick,
-            onItemSelected = onItemSelected,
-            onFirstItemVisible = onFirstItemVisible,
-            onScrollInProgress = onScrollInProgress,
-        )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colors.surface)
+    ) {
+        if (items.isNotEmpty()) {
+            ListView(
+                items = items,
+                selectedIds = selectedIds,
+                scrollToTop = scrollToTop,
+                onItemClick = onItemClick,
+                onItemMoreClick = onItemMoreClick,
+                onItemSelected = onItemSelected,
+                onFirstItemVisible = onFirstItemVisible,
+                onScrollInProgress = onScrollInProgress,
+            )
+        } else {
+            EmptyView(
+                isMeetingView = isMeetingView,
+                onEmptyButtonClick = onEmptyButtonClick,
+            )
+        }
     }
 }
 
@@ -133,19 +172,92 @@ private fun ListView(
 @Composable
 private fun EmptyView(
     modifier: Modifier = Modifier,
+    isMeetingView: Boolean,
+    onEmptyButtonClick: () -> Unit = {},
 ) {
-    Surface(modifier.testTag("EmptyView")) {
-        MegaEmptyView(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_no_search_results),
-            text = stringResource(R.string.no_results_found)
-                .uppercase(Locale.getDefault())
-                .toSpannedHtmlText()
+    val imageResource: Int
+    val titleResource: Int
+    val descriptionResource: Int
+    val buttonResource: Int
+    if (isMeetingView) {
+        imageResource = R.drawable.ic_zero_meeting
+        titleResource = R.string.meeting_list_empty_action
+        descriptionResource = R.string.meeting_list_empty_description
+        buttonResource = R.string.new_meeting
+    } else {
+        imageResource = R.drawable.ic_zero_chat
+        titleResource = R.string.chat_recent_list_empty_action
+        descriptionResource = R.string.chat_recent_list_empty_description
+        buttonResource = R.string.fab_label_new_chat
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Image(
+            painter = painterResource(imageResource),
+            contentDescription = "Empty placeholder",
+            modifier = Modifier.size(144.dp)
         )
+
+        Text(
+            text = stringResource(titleResource),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.colors.grey_alpha_087_white_alpha_087,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 10.dp, start = 50.dp, end = 50.dp)
+        )
+
+        Text(
+            text = stringResource(descriptionResource),
+            style = MaterialTheme.typography.subtitle2,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
+            modifier = Modifier.padding(top = 16.dp, start = 50.dp, end = 50.dp)
+        )
+
+        OutlinedButton(
+            onClick = onEmptyButtonClick,
+            colors = ButtonDefaults.outlinedButtonColors(
+                backgroundColor = Color.Transparent,
+                contentColor = MaterialTheme.colors.secondary
+            ),
+            border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.secondary),
+            modifier = Modifier
+                .padding(vertical = 40.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = stringResource(buttonResource),
+                style = MaterialTheme.typography.button,
+                color = MaterialTheme.colors.secondary
+            )
+        }
     }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "PreviewEmptyView")
+@Preview
 @Composable
-private fun PreviewEmptyView() {
-    EmptyView()
+private fun PreviewChatEmptyView() {
+    ChatListView(
+        items = emptyList(),
+        selectedIds = emptyList(),
+        isMeetingView = false,
+        scrollToTop = false,
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewMeetingEmptyView() {
+    ChatListView(
+        items = emptyList(),
+        selectedIds = emptyList(),
+        isMeetingView = true,
+        scrollToTop = false,
+    )
 }

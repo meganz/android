@@ -333,6 +333,10 @@ internal fun ChatRoomItemView(
                     end.linkTo(parent.end, 16.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
+                    visibility = if (!isLoading)
+                        Visibility.Visible
+                    else
+                        Visibility.Gone
                 },
         ) {
             Icon(
@@ -484,7 +488,7 @@ private fun Long.formatCallTime() =
 
 @Preview
 @Composable
-fun PreviewIndividualChatRoomItem() {
+private fun PreviewIndividualChatRoomItem() {
     val unreadCount = Random.nextInt(5)
     val item = IndividualChatRoomItem(
         chatId = 1L,

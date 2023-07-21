@@ -2,9 +2,11 @@ package mega.privacy.android.domain.usecase.chat
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
@@ -103,14 +105,12 @@ class GetChatsUseCase @Inject constructor(
 
             emitAll(
                 merge(
-                    merge(
-                        *chats.updateFields(
-                            mutex,
-                            chatRoomType,
-                            lastMessage,
-                            lastTimeMapper,
-                            meetingTimeMapper
-                        ).toTypedArray()
+                    chats.updateFields(
+                        mutex,
+                        chatRoomType,
+                        lastMessage,
+                        lastTimeMapper,
+                        meetingTimeMapper
                     ),
                     chats.monitorMutedChats(mutex, chatRoomType),
                     chats.monitorChatCalls(mutex, chatRoomType),
@@ -152,28 +152,32 @@ class GetChatsUseCase @Inject constructor(
         getLastMessage: suspend (Long) -> String,
         lastTimeMapper: (Long) -> String,
         meetingTimeMapper: (Long, Long) -> String,
-    ): List<Flow<List<ChatRoomItem>>> =
-        values.toList().map { currentItem ->
-            flow {
-                val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
-                if (currentItem != newItem) {
-                    mutex.withLock {
-                        put(currentItem.chatId, newItem)
-                    }
-                    emit(values.toList())
-                }
-
-                if (currentItem is MeetingChatRoomItem) {
-                    val meetingItem = newItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
-                    if (newItem != meetingItem) {
+    ): Flow<List<ChatRoomItem>> = channelFlow {
+        coroutineScope {
+            values.map { currentItem ->
+                async {
+                    val newItem = currentItem.updateChatFields(getLastMessage, lastTimeMapper)
+                    if (currentItem != newItem) {
                         mutex.withLock {
-                            put(currentItem.chatId, meetingItem)
+                            put(currentItem.chatId, newItem)
                         }
-                        emit(values.toList())
+                        send(values.toList())
+                    }
+
+                    if (currentItem is MeetingChatRoomItem) {
+                        val meetingItem =
+                            newItem.updateMeetingFields(chatRoomType, meetingTimeMapper)
+                        if (newItem != meetingItem) {
+                            mutex.withLock {
+                                put(currentItem.chatId, meetingItem)
+                            }
+                            send(values.toList())
+                        }
                     }
                 }
-            }
+            }.awaitAll()
         }
+    }
 
     private suspend fun ChatRoomItem.updateChatFields(
         getLastMessage: suspend (Long) -> String,

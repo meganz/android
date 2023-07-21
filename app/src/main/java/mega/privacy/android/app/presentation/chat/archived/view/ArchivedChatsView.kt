@@ -105,6 +105,7 @@ fun ArchivedChatsView(
                 items = filteredChats ?: state.items,
                 selectedIds = emptyList(),
                 scrollToTop = false,
+                isMeetingView = false,
                 onItemClick = onItemClick,
                 onItemMoreClick = { chatItem ->
                     sheetItem = chatItem

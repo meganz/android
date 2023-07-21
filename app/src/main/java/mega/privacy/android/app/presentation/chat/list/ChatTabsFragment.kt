@@ -11,6 +11,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
@@ -36,11 +38,14 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.dialog.chatstatus.ChatStatusDialogFragment
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
+import mega.privacy.android.app.presentation.startconversation.StartConversationActivity.Companion.EXTRA_NEW_CHAT_ID
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -79,6 +84,8 @@ class ChatTabsFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private var currentTab: ChatTab = ChatTab.CHATS
 
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent?>
+
     private val viewModel by viewModels<ChatTabsViewModel>()
 
     private val bluetoothPermissionLauncher =
@@ -93,6 +100,26 @@ class ChatTabsFragment : Fragment() {
                 )
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        resultLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == ComponentActivity.RESULT_OK
+                && result.data?.hasExtra(EXTRA_NEW_CHAT_ID) == true
+            ) {
+                val chatId = result.data?.getLongExtra(EXTRA_NEW_CHAT_ID, -1L)
+                    ?: return@registerForActivityResult
+
+                startActivity(
+                    Intent(requireContext(), ChatActivity::class.java)
+                        .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
+                        .putExtra(Constants.CHAT_ID, chatId)
+                )
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -111,6 +138,7 @@ class ChatTabsFragment : Fragment() {
                         onItemMoreClick = ::onItemMoreClick,
                         onItemSelected = ::onItemSelected,
                         onScrollInProgress = ::onScrollInProgress,
+                        onEmptyButtonClick = ::onEmptyButtonClick,
                     )
                 }
             }
@@ -299,6 +327,17 @@ class ChatTabsFragment : Fragment() {
 
     private fun onScrollInProgress(scrolling: Boolean) {
         LiveEventBus.get<Boolean>(Constants.EVENT_FAB_CHANGE).post(!scrolling)
+    }
+
+    private fun onEmptyButtonClick() {
+        if (isMeetingTabShown()) {
+            MeetingBottomSheetDialogFragment.newInstance(true).show(
+                childFragmentManager,
+                MeetingBottomSheetDialogFragment.TAG
+            )
+        } else {
+            resultLauncher.launch(StartConversationActivity.getChatIntent(requireContext()))
+        }
     }
 
     private fun buildActionMode(): ActionMode.Callback =

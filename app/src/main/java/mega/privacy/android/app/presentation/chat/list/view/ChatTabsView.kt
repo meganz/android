@@ -45,6 +45,7 @@ fun ChatTabsView(
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onScrollInProgress: (Boolean) -> Unit = {},
+    onEmptyButtonClick: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
@@ -79,23 +80,24 @@ fun ChatTabsView(
             pageCount = ChatTab.values().size,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
-            Column {
-                val items = if (page == ChatTab.CHATS.ordinal) {
-                    filteredChats ?: state.chats
-                } else {
-                    filteredMeetings ?: state.meetings
-                }
-
-                ChatListView(
-                    items = items,
-                    selectedIds = state.selectedIds,
-                    scrollToTop = scrollToTop,
-                    onItemClick = onItemClick,
-                    onItemMoreClick = onItemMoreClick,
-                    onItemSelected = onItemSelected,
-                    onScrollInProgress = onScrollInProgress,
-                )
+            val isMeetingView = page == ChatTab.MEETINGS.ordinal
+            val items = if (isMeetingView) {
+                filteredMeetings ?: state.meetings
+            } else {
+                filteredChats ?: state.chats
             }
+
+            ChatListView(
+                items = items,
+                selectedIds = state.selectedIds,
+                scrollToTop = scrollToTop,
+                onItemClick = onItemClick,
+                isMeetingView = isMeetingView,
+                onItemMoreClick = onItemMoreClick,
+                onItemSelected = onItemSelected,
+                onScrollInProgress = onScrollInProgress,
+                onEmptyButtonClick = onEmptyButtonClick,
+            )
         }
 
         LaunchedEffect(state.searchQuery) {

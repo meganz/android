@@ -5012,4 +5012,8 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">End recurrence</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Ends</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">Start a meeting</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">Talk securely and privately on audio or video calls with friends and colleagues around the world.</string>
 </resources>
