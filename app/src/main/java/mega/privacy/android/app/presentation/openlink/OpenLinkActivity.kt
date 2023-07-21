@@ -73,7 +73,6 @@ import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.MEGA_DROP_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.MEGA_FILE_REQUEST_LINK_REGEXES
-import mega.privacy.android.app.utils.Constants.MEGA_REGEXS
 import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT
 import mega.privacy.android.app.utils.Constants.PASSWORD_LINK_REGEXS
@@ -87,6 +86,7 @@ import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
+import mega.privacy.android.app.utils.isURLSanitizedForWebView
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -114,6 +114,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     @Inject
     lateinit var querySignupLinkUseCase: QuerySignupLinkUseCase
 
+    /**
+     * getFeatureFlagValueUseCase
+     */
     @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
@@ -134,6 +137,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         ActivityOpenLinkBinding.inflate(layoutInflater)
     }
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         url = intent.dataString
@@ -155,8 +161,8 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when {
             // If is not a MEGA link, is not a supported link
-            !matchRegexs(url, MEGA_REGEXS) -> {
-                Timber.d("The link is not a MEGA link: $url")
+            !url.isURLSanitizedForWebView() -> {
+                Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
                 setError(getString(R.string.open_link_not_valid_link))
             }
             // Album link
@@ -605,12 +611,21 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     }
 
+    /**
+     * onRequestStart
+     */
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
         Timber.d("onRequestStart")
     }
 
+    /**
+     * onRequestUpdate
+     */
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {}
 
+    /**
+     * onRequestFinish
+     */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
         when (request.type) {
@@ -641,8 +656,14 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         binding.containerAcceptButton.isVisible = true
     }
 
+    /**
+     * onRequestTemporaryError
+     */
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {}
 
+    /**
+     * onPreviewLoaded
+     */
     override fun onPreviewLoaded(request: MegaChatRequest, alreadyExist: Boolean) {
         val chatId = request.chatHandle
         val isFromOpenChatPreview = request.flag
@@ -705,6 +726,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    /**
+     * onErrorLoadingPreview
+     */
     override fun onErrorLoadingPreview(errorCode: Int) {
         setError(getString(R.string.invalid_link))
     }

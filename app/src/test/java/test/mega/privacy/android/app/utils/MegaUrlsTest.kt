@@ -1,8 +1,9 @@
 package test.mega.privacy.android.app.utils
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.utils.Constants.MEGA_REGEXS
-import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.APP_STORE_URL
+import mega.privacy.android.app.utils.PLAY_STORE_URL
+import mega.privacy.android.app.utils.isURLSanitizedForWebView
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -16,7 +17,7 @@ class MegaUrlsTest {
     fun `test that when url does matches regex pattern should accept url`(
         urlToCheck: String,
     ) {
-        val isMatched = Util.matchRegexs(urlToCheck, MEGA_REGEXS)
+        val isMatched = urlToCheck.isURLSanitizedForWebView()
         assertThat(isMatched).isTrue()
     }
 
@@ -25,7 +26,7 @@ class MegaUrlsTest {
     fun `test that when url does NOT matches regex pattern should NOT accept url`(
         urlToCheck: String,
     ) {
-        val isMatched = Util.matchRegexs(urlToCheck, MEGA_REGEXS)
+        val isMatched = urlToCheck.isURLSanitizedForWebView()
         assertThat(isMatched).isFalse()
     }
 
@@ -43,6 +44,8 @@ class MegaUrlsTest {
         Arguments.of("https://help.mega.nz/chat"),
         Arguments.of("https://help.mega.nz/chat?sort=DESC"),
         Arguments.of("https://help.mega.io/chats-meetings/meetings/schedule-oneoff-recurring-meeting"),
+        Arguments.of(PLAY_STORE_URL),
+        Arguments.of(APP_STORE_URL)
     )
 
     private fun blockedUrl(): Stream<Arguments> = Stream.of(
@@ -67,5 +70,7 @@ class MegaUrlsTest {
         Arguments.of("https://attacker.mega.com/"),
         Arguments.of("https://attackermega.nz/"),
         Arguments.of("https://attackermega.nz/home"),
+        Arguments.of("https://apps.apple.com/app/mega"),
+        Arguments.of("https://play.google.com/store/apps/details?id=mega.privacy.android.app")
     )
 }

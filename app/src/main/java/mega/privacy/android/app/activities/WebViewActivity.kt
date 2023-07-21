@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.isURLSanitizedForWebView
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -37,6 +38,9 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * WebViewActivity
+ */
 class WebViewActivity : BaseActivity() {
     companion object {
         private const val IMAGE_CONTENT_TYPE = 0
@@ -54,6 +58,9 @@ class WebViewActivity : BaseActivity() {
     private var pickedImage: String? = null
     private var pickedVideo: String? = null
 
+    /**
+     * onCreate
+     */
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +72,7 @@ class WebViewActivity : BaseActivity() {
 
         val url = intent.dataString
 
-        if (!Util.matchRegexs(url, MEGA_REGEXS)) {
+        if (!url.isURLSanitizedForWebView()) {
             Timber.e("WebViewActivity::onCreate", "Vulnerable/Malicious Url detected: $url")
             finish()
         }
@@ -89,7 +96,7 @@ class WebViewActivity : BaseActivity() {
             webViewClient = object : WebViewClient() {
                 @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    if (!Util.matchRegexs(url, MEGA_REGEXS)) {
+                    if (!url.isURLSanitizedForWebView()) {
                         Timber.e(
                             "WebViewActivity::shouldOverrideUrlLoading",
                             "Vulnerable/Malicious Url detected: $url"
@@ -136,11 +143,17 @@ class WebViewActivity : BaseActivity() {
 
     }
 
+    /**
+     * onDestroy
+     */
     override fun onDestroy() {
         super.onDestroy()
         MegaApplication.setIsWebOpenDueToEmailVerification(false)
     }
 
+    /**
+     * onRequestPermissionsResult
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -225,6 +238,7 @@ class WebViewActivity : BaseActivity() {
                     RECORD_AUDIO
                 }
             }
+
             REQUEST_WRITE_AND_RECORD_AUDIO -> {
                 if (!hasPermissions(this, WRITE_EXTERNAL_STORAGE)) {
                     WRITE_EXTERNAL_STORAGE
@@ -232,9 +246,11 @@ class WebViewActivity : BaseActivity() {
                     RECORD_AUDIO
                 }
             }
+
             REQUEST_WRITE_STORAGE -> {
                 WRITE_EXTERNAL_STORAGE
             }
+
             REQUEST_CAMERA_AND_RECORD_AUDIO -> {
                 if (!hasPermissions(this, CAMERA)) {
                     CAMERA
@@ -242,9 +258,11 @@ class WebViewActivity : BaseActivity() {
                     RECORD_AUDIO
                 }
             }
+
             REQUEST_CAMERA -> {
                 CAMERA
             }
+
             else -> {
                 RECORD_AUDIO
             }
@@ -401,9 +419,11 @@ class WebViewActivity : BaseActivity() {
             IMAGE_CONTENT_TYPE -> {
                 Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             }
+
             VIDEO_CONTENT_TYPE -> {
                 Intent(MediaStore.ACTION_VIDEO_CAPTURE)
             }
+
             else -> {
                 null
             }
@@ -422,9 +442,11 @@ class WebViewActivity : BaseActivity() {
             IMAGE_CONTENT_TYPE -> {
                 FileUtil.JPG_EXTENSION
             }
+
             VIDEO_CONTENT_TYPE -> {
                 FileUtil._3GP_EXTENSION
             }
+
             else -> {
                 null
             }

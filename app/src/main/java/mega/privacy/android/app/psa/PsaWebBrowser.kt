@@ -20,6 +20,7 @@ import mega.privacy.android.app.databinding.FragmentPsaWebBrowserBinding
 import mega.privacy.android.app.psa.PsaManager.dismissPsa
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.isURLSanitizedForWebView
 import timber.log.Timber
 
 class PsaWebBrowser : Fragment() {
@@ -68,7 +69,7 @@ class PsaWebBrowser : Fragment() {
         this.psaId = psaId
 
         try {
-            if (!Util.matchRegexs(url, Constants.MEGA_REGEXS)) {
+            if (!url.isURLSanitizedForWebView()) {
                 throw RuntimeException("PsaWebBrowser (Psa id: $psaId): Vulnerable/Malicious Url detected: $url")
             }
             val megaApi = MegaApplication.getInstance().megaApi
@@ -131,8 +132,9 @@ class PsaWebBrowser : Fragment() {
         }
     }
 
-    @Deprecated("All activities and fragments should handle their own " +
-            "onBackPressedDispatcher callbacks independent from any other fragments or activities.")
+    @Deprecated(
+        "All activities and fragments should handle their own " + "onBackPressedDispatcher callbacks independent from any other fragments or activities."
+    )
     fun consumeBack() = onBackPressedCallback.isEnabled
 
     companion object {
