@@ -426,17 +426,21 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             val lastName = createAccountLastNameText.text.toString()
             val attributes = getInstance().dbH.attributes
             val lastPublicHandle = attributes?.lastPublicHandle ?: MegaApiJava.INVALID_HANDLE
-
-            if (lastPublicHandle == MegaApiJava.INVALID_HANDLE) {
+            val lastPublicHandleType =
+                attributes?.lastPublicHandleType ?: MegaApiJava.AFFILIATE_TYPE_INVALID
+            if (lastPublicHandle == MegaApiJava.INVALID_HANDLE
+                || lastPublicHandleType == MegaApiJava.AFFILIATE_TYPE_INVALID
+            ) {
                 megaApi.createAccount(email, password, name, lastName, this@CreateAccountFragment)
             } else {
+                Timber.d("Create new account with lastPublicHandle: $lastPublicHandle and lastPublicHandleType: $lastPublicHandleType")
                 megaApi.createAccount(
                     email,
                     password,
                     name,
                     lastName,
                     lastPublicHandle,
-                    attributes?.lastPublicHandleType ?: -1,
+                    lastPublicHandleType,
                     attributes?.lastPublicHandleTimeStamp ?: -1L,
                     this@CreateAccountFragment
                 )
