@@ -23,9 +23,10 @@ internal class DefaultFeatureFlagRepository @Inject constructor(
 
     override suspend fun getFeatureValue(feature: Feature) =
         withContext(ioDispatcher) {
-            featureFlagValueProvider.toSortedMap(
+            val sortedMap = featureFlagValueProvider.toSortedMap(
                 compareByDescending<FeatureFlagPriorityKey> { it.priority }
-                    .thenBy { it.implementingClass.simpleName }
-            ).firstNotNullOfOrNull { it.value.isEnabled(feature) }
+                    .thenBy { it.implementingClass.qualifiedName }
+            )
+            sortedMap.firstNotNullOfOrNull { it.value.isEnabled(feature) }
         }
 }

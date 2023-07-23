@@ -40,6 +40,9 @@ class DefaultFeatureFlagRepositoryTest {
         FeatureFlagValuePriority.RuntimeOverride to runtimeOverrideProviderMock,
     )
 
+    private val fake1 = mock<FeatureFlagValueProvider>()
+    private val fake2 = mock<FeatureFlagValueProvider>()
+
     private val featureFlagValueProviders = providerMocks.mapKeys {
         FeatureFlagPriorityKey(
             implementingClass = FeatureFlagValueProvider::class,
@@ -50,6 +53,16 @@ class DefaultFeatureFlagRepositoryTest {
             implementingClass = FakeFeatureFlagValueProvider::class,
             priority = FeatureFlagValuePriority.Default
         ) to secondaryDefaultProviderMock
+    ).plus(
+        FeatureFlagPriorityKey(
+            implementingClass = Fake1.FakeProvider::class,
+            priority = FeatureFlagValuePriority.RemoteToggled
+        ) to Fake1(fake1).fakeProvider
+    ).plus(
+        FeatureFlagPriorityKey(
+            implementingClass = Fake2.FakeProvider::class,
+            priority = FeatureFlagValuePriority.RemoteToggled
+        ) to Fake2(fake2).fakeProvider
     )
 
     @BeforeEach
@@ -86,7 +99,22 @@ class DefaultFeatureFlagRepositoryTest {
         val primaryFeature = mock<Feature>()
         val secondaryFeature = mock<Feature>()
         whenever(defaultProviderMock.isEnabled(primaryFeature)).thenReturn(true)
+        whenever(defaultProviderMock.isEnabled(secondaryFeature)).thenReturn(null)
         whenever(secondaryDefaultProviderMock.isEnabled(secondaryFeature)).thenReturn(true)
+        whenever(secondaryDefaultProviderMock.isEnabled(primaryFeature)).thenReturn(null)
+
+        assertThat(underTest.getFeatureValue(primaryFeature)).isTrue()
+        assertThat(underTest.getFeatureValue(secondaryFeature)).isTrue()
+    }
+
+    @Test
+    internal fun `test that two providers with the same simple name are both used`() = runTest {
+        val primaryFeature = mock<Feature>()
+        val secondaryFeature = mock<Feature>()
+        whenever(fake1.isEnabled(primaryFeature)).thenReturn(true)
+        whenever(fake1.isEnabled(secondaryFeature)).thenReturn(null)
+        whenever(fake2.isEnabled(secondaryFeature)).thenReturn(true)
+        whenever(fake2.isEnabled(primaryFeature)).thenReturn(null)
 
         assertThat(underTest.getFeatureValue(primaryFeature)).isTrue()
         assertThat(underTest.getFeatureValue(secondaryFeature)).isTrue()
@@ -94,3 +122,23 @@ class DefaultFeatureFlagRepositoryTest {
 }
 
 private interface FakeFeatureFlagValueProvider : FeatureFlagValueProvider
+
+class Fake1(featureFlagValueProvider: FeatureFlagValueProvider) {
+    val fakeProvider = FakeProvider(featureFlagValueProvider)
+
+    class FakeProvider(private val featureFlagValueProvider: FeatureFlagValueProvider) :
+        FeatureFlagValueProvider {
+        override suspend fun isEnabled(feature: Feature) =
+            featureFlagValueProvider.isEnabled(feature)
+    }
+}
+
+class Fake2(featureFlagValueProvider: FeatureFlagValueProvider) {
+    val fakeProvider = FakeProvider(featureFlagValueProvider)
+
+    class FakeProvider(private val featureFlagValueProvider: FeatureFlagValueProvider) :
+        FeatureFlagValueProvider {
+        override suspend fun isEnabled(feature: Feature) =
+            featureFlagValueProvider.isEnabled(feature)
+    }
+}
