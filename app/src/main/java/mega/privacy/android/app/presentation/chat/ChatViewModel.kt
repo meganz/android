@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
+import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -119,6 +120,7 @@ class ChatViewModel @Inject constructor(
     private val monitorLeaveChatUseCase: MonitorLeaveChatUseCase,
     private val leaveChat: LeaveChat,
     private val getContactLinkUseCase: GetContactLinkUseCase,
+    private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -613,5 +615,38 @@ class ChatViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    /**
+     * Check contact request sent
+     *
+     * @param email
+     * @param name
+     */
+    fun checkContactRequestSent(email: String, name: String) {
+        viewModelScope.launch {
+            runCatching {
+                isContactRequestSentUseCase(email)
+            }.onSuccess { isSent ->
+                _state.update {
+                    it.copy(
+                        contactInvitation = ContactInvitation(
+                            isSent = isSent,
+                            email = email,
+                            name = name
+                        )
+                    )
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * On contact invitation consumed
+     */
+    fun onContactInvitationConsumed() {
+        _state.update { it.copy(contactInvitation = null) }
     }
 }

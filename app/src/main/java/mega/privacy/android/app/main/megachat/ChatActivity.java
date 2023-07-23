@@ -331,7 +331,6 @@ import mega.privacy.android.app.components.voiceClip.OnBasketAnimationEnd;
 import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
-import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
@@ -351,6 +350,7 @@ import mega.privacy.android.app.listeners.LoadPreviewListener;
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener;
 import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
+import mega.privacy.android.app.presentation.chat.ContactInvitation;
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
@@ -527,8 +527,6 @@ public class ChatActivity extends PasscodeActivity
     FilePrepareUseCase filePrepareUseCase;
     @Inject
     PasscodeManagement passcodeManagement;
-    @Inject
-    InviteContactUseCase inviteContactUseCase;
     @Inject
     GetAvatarUseCase getAvatarUseCase;
     @Inject
@@ -2059,6 +2057,18 @@ public class ChatActivity extends PasscodeActivity
             if (chatState.getSnackbarMessage() != null) {
                 showSnackbar(SNACKBAR_TYPE, getString(chatState.getSnackbarMessage()), MEGACHAT_INVALID_HANDLE);
                 viewModel.onSnackbarMessageConsumed();
+            }
+
+            ContactInvitation contactInvitation = chatState.getContactInvitation();
+            if (contactInvitation != null) {
+                if (contactInvitation.isSent()) {
+                    String text = getString(R.string.contact_already_invited, converterShortCodes(contactInvitation.getName()));
+                    showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
+                } else {
+                    String text = getString(R.string.user_is_not_contact, converterShortCodes(contactInvitation.getName()));
+                    showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, contactInvitation.getEmail());
+                }
+                viewModel.onContactInvitationConsumed();
             }
 
             return Unit.INSTANCE;
@@ -5788,29 +5798,6 @@ public class ChatActivity extends PasscodeActivity
     }
 
     /**
-     * Checks if a contact invitation has been already sent.
-     *
-     * @param email       Contact email to check.
-     * @param contactName Name of the contact.
-     */
-    private void checkIfInvitationIsAlreadySent(String email, String contactName) {
-        internalComposite.add(inviteContactUseCase.isContactRequestAlreadySent(email)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe((alreadyInvited, throwable) -> {
-                    if (throwable == null) {
-                        if (alreadyInvited) {
-                            String text = getString(R.string.contact_already_invited, converterShortCodes(contactName));
-                            showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
-                        } else {
-                            String text = getString(R.string.user_is_not_contact, converterShortCodes(contactName));
-                            showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
-                        }
-                    }
-                }));
-    }
-
-    /**
      * Opens a contact link message.
      *
      * @param contactLinkResult All the data of the contact link.
@@ -5840,7 +5827,7 @@ public class ChatActivity extends PasscodeActivity
         MegaUser contact = megaApi.getContact(email);
 
         if (contact == null || contact.getVisibility() != MegaUser.VISIBILITY_VISIBLE) {
-            checkIfInvitationIsAlreadySent(email, name);
+            viewModel.checkContactRequestSent(email, name);
         } else if (!chatRoom.isGroup() && email != null && email.equals(megaChatApi.getUserEmailFromCache(0))) {
             showGroupOrContactInfoActivity();
         } else {

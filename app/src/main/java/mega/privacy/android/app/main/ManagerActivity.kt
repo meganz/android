@@ -124,7 +124,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
-import mega.privacy.android.app.contacts.usecase.InviteContactUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment
@@ -400,9 +399,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
-
-    @Inject
-    lateinit var inviteContactUseCase: InviteContactUseCase
 
     @Inject
     lateinit var filePrepareUseCase: FilePrepareUseCase

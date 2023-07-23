@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.chat.model
 
 import androidx.annotation.StringRes
+import mega.privacy.android.app.presentation.chat.ContactInvitation
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property isJoiningOrLeaving                         True if user is joining or leaving the chat, false otherwise.
  * @property joiningOrLeavingAction                     String ID which indicates if the UI to set is the joining or leaving state.
  * @property snackbarMessage                            String ID to display as a snackbar message.
+ * @property contactInvitation                          Contact invtation result to check if it's in contacts
  */
 data class ChatState(
     val chatId: Long = -1L,
@@ -41,4 +43,5 @@ data class ChatState(
     val isJoiningOrLeaving: Boolean = false,
     @StringRes val joiningOrLeavingAction: Int? = null,
     @StringRes val snackbarMessage: Int? = null,
+    val contactInvitation: ContactInvitation? = null,
 )

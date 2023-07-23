@@ -164,7 +164,6 @@ import mega.privacy.android.app.components.twemoji.EmojiManager;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.components.twemoji.reaction.AutoFitRecyclerView;
 import mega.privacy.android.app.components.voiceClip.DetectorSeekBar;
-import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.listeners.GetPeerAttributesListener;
 import mega.privacy.android.app.main.adapters.ReactionAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;

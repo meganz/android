@@ -836,4 +836,8 @@ internal class DefaultContactsRepository @Inject constructor(
             .any { contact -> result.email == contact.email && contact.visibility == MegaUser.VISIBILITY_VISIBLE }
         return@withContext result.copy(isContact = isContact)
     }
+
+    override suspend fun isContactRequestSent(email: String) = withContext(ioDispatcher) {
+        megaApiGateway.outgoingContactRequests().any { it.targetEmail == email }
+    }
 }

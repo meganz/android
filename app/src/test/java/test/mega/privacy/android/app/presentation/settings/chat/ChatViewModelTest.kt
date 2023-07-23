@@ -14,6 +14,7 @@ import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.ChatViewModel
+import mega.privacy.android.app.presentation.chat.ContactInvitation
 import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
+import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -67,6 +69,7 @@ class ChatViewModelTest {
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase = mock()
     private val getContactLinkUseCase: GetContactLinkUseCase = mock()
     private val deviceGateway: DeviceGateway = mock()
+    private val isContactRequestSentUseCase: IsContactRequestSentUseCase = mock()
     private val monitorUpdatePushNotificationSettingsUseCase =
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
             onBlocking { invoke() }.thenReturn(flowOf(true))
@@ -112,6 +115,7 @@ class ChatViewModelTest {
             monitorLeaveChatUseCase = monitorLeaveChatUseCase,
             leaveChat = leaveChat,
             getContactLinkUseCase = getContactLinkUseCase,
+            isContactRequestSentUseCase = isContactRequestSentUseCase
         )
     }
 
@@ -203,4 +207,34 @@ class ChatViewModelTest {
             Truth.assertThat(it).isEqualTo(contactLink)
         }
     }
+
+    @Test
+    fun `test that contactInvitation updates correctly when call isContactRequestSent returns true`() =
+        runTest {
+            val myEmail = "myEmail"
+            val myName = "myName"
+            whenever((isContactRequestSentUseCase(myEmail))).thenReturn(true)
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().contactInvitation).isNull()
+                underTest.checkContactRequestSent(email = myEmail, name = myName)
+                Truth.assertThat(awaitItem().contactInvitation)
+                    .isEqualTo(ContactInvitation(email = myEmail, name = myName, isSent = true))
+            }
+        }
+
+    @Test
+    fun `test that contactInvitation updates correctly when call isContactRequestSent returns false`() =
+        runTest {
+            val myEmail = "myEmail"
+            val myName = "myName"
+            whenever((isContactRequestSentUseCase(myEmail))).thenReturn(false)
+            testScheduler.advanceUntilIdle()
+            underTest.state.test {
+                Truth.assertThat(awaitItem().contactInvitation).isNull()
+                underTest.checkContactRequestSent(email = myEmail, name = myName)
+                Truth.assertThat(awaitItem().contactInvitation)
+                    .isEqualTo(ContactInvitation(email = myEmail, name = myName, isSent = false))
+            }
+        }
 }

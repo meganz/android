@@ -1220,4 +1220,26 @@ class DefaultContactsRepositoryTest {
             }
             underTest.getContactLink(1L)
         }
+
+    @Test
+    fun `test that isContactRequestAlreadySent returns true when outgoingContactRequests contains email`() =
+        runTest {
+            val myEmail = "myEmail"
+            val contactRequest = mock<MegaContactRequest> {
+                on { targetEmail }.thenReturn(myEmail)
+            }
+            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
+            assertThat(underTest.isContactRequestSent(myEmail)).isTrue()
+        }
+
+    @Test
+    fun `test that isContactRequestAlreadySent returns false when outgoingContactRequests doesn't contain email`() =
+        runTest {
+            val myEmail = "myEmail"
+            val contactRequest = mock<MegaContactRequest> {
+                on { targetEmail }.thenReturn("abc")
+            }
+            whenever(megaApiGateway.outgoingContactRequests()).thenReturn(arrayListOf(contactRequest))
+            assertThat(underTest.isContactRequestSent(myEmail)).isFalse()
+        }
 }

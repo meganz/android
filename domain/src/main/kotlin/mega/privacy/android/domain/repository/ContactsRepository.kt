@@ -368,4 +368,11 @@ interface ContactsRepository {
      * @return
      */
     suspend fun getContactLink(userHandle: Long): ContactLink
+
+    /**
+     * Is contact request sent
+     *
+     * @param email
+     */
+    suspend fun isContactRequestSent(email: String): Boolean
 }
