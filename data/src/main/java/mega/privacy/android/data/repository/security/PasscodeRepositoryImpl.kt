@@ -12,7 +12,7 @@ internal class PasscodeRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val passcodeStoreGateway: PasscodeStoreGateway,
 ) : PasscodeRepository {
-    override fun monitorFailedAttempts() = passcodeStoreGateway.getFailedAttemptsFlow()
+    override fun monitorFailedAttempts() = passcodeStoreGateway.monitorFailedAttempts()
         .flowOn(ioDispatcher)
 
     override suspend fun setFailedAttempts(attempts: Int) = withContext(ioDispatcher) {
@@ -31,8 +31,7 @@ internal class PasscodeRepositoryImpl @Inject constructor(
         passcodeStoreGateway.setLockedState(locked)
     }
 
-    override fun monitorLockState() = passcodeStoreGateway.getLockStateFlow()
+    override fun monitorLockState() = passcodeStoreGateway.monitorLockState()
         .flowOn(ioDispatcher)
-
 
 }

@@ -32,7 +32,7 @@ internal class PasscodeRepositoryImplTest {
     internal fun `test that monitorFailedAttempts returns the value from the store`() = runTest {
         val expected = listOf(null, 1, 2, 3, 4, 5, 6, 7, 8, 9)
         passcodeStoreGateway.stub {
-            on { getFailedAttemptsFlow() }.thenReturn(expected.asFlow())
+            on { monitorFailedAttempts() }.thenReturn(expected.asFlow())
         }
         underTest.monitorFailedAttempts().test {
             val actual = cancelAndConsumeRemainingEvents()
@@ -86,7 +86,7 @@ internal class PasscodeRepositoryImplTest {
         runTest {
             val expected = listOf(false, true, null, false)
             passcodeStoreGateway.stub {
-                on { getLockStateFlow() }.thenReturn(expected.asFlow())
+                on { monitorLockState() }.thenReturn(expected.asFlow())
             }
             underTest.monitorLockState().test {
                 val actual = cancelAndConsumeRemainingEvents()

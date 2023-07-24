@@ -13,7 +13,7 @@ interface PasscodeStoreGateway {
      *
      * @return flow of latest failed attempts count
      */
-    fun getFailedAttemptsFlow(): Flow<Int?>
+    fun monitorFailedAttempts(): Flow<Int?>
 
     /**
      * Set failed attempts
@@ -48,5 +48,5 @@ interface PasscodeStoreGateway {
      *
      * @return flow of latest locked state
      */
-    fun getLockStateFlow(): Flow<Boolean?>
+    fun monitorLockState(): Flow<Boolean?>
 }
