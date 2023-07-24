@@ -28,7 +28,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.isURLSanitizedForWebView
+import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -72,7 +72,7 @@ class WebViewActivity : BaseActivity() {
 
         val url = intent.dataString
 
-        if (!url.isURLSanitizedForWebView()) {
+        if (!url.isURLSanitized()) {
             Timber.e("WebViewActivity::onCreate", "Vulnerable/Malicious Url detected: $url")
             finish()
         }
@@ -96,7 +96,7 @@ class WebViewActivity : BaseActivity() {
             webViewClient = object : WebViewClient() {
                 @Deprecated("Deprecated in Java")
                 override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                    if (!url.isURLSanitizedForWebView()) {
+                    if (!url.isURLSanitized()) {
                         Timber.e(
                             "WebViewActivity::shouldOverrideUrlLoading",
                             "Vulnerable/Malicious Url detected: $url"

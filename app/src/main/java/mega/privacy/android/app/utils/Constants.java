@@ -598,9 +598,18 @@ public class Constants {
 
     public static final String SEPARATOR = File.separator;
 
+    /**
+     * This Regex Pattern will check for the existence of:
+     * 1. Domain with HTTPS protocol
+     * 2. Followed by either: Mega.co.nz, Mega.nz, Mega.io, Megaad.nz
+     * 3. No words are allowed after the domain name, for example; <a href="https://mega.co.nzxxx">...</a> is not allowed
+     * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; <a href="https://mega.nz/home">...</a>
+     * 5. Any words after Backslashes (/) or Question Mark (?) are allowed
+     * 6. No dot (.) after the domain name, for example; <a href="https://mega.co.nz//@attacker.com">...</a> is not allowed
+     */
     public static final String[] MEGA_REGEXS = {
-            "^https://(?:mega\\.co\\.nz|mega\\.nz|mega\\.io)(?:\\/|\\?).[^.]+$",
-            "^https://[^.]+\\.(?:mega\\.co\\.nz|mega\\.nz|mega\\.io)(?:\\/|\\?).[^.]+$"
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(?!\\w)((?:\\/|\\?)?)([^.]?)+$",
+            "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz)(?!\\w)((?:\\/|\\?)?)([^.]?)+$"
     };
 
     public static final String[] FILE_LINK_REGEXS = {

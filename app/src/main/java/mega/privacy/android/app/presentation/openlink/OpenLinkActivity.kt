@@ -86,7 +86,7 @@ import mega.privacy.android.app.utils.LinksUtil.requiresTransferSession
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
-import mega.privacy.android.app.utils.isURLSanitizedForWebView
+import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -161,7 +161,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when {
             // If is not a MEGA link, is not a supported link
-            !url.isURLSanitizedForWebView() -> {
+            !url.isURLSanitized() -> {
                 Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
                 setError(getString(R.string.open_link_not_valid_link))
             }

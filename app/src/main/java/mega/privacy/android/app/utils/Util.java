@@ -1190,6 +1190,7 @@ public class Util {
         }
         for (String regex : regexs) {
             if (url.matches(regex)) {
+                Timber.d("REGEX MATCH: %s", regex);
                 return true;
             }
         }
