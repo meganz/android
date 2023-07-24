@@ -79,6 +79,10 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.photos.DeletePreviewUseCase
+import mega.privacy.android.domain.usecase.photos.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.photos.GeneratePreviewUseCase
+import mega.privacy.android.domain.usecase.photos.GenerateThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -184,6 +188,10 @@ class CameraUploadsWorkerTest {
     private val stringWrapper: StringWrapper = mock()
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase = mock()
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase = mock()
+    private val generatePreviewUseCase: GeneratePreviewUseCase = mock()
+    private val generateThumbnailUseCase: GenerateThumbnailUseCase = mock()
+    private val deletePreviewUseCase: DeletePreviewUseCase = mock()
+    private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
 
     @Before
     fun setUp() {
@@ -282,7 +290,11 @@ class CameraUploadsWorkerTest {
             isChargingUseCase = isChargingUseCase,
             stringWrapper = stringWrapper,
             monitorStorageOverQuotaUseCase = monitorStorageOverQuotaUseCase,
-            broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase
+            broadcastStorageOverQuotaUseCase = broadcastStorageOverQuotaUseCase,
+            generatePreviewUseCase = generatePreviewUseCase,
+            generateThumbnailUseCase = generateThumbnailUseCase,
+            deletePreviewUseCase = deletePreviewUseCase,
+            deleteThumbnailUseCase = deleteThumbnailUseCase
         )
     }
 

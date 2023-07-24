@@ -31,7 +31,6 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.getScreenSize
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.extensions.toException
-import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -555,79 +554,37 @@ internal class DefaultImageRepository @Inject constructor(
             }
         }
 
-    override suspend fun generatePreview(handle: Long, file: File): String? {
-        val previewFileName =
+    override suspend fun createThumbnail(handle: Long, file: File) = withContext(ioDispatcher) {
+        val thumbnailFileName =
             "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-        val isVideo = MimeTypeList.typeForName(file.name).isVideo
-        return getOrGeneratePreview(previewFileName, isVideo, file, false)
+        val thumbnailFile = getThumbnailFile(thumbnailFileName)
+        requireNotNull(thumbnailFile)
+        megaApiGateway.createThumbnail(file.absolutePath, thumbnailFile.absolutePath)
     }
 
-    override suspend fun generateThumbnail(handle: Long, imageFile: File): String? =
-        withContext(ioDispatcher) {
-            if (MimeTypeList.typeForName(imageFile.name).isVideo.not()) return@withContext null
-            if (!imageFile.exists()) return@withContext null
-            val fileName =
-                "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
-            val thumbnailFile = getThumbnailFile(fileName)
-            if (thumbnailFile?.exists() == true) thumbnailFile.delete()
-            thumbnailFile?.absolutePath?.let {
-                val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageFile.toUri())
-                    .setRotationOptions(RotationOptions.autoRotate())
-                    .setRequestPriority(Priority.LOW)
-                    .setResizeOptions(
-                        ResizeOptions.forSquareSize(THUMBNAIL_SIZE)
-                    )
-                    .build()
 
-                return@withContext suspendCancellableCoroutine { continuation ->
-                    val dataSource =
-                        Fresco.getImagePipeline().fetchDecodedImage(imageRequest, imageFile.toUri())
-                    dataSource.subscribe(object : BaseBitmapDataSubscriber() {
-                        override fun onNewResultImpl(bitmap: Bitmap?) {
-                            bitmap?.let {
-                                BufferedOutputStream(FileOutputStream(thumbnailFile)).apply {
-                                    this.use {
-                                        bitmap.compress(
-                                            Bitmap.CompressFormat.JPEG,
-                                            BITMAP_COMPRESS_QUALITY,
-                                            it
-                                        )
-                                    }
-                                }
-                                bitmap.recycle()
-                                Timber.d("Thumbnail generated ${imageFile.name} and ${thumbnailFile.absolutePath}")
-                                continuation.resumeWith(
-                                    Result.success(
-                                        thumbnailFile.toUri().toString()
-                                    )
-                                )
-                                dataSource.close()
-                            } ?: run {
-                                Timber.e("Thumbnail generation failed ${thumbnailFile.name}")
-                                continuation.resumeWithException(NullPointerException())
-                                dataSource.close()
-                            }
-                        }
+    override suspend fun createPreview(handle: Long, file: File) = withContext(ioDispatcher) {
+        val previewFileName =
+            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        val previewFile = getPreviewFile(previewFileName)
+        requireNotNull(previewFile)
+        megaApiGateway.createPreview(file.absolutePath, previewFile.absolutePath)
+    }
 
-                        override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-                            Timber.e(
-                                dataSource.failureCause,
-                                "Thumbnail generation failed ${thumbnailFile.name}"
-                            )
-                            continuation.resumeWithException(dataSource.failureCause ?: return)
-                            dataSource.close()
-                        }
-                    }, CallerThreadExecutor.getInstance())
-                    continuation.invokeOnCancellation {
-                        dataSource.close()
-                    }
-                }
-            }
-        }
+    override suspend fun deleteThumbnail(handle: Long) = withContext(ioDispatcher) {
+        val thumbnailFileName =
+            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        getThumbnailFile(thumbnailFileName)?.delete()
+    }
+
+    override suspend fun deletePreview(handle: Long) = withContext(ioDispatcher) {
+        val previewFileName =
+            "${handle.toString().encodeBase64()}${FileConstant.JPG_EXTENSION}"
+        getPreviewFile(previewFileName)?.delete()
+    }
 
     companion object {
         private const val SIZE_1_MB = 1024 * 1024 * 1L
         private const val BITMAP_COMPRESS_QUALITY = 75
-        private const val THUMBNAIL_SIZE = 200
     }
 }

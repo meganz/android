@@ -11,30 +11,29 @@ import org.mockito.kotlin.verify
 import java.io.File
 
 /**
- * Test class for [GeneratePreviewAndThumbnailUseCase]
+ * Test class for [GenerateThumbnailUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GeneratePreviewAndThumbnailUseCaseTest {
+class GenerateThumbnailUseCaseTest {
 
-    private lateinit var underTest: GeneratePreviewAndThumbnailUseCase
+    private lateinit var underTest: GenerateThumbnailUseCase
 
     private val imageRepository = mock<ImageRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = GeneratePreviewAndThumbnailUseCase(
+        underTest = GenerateThumbnailUseCase(
             imageRepository = imageRepository,
         )
     }
 
     @Test
-    internal fun `test that preview and thumbnail is generated when invoked`() =
+    internal fun `test that thumbnail is generated when invoked`() =
         runTest {
             val handle = 1L
             val file = mock<File>()
             underTest(handle, file)
-            verify(imageRepository).generatePreview(handle, file)
-            verify(imageRepository).generateThumbnail(handle, file)
+            verify(imageRepository).createThumbnail(handle, file)
         }
 }

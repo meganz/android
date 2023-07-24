@@ -2746,4 +2746,24 @@ interface MegaApiGateway {
      * @param longitude Longitude in signed decimal degrees notation
      */
     suspend fun setNodeCoordinates(node: MegaNode, latitude: Double, longitude: Double)
+
+    /**
+     * Create a thumbnail for an image
+     *
+     * @param imagePath Image path
+     * @param destinationPath   Destination path for the thumbnail (including the file name)
+     * @return True if the thumbnail was successfully created, otherwise false.
+     */
+
+    suspend fun createThumbnail(imagePath: String, destinationPath: String): Boolean
+
+    /**
+     * Create a preview for an image
+     *
+     * @param imagePath Image path
+     * @param destinationPath   Destination path for the preview (including the file name)
+     * @return True if the preview was successfully created, otherwise false.
+     */
+
+    suspend fun createPreview(imagePath: String, destinationPath: String): Boolean
 }

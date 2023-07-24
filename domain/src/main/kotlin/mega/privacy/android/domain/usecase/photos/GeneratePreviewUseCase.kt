@@ -6,9 +6,9 @@ import javax.inject.Inject
 
 
 /**
- * UseCase for generating preview and thumbnail for a file
+ * UseCase for generating preview for a file
  */
-class GeneratePreviewAndThumbnailUseCase @Inject constructor(
+class GeneratePreviewUseCase @Inject constructor(
     private val imageRepository: ImageRepository,
 ) {
 
@@ -18,8 +18,6 @@ class GeneratePreviewAndThumbnailUseCase @Inject constructor(
      * @param file
      */
     suspend operator fun invoke(handle: Long, file: File) {
-        imageRepository.generatePreview(handle, file)
-        imageRepository.generateThumbnail(handle, file)
+        imageRepository.createPreview(handle, file)
     }
-
 }

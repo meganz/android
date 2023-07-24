@@ -156,24 +156,39 @@ interface ImageRepository {
     ): ImageNode
 
     /**
-     * generate Preview for a File
+     * Create a thumbnail for an image
+     *
      * @param handle
      * @param file
-     * @return path
+     * @return True if the thumbnail was successfully created, otherwise false.
      */
-    suspend fun generatePreview(
-        handle: Long,
-        file: File,
-    ): String?
+
+    suspend fun createThumbnail(handle: Long, file: File): Boolean
 
     /**
-     * generate Thumbnail for a File
+     * Create a preview for an image
+     *
      * @param handle
-     * @param imageFile
-     * @return path
+     * @param file
+     * @return True if the preview was successfully created, otherwise false.
      */
-    suspend fun generateThumbnail(
-        handle: Long,
-        imageFile: File,
-    ): String?
+
+    suspend fun createPreview(handle: Long, file: File): Boolean
+
+    /**
+     * Delete a thumbnail for node
+     *
+     * @param handle
+     * @return True if the thumbnail was successfully created, otherwise false.
+     */
+
+    suspend fun deleteThumbnail(handle: Long): Boolean?
+
+    /**
+     * Create a preview for an image
+     *
+     * @param handle
+     */
+
+    suspend fun deletePreview(handle: Long): Boolean?
 }

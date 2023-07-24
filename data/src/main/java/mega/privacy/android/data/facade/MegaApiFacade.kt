@@ -1293,4 +1293,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun setNodeCoordinates(node: MegaNode, latitude: Double, longitude: Double) =
         megaApi.setNodeCoordinates(node, latitude, longitude, null)
+
+    override suspend fun createThumbnail(imagePath: String, destinationPath: String) =
+        megaApi.createThumbnail(imagePath, destinationPath)
+
+    override suspend fun createPreview(imagePath: String, destinationPath: String) =
+        megaApi.createPreview(imagePath, destinationPath)
 }

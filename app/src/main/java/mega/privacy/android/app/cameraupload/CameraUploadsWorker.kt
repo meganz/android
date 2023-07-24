@@ -33,7 +33,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
@@ -41,10 +40,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.ImageProcessor
-import mega.privacy.android.app.utils.PreviewUtils
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.BackupState
@@ -119,6 +114,10 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishOrDeletedUseCase
+import mega.privacy.android.domain.usecase.photos.DeletePreviewUseCase
+import mega.privacy.android.domain.usecase.photos.DeleteThumbnailUseCase
+import mega.privacy.android.domain.usecase.photos.GeneratePreviewUseCase
+import mega.privacy.android.domain.usecase.photos.GenerateThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
@@ -127,7 +126,6 @@ import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCas
 import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -209,6 +207,10 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val stringWrapper: StringWrapper,
     private val monitorStorageOverQuotaUseCase: MonitorStorageOverQuotaUseCase,
     private val broadcastStorageOverQuotaUseCase: BroadcastStorageOverQuotaUseCase,
+    private val generateThumbnailUseCase: GenerateThumbnailUseCase,
+    private val generatePreviewUseCase: GeneratePreviewUseCase,
+    private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
+    private val deletePreviewUseCase: DeletePreviewUseCase,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -1191,82 +1193,64 @@ class CameraUploadsWorker @AssistedInject constructor(
         transfer: Transfer,
         error: MegaException?,
         record: SyncRecord,
-    ) {
-        val path = transfer.localPath
-        if (transfer.state == TransferState.STATE_COMPLETED) {
-            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, error, context)
-            addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
-        }
-        error?.let {
-            Timber.d("Image Sync Finished, Error Code: ${it.errorCode}")
-            if (error is QuotaExceededMegaException) {
-                Timber.w("Over quota error: ${error.errorCode}")
-                showStorageOverQuotaNotification()
-                endService(aborted = true)
-            } else {
-                Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, it.errorString)
+    ) = withContext(NonCancellable) {
+        try {
+            val path = transfer.localPath
+            if (transfer.state == TransferState.STATE_COMPLETED) {
+                val androidCompletedTransfer = AndroidCompletedTransfer(transfer, error, context)
+                addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
             }
-        } ?: run {
-            Timber.d(
-                "Image Sync Finished" +
-                        "Image Handle: ${transfer.nodeHandle}, " +
-                        "Image Size: ${transfer.transferredBytes}"
-            )
-            val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
-            node?.let { nonNullNode ->
-                handleSetOriginalFingerprint(
-                    nodeId = nonNullNode.id,
-                    originalFingerprint = record.originFingerprint.orEmpty(),
+            error?.let {
+                Timber.d("Image Sync Finished, Error Code: ${it.errorCode}")
+                if (error is QuotaExceededMegaException) {
+                    Timber.w("Over quota error: ${error.errorCode}")
+                    showStorageOverQuotaNotification()
+                    broadcastStorageOverQuotaUseCase()
+                } else {
+                    Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, it.errorString)
+                }
+            } ?: run {
+                Timber.d(
+                    "Image Sync Finished" +
+                            "Image Handle: ${transfer.nodeHandle}, " +
+                            "Image Size: ${transfer.transferredBytes}"
                 )
-                record.latitude?.let { latitude ->
-                    record.longitude?.let { longitude ->
-                        setCoordinatesUseCase(
-                            nodeId = nonNullNode.id,
-                            latitude = latitude.toDouble(),
-                            longitude = longitude.toDouble(),
-                        )
+                val node = getNodeByIdUseCase(NodeId(transfer.nodeHandle)) as? TypedFileNode
+                node?.let { nonNullNode ->
+                    handleSetOriginalFingerprint(
+                        nodeId = nonNullNode.id,
+                        originalFingerprint = record.originFingerprint.orEmpty(),
+                    )
+                    record.latitude?.let { latitude ->
+                        record.longitude?.let { longitude ->
+                            setCoordinatesUseCase(
+                                nodeId = nonNullNode.id,
+                                latitude = latitude.toDouble(),
+                                longitude = longitude.toDouble(),
+                            )
+                        }
+                    }
+                    record.localPath?.let { File(it) }?.takeIf { it.exists() }?.let {
+                        if (deleteThumbnailUseCase(nonNullNode.id.longValue)) {
+                            generateThumbnailUseCase(nonNullNode.id.longValue, it)
+                        }
+                        if (deletePreviewUseCase(nonNullNode.id.longValue)) {
+                            generatePreviewUseCase(nonNullNode.id.longValue, it)
+                        }
+                    }
+                }
+                // delete database record
+                deleteSyncRecord(path, record.isSecondary)
+                // delete temp files
+                if (path.startsWith(tempRoot)) {
+                    val temp = File(path)
+                    if (temp.exists()) {
+                        temp.delete()
                     }
                 }
             }
-            val src = record.localPath?.let { File(it) }
-            if (src != null && src.exists()) {
-                Timber.d("Creating preview")
-                val previewDir = PreviewUtils.getPreviewFolder(context)
-                val preview = File(
-                    previewDir,
-                    MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
-                )
-                val thumbDir = ThumbnailUtils.getThumbFolder(context)
-                val thumb = File(
-                    thumbDir,
-                    MegaApiAndroid.handleToBase64(transfer.nodeHandle) + FileUtil.JPG_EXTENSION
-                )
-                if (FileUtil.isVideoFile(path)) {
-                    val img = record.localPath?.let { File(it) }
-                    if (!preview.exists()) {
-                        ImageProcessor.createVideoPreview(
-                            context,
-                            img,
-                            preview
-                        )
-                    }
-                    ImageProcessor.createThumbnail(img, thumb)
-                } else if (MimeTypeList.typeForName(path).isImage) {
-                    if (!preview.exists()) {
-                        ImageProcessor.createImagePreview(src, preview)
-                    }
-                    ImageProcessor.createThumbnail(src, thumb)
-                }
-            }
-            // delete database record
-            deleteSyncRecord(path, record.isSecondary)
-            // delete temp files
-            if (path.startsWith(tempRoot)) {
-                val temp = File(path)
-                if (temp.exists()) {
-                    temp.delete()
-                }
-            }
+        } catch (exception: Exception) {
+            Timber.e(exception, "$transfer transferFinished error")
         }
     }
 
@@ -1659,7 +1643,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private fun showVideoCompressionProgressNotification(
         progress: Int,
         currentFileIndex: Int,
-        totalCount: Int
+        totalCount: Int,
     ) {
         val content = context.getString(
             R.string.title_compress_video,
