@@ -2284,7 +2284,7 @@
     <!--  -->
     <string name="custom_subtitle_of_group_chat">還有%1$s和%2$d</string>
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
-    <string name="message_error_set_title_get_link">在您產出對話連結之前，您需要先設定說明：</string>
+    <string name="message_error_set_title_get_link">在您產生對話連結之前，您需要先設定說明：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
     <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
@@ -4798,4 +4798,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">結束重複</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">結束</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">開始會議</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">透過語音或視訊與全世界的朋友和同事進行安全私密交談。</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">此會議將被封存，所有與會者都會收到通知。</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">此會議將被放置在過去的會議底下，所有與會者都會收到通知。</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">不要取消</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">取消並封存</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">取消會議</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">會議已取消並封存</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">會議已取消</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">只有此事件會被取消。所有其它事件將按照排程進行。</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">要取消事件和會議？</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">取消事件</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
 </resources>

@@ -5012,4 +5012,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">Herhaling beëindigen</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Eindigt</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">Begin vergadering</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">Praat veilig en privé tijdens audio- of videogesprekken met vrienden en collega’s over de hele wereld.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">“%1$s” annuleren?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Deze vergadering wordt gearchiveerd en alle deelnemers worden op de hoogte gebracht.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Deze vergadering wordt geplaatst onder Eerdere vergaderingen en alle deelnemers worden op de hoogte gebracht.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Niet annuleren</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Annuleren en archiveren</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Vergadering annuleren</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Vergadering geannuleerd en gearchiveerd</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Vergadering geannuleerd</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">De %1$s gebeurtenis annuleren?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Alleen dit evenement wordt geannuleerd. Alle andere evenementen gaan door zoals gepland.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Gebeurtenis en vergadering annuleren?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Dit is de enige keer dat de terugkerende vergadering voorkomt. Als u deze gebeurtenis annuleert, wordt de vergadering geannuleerd. \nBij annulering wordt de vergadering gearchiveerd en worden alle deelnemers op de hoogte gesteld.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Dit is de enige keer dat de terugkerende vergadering voorkomt. Als u deze gebeurtenis annuleert, wordt de vergadering geannuleerd. \nBij annulering, wordt de vergadering geplaatst onder Eerdere vergaderingen en worden alle deelnemers op de hoogte gesteld.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s gebeurtenis geannuleerd</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Gebeurtenis annuleren</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] heeft de vergadering bijgewerkt[/B]</string>
 </resources>

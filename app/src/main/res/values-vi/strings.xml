@@ -4787,4 +4787,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">Ngừng tái&#160;diễn</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Kết&#160;thúc</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">Bắt&#160;đầu một cuộc&#160;họp</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">Nói chuyện an toàn và riêng tư vớI gọi thoại hay gọi video với bạn bè và đồng nghiệp trên toàn cầu.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Hủy “%1$s”?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Cuộc họp này sẽ được liệt vào danh&#160;sách bảo&#160;lưu và tất&#160;cả các thành&#160;viên sẽ nhận được thông&#160;báo.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Cuộc họp này sẽ được liệt vào danh&#160;sách Các cuộc họp trước&#160;đây và tất&#160;cả các thành&#160;viên sẽ nhận được thông&#160;báo.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Đừng hủy</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Hủy&#160;bỏ và bảo&#160;lưu</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Hủy&#160;bỏ cuộc&#160;họp</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Đã hủy và bảo&#160;lưu cuộc họp</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Cuộc họp đã hủy</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Hủy&#160;bỏ thời&#160;điểm tái&#160;diễn %1$s?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Chỉ&#160;có mỗi thời&#160;điểm tái&#160;diễn này sẽ bị hủy. Còn tất&#160;cả các thời&#160;điểm tái&#160;diễn khác sẽ vẫn diễn&#160;ra như lịch&#160;trình.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Hủy&#160;bỏ lần tái&#160;diễn và cuộc họp?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Đây là lần tái&#160;diễn duy&#160;nhất của cuộc họp định&#160;kỳ. Hủy&#160;bỏ lần tái&#160;diễn này sẽ hủy&#160;bỏ toàn&#160;bộ cuộc họp.\nNếu bị hủy, cuộc họp sẽ được liệt vào trong bảo&#160;lưu và tất&#160;cả những người tham&#160;gia sẽ được thông&#160;báo.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Đây là lần tái&#160;diễn duy&#160;nhất của cuộc họp định&#160;kỳ. Hủy&#160;bỏ lần tái&#160;diễn này sẽ hủy&#160;bỏ toàn&#160;bộ cuộc họp.\nNếu bị hủy, cuộc họp sẽ được liệt vào trong Các cuộc&#160;họp trước&#160;đây và tất&#160;cả những người tham&#160;gia sẽ được thông&#160;báo.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Thời&#160;điểm tái&#160;diễn %1$s đã bị hủy</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Hủy&#160;bỏ thời&#160;điểm tái&#160;diễn</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] đã cập&#160;nhật cuộc họp[/B]</string>
 </resources>

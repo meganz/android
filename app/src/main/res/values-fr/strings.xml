@@ -3584,7 +3584,7 @@
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
     <string name="message_android_platform_subscription">Vous avez un abonnement MEGA actif auprès de %1$s. Vous devez l’annuler séparément dans %2$s, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">Vous avez un abonnement MEGA actif. Il sera annulé automatiquement  après suppression du compte. Pour plus de précisions, visitez notre centre d’assistance.</string>
+    <string name="message_other_platform_subscription">Vous avez un abonnement MEGA actif. Il sera annulé automatiquement après suppression du compte. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
     <string name="message_itunes_platform_subscription">Vous avez un abonnement MEGA actif auprès d’Apple. Vous devez l’annuler séparément dans votre compte iTunes, car MEGA ne peut pas l’annuler pour vous. Pour plus de précisions, visitez notre centre d’assistance.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
@@ -3954,7 +3954,7 @@
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Toucher pour le déverrouiller</string>
     <!-- Label that schedule a meeting -->
-    <string name="chat_schedule_meeting">Planifier une réunion</string>
+    <string name="chat_schedule_meeting">Programmer une réunion</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Nous vous remercions pour votre abonnement mensuel Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
@@ -4100,9 +4100,9 @@
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Redémarrer</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]vous a invité à une réunion planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]vous a invité à une réunion programmée&#160;:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s a annulé[/A][B] la réunion planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s a annulé[/A][B] la réunion programmée&#160;:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
     <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s a mis à jour[/A][B] le nom de la réunion de «&#160;%s&#160;» à [/B]«&#160;[A]%s[/A]&#160;»</string>
     <!-- User Alert notification for scheduled meeting date change -->
@@ -4112,7 +4112,7 @@
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s a mis à jour[/A][B] la description de la réunion[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s a mis à jour[/A][B] les détails de la réunion planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s a mis à jour[/A][B] les détails de la réunion programmée&#160;:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">L’accès a été refusé</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4136,11 +4136,11 @@
     <!-- Label for scheduled daily meetings -->
     <string name="meetings_list_scheduled_meeting_daily_label">%s tous les jours</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]vous a invité à une réunion périodique planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]vous a invité à une réunion périodique programmée&#160;:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s a mis à jour[/A][B] la description de la réunion périodique[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s a mis à jour[/A][B] les détails de la réunion périodique  planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s a mis à jour[/A][B] les détails de la réunion périodique programmée&#160;:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s a mis à jour[/A][B] une occurrence&#160;:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
@@ -4148,7 +4148,7 @@
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s a annulé[/A][B] la réunion et toutes ses occurrences[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s a annulé[/A][B] l’occurrence planifiée&#160;:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s a annulé[/A][B] l’occurrence programmée&#160;:[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">Ce lien n’a pas été généré avec le compte dans lequel vous êtes connecté actuellement. Connectez-vous au compte approprié pour ce lien afin de confirmer votre adresse courriel.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
@@ -4822,7 +4822,7 @@
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_description_too_long_error">Saisir jusqu’à 3 000&#160;caractères</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">La réunion a été planifiée</string>
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">La réunion a été programmée</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_never_label">Jamais</string>
     <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
@@ -4961,9 +4961,9 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensuelle</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Certains mois ne comportent pas %1$d jour. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
-        <item quantity="many">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
-        <item quantity="other">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera planifiée le dernier jour du mois.</item>
+        <item quantity="one">Certains mois ne comportent pas %1$d jour. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
+        <item quantity="many">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
+        <item quantity="other">Certains mois ne comportent pas %1$d&#160;jours. Pour ces mois, l’occurrence sera programmée le dernier jour du mois.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">Impossible d’ouvrir le dossier</string>
@@ -5237,4 +5237,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">Fin de la récurrence</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Se termine</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">Commencer une réunion</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">Parlez en toute sécurité et confidentialité lors d’appels vocaux ou vidéo avec vos amis et collègues partout dans le monde.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Annuler «&#160;%1$s&#160;» ?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Cette réunion sera archivée, ce qui sera signalé à tous les participants.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Cette réunion sera déplacée dans Réunions antérieures, ce qui sera signalé à tous les participants.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Ne pas annuler</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Annuler et archiver</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Annuler la réunion</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">La réunion a été annulée et archivée</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">La réunion a été annulée</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Annuler l’occurrence du %1$s&#64; ?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Seule cette occurrence sera annulée. Toutes les autres occurrences se poursuivront comme prévu.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Annuler l’occurrence et la réunion ?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Ceci est la seule occurrence de la réunion périodique. Annuler cette occurrence annulera aussi la réunion.\nEn cas d’annulation, la réunion sera archivée, ce qui sera signalé à tous les participants.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Ceci est la seule occurrence de la réunion périodique. Annuler cette occurrence annulera aussi la réunion.\nEn cas d’annulation, la réunion sera déplacée dans les Réunions antérieures, ce qui sera signalé à tous les participants.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">L’occurrence du %1$sa été annulée</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Annuler l’occurrence</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
 </resources>
