@@ -671,6 +671,26 @@ internal class DefaultAlbumRepository @Inject constructor(
             megaApiGateway.httpServerGetLocalLink(node)
         }
 
+    override suspend fun isAlbumLinkValid(albumLink: AlbumLink): Boolean =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        continuation.resume(error.errorCode == MegaError.API_OK && request.megaSet?.id() != -1L)
+                    },
+                )
+
+                megaApiGateway.fetchPublicSet(
+                    publicSetLink = albumLink.link,
+                    listener = listener,
+                )
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = null

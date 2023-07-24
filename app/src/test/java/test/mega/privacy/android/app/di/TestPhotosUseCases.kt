@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
 import mega.privacy.android.domain.usecase.photos.SaveAlbumToFolderUseCase
 import org.mockito.kotlin.mock
 
@@ -88,4 +89,7 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideSaveAlbumToFolderUseCase(): SaveAlbumToFolderUseCase = mock()
+
+    @Provides
+    fun provideIsAlbumLinkValidUseCase(): IsAlbumLinkValidUseCase = mock()
 }

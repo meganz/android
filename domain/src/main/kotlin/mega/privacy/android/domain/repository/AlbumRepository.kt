@@ -245,6 +245,14 @@ interface AlbumRepository {
     suspend fun getAlbumPhotoFileUrlByNodeHandle(nodeId: NodeId): String?
 
     /**
+     * Check if album link is valid
+     *
+     * @param albumLink Album link to be checked
+     * @return Link's validity
+     */
+    suspend fun isAlbumLinkValid(albumLink: AlbumLink): Boolean
+
+    /**
      * Clear all albums cache
      */
     fun clearCache()
