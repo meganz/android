@@ -5462,4 +5462,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">Zakończ powtarzanie</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">Koniec</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">Rozpocznij spotkanie</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">Bezpieczne i prywatne rozmowy audio lub wideo z przyjaciółmi i współpracownikami z całego świata.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">Anulować \“%1$s\“?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">Spotkanie to zostanie zarchiwizowane, a wszyscy uczestnicy zostaną o tym powiadomieni.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">Spotkanie to zostanie umieszczone w zakładce Poprzednie spotkania, a wszyscy uczestnicy zostaną o nim powiadomieni.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">Nie anuluj</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">Anuluj i zarchiwizuj</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">Anuluj spotkanie</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Spotkanie odwołane i zarchiwizowane</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Spotkanie odwołane</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Anulować wystąpienie %1$s?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Tylko to zdarzenie zostanie anulowane. Wszystkie pozostałe wydarzenia odbędą się zgodnie z planem.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Odwołać zdarzenie i spotkanie?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Jest to jedyne wystąpienie spotkania cyklicznego. Anulowanie tego wystąpienia spowoduje anulowanie spotkania. \nW przypadku anulowania spotkanie zostanie zarchiwizowane, a wszyscy uczestnicy zostaną o tym powiadomieni.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Jest to jedyne wystąpienie spotkania cyklicznego. Anulowanie tego wystąpienia spowoduje anulowanie spotkania. \nW przypadku anulowania spotkanie zostanie umieszczone w sekcji Poprzednie spotkania, a wszyscy uczestnicy zostaną o tym powiadomieni.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Wystąpienie %1$s anulowane</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Anuluj zdarzenie</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] zaktualizował spotkanie[/B]</string>
 </resources>

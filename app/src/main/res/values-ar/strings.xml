@@ -5912,4 +5912,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">إنهاء التكرار</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">ينتهي</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">ابدأ اجتماع</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">تحدث بأمان وخصوصية في مكالمات الصوت أو الفيديو مع الأصدقاء والزملاء في جميع أنحاء العالم.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">إلغاء ”%1$s“؟</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">سيتم أرشفة هذا الاجتماع وسيتم إعلام جميع المشاركين.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">سيتم وضع هذا الاجتماع تحت الاجتماعات السابقة وسيتم إعلام جميع المشاركين.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">لا تلغي</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">إلغاء وأرشفة</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">إلغاء الاجتماع</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">تم إلغاء الاجتماع وأرشفته</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">تم إلغاء الاجتماع</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">إلغاء التكرار في %1$s؟</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">سيتم إلغاء هذا التكرار فقط. سيتم المضي قدمًا في جميع التكرارات الأخرى كما هو مقرر.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">إلغاء التكرار والاجتماع؟</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">هذا هو التكرار الوحيد للاجتماع المتكرر. إلغاء هذا التكرار سيلغي الاجتماع.\n في حالة الإلغاء سيتم أرشفة الاجتماع وسيتم إعلام جميع المشاركين.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">هذا هو التكرار الوحيد للاجتماع المتكرر. إلغاء هذا التكرار سيلغي الاجتماع.\n في حالة الإلغاء سيتم وضع الاجتماع ضمن الاجتماعات الماضية وسيتم إعلام جميع المشاركين.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">تم إلغاء التكرار في %1$s</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">إلغاء هذا التكرار</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
 </resources>

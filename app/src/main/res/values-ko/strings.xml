@@ -4787,4 +4787,40 @@
     <string name="meetings_schedule_meeting_end_recurrence_label">되풀이 종료</string>
     <!-- Title of Ends section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_ends_section">종료</string>
+    <!--Action text to start a conversation from Meeting List screen empty view-->
+    <string name="meeting_list_empty_action">회의 시작</string>
+    <!--Description text from Meeting List screen empty view-->
+    <string name="meeting_list_empty_description">전세계의 친구 및 동료들과 안전하고 비밀스럽게 음성 또는 영상 통화를 하세요.</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">“%1$s”을/를 취소할까요?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">이 회의는 보관될 것이며 모든 참여자에게 알려질 것입니다.</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_message">이 회의는 지난 회의에 위치할 것이며 모든 참여자에게 알려질 것입니다.</string>
+    <!-- Abort button of the confirmation dialog to cancel a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button">취소하지 마세요</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button">취소하고 보관</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">회의 취소</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">회의가 취소되고 보관되었습니다</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">회의가 취소되었습니다</string>
+    <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">%1$s의 되풀이 항목을 취소할까요?</string>
+    <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">이 되풀이 항목만 취소됩니다. 다른 되풀이 항목은 예정대로 진행됩니다.</string>
+    <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">되풀이와 회의를 취소할까요?</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">이것은 반복 회의의 유일한 되풀이입니다. 이 되풀이를 취소하면 회의를 취소하게 됩니다.\n만약 취소되면, 회의는 보관될 것이며 모든 참여자는 알림을 받게 됩니다.</string>
+    <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">이것은 반복 회의의 유일한 되풀이입니다. 이 되풀이를 취소하면 회의를 취소하게 됩니다.\n만약 취소되면, 회의는 지난 회의에 위치하게 되며 모든 참여자는 알림을 받게 됩니다.</string>
+    <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s의 되풀이 항목이 취소되었습니다</string>
+    <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">되풀이 항목 취소</string>
+    <!-- Chat log message when there is an update in the scheduled meeting -->
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A]님이 [B]회의를 수정하였습니다[/B]</string>
 </resources>
