@@ -33,7 +33,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
-                    data = Uri.parse(intent.dataString)
+                    data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
             Constants.ACTION_OPEN_MEGA_LINK -> Intent(activity, FileLinkActivity::class.java)
@@ -41,7 +41,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
-                    data = Uri.parse(intent.dataString)
+                    data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
             Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> Intent(activity, LoginActivity::class.java)
@@ -49,7 +49,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
-                    data = Uri.parse(intent.dataString)
+                    data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
             Constants.ACTION_OPEN_CHAT_LINK -> Intent(activity, LoginActivity::class.java)
@@ -57,7 +57,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_OPEN_CHAT_LINK
-                    data = Uri.parse(intent.dataString)
+                    data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
             Constants.ACTION_EXPORT_MASTER_KEY -> Intent(activity, LoginActivity::class.java)
@@ -117,7 +117,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_OPEN_HANDLE_NODE
-                    data = Uri.parse(intent.dataString)
+                    data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
             Constants.ACTION_OVERQUOTA_TRANSFER -> Intent(
