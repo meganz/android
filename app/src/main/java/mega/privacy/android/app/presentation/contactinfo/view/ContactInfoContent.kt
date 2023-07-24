@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
-import mega.privacy.android.core.ui.controls.lists.MegaMenuAction
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -41,7 +41,7 @@ internal fun ContactInfoContent(
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     ChatOptions()
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
-    MegaMenuAction(
+    MenuActionListTile(
         text = stringResource(id = R.string.title_incoming_shares_explorer),
         icon = R.drawable.ic_incoming_share,
     ) {
@@ -54,7 +54,7 @@ internal fun ContactInfoContent(
             color = MaterialTheme.colors.secondary,
         )
     }
-    MegaMenuAction(
+    MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_notifications_contact),
         icon = R.drawable.ic_bell,
     ) {
@@ -63,22 +63,22 @@ internal fun ContactInfoContent(
             onCheckedChange = {}
         )
     }
-    MegaMenuAction(
+    MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
         icon = R.drawable.ic_contact_share
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
-        MegaMenuAction(
+        MenuActionListTile(
             text = stringResource(id = R.string.title_chat_shared_files_info),
             icon = R.drawable.ic_shared_files
         )
-        MegaMenuAction(
+        MenuActionListTile(
             text = stringResource(id = R.string.title_properties_manage_chat),
             icon = R.drawable.ic_clear_chat_history,
         )
     }
-    MegaMenuAction(
+    MenuActionListTile(
         text = stringResource(id = R.string.title_properties_remove_contact),
         icon = R.drawable.ic_remove_contact,
         isDestructive = true,

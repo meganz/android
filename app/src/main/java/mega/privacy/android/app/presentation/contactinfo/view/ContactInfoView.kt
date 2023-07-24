@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.contactinfo.view
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,15 +25,14 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
-import timber.log.Timber
 
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun ContactInfoView(
     uiState: ContactInfoState,
     onBackPress: () -> Unit,
     statusBarHeight: Float,
+    modifier: Modifier = Modifier,
 ) {
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(
@@ -52,10 +50,10 @@ internal fun ContactInfoView(
     val headerStartGoneHeight = headerStartGoneHeight(statusBarHeight)
 
     Scaffold(
-        modifier = Modifier,
+        modifier = modifier,
         backgroundColor = Color.Transparent,
         scaffoldState = scaffoldState,
-    ) {
+    ) { padding ->
 
         SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackBarHostState)
 
@@ -74,7 +72,11 @@ internal fun ContactInfoView(
             }
         }
         //to set the minimum height of the colum so it's always possible to collapse the header
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+        ) {
             //to set the minimum height of the colum so it's always possible to collapse the header
             val boxWithConstraintsScope = this
             ContactInfoTopAppBar(
@@ -131,7 +133,8 @@ private fun ContactInfoPreview() {
                 status = UserStatus.Online,
                 lastSeen = 0,
             ),
-        ), onBackPress = {},
-        statusBarHeight = 12f
+        ),
+        onBackPress = {},
+        statusBarHeight = 12f,
     )
 }

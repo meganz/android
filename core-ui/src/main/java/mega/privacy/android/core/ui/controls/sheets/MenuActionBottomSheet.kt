@@ -29,14 +29,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.lists.MegaMenuAction
-import mega.privacy.android.core.ui.controls.lists.MegaMenuActionHeader
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
+import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 
 /**
- * MegaActionMenuBottomSheetLayout
+ * ActionMenuBottomSheet
  *
  * @param modalSheetState state of [ModalBottomSheetLayout]
  * @param sheetHeader header composable for the bottom sheet
@@ -47,7 +47,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MegaActionMenuBottomSheetLayout(
+fun MenuActionBottomSheet(
     modalSheetState: ModalBottomSheetState,
     modifier: Modifier = Modifier,
     headerDividerPadding: Dp = 16.dp,
@@ -79,22 +79,22 @@ fun MegaActionMenuBottomSheetLayout(
 @OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
-private fun MegaActionMenuBottomSheetLayoutPreview() {
+private fun MenuActionBottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = false,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaActionMenuBottomSheetLayout(
+        MenuActionBottomSheet(
             modalSheetState = modalSheetState,
             sheetHeader = {
-                MegaMenuActionHeader(text = "Header")
+                MenuActionHeader(text = "Header")
             },
             sheetBody = {
                 LazyColumn {
                     items(100) {
-                        MegaMenuAction(text = "title $it", icon = R.drawable.ic_folder_list)
+                        MenuActionListTile(text = "title $it", icon = R.drawable.ic_folder_list)
                     }
                 }
             }) {

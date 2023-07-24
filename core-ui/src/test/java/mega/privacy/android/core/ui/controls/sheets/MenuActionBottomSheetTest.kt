@@ -19,14 +19,14 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.ui.controls.lists.MegaMenuAction
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @OptIn(ExperimentalMaterialApi::class)
 @RunWith(AndroidJUnit4::class)
-class MegaMenuActionBottomSheetLayoutTest {
+class MenuActionBottomSheetTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -41,13 +41,13 @@ class MegaMenuActionBottomSheetLayoutTest {
         )
         composeTestRule.setContent {
             val coroutineScope = rememberCoroutineScope()
-            MegaActionMenuBottomSheetLayout(
+            MenuActionBottomSheet(
                 modalSheetState = sheetState,
                 sheetHeader = { Text(text = "sample") },
                 sheetBody = {
                     LazyColumn {
                         items(100) {
-                            MegaMenuAction(text = "title $it")
+                            MenuActionListTile(text = "title $it")
                         }
                     }
                 },
@@ -81,13 +81,13 @@ class MegaMenuActionBottomSheetLayoutTest {
         )
         composeTestRule.setContent {
             val coroutineScope = rememberCoroutineScope()
-            MegaActionMenuBottomSheetLayout(
+            MenuActionBottomSheet(
                 modalSheetState = sheetState,
                 sheetHeader = { Text(text = "sample") },
                 sheetBody = {
                     LazyColumn {
                         items(100) {
-                            MegaMenuAction(text = "title $it")
+                            MenuActionListTile(text = "title $it")
                         }
                     }
                 },

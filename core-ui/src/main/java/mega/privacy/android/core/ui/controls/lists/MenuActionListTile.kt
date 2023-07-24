@@ -34,7 +34,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 /**
- * MegaMenuAction
+ * MenuActionListTile
  *
  * One line list menu item from Figma Designs
  * @param text list item title
@@ -48,7 +48,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  * @param modifier
  */
 @Composable
-fun MegaMenuAction(
+fun MenuActionListTile(
     text: String,
     modifier: Modifier = Modifier,
     @DrawableRes icon: Int? = null,
@@ -106,9 +106,9 @@ fun MegaMenuAction(
     }
 }
 
-internal const val MENU_ITEM_ICON_TAG = "menu_list_view_item:list_icon:"
-internal const val MENU_ITEM_TEXT_TAG = "menu_list_view_item:text_title"
-internal const val MENU_ITEM_SWITCH_TAG = "menu_list_view_item:button_switch"
+internal const val MENU_ITEM_ICON_TAG = "menu_action:list_icon:"
+internal const val MENU_ITEM_TEXT_TAG = "menu_action:text_title"
+internal const val MENU_ITEM_SWITCH_TAG = "menu_action:button_switch"
 
 @CombinedThemePreviews
 @Composable
@@ -116,7 +116,7 @@ private fun PreviewPreviewMegaMenuAction(
     @PreviewParameter(BooleanProvider::class) isDestructive: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaMenuAction(
+        MenuActionListTile(
             text = "Menu Item",
             icon = R.drawable.ic_folder_list,
             isDestructive = isDestructive,
@@ -130,7 +130,7 @@ private fun PreviewMegaMenuActionWithSwitch(
     @PreviewParameter(BooleanProvider::class) hasSwitch: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaMenuAction(
+        MenuActionListTile(
             text = "Menu Item",
             icon = R.drawable.ic_folder_list,
         ) {
@@ -147,7 +147,7 @@ private fun PreviewMegaMenuActionWithSwitch(
 @Composable
 private fun PreviewMegaMenuActionWithoutIcon() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaMenuAction(
+        MenuActionListTile(
             text = "Menu Item",
         )
     }
@@ -157,7 +157,7 @@ private fun PreviewMegaMenuActionWithoutIcon() {
 @Composable
 private fun PreviewMegaMenuActionWithTextButton() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        MegaMenuAction(
+        MenuActionListTile(
             text = "Menu Item",
             icon = R.drawable.ic_folder_list,
         ) {

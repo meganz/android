@@ -13,14 +13,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class MenuMenuActionTest {
+class MenuActionListTileTest {
     @get:Rule
     var composeRule = createComposeRule()
 
     @Test
     fun `test that MenuListViewItem displays text when we pass text to MenuListViewItem`() {
         composeRule.setContent {
-            MegaMenuAction(
+            MenuActionListTile(
                 text = "MenuListViewItem",
             )
         }
@@ -37,7 +37,7 @@ class MenuMenuActionTest {
     fun `test that MenuListViewItem displays text,icon,switch when we pass text,icon,switch to MenuListViewItem`() {
         val switchTag = "Mega Switch"
         composeRule.setContent {
-            MegaMenuAction(
+            MenuActionListTile(
                 text = "MenuListViewItem",
                 icon = R.drawable.ic_favorite,
             ) {
@@ -60,7 +60,7 @@ class MenuMenuActionTest {
     @Test
     fun `test that MenuListViewItem displays text and icon when we pass text, icon resource`() {
         composeRule.setContent {
-            MegaMenuAction(
+            MenuActionListTile(
                 text = "MenuListViewItem",
                 icon = R.drawable.ic_favorite
             )
