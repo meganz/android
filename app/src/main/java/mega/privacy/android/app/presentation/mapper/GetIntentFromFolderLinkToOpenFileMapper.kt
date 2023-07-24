@@ -8,7 +8,7 @@ import android.net.Uri
 import android.os.Environment
 import androidx.core.content.FileProvider
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
@@ -28,9 +28,13 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import javax.inject.Inject
 
 /**
@@ -38,10 +42,13 @@ import javax.inject.Inject
  *
  * @property getLocalFileForNode [GetLocalFileForNode] to get local file if present
  * @property getLocalFolderLinkFromMegaApiFolderUseCase [GetLocalFolderLinkFromMegaApiFolderUseCase] to get file url if present
- * @property megaApiFolderHttpServerStartUseCase [MegaApiFolderHttpServerStartUseCase] to start MegaApi Server
- * @property megaApiFolderHttpServerIsRunningUseCase [MegaApiFolderHttpServerIsRunningUseCase] to check Mega Api Http server is running
+ * @property megaApiFolderHttpServerStartUseCase [MegaApiFolderHttpServerStartUseCase] to start MegaFolderApi Server
+ * @property megaApiFolderHttpServerIsRunningUseCase [MegaApiFolderHttpServerIsRunningUseCase] to check MegaFolderApi Http server is running
  * @property megaApiFolderHttpServerSetMaxBufferSizeUseCase [MegaApiFolderHttpServerSetMaxBufferSizeUseCase] to get Api buffer size
- * @property getNodeByHandle [GetNodeByHandle]
+ * @property httpServerStart [MegaApiHttpServerStartUseCase] to start MegaApi Server
+ * @property httpServerIsRunning [MegaApiHttpServerIsRunningUseCase] to check Mega Api Http server is running
+ * @property httpServerSetMaxBufferSize [MegaApiHttpServerSetMaxBufferSizeUseCase] to get Api buffer size
+ * @property getPublicNodeListByIds [GetPublicNodeListByIds]
  */
 class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
     private val getLocalFileForNode: GetLocalFileForNode,
@@ -49,7 +56,11 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
     private val megaApiFolderHttpServerStartUseCase: MegaApiFolderHttpServerStartUseCase,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
     private val megaApiFolderHttpServerSetMaxBufferSizeUseCase: MegaApiFolderHttpServerSetMaxBufferSizeUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
+    private val httpServerStart: MegaApiHttpServerStartUseCase,
+    private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
+    private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSizeUseCase,
+    private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
+    private val getPublicNodeListByIds: GetPublicNodeListByIds,
 ) {
 
     /**
@@ -65,6 +76,7 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
         activity: Activity,
         fileNode: FileNode,
         viewType: Int,
+        hasDbCredentials: Boolean,
         childrenNodeIds: List<Long> = listOf(),
     ): Intent? {
         return if (MimeTypeList.typeForName(fileNode.name).isPdf) {
@@ -101,10 +113,9 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
                 }
                 pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
-                startHttpServer(pdfIntent, activity)
-                val path = getLocalFolderLinkFromMegaApiFolderUseCase(fileNode.id.longValue)
-                    ?: throw UrlDownloadException()
-                pdfIntent.setDataAndType(Uri.parse(path), mimeType)
+                setStreamingIntentParams(
+                    activity, pdfIntent, hasDbCredentials, fileNode.id.longValue, mimeType
+                )
             }
             pdfIntent
 
@@ -162,11 +173,13 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
                 }
                 intentInternalIntentPair.first.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             } ?: run {
-                startHttpServer(intentInternalIntentPair.first, activity)
-                val path =
-                    getLocalFolderLinkFromMegaApiFolderUseCase(fileNode.id.longValue)
-                        ?: throw UrlDownloadException()
-                intentInternalIntentPair.first.setDataAndType(Uri.parse(path), mimeType)
+                setStreamingIntentParams(
+                    activity,
+                    intentInternalIntentPair.first,
+                    hasDbCredentials,
+                    fileNode.id.longValue,
+                    mimeType
+                )
             }
             if (opusFile) {
                 intentInternalIntentPair.first.setDataAndType(
@@ -185,14 +198,30 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
             )
 
         } else {
-            getNodeByHandle(fileNode.id.longValue)?.let { node ->
-                (activity as FolderLinkComposeActivity).downloadNodes(listOf(node))
-            }
+            val nodes = getPublicNodeListByIds(listOf(fileNode.id.longValue))
+            (activity as FolderLinkComposeActivity).downloadNodes(nodes)
             null
         }
     }
 
-    private suspend fun startHttpServer(intent: Intent, context: Context): Intent {
+    private suspend fun setStreamingIntentParams(
+        activity: Activity,
+        intent: Intent,
+        hasDbCredentials: Boolean,
+        handle: Long,
+        mimeType: String,
+    ) {
+        val path = if (hasDbCredentials) {
+            startMegaApiHttpServer(intent, activity)
+            getLocalFolderLinkFromMegaApiUseCase(handle) ?: throw UrlDownloadException()
+        } else {
+            startMegaApiFolderHttpServer(intent, activity)
+            getLocalFolderLinkFromMegaApiFolderUseCase(handle) ?: throw UrlDownloadException()
+        }
+        intent.setDataAndType(Uri.parse(path), mimeType)
+    }
+
+    private suspend fun startMegaApiFolderHttpServer(intent: Intent, context: Context): Intent {
         if (megaApiFolderHttpServerIsRunningUseCase() == 0) {
             megaApiFolderHttpServerStartUseCase()
             intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
@@ -202,6 +231,25 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
             .getMemoryInfo(memoryInfo)
 
         megaApiFolderHttpServerSetMaxBufferSizeUseCase(
+            if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
+                Constants.MAX_BUFFER_32MB
+            } else {
+                Constants.MAX_BUFFER_16MB
+            }
+        )
+        return intent
+    }
+
+    private suspend fun startMegaApiHttpServer(intent: Intent, context: Context): Intent {
+        if (httpServerIsRunning() == 0) {
+            httpServerStart()
+            intent.putExtra(Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+        }
+        val memoryInfo = ActivityManager.MemoryInfo()
+        (context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+            .getMemoryInfo(memoryInfo)
+
+        httpServerSetMaxBufferSize(
             if (memoryInfo.totalMem > Constants.BUFFER_COMP) {
                 Constants.MAX_BUFFER_32MB
             } else {

@@ -585,6 +585,7 @@ class FolderLinkViewModel @Inject constructor(
                             activity = activity,
                             fileNode = nodeUIItem.node,
                             viewType = Constants.FOLDER_LINK_ADAPTER,
+                            hasDbCredentials = state.value.hasDbCredentials,
                             childrenNodeIds = state.value.nodesList.map { it.id.longValue }
                         )
                     }.onSuccess { intent ->
