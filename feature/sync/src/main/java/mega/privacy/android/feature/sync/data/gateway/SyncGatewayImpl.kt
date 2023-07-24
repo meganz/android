@@ -26,6 +26,7 @@ internal class SyncGatewayImpl @Inject constructor(
 ) : SyncGateway {
 
     override suspend fun syncFolderPair(
+        name: String?,
         localPath: String,
         remoteFolderId: Long,
     ): Boolean =
@@ -42,7 +43,7 @@ internal class SyncGatewayImpl @Inject constructor(
 //            megaApi.syncFolder(
 //                MegaSync.SyncType.TYPE_TWOWAY,
 //                localPath,
-//                null,
+//                name,
 //                remoteFolderId,
 //                null,
 //                requestListener

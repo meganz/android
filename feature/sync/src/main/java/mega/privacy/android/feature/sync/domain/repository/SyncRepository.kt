@@ -12,7 +12,7 @@ interface SyncRepository {
     /**
      * Establishes a pair between local and remote directories and starts the syncing process
      */
-    suspend fun setupFolderPair(localPath: String, remoteFolderId: Long): Boolean
+    suspend fun setupFolderPair(name: String?, localPath: String, remoteFolderId: Long): Boolean
 
     /**
      * Returns all setup folder pairs.

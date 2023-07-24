@@ -56,6 +56,7 @@ internal class SyncNewFolderViewModel @Inject constructor(
                 viewModelScope.launch {
                     state.value.selectedMegaFolder?.let { remoteFolder ->
                         syncFolderPairUseCase(
+                            name = state.value.folderPairName,
                             localPath = state.value.selectedLocalFolder,
                             remotePath = remoteFolder,
                         )

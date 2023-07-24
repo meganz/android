@@ -18,6 +18,7 @@ internal interface SyncGateway {
      * successfully or not
      */
     suspend fun syncFolderPair(
+        name: String?,
         localPath: String,
         remoteFolderId: Long
     ): Boolean

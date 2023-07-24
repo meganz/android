@@ -25,6 +25,7 @@ import javax.inject.Inject
  * ViewModel for Sync feature
  */
 @HiltViewModel
+@Deprecated("This ViewModel was used in POC and will soon be deleted")
 class SyncViewModel @Inject constructor(
     private val getRemoteFoldersUseCase: GetRemoteFoldersUseCase,
     private val syncFolderPairUseCase: SyncFolderPairUseCase,
@@ -91,6 +92,7 @@ class SyncViewModel @Inject constructor(
                     viewModelScope.launch {
                         removeFolderPairsUseCase()
                         val isSyncFolderPairRequestSuccessful = syncFolderPairUseCase(
+                            "",
                             _state.value.selectedLocalFolder,
                             remoteFolder
                         )
