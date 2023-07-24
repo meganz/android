@@ -90,6 +90,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     private var isNotificationCreated = false
 
+    private var isForeground = true
+
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
@@ -242,7 +244,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 thumbnail = viewModelGateway.getPlayingThumbnail(),
                 smallIcon = R.drawable.ic_stat_notify,
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
-                    if (ongoing) {
+                    if (ongoing && isForeground) {
                         // Make sure the service will not get destroyed while playing media.
                         startForeground(notificationId, notification)
                     } else {
@@ -401,6 +403,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      * Service is moved to foreground
      */
     private fun onMoveToForeground() {
+        isForeground = true
         if (needPlayWhenGoForeground) {
             setPlayWhenReady(true)
             needPlayWhenGoForeground = false
@@ -411,6 +414,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
      * Service is moved to background
      */
     private fun onMoveToBackground() {
+        isForeground = false
         with(viewModelGateway) {
             if (!backgroundPlayEnabled() && playing()) {
                 setPlayWhenReady(false)
@@ -471,6 +475,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             Lifecycle.Event.ON_STOP -> onMoveToBackground()
             else -> return
         }
+        Timber.d("AudioPlayerService isForeground: $isForeground")
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
