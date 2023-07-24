@@ -6,16 +6,17 @@ package mega.privacy.android.feature.devicecenter.domain.repository
 interface DeviceCenterRepository {
 
     /**
-     * Sets a name to the current Device
-     *
-     * @param deviceName The Device Name
-     */
-    suspend fun setDeviceName(deviceName: String)
-
-    /**
      * Retrieves the Device ID of the current Device
      *
      * @return the Device ID
      */
     suspend fun getDeviceId(): String?
+
+    /**
+     * Renames a Device
+     *
+     * @param deviceId The Device ID identifying the Device to be renamed
+     * @param deviceName The new Device Name
+     */
+    suspend fun renameDevice(deviceId: String, deviceName: String)
 }

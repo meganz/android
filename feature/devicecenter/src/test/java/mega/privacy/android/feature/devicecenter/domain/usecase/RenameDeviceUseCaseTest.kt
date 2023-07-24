@@ -12,19 +12,19 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 /**
- * Test class for [SetDeviceNameUseCase]
+ * Test class for [RenameDeviceUseCase]
  */
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class SetDeviceNameUseCaseTest {
+internal class RenameDeviceUseCaseTest {
 
-    private lateinit var underTest: SetDeviceNameUseCase
+    private lateinit var underTest: RenameDeviceUseCase
 
     private val deviceCenterRepository = mock<DeviceCenterRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = SetDeviceNameUseCase(deviceCenterRepository)
+        underTest = RenameDeviceUseCase(deviceCenterRepository)
     }
 
     @BeforeEach
@@ -33,9 +33,17 @@ internal class SetDeviceNameUseCaseTest {
     }
 
     @Test
-    fun `test that set device name is invoked`() = runTest {
-        val deviceName = "Test Device Name"
-        underTest(deviceName)
-        verify(deviceCenterRepository).setDeviceName(deviceName)
+    fun `test that rename device is invoked`() = runTest {
+        val deviceId = "123-456"
+        val deviceName = "New Device Name"
+
+        underTest.invoke(
+            deviceId = deviceId,
+            deviceName = deviceName,
+        )
+        verify(deviceCenterRepository).renameDevice(
+            deviceId = deviceId,
+            deviceName = deviceName,
+        )
     }
 }
