@@ -49,4 +49,46 @@ interface PasscodeStoreGateway {
      * @return flow of latest locked state
      */
     fun monitorLockState(): Flow<Boolean?>
+
+    /**
+     * Set passcode enabled
+     *
+     * @param enabled
+     */
+    suspend fun setPasscodeEnabledState(enabled: Boolean)
+
+    /**
+     * Monitor passcode enabled state
+     *
+     * @return
+     */
+    fun monitorPasscodeEnabledState(): Flow<Boolean?>
+
+    /**
+     * Set passcode timeout
+     *
+     * @param timeOutMilliseconds
+     */
+    suspend fun setPasscodeTimeout(timeOutMilliseconds: Long)
+
+    /**
+     * Monitor passcode time out
+     *
+     * @return passcode timeout
+     */
+    fun monitorPasscodeTimeOut(): Flow<Long?>
+
+    /**
+     * Set last background time
+     *
+     * @param backgroundUTC
+     */
+    suspend fun setLastBackgroundTime(backgroundUTC: Long?)
+
+    /**
+     * Monitor last background time
+     *
+     * @return last background time
+     */
+    fun monitorLastBackgroundTime(): Flow<Long?>
 }

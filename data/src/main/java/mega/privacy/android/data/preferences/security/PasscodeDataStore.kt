@@ -29,6 +29,9 @@ internal class PasscodeDataStore @Inject constructor(
     private val failedAttemptsKey = stringPreferencesKey("failedAttemptsKey")
     private val passcodeKey = stringPreferencesKey("passcode")
     private val lockedStateKey = stringPreferencesKey("lockedState")
+    private val passcodeEnabledKey = stringPreferencesKey("passcodeEnabled")
+    private val passcodeTimeOutKey = stringPreferencesKey("passcodeTimeOutKey")
+    private val passcodeLastBackgroundKey = stringPreferencesKey("passcodeLastBackgroundKey")
 
     override fun monitorFailedAttempts() =
         dataStore.monitor(failedAttemptsKey)
@@ -42,7 +45,7 @@ internal class PasscodeDataStore @Inject constructor(
     }
 
     override suspend fun setPasscode(passcode: String?) {
-        val encryptedValue = encryptData(passcode.toString())
+        val encryptedValue = encryptData(passcode)
         dataStore.edit {
             if (encryptedValue == null) {
                 it.remove(passcodeKey)
@@ -66,4 +69,40 @@ internal class PasscodeDataStore @Inject constructor(
     override fun monitorLockState() =
         dataStore.monitor(lockedStateKey)
             .map { decryptData(it)?.toBooleanStrictOrNull() }
+
+    override suspend fun setPasscodeEnabledState(enabled: Boolean) {
+        val encryptedValue = encryptData(enabled.toString()) ?: return
+        dataStore.edit {
+            it[passcodeEnabledKey] = encryptedValue
+        }
+    }
+
+    override fun monitorPasscodeEnabledState() =
+        dataStore.monitor(passcodeEnabledKey)
+            .map { decryptData(it)?.toBooleanStrictOrNull() }
+
+    override suspend fun setPasscodeTimeout(timeOutMilliseconds: Long) {
+        val encryptedValue = encryptData(timeOutMilliseconds.toString()) ?: return
+        dataStore.edit {
+            it[passcodeTimeOutKey] = encryptedValue
+        }
+    }
+
+    override fun monitorPasscodeTimeOut() = dataStore.monitor(passcodeTimeOutKey)
+        .map { decryptData(it)?.toLongOrNull() }
+
+    override suspend fun setLastBackgroundTime(backgroundUTC: Long?) {
+        val encryptedValue = encryptData(backgroundUTC?.toString())
+        dataStore.edit {
+            if (encryptedValue == null) {
+                it.remove(passcodeLastBackgroundKey)
+            } else {
+                it[passcodeLastBackgroundKey] = encryptedValue
+            }
+        }
+    }
+
+    override fun monitorLastBackgroundTime() =
+        dataStore.monitor(passcodeLastBackgroundKey)
+            .map { decryptData(it)?.toLongOrNull() }
 }

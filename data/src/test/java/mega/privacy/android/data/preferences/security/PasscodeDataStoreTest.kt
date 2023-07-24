@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -48,6 +49,7 @@ internal class PasscodeDataStoreTest {
 
     @BeforeEach
     internal fun setUp() {
+        Mockito.clearInvocations(encryptData, decryptData)
         underTest = PasscodeDataStore(
             dataStore = dataStore,
             encryptData = encryptData,
@@ -113,5 +115,76 @@ internal class PasscodeDataStoreTest {
         underTest.monitorLockState().test {
             assertThat(awaitItem()).isEqualTo(expected)
         }
+    }
+
+    @Test
+    internal fun `test that passcode enabled state is encrypted`() = runTest {
+        val input = true
+
+        underTest.setPasscodeEnabledState(input)
+
+        verifyBlocking(encryptData) { invoke(input.toString()) }
+    }
+
+    @Test
+    internal fun `test that passcode enabled state is decrypted`() = runTest {
+        val expected = false
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+
+        underTest.monitorPasscodeEnabledState().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that passcode timeout is encrypted`() = runTest {
+        val input = 12345L
+
+        underTest.setPasscodeTimeout(input)
+
+        verifyBlocking(encryptData) { invoke(input.toString()) }
+    }
+
+    @Test
+    internal fun `test that passcode time out is decrypted`() = runTest {
+        val expected = 12345L
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+
+        underTest.monitorPasscodeTimeOut().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that last background time is encrypted`() = runTest {
+        val input = 6543L
+
+        underTest.setLastBackgroundTime(input)
+
+        verifyBlocking(encryptData) { invoke(input.toString()) }
+    }
+
+    @Test
+    internal fun `test that last background time is decrypted`() = runTest {
+        val expected = 6543L
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+
+        underTest.monitorLastBackgroundTime().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that null background time is encrypted as null`() = runTest {
+        underTest.setLastBackgroundTime(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
+    }
+
+    @Test
+    internal fun `test that null passcode is encrypted as null`() = runTest {
+        underTest.setPasscode(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
     }
 }
