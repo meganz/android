@@ -34,7 +34,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.controls.images.ThumbnailView
-import mega.privacy.android.core.ui.controls.textfields.MiddleEllipsisText
+import mega.privacy.android.core.ui.controls.text.MiddleEllipsisText
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
@@ -167,7 +167,6 @@ fun NodeListViewItem(
                             text = name,
                             style = MaterialTheme.typography.subtitle1,
                             color = if (isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
-                            maxLines = 1
                         )
 
                         if (isFavourite) {
