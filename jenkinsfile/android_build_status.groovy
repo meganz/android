@@ -233,6 +233,7 @@ pipeline {
             }
             parallel {
                 stage('Build APK (GMS+QA)') {
+                    agent { label NODE_LABELS }
                     when {
                         expression { (!shouldSkipBuild()) }
                     }
@@ -263,6 +264,9 @@ pipeline {
                             script {
                                 BUILD_STEP = "Build APK (GMS+QA)"
                             }
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: false)
                         }
                     }
                 } //stage('Build APK (GMS+QA)')
@@ -354,6 +358,9 @@ pipeline {
                                 BUILD_STEP = "Unit Test and Code Coverage"
                             }
                         }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: false)
+                        }
                     }
                 } //stage('Unit Test and Code Coverage')
 
@@ -388,6 +395,9 @@ pipeline {
                             script {
                                 BUILD_STEP = "Lint Check"
                             }
+                        }
+                        cleanup {
+                            cleanWs(cleanWhenFailure: false)
                         }
                     }
                 }  //stage('Lint Check')
