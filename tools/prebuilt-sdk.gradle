@@ -55,6 +55,7 @@ println("SDK_BUILDER_NAME = $SDK_BUILDER_NAME")
 
 project('sdk') {
     artifactoryPublish.dependsOn('build')
+    artifactoryPublish.dependsOn('releaseSourcesJar')
     publishing {
         publications {
             aar(MavenPublication) {
@@ -63,6 +64,10 @@ project('sdk') {
                 version = sdkVersion() + "-" + sdkLibType()
                 // Tell maven to prepare the generated "*.aar" file for publishing
                 artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+                artifact("$buildDir/libs/${project.getName()}-sources.jar") {
+                    classifier = "sources"
+                    extension = "jar"
+                }
             }
         }
     }
