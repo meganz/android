@@ -172,13 +172,6 @@ class VideoPlayerFragment : Fragment() {
                     playerViewHolder?.displayMetadata(metadata)
                 }
 
-                viewLifecycleOwner.collectFlow(playerSourcesState) { mediaPlaySources ->
-                    if (mediaPlaySources.mediaItems.isNotEmpty()) {
-                        currentMediaPlaySources = mediaPlaySources
-                        playSource(mediaPlaySources)
-                    }
-                }
-
                 viewLifecycleOwner.collectFlow(screenOrientationState) { orientation ->
                     playerViewHolder?.setTrackNameVisible(orientation != ORIENTATION_LANDSCAPE)
                     if (toolbarVisible) {

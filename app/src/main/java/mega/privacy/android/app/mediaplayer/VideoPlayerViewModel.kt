@@ -243,8 +243,9 @@ class VideoPlayerViewModel @Inject constructor(
     private val _screenLockState = MutableStateFlow(false)
     internal val screenLockState: StateFlow<Boolean> = _screenLockState
 
-    private val _playerSourcesState = MutableStateFlow(MediaPlaySources(emptyList(), 0, null))
-    internal val playerSourcesState: StateFlow<MediaPlaySources> = this._playerSourcesState
+    private val _playerSourcesState =
+        MutableStateFlow(MediaPlaySources(emptyList(), INVALID_VALUE, null))
+    internal val playerSourcesState: StateFlow<MediaPlaySources> = _playerSourcesState
 
     private val _mediaItemToRemoveState = MutableStateFlow<Int?>(null)
     internal val mediaItemToRemoveState: StateFlow<Int?> = _mediaItemToRemoveState
@@ -649,13 +650,15 @@ class VideoPlayerViewModel @Inject constructor(
             .setUri(firstPlayUri)
             .setMediaId(firstPlayHandle.toString())
             .build()
-        this._playerSourcesState.value = MediaPlaySources(
-            listOf(mediaItem),
-            // we will emit a single item list at first, and the current playing item
-            // will always be at index 0 in that single item list.
-            if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
-            if (displayNodeNameFirst) firstPlayNodeName else null
-        )
+        _playerSourcesState.update {
+            MediaPlaySources(
+                listOf(mediaItem),
+                // we will emit a single item list at first, and the current playing item
+                // will always be at index 0 in that single item list.
+                if (samePlaylist && firstPlayHandle == playingHandle) 0 else INVALID_VALUE,
+                if (displayNodeNameFirst) firstPlayNodeName else null
+            )
+        }
 
         if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_PLAYLIST, true)) {
             if (type != OFFLINE_ADAPTER && type != ZIP_ADAPTER) {

@@ -33,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import androidx.core.view.updatePadding
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
@@ -58,7 +59,6 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_RESUME_PLAYBACK_POSITION
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
@@ -144,8 +144,6 @@ class VideoPlayerActivity : MediaPlayerActivity() {
     private var mediaPlayerIntent: Intent? = null
     private var isPlayingAfterReady = false
     private var currentPlayingHandle: Long? = null
-
-    private var currentMediaPlaySources: MediaPlaySources? = null
 
     private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -676,9 +674,11 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 updateToolbar(isLock)
             }
 
-            collectFlow(playerSourcesState) { mediaPlaySources ->
+            collectFlow(
+                targetFlow = playerSourcesState,
+                minActiveState = Lifecycle.State.CREATED
+            ) { mediaPlaySources ->
                 if (mediaPlaySources.mediaItems.isNotEmpty()) {
-                    currentMediaPlaySources = mediaPlaySources
                     playSource(mediaPlaySources)
                 }
             }
