@@ -4640,7 +4640,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (getPhotosFragment() != null) {
                             if (photosFragment?.isEnableCameraUploadsViewShown() == true) {
                                 photosFragment?.onBackPressed()
-                                return true
                             }
                             setToolbarTitle()
                             invalidateOptionsMenu()

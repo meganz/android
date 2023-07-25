@@ -251,7 +251,6 @@ class PhotosFragment : Fragment() {
                     if (
                         timelineViewModel.state.value.enableCameraUploadPageShowing
                         && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-                        || arguments?.getBoolean(firstLoginKey) == true
                         || !timelineViewModel.state.value.loadPhotosDone
                     ) {
                         photosViewModel.setMenuShowing(false)
