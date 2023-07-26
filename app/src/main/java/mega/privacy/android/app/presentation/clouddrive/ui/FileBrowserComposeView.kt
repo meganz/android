@@ -19,7 +19,6 @@ import mega.privacy.android.app.presentation.view.OverQuotaView
 import mega.privacy.android.core.ui.controls.MegaEmptyView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import java.util.concurrent.TimeUnit
 
 /**
  * Composable view for FileBrowser
@@ -57,7 +56,7 @@ fun FileBrowserComposeView(
     if (uiState.nodesList.isNotEmpty()) {
         Column {
             OverQuotaView(
-                bannerTime = TimeUnit.MINUTES.toMillis(1),
+                bannerTime = uiState.bannerTime,
                 shouldShowBannerVisibility = true,
                 onUpgradeClicked = onUpgradeClicked,
                 onDismissClicked = onDismissClicked

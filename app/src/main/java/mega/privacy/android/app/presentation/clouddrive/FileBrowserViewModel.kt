@@ -393,7 +393,7 @@ class FileBrowserViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     shouldShowBannerVisibility = transfersManagement.isTransferOverQuotaBannerShown,
-                    bannerTimer = overQuotaBannerTimeDelay
+                    bannerTime = overQuotaBannerTimeDelay
                 )
             }
         }
