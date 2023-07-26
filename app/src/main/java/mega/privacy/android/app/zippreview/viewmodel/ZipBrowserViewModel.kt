@@ -1,5 +1,6 @@
 package mega.privacy.android.app.zippreview.viewmodel
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,8 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.core.R as CoreUiR
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.zippreview.domain.FileType

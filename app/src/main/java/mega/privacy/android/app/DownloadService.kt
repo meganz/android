@@ -42,7 +42,7 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.createInitialServiceNotification
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.notifications.TransferOverQuotaNotification

@@ -22,7 +22,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
-import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.wrapper.StringWrapper

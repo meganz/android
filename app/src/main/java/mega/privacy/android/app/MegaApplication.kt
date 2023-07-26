@@ -40,8 +40,8 @@ import mega.privacy.android.app.meeting.CallSoundType
 import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.MeetingListener
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
-import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler

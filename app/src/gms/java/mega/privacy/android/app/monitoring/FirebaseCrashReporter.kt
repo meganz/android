@@ -1,9 +1,12 @@
-package mega.privacy.android.app.service.reporter
+package mega.privacy.android.app.monitoring
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import mega.privacy.android.app.BuildConfig
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 
+/**
+ * Report logs to FirebaseCrashlytics
+ */
 class FirebaseCrashReporter(
     private val crashlytics: FirebaseCrashlytics
 ) : CrashReporter {

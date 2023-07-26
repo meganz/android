@@ -34,7 +34,7 @@ import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.databinding.ActivityZipBrowserBinding
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER

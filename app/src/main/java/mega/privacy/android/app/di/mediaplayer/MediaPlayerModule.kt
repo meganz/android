@@ -7,10 +7,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.mediaplayer.facade.MediaPlayerFacade
-import mega.privacy.android.app.mediaplayer.usecase.DefaultStopAudioService
-import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
+import mega.privacy.android.app.mediaplayer.usecase.DefaultStopAudioService
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.StopAudioService
 import javax.inject.Singleton
 

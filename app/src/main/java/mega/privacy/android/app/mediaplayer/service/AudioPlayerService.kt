@@ -39,7 +39,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT

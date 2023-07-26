@@ -44,7 +44,7 @@ import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants

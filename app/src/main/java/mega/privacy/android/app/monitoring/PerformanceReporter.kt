@@ -1,4 +1,4 @@
-package mega.privacy.android.app.middlelayer.reporter
+package mega.privacy.android.app.monitoring
 
 /**
  * Performance reporter class to collect performance data such as Traces.

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.listeners
 
+import mega.privacy.android.core.R as CoreUiR
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -19,7 +20,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.EventConstants.EVENT_MEETING_AVATAR_CHANGE
@@ -29,8 +29,8 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieTy
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
-import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.monitoring.CrashReporter
+import mega.privacy.android.app.monitoring.PerformanceReporter
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.service.iar.RatingHandlerImpl

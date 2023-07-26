@@ -1,7 +1,7 @@
-package mega.privacy.android.app.middlelayer.reporter
+package mega.privacy.android.app.monitoring
 
 /**
- * When uncaught exception occurs, upload related info to platform tools. For example, Firebase Crashlytics. 
+ * When uncaught exception occurs, upload related info to platform tools. For example, Firebase Crashlytics.
  */
 interface CrashReporter {
 

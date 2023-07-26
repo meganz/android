@@ -36,7 +36,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.PlayerNotificationCreatedParams
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.MetadataExtractor
-import mega.privacy.android.app.middlelayer.reporter.CrashReporter
+import mega.privacy.android.app.monitoring.CrashReporter
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import timber.log.Timber

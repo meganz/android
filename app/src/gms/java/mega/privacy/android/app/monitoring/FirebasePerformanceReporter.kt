@@ -1,10 +1,13 @@
-package mega.privacy.android.app.service.reporter
+package mega.privacy.android.app.monitoring
 
 import com.google.firebase.perf.FirebasePerformance
 import com.google.firebase.perf.ktx.trace
 import com.google.firebase.perf.metrics.Trace
-import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.monitoring.PerformanceReporter
 
+/**
+ * Report performance to FirebasePerformance
+ */
 class FirebasePerformanceReporter(
     private val firebasePerformance: FirebasePerformance
 ) : PerformanceReporter {
