@@ -76,7 +76,9 @@ internal class DefaultNetworkRepository @Inject constructor(
             override fun onLost(network: Network) {
                 super.onLost(network)
                 Timber.d("onLost")
-                trySend(ConnectivityState.Disconnected)
+                // we still check current connectivity state to ensure getting latest value
+                // I have no idea it's device specific issue
+                trySend(getCurrentConnectivityState())
             }
 
             override fun onAvailable(network: Network) {
