@@ -36,7 +36,9 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants
@@ -110,6 +112,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCa
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -211,6 +214,8 @@ class CameraUploadsWorker @AssistedInject constructor(
     private val generatePreviewUseCase: GeneratePreviewUseCase,
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase,
     private val deletePreviewUseCase: DeletePreviewUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val performanceReporter: PerformanceReporter,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -230,6 +235,12 @@ class CameraUploadsWorker @AssistedInject constructor(
         private const val LOW_BATTERY_LEVEL = 20
         private const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 1000
         private const val CONCURRENT_UPLOADS_LIMIT = 16
+
+        private const val PerfUploadFilesTrace = "camera_uploads_upload_files"
+        private const val PerfScanFilesTrace = "camera_uploads_scan_files"
+        private const val PerfCompressVideosTrace = "camera_uploads_compress_videos"
+        private const val PerfUploadCompressedVideosTrace =
+            "camera_uploads_upload_compressed_videos"
     }
 
     /**
@@ -334,6 +345,11 @@ class CameraUploadsWorker @AssistedInject constructor(
      */
     private val semaphore = Semaphore(CONCURRENT_UPLOADS_LIMIT)
 
+    /**
+     * Flag to check if performance benchmark is enabled
+     */
+    private var performanceEnabled: Boolean = false
+
     override suspend fun doWork() = coroutineScope {
         try {
             Timber.d("Start CU Worker")
@@ -343,12 +359,18 @@ class CameraUploadsWorker @AssistedInject constructor(
             setForegroundAsync(getForegroundInfo())
 
             withContext(ioDispatcher) {
+                performanceEnabled =
+                    getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPerformance)
                 initService()
                 if (hasMediaPermission() && isLoginSuccessful() && canRunCameraUploads()) {
                     Timber.d("Calling startWorker() successful. Starting Camera Uploads")
                     cancelNotifications()
-                    checkUploadNodes()
-                    startUploadAndCompression()
+
+                    tracePerformance(PerfScanFilesTrace) { checkUploadNodes() }
+                    tracePerformance(PerfUploadFilesTrace) { upload() }
+                    tracePerformance(PerfCompressVideosTrace) { compressVideos() }
+                    tracePerformance(PerfUploadCompressedVideosTrace) { uploadCompressedVideos() }
+
                     onQueueComplete()
                     endService()
                     Result.success()
@@ -361,6 +383,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         } catch (throwable: Throwable) {
             Timber.e(throwable, "Worker cancelled")
             endService(aborted = true)
+            performanceReporter.clearTraces()
             Result.failure()
         }
     }
@@ -696,7 +719,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun startUploadAndCompression() {
+    private suspend fun upload() {
         val finalList = getPendingSyncRecords().also {
             Timber.d("Total File to upload ${it.size}")
         }
@@ -704,13 +727,19 @@ class CameraUploadsWorker @AssistedInject constructor(
         if (finalList.isNotEmpty()) {
             startParallelUpload(finalList, isCompressedVideo = false)
         }
+    }
+
+    private suspend fun compressVideos() {
         if (compressedVideoPending()) {
             startVideoCompression()
-            val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
-            if (compressedList.isNotEmpty()) {
-                Timber.d("Start to upload ${compressedList.size} compressed videos.")
-                startParallelUpload(compressedList, isCompressedVideo = true)
-            }
+        }
+    }
+
+    private suspend fun uploadCompressedVideos() {
+        val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
+        if (compressedList.isNotEmpty()) {
+            Timber.d("Start to upload ${compressedList.size} compressed videos.")
+            startParallelUpload(compressedList, isCompressedVideo = true)
         }
     }
 
@@ -1905,5 +1934,22 @@ class CameraUploadsWorker @AssistedInject constructor(
             heartbeatStatus = heartbeatStatus,
             cameraUploadsState = cameraUploadState,
         )
+    }
+
+    /**
+     * Trace performance if feature flag is enabled
+     *
+     * @param traceName
+     * @param block
+     */
+    private suspend fun <T> tracePerformance(traceName: String, block: suspend () -> T) {
+        if (performanceEnabled) {
+            with(performanceReporter) {
+                setEnabled(true)
+                trace(traceName) {
+                    block()
+                }
+            }
+        } else block()
     }
 }

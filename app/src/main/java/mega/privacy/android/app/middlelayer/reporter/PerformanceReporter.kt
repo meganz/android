@@ -6,6 +6,13 @@ package mega.privacy.android.app.middlelayer.reporter
 interface PerformanceReporter {
 
     /**
+     * Measures the time it takes to run the [block]
+     *
+     * @param traceName     Trace name to be uniquely identified
+     */
+    suspend fun <T> trace(traceName: String, block: suspend () -> T)
+
+    /**
      * This will start a trace with the given name.
      * A trace is a report of performance data captured between two points in time.
      *

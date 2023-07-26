@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.cameraupload.CameraUploadsWorker
+import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.wrapper.StringWrapper
@@ -75,6 +76,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCa
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupHeartbeatStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.UpdateCameraUploadsBackupStatesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
@@ -192,6 +194,8 @@ class CameraUploadsWorkerTest {
     private val generateThumbnailUseCase: GenerateThumbnailUseCase = mock()
     private val deletePreviewUseCase: DeletePreviewUseCase = mock()
     private val deleteThumbnailUseCase: DeleteThumbnailUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val performanceReporter: PerformanceReporter = mock()
 
     @Before
     fun setUp() {
@@ -294,7 +298,9 @@ class CameraUploadsWorkerTest {
             generatePreviewUseCase = generatePreviewUseCase,
             generateThumbnailUseCase = generateThumbnailUseCase,
             deletePreviewUseCase = deletePreviewUseCase,
-            deleteThumbnailUseCase = deleteThumbnailUseCase
+            deleteThumbnailUseCase = deleteThumbnailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            performanceReporter = performanceReporter,
         )
     }
 

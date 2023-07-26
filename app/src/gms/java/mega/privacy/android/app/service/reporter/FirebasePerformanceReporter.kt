@@ -1,6 +1,7 @@
 package mega.privacy.android.app.service.reporter
 
 import com.google.firebase.perf.FirebasePerformance
+import com.google.firebase.perf.ktx.trace
 import com.google.firebase.perf.metrics.Trace
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
 
@@ -9,6 +10,13 @@ class FirebasePerformanceReporter(
 ) : PerformanceReporter {
 
     private val traces = mutableMapOf<String, Trace>()
+
+    override suspend fun <T> trace(traceName: String, block: suspend () -> T) {
+        stopTrace(traceName)
+        traces[traceName] = firebasePerformance.newTrace(traceName).apply {
+            trace { block() }
+        }
+    }
 
     override fun startTrace(traceName: String) {
         stopTrace(traceName)
