@@ -3,15 +3,24 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileLinkRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -20,6 +29,8 @@ import javax.inject.Inject
 internal class FileLinkRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val nodeMapper: NodeMapper,
+    private val cacheGateway: CacheGateway,
+    private val megaLocalStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FileLinkRepository {
 
@@ -56,8 +67,56 @@ internal class FileLinkRepositoryImpl @Inject constructor(
             }
         }
 
-        nodeMapper(result.publicMegaNode)
+        val publicNode = result.publicMegaNode
+        if (publicNode.handle != MegaApiJava.INVALID_HANDLE) {
+            megaLocalStorageGateway.setLastPublicHandle(publicNode.handle)
+            megaLocalStorageGateway.setLastPublicHandleTimeStamp()
+        }
+
+        val previewPath = getPreviewPath(publicNode)
+        val node = nodeMapper(publicNode)
+        (node as? DefaultFileNode)?.copy(previewPath = previewPath) ?: node
     }
+
+    private suspend fun getPreviewPath(node: MegaNode) = withContext(ioDispatcher) {
+        if (node.hasPreview()) {
+            val previewFile =
+                runCatching { getPreviewFromLocal(node) ?: getPreviewFromServer(node) }.getOrNull()
+            previewFile?.takeIf { it.exists() }?.absolutePath
+        } else {
+            null
+        }
+    }
+
+    private suspend fun getPreviewFromLocal(node: MegaNode): File? =
+        withContext(ioDispatcher) {
+            getPreviewFile(node).takeIf { it?.exists() ?: false }
+        }
+
+    private suspend fun getPreviewFromServer(node: MegaNode): File? =
+        withContext(ioDispatcher) {
+            getPreviewFile(node)?.let { preview ->
+                suspendCancellableCoroutine { continuation ->
+                    megaApiGateway.getPreview(node, preview.absolutePath,
+                        OptionalMegaRequestListenerInterface(
+                            onRequestFinish = { _, error ->
+                                if (error.errorCode == MegaError.API_OK) {
+                                    continuation.resumeWith(Result.success(preview))
+                                } else {
+                                    continuation.failWithError(error, "getPreviewFromServer")
+                                }
+                            }
+                        )
+                    )
+                }
+            }
+        }
+
+    private suspend fun getPreviewFile(node: MegaNode): File? =
+        cacheGateway.getCacheFile(
+            CacheFolderConstant.PREVIEW_FOLDER,
+            "${node.base64Handle}${FileConstant.JPG_EXTENSION}"
+        )
 
     override suspend fun encryptLinkWithPassword(link: String, password: String): String =
         withContext(ioDispatcher) {
