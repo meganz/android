@@ -5047,5 +5047,5 @@
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Termin absagen</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] hat das Meeting aktualisiert[/B]</string>
 </resources>

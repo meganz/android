@@ -1832,7 +1832,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชี ระบบจะขอให้คุณกรอกรหัส 6 หลักจากแอปตัวรับรองความถูกต้องที่ให้มา</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">Please save your <b>recovery key</b> in a safe location, to avoid issues in case you lose access to your app, or if you want to disable two-factor authentication.</string>
+    <string name="recommendation_2fa_enabled">กรุณาบันทึก<b>คีย์การกู้คืน</b>ของคุณไว้ในที่ปลอดภัย เพื่อหลีกเลี่ยงปัญหาในกรณีที่คุณไม่สามารถเข้าถึงแอปของคุณหรือคุณต้องการปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัย</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">โค้ดไม่ถูกต้อง</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -3884,7 +3884,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">เล่นวิดีโอต่อจากก่อนหน้านี้หรือไม่</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">“%1$s” will resume from %2$s.</string>
+    <string name="video_playback_position_dialog_message">ไฟล์ “%1$s” จะเริ่มเล่นต่อตั้งแต่ %2$s เป็นต้นไป</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">เล่นต่อ</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4541,8 +4541,7 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">รายเดือน</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Some months don’t have %1$d day. For these months, the occurrence will be scheduled for the last day of the month.</item>
-        <item quantity="other">Some months don’t have %1$d days. For these months, the occurrence will be scheduled for the last day of the month.</item>
+        <item quantity="other">บางเดือนจะไม่มี %1$d วัน แต่สำหรับเดือนนี้ เหตุการณ์จะจัดขึ้นในวันสุดท้ายของเดือนแทน</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">ไม่สามารถเปิดโฟลเดอร์ได้</string>
@@ -4553,9 +4552,9 @@
     <!-- Description of the dialog, shown for disputed or taken down file. The dialog will be shown, when user will try to open file, which was taken down  -->
     <string name="dialog_taken_down_file_description"></string>
     <!-- Text of the button to show the dialog to update to pro -->
-    <string name="general_pro_only">Pro only</string>
+    <string name="general_pro_only">Pro เท่านั้น</string>
     <!-- Title of the link access section where information is displayed to the user about link access-->
-    <string name="cloud_drive_title_link_access">Link access</string>
+    <string name="cloud_drive_title_link_access">สิทธิ์การเข้าถึงลิงก์</string>
     <!-- SubTitle of the link access section where information is displayed to the user about link access-->
     <string name="cloud_drive_subtitle_link_access"></string>
     <!-- Text of setting expiry date to link-->
@@ -4565,15 +4564,15 @@
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">อัปเดตลิงก์แล้ว คัดลอกใหม่อีกครั้ง</string>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
-    <string name="general_link_created_and_copied">Link created and copied to your clipboard</string>
+    <string name="general_link_created_and_copied">สร้างและคัดลอกลิงก์ไปที่คลิปบอร์ดของคุณแล้ว</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Album link</string>
+    <string name="album_import_link">ลิงก์อัลบั้ม</string>
     <!-- Album import error access title -->
-    <string name="album_import_error_access_title">Cannot access album</string>
+    <string name="album_import_error_access_title">เข้าถึงอัลบั้มนี้ไม่ได้</string>
     <!-- Album import error access description -->
-    <string name="album_import_error_access_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <string name="album_import_error_access_description">ลิงก์อัลบั้มนี้อาจถูกลบหรืออัลบั้มถูกลบไปแล้ว ติดต่อบุคคลที่แชร์ลิงก์นี้กับคุณ</string>
     <!-- Album import error access confirmation -->
-    <string name="album_import_error_access_confirmation">Ok, got it</string>
+    <string name="album_import_error_access_confirmation">โอเค เข้าใจแล้ว</string>
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">เสียง</string>
     <!-- Title shown on Upgrade account screen, where user can choose plan to buy. -->
@@ -4585,31 +4584,31 @@
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_label_save_up_to">ถ้าเลือกเก็บเงินทุกปี จะประหยัดได้สูงสุดถึง 16%</string>
     <!-- Description about how much storage user will get for specific plan. The placeholder %1$s will be replaced with storage size (e.g. 20GB or 4TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_storage">[B]Storage:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_storage">[B]พื้นที่เก็บข้อมูล:[/B] [A]%1$s[/A]</string>
     <!-- Description about how much transfer user will get for specific plan. The placeholder %1$s will be replaced with transfer size (e.g. 400GB or 8TB). The TB or GB will be shown correctly for each language, as the strings with keys 'label_file_size_giga_byte' and 'label_file_size_tera_byte' will be used. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_transfer">[B]Transfer:[/B] [A]%1$s[/A]</string>
+    <string name="account_upgrade_account_pro_plan_info_transfer">[B]ถ่ายโอนข้อมูล:[/B] [A]%1$s[/A]</string>
     <!-- Price the user will pay monthly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/month[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_monthly_price">[A]%1$s[/A]\n[B]%2$s/เดือน[/B]</string>
     <!-- Price the user will pay yearly for specific plan. The placeholder %1$s will be replaced with local price (e.g. $8.99). The placeholder %2$s will be replaced with local currency code (e.g. 'NZD' or 'EUR'). The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/year[/B]</string>
+    <string name="account_upgrade_account_pro_plan_info_yearly_price">[A]%1$s[/A]\n[B]%2$s/ปี[/B]</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">แนะนำ</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">แผนปัจจุบัน</string>
     <!-- Title of description of features, which are available for users, if they buy plan. -->
-    <string name="account_upgrade_account_description_title_features">Features of Pro plans</string>
+    <string name="account_upgrade_account_description_title_features">ฟีเจอร์สำหรับแผน Pro</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create a link for file and add password to the link. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;Password-protected links</string>
+    <string name="account_upgrade_account_description_feature_password">&#8226;&#160;ป้องกันลิงก์ด้วยการกำหนดรหัสผ่านได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to create link with expiration date. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;Links with expiry dates</string>
+    <string name="account_upgrade_account_description_feature_link">&#8226;&#160;ตั้งค่าวันหมดอายุลิงก์ได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to share his transfer quota with other users. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;Transfer quota sharing</string>
+    <string name="account_upgrade_account_description_feature_transfer">&#8226;&#160;แชร์โควต้าการถ่ายโอนได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to back up automatically his files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;Automatic backups</string>
+    <string name="account_upgrade_account_description_feature_backup">&#8226;&#160;ตั้งค่าการสำรองข้อมูลอัตโนมัติได้</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to recover accidentally changed or deleted files. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;Rewind up to 90 days on Pro&#160;Lite and up to 365 days on Pro&#160;I, II, and III (coming soon)</string>
+    <string name="account_upgrade_account_description_feature_rewind">&#8226;&#160;ใช้ฟีเจอร์ย้อนกลับไฟล์ได้ โดย Pro&#160;Lite ย้อนกลับได้ถึง 90 วัน ส่วน Pro&#160;I, II และ III ย้อนกลับได้ถึง 365 วัน (จะมาในเร็ว ๆ นี้)</string>
     <!-- Description of feature, which will be available for user, if they buy plan. This feature means user will be able to schedule when the rubbish bin will be cleared. Keep the bullet point, as this string is part of the bullet point list. -->
-    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;Schedule rubbish bin clearing between 7 days and 10 years</string>
+    <string name="account_upgrade_account_description_feature_rubbish_bin">&#8226;&#160;สร้างกำหนดการล้างถังขยะได้ตั้งแต่ 7 วันถึง 10 ปี</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_lite">ซื้อ Pro Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
@@ -4621,24 +4620,23 @@
     <!-- Link to Mega Terms of Service page - https://mega.io/terms -->
     <string name="account_upgrade_account_terms_of_service_link">เงื่อนไขการให้บริการ</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
-    <string name="cloud_drive_subtitle_links_access_all_user">Anyone with this link can view and download your data</string>
+    <string name="cloud_drive_subtitle_links_access_all_user">ใครก็ตามที่มีลิงก์นี้ สามารถดูและดาวน์โหลดข้อมูลของคุณได้</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">เฉพาะผู้ที่มีรหัสผ่านเท่านั้นที่สามารถเปิดลิงก์ได้</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
-        <item quantity="one">Apply to the duplicate</item>
-        <item quantity="other">Apply to all %1$d duplicates</item>
+        <item quantity="other">นำไปใช้กับรายการที่ซ้ำกันทั้งหมด %1$d รายการ</item>
     </plurals>
     <!-- Title of the meeting info screen -->
     <string name="meetings_info_title">ข้อมูล</string>
     <!-- Option of the info screen to enable/disable notifications for a meeting -->
     <string name="meetings_info_notifications_option">แจ้งเตือนการประชุม</string>
     <!-- Option of the info screen to manage meeting history -->
-    <string name="meetings_info_manage_history_option">Manage meeting history</string>
+    <string name="meetings_info_manage_history_option">จัดการประวัติการประชุม</string>
     <!-- Option of the info screen to leave the meeting -->
     <string name="meetings_info_leave_option">ออกจากการประชุม</string>
     <!-- Title of the manage history screen -->
-    <string name="meetings_manage_history_view_title">Manage meeting history</string>
+    <string name="meetings_manage_history_view_title">จัดการประวัติการประชุม</string>
     <!-- Option of the manage history screen to clear the meeting history -->
     <string name="meetings_manage_history_clear">ล้างประวัติการประชุม</string>
     <!-- Confirmation dialog title to clear the meeting history -->
@@ -4648,15 +4646,15 @@
     <!-- Dialog title for selecting the period during which meeting notifications will be muted -->
     <string name="meetings_mute_notifications_dialog_title">ปิดเสียงแจ้งเตือนการประชุมเป็นเวลา</string>
     <!-- Confirmation dialog title to leave a meeting -->
-    <string name="meetings_leave_meeting_confirmation_dialog_title">Leave meeting?</string>
+    <string name="meetings_leave_meeting_confirmation_dialog_title">ออกจากการประชุมหรือไม่</string>
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">เปลี่ยนชื่ออัลบั้ม</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">An album named “%1$s” already exists in your Albums. Enter a new name for the album you’re saving.</string>
+    <string name="album_import_rename_album_description">มีอัลบั้มที่ชื่อ “%1$s” อยู่แล้วในอัลบั้มของคุณ กรุณากรอกชื่ออัลบั้มที่คุณกำลังจะบันทึกใหม่</string>
     <!-- Album import enter album name -->
-    <string name="album_import_enter_album_name">Enter an album name</string>
+    <string name="album_import_enter_album_name">กรอกชื่ออัลบั้ม</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
-    <string name="account_upgrade_account_pricing_page_link_text">You can upgrade your current subscription on our [A]pricing page.[/A]</string>
+    <string name="account_upgrade_account_pricing_page_link_text">คุณสามารถอัปเกรดการสมัครใช้งานของคุณได้ที่[A]หน้าราคาค่าบริการ[/A]</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
         <item quantity="other">ใครก็ตามที่มีลิงก์เหล่านี้ สามารถดูและดาวน์โหลดข้อมูลของคุณได้</item>
@@ -4664,28 +4662,27 @@
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">บันทึกไปยังคลาวด์ไดรฟ์</string>
     <!-- Album import saving -->
-    <string name="album_import_saving">Saving&#8230;</string>
+    <string name="album_import_saving">กำลังบันทึก&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">“%1$s” saved to Cloud drive</string>
+    <string name="album_import_success_message">บันทึก “%1$s” ไปที่คลาวด์ไดรฟ์แล้ว</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">“%1$s” can’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <string name="album_import_error_message">ไม่สามารถบันทึก “%1$s” ลงในคลาวด์ไดร์ฟได้ กรุณาลองอีกครั้งในภายหลัง แต่หากปัญหายังคงอยู่ ให้ติดต่อบุคคลที่แชร์ลิงก์กับคุณ</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_weekdays_button">Weekdays</string>
+    <string name="meetings_custom_recurrence_weekdays_button">วันธรรมดา</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_every_section">ทุก</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every weekday -->
-    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">Every weekday</string>
+    <string name="meetings_schedule_meeting_recurrence_every_weekday_label">ทุกวันธรรมดา</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs every 1 or more days -->
     <plurals name="meetings_schedule_meeting_recurrence_every_number_of_days_label">
-        <item quantity="one">Daily</item>
-        <item quantity="other">Every %1$d days</item>
+        <item quantity="other">ทุก %1$d วัน</item>
     </plurals>
     <!-- Text when link created and copied to clipboard when share link screen opened and link is create-->
     <plurals name="general_snackbar_link_created_and_copied">
         <item quantity="other">ทำการสร้างลิงก์และคัดลอกไปที่คลิปบอร์ดของคุณแล้ว</item>
     </plurals>
     <!-- Title of occurs on section in Custom Recurrence screen -->
-    <string name="meetings_custom_recurrence_occurs_on_section">Occurs on</string>
+    <string name="meetings_custom_recurrence_occurs_on_section">วันที่จะเกิดขึ้น</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Monday -->
     <string name="meetings_custom_recurrence_monday_option">จ</string>
     <!-- In the section to customise a weekly recurrence, the first letter of the day of the week is displayed to be chosen as the repetition rule for the meeting. This text represents Tuesday -->
@@ -4702,20 +4699,18 @@
     <string name="meetings_custom_recurrence_sunday_option">อา</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs one day every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_one_day_every_number_of_weeks_label">
-        <item quantity="one">%1$s, every week</item>
-        <item quantity="other">%1$s, every %2$d weeks</item>
+        <item quantity="other">%1$sของทุก %2$d สัปดาห์</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs several days every 1 or more weeks -->
     <plurals name="meetings_schedule_meeting_recurrence_several_days_every_number_of_weeks_label">
-        <item quantity="one">%1$s and %2$s, every week</item>
-        <item quantity="other">%1$s and %2$s, every %3$d weeks</item>
+        <item quantity="other">%1$sและ%2$sของทุก %3$d สัปดาห์</item>
     </plurals>
     <!-- Snackbar, shown on Upgrade Account screen, when user has already recurring subscription and tries to tap on his current plan. -->
-    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">You already have a recurring subscription for this plan</string>
+    <string name="account_upgrade_account_snackbar_recurring_plan_already_exist">คุณมีการสมัครใช้งานแผนนี้แบบเป็นประจำอยู่แล้ว</string>
     <!-- Album import storage exceeded title -->
-    <string name="album_import_storage_exceeded_title">Cannot save album</string>
+    <string name="album_import_storage_exceeded_title">บันทึกอัลบั้มไม่ได้</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">You don’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <string name="album_import_storage_exceeded_description">คุณมีพื้นที่เก็บข้อมูลไม่เพียงพอที่จะบันทึกอัลบั้มนี้ไปที่คลาวด์ไดร์ฟ อัปเกรดทันทีเพื่อรับพื้นที่เก็บข้อมูลเพิ่มมากขึ้น</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">วันที่</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4758,43 +4753,35 @@
     <string name="meetings_custom_recurrence_fifth_week_monthly_section">สุดท้าย</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="other">%1$sแรก ของทุก %2$d เดือน</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="other">%1$sที่สอง ของทุก %2$d เดือน</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="other">%1$sที่สาม ของทุก %2$d เดือน</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="other">%1$sที่สี่ ของทุก %2$d เดือน</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="other">%1$sสุดท้าย ของทุก %2$d เดือน</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="other">วันที่ %2$d ของทุก %1$s เดือน</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
-        <item quantity="one">Download started</item>
-        <item quantity="other">%1$d downloads started</item>
+        <item quantity="other">เริ่มต้นดาวน์โหลด %1$d รายการแล้ว</item>
     </plurals>
     <!-- Message when many downloads finish. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_complete">
-        <item quantity="one">Download complete</item>
-        <item quantity="other">%1$d downloads complete</item>
+        <item quantity="other">ดาวน์โหลด %1$d รายการเรียบร้อยแล้ว</item>
     </plurals>
     <!-- Title of option to set the end of a recurrence in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_end_recurrence_label">เวลาสิ้นสุดกิจวัตร</string>
@@ -4805,7 +4792,7 @@
     <!--Description text from Meeting List screen empty view-->
     <string name="meeting_list_empty_description">โทรด้วยเสียงหรือวิดีโอที่ปลอดภัยและเป็นส่วนตัวกับเพื่อนและเพื่อนร่วมงานทั่วโลก</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_dialog_title">Cancel “%1$s”?</string>
+    <string name="meetings_cancel_scheduled_meeting_dialog_title">ยกเลิก “%1$s” หรือไม่</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_empty_dialog_message">การประชุมนี้จะถูกเก็บถาวรและผู้เข้าร่วมทุกคนจะได้รับการแจ้งเตือน</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
@@ -4817,23 +4804,23 @@
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button">ยกเลิกการประชุม</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">Meeting cancelled and archived</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar">การประชุมถูกยกเลิกและจัดเก็บแล้ว</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Meeting cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">ยกเลิกการประชุมแล้ว</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Cancel the %1$s occurrence?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">ยกเลิกเหตุการณ์ %1$s หรือไม่</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Only this occurrence will be cancelled. All the other occurrences will go ahead as scheduled.</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">เฉพาะเหตุการณ์นี้เท่านั้นที่จะถูกยกเลิก ส่วนเหตุการณ์อื่น ๆ ทั้งหมดจะดำเนินต่อไปตามกำหนดการที่ได้ตั้งไว้</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
     <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">ยกเลิกเหตุการณ์และการประชุมหรือไม่</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be archived and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">นี่เป็นการประชุมที่เป็นกิจวัตรเพียงครั้งเดียวที่จัดขึ้น การยกเลิกเหตุการณ์นี้จะทำให้การประชุมถูกยกเลิก\nหากยกเลิกแล้ว การประชุมจะถูกจัดเก็บไว้และผู้เข้าร่วมทุกคนจะได้รับการแจ้งเตือน</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">This is the only occurrence of the recurring meeting. Cancelling this occurrence will cancel the meeting.\nIf cancelled, the meeting will be placed under Past meetings and all participants will be notified.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">นี่เป็นการประชุมที่เป็นกิจวัตรเพียงครั้งเดียวที่จัดขึ้น การยกเลิกเหตุการณ์นี้จะทำให้การประชุมถูกยกเลิก\nหากยกเลิกแล้ว การประชุมจะถูกเก็บไว้ในประวัติการประชุม และผู้เข้าร่วมทุกคนจะได้รับการแจ้งเตือน</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">%1$s occurrence cancelled</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">ยกเลิกเหตุการณ์ %1$s แล้ว</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">ยกเลิกเหตุการณ์</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] อัปเดตการประชุมแล้ว[/B]</string>
 </resources>
