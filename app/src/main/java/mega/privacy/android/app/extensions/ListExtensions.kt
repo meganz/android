@@ -6,5 +6,7 @@ package mega.privacy.android.app.extensions
  * @param item item to be updated
  * @return [List] updated list with updated item
  */
-fun <T> List<T>.updateItemAt(index: Int, item: T): List<T> =
-    toMutableList().apply { this[index] = item }
+fun <T> List<T>.updateItemAt(index: Int, item: T): List<T> {
+    return if (index in indices) toMutableList().apply { this[index] = item }
+    else this
+}
