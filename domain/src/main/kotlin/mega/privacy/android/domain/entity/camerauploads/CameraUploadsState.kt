@@ -38,12 +38,4 @@ data class CameraUploadsState(
                 0L -> 0
                 else -> ((totalBytesUploadedCount.toDouble() / totalBytesToUploadCount) * 100).roundToInt()
             }
-
-    /**
-     *  Reset the upload counts
-     */
-    fun resetUploadsCounts() {
-        primaryCameraUploadsState.resetUploadsCounts()
-        secondaryCameraUploadsState.resetUploadsCounts()
-    }
 }

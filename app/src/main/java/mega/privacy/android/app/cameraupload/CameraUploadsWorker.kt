@@ -23,13 +23,19 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.MegaApplication
@@ -134,6 +140,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
 import java.time.Instant
+import java.util.Hashtable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.TimeUnit
 
@@ -278,9 +285,21 @@ class CameraUploadsWorker @AssistedInject constructor(
     private lateinit var tempRoot: String
 
     /**
-     * Camera Upload State holder
+     * Camera Uploads State
      */
-    private val cameraUploadState = CameraUploadsState()
+    private val _state = MutableStateFlow(CameraUploadsState())
+
+    /**
+     * Read-only Camera Uploads State
+     */
+    private val state: StateFlow<CameraUploadsState> = _state.asStateFlow()
+
+    /**
+     * Mutex for updating the state in a synchronized way
+     * Only one coroutine can update the state at a time
+     */
+    private val stateUpdateMutex = Mutex()
+
 
     /**
      * Time in milliseconds to flag the last update of the notification
@@ -838,7 +857,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }.retryWhen { cause, attempt ->
                     if (cause is NotEnoughStorageException) {
                         if (attempt >= 60) {
-                            if (cameraUploadState.totalPendingCount == 0) {
+                            if (state.value.totalPendingCount == 0) {
                                 showNotEnoughStorageNotification()
                                 Timber.w("Stop service due to out of space issue")
                                 endService(aborted = true)
@@ -879,7 +898,7 @@ class CameraUploadsWorker @AssistedInject constructor(
 
         sendBackupHeartbeatJob =
             scope?.launch(ioDispatcher) {
-                sendBackupHeartBeatSyncUseCase(cameraUploadState)
+                sendBackupHeartBeatSyncUseCase(state.value)
                     .catch { Timber.e(it) }
                     .collect()
             }
@@ -1005,7 +1024,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun onQueueComplete() {
         Timber.d("onQueueComplete")
         resetTotalUploadsUseCase()
-        cameraUploadState.resetUploadsCounts()
+        resetUploadsCounts()
     }
 
     /**
@@ -1308,16 +1327,13 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun updateToUploadCount(
         record: SyncRecord,
     ) {
-        with(cameraUploadState) {
-            val bytes = record.localPath?.let { File(it).length() } ?: 0L
-            if (record.isSecondary) {
-                secondaryCameraUploadsState.toUploadCount++
-                secondaryCameraUploadsState.bytesToUploadCount += bytes
-            } else {
-                primaryCameraUploadsState.toUploadCount++
-                primaryCameraUploadsState.bytesToUploadCount += bytes
-            }
-        }
+        val bytes = record.localPath?.let { File(it).length() } ?: 0L
+        increaseTotalToUpload(
+            cameraUploadFolderType =
+            if (record.isSecondary) CameraUploadFolderType.Secondary
+            else CameraUploadFolderType.Primary,
+            bytesToUpload = bytes,
+        )
         displayUploadProgressNotification()
     }
 
@@ -1329,19 +1345,14 @@ class CameraUploadsWorker @AssistedInject constructor(
     private suspend fun updateUploadedCountAfterCopy(
         record: SyncRecord,
     ) {
-        val cameraUploadFolderType =
-            if (record.isSecondary) CameraUploadFolderType.Secondary
-            else CameraUploadFolderType.Primary
-        val isFinished = true
-        val nodeHandle = record.nodeHandle
-        val recordId = record.id
-        val bytesTransferred = record.localPath?.let { File(it).length() } ?: 0L
         updateUploadedCount(
-            cameraUploadFolderType,
-            isFinished,
-            nodeHandle,
-            recordId,
-            bytesTransferred
+            cameraUploadFolderType =
+            if (record.isSecondary) CameraUploadFolderType.Secondary
+            else CameraUploadFolderType.Primary,
+            isFinished = true,
+            nodeHandle = record.nodeHandle,
+            recordId = record.id,
+            bytesUploaded = record.localPath?.let { File(it).length() } ?: 0L,
         )
     }
 
@@ -1356,19 +1367,14 @@ class CameraUploadsWorker @AssistedInject constructor(
         record: SyncRecord,
         transfer: Transfer,
     ) {
-        val cameraUploadFolderType =
-            if (record.isSecondary) CameraUploadFolderType.Secondary
-            else CameraUploadFolderType.Primary
-        val isFinished = transfer.isFinished
-        val nodeHandle = transfer.nodeHandle
-        val recordId = record.id
-        val bytesTransferred = transfer.transferredBytes
         updateUploadedCount(
-            cameraUploadFolderType,
-            isFinished,
-            nodeHandle,
-            recordId,
-            bytesTransferred
+            cameraUploadFolderType =
+            if (record.isSecondary) CameraUploadFolderType.Secondary
+            else CameraUploadFolderType.Primary,
+            isFinished = transfer.isFinished,
+            nodeHandle = transfer.nodeHandle,
+            recordId = record.id,
+            bytesUploaded = transfer.transferredBytes,
         )
     }
 
@@ -1380,79 +1386,23 @@ class CameraUploadsWorker @AssistedInject constructor(
      *  @param nodeHandle the node handle associated to the transfer or the node copied
      *  @param recordId the recordId associated to the file uploaded.
      *                  It is used to identifies the bytes transferred for a unique filed transferred
-     *  @param bytesTransferred the bytes transferred for this file
+     *  @param bytesUploaded the bytes transferred for this file
      */
     private suspend fun updateUploadedCount(
         cameraUploadFolderType: CameraUploadFolderType,
         isFinished: Boolean,
         nodeHandle: Long?,
-        recordId: Int?,
-        bytesTransferred: Long,
+        recordId: Int,
+        bytesUploaded: Long,
     ) {
-        with(cameraUploadState) {
-            when (cameraUploadFolderType) {
-                CameraUploadFolderType.Primary -> {
-                    with(primaryCameraUploadsState) {
-                        if (isFinished) {
-                            uploadedCount++
-                            lastTimestamp = Instant.now().epochSecond
-                            nodeHandle?.let { lastHandle = it }
-                            recordId?.let { bytesInProgressUploadedTable.remove(it) }
-                            bytesFinishedUploadedCount += bytesTransferred
-                        } else {
-                            recordId?.let {
-                                bytesInProgressUploadedTable[it] = bytesTransferred
-                            }
-                        }
-                    }
-                }
-
-                else -> {
-                    with(secondaryCameraUploadsState) {
-                        if (isFinished) {
-                            uploadedCount++
-                            lastTimestamp = Instant.now().epochSecond
-                            nodeHandle?.let { lastHandle = it }
-                            recordId?.let { bytesInProgressUploadedTable.remove(it) }
-                            bytesFinishedUploadedCount += bytesTransferred
-                        } else {
-                            recordId?.let {
-                                bytesInProgressUploadedTable[it] = bytesTransferred
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        increaseTotalUploaded(
+            cameraUploadFolderType = cameraUploadFolderType,
+            isFinished = isFinished,
+            nodeHandle = nodeHandle,
+            recordId = recordId,
+            bytesUploaded = bytesUploaded,
+        )
         displayUploadProgressNotification()
-    }
-
-    /**
-     * Update the timestamp of the last actions
-     * This timestamp is updated when :
-     * - the backup state is updated
-     * - the heartbeat status is updated due to interrupted or finished process
-     * - a transfer finished
-     *
-     * @param cameraUploadFolderType Whether primary or secondary folder.
-     *                               If null, both folder timestamps are updated
-     */
-    private fun updateLastTimestamp(cameraUploadFolderType: CameraUploadFolderType? = null) {
-        with(cameraUploadState) {
-            when (cameraUploadFolderType) {
-                CameraUploadFolderType.Primary ->
-                    primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
-
-                CameraUploadFolderType.Secondary ->
-                    secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
-
-                else -> {
-                    primaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
-                    secondaryCameraUploadsState.lastTimestamp = Instant.now().epochSecond
-                }
-            }
-        }
     }
 
     /**
@@ -1469,7 +1419,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         val fullList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS)
         if (fullList.isNotEmpty()) {
             resetTotalUploadsUseCase()
-            cameraUploadState.resetUploadsCounts()
+            resetUploadsCounts()
             totalVideoSize = getTotalVideoSizeInMB(fullList)
             Timber.d("Total videos count are ${fullList.size}, $totalVideoSize MB to Conversion")
             if (shouldStartVideoCompression(totalVideoSize)) {
@@ -1598,41 +1548,42 @@ class CameraUploadsWorker @AssistedInject constructor(
     }
 
     private suspend fun displayUploadProgressNotification() {
-        // refresh UI every 1 seconds to avoid too much workload on main thread
-        val now = System.currentTimeMillis()
-        lastUpdated = if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS) {
-            now
-        } else {
-            return
-        }
+        runCatching {
+            // refresh UI every 1 seconds to avoid too much workload on main thread
+            val now = System.currentTimeMillis()
+            lastUpdated = if (now - lastUpdated > ON_TRANSFER_UPDATE_REFRESH_MILLIS) {
+                now
+            } else {
+                return
+            }
 
-        with(cameraUploadState) {
-            Timber.d(
-                "Total to upload: $totalToUploadCount " +
-                        "Total uploaded: $totalUploadedCount " +
-                        "Pending uploads: $totalPendingCount " +
-                        "bytes to upload: $totalBytesToUploadCount " +
-                        "bytes uploaded: $totalBytesUploadedCount " +
-                        "progress: $totalProgress"
-            )
+            with(state.value) {
+                val totalUploadBytes = totalBytesToUploadCount
+                val totalUploadedBytes = totalBytesUploadedCount
+                val totalUploaded = totalUploadedCount
+                val totalToUpload = totalToUploadCount
+                val pendingToUpload = totalPendingCount
+                val progressPercent = totalProgress
 
-            val totalUploadBytes = totalBytesToUploadCount
-            val totalUploadedBytes = totalBytesUploadedCount
-            val totalUploaded = totalUploadedCount
-            val totalToUpload = totalToUploadCount
-            val pendingToUpload = totalPendingCount
-            val progressPercent = totalProgress
-
-            broadcastProgress(progressPercent, pendingToUpload)
-            showUploadProgressNotification(
-                totalUploaded,
-                totalToUpload,
-                totalUploadedBytes,
-                totalUploadBytes,
-                progressPercent,
-                areUploadsPaused,
-            )
-        }
+                Timber.d(
+                    "Total to upload: $totalToUpload " +
+                            "Total uploaded: $totalUploaded " +
+                            "Pending uploads: $pendingToUpload " +
+                            "bytes to upload: $totalUploadBytes " +
+                            "bytes uploaded: $totalUploadedBytes " +
+                            "progress: $progressPercent"
+                )
+                broadcastProgress(progressPercent, pendingToUpload)
+                showUploadProgressNotification(
+                    totalUploaded,
+                    totalToUpload,
+                    totalUploadedBytes,
+                    totalUploadBytes,
+                    progressPercent,
+                    areUploadsPaused,
+                )
+            }
+        }.onFailure { Timber.w(it) }
     }
 
     /**
@@ -1932,7 +1883,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         updateLastTimestamp()
         updateCameraUploadsBackupHeartbeatStatusUseCase(
             heartbeatStatus = heartbeatStatus,
-            cameraUploadsState = cameraUploadState,
+            cameraUploadsState = state.value,
         )
     }
 
@@ -1951,5 +1902,164 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         } else block()
+    }
+
+    /**
+     * Update the timestamp of the last actions
+     * This timestamp is updated when :
+     * - the backup state is updated
+     * - the heartbeat status is updated due to interrupted or finished process
+     * - a transfer finished
+     */
+    private suspend fun updateLastTimestamp(
+    ) = stateUpdateMutex.withLock {
+        val timestamp = Instant.now().epochSecond
+        updateState(
+            cameraUploadFolderType = CameraUploadFolderType.Primary,
+            lastTimestamp = timestamp,
+        )
+        updateState(
+            cameraUploadFolderType = CameraUploadFolderType.Secondary,
+            lastTimestamp = timestamp
+        )
+    }
+
+    /**
+     * Increase by 1 the total to upload count for the given [CameraUploadFolderType]
+     * Add the [bytesToUpload] to the total bytes to upload count
+     *
+     * @param cameraUploadFolderType the type of the CU folder
+     * @param bytesToUpload bytes to be added to the total bytes to upload count
+     */
+    private suspend fun increaseTotalToUpload(
+        cameraUploadFolderType: CameraUploadFolderType,
+        bytesToUpload: Long,
+    ) = stateUpdateMutex.withLock {
+        when (cameraUploadFolderType) {
+            CameraUploadFolderType.Primary -> state.value.primaryCameraUploadsState
+            CameraUploadFolderType.Secondary -> state.value.secondaryCameraUploadsState
+        }.let { state ->
+            updateState(
+                cameraUploadFolderType = cameraUploadFolderType,
+                toUploadCount = state.toUploadCount + 1,
+                bytesToUploadCount = state.bytesToUploadCount + bytesToUpload
+            )
+        }
+    }
+
+    /**
+     * Increase by 1 the total uploaded count for the given [CameraUploadFolderType]
+     * only if the upload is finished
+     * Add the [bytesUploaded] to the total bytes uploaded count
+     * @param cameraUploadFolderType the type of the CU folder
+     * @param isFinished true if the upload is finished
+     * @param nodeHandle the node handle of the file uploaded
+     * @param recordId the recordId associated to the file uploaded
+     * @param bytesUploaded bytes to be added to the total bytes to uploaded count
+     */
+    private suspend fun increaseTotalUploaded(
+        cameraUploadFolderType: CameraUploadFolderType,
+        isFinished: Boolean,
+        bytesUploaded: Long,
+        nodeHandle: Long?,
+        recordId: Int,
+    ) = stateUpdateMutex.withLock {
+        when (cameraUploadFolderType) {
+            CameraUploadFolderType.Primary -> state.value.primaryCameraUploadsState
+            CameraUploadFolderType.Secondary -> state.value.secondaryCameraUploadsState
+        }.let { state ->
+            if (isFinished) {
+                updateState(
+                    cameraUploadFolderType = cameraUploadFolderType,
+                    uploadedCount = state.uploadedCount + 1,
+                    lastTimestamp = Instant.now().epochSecond,
+                    lastHandle = nodeHandle,
+                    recordId = recordId,
+                    bytesFinishedUploadedCount = state.bytesFinishedUploadedCount + bytesUploaded,
+                )
+            } else {
+                updateState(
+                    cameraUploadFolderType = cameraUploadFolderType,
+                    recordId = recordId,
+                    bytesUploaded = bytesUploaded,
+                )
+            }
+        }
+    }
+
+    /**
+     * Reset the total uploads counts
+     */
+    private suspend fun resetUploadsCounts() = stateUpdateMutex.withLock {
+        updateState(
+            cameraUploadFolderType = CameraUploadFolderType.Primary,
+            toUploadCount = 0,
+            uploadedCount = 0,
+            bytesToUploadCount = 0L,
+            bytesUploadedTable = Hashtable(),
+            bytesFinishedUploadedCount = 0L,
+        )
+        updateState(
+            cameraUploadFolderType = CameraUploadFolderType.Secondary,
+            toUploadCount = 0,
+            uploadedCount = 0,
+            bytesToUploadCount = 0L,
+            bytesUploadedTable = Hashtable(),
+            bytesFinishedUploadedCount = 0L,
+        )
+    }
+
+    /**
+     * Update the state of the given [CameraUploadFolderType]
+     *
+     * If the value passed in parameter is null, keep the current value of the state attribute
+     */
+    private fun updateState(
+        cameraUploadFolderType: CameraUploadFolderType,
+        lastTimestamp: Long? = null,
+        lastHandle: Long? = null,
+        toUploadCount: Int? = null,
+        uploadedCount: Int? = null,
+        bytesToUploadCount: Long? = null,
+        recordId: Int? = null,
+        bytesUploaded: Long? = null,
+        bytesUploadedTable: Hashtable<Int, Long>? = null,
+        bytesFinishedUploadedCount: Long? = null,
+    ) {
+        when (cameraUploadFolderType) {
+            CameraUploadFolderType.Primary -> state.value.primaryCameraUploadsState
+            CameraUploadFolderType.Secondary -> state.value.secondaryCameraUploadsState
+        }.let { state ->
+            val copiedState = with(state) {
+                val bytesTable =
+                    recordId?.let {
+                        Hashtable(this.bytesInProgressUploadedTable).apply {
+                            if (bytesFinishedUploadedCount == null) {
+                                bytesUploaded?.let { this[recordId] = bytesUploaded }
+                            } else {
+                                this.remove(recordId)
+                            }
+                        }
+                    } ?: bytesUploadedTable
+
+                copy(
+                    lastTimestamp = lastTimestamp ?: this.lastTimestamp,
+                    lastHandle = lastHandle ?: this.lastHandle,
+                    toUploadCount = toUploadCount ?: this.toUploadCount,
+                    uploadedCount = uploadedCount ?: this.uploadedCount,
+                    bytesToUploadCount = bytesToUploadCount ?: this.bytesToUploadCount,
+                    bytesInProgressUploadedTable = bytesTable
+                        ?: this.bytesInProgressUploadedTable,
+                    bytesFinishedUploadedCount = bytesFinishedUploadedCount
+                        ?: this.bytesFinishedUploadedCount
+                )
+            }
+            _state.update {
+                when (cameraUploadFolderType) {
+                    CameraUploadFolderType.Primary -> it.copy(primaryCameraUploadsState = copiedState)
+                    CameraUploadFolderType.Secondary -> it.copy(secondaryCameraUploadsState = copiedState)
+                }
+            }
+        }
     }
 }

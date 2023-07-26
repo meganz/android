@@ -19,13 +19,13 @@ import kotlin.math.roundToInt
  * @property progress current progress of Camera Uploads process for the folder. A [Int] between 0 and 100
  */
 data class CameraUploadsFolderState(
-    var lastTimestamp: Long = -1,
-    var lastHandle: Long = -1,
-    var toUploadCount: Int = 0,
-    var uploadedCount: Int = 0,
-    var bytesToUploadCount: Long = 0,
-    var bytesFinishedUploadedCount: Long = 0,
-    var bytesInProgressUploadedTable: Hashtable<Int, Long> = Hashtable()
+    val lastTimestamp: Long = -1,
+    val lastHandle: Long = -1,
+    val toUploadCount: Int = 0,
+    val uploadedCount: Int = 0,
+    val bytesToUploadCount: Long = 0,
+    val bytesFinishedUploadedCount: Long = 0,
+    val bytesInProgressUploadedTable: Hashtable<Int, Long> = Hashtable()
 ) {
     val bytesUploadedCount: Long
         get() = bytesFinishedUploadedCount + bytesInProgressUploadedTable.values.sum()
@@ -40,14 +40,4 @@ data class CameraUploadsFolderState(
                 else -> ((bytesUploadedCount.toDouble() / bytesToUploadCount) * 100).roundToInt()
             }
 
-    /**
-     *  Reset the uploads counts
-     */
-    fun resetUploadsCounts() {
-        toUploadCount = 0
-        uploadedCount = 0
-        bytesToUploadCount = 0
-        bytesFinishedUploadedCount = 0
-        bytesInProgressUploadedTable.clear()
-    }
 }

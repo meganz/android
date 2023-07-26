@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.entity.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.util.Hashtable
 import kotlin.math.roundToInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -11,24 +11,21 @@ internal class CameraUploadsStateTest {
 
     lateinit var underTest: CameraUploadsState
 
-    @BeforeAll
-    fun setUp() {
-        underTest = CameraUploadsState(
-            primaryCameraUploadsState = CameraUploadsFolderState(),
-            secondaryCameraUploadsState = CameraUploadsFolderState(),
-        )
-    }
-
     @Test
     fun `test that totalToUpload returns the sum of primaryToUpload and secondaryToUpload`() {
         val primaryToUpload = 30
         val secondaryToUpload = 10
         val expected = (primaryToUpload + secondaryToUpload)
 
-        with(underTest) {
-            primaryCameraUploadsState.toUploadCount = primaryToUpload
-            secondaryCameraUploadsState.toUploadCount = secondaryToUpload
-        }
+
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                toUploadCount = primaryToUpload,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                toUploadCount = secondaryToUpload,
+            ),
+        )
 
         assertThat(underTest.totalPendingCount).isEqualTo(expected)
     }
@@ -39,10 +36,14 @@ internal class CameraUploadsStateTest {
         val secondaryUploaded = 10
         val expected = (primaryUploaded + secondaryUploaded)
 
-        with(underTest) {
-            primaryCameraUploadsState.uploadedCount = primaryUploaded
-            secondaryCameraUploadsState.uploadedCount = secondaryUploaded
-        }
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                uploadedCount = primaryUploaded,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                uploadedCount = secondaryUploaded,
+            ),
+        )
 
         assertThat(underTest.totalUploadedCount).isEqualTo(expected)
     }
@@ -55,12 +56,16 @@ internal class CameraUploadsStateTest {
         val secondaryUploaded = 5
         val expected = (primaryToUpload + secondaryToUpload) - (primaryUploaded + secondaryUploaded)
 
-        with(underTest) {
-            primaryCameraUploadsState.toUploadCount = primaryToUpload
-            secondaryCameraUploadsState.toUploadCount = secondaryToUpload
-            primaryCameraUploadsState.uploadedCount = primaryUploaded
-            secondaryCameraUploadsState.uploadedCount = secondaryUploaded
-        }
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                toUploadCount = primaryToUpload,
+                uploadedCount = primaryUploaded,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                toUploadCount = secondaryToUpload,
+                uploadedCount = secondaryUploaded,
+            ),
+        )
 
         assertThat(underTest.totalPendingCount).isEqualTo(expected)
     }
@@ -71,10 +76,14 @@ internal class CameraUploadsStateTest {
         val secondaryBytesToUpload = 2000000L
         val expected = primaryBytesToUpload + secondaryBytesToUpload
 
-        with(underTest) {
-            primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
-            secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-        }
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = primaryBytesToUpload,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = secondaryBytesToUpload,
+            ),
+        )
 
         assertThat(underTest.totalBytesToUploadCount).isEqualTo(expected)
     }
@@ -93,15 +102,25 @@ internal class CameraUploadsStateTest {
             secondaryBytesFinishedUploadedCount + fileC.second + fileD.second
         val expected = primaryBytesUploaded + secondaryBytesUploaded
 
-        with(underTest) {
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
-            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
-            secondaryCameraUploadsState.bytesFinishedUploadedCount =
-                secondaryBytesFinishedUploadedCount
+        val primaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileA.first] = fileA.second
+            this[fileB.first] = fileB.second
         }
+        val secondaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileC.first] = fileC.second
+            this[fileD.first] = fileD.second
+        }
+
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                bytesInProgressUploadedTable = primaryBytesInProgressUploadedTable,
+                bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                bytesInProgressUploadedTable = secondaryBytesInProgressUploadedTable,
+                bytesFinishedUploadedCount = secondaryBytesFinishedUploadedCount,
+            ),
+        )
 
         assertThat(underTest.totalBytesUploadedCount).isEqualTo(expected)
     }
@@ -112,10 +131,14 @@ internal class CameraUploadsStateTest {
         val secondaryBytesToUpload = 0L
         val expected = 0
 
-        with(underTest) {
-            primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
-            secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-        }
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = primaryBytesToUpload,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = secondaryBytesToUpload,
+            ),
+        )
 
         assertThat(underTest.totalProgress).isEqualTo(expected)
     }
@@ -138,66 +161,29 @@ internal class CameraUploadsStateTest {
             (((primaryBytesUploaded + secondaryBytesUploaded).toDouble() / (primaryBytesToUpload + secondaryBytesToUpload)) * 100)
                 .roundToInt()
 
-        with(underTest) {
-            primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
-            secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
-            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
-            secondaryCameraUploadsState.bytesFinishedUploadedCount =
-                secondaryBytesFinishedUploadedCount
+        val primaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileA.first] = fileA.second
+            this[fileB.first] = fileB.second
         }
+
+        val secondaryBytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileC.first] = fileC.second
+            this[fileD.first] = fileD.second
+        }
+
+        underTest = CameraUploadsState(
+            primaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = primaryBytesToUpload,
+                bytesInProgressUploadedTable = primaryBytesInProgressUploadedTable,
+                bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount,
+            ),
+            secondaryCameraUploadsState = CameraUploadsFolderState(
+                bytesToUploadCount = secondaryBytesToUpload,
+                bytesInProgressUploadedTable = secondaryBytesInProgressUploadedTable,
+                bytesFinishedUploadedCount = secondaryBytesFinishedUploadedCount,
+            ),
+        )
 
         assertThat(underTest.totalProgress).isEqualTo(expected)
     }
-
-    @Test
-    fun `test that when resetUploadCount reset values to 0`() {
-        val primaryToUpload = 20
-        val secondaryToUpload = 10
-        val primaryUploaded = 20
-        val secondaryUploaded = 10
-        val primaryBytesToUpload = 2000L
-        val secondaryBytesToUpload = 1000L
-        val fileA = 1 to 500L / 2
-        val fileB = 2 to 500L / 2
-        val fileC = 3 to 500L / 2
-        val fileD = 4 to 500L / 2
-        val primaryBytesFinishedUploadedCount = 1000L
-        val secondaryBytesFinishedUploadedCount = 2000L
-
-        with(underTest) {
-            primaryCameraUploadsState.toUploadCount = primaryToUpload
-            secondaryCameraUploadsState.toUploadCount = secondaryToUpload
-            primaryCameraUploadsState.uploadedCount = primaryUploaded
-            secondaryCameraUploadsState.uploadedCount = secondaryUploaded
-            primaryCameraUploadsState.bytesToUploadCount = primaryBytesToUpload
-            secondaryCameraUploadsState.bytesToUploadCount = secondaryBytesToUpload
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileA.first] = fileA.second
-            primaryCameraUploadsState.bytesInProgressUploadedTable[fileB.first] = fileB.second
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileC.first] = fileC.second
-            secondaryCameraUploadsState.bytesInProgressUploadedTable[fileD.first] = fileD.second
-            primaryCameraUploadsState.bytesFinishedUploadedCount = primaryBytesFinishedUploadedCount
-            secondaryCameraUploadsState.bytesFinishedUploadedCount =
-                secondaryBytesFinishedUploadedCount
-        }
-
-        underTest.resetUploadsCounts()
-
-        with(underTest) {
-            assertThat(primaryCameraUploadsState.toUploadCount).isEqualTo(0)
-            assertThat(secondaryCameraUploadsState.toUploadCount).isEqualTo(0)
-            assertThat(primaryCameraUploadsState.uploadedCount).isEqualTo(0)
-            assertThat(secondaryCameraUploadsState.uploadedCount).isEqualTo(0)
-            assertThat(primaryCameraUploadsState.bytesToUploadCount).isEqualTo(0)
-            assertThat(secondaryCameraUploadsState.bytesToUploadCount).isEqualTo(0)
-            assertThat(primaryCameraUploadsState.bytesUploadedCount).isEqualTo(0)
-            assertThat(secondaryCameraUploadsState.bytesUploadedCount).isEqualTo(0)
-            assertThat(primaryCameraUploadsState.bytesFinishedUploadedCount).isEqualTo(0)
-            assertThat(secondaryCameraUploadsState.bytesFinishedUploadedCount).isEqualTo(0)
-        }
-    }
-
 }

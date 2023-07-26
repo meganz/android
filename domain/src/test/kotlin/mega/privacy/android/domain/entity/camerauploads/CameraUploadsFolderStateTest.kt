@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.entity.camerauploads
 
 import com.google.common.truth.Truth.assertThat
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.util.Hashtable
 import kotlin.math.roundToInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -11,21 +11,16 @@ class CameraUploadsFolderStateTest {
 
     lateinit var underTest: CameraUploadsFolderState
 
-    @BeforeAll
-    fun setUp() {
-        underTest = CameraUploadsFolderState()
-    }
-
     @Test
     fun `test that pendingCount returns the difference between toUploadCount and uploadedCount`() {
         val toUploadCount = 30
         val uploadedCount = 10
         val expected = (toUploadCount - uploadedCount)
 
-        with(underTest) {
-            this.toUploadCount = toUploadCount
-            this.uploadedCount = uploadedCount
-        }
+        underTest = CameraUploadsFolderState(
+            toUploadCount = toUploadCount,
+            uploadedCount = uploadedCount,
+        )
 
         assertThat(underTest.pendingCount).isEqualTo(expected)
     }
@@ -35,9 +30,9 @@ class CameraUploadsFolderStateTest {
         val bytesToUploadCount = 0L
         val expected = 0
 
-        with(underTest) {
-            this.bytesToUploadCount = bytesToUploadCount
-        }
+        underTest = CameraUploadsFolderState(
+            bytesToUploadCount = bytesToUploadCount,
+        )
 
         assertThat(underTest.progress).isEqualTo(expected)
     }
@@ -48,12 +43,15 @@ class CameraUploadsFolderStateTest {
         val fileB = 2 to 2000L
         val bytesFinishedUploadedCount = 100L
         val expected = bytesFinishedUploadedCount + fileA.second + fileB.second
-
-        with(underTest) {
-            this.bytesFinishedUploadedCount = bytesFinishedUploadedCount
-            this.bytesInProgressUploadedTable[fileA.first] = fileA.second
-            this.bytesInProgressUploadedTable[fileB.first] = fileB.second
+        val bytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileA.first] = fileA.second
+            this[fileB.first] = fileB.second
         }
+
+        underTest = CameraUploadsFolderState(
+            bytesFinishedUploadedCount = bytesFinishedUploadedCount,
+            bytesInProgressUploadedTable = bytesInProgressUploadedTable
+        )
 
         assertThat(underTest.bytesUploadedCount).isEqualTo(expected)
     }
@@ -68,12 +66,16 @@ class CameraUploadsFolderStateTest {
         val expected =
             (((bytesFinishedUploadedCount + fileA.second + fileB.second).toDouble() / (bytesToUploadCount)) * 100).roundToInt()
 
-        with(underTest) {
-            this.bytesToUploadCount = bytesToUploadCount
-            this.bytesFinishedUploadedCount = bytesFinishedUploadedCount
-            this.bytesInProgressUploadedTable[fileA.first] = fileA.second
-            this.bytesInProgressUploadedTable[fileB.first] = fileB.second
+        val bytesInProgressUploadedTable = Hashtable<Int, Long>().apply {
+            this[fileA.first] = fileA.second
+            this[fileB.first] = fileB.second
         }
+
+        underTest = CameraUploadsFolderState(
+            bytesToUploadCount = bytesToUploadCount,
+            bytesFinishedUploadedCount = bytesFinishedUploadedCount,
+            bytesInProgressUploadedTable = bytesInProgressUploadedTable
+        )
 
         assertThat(underTest.progress).isEqualTo(expected)
     }
