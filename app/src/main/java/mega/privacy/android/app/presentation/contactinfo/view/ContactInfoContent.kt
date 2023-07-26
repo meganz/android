@@ -2,16 +2,19 @@ package mega.privacy.android.app.presentation.contactinfo.view
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoState
 import mega.privacy.android.core.ui.controls.controlssliders.MegaSwitch
@@ -26,17 +29,24 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ContactInfoContent(
     uiState: ContactInfoState,
+    coroutineScope: CoroutineScope,
+    modalSheetState: ModalBottomSheetState,
+    updateNickNameDialogVisibility: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    contentHeight: Dp = 0.dp,
-) = Column(modifier = modifier.heightIn(contentHeight)) {
+) = Column(modifier = modifier) {
     InfoOptionsView(
         primaryDisplayName = uiState.primaryDisplayName,
         secondaryDisplayName = uiState.secondaryDisplayName,
         modifyNickNameTextId = uiState.modifyNickNameTextId,
         email = uiState.email,
+        coroutineScope = coroutineScope,
+        modalSheetState = modalSheetState,
+        hasAlias = uiState.hasAlias,
+        updateNickNameDialogVisibility = updateNickNameDialogVisibility
     )
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     ChatOptions()
@@ -65,13 +75,13 @@ internal fun ContactInfoContent(
     }
     MenuActionListTile(
         text = stringResource(id = R.string.title_properties_chat_share_contact),
-        icon = R.drawable.ic_contact_share
+        icon = R.drawable.ic_share_contact,
     )
     VerifyCredentialsView(isVerified = uiState.areCredentialsVerified)
     if (uiState.chatRoom != null) {
         MenuActionListTile(
             text = stringResource(id = R.string.title_chat_shared_files_info),
-            icon = R.drawable.ic_shared_files
+            icon = R.drawable.ic_shared_files,
         )
         MenuActionListTile(
             text = stringResource(id = R.string.title_properties_manage_chat),
@@ -86,9 +96,16 @@ internal fun ContactInfoContent(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 private fun PreviewContactInfoContent() {
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = false,
+    )
+
     val contactData = ContactData(
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
@@ -108,14 +125,23 @@ private fun PreviewContactInfoContent() {
                     status = UserStatus.Online,
                     lastSeen = 0,
                 )
-            )
+            ),
+            coroutineScope = coroutineScope,
+            modalSheetState = modalSheetState,
+            updateNickNameDialogVisibility = {},
         )
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @CombinedThemePreviews
 @Composable
 private fun PreviewContactInfoContentWithChatRoom() {
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = false,
+    )
     val contactData = ContactData(
         alias = "Iron Man",
         avatarUri = "https://avatar.uri.com",
@@ -162,7 +188,10 @@ private fun PreviewContactInfoContentWithChatRoom() {
                     lastSeen = 0,
                 ),
                 chatRoom = chatRoom,
-            )
+            ),
+            coroutineScope = coroutineScope,
+            modalSheetState = modalSheetState,
+            updateNickNameDialogVisibility = { },
         )
     }
 }

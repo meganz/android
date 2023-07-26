@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -54,15 +57,16 @@ fun MenuActionBottomSheet(
     scrimColor: Color = Color.Black.copy(alpha = 0.5f),
     sheetHeader: @Composable () -> Unit,
     sheetBody: @Composable () -> Unit,
-    content: @Composable () -> Unit,
+    content: (@Composable () -> Unit)? = null,
 ) {
     val roundedCornerRadius = remember {
         derivedStateOf {
             if (modalSheetState.currentValue == ModalBottomSheetValue.Expanded) 0.dp else 4.dp
         }
     }
+    val navigationBarHeight = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
     ModalBottomSheetLayout(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = navigationBarHeight),
         sheetShape = RoundedCornerShape(roundedCornerRadius.value),
         sheetState = modalSheetState,
         scrimColor = scrimColor,
@@ -72,7 +76,7 @@ fun MenuActionBottomSheet(
             sheetBody()
         },
     ) {
-        content()
+        content?.invoke()
     }
 }
 

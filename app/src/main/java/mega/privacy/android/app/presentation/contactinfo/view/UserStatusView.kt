@@ -23,10 +23,10 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
 
 @Composable
 internal fun UserStatusView(
-    modifier: Modifier = Modifier,
     title: String,
     userStatus: UserStatus,
     progress: Float,
+    modifier: Modifier = Modifier,
 ) {
     val primaryTextColor = lerp(white_alpha_087, MaterialTheme.colors.textColorPrimary, progress)
     val secondaryTextColor =

@@ -745,6 +745,15 @@ class ContactInfoViewModel @Inject constructor(
             .addTo(composite)
     }
 
+    /**
+     * updateNickNameDialogVisibility
+     *
+     * @param shouldShow checks if dialog should be visible or not
+     */
+    fun updateNickNameDialogVisibility(shouldShow: Boolean) {
+        _state.update { it.copy(showUpdateAliasDialog = shouldShow) }
+    }
+
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L
         private const val INVALID_NODE_HANDLE = -1L

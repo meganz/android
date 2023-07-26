@@ -38,6 +38,8 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property currentCallAudioStatus                     True, if audio is on. False, if audio is off.
  * @property currentCallVideoStatus                     True, if video is on. False, if video is off.
  * @property enableCallLayout                           call button is enabled and disabled based on this
+ * @property hasAlias                                   checks if user has nick name
+ * @property showUpdateAliasDialog                      True, shows update nick name dialog to the user
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -67,6 +69,7 @@ data class ContactInfoState(
     val currentCallAudioStatus: Boolean = false,
     val currentCallVideoStatus: Boolean = false,
     val enableCallLayout: Boolean = true,
+    val showUpdateAliasDialog: Boolean = false,
 ) {
 
     /**
@@ -81,7 +84,7 @@ data class ContactInfoState(
         contactItem?.contactData?.alias ?: contactItem?.contactData?.fullName ?: ""
     }
 
-    private val hasAlias = !contactItem?.contactData?.alias.isNullOrEmpty()
+    val hasAlias = !contactItem?.contactData?.alias.isNullOrEmpty()
 
     /**
      * secondary display name   Full name of the user shown only if user has a nick name

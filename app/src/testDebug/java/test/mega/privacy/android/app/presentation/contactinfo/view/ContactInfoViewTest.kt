@@ -87,7 +87,11 @@ class ContactInfoViewTest {
     private fun setupRule(state: ContactInfoState = ContactInfoState()) {
         composeRule.setContent {
             ContactInfoView(
-                uiState = state, onBackPress = {}, statusBarHeight = 25f,
+                uiState = state,
+                onBackPress = {},
+                statusBarHeight = 25f,
+                updateNickName = {},
+                updateNickNameDialogVisibility = {}
             )
         }
     }
