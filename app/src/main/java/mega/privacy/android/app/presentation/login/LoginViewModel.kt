@@ -548,6 +548,10 @@ class LoginViewModel @Inject constructor(
      * Login with 2FA.
      */
     private fun performLoginWith2FA(pin2FA: String) {
+        if (MegaApplication.isLoggingIn) {
+            return
+        }
+
         viewModelScope.launch {
             MegaApplication.isLoggingIn = true
             _state.update { state -> state.copy(multiFactorAuthState = MultiFactorAuthState.Checking) }
