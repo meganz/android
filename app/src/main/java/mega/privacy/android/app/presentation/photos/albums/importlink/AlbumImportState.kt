@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
 internal data class AlbumImportState(
+    val isNetworkConnected: Boolean = false,
     val isInitialized: Boolean = false,
     val isLogin: Boolean = false,
     val showInputDecryptionKeyDialog: Boolean = false,

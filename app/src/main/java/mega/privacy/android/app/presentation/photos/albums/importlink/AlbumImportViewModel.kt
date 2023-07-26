@@ -7,12 +7,15 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
@@ -34,16 +37,19 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 internal class AlbumImportViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -58,6 +64,8 @@ internal class AlbumImportViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val importPublicAlbumUseCase: ImportPublicAlbumUseCase,
+    private val isAlbumLinkValidUseCase: IsAlbumLinkValidUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumImportState())
@@ -65,6 +73,16 @@ internal class AlbumImportViewModel @Inject constructor(
 
     private val albumLink: String?
         get() = savedStateHandle[ALBUM_LINK]
+
+    private var albumNameToImport: String = ""
+
+    private var photosToImport: Collection<Photo> = listOf()
+
+    private var importAlbumJob: Job? = null
+
+    @Volatile
+    @VisibleForTesting
+    var isNetworkConnected: Boolean = false
 
     @Volatile
     @VisibleForTesting
@@ -74,11 +92,8 @@ internal class AlbumImportViewModel @Inject constructor(
     @VisibleForTesting
     var availableStorage: Long = 0
 
-    private var albumNameToImport: String = ""
-
-    private var photosToImport: Collection<Photo> = listOf()
-
     fun initialize() = viewModelScope.launch {
+        monitorNetworkConnection()
         validateLink(link = albumLink)
 
         val isLogin = hasCredentialsUseCase()
@@ -95,6 +110,31 @@ internal class AlbumImportViewModel @Inject constructor(
                 isAvailableStorageCollected = it.isAvailableStorageCollected || !isLogin,
             )
         }
+    }
+
+    private fun monitorNetworkConnection() {
+        var isFirstEmission = true
+        monitorConnectivityUseCase()
+            .debounce { isConnected ->
+                if (isConnected || isFirstEmission) {
+                    isFirstEmission = false
+                    0.seconds
+                } else {
+                    1.seconds
+                }
+            }
+            .onEach(::handleNetworkConnection)
+            .launchIn(viewModelScope)
+    }
+
+    private fun handleNetworkConnection(isConnected: Boolean) {
+        isNetworkConnected = isConnected
+        state.update {
+            it.copy(isNetworkConnected = isConnected)
+        }
+
+        if (isNetworkConnected) return
+        cancelImportAlbum()
     }
 
     private suspend fun validateLink(link: String?) {
@@ -363,41 +403,80 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    fun importAlbum(targetParentFolderNodeId: NodeId) = viewModelScope.launch {
+    fun importAlbum(targetParentFolderNodeId: NodeId) {
+        if (!isNetworkConnected) {
+            state.update {
+                it.copy(
+                    importAlbumMessage = getStringFromStringResMapper(
+                        stringId = R.string.error_server_connection_problem,
+                    ),
+                )
+            }
+            return
+        }
+
+        importAlbumJob?.cancel()
+        importAlbumJob = viewModelScope.launch {
+            state.update {
+                it.copy(showImportAlbumDialog = true)
+            }
+
+            runCatching {
+                if (!isAlbumLinkValidUseCase(albumLink = AlbumLink(state.value.link.orEmpty()))) {
+                    state.update {
+                        it.copy(
+                            showErrorAccessDialog = true,
+                            showImportAlbumDialog = false,
+                        )
+                    }
+                    return@launch
+                }
+
+                val photoIds = withContext(defaultDispatcher) {
+                    photosToImport.map { NodeId(it.id) }
+                }
+
+                importPublicAlbumUseCase(
+                    albumName = albumNameToImport,
+                    photoIds = photoIds,
+                    targetParentFolderNodeId = targetParentFolderNodeId,
+                )
+            }.onFailure {
+                state.update {
+                    it.copy(
+                        showImportAlbumDialog = false,
+                        importAlbumMessage = getStringFromStringResMapper(
+                            stringId = R.string.album_import_error_message,
+                            albumNameToImport,
+                        ),
+                    )
+                }
+            }.onSuccess {
+                state.update {
+                    it.copy(
+                        showImportAlbumDialog = false,
+                        importAlbumMessage = getStringFromStringResMapper(
+                            stringId = R.string.album_import_success_message,
+                            albumNameToImport,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
+    private fun cancelImportAlbum() {
+        if (!state.value.showImportAlbumDialog) return
+        importAlbumJob?.cancel()
+
         state.update {
-            it.copy(showImportAlbumDialog = true)
-        }
-
-        val photoIds = withContext(defaultDispatcher) {
-            photosToImport.map { NodeId(it.id) }
-        }
-
-        runCatching {
-            importPublicAlbumUseCase(
-                albumName = albumNameToImport,
-                photoIds = photoIds,
-                targetParentFolderNodeId = targetParentFolderNodeId,
+            it.copy(
+                showImportAlbumDialog = false,
+                importAlbumMessage = getStringFromStringResMapper(
+                    stringId = R.string.album_import_error_message,
+                    albumNameToImport,
+                ),
             )
-        }.onFailure {
-            state.update {
-                it.copy(
-                    showImportAlbumDialog = false,
-                    importAlbumMessage = getStringFromStringResMapper(
-                        stringId = R.string.album_import_error_message,
-                        albumNameToImport,
-                    ),
-                )
-            }
-        }.onSuccess {
-            state.update {
-                it.copy(
-                    showImportAlbumDialog = false,
-                    importAlbumMessage = getStringFromStringResMapper(
-                        stringId = R.string.album_import_success_message,
-                        albumNameToImport,
-                    ),
-                )
-            }
         }
     }
 

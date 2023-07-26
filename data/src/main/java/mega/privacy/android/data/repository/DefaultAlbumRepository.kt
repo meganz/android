@@ -414,7 +414,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                                 }
                             }.orEmpty()
 
-                            if (userSet != null) {
+                            if (userSet != null && userSet.id != -1L) {
                                 continuation.resume(userSet to albumPhotoIds)
                             } else {
                                 continuation.failWithError(error, "fetchPublicAlbum")
@@ -680,6 +680,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                     },
                 )
 
+                megaApiGateway.stopPublicSetPreview()
                 megaApiGateway.fetchPublicSet(
                     publicSetLink = albumLink.link,
                     listener = listener,

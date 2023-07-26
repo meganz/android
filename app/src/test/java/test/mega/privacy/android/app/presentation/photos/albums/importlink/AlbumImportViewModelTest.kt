@@ -21,12 +21,14 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -50,11 +52,9 @@ class AlbumImportViewModelTest {
 
     private val mockLegacyPublicAlbumPhotoNodeProvider: LegacyPublicAlbumPhotoNodeProvider = mock()
 
-    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase =
-        mock()
+    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase = mock()
 
-    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase =
-        mock()
+    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase = mock()
 
     private val mockMonitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
@@ -63,6 +63,10 @@ class AlbumImportViewModelTest {
     private val mockGetStringFromStringResMapper: GetStringFromStringResMapper = mock()
 
     private val mockImportPublicAlbumUseCase: ImportPublicAlbumUseCase = mock()
+
+    private val mockIsAlbumLinkValidUseCase: IsAlbumLinkValidUseCase = mock()
+
+    private val mockMonitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
 
     @Before
     fun setup() {
@@ -81,6 +85,8 @@ class AlbumImportViewModelTest {
             getProscribedAlbumNamesUseCase = mockGetProscribedAlbumNamesUseCase,
             getStringFromStringResMapper = mockGetStringFromStringResMapper,
             importPublicAlbumUseCase = mockImportPublicAlbumUseCase,
+            isAlbumLinkValidUseCase = mockIsAlbumLinkValidUseCase,
+            monitorConnectivityUseCase = mockMonitorConnectivityUseCase,
             defaultDispatcher = StandardTestDispatcher(),
         )
     }
@@ -314,6 +320,8 @@ class AlbumImportViewModelTest {
     @Test
     fun `test that import album works properly`() = runTest {
         // given
+        underTest.isNetworkConnected = true
+
         whenever(mockGetStringFromStringResMapper(any(), any()))
             .thenReturn("")
 

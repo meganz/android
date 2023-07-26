@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -37,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -58,6 +58,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
@@ -101,7 +102,9 @@ internal fun AlbumImportScreen(
     val isLight = MaterialTheme.colors.isLight
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(state.isInitialized) {
         if (!state.isInitialized) {
@@ -192,19 +195,35 @@ internal fun AlbumImportScreen(
                 AlbumImportBottomBar(
                     isLogin = state.isLogin,
                     onImport = {
-                        val photos = state.selectedPhotos.ifEmpty { state.photos }
-                        albumImportViewModel.validateImportConstraint(
-                            album = state.album,
-                            photos = photos,
-                        )
-                        albumImportViewModel.clearSelection()
+                        if (state.isNetworkConnected) {
+                            val photos = state.selectedPhotos.ifEmpty { state.photos }
+                            albumImportViewModel.validateImportConstraint(
+                                album = state.album,
+                                photos = photos,
+                            )
+                            albumImportViewModel.clearSelection()
+                        } else {
+                            coroutineScope.launch {
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = context.resources.getString(R.string.error_server_connection_problem),
+                                )
+                            }
+                        }
                     },
                     onSaveToDevice = {
-                        val photos = state.selectedPhotos.ifEmpty { state.photos }
-                        val nodes = albumImportViewModel.mapPhotosToNodes(photos)
-                        onSaveToDevice(nodes)
+                        if (state.isNetworkConnected) {
+                            val photos = state.selectedPhotos.ifEmpty { state.photos }
+                            val nodes = albumImportViewModel.mapPhotosToNodes(photos)
+                            onSaveToDevice(nodes)
 
-                        albumImportViewModel.clearSelection()
+                            albumImportViewModel.clearSelection()
+                        } else {
+                            coroutineScope.launch {
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = context.resources.getString(R.string.error_server_connection_problem),
+                                )
+                            }
+                        }
                     },
                 )
             }
@@ -231,7 +250,15 @@ internal fun AlbumImportScreen(
                 onDownloadImage = albumImportViewModel::downloadImage,
                 onClickPhoto = { photo ->
                     if (state.selectedPhotos.isEmpty()) {
-                        onPreviewPhoto(photo)
+                        if (state.isNetworkConnected) {
+                            onPreviewPhoto(photo)
+                        } else {
+                            coroutineScope.launch {
+                                scaffoldState.snackbarHostState.showSnackbar(
+                                    message = context.resources.getString(R.string.error_server_connection_problem),
+                                )
+                            }
+                        }
                     } else if (photo in state.selectedPhotos) {
                         albumImportViewModel.unselectPhoto(photo)
                     } else {
