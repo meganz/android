@@ -15,6 +15,7 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
@@ -104,6 +105,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
     private val deviceGateway: AndroidDeviceGateway,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationContext private val context: Context,
 ) : CameraUploadRepository {
@@ -137,7 +139,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {
-        localStorageGateway.getPendingSyncRecords()
+        megaLocalRoomGateway.getPendingSyncRecords()
     }
 
     override suspend fun getUploadOption() = withContext(ioDispatcher) {
@@ -150,17 +152,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun deleteAllSyncRecords(syncRecordType: SyncRecordType) =
         withContext(ioDispatcher) {
-            localStorageGateway.deleteAllSyncRecords(syncRecordTypeIntMapper(syncRecordType))
+            megaLocalRoomGateway.deleteAllSyncRecords(syncRecordTypeIntMapper(syncRecordType))
         }
 
     override suspend fun deleteSyncRecord(path: String?, isSecondary: Boolean) =
         withContext(ioDispatcher) {
-            localStorageGateway.deleteSyncRecordByPath(path, isSecondary)
+            megaLocalRoomGateway.deleteSyncRecordByPath(path, isSecondary)
         }
 
     override suspend fun deleteSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean) =
         withContext(ioDispatcher) {
-            localStorageGateway.deleteSyncRecordByLocalPath(localPath, isSecondary)
+            megaLocalRoomGateway.deleteSyncRecordByLocalPath(localPath, isSecondary)
         }
 
     override suspend fun deleteSyncRecordByFingerprint(
@@ -169,7 +171,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         isSecondary: Boolean,
     ) =
         withContext(ioDispatcher) {
-            localStorageGateway.deleteSyncRecordByFingerPrint(
+            megaLocalRoomGateway.deleteSyncRecordByFingerPrint(
                 originalPrint,
                 newPrint,
                 isSecondary
@@ -182,37 +184,35 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         isCopy: Boolean,
     ): SyncRecord? =
         withContext(ioDispatcher) {
-            localStorageGateway.getSyncRecordByFingerprint(fingerprint, isSecondary, isCopy)
+            megaLocalRoomGateway.getSyncRecordByFingerprint(fingerprint, isSecondary, isCopy)
         }
 
     override suspend fun getSyncRecordByNewPath(path: String): SyncRecord? =
         withContext(ioDispatcher) {
-            localStorageGateway.getSyncRecordByNewPath(path)
+            megaLocalRoomGateway.getSyncRecordByNewPath(path)
         }
 
     override suspend fun getSyncRecordByLocalPath(path: String, isSecondary: Boolean): SyncRecord? =
         withContext(ioDispatcher) {
-            localStorageGateway.getSyncRecordByLocalPath(path, isSecondary)
+            megaLocalRoomGateway.getSyncRecordByLocalPath(path, isSecondary)
         }
 
     override suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
-        type: SyncRecordType,
     ): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.doesFileNameExist(fileName, isSecondary, syncRecordTypeIntMapper(type))
+        megaLocalRoomGateway.doesFileNameExist(fileName, isSecondary)
     }
 
     override suspend fun doesLocalPathExist(
         fileName: String,
         isSecondary: Boolean,
-        type: SyncRecordType,
     ): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.doesLocalPathExist(fileName, isSecondary, syncRecordTypeIntMapper(type))
+        megaLocalRoomGateway.doesLocalPathExist(fileName, isSecondary)
     }
 
     override suspend fun saveSyncRecord(record: SyncRecord) = withContext(ioDispatcher) {
-        localStorageGateway.saveSyncRecord(record)
+        megaLocalRoomGateway.saveSyncRecord(record)
     }
 
     override suspend fun getSyncTimeStamp(type: SyncTimeStamp): Long? {
@@ -318,7 +318,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus) =
         withContext(ioDispatcher) {
-            localStorageGateway.setUploadVideoSyncStatus(syncStatusIntMapper(syncStatus))
+            megaLocalRoomGateway.setUploadVideoSyncStatus(syncStatusIntMapper(syncStatus))
         }
 
     override suspend fun areUploadFileNamesKept(): Boolean = withContext(ioDispatcher) {
@@ -421,7 +421,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord> =
         withContext(ioDispatcher) {
-            localStorageGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
+            megaLocalRoomGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
         }
 
     override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
@@ -446,7 +446,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localPath: String?,
         isSecondary: Boolean,
     ) = withContext(ioDispatcher) {
-        localStorageGateway.updateSyncRecordStatusByLocalPath(
+        megaLocalRoomGateway.updateSyncRecordStatusByLocalPath(
             syncStatusType,
             localPath,
             isSecondary
@@ -556,11 +556,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun deleteAllPrimarySyncRecords() = withContext(ioDispatcher) {
-        localStorageGateway.deleteAllPrimarySyncRecords()
+        megaLocalRoomGateway.deleteAllPrimarySyncRecords()
     }
 
     override suspend fun deleteAllSecondarySyncRecords() = withContext(ioDispatcher) {
-        localStorageGateway.deleteAllSecondarySyncRecords()
+        megaLocalRoomGateway.deleteAllSecondarySyncRecords()
     }
 
     override suspend fun convertBase64ToHandle(base64: String): Long = withContext(ioDispatcher) {

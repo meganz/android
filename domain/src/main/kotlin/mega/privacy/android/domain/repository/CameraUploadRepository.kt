@@ -195,7 +195,6 @@ interface CameraUploadRepository {
     suspend fun doesFileNameExist(
         fileName: String,
         isSecondary: Boolean,
-        type: SyncRecordType,
     ): Boolean
 
     /**
@@ -206,7 +205,6 @@ interface CameraUploadRepository {
     suspend fun doesLocalPathExist(
         fileName: String,
         isSecondary: Boolean,
-        type: SyncRecordType,
     ): Boolean
 
     /**

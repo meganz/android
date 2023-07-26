@@ -11,7 +11,6 @@ import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -127,8 +126,7 @@ abstract class CameraUploadUseCases {
             MediaLocalPathExists { filePath, isSecondary ->
                 cameraUploadRepository.doesLocalPathExist(
                     filePath,
-                    isSecondary,
-                    SyncRecordType.TYPE_ANY
+                    isSecondary
                 )
             }
 
@@ -168,8 +166,7 @@ abstract class CameraUploadUseCases {
             FileNameExists { fileName, isSecondary ->
                 cameraUploadRepository.doesFileNameExist(
                     fileName,
-                    isSecondary,
-                    SyncRecordType.TYPE_ANY
+                    isSecondary
                 )
             }
 

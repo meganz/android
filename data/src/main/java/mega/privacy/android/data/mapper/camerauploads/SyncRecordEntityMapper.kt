@@ -10,7 +10,6 @@ internal class SyncRecordEntityMapper @Inject constructor(
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
 ) {
     suspend operator fun invoke(syncRecord: SyncRecord) = SyncRecordEntity(
-        id = syncRecord.id,
         originalPath = encryptData(syncRecord.localPath),
         newPath = encryptData(syncRecord.newPath),
         originalFingerPrint = encryptData(syncRecord.originFingerprint),

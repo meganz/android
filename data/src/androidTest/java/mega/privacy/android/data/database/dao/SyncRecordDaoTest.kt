@@ -55,16 +55,16 @@ class SyncRecordDaoTest {
     }
 
     @Test
-    fun test_that_getSyncRecordCountyByFileName_returns_the_items_count() = runTest {
+    fun test_that_getSyncRecordCountByFileName_returns_the_items_count() = runTest {
         generateEntities().forEach { syncRecordDao.insertOrUpdateSyncRecord(it) }
         Truth.assertThat(
-            syncRecordDao.getSyncRecordCountyByFileName(
+            syncRecordDao.getSyncRecordCountByFileName(
                 fileName = "2023-07-25 00.13.20_1_2.jpg",
                 secondary = "true"
             )
         ).isEqualTo(1)
         Truth.assertThat(
-            syncRecordDao.getSyncRecordCountyByFileName(
+            syncRecordDao.getSyncRecordCountByFileName(
                 fileName = "2023-07-25 00.13.20_1_2.jpg",
                 secondary = "false"
             )
@@ -72,10 +72,10 @@ class SyncRecordDaoTest {
     }
 
     @Test
-    fun test_that_getSyncRecordCountyByOriginalPath_returns_the_items_count() = runTest {
+    fun test_that_getSyncRecordCountByOriginalPath_returns_the_items_count() = runTest {
         generateEntities().forEach { syncRecordDao.insertOrUpdateSyncRecord(it) }
         Truth.assertThat(
-            syncRecordDao.getSyncRecordCountyByOriginalPath(
+            syncRecordDao.getSyncRecordCountByOriginalPath(
                 originalPath = "Cloud drive/Camera uploads/53132573053997.2023-03-24 00.13.20_1.jpg",
                 secondary = "false"
             )
@@ -83,15 +83,16 @@ class SyncRecordDaoTest {
     }
 
     @Test
-    fun test_that_getSyncRecordCountyByOriginalFingerprint_returns_the_items_count() = runTest {
-        generateEntities().forEach { syncRecordDao.insertOrUpdateSyncRecord(it) }
+    fun test_that_getSyncRecordByOriginalFingerprint_returns_the_items_count() = runTest {
+        val entities = generateEntities()
+        entities.forEach { syncRecordDao.insertOrUpdateSyncRecord(it) }
         Truth.assertThat(
-            syncRecordDao.getSyncRecordCountyByOriginalFingerprint(
+            syncRecordDao.getSyncRecordByOriginalFingerprint(
                 originalFingerprint = "adlkfjalsdkfj10",
                 secondary = "true",
                 copyOnly = "false",
             )
-        ).isEqualTo(1)
+        ).isEqualTo(entities[9].copy(id = 10))
     }
 
     @Test

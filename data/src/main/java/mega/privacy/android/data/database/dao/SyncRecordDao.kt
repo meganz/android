@@ -20,17 +20,17 @@ internal interface SyncRecordDao {
     suspend fun updateVideoState(state: Int)
 
     @Query("SELECT COUNT(id) FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_filename = :fileName AND sync_secondary = :secondary")
-    suspend fun getSyncRecordCountyByFileName(fileName: String?, secondary: String): Int
+    suspend fun getSyncRecordCountByFileName(fileName: String?, secondary: String): Int
 
     @Query("SELECT COUNT(id) FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_filepath_origin = :originalPath AND sync_secondary = :secondary")
-    suspend fun getSyncRecordCountyByOriginalPath(originalPath: String?, secondary: String): Int
+    suspend fun getSyncRecordCountByOriginalPath(originalPath: String?, secondary: String): Int
 
-    @Query("SELECT COUNT(id) FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_fingerprint_origin = :originalFingerprint AND sync_secondary = :secondary AND sync_copyonly = :copyOnly")
-    suspend fun getSyncRecordCountyByOriginalFingerprint(
+    @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_fingerprint_origin = :originalFingerprint AND sync_secondary = :secondary AND sync_copyonly = :copyOnly")
+    suspend fun getSyncRecordByOriginalFingerprint(
         originalFingerprint: String?,
         secondary: String,
         copyOnly: String,
-    ): Int
+    ): SyncRecordEntity?
 
     @Query("SELECT * FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_filepath_origin = :originalPath AND sync_secondary = :secondary")
     suspend fun getSyncRecordByOriginalPathAndIsSecondary(

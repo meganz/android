@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
@@ -88,6 +89,7 @@ class DefaultCameraUploadRepositoryTest {
     private val uploadOptionIntMapper = mock<UploadOptionIntMapper>()
     private val uploadOptionMapper = mock<UploadOptionMapper>()
     private val deviceGateway = mock<AndroidDeviceGateway>()
+    private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -131,6 +133,7 @@ class DefaultCameraUploadRepositoryTest {
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,
             uploadOptionIntMapper = uploadOptionIntMapper,
+            megaLocalRoomGateway = megaLocalRoomGateway,
             context = mock(),
         )
     }
@@ -273,7 +276,7 @@ class DefaultCameraUploadRepositoryTest {
         @EnumSource(SyncStatus::class)
         fun `test that the upload video sync status is updated`(syncStatus: SyncStatus) = runTest {
             underTest.setUploadVideoSyncStatus(syncStatus)
-            verify(localStorageGateway).setUploadVideoSyncStatus(syncStatus.value)
+            verify(megaLocalRoomGateway).setUploadVideoSyncStatus(syncStatus.value)
         }
     }
 
@@ -282,7 +285,7 @@ class DefaultCameraUploadRepositoryTest {
     inner class SyncTest {
         @Test
         fun `test that the camera uploads sync records are retrieved`() = runTest {
-            whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
+            whenever(megaLocalRoomGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
             assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
         }
 
@@ -330,10 +333,9 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that the file name exists or not`(fileNameExists: Boolean) = runTest {
             whenever(
-                localStorageGateway.doesFileNameExist(
+                megaLocalRoomGateway.doesFileNameExist(
                     fileName = any(),
                     isSecondary = any(),
-                    type = any(),
                 )
             ).thenReturn(
                 fileNameExists
@@ -344,7 +346,6 @@ class DefaultCameraUploadRepositoryTest {
                 underTest.doesFileNameExist(
                     fileName = "",
                     isSecondary = false,
-                    type = SyncRecordType.TYPE_ANY,
                 )
             ).isEqualTo(fileNameExists)
         }
@@ -353,10 +354,9 @@ class DefaultCameraUploadRepositoryTest {
         @ValueSource(booleans = [true, false])
         fun `test that the local path exists or not`(localPathExists: Boolean) = runTest {
             whenever(
-                localStorageGateway.doesLocalPathExist(
+                megaLocalRoomGateway.doesLocalPathExist(
                     fileName = any(),
                     isSecondary = any(),
-                    type = any(),
                 )
             ).thenReturn(
                 localPathExists
@@ -367,7 +367,6 @@ class DefaultCameraUploadRepositoryTest {
                 underTest.doesLocalPathExist(
                     fileName = "",
                     isSecondary = false,
-                    type = SyncRecordType.TYPE_ANY,
                 )
             ).isEqualTo(localPathExists)
         }
@@ -423,7 +422,7 @@ class DefaultCameraUploadRepositoryTest {
 
         @Test
         fun `test that the video sync records are retrieved by status`() = runTest {
-            whenever(localStorageGateway.getVideoSyncRecordsByStatus(any())).thenReturn(
+            whenever(megaLocalRoomGateway.getVideoSyncRecordsByStatus(any())).thenReturn(
                 listOf(fakeRecord)
             )
             assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)).isEqualTo(

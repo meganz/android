@@ -46,7 +46,7 @@ internal class SyncRecordEntityMapperTest {
         )
 
         val expected = SyncRecordEntity(
-            id = 0,
+            id = null,
             originalPath = "Cloud drive/Camera uploads/53132573053997.2023-03-24 00.13.20_1.jpg",
             newPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             originalFingerPrint = "adlkfjalsdkfj",
