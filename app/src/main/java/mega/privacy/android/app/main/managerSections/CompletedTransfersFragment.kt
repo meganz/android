@@ -17,7 +17,6 @@ import mega.privacy.android.app.main.adapters.MegaCompletedTransfersAdapter
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import nz.mega.sdk.MegaApiAndroid
 import javax.inject.Inject
 
@@ -95,22 +94,6 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
             }
         }
     }
-
-    /**
-     * Checks if there is any completed transfer.
-     *
-     * @return True if there is any completed transfer, false otherwise.
-     */
-    fun isAnyTransferCompleted(): Boolean = viewModel.getCompletedTransfers().isNotEmpty()
-
-    /**
-     * Removes a completed transfer.
-     *
-     * @param transfer transfer to remove
-     * @param isRemovedCache If ture, remove cache file, otherwise doesn't remove cache file
-     */
-    fun transferRemoved(transfer: CompletedTransfer, isRemovedCache: Boolean) =
-        viewModel.completedTransferRemoved(transfer, isRemovedCache)
 
     /**
      * Removes all completed transfers.

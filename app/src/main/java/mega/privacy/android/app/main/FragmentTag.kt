@@ -1,7 +1,5 @@
 package mega.privacy.android.app.main
 
-import mega.privacy.android.app.R
-
 internal enum class FragmentTag {
     CLOUD_DRIVE,
     HOMEPAGE,
@@ -10,8 +8,7 @@ internal enum class FragmentTag {
     INCOMING_SHARES,
     OUTGOING_SHARES,
     SEARCH,
-    TRANSFERS,
-    COMPLETED_TRANSFERS,
+    TRANSFERS_PAGE,
     RECENT_CHAT,
     SYNC,
     RUBBISH_BIN,
@@ -37,8 +34,7 @@ internal enum class FragmentTag {
             INCOMING_SHARES -> "incomingSharesFragment"
             OUTGOING_SHARES -> "outgoingSharesFragment"
             SEARCH -> "searchFragment"
-            TRANSFERS -> "android:switcher:${R.id.transfers_tabs_pager}:0"
-            COMPLETED_TRANSFERS -> "android:switcher:${R.id.transfers_tabs_pager}:1"
+            TRANSFERS_PAGE -> "transferPageFragment"
             RECENT_CHAT -> "chatTabsFragment"
             NOTIFICATIONS -> "notificationsFragment"
             TURN_ON_NOTIFICATIONS -> "turnOnNotificationsFragment"

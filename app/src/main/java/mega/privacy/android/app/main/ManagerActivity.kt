@@ -74,7 +74,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -108,7 +107,6 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.CustomViewPager
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -144,7 +142,6 @@ import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.RemoveFromChatRoomListener
-import mega.privacy.android.app.main.adapters.TransfersPageAdapter
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
@@ -156,9 +153,7 @@ import mega.privacy.android.app.main.dialog.connect.ConfirmConnectDialogFragment
 import mega.privacy.android.app.main.dialog.contactlink.ContactLinkDialogFragment
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.listeners.FabButtonListener
-import mega.privacy.android.app.main.managerSections.CompletedTransfersFragment
 import mega.privacy.android.app.main.managerSections.ManagerUploadBottomSheetDialogActionHandler
-import mega.privacy.android.app.main.managerSections.TransfersFragment
 import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.mapper.ManagerRedirectIntentMapper
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
@@ -172,7 +167,6 @@ import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragmen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
-import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ChatBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
@@ -250,6 +244,8 @@ import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingShare
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
+import mega.privacy.android.app.presentation.transfers.page.TransferPageFragment
+import mega.privacy.android.app.presentation.transfers.page.TransferPageViewModel
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaManager
@@ -396,6 +392,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
+    private val transferPageViewModel: TransferPageViewModel by viewModels()
 
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
@@ -538,9 +535,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var viewPagerShares: ViewPager2
 
     //Tabs in Transfers
-    private lateinit var tabLayoutTransfers: TabLayout
-    private lateinit var transferTabsAdapter: TransfersPageAdapter
-    private lateinit var viewPagerTransfers: CustomViewPager
     private lateinit var callInProgressLayout: RelativeLayout
     private lateinit var callInProgressChrono: Chronometer
     private lateinit var callInProgressText: TextView
@@ -568,8 +562,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var incomingSharesFragment: MegaNodeBaseFragment? = null
     private var outgoingSharesFragment: MegaNodeBaseFragment? = null
     private var linksFragment: MegaNodeBaseFragment? = null
-    private var transfersFragment: TransfersFragment? = null
-    private var completedTransfersFragment: CompletedTransfersFragment? = null
     private var searchFragment: SearchFragment? = null
     private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
@@ -989,7 +981,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             handler.postDelayed({ changeAppBarElevation(true, elevationCause) }, 100)
         }
         setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout))
-        setupTransferPager()
         setupAudioPlayerController()
         megaApi.getAccountAchievements(this)
         if (!viewModel.isConnected) {
@@ -1110,8 +1101,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         cameraUploadViewTypes = findViewById(R.id.cu_view_type)
         tabLayoutShares = findViewById(R.id.sliding_tabs_shares)
         viewPagerShares = findViewById(R.id.shares_tabs_pager)
-        tabLayoutTransfers = findViewById(R.id.sliding_tabs_transfers)
-        viewPagerTransfers = findViewById(R.id.transfers_tabs_pager)
         callInProgressLayout = findViewById(R.id.call_in_progress_layout)
         callInProgressChrono = findViewById(R.id.call_in_progress_chrono)
         callInProgressText = findViewById(R.id.call_in_progress_text)
@@ -1264,33 +1253,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 override fun onTabReselected(tab: TabLayout.Tab) {}
             }
         )
-        viewPagerTransfers.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int,
-            ) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                supportInvalidateOptionsMenu()
-                checkScrollElevation()
-                val selectedTab: TransfersTab = TransfersTab.fromPosition(position)
-                if (selectedTab === TransfersTab.PENDING_TAB && isTransfersInProgressAdded) {
-                    transfersFragment?.setGetMoreQuotaViewVisibility()
-                } else if (selectedTab === TransfersTab.COMPLETED_TAB) {
-                    if (isTransfersCompletedAdded) {
-                        completedTransfersFragment?.setGetMoreQuotaViewVisibility()
-                    }
-                    if (isTransfersInProgressAdded) {
-                        transfersFragment?.checkSelectModeAfterChangeTabOrDrawerItem()
-                    }
-                }
-                transfersViewModel.setCurrentSelectedTab(selectedTab)
-            }
-
-            override fun onPageScrollStateChanged(state: Int) {}
-        })
         callInProgressLayout.setOnClickListener(this)
         (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as? NavHostFragment)?.let {
             setupNavDestListener(it)
@@ -1305,12 +1267,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         itemView.addView(callBadge)
         callBadge.visibility = View.GONE
         setChatBadge()
-    }
-
-    private fun setupTransferPager() {
-        transferTabsAdapter = TransfersPageAdapter(supportFragmentManager, this)
-        viewPagerTransfers.adapter = transferTabsAdapter
-        tabLayoutTransfers.setupWithViewPager(viewPagerTransfers)
     }
 
     private fun setupAudioPlayerController() {
@@ -1394,9 +1350,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 result
             )
         }
-        transfersManagementViewModel.onGetShouldCompletedTab().observe(
-            this
-        ) { showCompleted: Boolean -> updateTransfersTab(showCompleted) }
     }
 
     private fun handleRootNodeAndHeartbeatState(
@@ -1801,7 +1754,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
                             }
                             drawerItem = DrawerItem.TRANSFERS
-                            viewModel.setTransfersTab(
+                            transferPageViewModel.setTransfersTab(
                                 intent.serializable(
                                     TRANSFERS_TAB
                                 ) ?: TransfersTab.NONE
@@ -1966,7 +1919,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         viewModel.onCancelTransfersResultConsumed()
         if (cancelTransfersResult.isSuccess) {
             hideTransfersWidget()
-            if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
+            if (drawerItem === DrawerItem.TRANSFERS) {
                 pauseTransfersMenuIcon?.isVisible = false
                 playTransfersMenuIcon?.isVisible = false
                 cancelAllTransfersMenuItem?.isVisible = false
@@ -2605,7 +2558,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Constants.ACTION_CANCEL_CAM_SYNC -> {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC")
                     drawerItem = DrawerItem.TRANSFERS
-                    viewModel.setTransfersTab(
+                    transferPageViewModel.setTransfersTab(
                         intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
                     )
                     selectDrawerItem(drawerItem)
@@ -2616,7 +2569,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         getString(R.string.general_yes)
                     ) { _: DialogInterface?, _: Int ->
                         viewModel.stopCameraUploads(shouldReschedule = false)
-                        transfersFragment?.destroyActionMode()
+                        transferPageFragment?.destroyActionMode()
                     }
                     builder.setNegativeButton(getString(R.string.general_no), null)
                     val dialog = builder.create()
@@ -2632,7 +2585,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
                     }
                     drawerItem = DrawerItem.TRANSFERS
-                    viewModel.setTransfersTab(
+                    transferPageViewModel.setTransfersTab(
                         intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE
                     )
                     selectDrawerItem(drawerItem)
@@ -2887,8 +2840,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         appBarLayout.visibility = View.VISIBLE
         tabLayoutShares.visibility = View.GONE
         viewPagerShares.visibility = View.GONE
-        tabLayoutTransfers.visibility = View.GONE
-        viewPagerTransfers.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
 
         lifecycleScope.launch {
@@ -3456,39 +3407,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         drawerItem = DrawerItem.TRANSFERS
         setBottomNavigationMenuItemChecked(NO_BNV)
         transfersManagementViewModel.checkIfShouldShowCompletedTab()
+        replaceFragment(
+            transferPageFragment ?: TransferPageFragment.newInstance(),
+            FragmentTag.TRANSFERS_PAGE.tag
+        )
         setToolbarTitle()
         showFabButton()
         closeDrawer()
-    }
-
-    /**
-     * Updates the Transfers tab index.
-     *
-     * @param showCompleted True if should show the Completed tab, false otherwise.
-     */
-    private fun updateTransfersTab(showCompleted: Boolean) {
-        viewModel.setTransfersTab(if (transfersManagement.getAreFailedTransfers() || showCompleted) TransfersTab.COMPLETED_TAB else TransfersTab.PENDING_TAB)
-        when (viewModel.state.value.transfersTab) {
-            TransfersTab.COMPLETED_TAB -> {
-                refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)
-                viewPagerTransfers.currentItem = TransfersTab.COMPLETED_TAB.position
-            }
-
-            else -> {
-                refreshFragment(FragmentTag.TRANSFERS.tag)
-                viewPagerTransfers.currentItem = TransfersTab.PENDING_TAB.position
-                if (transfersManagement.shouldShowNetworkWarning) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_server_connection_problem),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        }
-        transferTabsAdapter.notifyDataSetChanged()
-        viewModel.setTransfersTab(TransfersTab.fromPosition(viewPagerTransfers.currentItem))
-        setToolbarTitle()
     }
 
     private fun selectDrawerItemChat() {
@@ -3519,8 +3444,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun setTabsVisibility() {
         tabLayoutShares.visibility = View.GONE
         viewPagerShares.visibility = View.GONE
-        tabLayoutTransfers.visibility = View.GONE
-        viewPagerTransfers.visibility = View.GONE
         mShowAnyTabLayout = false
         fragmentContainer.visibility = View.GONE
         navHostView.visibility = View.GONE
@@ -3541,12 +3464,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewPagerShares.isUserInputEnabled = true
                 }
                 viewPagerShares.visibility = View.VISIBLE
-                mShowAnyTabLayout = true
-            }
-
-            DrawerItem.TRANSFERS -> {
-                tabLayoutTransfers.visibility = View.VISIBLE
-                viewPagerTransfers.visibility = View.VISIBLE
                 mShowAnyTabLayout = true
             }
 
@@ -3589,14 +3506,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 tabLayoutShares.visibility = visibility
                 viewPagerShares.isUserInputEnabled = !hide
-            }
-
-            DrawerItem.TRANSFERS -> {
-                if (currentTab === TransfersTab.PENDING_TAB && !isTransfersInProgressAdded) {
-                    return
-                }
-                tabLayoutTransfers.visibility = visibility
-                viewPagerTransfers.disableSwipe(hide)
             }
 
             else -> {}
@@ -3719,8 +3628,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (item !== DrawerItem.PHOTOS) {
             resetCUFragment()
         }
-        if (item !== DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
-            transfersFragment?.checkSelectModeAfterChangeTabOrDrawerItem()
+        if (item !== DrawerItem.TRANSFERS) {
+            transferPageFragment?.destroyActionModeIfNeeded()
         }
         transfersManagement.isOnTransfersSection = item === DrawerItem.TRANSFERS
         when (item) {
@@ -4076,18 +3985,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 sharesPageAdapter.getFragment(SharesTab.LINKS_TAB.position) as? MegaNodeBaseFragment
             return linksFragment != null && linksFragment?.isAdded == true
         }
-    private val isTransfersInProgressAdded: Boolean
-        get() {
-            transfersFragment =
-                supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS.tag) as? TransfersFragment
-            return transfersFragment?.isAdded ?: false
-        }
-    private val isTransfersCompletedAdded: Boolean
-        get() {
-            completedTransfersFragment =
-                supportFragmentManager.findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.tag) as? CompletedTransfersFragment
-            return completedTransfersFragment?.isAdded ?: false
-        }
+    private val transferPageFragment: TransferPageFragment?
+        get() = supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS_PAGE.tag) as? TransferPageFragment
 
     override val isOnFileManagementManagerSection: Boolean
         get() = drawerItem !== DrawerItem.TRANSFERS
@@ -4137,11 +4036,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             DrawerItem.TRANSFERS -> {
-                if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded) {
-                    transfersFragment?.updateElevation()
-                } else if (tabItemTransfers === TransfersTab.COMPLETED_TAB && isTransfersCompletedAdded) {
-                    completedTransfersFragment?.updateElevation()
-                }
+                transferPageFragment?.updateElevation()
             }
 
             else -> {}
@@ -4492,7 +4387,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                 }
 
-                DrawerItem.TRANSFERS -> if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded && transfersFragment?.isNotEmptyTransfer() == true) {
+                DrawerItem.TRANSFERS -> if (transferPageViewModel.transferTab == TransfersTab.PENDING_TAB
+                    && transfersViewModel.getActiveTransfers().isNotEmpty()
+                ) {
                     if (dbH.transferQueueStatus) {
                         playTransfersMenuIcon?.isVisible = true
                     } else {
@@ -4500,7 +4397,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                     cancelAllTransfersMenuItem?.isVisible = true
                     enableSelectMenuItem.isVisible = true
-                } else if ((tabItemTransfers === TransfersTab.COMPLETED_TAB) && isTransfersInProgressAdded && (completedTransfersFragment?.isAnyTransferCompleted() == true)) {
+                } else if ((transferPageViewModel.transferTab === TransfersTab.COMPLETED_TAB)
+                    && transfersViewModel.getCompletedTransfers().isNotEmpty()
+                ) {
                     clearCompletedTransfers?.isVisible = true
                     retryTransfers?.isVisible = thereAreFailedOrCancelledTransfers()
                 }
@@ -4802,9 +4701,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             R.id.action_enable_select -> {
-                if (isTransfersInProgressAdded) {
-                    transfersFragment?.activateActionMode()
-                }
+                transferPageFragment?.activateActionMode()
                 true
             }
 
@@ -6360,7 +6257,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 transfersToImageViewer = true
             }
             drawerItem = DrawerItem.TRANSFERS
-            viewModel.setTransfersTab(intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE)
+            transferPageViewModel.setTransfersTab(intent.serializable(TRANSFERS_TAB) ?: TransfersTab.NONE)
             selectDrawerItem(drawerItem)
             return
         }
@@ -7792,9 +7689,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 //force update the pause notification to prevent missed onTransferUpdate
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidgetState()
-                    if (drawerItem === DrawerItem.TRANSFERS && isTransfersInProgressAdded) {
+                    if (drawerItem === DrawerItem.TRANSFERS) {
                         val areTransfersPaused = dbH.transferQueueStatus
-                        refreshFragment(FragmentTag.TRANSFERS.tag)
+                        refreshFragment(FragmentTag.TRANSFERS_PAGE.tag)
                         pauseTransfersMenuIcon?.isVisible = !areTransfersPaused
                         playTransfersMenuIcon?.isVisible = areTransfersPaused
 
@@ -7812,10 +7709,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
                 if (e.errorCode == MegaError.API_OK) {
                     updateTransfersWidgetState()
-
-                    if (isTransfersInProgressAdded) {
-                        transfersFragment?.changeStatusButton(request.transferTag)
-                    }
+                    transfersViewModel.activeTransferChangeStatus(request.transferTag)
                 } else {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
@@ -8116,9 +8010,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val builder = MaterialAlertDialogBuilder(this)
         builder.setMessage(R.string.confirmation_to_clear_completed_transfers)
             .setPositiveButton(R.string.general_clear) { _: DialogInterface?, _: Int ->
-                if (isTransfersCompletedAdded) {
-                    completedTransfersFragment?.clearCompletedTransfers()
-                }
+                transfersViewModel.clearCompletedTransfers()
                 dbH.emptyCompletedTransfers()
                 supportInvalidateOptionsMenu()
             }
@@ -8150,9 +8042,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         object : OptionalMegaRequestListenerInterface() {
                         })
                 }
-                if (isTransfersInProgressAdded) {
-                    transfersFragment?.destroyActionMode()
-                }
+                transferPageFragment?.destroyActionMode()
             }
             .setNegativeButton(R.string.general_dismiss, null)
         confirmationTransfersDialog = builder.create()
@@ -8170,8 +8060,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             ) { _: DialogInterface?, _: Int ->
                 viewModel.cancelAllTransfers()
                 viewModel.stopCameraUploads(shouldReschedule = true)
-                refreshFragment(FragmentTag.TRANSFERS.tag)
-                refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)
+                refreshFragment(FragmentTag.TRANSFERS_PAGE.tag)
             }
             .setNegativeButton(R.string.general_dismiss, null)
         confirmationTransfersDialog = builder.create()
@@ -8207,17 +8096,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         set(index) {
             viewPagerShares.currentItem = index.position
         }
-
-    private val tabItemTransfers: TransfersTab
-        get() = TransfersTab.fromPosition(viewPagerTransfers.currentItem)
-
-
-    fun showChatPanel(chat: MegaChatListItem?) {
-        Timber.d("showChatPanel")
-        if (chat == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        bottomSheetDialogFragment = ChatBottomSheetDialogFragment.newInstance(chat.chatId)
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
-    }
 
     private fun updateUserNameNavigationView(fullName: String?) {
         Timber.d("updateUserNameNavigationView")
@@ -8702,9 +8580,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun removeCompletedTransfer(transfer: CompletedTransfer, isRemovedCache: Boolean) {
         dbH.deleteTransfer(transfer.id ?: return)
-        if (isTransfersCompletedAdded) {
-            completedTransfersFragment?.transferRemoved(transfer, isRemovedCache)
-        }
+        transfersViewModel.completedTransferRemoved(transfer, isRemovedCache)
     }
 
     /**
@@ -8897,9 +8773,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val retryTransfers = failedAndCancelledTransfers
         dbH.removeFailedOrCancelledTransfers()
         for (transfer in retryTransfers) {
-            if (isTransfersCompletedAdded) {
-                completedTransfersFragment?.transferRemoved(transfer, false)
-            }
+            transfersViewModel.completedTransferRemoved(transfer, false)
             retryTransfer(transfer)
         }
     }

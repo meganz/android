@@ -123,16 +123,9 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     }
 
     /**
-     * Changes the status (play/pause) of the button of a transfer.
-     *
-     * @param tag identifier of the transfer to change the status of the button
-     */
-    fun changeStatusButton(tag: Int) = viewModel.activeTransferChangeStatus(tag)
-
-    /**
      * Check whether is in select mode after changing tab or drawer item.
      */
-    fun checkSelectModeAfterChangeTabOrDrawerItem() {
+    fun destroyActionModeIfNeed() {
         adapter?.run {
             if (isMultipleSelect()) {
                 destroyActionMode()
@@ -372,12 +365,6 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     private fun disableDragAndDrop() =
         itemTouchHelper.attachToRecyclerView(null)
-
-    /**
-     * Is empty transfer
-     *
-     */
-    fun isNotEmptyTransfer() = viewModel.getActiveTransfers().isNotEmpty()
 
     companion object {
 

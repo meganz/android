@@ -28,7 +28,6 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
@@ -407,15 +406,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun setSharesTab(tab: SharesTab) = viewModelScope.launch {
         _state.update { it.copy(sharesTab = tab) }
-    }
-
-    /**
-     * Set the current transfers tab to the UI state
-     *
-     * @param tab transfer tab to set
-     */
-    fun setTransfersTab(tab: TransfersTab) = viewModelScope.launch {
-        _state.update { it.copy(transfersTab = tab) }
     }
 
     /**

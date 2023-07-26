@@ -23,7 +23,6 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
-import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.CameraUploadFolderIconUpdate
 import mega.privacy.android.domain.entity.EventType
@@ -319,7 +318,6 @@ class ManagerViewModelTest {
             val initial = awaitItem()
             assertThat(initial.isFirstNavigationLevel).isTrue()
             assertThat(initial.sharesTab).isEqualTo(SharesTab.INCOMING_TAB)
-            assertThat(initial.transfersTab).isEqualTo(TransfersTab.NONE)
             assertThat(initial.isFirstLogin).isFalse()
             assertThat(initial.nodeUpdateReceived).isFalse()
             assertThat(initial.shouldAlertUserAboutSecurityUpgrade).isFalse()
@@ -355,17 +353,6 @@ class ManagerViewModelTest {
                 val newValue = SharesTab.OUTGOING_TAB
                 assertThat(awaitItem()).isEqualTo(SharesTab.INCOMING_TAB)
                 underTest.setSharesTab(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
-            }
-    }
-
-    @Test
-    fun `test that transfers tab is updated if new value provided`() = runTest {
-        underTest.state.map { it.transfersTab }.distinctUntilChanged()
-            .test {
-                val newValue = TransfersTab.PENDING_TAB
-                assertThat(awaitItem()).isEqualTo(TransfersTab.NONE)
-                underTest.setTransfersTab(newValue)
                 assertThat(awaitItem()).isEqualTo(newValue)
             }
     }

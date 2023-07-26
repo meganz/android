@@ -51,12 +51,6 @@
                         android:text="@string/tab_links_shares"/>
                 </com.google.android.material.tabs.TabLayout>
 
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/sliding_tabs_transfers"
-                    style="@style/Widget.Mega.TabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
             </com.google.android.material.appbar.AppBarLayout>
 
             <include
@@ -72,12 +66,6 @@
                 android:layout_height="0dp"
                 android:layout_weight="1" >
             </androidx.viewpager2.widget.ViewPager2>
-
-            <mega.privacy.android.app.components.CustomViewPager
-                android:id="@+id/transfers_tabs_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/nav_host_fragment"

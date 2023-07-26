@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
     val sharesTab: SharesTab = SharesTab.INCOMING_TAB,
-    val transfersTab: TransfersTab = TransfersTab.NONE,
     val isFirstLogin: Boolean = false,
     val hasInboxChildren: Boolean = false,
     val nodeUpdateReceived: Boolean = false,
