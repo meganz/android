@@ -615,6 +615,7 @@ class PasscodeLockActivity : BaseActivity() {
     private fun skipPasscode() {
         passcodeUtil.pauseUpdate()
         resetAttempts()
+        clearFocus()
         finish()
     }
 
@@ -762,6 +763,19 @@ class PasscodeLockActivity : BaseActivity() {
             onBackPressedDispatcher.onBackPressed()
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun clearFocus() {
+        with(binding) {
+            listOf(
+                passFirstInput,
+                passSecondInput,
+                passThirdInput,
+                passFourthInput,
+                passFifthInput,
+                passSixthInput,
+            ).forEach { it.clearFocus() }
+        }
     }
 
     override fun onDestroy() {

@@ -23,9 +23,11 @@ class EditTextPIN @JvmOverloads constructor(
      */
     var previousDigitEditText: AppCompatEditText? = null
 
-    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection {
+    override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         Timber.tag("EditTextPIN").d("onCreateInputConnection()")
-        return PinInputConnection(super.onCreateInputConnection(outAttrs), true)
+        return super.onCreateInputConnection(outAttrs)?.let {
+            PinInputConnection(it, true)
+        }
     }
 
     private inner class PinInputConnection(target: InputConnection?, mutable: Boolean) :
