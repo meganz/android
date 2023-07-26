@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import mega.privacy.android.core.ui.navigation.launchFolderPicker
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.feature.sync.R
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.core.ui.controls.banners.TwoActionsBanner
 import mega.privacy.android.feature.sync.ui.views.InputSyncInformationView
 
 @Composable
@@ -24,6 +26,9 @@ internal fun SyncNewFolderScreen(
     folderPairName: String,
     selectedLocalFolder: String,
     selectedMegaFolder: RemoteFolder?,
+    showPermissionBanner: Boolean,
+    permissionAllowButtonClicked: () -> Unit,
+    permissionLearnMoreButtonClicked: () -> Unit,
     localFolderSelected: (Uri) -> Unit,
     folderNameChanged: (String) -> Unit,
     selectMegaFolderClicked: () -> Unit,
@@ -33,6 +38,20 @@ internal fun SyncNewFolderScreen(
     Column {
         val folderPicker = launchFolderPicker {
             localFolderSelected(it)
+        }
+
+        if (showPermissionBanner) {
+            TwoActionsBanner(
+                modifier = Modifier.padding(top = 20.dp),
+                mainText = "Battery optimisation permission allows MEGA to run " +
+                        "in the background. You can change this any time by going to " +
+                        "Settings -> Apps.",
+                leftActionText = "Learn more",
+                rightActionText = "Allow",
+                leftActionClicked = permissionLearnMoreButtonClicked,
+                rightActionClicked = permissionAllowButtonClicked,
+            )
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
         }
 
         InputSyncInformationView(
@@ -78,6 +97,9 @@ private fun PreviewSyncNewFolderScreen() {
             folderPairName = "",
             selectedLocalFolder = "",
             selectedMegaFolder = null,
+            showPermissionBanner = true,
+            permissionAllowButtonClicked = {},
+            permissionLearnMoreButtonClicked = {},
             localFolderSelected = {},
             folderNameChanged = {},
             selectMegaFolderClicked = {},

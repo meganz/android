@@ -21,6 +21,13 @@ internal fun SyncNewFolderScreenRoute(
         localFolderSelected = { viewModel.handleAction(LocalFolderSelected(it)) },
         folderNameChanged = { viewModel.handleAction(FolderNameChanged(it)) },
         selectMegaFolderClicked = openSelectMegaFolderScreen,
+        showPermissionBanner = false,
+        permissionAllowButtonClicked = {
+            // implemented in next MR
+        },
+        permissionLearnMoreButtonClicked = {
+            // implemented in next MR
+        },
         syncClicked = {
             viewModel.handleAction(NextClicked)
             openNextScreen(state.value)
