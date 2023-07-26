@@ -55,7 +55,6 @@ fun PasscodeField(
         PasscodeCell(
             char = character,
             isFocussed = isFocussed,
-            modifier = modifier,
         )
     },
 ) {
@@ -76,7 +75,10 @@ fun PasscodeField(
         keyboardOptions = keyboardOptions,
         modifier = Modifier.testTag(PASSCODE_FIELD_TAG),
         decorationBox = {
-            Row(horizontalArrangement = Arrangement.Center) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = modifier
+            ) {
                 repeat(numberOfCharacters) { index ->
                     val char = when {
                         index >= passcodeValue.length -> ""
