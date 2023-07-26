@@ -682,7 +682,7 @@ public class ChatActivity extends PasscodeActivity
     private TextView startOrJoinMeetingBanner;
     private Chronometer callInProgressChrono;
     private boolean startVideo = false;
-
+    private boolean shouldCallRing = true;
     private RelativeLayout chatRoomOptions;
     private EmojiEditText textChat;
     private ImageButton sendIcon;
@@ -1196,7 +1196,7 @@ public class ChatActivity extends PasscodeActivity
             return;
 
         startVideo = videoOn;
-
+        shouldCallRing = true;
         startCall();
     }
 
@@ -1512,7 +1512,7 @@ public class ChatActivity extends PasscodeActivity
                 result -> {
                     if (checkMandatoryCallPermissions(chatActivity)) {
                         enableCallMenuItems(false);
-                        viewModel.onCallTap(startVideo);
+                        viewModel.onCallTap(startVideo, shouldCallRing);
                     } else {
                         showSnackbar(Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
                                 fragmentContainer,
@@ -3650,6 +3650,7 @@ public class ChatActivity extends PasscodeActivity
 
         if (!participatingInACall()) {
             Timber.d("There is not a call in this chat and I am NOT in another call");
+            shouldCallRing = true;
             startCall();
         }
     }
@@ -4473,6 +4474,7 @@ public class ChatActivity extends PasscodeActivity
             }
         } else if (id == R.id.start_or_join_meeting_banner) {
             startVideo = false;
+            shouldCallRing = false;
             startCall();
         }
     }

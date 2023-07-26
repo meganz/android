@@ -216,8 +216,9 @@ class ChatViewModel @Inject constructor(
      * Call button clicked
      *
      * @param video True, video on. False, video off.
+     * @param isStartCall True, if it should start as a call. False if not.
      */
-    fun onCallTap(video: Boolean) {
+    fun onCallTap(video: Boolean, isStartCall: Boolean) {
         MegaApplication.isWaitingForCall = false
         cameraGateway.setFrontCamera()
 
@@ -226,8 +227,12 @@ class ChatViewModel @Inject constructor(
                 video = video
             )
 
-            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
-            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> answerCall(
+            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> if (isStartCall) startCall(
+                video = video
+            ) else startSchedMeeting()
+
+            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined
+            -> answerCall(
                 _state.value.chatId,
                 video = false,
                 audio = true
