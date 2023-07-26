@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -29,10 +30,12 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
+import java.util.UUID
 
 /**
  * Fragment of [GetLinkActivity] to allow the creation of multiple links.
  */
+@AndroidEntryPoint
 class GetSeveralLinksFragment : Fragment() {
 
     private val viewModel: GetSeveralLinksViewModel by activityViewModels()
@@ -79,11 +82,11 @@ class GetSeveralLinksFragment : Fragment() {
             }
 
             R.id.action_share -> {
-                startActivity(
-                    Intent(Intent.ACTION_SEND)
-                        .setType(TYPE_TEXT_PLAIN)
-                        .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
-                )
+                val uniqueId = UUID.randomUUID()
+                Intent(Intent.ACTION_SEND)
+                    .setType(TYPE_TEXT_PLAIN)
+                    .putExtra(Intent.EXTRA_SUBJECT, "${uniqueId}.url")
+                    .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
             }
 
             R.id.action_chat -> {

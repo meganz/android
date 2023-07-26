@@ -283,6 +283,7 @@ class GetLinkViewModel @Inject constructor(
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = Constants.TYPE_TEXT_PLAIN
         intent.putExtra(Intent.EXTRA_TEXT, link ?: node?.publicLink)
+        intent.putExtra(Intent.EXTRA_SUBJECT, node?.name)
         action.invoke(Intent.createChooser(intent, context.getString(R.string.context_get_link)))
     }
 

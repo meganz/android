@@ -107,6 +107,7 @@ import java.io.FileReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -362,6 +363,8 @@ object MegaNodeUtil {
     fun startShareIntent(context: Context, shareIntent: Intent, link: String?) {
         shareIntent.type = TYPE_TEXT_PLAIN
         shareIntent.putExtra(Intent.EXTRA_TEXT, link)
+        val uniqueId = UUID.randomUUID()
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "${uniqueId}.url")
         context.startActivity(
             Intent.createChooser(
                 shareIntent,
