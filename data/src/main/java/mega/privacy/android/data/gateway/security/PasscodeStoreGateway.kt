@@ -69,7 +69,7 @@ interface PasscodeStoreGateway {
      *
      * @param timeOutMilliseconds
      */
-    suspend fun setPasscodeTimeout(timeOutMilliseconds: Long)
+    suspend fun setPasscodeTimeout(timeOutMilliseconds: Long?)
 
     /**
      * Monitor passcode time out

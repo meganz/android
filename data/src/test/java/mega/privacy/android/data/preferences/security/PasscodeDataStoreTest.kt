@@ -187,4 +187,11 @@ internal class PasscodeDataStoreTest {
 
         verifyBlocking(encryptData) { invoke(null) }
     }
+
+    @Test
+    internal fun `test that null passcode timeout is encrypted as null`() = runTest {
+        underTest.setPasscodeTimeout(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
+    }
 }

@@ -17,7 +17,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore.Companion.LAST_CAM_SYNC_TIMESTAMP_FILE
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
-import mega.privacy.android.data.preferences.security.passcodeDataStore
+import mega.privacy.android.data.preferences.security.PasscodeDatastoreMigration
 import mega.privacy.android.data.preferences.security.passcodeDatastoreName
 import mega.privacy.android.data.qualifier.CameraTimestampsPreference
 import mega.privacy.android.data.qualifier.RequestPhoneNumberPreference
@@ -82,8 +82,22 @@ internal object DataStoreModule {
         )
     }
 
+    @Singleton
     @Provides
     @Named(passcodeDatastoreName)
-    fun providePasscodeDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        context.passcodeDataStore
+    fun providePasscodeDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        passcodeDatastoreMigration: PasscodeDatastoreMigration,
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            migrations = listOf(
+                passcodeDatastoreMigration
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            produceFile = { context.preferencesDataStoreFile(passcodeDatastoreName) }
+        )
 }
