@@ -12,7 +12,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 /**
  * Test tag for the Device Center Screen
  */
-internal const val TAG_DEVICE_CENTER_SCREEN = "DEVICE_CENTER_SCREEN"
+internal const val DEVICE_CENTER_SCREEN_TAG = "device_center_screen:box"
 
 /**
  * A [Composable] that serves as the main View for the Device Center
@@ -22,7 +22,7 @@ internal fun DeviceCenterScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .testTag(TAG_DEVICE_CENTER_SCREEN),
+            .testTag(DEVICE_CENTER_SCREEN_TAG),
     )
 }
 

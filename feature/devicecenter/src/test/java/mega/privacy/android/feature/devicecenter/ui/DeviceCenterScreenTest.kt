@@ -20,6 +20,6 @@ internal class DeviceCenterScreenTest {
     @Test
     fun `test that all device center components are displayed`() {
         composeTestRule.setContent { DeviceCenterScreen() }
-        composeTestRule.onNodeWithTag(TAG_DEVICE_CENTER_SCREEN).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(DEVICE_CENTER_SCREEN_TAG).assertIsDisplayed()
     }
 }

@@ -81,15 +81,18 @@ dependencies {
     implementation(androidx.fragment)
     implementation(google.material)
     implementation(androidx.lifecycle.viewmodel)
-    implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.lifecycle.service)
-    implementation(androidx.compose.activity)
-    implementation(platform(androidx.compose.bom))
-    implementation(androidx.bundles.compose.bom)
-    implementation(lib.compose.state.events)
     implementation(google.hilt.android)
     kapt(google.hilt.android.compiler)
     kapt(androidx.hilt.compiler)
+
+    // Compose
+    implementation(androidx.lifecycle.runtime.compose)
+    implementation(androidx.compose.activity)
+    implementation(androidx.compose.viewmodel)
+    implementation(platform(androidx.compose.bom))
+    implementation(androidx.bundles.compose.bom)
+    implementation(lib.compose.state.events)
 
     testImplementation(testlib.junit)
     testImplementation(testlib.junit.test.ktx)
