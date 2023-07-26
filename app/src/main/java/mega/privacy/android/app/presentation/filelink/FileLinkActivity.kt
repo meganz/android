@@ -261,10 +261,10 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
 
                 it.copyThrowable != null -> {
                     if (!manageCopyMoveException(it.copyThrowable)) {
-                        showSnackbar(it.snackBarMessageId)
+                        showSnackbar(R.string.context_no_copied)
                         launchManagerActivity()
                     } else {
-                        viewModel.resetCopy()
+                        viewModel.resetCopyError()
                     }
                 }
             }

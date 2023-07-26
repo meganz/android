@@ -8,15 +8,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -33,6 +35,7 @@ class FileLinkViewModel @Inject constructor(
     private val legacyCopyNodeUseCase: LegacyCopyNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val getNodeByHandle: GetNodeByHandle,
+    private val getPublicNodeUseCase: GetPublicNodeUseCase,
 ) : ViewModel() {
 
 
@@ -60,6 +63,47 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
+     * Get node from public link
+     */
+    fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
+        runCatching { getPublicNodeUseCase(link) }
+            .onSuccess { node ->
+                val iconResource = getNodeIcon(node, false)
+                _state.update {
+                    it.copy(
+                        fileNode = node,
+                        previewPath = node.previewPath,
+                        iconResource = if (node.previewPath == null) iconResource else null
+                    )
+                }
+            }
+            .onFailure { exception ->
+                when (exception) {
+                    is PublicNodeException.InvalidDecryptionKey -> {
+                        if (decryptionIntroduced) {
+                            Timber.w("Incorrect key, ask again!")
+                            _state.update { it.copy(askForDecryptionDialog = true) }
+                        } else {
+                            _state.update {
+                                it.copy(fetchPublicNodeError = exception)
+                            }
+                        }
+                    }
+
+                    is PublicNodeException.DecryptionKeyRequired -> {
+                        _state.update { it.copy(askForDecryptionDialog = true) }
+                    }
+
+                    else -> {
+                        _state.update {
+                            it.copy(fetchPublicNodeError = exception as? PublicNodeException)
+                        }
+                    }
+                }
+            }
+    }
+
+    /**
      * Handle import node
      *
      * @param node
@@ -77,7 +121,7 @@ class FileLinkViewModel @Inject constructor(
                     is MegaNodeException.ChildDoesNotExistsException -> copy(node, targetHandle)
 
                     is MegaNodeException.ParentDoesNotExistException -> {
-                        _state.update { it.copy(snackBarMessageId = R.string.general_error) }
+                        _state.update { it.copy(collisionCheckThrowable = throwable) }
                     }
 
                     else -> Timber.e(throwable)
@@ -90,19 +134,14 @@ class FileLinkViewModel @Inject constructor(
         runCatching { legacyCopyNodeUseCase.copyAsync(node, targetNode) }
             .onSuccess { _state.update { it.copy(copySuccess = true) } }
             .onFailure { copyThrowable ->
-                _state.update {
-                    it.copy(
-                        copyThrowable = copyThrowable,
-                        snackBarMessageId = R.string.context_no_copied
-                    )
-                }
+                _state.update { it.copy(copyThrowable = copyThrowable) }
             }
     }
 
     /**
      * Reset copy node values
      */
-    fun resetCopy() {
-        _state.update { it.copy(copyThrowable = null, snackBarMessageId = -1) }
+    fun resetCopyError() {
+        _state.update { it.copy(copyThrowable = null) }
     }
 }

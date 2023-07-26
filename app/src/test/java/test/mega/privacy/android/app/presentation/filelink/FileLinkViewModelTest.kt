@@ -17,8 +17,11 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.clouddrive.FileLinkViewModel
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -26,6 +29,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -39,6 +43,7 @@ class FileLinkViewModelTest {
     private val legacyCopyNodeUseCase = mock<LegacyCopyNodeUseCase>()
     private val checkNameCollisionUseCase = mock<CheckNameCollisionUseCase>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -61,7 +66,8 @@ class FileLinkViewModelTest {
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             legacyCopyNodeUseCase = legacyCopyNodeUseCase,
             checkNameCollisionUseCase = checkNameCollisionUseCase,
-            getNodeByHandle = getNodeByHandle
+            getNodeByHandle = getNodeByHandle,
+            getPublicNodeUseCase = getPublicNodeUseCase
         )
     }
 
@@ -71,10 +77,14 @@ class FileLinkViewModelTest {
             val initial = awaitItem()
             assertThat(initial.shouldLogin).isNull()
             assertThat(initial.url).isNull()
+            assertThat(initial.fileNode).isNull()
+            assertThat(initial.previewPath).isNull()
+            assertThat(initial.iconResource).isNull()
+            assertThat(initial.askForDecryptionDialog).isFalse()
             assertThat(initial.collision).isNull()
+            assertThat(initial.collisionCheckThrowable).isNull()
             assertThat(initial.copyThrowable).isNull()
             assertThat(initial.copySuccess).isFalse()
-            assertThat(initial.snackBarMessageId).isEqualTo(-1)
         }
     }
 
@@ -136,7 +146,7 @@ class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that when checking name collision throws ParentDoesNotExistException snackbar message is set`() =
+    fun `test that when checking name collision throws ParentDoesNotExistException collisionCheckThrowable is set`() =
         runTest {
             val parentHandle = 123L
             val node = mock<MegaNode>()
@@ -148,7 +158,7 @@ class FileLinkViewModelTest {
                 underTest.handleImportNode(node, parentHandle)
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.collision).isNull()
-                assertThat(newValue.snackBarMessageId).isNotEqualTo(-1)
+                assertThat(newValue.collisionCheckThrowable).isNotNull()
             }
         }
 
@@ -169,6 +179,77 @@ class FileLinkViewModelTest {
         underTest.state.test {
             val newValue = awaitItem()
             assertThat(newValue.copySuccess).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that on getting valid public node correct values are set`() = runTest {
+        val url = "https://mega.co.nz/abc"
+        val expectedPath = "data/cache/xyz.jpg"
+        val publicNode = mock<TypedFileNode> {
+            on { previewPath }.thenReturn(expectedPath)
+            on { name }.thenReturn("abc")
+        }
+
+        whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
+        underTest.state.test {
+            underTest.getPublicNode(url)
+            val result = expectMostRecentItem()
+            assertThat(result.fileNode).isEqualTo(publicNode)
+            assertThat(result.previewPath).isEqualTo(expectedPath)
+            assertThat(result.iconResource).isEqualTo(null)
+        }
+    }
+
+    @Test
+    fun `test that on getting DecryptionKeyRequired exception askForDecryptionDialog values is set`() =
+        runTest {
+            val url = "https://mega.co.nz/abc"
+
+            whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.DecryptionKeyRequired())
+            underTest.state.test {
+                underTest.getPublicNode(url)
+                val result = expectMostRecentItem()
+                assertThat(result.askForDecryptionDialog).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that on getting InvalidDecryptionKey exception when fetching from decrypt dialog askForDecryptionDialog value is set`() =
+        runTest {
+            val url = "https://mega.co.nz/abc"
+
+            whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.InvalidDecryptionKey())
+            underTest.state.test {
+                underTest.getPublicNode(url, true)
+                val result = expectMostRecentItem()
+                assertThat(result.askForDecryptionDialog).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that on getting InvalidDecryptionKey exception when not fetching from decrypt dialog then error dialog value is set`() =
+        runTest {
+            val url = "https://mega.co.nz/abc"
+
+            whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.InvalidDecryptionKey())
+            underTest.state.test {
+                underTest.getPublicNode(url, false)
+                val result = expectMostRecentItem()
+                assertThat(result.askForDecryptionDialog).isEqualTo(false)
+                assertThat(result.fetchPublicNodeError).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that on getting GenericError exception error dialog values are set`() = runTest {
+        val url = "https://mega.co.nz/abc"
+
+        whenever(getPublicNodeUseCase(any())).thenThrow(PublicNodeException.GenericError())
+        underTest.state.test {
+            underTest.getPublicNode(url)
+            val result = expectMostRecentItem()
+            assertThat(result.fetchPublicNodeError).isNotNull()
         }
     }
 }
