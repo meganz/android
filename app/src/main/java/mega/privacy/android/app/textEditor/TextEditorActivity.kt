@@ -197,7 +197,9 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putFloat(SCROLL_TEXT, getScrollSpot())
+        getScrollSpot().takeIf { it >= 0.0f }?.let {
+            outState.putFloat(SCROLL_TEXT, it)
+        }
         outState.putInt(STATE, currentUIState)
         outState.putInt(CURSOR_POSITION, binding.contentEditText.selectionStart)
         outState.putBoolean(DISCARD_CHANGES_SHOWN, isDiscardChangesConfirmationDialogShown())
@@ -940,7 +942,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
      */
     private fun getScrollSpot(): Float {
         val y = binding.fileEditorScrollView.scrollY
-        val layout = binding.contentText.layout
+        val layout = binding.contentText.layout ?: return -1f
         val topPadding = -layout.topPadding
 
         if (y <= topPadding) {
