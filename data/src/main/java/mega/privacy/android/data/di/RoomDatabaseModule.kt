@@ -13,6 +13,7 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.SyncRecordDao
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -41,6 +42,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideActiveTransferDao(database: MegaDatabase): ActiveTransferDao =
         database.activeTransfersDao()
+
+    @Provides
+    @Singleton
+    internal fun provideSyncRecordDao(database: MegaDatabase): SyncRecordDao =
+        database.syncRecordDao()
 
     @Provides
     @Singleton
