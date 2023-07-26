@@ -605,7 +605,9 @@ class FolderLinkViewModel @Inject constructor(
      */
     private fun openFolder(nodeUIItem: NodeUIItem<TypedNode>) {
         viewModelScope.launch {
-            val children = getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null)
+            val children =
+                runCatching { getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null) }
+                    .getOrDefault(emptyList())
             _state.update {
                 val hasMediaItem = containsMediaItemUseCase(children)
                 it.copy(
