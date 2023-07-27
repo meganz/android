@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Base64
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -123,6 +124,16 @@ abstract class UtilWrapperModule {
             object : StringWrapper {
                 override fun getProgressSize(progress: Long, size: Long): String =
                     Util.getProgressSize(context, progress, size)
+
+                override fun encodeBase64(string: String): String =
+                    Base64.encodeToString(string.toByteArray(Charsets.UTF_8), Base64.NO_WRAP)
+
+                override fun decodeBase64(base64: String): String =
+                    try {
+                        Base64.decode(base64.trim(), Base64.DEFAULT).toString(Charsets.UTF_8)
+                    } catch (ignore: IllegalArgumentException) {
+                        Base64.decode(base64.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
+                    }
             }
 
         /**

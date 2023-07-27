@@ -28,6 +28,7 @@ import mega.privacy.android.data.repository.DefaultPhotosRepository
 import mega.privacy.android.data.repository.DefaultPushesRepository
 import mega.privacy.android.data.repository.DefaultQRCodeRepository
 import mega.privacy.android.data.repository.DefaultRecentActionsRepository
+import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.DefaultSettingsRepository
 import mega.privacy.android.data.repository.DefaultSortOrderRepository
 import mega.privacy.android.data.repository.DefaultStatisticsRepository
@@ -78,6 +79,7 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
+import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.repository.SlideshowRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
@@ -245,6 +247,9 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindPasscodeRepository(implementation: PasscodeRepositoryImpl): PasscodeRepository
+
+    @Binds
+    abstract fun bindRemotePreferencesRepository(implementation: RemotePreferencesRepositoryImpl): RemotePreferencesRepository
 
 
 }
