@@ -2,9 +2,13 @@ package mega.privacy.android.feature.sync.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.mapper.FolderPairMapper
@@ -15,6 +19,7 @@ import javax.inject.Inject
 
 internal class SyncRepositoryImpl @Inject constructor(
     private val syncGateway: SyncGateway,
+    private val megaApiGateway: MegaApiGateway,
     private val megaApi: MegaApiGateway,
     private val folderPairMapper: FolderPairMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -70,13 +75,15 @@ internal class SyncRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun monitorSync(): Flow<FolderPair> =
-        syncGateway
-            .monitorSync()
-            .map { megaSync ->
-                val megaFolderName =
-                    megaApi.getMegaNodeByHandle(megaSync.megaHandle)?.name ?: ""
+    override fun monitorSyncChanges(): Flow<Unit> =
+        merge(
+            getOnGlobalSyncStateChangedFlow(),
+            syncGateway.monitorOnSyncDeleted()
+        ).map { Unit }
+            .flowOn(ioDispatcher)
 
-                folderPairMapper(megaSync, megaFolderName)
-            }
+    private fun getOnGlobalSyncStateChangedFlow(): Flow<GlobalUpdate.OnGlobalSyncStateChanged> =
+        megaApiGateway
+            .globalUpdates
+            .filterIsInstance()
 }

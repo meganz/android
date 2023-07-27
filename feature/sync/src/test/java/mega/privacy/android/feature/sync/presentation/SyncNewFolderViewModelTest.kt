@@ -4,6 +4,7 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -80,6 +81,7 @@ internal class SyncNewFolderViewModelTest {
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
             flow {
                 emit(remoteFolder)
+                awaitCancellation()
             }
         )
         initViewModel()
@@ -94,6 +96,7 @@ internal class SyncNewFolderViewModelTest {
         whenever(monitorSelectedMegaFolderUseCase()).thenReturn(
             flow {
                 emit(remoteFolder)
+                awaitCancellation()
             }
         )
         val state = SyncNewFolderState(

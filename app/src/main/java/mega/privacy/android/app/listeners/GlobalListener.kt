@@ -63,6 +63,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -285,6 +286,10 @@ class GlobalListener @Inject constructor(
         elements: ArrayList<MegaSetElement>?,
     ) {
         Timber.d("Set elements updated")
+    }
+
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {
+        Timber.d("Global sync state changed")
     }
 
     private fun sendBroadcastUpdateAccountDetails() {

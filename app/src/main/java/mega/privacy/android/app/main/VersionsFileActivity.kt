@@ -836,6 +836,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
     override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
     override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
     override fun onNodesUpdate(api: MegaApiJava, nodes: ArrayList<MegaNode>?) {
         Timber.d("onNodesUpdate")
         var thisNode = false

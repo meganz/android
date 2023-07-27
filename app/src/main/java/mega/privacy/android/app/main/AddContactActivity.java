@@ -69,6 +69,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.SwitchCompat;
@@ -133,6 +134,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaSet;
 import nz.mega.sdk.MegaSetElement;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaSync;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
@@ -337,6 +339,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             return filteredContactsShare;
         }
     }
+
+    @Override
+    public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {}
 
     private class GetPhoneContactsTask extends AsyncTask<Void, Void, Void> {
 

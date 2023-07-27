@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -11,8 +13,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.FolderPairState
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
-import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.model.SyncStatus
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -33,9 +35,9 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SyncListViewModelTest {
 
-    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val syncUiItemMapper: SyncUiItemMapper = mock()
     private val removeFolderPairUseCase: RemoveFolderPairUseCase = mock()
+    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
 
     private lateinit var underTest: SyncListViewModel
 
@@ -70,14 +72,18 @@ class SyncListViewModelTest {
     fun resetAndTearDown() {
         Dispatchers.resetMain()
         reset(
-            getFolderPairsUseCase,
+            monitorSyncsUseCase,
             syncUiItemMapper,
+            removeFolderPairUseCase
         )
     }
 
     @Test
     fun `test that viewmodel fetches all folder pairs upon initialization`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncListState(syncUiItems)
 
@@ -90,7 +96,10 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that card click change the state to expanded`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val expectedState = SyncListState(syncUiItems.map { it.copy(expanded = true) })
 
@@ -106,11 +115,13 @@ class SyncListViewModelTest {
 
     @Test
     fun `test that remove action removes folder pair`() = runTest {
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(monitorSyncsUseCase()).thenReturn(flow {
+            emit(folderPairs)
+            awaitCancellation()
+        })
         whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
         val folderPairId = 9999L
         whenever(removeFolderPairUseCase(folderPairId)).thenReturn(Unit)
-        val expectedState = SyncListState(syncUiItems.map { it.copy(expanded = true) })
 
         initViewModel()
         underTest.handleAction(
@@ -122,9 +133,9 @@ class SyncListViewModelTest {
 
     private fun initViewModel() {
         underTest = SyncListViewModel(
-            getFolderPairsUseCase,
             syncUiItemMapper,
             removeFolderPairUseCase,
+            monitorSyncsUseCase
         )
     }
 }

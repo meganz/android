@@ -1,5 +1,6 @@
 package mega.privacy.android.app.listeners
 
+import mega.privacy.android.data.model.GlobalUpdate
 import nz.mega.sdk.*
 
 /**
@@ -14,7 +15,8 @@ class OptionalMegaGlobalListenerInterface(
     private val onContactRequestsUpdate: ((ArrayList<MegaContactRequest>?) -> Unit)? = null,
     private val onEvent: ((MegaEvent) -> Unit)? = null,
     private val onSetsUpdate: ((ArrayList<MegaSet>?) -> Unit)? = null,
-    private val onSetElementsUpdate: ((ArrayList<MegaSetElement>?) -> Unit)? = null
+    private val onSetElementsUpdate: ((ArrayList<MegaSetElement>?) -> Unit)? = null,
+    private val onGlobalSyncStateChange: (() -> Unit)? = null,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
@@ -39,7 +41,7 @@ class OptionalMegaGlobalListenerInterface(
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>?
+        requests: ArrayList<MegaContactRequest>?,
     ) {
         onContactRequestsUpdate?.invoke(requests)
     }
@@ -57,5 +59,9 @@ class OptionalMegaGlobalListenerInterface(
         elements: ArrayList<MegaSetElement>?,
     ) {
         onSetElementsUpdate?.invoke(elements)
+    }
+
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {
+        onGlobalSyncStateChange?.invoke()
     }
 }

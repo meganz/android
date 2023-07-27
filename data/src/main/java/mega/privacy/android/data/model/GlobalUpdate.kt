@@ -68,4 +68,9 @@ sealed class GlobalUpdate {
      * @property elements
      */
     data class OnSetElementsUpdate(val elements: ArrayList<MegaSetElement>?) : GlobalUpdate()
+
+    /**
+     * On global sync state changed
+     */
+    object OnGlobalSyncStateChanged : GlobalUpdate()
 }

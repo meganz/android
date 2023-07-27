@@ -94,6 +94,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -944,6 +945,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
     override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
     override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
     override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
+
     fun showOptionsPanel(node: MegaNode?) {
         Timber.d("showOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return

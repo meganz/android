@@ -17,7 +17,7 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncByWiFiUseCase
-import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.PauseAllSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.ResumeAllSyncsUseCase
 import timber.log.Timber
@@ -55,9 +55,7 @@ internal class SyncBackgroundService : LifecycleService() {
     internal lateinit var resumeAllSyncsUseCase: ResumeAllSyncsUseCase
 
     @Inject
-    internal lateinit var monitorSyncUseCase: MonitorSyncUseCase
-
-    private lateinit var changedFolderPair: SharedFlow<FolderPair>
+    internal lateinit var monitorSyncsUseCase: MonitorSyncsUseCase
 
     override fun onCreate() {
         super.onCreate()
@@ -67,9 +65,6 @@ internal class SyncBackgroundService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Timber.d("SyncBackgroundService started")
-        changedFolderPair =
-            monitorSyncUseCase().stateIn(lifecycleScope, SharingStarted.Eagerly, FolderPair.empty())
-
 
         if (!applicationLoggingInSetter.isLoggingIn()) {
             lifecycleScope.launch {
@@ -83,8 +78,8 @@ internal class SyncBackgroundService : LifecycleService() {
             combine(
                 monitorConnectivityUseCase(),
                 monitorSyncByWiFiUseCase(),
-                changedFolderPair
-            ) { connectedToInternet: Boolean, syncByWifi: Boolean, currentSync: FolderPair ->
+                monitorSyncsUseCase()
+            ) { connectedToInternet: Boolean, syncByWifi: Boolean, _ ->
                 Pair(connectedToInternet, syncByWifi)
             }.collect { (connectedToInternet, syncByWifi) ->
                 updateSyncState(connectedToInternet, syncByWifi)

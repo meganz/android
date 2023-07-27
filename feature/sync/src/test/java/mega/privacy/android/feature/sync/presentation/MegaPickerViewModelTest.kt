@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -72,6 +72,7 @@ internal class MegaPickerViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(rootFolder)
         whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
             emit(childrenNodes)
+            awaitCancellation()
         })
         initViewModel()
         val expectedState = MegaPickerState(
@@ -92,6 +93,7 @@ internal class MegaPickerViewModelTest {
         }
         whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
             emit(childrenNodes)
+            awaitCancellation()
         })
         val expectedState = MegaPickerState(
             currentFolder = clickedFolder, nodes = childrenNodes
@@ -118,10 +120,12 @@ internal class MegaPickerViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(currentFolder)
         whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
             emit(childrenNodes)
+            awaitCancellation()
         })
         whenever(getNodeByHandleUseCase(parentFolderId.longValue)).thenReturn(parentFolder)
         whenever(getTypedNodesFromFolder(parentFolderId)).thenReturn(flow {
             emit(childrenNodes)
+            awaitCancellation()
         })
         val expectedState = MegaPickerState(
             currentFolder = parentFolder, nodes = childrenNodes
@@ -146,6 +150,7 @@ internal class MegaPickerViewModelTest {
         whenever(getRootNodeUseCase()).thenReturn(currentFolder)
         whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
             emit(childrenNodes)
+            awaitCancellation()
         })
         initViewModel()
 

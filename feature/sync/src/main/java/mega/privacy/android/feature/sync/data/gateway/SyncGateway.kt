@@ -41,7 +41,7 @@ internal interface SyncGateway {
      * Monitor changes to MegaSync objects
      *
      */
-    fun monitorSync(): Flow<MegaSync>
+    fun monitorOnSyncDeleted(): Flow<MegaSync>
 
     /**
      * Resume all syncs

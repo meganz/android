@@ -89,6 +89,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
@@ -625,6 +626,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
 
     override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
+
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
 
     override fun showSnackbar(type: Int, content: String?, chatId: Long) {
         showSnackbar(type, binding.pdfViewerContainer, content, chatId)

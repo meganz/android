@@ -36,6 +36,7 @@ import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaStringList
 import nz.mega.sdk.MegaStringMap
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
@@ -206,6 +207,10 @@ internal class MegaApiFacade @Inject constructor(
                 elements: ArrayList<MegaSetElement>?,
             ) {
                 trySend(GlobalUpdate.OnSetElementsUpdate(elements))
+            }
+
+            override fun onGlobalSyncStateChanged(api: MegaApiJava) {
+                trySend(GlobalUpdate.OnGlobalSyncStateChanged)
             }
         }
 

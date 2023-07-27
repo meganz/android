@@ -49,6 +49,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
@@ -97,6 +98,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaSet;
 import nz.mega.sdk.MegaSetElement;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaSync;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
@@ -210,6 +212,8 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
     }
 
+    @Override
+    public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {}
     private class ActionBarCallBack implements ActionMode.Callback {
 
         @SuppressLint("NonConstantResourceId")

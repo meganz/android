@@ -6,8 +6,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import mega.privacy.android.feature.sync.domain.usecase.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.RemoveFolderPairUseCase
 import mega.privacy.android.feature.sync.ui.mapper.SyncUiItemMapper
 import mega.privacy.android.feature.sync.ui.synclist.SyncListAction.CardExpanded
@@ -15,9 +17,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SyncListViewModel @Inject constructor(
-    private val getFolderPairsUseCase: GetFolderPairsUseCase,
     private val syncUiItemMapper: SyncUiItemMapper,
     private val removeFolderPairUseCase: RemoveFolderPairUseCase,
+    private val monitorSyncsUseCase: MonitorSyncsUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SyncListState(emptyList()))
@@ -25,10 +27,11 @@ internal class SyncListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val folders = getFolderPairsUseCase()
-                .let(syncUiItemMapper::invoke)
-
-            _state.value = SyncListState(folders)
+            monitorSyncsUseCase()
+                .map(syncUiItemMapper::invoke)
+                .collectLatest { syncs ->
+                    _state.value = SyncListState(syncs)
+                }
         }
     }
 

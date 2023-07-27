@@ -119,6 +119,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaSync
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -2143,6 +2144,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         elements: ArrayList<MegaSetElement>?,
     ) {
     }
+
+    override fun onGlobalSyncStateChanged(api: MegaApiJava) {}
 
     override fun onNodesUpdate(api: MegaApiJava, updatedNodes: ArrayList<MegaNode>?) {
         Timber.d("onNodesUpdate")

@@ -31,5 +31,5 @@ interface SyncRepository {
 
     suspend fun pauseAllSyncs()
 
-    fun monitorSync(): Flow<FolderPair>
+    fun monitorSyncChanges(): Flow<Unit>
 }

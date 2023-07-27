@@ -51,6 +51,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatEditText;
@@ -108,6 +109,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaSet;
 import nz.mega.sdk.MegaSetElement;
+import nz.mega.sdk.MegaSync;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
@@ -1838,4 +1840,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
         float elevation = getResources().getDimension(R.dimen.toolbar_elevation);
         aBL.setElevation(withElevation ? elevation : 0);
     }
+
+    @Override
+    public void onGlobalSyncStateChanged(@NonNull MegaApiJava api) {}
 }
