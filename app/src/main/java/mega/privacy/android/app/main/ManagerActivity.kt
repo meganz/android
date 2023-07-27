@@ -212,6 +212,7 @@ import mega.privacy.android.app.presentation.notification.model.NotificationNavi
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
 import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
@@ -315,6 +316,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -5381,45 +5383,61 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return
         }
         if (drawerItem === DrawerItem.CLOUD_DRIVE) {
-            val linkType = nodeController.importLink(link)
-            if (openLinkError?.visibility == View.VISIBLE) {
-                when (linkType) {
-                    Constants.CHAT_LINK -> {
-                        Timber.d("Open chat link: correct chat link")
-                        // Identify the link is a meeting or normal chat link
-                        megaChatApi.checkChatLink(
-                            link,
-                            LoadPreviewListener(
-                                this@ManagerActivity,
-                                this@ManagerActivity,
-                                Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-                            )
-                        )
+            lifecycleScope.launch {
+                if (Util.matchRegexs(link, Constants.ALBUM_LINK_REGEXS)) {
+                    if (getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)) {
                         dismissAlertDialogIfExists(openLinkDialog)
-                    }
-
-                    Constants.CONTACT_LINK -> {
-                        Timber.d("Open contact link: correct contact link")
-                        val s =
-                            link.split("C!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                        if (s.size > 1) {
-                            val handle: Long =
-                                MegaApiAndroid.base64ToHandle(s[1].trim { it <= ' ' })
-                            openContactLink(handle)
-                            dismissAlertDialogIfExists(openLinkDialog)
+                        val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
+                            context = this@ManagerActivity,
+                            albumLink = AlbumLink(link),
+                        ).apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                         }
+                        startActivity(intent)
+                        return@launch
                     }
                 }
-            } else {
-                when (linkType) {
-                    Constants.FILE_LINK, Constants.FOLDER_LINK -> {
-                        Timber.d("Do nothing: correct file or folder link")
-                        dismissAlertDialogIfExists(openLinkDialog)
-                    }
 
-                    Constants.CHAT_LINK, Constants.CONTACT_LINK, Constants.ERROR_LINK -> {
-                        Timber.w("Show error: invalid link or correct chat or contact link")
-                        showOpenLinkError(true, linkType)
+                val linkType = nodeController.importLink(link)
+                if (openLinkError?.visibility == View.VISIBLE) {
+                    when (linkType) {
+                        Constants.CHAT_LINK -> {
+                            Timber.d("Open chat link: correct chat link")
+                            // Identify the link is a meeting or normal chat link
+                            megaChatApi.checkChatLink(
+                                link,
+                                LoadPreviewListener(
+                                    this@ManagerActivity,
+                                    this@ManagerActivity,
+                                    Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
+                                )
+                            )
+                            dismissAlertDialogIfExists(openLinkDialog)
+                        }
+
+                        Constants.CONTACT_LINK -> {
+                            Timber.d("Open contact link: correct contact link")
+                            val s =
+                                link.split("C!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                            if (s.size > 1) {
+                                val handle: Long =
+                                    MegaApiAndroid.base64ToHandle(s[1].trim { it <= ' ' })
+                                openContactLink(handle)
+                                dismissAlertDialogIfExists(openLinkDialog)
+                            }
+                        }
+                    }
+                } else {
+                    when (linkType) {
+                        Constants.FILE_LINK, Constants.FOLDER_LINK -> {
+                            Timber.d("Do nothing: correct file or folder link")
+                            dismissAlertDialogIfExists(openLinkDialog)
+                        }
+
+                        Constants.CHAT_LINK, Constants.CONTACT_LINK, Constants.ERROR_LINK -> {
+                            Timber.w("Show error: invalid link or correct chat or contact link")
+                            showOpenLinkError(true, linkType)
+                        }
                     }
                 }
             }
