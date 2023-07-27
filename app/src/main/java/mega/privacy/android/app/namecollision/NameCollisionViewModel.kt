@@ -113,6 +113,7 @@ class NameCollisionViewModel @Inject constructor(
     private fun setCopyToOrigin(collision: NameCollision.Copy, action: () -> Unit) {
         getNodeUseCase.get(collision.nodeHandle).blockingGetOrNull()?.let { node ->
             isCopyToOrigin = node.parentHandle == collision.parentHandle
+            action.invoke()
         } ?: MegaNode.unserialize(collision.serializedNode)?.let { node ->
             if (!node.isForeign) {
                 viewModelScope.launch {
