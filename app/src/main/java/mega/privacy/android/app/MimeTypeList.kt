@@ -358,7 +358,7 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
     /**
      * Returns if type is non supported video
      */
-    val isVideoNotSupported get() = extension == "mpg" || extension == "avi" || extension == "wmv"
+    val isVideoNotSupported get() = extension == "mpg" || extension == "wmv"
 
     /**
      * Return if type is mp4 video

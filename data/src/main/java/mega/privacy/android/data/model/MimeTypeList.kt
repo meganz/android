@@ -54,7 +54,7 @@ data class MimeTypeList(
     /**
      * Returns if type is non supported video
      */
-    val isVideoNotSupported get() = extension == "mpg" || extension == "avi" || extension == "wmv"
+    val isVideoNotSupported get() = extension == "mpg" || extension == "wmv"
 
     /**
      * Check if MimeType is Mp4 or Video
