@@ -131,6 +131,25 @@ class FileLinkViewModelTest {
     }
 
     @Test
+    fun `test that on calling resetCollision then collision value is reset`() = runTest {
+        val parentNodeHandle = 123L
+        val nameCollision = mock<NameCollision.Copy>()
+        val node = mock<MegaNode>()
+
+        whenever(checkNameCollisionUseCase.check(node, parentNodeHandle, NameCollisionType.COPY))
+            .thenReturn(nameCollision)
+
+        underTest.state.test {
+            underTest.handleImportNode(node, parentNodeHandle)
+            var newValue = expectMostRecentItem()
+            assertThat(newValue.collision).isNotNull()
+            underTest.resetCollision()
+            newValue = expectMostRecentItem()
+            assertThat(newValue.collision).isNull()
+        }
+    }
+
+    @Test
     fun `test that on importing node without same name collision value is null`() = runTest {
         val parentNodeHandle = 123L
         val node = mock<MegaNode>()
@@ -159,6 +178,25 @@ class FileLinkViewModelTest {
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.collision).isNull()
                 assertThat(newValue.collisionCheckThrowable).isNotNull()
+            }
+        }
+
+    @Test
+    fun `test that on calling resetCollisionError then collisionCheckThrowable is reset`() =
+        runTest {
+            val parentHandle = 123L
+            val node = mock<MegaNode>()
+
+            whenever(checkNameCollisionUseCase.check(node, parentHandle, NameCollisionType.COPY))
+                .thenThrow(MegaNodeException.ParentDoesNotExistException())
+
+            underTest.state.test {
+                underTest.handleImportNode(node, parentHandle)
+                var newValue = expectMostRecentItem()
+                assertThat(newValue.collisionCheckThrowable).isNotNull()
+                underTest.resetCollisionError()
+                newValue = expectMostRecentItem()
+                assertThat(newValue.collisionCheckThrowable).isNull()
             }
         }
 

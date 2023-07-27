@@ -144,4 +144,18 @@ class FileLinkViewModel @Inject constructor(
     fun resetCopyError() {
         _state.update { it.copy(copyThrowable = null) }
     }
+
+    /**
+     * Reset collision error
+     */
+    fun resetCollisionError() {
+        _state.update { it.copy(collisionCheckThrowable = null) }
+    }
+
+    /**
+     * Reset collision
+     */
+    fun resetCollision() {
+        _state.update { it.copy(collision = null) }
+    }
 }

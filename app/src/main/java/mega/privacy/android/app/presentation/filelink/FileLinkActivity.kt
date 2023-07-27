@@ -255,6 +255,18 @@ class FileLinkActivity : TransfersManagementActivity(), MegaRequestListenerInter
                     showLoginScreen()
                 }
 
+                it.collision != null -> {
+                    statusDialog?.dismiss()
+                    nameCollisionActivityContract?.launch(arrayListOf(it.collision))
+                    viewModel.resetCollision()
+                }
+
+                it.collisionCheckThrowable != null -> {
+                    statusDialog?.dismiss()
+                    showSnackbar(R.string.general_error)
+                    viewModel.resetCollisionError()
+                }
+
                 it.copySuccess -> {
                     launchManagerActivity()
                 }
