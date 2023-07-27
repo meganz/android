@@ -146,7 +146,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new FileBrowser Compose UI
      */
-    FileBrowserCompose("Enable compose for FileBrowser", false),
+    FileBrowserCompose("Enable compose for FileBrowser", true),
 
     /**
      * Meeting notification settings

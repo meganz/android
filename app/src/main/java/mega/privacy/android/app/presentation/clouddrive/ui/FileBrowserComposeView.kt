@@ -57,7 +57,7 @@ fun FileBrowserComposeView(
         Column {
             OverQuotaView(
                 bannerTime = uiState.bannerTime,
-                shouldShowBannerVisibility = true,
+                shouldShowBannerVisibility = uiState.shouldShowBannerVisibility,
                 onUpgradeClicked = onUpgradeClicked,
                 onDismissClicked = onDismissClicked
             )
