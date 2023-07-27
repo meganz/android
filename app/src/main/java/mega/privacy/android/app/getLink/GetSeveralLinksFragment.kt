@@ -83,10 +83,12 @@ class GetSeveralLinksFragment : Fragment() {
 
             R.id.action_share -> {
                 val uniqueId = UUID.randomUUID()
-                Intent(Intent.ACTION_SEND)
-                    .setType(TYPE_TEXT_PLAIN)
-                    .putExtra(Intent.EXTRA_SUBJECT, "${uniqueId}.url")
-                    .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
+                startActivity(
+                    Intent(Intent.ACTION_SEND)
+                        .setType(TYPE_TEXT_PLAIN)
+                        .putExtra(Intent.EXTRA_SUBJECT, "${uniqueId}.url")
+                        .putExtra(Intent.EXTRA_TEXT, viewModel.getLinksString())
+                )
             }
 
             R.id.action_chat -> {

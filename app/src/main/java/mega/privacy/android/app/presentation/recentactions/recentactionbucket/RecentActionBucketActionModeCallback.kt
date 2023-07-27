@@ -68,11 +68,17 @@ class RecentActionBucketActionModeCallback constructor(
                 viewModel.clearSelection()
             }
             R.id.cab_menu_share_link -> {
-                LinksUtil.showGetLinkActivity(
-                    managerActivity,
-                    nodesHandles.toLongArray()
-                )
-
+                if (selectedMegaNodes.size == 1) {
+                    LinksUtil.showGetLinkActivity(
+                        managerActivity,
+                        nodesHandles[0]
+                    )
+                } else {
+                    LinksUtil.showGetLinkActivity(
+                        managerActivity,
+                        nodesHandles.toLongArray()
+                    )
+                }
                 viewModel.clearSelection()
             }
             R.id.cab_menu_send_to_chat -> {
