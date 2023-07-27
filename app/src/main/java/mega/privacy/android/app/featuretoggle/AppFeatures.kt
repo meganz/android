@@ -69,7 +69,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     TwoFactorAuthenticationCompose(
         "Enable compose implementation of Two Factor Authentication screen",
-        false
+        true
     ),
 
     /**
