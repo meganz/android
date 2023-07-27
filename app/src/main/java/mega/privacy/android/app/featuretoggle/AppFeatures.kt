@@ -153,6 +153,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     MeetingNotificationSettings("Enable Meeting notification settings", false),
 
+    /**
+     * File sharing contact verification
+     */
+    ContactVerification(
+        "Enable new improved contact verification reminders",
+        false,
+    )
+
     ;
 
     companion object : FeatureFlagValueProvider {
