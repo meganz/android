@@ -278,7 +278,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                     draggedTransfer = viewModel.getActiveTransfer(posDragged)
                 }
                 viewModel.activeTransfersSwap(posDragged, newPosition)
-                return false
+                return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
