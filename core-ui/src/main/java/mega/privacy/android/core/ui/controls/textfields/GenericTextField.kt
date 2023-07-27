@@ -51,7 +51,6 @@ import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_
  * @param text            Typed text.
  * @param errorText       Error to show if any.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun GenericTextField(
     text: String,
@@ -71,47 +70,17 @@ fun GenericTextField(
         focusedIndicatorColor = MaterialTheme.colors.secondary,
         unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
     ),
-) = Column(modifier = modifier) {
-    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-    val isError = errorText != null
-    val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.secondary,
-        backgroundColor = MaterialTheme.colors.secondary
-    )
-
-    CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
-        BasicTextField(
-            value = text,
-            onValueChange = onTextChange,
-            modifier = Modifier
-                .testTag(GENERIC_TEXT_FIELD_TEXT_TAG)
-                .background(Color.Transparent)
-                .indicatorLine(true, isError, interactionSource, colors)
-                .fillMaxWidth(),
-            textStyle = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.onPrimary),
-            cursorBrush = SolidColor(colors.cursorColor(isError).value),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = imeAction
-            ),
-            keyboardActions = keyboardActions,
-            interactionSource = interactionSource,
-            singleLine = singleLine,
-        ) {
-            GenericDecorationBox(
-                text,
-                it,
-                singleLine,
-                interactionSource,
-                isError,
-                placeholder,
-                colors,
-            )
-        }
-    }
-
-    GenericError(errorText)
-}
+) = GenericTextField(
+    textFieldValue = TextFieldValue(text),
+    onTextChange = { onTextChange(it.text) },
+    modifier = modifier,
+    placeholder = placeholder,
+    errorText = errorText,
+    imeAction = imeAction,
+    keyboardActions = keyboardActions,
+    colors = colors,
+    singleLine = singleLine,
+)
 
 /**
  * Text field generic with [TextFieldValue] as input
