@@ -3,11 +3,9 @@ package test.mega.privacy.android.app.presentation.mediaplayer
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import io.reactivex.rxjava3.android.plugins.RxAndroidPlugins
-import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -19,11 +17,13 @@ import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTI
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
 import mega.privacy.android.app.mediaplayer.VideoPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
-import mega.privacy.android.app.usecase.GetGlobalChangesUseCase
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
-import nz.mega.sdk.MegaTransfer
-import org.junit.Ignore
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
+import nz.mega.sdk.MegaApiJava
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -40,7 +40,7 @@ import test.mega.privacy.android.app.presentation.myaccount.InstantTaskExecutorE
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class VideoPlayerViewModelTest {
     private lateinit var underTest: VideoPlayerViewModel
-    private val getGlobalTransferUseCase = mock<GetGlobalTransferUseCase>()
+    private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase>()
     private val savedStateHandle = SavedStateHandle(mapOf())
 
     private val expectedId = 123456L
@@ -50,21 +50,17 @@ internal class VideoPlayerViewModelTest {
     @BeforeAll
     fun initialise() {
         Dispatchers.setMain(StandardTestDispatcher())
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
     }
 
     @BeforeEach
     fun setUp() {
-        whenever(getGlobalTransferUseCase.get()).thenAnswer {
-            Flowable.empty<GetGlobalTransferUseCase.Result>()
-        }
         underTest = VideoPlayerViewModel(
             context = mock(),
             mediaPlayerGateway = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
             sendStatisticsMediaPlayerUseCase = mock(),
             offlineThumbnailFileWrapper = mock(),
-            getGlobalTransferUseCase = getGlobalTransferUseCase,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
             playlistItemMapper = mock(),
             trackPlaybackPositionUseCase = mock(),
             monitorPlaybackTimesUseCase = mock(),
@@ -114,7 +110,6 @@ internal class VideoPlayerViewModelTest {
     @AfterAll
     fun tearDown() {
         Dispatchers.resetMain()
-        RxAndroidPlugins.reset()
     }
 
     @Test
@@ -235,4 +230,45 @@ internal class VideoPlayerViewModelTest {
             assertThat(actual.isSubtitleDialogShown).isFalse()
         }
     }
+
+    @Test
+    internal fun `test that the errorState is updated correctly based on the value of monitorTransferEventsUseCase`() =
+        runTest {
+            val transfer1 = mock<Transfer> {
+                on { isForeignOverQuota }.thenReturn(true)
+                on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+            }
+            val transfer2 = mock<Transfer> {
+                on { isForeignOverQuota }.thenReturn(false)
+                on { nodeHandle }.thenReturn(MegaApiJava.INVALID_HANDLE)
+            }
+            val expectedError1 = mock<QuotaExceededMegaException> {
+                on { value }.thenReturn(1)
+            }
+            val expectedError2 = mock<BlockedMegaException>()
+            val event1 = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer }.thenReturn(transfer1)
+                on { error }.thenReturn(expectedError1)
+            }
+            val event2 = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer }.thenReturn(transfer2)
+                on { error }.thenReturn(expectedError1)
+            }
+            val event3 = mock<TransferEvent.TransferTemporaryErrorEvent> {
+                on { transfer }.thenReturn(transfer1)
+                on { error }.thenReturn(expectedError2)
+            }
+            whenever(monitorTransferEventsUseCase.invoke()).thenReturn(
+                flowOf(
+                    event1,
+                    event2,
+                    event3
+                )
+            )
+            underTest.errorState.test {
+                assertThat(awaitItem()).isEqualTo(null)
+                assertThat(awaitItem()).isInstanceOf(QuotaExceededMegaException::class.java)
+                assertThat(awaitItem()).isInstanceOf(BlockedMegaException::class.java)
+            }
+        }
 }

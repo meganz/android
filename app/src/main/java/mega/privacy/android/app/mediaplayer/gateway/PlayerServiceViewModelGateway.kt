@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
+import mega.privacy.android.domain.exception.MegaException
 import java.io.File
 
 /**
@@ -86,9 +87,16 @@ interface PlayerServiceViewModelGateway {
     /**
      * Update when error is happened
      *
-     * @return Flow<Int>
+     * @return Flow<MegaException?>
      */
-    fun errorUpdate(): Flow<Int>
+    fun errorUpdate(): Flow<MegaException?>
+
+    /**
+     * Update when the items are cleared
+     *
+     * @return Flow<Boolean?>
+     */
+    fun itemsClearedUpdate(): Flow<Boolean?>
 
     /**
      * Update when playlist title is changed

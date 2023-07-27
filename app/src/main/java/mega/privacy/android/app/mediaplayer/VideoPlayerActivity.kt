@@ -108,6 +108,8 @@ import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -692,9 +694,15 @@ class VideoPlayerActivity : MediaPlayerActivity() {
                 }
             }
 
-            collectFlow(errorState) { errorCode ->
-                errorCode?.let {
+            collectFlow(errorState) { megaException ->
+                megaException?.let {
                     this@VideoPlayerActivity.onError(it)
+                }
+            }
+
+            collectFlow(itemsClearedState) { isCleared ->
+                if (isCleared == true) {
+                    stopPlayer()
                 }
             }
 
@@ -1359,16 +1367,14 @@ class VideoPlayerActivity : MediaPlayerActivity() {
         }
     }
 
-    private fun onError(code: Int) {
-        when (code) {
-            MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
-            MegaError.API_EBLOCKED -> {
+    private fun onError(megaException: mega.privacy.android.domain.exception.MegaException) {
+        when (megaException) {
+            is QuotaExceededMegaException -> showGeneralTransferOverQuotaWarning()
+            is BlockedMegaException -> {
                 if (!AlertDialogUtil.isAlertDialogShown(takenDownDialog)) {
                     takenDownDialog = AlertsAndWarnings.showTakenDownAlert(this)
                 }
             }
-
-            MegaError.API_ENOENT -> stopPlayer()
         }
     }
 

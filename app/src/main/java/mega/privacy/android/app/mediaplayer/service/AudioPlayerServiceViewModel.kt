@@ -11,27 +11,20 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.ShuffleOrder
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_BACKGROUND_PLAY_ENABLED
-import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_REPEAT_MODE
-import mega.privacy.android.app.constants.SettingsConstants.KEY_AUDIO_SHUFFLE_ENABLED
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -43,8 +36,6 @@ import mega.privacy.android.app.mediaplayer.playlist.finalizeItem
 import mega.privacy.android.app.mediaplayer.playlist.updateNodeName
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase.Result
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
@@ -94,6 +85,10 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
@@ -134,11 +129,9 @@ import mega.privacy.android.domain.usecase.mediaplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaTransfer
-import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
 import java.util.Collections
@@ -151,7 +144,7 @@ import javax.inject.Inject
 class AudioPlayerServiceViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
-    private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val playlistItemMapper: PlaylistItemMapper,
@@ -233,7 +226,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private val retry = MutableLiveData<Boolean>()
 
-    private val error = MutableLiveData<Int>()
+    private val error = MutableLiveData<MegaException?>()
+
+    private val itemsClearedState = MutableStateFlow<Boolean?>(null)
 
     private var actionMode = MutableLiveData<Boolean>()
 
@@ -853,24 +848,26 @@ class AudioPlayerServiceViewModel @Inject constructor(
      * Setup transfer listener
      */
     private fun setupTransferListener() {
-        getGlobalTransferUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .filter { it is Result.OnTransferTemporaryError && it.transfer != null }
-            .subscribeBy(
-                onNext = { event ->
-                    val errorEvent = event as Result.OnTransferTemporaryError
-                    errorEvent.transfer?.run {
-                        onTransferTemporaryError(this, errorEvent.error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeBy(onError = { Timber.e(it) })
-                            .addTo(compositeDisposable)
+        cancellableJobs[JOB_KEY_MONITOR_TRANSFER]?.cancel()
+        cancellableJobs[JOB_KEY_MONITOR_TRANSFER] = sharingScope.launch {
+            monitorTransferEventsUseCase()
+                .catch {
+                    Timber.e(it)
+                }.collect { event ->
+                    if (event is TransferEvent.TransferTemporaryErrorEvent) {
+                        val megaException = event.error
+                        val transfer = event.transfer
+                        if (transfer.nodeHandle == playingHandle
+                            && ((megaException is QuotaExceededMegaException
+                                    && !transfer.isForeignOverQuota
+                                    && megaException.value != 0L)
+                                    || megaException is BlockedMegaException)
+                        ) {
+                            error.postValue(megaException)
+                        }
                     }
-                },
-                onError = { Timber.e(it) }
-            )
-            .addTo(compositeDisposable)
+                }
+        }
     }
 
     override fun onPlayerError() {
@@ -1160,6 +1157,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun errorUpdate() = error.asFlow()
 
+    override fun itemsClearedUpdate() = itemsClearedState
+
     override fun playlistTitleUpdate() = playlistTitle.asFlow()
 
     override fun itemsSelectedCountUpdate() = itemsSelectedCount.asFlow()
@@ -1176,7 +1175,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
             playlistItemsFlow.update {
                 it.copy(emptyList(), 0)
             }
-            error.postValue(MegaError.API_ENOENT)
+            itemsClearedState.update { true }
         }
     }
 
@@ -1412,19 +1411,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         }
     }
 
-    private fun onTransferTemporaryError(transfer: MegaTransfer, e: MegaError): Completable =
-        Completable.fromAction {
-            if (transfer.nodeHandle != playingHandle) {
-                return@fromAction
-            }
-
-            if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
-                || e.errorCode == MegaError.API_EBLOCKED
-            ) {
-                error.value = e.errorCode
-            }
-        }
-
     private suspend fun setupStreamingServer(type: Int): Boolean {
         val memoryInfo = ActivityManager.MemoryInfo()
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -1480,19 +1466,6 @@ class AudioPlayerServiceViewModel @Inject constructor(
         private const val JOB_KEY_TOGGLE_BACKGROUND_PLAY = "JOB_KEY_TOGGLE_BACKGROUND_PLAY"
         private const val JOB_KEY_SET_SHUFFLE = "JOB_KEY_SET_SHUFFLE"
         private const val JOB_KEY_SET_AUDIO_REPEAT_MODE = "JOB_KEY_SET_AUDIO_REPEAT_MODE"
-
-        /**
-         * Clear saved audio player settings.
-         *
-         * @param context Android context
-         */
-        @JvmStatic
-        fun clearSettings(context: Context) {
-            context.defaultSharedPreferences.edit()
-                .remove(KEY_AUDIO_BACKGROUND_PLAY_ENABLED)
-                .remove(KEY_AUDIO_SHUFFLE_ENABLED)
-                .remove(KEY_AUDIO_REPEAT_MODE)
-                .apply()
-        }
+        private const val JOB_KEY_MONITOR_TRANSFER = "JOB_KEY_MONITOR_TRANSFER"
     }
 }

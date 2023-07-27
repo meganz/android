@@ -72,6 +72,8 @@ import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -125,8 +127,16 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                     )
                 }
 
-                collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { errorCode ->
-                    this@AudioPlayerActivity.onError(errorCode)
+                collectFlow(service.playerServiceViewModelGateway.errorUpdate()) { megaException ->
+                    megaException?.let {
+                        this@AudioPlayerActivity.onError(it)
+                    }
+                }
+
+                collectFlow(service.playerServiceViewModelGateway.itemsClearedUpdate()) { isCleared ->
+                    if (isCleared == true) {
+                        stopPlayer()
+                    }
                 }
             }
         }
@@ -753,16 +763,14 @@ class AudioPlayerActivity : MediaPlayerActivity() {
             ?.onDragActivated(activated = activated)
     }
 
-    private fun onError(code: Int) {
-        when (code) {
-            MegaError.API_EOVERQUOTA -> showGeneralTransferOverQuotaWarning()
-            MegaError.API_EBLOCKED -> {
+    private fun onError(megaException: mega.privacy.android.domain.exception.MegaException) {
+        when (megaException) {
+            is QuotaExceededMegaException -> showGeneralTransferOverQuotaWarning()
+            is BlockedMegaException -> {
                 if (!AlertDialogUtil.isAlertDialogShown(takenDownDialog)) {
                     takenDownDialog = AlertsAndWarnings.showTakenDownAlert(this)
                 }
             }
-
-            MegaError.API_ENOENT -> stopPlayer()
         }
     }
 

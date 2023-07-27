@@ -23,16 +23,12 @@ import androidx.lifecycle.viewModelScope
 import com.google.android.exoplayer2.MediaItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -59,7 +55,6 @@ import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.extensions.parcelableArrayList
 import mega.privacy.android.app.search.callback.SearchCallback
-import mega.privacy.android.app.usecase.GetGlobalTransferUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.CONTACT_FILE_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
@@ -111,6 +106,10 @@ import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
+import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.BlockedMegaException
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
@@ -149,10 +148,9 @@ import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayer
 import mega.privacy.android.domain.usecase.mediaplayer.SetVideoRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -175,7 +173,7 @@ class VideoPlayerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
-    private val getGlobalTransferUseCase: GetGlobalTransferUseCase,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val playlistItemMapper: PlaylistItemMapper,
     private val trackPlaybackPositionUseCase: TrackPlaybackPositionUseCase,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimesUseCase,
@@ -260,8 +258,11 @@ class VideoPlayerViewModel @Inject constructor(
     private val _retryState = MutableStateFlow<Boolean?>(null)
     internal val retryState: StateFlow<Boolean?> = _retryState
 
-    private val _errorState = MutableStateFlow<Int?>(null)
-    internal val errorState: StateFlow<Int?> = _errorState
+    private val _errorState = MutableStateFlow<MegaException?>(null)
+    internal val errorState: StateFlow<MegaException?> = _errorState
+
+    private val _itemsClearedState = MutableStateFlow<Boolean?>(null)
+    internal val itemsClearedState: StateFlow<Boolean?> = _itemsClearedState
 
     private val _actionModeState = MutableStateFlow(false)
     internal val actionModeState: StateFlow<Boolean> = _actionModeState
@@ -1147,27 +1148,26 @@ class VideoPlayerViewModel @Inject constructor(
     /**
      * Setup transfer listener
      */
-    private fun setupTransferListener() {
-        getGlobalTransferUseCase.get()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .filter { it is GetGlobalTransferUseCase.Result.OnTransferTemporaryError && it.transfer != null }
-            .subscribeBy(
-                onNext = { event ->
-                    val errorEvent =
-                        event as GetGlobalTransferUseCase.Result.OnTransferTemporaryError
-                    errorEvent.transfer?.run {
-                        onTransferTemporaryError(this, errorEvent.error)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeBy(onError = { Timber.e(it) })
-                            .addTo(compositeDisposable)
+    private fun setupTransferListener() =
+        viewModelScope.launch {
+            monitorTransferEventsUseCase()
+                .catch {
+                    Timber.e(it)
+                }.collect { event ->
+                    if (event is TransferEvent.TransferTemporaryErrorEvent) {
+                        val error = event.error
+                        val transfer = event.transfer
+                        if (transfer.nodeHandle == playingHandle
+                            && ((error is QuotaExceededMegaException
+                                    && !transfer.isForeignOverQuota
+                                    && error.value != 0L)
+                                    || error is BlockedMegaException)
+                        ) {
+                            _errorState.update { error }
+                        }
                     }
-                },
-                onError = { Timber.e(it) }
-            )
-            .addTo(compositeDisposable)
-    }
+                }
+        }
 
     /**
      * Handle player error.
@@ -1435,7 +1435,7 @@ class VideoPlayerViewModel @Inject constructor(
             _playlistItemsState.update {
                 it.copy(emptyList(), 0)
             }
-            _errorState.update { MegaError.API_ENOENT }
+            _itemsClearedState.update { true }
         }
     }
 
@@ -1743,19 +1743,6 @@ class VideoPlayerViewModel @Inject constructor(
             playSourceChanged.addAll(_playerSourcesState.value.mediaItems)
         }
     }
-
-    private fun onTransferTemporaryError(transfer: MegaTransfer, e: MegaError): Completable =
-        Completable.fromAction {
-            if (transfer.nodeHandle != playingHandle) {
-                return@fromAction
-            }
-
-            if ((e.errorCode == MegaError.API_EOVERQUOTA && !transfer.isForeignOverquota && e.value != 0L)
-                || e.errorCode == MegaError.API_EBLOCKED
-            ) {
-                _errorState.update { e.errorCode }
-            }
-        }
 
     private suspend fun setupStreamingServer(type: Int): Boolean {
         val memoryInfo = ActivityManager.MemoryInfo()
