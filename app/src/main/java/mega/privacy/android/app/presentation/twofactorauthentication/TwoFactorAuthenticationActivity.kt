@@ -99,6 +99,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     private var rkSaved = false
     private var isHelpDialogShown = false
     private var isNoAppsDialogShown = false
+    private var is2FAComposeEnabled = false
     private var imm: InputMethodManager? = null
 
     private val downloadFolderActivityResult =
@@ -173,7 +174,10 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 update2FASetting()
                 finish()
             },
-            onIsRkExportSuccessfullyConsumed = viewModel::onIsRkExportSuccessfullyConsumed
+            onCopySeedLongClicked = { copySeed(uiState.seed.orEmpty()) },
+            onIsRkExportSuccessfullyConsumed = viewModel::onIsRkExportSuccessfullyEventConsumed,
+            onIsWritePermissionDeniedConsumed = viewModel::onWritePermissionDeniedEventConsumed,
+            onIsSeedCopiedToClipboardConsumed = viewModel::onSeedCopiedToClipboardEventConsumed
         )
     }
 
@@ -334,6 +338,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
             if (isTwoFactorAuthenticationComposeEnabled()) {
+                is2FAComposeEnabled = true
                 setContentByCompose()
                 viewModel.getAuthenticationCode()
             } else {
@@ -367,7 +372,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             saveRecoveryKeyToStorage()
         } else {
-            showSnackbar(getString(R.string.denied_write_permissions))
+            viewModel.triggerWritePermissionDeniedEvent()
+            if (!is2FAComposeEnabled)
+                showSnackbar(getString(R.string.denied_write_permissions))
         }
     }
 
@@ -421,8 +428,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
                 finish()
-                viewModel.setIsRkExportSuccessfully(true)
-                toast(R.string.save_MK_confirmation)
+                viewModel.setIsRkExportSuccessfullyEvent(true)
+                if (!is2FAComposeEnabled)
+                    toast(R.string.save_MK_confirmation)
             }
 
             else -> {
@@ -757,7 +765,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         seed.let {
             ClipData.newPlainText("seed", seed)?.let {
                 clipboard.setPrimaryClip(it)
-                showSnackbar(getString(R.string.messages_copied_clipboard))
+                viewModel.triggerSeedCopiedToClipboardEvent()
+                if (!is2FAComposeEnabled)
+                    showSnackbar(getString(R.string.messages_copied_clipboard))
             }
         }
     }

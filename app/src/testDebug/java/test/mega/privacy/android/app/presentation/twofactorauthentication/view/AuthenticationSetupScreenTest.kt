@@ -40,7 +40,8 @@ class AuthenticationSetupScreenTest {
                 isIntentAvailable = { true },
                 onNextClicked = {},
                 onOpenInClicked = {},
-                openPlayStore = {}
+                openPlayStore = {},
+                onCopySeedLongClicked = {}
             )
         }
     }

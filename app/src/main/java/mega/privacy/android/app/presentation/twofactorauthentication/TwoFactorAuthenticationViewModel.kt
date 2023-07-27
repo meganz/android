@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getTwoFactorAuthentication
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.getUpdatedTwoFactorAuthentication
@@ -91,14 +90,38 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     /**
      * Updates the Recovery key in state
      */
-    fun setIsRkExportSuccessfully(isExported: Boolean) =
-        _uiState.update { it.copy(isRkExportedSuccessfully = triggered(isExported)) }
+    fun setIsRkExportSuccessfullyEvent(isExported: Boolean) =
+        _uiState.update { it.copy(isRkExportedSuccessfullyEvent = triggered(isExported)) }
 
     /**
-     * Updates the Recovery key in state
+     * Sets isRkExportedSuccessfullyEvent as consumed
      */
-    fun onIsRkExportSuccessfullyConsumed() =
-        _uiState.update { it.copy(isRkExportedSuccessfully = consumed()) }
+    fun onIsRkExportSuccessfullyEventConsumed() =
+        _uiState.update { it.copy(isRkExportedSuccessfullyEvent = consumed()) }
+
+    /**
+     * Updates writePermissionDeniedEvent in state
+     */
+    fun triggerWritePermissionDeniedEvent() =
+        _uiState.update { it.copy(writePermissionDeniedEvent = triggered) }
+
+    /**
+     * Sets writePermissionDeniedEvent as consumed
+     */
+    fun onWritePermissionDeniedEventConsumed() =
+        _uiState.update { it.copy(writePermissionDeniedEvent = consumed) }
+
+    /**
+     * Updates seedCopiedToClipboardEvent in state
+     */
+    fun triggerSeedCopiedToClipboardEvent() =
+        _uiState.update { it.copy(seedCopiedToClipboardEvent = triggered) }
+
+    /**
+     * Sets seedCopiedToClipboardEvent as consumed
+     */
+    fun onSeedCopiedToClipboardEventConsumed() =
+        _uiState.update { it.copy(seedCopiedToClipboardEvent = consumed) }
 
 
     /**
@@ -109,7 +132,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
             if (key.isNullOrBlank().not()) {
                 setMasterKeyExportedUseCase()
             } else {
-                setIsRkExportSuccessfully(false)
+                setIsRkExportSuccessfullyEvent(false)
             }
         }
     }

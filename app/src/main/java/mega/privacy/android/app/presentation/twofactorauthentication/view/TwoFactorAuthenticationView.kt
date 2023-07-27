@@ -55,7 +55,10 @@ internal fun TwoFactorAuthenticationView(
     on2FAPinReset: () -> Unit,
     onExportRkClicked: () -> Unit,
     onDismissClicked: () -> Unit,
+    onCopySeedLongClicked: () -> Unit,
     onIsRkExportSuccessfullyConsumed: () -> Unit,
+    onIsWritePermissionDeniedConsumed: () -> Unit,
+    onIsSeedCopiedToClipboardConsumed: () -> Unit,
 ) {
 
     val currentScreen =
@@ -138,6 +141,7 @@ internal fun TwoFactorAuthenticationView(
                     openPlayStore = openPlayStore,
                     isIntentAvailable = isIntentAvailable,
                     onOpenInClicked = onOpenInClicked,
+                    onCopySeedLongClicked = onCopySeedLongClicked,
                     modifier = Modifier.semantics { testTagsAsResourceId = true }
                 )
             }
@@ -161,7 +165,21 @@ internal fun TwoFactorAuthenticationView(
         }
 
         EventEffect(
-            event = uiState.isRkExportedSuccessfully,
+            event = uiState.seedCopiedToClipboardEvent,
+            onConsumed = onIsSeedCopiedToClipboardConsumed
+        ) {
+            snackBarHostState.showSnackbar(context.resources.getString(R.string.messages_copied_clipboard))
+        }
+
+        EventEffect(
+            event = uiState.writePermissionDeniedEvent,
+            onConsumed = onIsWritePermissionDeniedConsumed
+        ) {
+            snackBarHostState.showSnackbar(context.resources.getString(R.string.denied_write_permissions))
+        }
+
+        EventEffect(
+            event = uiState.isRkExportedSuccessfullyEvent,
             onConsumed = onIsRkExportSuccessfullyConsumed
         ) { isExported ->
             if (isExported) {

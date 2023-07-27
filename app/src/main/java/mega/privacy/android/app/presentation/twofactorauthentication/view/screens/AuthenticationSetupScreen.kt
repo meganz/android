@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view.screens
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,6 +69,7 @@ internal fun AuthenticationSetupScreen(
     onNextClicked: () -> Unit,
     isIntentAvailable: (String) -> Boolean,
     onOpenInClicked: (String) -> Unit,
+    onCopySeedLongClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -110,6 +113,7 @@ internal fun AuthenticationSetupScreen(
                 modifier = Modifier.testTag(
                     SEED_BOX_TEST_TAG
                 ),
+                onCopySeedLongClicked = onCopySeedLongClicked,
                 seedsList = uiState.seed?.toSeedArray().orEmpty()
             )
             Spacer(modifier = Modifier.padding(top = 24.dp))
@@ -230,8 +234,13 @@ internal fun InstructionBox(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun SeedsBox(seedsList: List<String>, modifier: Modifier = Modifier) {
+private fun SeedsBox(
+    seedsList: List<String>,
+    onCopySeedLongClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -239,6 +248,10 @@ private fun SeedsBox(seedsList: List<String>, modifier: Modifier = Modifier) {
             .background(
                 color = MaterialTheme.colors.grey_020_grey_800,
                 shape = RoundedCornerShape(8.dp)
+            )
+            .combinedClickable(
+                onClick = {},
+                onLongClick = onCopySeedLongClicked
             )
     ) {
 
@@ -337,6 +350,7 @@ private fun PreviewSetupView() {
         isIntentAvailable = { true },
         onNextClicked = {},
         onOpenInClicked = {},
+        onCopySeedLongClicked = {},
         openPlayStore = {})
 }
 
