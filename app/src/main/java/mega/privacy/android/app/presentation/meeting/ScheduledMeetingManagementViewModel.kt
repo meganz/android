@@ -15,6 +15,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
@@ -203,25 +204,50 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     }
 
     /**
-     * Cancel occurrence and archive meeting (in case of a meeting with a single occurrence)
-     *
-     * @param occurrence    Occurrence to cancel
+     * Cancel last occurrence and the scheduled meeting
      */
-    fun cancelOccurrenceAndArchiveMeeting(occurrence: ChatScheduledMeetingOccurr) =
-        viewModelScope.launch {
-            runCatching {
-                _state.value.chatId?.let { chatId ->
-                    cancelScheduledMeetingOccurrenceUseCase(chatId, occurrence)
-                    cancelScheduledMeetingUseCase(chatId)
-                    archiveChatUseCase(chatId, true)
-                }
-            }.onSuccess {
-                _state.update { it.copy(finish = true) }
-                triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar))
-            }.onFailure { exception ->
-                Timber.e(exception)
+    fun cancelOccurrenceAndScheduledMeeting() {
+        _state.value.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
+            if (isChatHistoryEmpty) {
+                cancelOccurrenceAndArchiveMeeting()
+            } else {
+                cancelOccurrenceAndMeeting()
             }
         }
+    }
+
+    /**
+     * Cancel and archive meeting (in case of a meeting with a single occurrence)
+     */
+    private fun cancelOccurrenceAndArchiveMeeting() = viewModelScope.launch {
+        runCatching {
+            _state.value.chatId?.let { chatId ->
+                cancelScheduledMeetingUseCase(chatId)
+                archiveChatUseCase(chatId, true)
+            }
+        }.onSuccess {
+            _state.update { it.copy(finish = true) }
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_empty_success_snackbar))
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
+
+    /**
+     * Cancel meeting (in case of a meeting with a single occurrence)
+     */
+    private fun cancelOccurrenceAndMeeting() = viewModelScope.launch {
+        runCatching {
+            _state.value.chatId?.let { chatId ->
+                cancelScheduledMeetingUseCase(chatId)
+            }
+        }.onSuccess {
+            _state.update { it.copy(finish = true) }
+            triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar))
+        }.onFailure { exception ->
+            Timber.e(exception)
+        }
+    }
 
     /**
      * Trigger event to show Snackbar message
@@ -253,6 +279,22 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
             }
             getChatRoom()
         }
+    }
+
+    /**
+     * Sets the selected [ChatRoomItem]
+     *
+     * @param chatRoomItem The selected [ChatRoomItem]
+     */
+    fun setChatRoomItem(chatRoomItem: ChatRoomItem) {
+        _state.update { state -> state.copy(chatRoomItem = chatRoomItem) }
+    }
+
+    /**
+     * Sets chatRoomItem as consumed.
+     */
+    fun setOnChatRoomItemConsumed() {
+        _state.update { state -> state.copy(chatRoomItem = null) }
     }
 
     /**

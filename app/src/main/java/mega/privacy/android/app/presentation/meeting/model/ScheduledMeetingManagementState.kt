@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
  * @property chatRoom                   [ChatRoom] of the scheduled meeting
  * @property snackbarMessageContent     State to show snackbar message
  * @property cancelOccurrenceTapped     Indicates if cancel occurrence option was tapped
+ * @property chatRoomItem               Selected [ChatRoomItem]
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState constructor(
@@ -27,4 +29,5 @@ data class ScheduledMeetingManagementState constructor(
     val chatRoom: ChatRoom? = null,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val cancelOccurrenceTapped: Boolean = false,
+    val chatRoomItem: ChatRoomItem? = null,
 )

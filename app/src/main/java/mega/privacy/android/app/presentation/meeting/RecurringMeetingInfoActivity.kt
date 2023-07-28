@@ -82,6 +82,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
         with(scheduledMeetingManagementViewModel) {
             stopMonitoringLoadMessages()
             setOnChatIdConsumed()
+            setOnChatRoomItemConsumed()
         }
         super.onDestroy()
     }
@@ -131,11 +132,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                     onDismissDialog()
                 },
                 onCancelOccurrenceAndMeeting = {
-                    managementState.selectedOccurrence?.let { occurrence ->
-                        scheduledMeetingManagementViewModel.cancelOccurrenceAndArchiveMeeting(
-                            occurrence
-                        )
-                    }
+                    scheduledMeetingManagementViewModel.cancelOccurrenceAndScheduledMeeting()
                     onDismissDialog()
                 },
                 onDismissDialog = ::onDismissDialog,

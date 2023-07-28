@@ -76,6 +76,7 @@ fun ChatTabsView(
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
                 Snackbar(snackbarData = data,
+                    modifier = Modifier.padding(bottom = 80.dp),
                     backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white)
             }
         },
@@ -167,13 +168,16 @@ fun ChatTabsView(
     SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
 
     managementState.isChatHistoryEmpty?.let { isChatHistoryEmpty ->
-        managementState.chatRoom?.let { chatRoom ->
-            CancelScheduledMeetingDialog(
-                isChatHistoryEmpty = isChatHistoryEmpty,
-                chatTitle = chatRoom.title,
-                onConfirm = onCancelScheduledMeeting,
-                onDismiss = onDismissDialog,
-            )
+        managementState.chatRoomItem?.let { chatRoomItem ->
+            managementState.chatRoom?.let { chatRoom ->
+                CancelScheduledMeetingDialog(
+                    isChatHistoryEmpty = isChatHistoryEmpty,
+                    isRecurringMeeting = chatRoomItem.isRecurringMeeting(),
+                    chatTitle = chatRoom.title,
+                    onConfirm = onCancelScheduledMeeting,
+                    onDismiss = onDismissDialog,
+                )
+            }
         }
     }
 }

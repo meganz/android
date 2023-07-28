@@ -165,6 +165,9 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun onCancelClick() {
+        viewModel.getChatItem(chatId)?.let { chatRoomItem ->
+            scheduledMeetingManagementViewModel.setChatRoomItem(chatRoomItem)
+        }
         scheduledMeetingManagementViewModel.checkIfIsChatHistoryEmpty(chatId)
         dismissAllowingStateLoss()
     }

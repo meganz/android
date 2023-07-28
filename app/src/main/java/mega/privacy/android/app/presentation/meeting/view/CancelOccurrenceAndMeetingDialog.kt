@@ -30,13 +30,7 @@ fun CancelOccurrenceAndMeetingDialog(
                 R.string.meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message
             }
         ),
-        confirmButtonText = stringResource(
-            if (isChatHistoryEmpty) {
-                R.string.meetings_cancel_scheduled_meeting_chat_history_empty_dialog_confirm_button
-            } else {
-                R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button
-            }
-        ),
+        confirmButtonText = stringResource(R.string.meetings_cancel_scheduled_meeting_chat_history_not_empty_dialog_confirm_button),
         cancelButtonText = stringResource(id = R.string.meetings_cancel_scheduled_meeting_dialog_do_not_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onDismiss,

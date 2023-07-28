@@ -468,6 +468,7 @@ class ChatTabsFragment : Fragment() {
             it.setOnChatHistoryEmptyConsumed()
             it.onResetSelectedOccurrence()
             it.setOnChatIdConsumed()
+            it.setOnChatRoomItemConsumed()
         }
     }
 }
