@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.fileinfo.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -18,6 +19,7 @@ import nz.mega.sdk.MegaShare
  * @param isFile true if the node is a file false if it's a folder
  * @param origin from which origin the info screen was opened
  * @param oneOffViewEvent one-off events to be consumed by the view
+ * @param downloadEvent one-off event to start downloading the node
  * @param jobInProgressState indicates if there are any job in progress that needs to be notified
  * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
  * @param isNodeInInbox determines if the node is in the inbox or not (aka backup)
@@ -53,6 +55,7 @@ internal data class FileInfoViewState(
     val isFile: Boolean = true,
     val origin: FileInfoOrigin = FileInfoOrigin.Other,
     val oneOffViewEvent: StateEventWithContent<FileInfoOneOffViewEvent> = consumed(),
+    val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val jobInProgressState: FileInfoJobInProgressState? = FileInfoJobInProgressState.InitialLoading,
     val historyVersions: Int = 0,
     val isNodeInInbox: Boolean = false,

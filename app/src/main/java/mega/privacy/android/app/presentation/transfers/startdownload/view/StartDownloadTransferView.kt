@@ -5,20 +5,28 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContent
 import mega.privacy.android.app.R
 import mega.privacy.android.app.myAccount.StorageStatusDialogState
 import mega.privacy.android.app.myAccount.StorageStatusDialogView
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.TargetPreference
+import mega.privacy.android.app.presentation.transfers.startdownload.StartDownloadTransfersViewModel
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferEvent
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferJobInProgress
 import mega.privacy.android.app.presentation.transfers.startdownload.model.StartDownloadTransferViewState
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.StartDownloadForOffline
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent.StartDownloadNode
 import mega.privacy.android.app.presentation.transfers.view.TransferInProgressDialog
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.utils.MinimumTimeVisibility
@@ -32,7 +40,37 @@ import timber.log.Timber
  * (scanning in progress dialog, not enough space snackbar, start download snackbar, quota exceeded, etc.)
  */
 @Composable
-fun StartDownloadTransferView(
+internal fun StartDownloadTransferView(
+    event: StateEventWithContent<TransferTriggerEvent>,
+    onConsumeEvent: () -> Unit,
+    snackBarHostState: SnackbarHostState,
+    viewModel: StartDownloadTransfersViewModel = viewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    EventEffect(
+        event = event,
+        onConsumed = onConsumeEvent,
+        action = {
+            when (it) {
+                is StartDownloadForOffline -> {
+                    viewModel.startDownloadForOffline(it.typedNode)
+                }
+
+                is StartDownloadNode -> {
+                    viewModel.startDownloadNode(it.typedNodes)
+                }
+            }
+        })
+    StartDownloadTransferView(
+        uiState = uiState,
+        onConsumed = viewModel::consumeOneOffEvent,
+        onCancelledConfirmed = viewModel::cancelCurrentJob,
+        snackBarHostState = snackBarHostState,
+    )
+}
+
+@Composable
+private fun StartDownloadTransferView(
     uiState: StartDownloadTransferViewState,
     onConsumed: () -> Unit,
     onCancelledConfirmed: () -> Unit,
@@ -67,7 +105,7 @@ fun StartDownloadTransferView(
         )
     }
     showQuotaExceededDialog.value?.let {
-        //This view will be replaced with another will full StorageStatusViewModel logic in task: TRAN-181
+        //This view will be replaced with another with full StorageStatusViewModel logic in task: TRAN-181
         StorageStatusDialogView(
             onDismissRequest = { showQuotaExceededDialog.value = null },
             dismissClickListener = { showQuotaExceededDialog.value = null },

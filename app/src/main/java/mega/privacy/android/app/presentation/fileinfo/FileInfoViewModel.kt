@@ -18,6 +18,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -26,6 +27,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
+import mega.privacy.android.app.presentation.transfers.startdownload.model.TransferTriggerEvent
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
@@ -63,6 +65,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
@@ -127,6 +130,7 @@ class FileInfoViewModel @Inject constructor(
     private val nodeActionMapper: NodeActionMapper,
     private val clipboardGateway: ClipboardGateway,
     private val monitorOfflineFileAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -291,32 +295,47 @@ class FileInfoViewModel @Inject constructor(
     }
 
     /**
+     * Some events need to be consumed to don't be missed or fired more than once
+     */
+    fun consumeDownloadEvent() {
+        _uiState.updateDownloadEvent(null)
+    }
+
+    /**
      * Change the current offline availability
      */
     fun availableOfflineChanged(
         availableOffline: Boolean,
         activity: WeakReference<Activity>,
     ) {
-        if (availableOffline == _uiState.value.isAvailableOffline) return
-        if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
-            updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
-            return
-        }
-        updateState {
-            it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
-        }
         viewModelScope.launch {
-            setNodeAvailableOffline(
-                typedNode.id,
-                availableOffline,
-                activity
-            )
-            updateState {
-                it.copy(
-                    oneOffViewEvent = if (!availableOffline) triggered(FileInfoOneOffViewEvent.Message.RemovedOffline) else consumed(),
-                    isAvailableOffline = availableOffline,
-                    isAvailableOfflineEnabled = !typedNode.isTakenDown && !it.isNodeInRubbish,
-                )
+            if (availableOffline && getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                _uiState.updateDownloadEvent(TransferTriggerEvent.StartDownloadForOffline(typedNode))
+            } else {
+                if (availableOffline == _uiState.value.isAvailableOffline) return@launch
+                if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
+                    updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
+                    return@launch
+                }
+                updateState {
+                    it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
+                }
+                viewModelScope.launch {
+                    setNodeAvailableOffline(
+                        typedNode.id,
+                        availableOffline,
+                        activity
+                    )
+                    updateState {
+                        it.copy(
+                            oneOffViewEvent = if (!availableOffline) triggered(
+                                FileInfoOneOffViewEvent.Message.RemovedOffline
+                            ) else consumed(),
+                            isAvailableOffline = availableOffline,
+                            isAvailableOfflineEnabled = !typedNode.isTakenDown && !it.isNodeInRubbish,
+                        )
+                    }
+                }
             }
         }
     }
@@ -914,6 +933,11 @@ class FileInfoViewModel @Inject constructor(
             )
         }
 
+    private fun MutableStateFlow<FileInfoViewState>.updateDownloadEvent(event: TransferTriggerEvent?) =
+        this.update {
+            it.copy(downloadEvent = event?.let { triggered(event) } ?: consumed())
+        }
+
     private fun updateState(update: suspend (FileInfoViewState) -> FileInfoViewState) =
         viewModelScope.launch {
             _uiState.update {
@@ -929,6 +953,14 @@ class FileInfoViewModel @Inject constructor(
      * It checks the feature flag and start downloading the node with the appropriate use case or launch an one off event to start legacy download
      */
     fun startDownloadNode() {
-        _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
+        viewModelScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.DownloadWorker)) {
+                _uiState.updateDownloadEvent(
+                    TransferTriggerEvent.StartDownloadNode(listOf(typedNode))
+                )
+            } else {
+                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.StartLegacyDownload)
+            }
+        }
     }
 }

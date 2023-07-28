@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,8 +31,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.R
-import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.controls.lists.MenuActionHeader
+import mega.privacy.android.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -67,7 +66,7 @@ fun MenuActionBottomSheet(
     val navigationBarHeight = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
     ModalBottomSheetLayout(
         modifier = modifier.padding(bottom = navigationBarHeight),
-        sheetShape = RoundedCornerShape(roundedCornerRadius.value),
+        sheetShape = MaterialTheme.shapes.medium,
         sheetState = modalSheetState,
         scrimColor = scrimColor,
         sheetContent = {
@@ -86,7 +85,7 @@ fun MenuActionBottomSheet(
 private fun MenuActionBottomSheetPreview() {
     val coroutineScope = rememberCoroutineScope()
     val modalSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
+        initialValue = ModalBottomSheetValue.HalfExpanded,
         skipHalfExpanded = false,
     )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
