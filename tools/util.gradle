@@ -272,11 +272,17 @@ Long getNocturnTimeout() {
  */
 boolean isDebugBuild(List<String> taskNames) {
     def debugBuild = false
-    taskNames
-            .collect { it.toLowerCase() }
+    taskNames.collect { it.toLowerCase() }
             .forEach { name ->
-                if (!name.contains("clean") && (name.contains("debug") || name.contains("qa"))) {
-                    debugBuild =  true
+                if (name.contains("clean")) return
+
+                boolean containDebugKeywords = name.contains("debug") ||
+                        name.contains("qa") ||
+                        name.contains("lint") ||
+                        name.contains("test")
+
+                if (containDebugKeywords) {
+                    debugBuild = true
                 }
             }
     return debugBuild
