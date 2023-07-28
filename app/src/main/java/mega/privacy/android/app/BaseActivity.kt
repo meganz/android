@@ -275,8 +275,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
      * Every sub-class activity has an embedded PsaWebBrowser fragment, either visible or invisible.
      * In order to show the newly retrieved PSA at any occasion
      */
-    @JvmField
-    protected var psaWebBrowser: PsaWebBrowser? = null
+    protected val psaWebBrowser: PsaWebBrowser?
+        get() = supportFragmentManager.findFragmentById(R.id.psa_web_browser_container) as? PsaWebBrowser
 
     /**
      * Broadcast receiver to manage a possible SSL verification error.
@@ -488,8 +488,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             }
         }
 
-        // Add an invisible full screen Psa web browser fragment to the activity.
-        // Then show or hide it for browsing the PSA.
+        // Add an invisible full screen Psa web browser container to the activity.
         addPsaWebBrowser()
 
         LiveEventBus.get(EVENT_PSA, Psa::class.java).observeStickyForever(psaObserver)
@@ -523,26 +522,26 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
                 )
-
-            psaWebBrowser = PsaWebBrowser()
-
-            // Don't put the fragment to the back stack. Since pressing back key just hide it,
-            // never pop it up. onBackPressed() will let PSA browser to consume the back
-            // key event anyway
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.psa_web_browser_container, psaWebBrowser ?: return@post)
-                .commitNowAllowingStateLoss()
         }
     }
 
     /**
-     * Display the new url PSA in the web browser
+     * Add fragment and Display the new url PSA in the web browser
      *
      * @param psa the psa to display
      */
     private fun loadPsaInWebBrowser(psa: Psa) {
-        (psaWebBrowser ?: return).loadPsa(psa.url ?: return, psa.id)
+        if (psaWebBrowserContainer == null || psa.url.isNullOrEmpty()) return
+        // Don't put the fragment to the back stack. Since pressing back key just hide it,
+        // never pop it up. onBackPressed() will let PSA browser to consume the back
+        // key event anyway
+        supportFragmentManager
+            .beginTransaction()
+            .replace(
+                R.id.psa_web_browser_container,
+                PsaWebBrowser.newInstance(psa.url.orEmpty(), psa.id)
+            )
+            .commitAllowingStateLoss()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -1404,6 +1403,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_1_monthly
                                 )
                             }
+
                             Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
@@ -1412,6 +1412,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_2_monthly
                                 )
                             }
+
                             Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
@@ -1420,6 +1421,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_3_monthly
                                 )
                             }
+
                             Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> {
                                 account = R.string.prolite_account
                                 color = R.color.orange_400_orange_300
@@ -1429,6 +1431,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_lite_monthly
                                 )
                             }
+
                             else -> {
                                 Timber.w("Unexpected account subscription level")
                                 return@setOnShowListener
@@ -1440,6 +1443,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     }
                 }
             }
+
             else -> {
                 Timber.w("Unexpected PurchaseType")
                 return
@@ -1461,14 +1465,17 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 launchForeignNodeError()
                 true
             }
+
             is QuotaExceededMegaException -> {
                 launchOverQuota()
                 true
             }
+
             is NotEnoughQuotaMegaException -> {
                 launchPreOverQuota()
                 true
             }
+
             else -> false
         }
 

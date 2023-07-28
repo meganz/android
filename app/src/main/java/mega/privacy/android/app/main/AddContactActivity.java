@@ -117,6 +117,7 @@ import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
@@ -2940,6 +2941,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     public void onBackPressed() {
+        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 

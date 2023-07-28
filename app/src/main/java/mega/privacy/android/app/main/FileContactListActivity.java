@@ -85,6 +85,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.contact.FileContactListActivityExtensionKt;
 import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
@@ -629,6 +630,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     @Override
     public void onBackPressed() {
         Timber.d("onBackPressed");
+        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 

@@ -13,6 +13,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.OnBackPressedCallback
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
@@ -62,9 +63,18 @@ class PsaWebBrowser : Fragment() {
         }
 
         binding.webView.addJavascriptInterface(this, JS_INTERFACE)
+        loadPsa(
+            requireArguments().getString(ARGS_URL_KEY).orEmpty(),
+            requireArguments().getInt(ARGS_ID_KEY)
+        )
     }
 
-    fun loadPsa(url: String, psaId: Int) {
+    override fun onDestroyView() {
+        binding.webView.removeJavascriptInterface(JS_INTERFACE)
+        super.onDestroyView()
+    }
+
+    private fun loadPsa(url: String, psaId: Int) {
         binding.webView.visibility = View.INVISIBLE
         this.psaId = psaId
 
@@ -96,9 +106,12 @@ class PsaWebBrowser : Fragment() {
         // Due to the possible delay introduced by JS showPSA,
         // If the activity is no longer the activity sit on the top at the moment
         // then don't show psa on it. Show psa even if the app(activity task) is already on the background.
-        if (!Util.isTopActivity(activity?.javaClass?.name, requireContext())) return
+        if (!Util.isTopActivity(activity?.javaClass?.name, requireContext())) {
+            hidePSA()
+            return
+        }
         requireActivity().onBackPressedDispatcher.addCallback(
-            this, onBackPressedCallback
+            viewLifecycleOwner, onBackPressedCallback
         )
         uiHandler.post {
             binding.webView.visibility = View.VISIBLE
@@ -125,9 +138,12 @@ class PsaWebBrowser : Fragment() {
         uiHandler.post {
             val currentActivity = activity
             if (currentActivity is BaseActivity && binding.webView.visibility == View.VISIBLE) {
-                binding.webView.visibility = View.INVISIBLE
                 onBackPressedCallback.isEnabled = false
                 onBackPressedCallback.remove()
+                currentActivity.supportFragmentManager
+                    .beginTransaction()
+                    .remove(this)
+                    .commitAllowingStateLoss()
             }
         }
     }
@@ -138,8 +154,17 @@ class PsaWebBrowser : Fragment() {
     fun consumeBack() = onBackPressedCallback.isEnabled
 
     companion object {
-        const val ARGS_URL_KEY = "URL"
-        const val ARGS_ID_KEY = "ID"
-        const val JS_INTERFACE = "megaAndroid"
+        private const val ARGS_URL_KEY = "URL"
+        private const val ARGS_ID_KEY = "ID"
+        private const val JS_INTERFACE = "megaAndroid"
+
+        fun newInstance(url: String, id: Int): PsaWebBrowser {
+            return PsaWebBrowser().apply {
+                arguments = bundleOf(
+                    ARGS_URL_KEY to url,
+                    ARGS_ID_KEY to id
+                )
+            }
+        }
     }
 }

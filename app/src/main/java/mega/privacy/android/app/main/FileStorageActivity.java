@@ -61,6 +61,7 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.utils.ColorUtils;
 import timber.log.Timber;
 
@@ -532,6 +533,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
 
     @Override
     public void onBackPressed() {
+        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         retryConnectionsAndSignalPresence();
 

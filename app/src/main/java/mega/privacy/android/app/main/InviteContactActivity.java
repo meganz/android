@@ -83,6 +83,7 @@ import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.contacts.ContactsFilter;
@@ -391,6 +392,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public void onBackPressed() {
         Timber.d("onBackPressed");
+        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
         finish();
     }

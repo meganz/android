@@ -386,6 +386,7 @@ import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
+import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.GetPublicLinkInformationUseCase;
@@ -4350,6 +4351,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     public void onBackPressed() {
         Timber.d("onBackPressed");
+        PsaWebBrowser psaWebBrowser = getPsaWebBrowser();
         if (psaWebBrowser != null && psaWebBrowser.consumeBack()) return;
 
         retryConnectionsAndSignalPresence();
