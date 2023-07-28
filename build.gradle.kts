@@ -59,7 +59,7 @@ extra["appVersion"] = "8.7"
 // Sdk and tools
 extra["compileSdkVersion"] = 34
 extra["minSdkVersion"] = 24
-extra["targetSdkVersion"] = 33
+extra["targetSdkVersion"] = 34
 extra["buildTools"] = "34.0.0"
 
 // Prebuilt MEGA SDK version
