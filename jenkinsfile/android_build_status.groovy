@@ -242,21 +242,30 @@ pipeline {
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Build APK (GMS+QA)') {
-                            // Finish building and packaging the APK
-                            sh "./gradlew clean"
-                            sh "./gradlew app:assembleGmsRelease 2>&1  | tee ${GMS_APK_BUILD_LOG}"
-                            sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
+
+                            withCredentials([
+                                    string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                    string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+                            ]) {
+                                withEnv([
+                                        "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                                        "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
+                                ]) {
+                                    sh "./gradlew app:assembleGmsDebug 2>&1  | tee ${GMS_APK_BUILD_LOG}"
+                                    sh "./gradlew app:assembleGmsQa 2>&1  | tee ${QA_APK_BUILD_LOG}"
+                                }
+                            }
 
                             sh """
-                        if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
-                            echo GMS APK build failed. Exitting....
-                            exit 1
-                        fi
-                        if grep -q -m 1 \"^FAILURE: \" ${QA_APK_BUILD_LOG}; then
-                            echo QA APK build failed. Exitting....
-                            exit 1
-                        fi
-                    """
+                                if grep -q -m 1 \"^FAILURE: \" ${GMS_APK_BUILD_LOG}; then
+                                    echo GMS APK build failed. Exitting....
+                                    exit 1
+                                fi
+                                if grep -q -m 1 \"^FAILURE: \" ${QA_APK_BUILD_LOG}; then
+                                    echo QA APK build failed. Exitting....
+                                    exit 1
+                                fi
+                            """
                         }
                     }
                     post {
@@ -283,72 +292,77 @@ pipeline {
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
                             script {
 
-                                sh "./gradlew clean"
-
-                                // domain coverage
-                                try {
-                                    sh "./gradlew domain:jacocoTestReport"
-                                } finally {
-                                    DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
-                                }
-                                DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
-                                println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
-
-                                // data coverage
-                                try {
-                                    sh "./gradlew data:testGmsDebugUnitTestCoverage"
-                                } finally {
-                                    DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
-                                }
-                                DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
-                                println("DATA_COVERAGE = ${DATA_COVERAGE}")
-
-                                // run coverage for app module
-                                try {
-                                    sh "./gradlew app:createUnitTestCoverageReport"
-                                } finally {
-                                    APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
-                                }
-                                APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
-                                println("APP_COVERAGE = ${APP_COVERAGE}")
-
-
-                                sh "./gradlew feature:devicecenter:testDebugUnitTest"
-
-                                sh "./gradlew feature:sync:testDebugUnitTest"
-
-                                sh "./gradlew core-ui:testDebugUnitTest"
-
-                                // below code is only run when UnitTest is OK, before test reports are cleaned up.
-                                // If UnitTest is failed, summary is collected at post.failure{} phase
-                                // We have to collect the report here, before they are cleaned in the last stage.
-                                APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
-                                DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
-                                DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
-
-                                // Compare Coverage
                                 withCredentials([
                                         string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                                        string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                                        string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
                                 ]) {
-                                    String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+                                    withEnv([
+                                            "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                                            "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
+                                    ]) {
+                                        // domain coverage
+                                        try {
+                                            sh "./gradlew domain:jacocoTestReport"
+                                        } finally {
+                                            DOMAIN_UNIT_TEST_RESULT = unitTestArchiveLink("domain/build/reports/tests/test", "domain_unit_test_result.zip")
+                                        }
+                                        DOMAIN_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/domain/build/reports/jacoco/test/jacocoTestReport.csv")}"
+                                        println("DOMAIN_COVERAGE = ${DOMAIN_COVERAGE}")
 
-                                    // Navigate to the "/cicd/coverage/" path
-                                    // Download the code coverage from Artifactory.
-                                    // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
-                                    sh """
-                                cd ${WORKSPACE}
-                                rm -frv cicd
-                                mkdir -pv ${WORKSPACE}/cicd/coverage
-                                cd ${WORKSPACE}/cicd/coverage
-                                curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o develop_coverage_summary.txt ${developCoverageLocation}
-                                ls
-                            """
+                                        // data coverage
+                                        try {
+                                            sh "./gradlew data:testGmsDebugUnitTestCoverage"
+                                        } finally {
+                                            DATA_UNIT_TEST_RESULT = unitTestArchiveLink("data/build/reports/tests/testGmsDebugUnitTest", "data_unit_test_result.zip")
+                                        }
+                                        DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
+                                        println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
-                                    // Once the file has been downloaded, call the script to parse the Code Coverage results
-                                    ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
-                                    println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                                        // run coverage for app module
+                                        try {
+                                            sh "./gradlew app:createUnitTestCoverageReport"
+                                        } finally {
+                                            APP_UNIT_TEST_RESULT = unitTestArchiveLink("app/build/reports/tests/testGmsDebugUnitTest", "app_unit_test_result.zip")
+                                        }
+                                        APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
+                                        println("APP_COVERAGE = ${APP_COVERAGE}")
+
+
+                                        sh "./gradlew feature:devicecenter:testDebugUnitTest"
+
+                                        sh "./gradlew feature:sync:testDebugUnitTest"
+
+                                        sh "./gradlew core-ui:testDebugUnitTest"
+
+                                        // below code is only run when UnitTest is OK, before test reports are cleaned up.
+                                        // If UnitTest is failed, summary is collected at post.failure{} phase
+                                        // We have to collect the report here, before they are cleaned in the last stage.
+                                        APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
+                                        DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")
+                                        DATA_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/data/build/test-results/testGmsDebugUnitTest")
+
+                                        // Compare Coverage
+                                        String developCoverageLocation = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/coverage/coverage_summary.txt"
+
+                                        // Navigate to the "/cicd/coverage/" path
+                                        // Download the code coverage from Artifactory.
+                                        // Afterwards, rename the downloaded code coverage text file to "develop_coverage_summary.txt"
+                                        sh """
+                                            cd ${WORKSPACE}
+                                            rm -frv cicd
+                                            mkdir -pv ${WORKSPACE}/cicd/coverage
+                                            cd ${WORKSPACE}/cicd/coverage
+                                            curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -o develop_coverage_summary.txt ${developCoverageLocation}
+                                            ls
+                                        """
+
+                                        // Once the file has been downloaded, call the script to parse the Code Coverage results
+                                        ARTIFACTORY_DEVELOP_CODE_COVERAGE = "${getArtifactoryDevelopCodeCoverage("$WORKSPACE/cicd/coverage/develop_coverage_summary.txt")}"
+                                        println("ARTIFACTORY_DEVELOP_CODE_COVERAGE from Groovy: ${ARTIFACTORY_DEVELOP_CODE_COVERAGE}")
+                                    }
                                 }
+
+
                             }
                         }
                     }
@@ -376,9 +390,19 @@ pipeline {
                         }
 
                         gitlabCommitStatus(name: 'Lint Check') {
-                            sh "mv custom_lint.xml lint.xml"
-                            sh "./gradlew clean"
-                            sh "./gradlew lint"
+
+                            withCredentials([
+                                    string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                                    string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
+                            ]) {
+                                withEnv([
+                                        "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
+                                        "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}"
+                                ]) {
+                                    sh "mv custom_lint.xml lint.xml"
+                                    sh "./gradlew lint"
+                                }
+                            }
 
                             script {
                                 MODULE_LIST.each { module ->
@@ -439,9 +463,9 @@ String buildLintSummaryTable(String jsonLintReportLink) {
                 "| $jsonObject.warningCount " +
                 "| $jsonObject.informationCount " +
                 "| $jsonObject.errorMessage |\n"
-        fatalCount +=  jsonObject.fatalCount as int
-        errorCount +=  jsonObject.errorCount as int
-        warningCount +=  jsonObject.warningCount as int
+        fatalCount += jsonObject.fatalCount as int
+        errorCount += jsonObject.errorCount as int
+        warningCount += jsonObject.warningCount as int
     }
 
     // Create Summary to be returned after iterating through all modules

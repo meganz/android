@@ -39,3 +39,23 @@ include("liveeventbus-x")
 include(":xray")
 include(":analytics")
 include(":core-ui-test")
+
+println("isCiBuild = ${isCiBuild()}")
+
+buildCache {
+    local {
+        isEnabled = !isCiBuild()
+        isPush = !isCiBuild()
+    }
+
+    remote<HttpBuildCache> {
+        url =
+            uri("${System.getenv()["ARTIFACTORY_BASE_URL"]}/artifactory/android-mega/gradle-cache/")
+        credentials {
+            username = System.getenv()["ARTIFACTORY_USER"]
+            password = System.getenv()["ARTIFACTORY_ACCESS_TOKEN"]
+        }
+        isPush = isCiBuild()
+        isEnabled = isCiBuild()
+    }
+}

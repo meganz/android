@@ -275,8 +275,7 @@ boolean isDebugBuild(List<String> taskNames) {
     taskNames
             .collect { it.toLowerCase() }
             .forEach { name ->
-                if (!name.contains("clean") && name.contains("debug")) {
-
+                if (!name.contains("clean") && (name.contains("debug") || name.contains("qa"))) {
                     debugBuild =  true
                 }
             }
