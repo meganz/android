@@ -28,7 +28,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
@@ -142,14 +141,14 @@ class ChatTabsFragment : Fragment() {
                         onItemClick = ::onItemClick,
                         onItemMoreClick = ::onItemMoreClick,
                         onItemSelected = ::onItemSelected,
-                        onScrollInProgress = ::onScrollInProgress,
                         onResetSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
                         onCancelScheduledMeeting = {
                             scheduledMeetingManagementViewModel.onCancelScheduledMeeting()
                             onDismissDialog()
                         },
                         onDismissDialog = ::onDismissDialog,
-                        onEmptyButtonClick = ::onEmptyButtonClick,
+                        onStartChatClick = ::startChatAction,
+                        onTooltipDismissed = viewModel::onTooltipDismissed,
                     )
                 }
             }
@@ -206,7 +205,6 @@ class ChatTabsFragment : Fragment() {
 
         view.post {
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
-            (activity as? ManagerActivity?)?.showFabButton()
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
             (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
                 ChatStatusDialogFragment().show(childFragmentManager, ChatStatusDialogFragment.TAG)
@@ -299,7 +297,7 @@ class ChatTabsFragment : Fragment() {
     /**
      * Check if meeting tab is shown
      */
-    fun isMeetingTabShown(): Boolean =
+    private fun isMeetingTabShown(): Boolean =
         currentTab == ChatTab.MEETINGS
 
     /**
@@ -339,11 +337,7 @@ class ChatTabsFragment : Fragment() {
         )
     }
 
-    private fun onScrollInProgress(scrolling: Boolean) {
-        LiveEventBus.get<Boolean>(Constants.EVENT_FAB_CHANGE).post(!scrolling)
-    }
-
-    private fun onEmptyButtonClick() {
+    private fun startChatAction() {
         if (isMeetingTabShown()) {
             MeetingBottomSheetDialogFragment.newInstance(true).show(
                 childFragmentManager,

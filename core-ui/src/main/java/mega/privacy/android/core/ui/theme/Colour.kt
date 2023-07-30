@@ -401,6 +401,9 @@ val dark_blue_400 = Color(0xFF3FB2E2)
 @ShowkaseColor("dark_blue_500", "dark_blue")
 val dark_blue_500 = Color(0xFF2BA6DE)
 
+@ShowkaseColor("dark_blue_tooltip", "dark_blue")
+val dark_blue_tooltip = Color(0xFF04101E)
+
 @ShowkaseColor("blue_200", "blue")
 val blue_200 = Color(0xFF61D2FF)
 

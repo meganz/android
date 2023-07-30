@@ -47,16 +47,6 @@ internal class FabButtonListener(val context: Context) : View.OnClickListener {
                             }
                             context.showUploadPanel()
                         }
-                        DrawerItem.CHAT -> {
-                            Timber.d("Create new chat")
-                            if (!Util.isFastDoubleClick()) {
-                                if (context.isMeetingTabShown) {
-                                    context.showMeetingOptionsPanel(true)
-                                } else {
-                                    context.chooseAddContactDialog()
-                                }
-                            }
-                        }
                         else -> {}
                     }
                 }

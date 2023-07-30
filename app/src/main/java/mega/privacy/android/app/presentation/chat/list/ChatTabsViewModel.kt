@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
@@ -35,6 +36,9 @@ import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase.ChatRoomType
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
@@ -81,6 +85,9 @@ class ChatTabsViewModel @Inject constructor(
     private val getCurrentChatStatusUseCase: GetCurrentChatStatusUseCase,
     private val clearChatHistoryUseCase: ClearChatHistoryUseCase,
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase,
+    private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase,
+    private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase,
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -95,6 +102,7 @@ class ChatTabsViewModel @Inject constructor(
         signalChatPresence()
         requestChats()
         retrieveChatStatus()
+        retrieveTooltips()
     }
 
     /**
@@ -339,6 +347,22 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
+     * Retrieve Scheduled Meeting Tooltips to be shown
+     */
+    private fun retrieveTooltips() {
+        viewModelScope.launch {
+            val featureFlagEnabled = getFeatureFlagValue(AppFeatures.ScheduleMeeting)
+            if (featureFlagEnabled) {
+                runCatching {
+                    getMeetingTooltipsUseCase()
+                }.onSuccess { tooltips ->
+                    state.update { it.copy(tooltipToBeShown = tooltips) }
+                }.onFailure(Timber.Forest::e)
+            }
+        }
+    }
+
+    /**
      * On item selected
      *
      * @param chatId    Chat selected
@@ -423,5 +447,19 @@ class ChatTabsViewModel @Inject constructor(
      */
     fun markHandleIsParticipatingInChatCall() {
         state.update { it.copy(isParticipatingInChatCallResult = null) }
+    }
+
+    /**
+     * On current Meeting tooltip as been dismissed
+     */
+    fun onTooltipDismissed() {
+        viewModelScope.launch {
+            runCatching {
+                val currentTooltip = state.value.tooltipToBeShown
+                setNextMeetingTooltipUseCase(currentTooltip)
+            }.onSuccess {
+                retrieveTooltips()
+            }.onFailure(Timber.Forest::e)
+        }
     }
 }

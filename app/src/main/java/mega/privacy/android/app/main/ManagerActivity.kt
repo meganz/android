@@ -8201,7 +8201,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 else -> hideFabButton()
             }
 
-            DrawerItem.CHAT -> updateFabAndShow()
             else -> hideFabButton()
         }
     }
@@ -8820,9 +8819,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         get() = (supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment).also {
             chatTabsFragment = it
         }
-    val isMeetingTabShown: Boolean
-        get() = chatsFragment?.isMeetingTabShown() == true
-
     private fun getPermissionsFragment(): PermissionsFragment? {
         return (supportFragmentManager.findFragmentByTag(FragmentTag.PERMISSIONS.tag) as? PermissionsFragment).also {
             permissionsFragment = it

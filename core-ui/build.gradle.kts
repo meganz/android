@@ -78,6 +78,7 @@ dependencies {
     implementation(lib.showkase)
     implementation(lib.compose.state.events)
     implementation(lib.coil.compose)
+    implementation(lib.balloon)
     kapt(lib.showkase.processor)
 
     testImplementation(testlib.bundles.ui.test)

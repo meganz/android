@@ -1,12 +1,18 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
@@ -15,6 +21,8 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,15 +37,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.model.ChatsTabState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.view.CancelScheduledMeetingDialog
-import mega.privacy.android.core.ui.theme.black
+import mega.privacy.android.core.ui.controls.tooltips.MegaTooltip
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.core.ui.theme.white
+import mega.privacy.android.core.ui.theme.extensions.white_black
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 
 /**
  * Chat tabs view
@@ -57,17 +67,18 @@ fun ChatTabsView(
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
-    onScrollInProgress: (Boolean) -> Unit = {},
     onResetSnackbarMessage: () -> Unit = {},
     onCancelScheduledMeeting: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
-    onEmptyButtonClick: () -> Unit = {},
+    onStartChatClick: () -> Unit = {},
+    onTooltipDismissed: () -> Unit = {},
 ) {
     val scaffoldState = rememberScaffoldState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState()
     var scrollToTop by remember { mutableStateOf(false) }
+    var showFabButton by remember { mutableStateOf(true) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
     var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
 
@@ -75,11 +86,29 @@ fun ChatTabsView(
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
-                Snackbar(snackbarData = data,
+                Snackbar(
+                    snackbarData = data,
                     modifier = Modifier.padding(bottom = 80.dp),
-                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white)
+                    backgroundColor = MaterialTheme.colors.white_black
+                )
             }
         },
+        floatingActionButton = {
+            if (state.tooltipToBeShown == MeetingTooltipItem.CREATE) {
+                MegaTooltip(
+                    titleText = stringResource(R.string.chat_schedule_meeting),
+                    descriptionText = stringResource(R.string.meeting_list_tooltip_fab_description),
+                    actionText = stringResource(R.string.button_permission_info),
+                    showOnTop = true,
+                    arrowPosition = 0.89f,
+                    onDismissed = onTooltipDismissed
+                ) {
+                    FabButton(showFabButton, onStartChatClick)
+                }
+            } else {
+                FabButton(showFabButton, onStartChatClick)
+            }
+        }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -92,7 +121,7 @@ fun ChatTabsView(
                 contentColor = MaterialTheme.colors.red_600_red_300
             ) {
                 ChatTab.values().forEachIndexed { index, item ->
-                    Tab(text = { Text(text = stringResource(id = item.titleStringRes)) },
+                    Tab(text = { Text(text = stringResource(item.titleStringRes)) },
                         selected = pagerState.currentPage == index,
                         unselectedContentColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                         onClick = {
@@ -101,7 +130,8 @@ fun ChatTabsView(
                             } else {
                                 scrollToTop = !scrollToTop
                             }
-                        })
+                        }
+                    )
                 }
             }
 
@@ -123,10 +153,12 @@ fun ChatTabsView(
                     scrollToTop = scrollToTop,
                     onItemClick = onItemClick,
                     isMeetingView = isMeetingView,
+                    tooltipsToBeShown = state.tooltipToBeShown,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
-                    onScrollInProgress = onScrollInProgress,
-                    onEmptyButtonClick = onEmptyButtonClick,
+                    onScrollInProgress = { showFabButton = !it },
+                    onEmptyButtonClick = onStartChatClick,
+                    onTooltipDismissed = onTooltipDismissed,
                 )
             }
 
@@ -178,6 +210,24 @@ fun ChatTabsView(
                     onDismiss = onDismissDialog,
                 )
             }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalAnimationApi::class)
+private fun FabButton(showFabButton: Boolean, onStartChatClick: () -> Unit) {
+    AnimatedVisibility(
+        visible = showFabButton,
+        enter = scaleIn(),
+        exit = scaleOut(),
+    ) {
+        FloatingActionButton(onClick = onStartChatClick) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Create new chat",
+                tint = MaterialTheme.colors.white_black
+            )
         }
     }
 }

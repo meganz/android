@@ -39,9 +39,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.tooltips.MegaTooltip
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_087_white_alpha_087
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 
 /**
  * Chat list view
@@ -51,12 +53,14 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem
  * @param selectedIds
  * @param scrollToTop
  * @param isMeetingView
+ * @param tooltipsToBeShown
  * @param onItemClick
  * @param onItemMoreClick
  * @param onItemSelected
  * @param onFirstItemVisible
  * @param onScrollInProgress
  * @param onEmptyButtonClick
+ * @param onTooltipDismissed
  */
 @Composable
 fun ChatListView(
@@ -65,12 +69,14 @@ fun ChatListView(
     selectedIds: List<Long>,
     scrollToTop: Boolean,
     isMeetingView: Boolean,
+    tooltipsToBeShown: MeetingTooltipItem = MeetingTooltipItem.NONE,
     onItemClick: (Long) -> Unit = {},
     onItemMoreClick: (ChatRoomItem) -> Unit = {},
     onItemSelected: (Long) -> Unit = {},
     onFirstItemVisible: (Boolean) -> Unit = {},
     onScrollInProgress: (Boolean) -> Unit = {},
     onEmptyButtonClick: () -> Unit = {},
+    onTooltipDismissed: () -> Unit = {},
 ) {
     Box(
         modifier = modifier
@@ -82,11 +88,13 @@ fun ChatListView(
                 items = items,
                 selectedIds = selectedIds,
                 scrollToTop = scrollToTop,
+                tooltipsToBeShown = tooltipsToBeShown,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
                 onItemSelected = onItemSelected,
                 onFirstItemVisible = onFirstItemVisible,
                 onScrollInProgress = onScrollInProgress,
+                onTooltipDismissed = onTooltipDismissed,
             )
         } else {
             EmptyView(
@@ -104,15 +112,19 @@ private fun ListView(
     items: List<ChatRoomItem>,
     selectedIds: List<Long>,
     scrollToTop: Boolean,
+    tooltipsToBeShown: MeetingTooltipItem,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     onFirstItemVisible: (Boolean) -> Unit,
     onScrollInProgress: (Boolean) -> Unit,
+    onTooltipDismissed: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
     var hasBeenTouched by remember { mutableStateOf(false) }
+    var pendingTooltipShown by remember { mutableStateOf(false) }
+    var recurringTooltipShown by remember { mutableStateOf(false) }
 
     LazyColumn(
         state = listState,
@@ -135,15 +147,60 @@ private fun ListView(
             } ?: run {
                 if (index != 0) ChatDivider()
             }
+            when {
+                !pendingTooltipShown && tooltipsToBeShown == MeetingTooltipItem.PENDING && item is ChatRoomItem.MeetingChatRoomItem && item.isPending -> {
+                    pendingTooltipShown = true
+                    MegaTooltip(
+                        titleText = stringResource(R.string.btn_start_meeting),
+                        descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),
+                        actionText = stringResource(R.string.button_permission_info),
+                        showOnTop = false,
+                        arrowPosition = 0.5f,
+                        onDismissed = onTooltipDismissed,
+                    ) {
+                        ChatRoomItemView(
+                            item = item,
+                            isSelected = selectionEnabled && selectedIds.contains(item.chatId),
+                            isSelectionEnabled = selectionEnabled,
+                            onItemClick = onItemClick,
+                            onItemMoreClick = onItemMoreClick,
+                            onItemSelected = onItemSelected,
+                        )
+                    }
+                }
 
-            ChatRoomItemView(
-                item = item,
-                isSelected = selectionEnabled && selectedIds.contains(item.chatId),
-                isSelectionEnabled = selectionEnabled,
-                onItemClick = onItemClick,
-                onItemMoreClick = onItemMoreClick,
-                onItemSelected = onItemSelected,
-            )
+                !recurringTooltipShown && tooltipsToBeShown == MeetingTooltipItem.RECURRING && item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() -> {
+                    recurringTooltipShown = true
+                    MegaTooltip(
+                        titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),
+                        descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
+                        actionText = stringResource(R.string.button_permission_info),
+                        showOnTop = false,
+                        arrowPosition = 0.5f,
+                        onDismissed = onTooltipDismissed,
+                    ) {
+                        ChatRoomItemView(
+                            item = item,
+                            isSelected = selectionEnabled && selectedIds.contains(item.chatId),
+                            isSelectionEnabled = selectionEnabled,
+                            onItemClick = onItemClick,
+                            onItemMoreClick = onItemMoreClick,
+                            onItemSelected = onItemSelected,
+                        )
+                    }
+                }
+
+                else -> {
+                    ChatRoomItemView(
+                        item = item,
+                        isSelected = selectionEnabled && selectedIds.contains(item.chatId),
+                        isSelectionEnabled = selectionEnabled,
+                        onItemClick = onItemClick,
+                        onItemMoreClick = onItemMoreClick,
+                        onItemSelected = onItemSelected,
+                    )
+                }
+            }
         }
     }
 

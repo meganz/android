@@ -24,7 +24,7 @@ internal const val testFragmentTag = "underTest"
  */
 internal inline fun <reified T : Fragment> launchFragmentInHiltContainer(
     fragmentArgs: Bundle? = null,
-    @StyleRes themeResId: Int = androidx.fragment.testing.R.style.FragmentScenarioEmptyFragmentActivityTheme,
+    @StyleRes themeResId: Int = androidx.fragment.testing.manifest.R.style.FragmentScenarioEmptyFragmentActivityTheme,
     crossinline action: Fragment.() -> Unit = {},
 ): ActivityScenario<HiltTestActivity>? {
     val startActivityIntent = Intent.makeMainActivity(

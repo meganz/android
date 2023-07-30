@@ -567,6 +567,12 @@ private fun ActionOption(
                         }
                     }
 
+                    ScheduleMeetingAction.SendCalendarInvite -> {
+                        action.description?.let { description ->
+                            subtitle = stringResource(id = description)
+                        }
+                    }
+
                     ScheduleMeetingAction.AddParticipants -> {
                         if (state.numOfParticipants > 1) subtitle =
                             stringResource(

@@ -20,7 +20,7 @@ internal val ScheduleMeetingAction.description: Int?
         ScheduleMeetingAction.EndRecurrence -> null
         ScheduleMeetingAction.MeetingLink -> R.string.scheduled_meetings_share_meeting_link_panel_title
         ScheduleMeetingAction.AddParticipants -> null
-        ScheduleMeetingAction.SendCalendarInvite -> null
+        ScheduleMeetingAction.SendCalendarInvite -> R.string.scheduled_meetings_send_calendar_invite_panel_title
         ScheduleMeetingAction.AllowNonHostAddParticipants -> null
         ScheduleMeetingAction.AddDescription -> null
     }

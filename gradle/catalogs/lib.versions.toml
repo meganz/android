@@ -70,6 +70,7 @@ stickyheader = 'com.brandongogetap:stickyheaders:0.6.1'
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
 mega-analytics = "mega.privacy.mobile:analytics-events-android:+"
+balloon = "com.github.skydoves:balloon-compose:1.5.4"
 
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]

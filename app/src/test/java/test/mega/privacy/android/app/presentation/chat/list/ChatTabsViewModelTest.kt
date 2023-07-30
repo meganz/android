@@ -21,6 +21,9 @@ import mega.privacy.android.domain.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.domain.usecase.chat.ClearChatHistoryUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatsUseCase
 import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
+import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
+import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
@@ -62,6 +65,9 @@ internal class ChatTabsViewModelTest {
     private val loadMessagesUseCase: LoadMessagesUseCase = mock()
     private val cancelScheduledMeetingUseCase: CancelScheduledMeetingUseCase = mock()
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
+    private val getMeetingTooltipsUseCase: GetMeetingTooltipsUseCase = mock()
+    private val setNextMeetingTooltipUseCase: SetNextMeetingTooltipUseCase = mock()
+    private val getFeatureFlagValue: GetFeatureFlagValueUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -94,7 +100,10 @@ internal class ChatTabsViewModelTest {
             isChatHistoryEmptyUseCase,
             loadMessagesUseCase,
             cancelScheduledMeetingUseCase,
-            isParticipatingInChatCallUseCase
+            isParticipatingInChatCallUseCase,
+            getMeetingTooltipsUseCase,
+            setNextMeetingTooltipUseCase,
+            getFeatureFlagValue,
         )
     }
 
@@ -115,7 +124,10 @@ internal class ChatTabsViewModelTest {
             rtcAudioManagerGateway,
             getCurrentChatStatusUseCase,
             clearChatHistoryUseCase,
-            isParticipatingInChatCallUseCase
+            isParticipatingInChatCallUseCase,
+            getMeetingTooltipsUseCase,
+            setNextMeetingTooltipUseCase,
+            getFeatureFlagValue,
         )
     }
 
