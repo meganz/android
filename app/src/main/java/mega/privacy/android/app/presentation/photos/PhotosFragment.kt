@@ -195,6 +195,8 @@ class PhotosFragment : Fragment() {
                             onNavigatePhotosFilter = ::openFilterFragment,
                             onNavigateAlbumContent = ::openAlbum,
                             onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
+                            onZoomIn = ::handleZoomIn,
+                            onZoomOut = ::handleZoomOut,
                         )
                     }
                 }
@@ -453,24 +455,12 @@ class PhotosFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_zoom_in -> { // +
-                with(timelineViewModel) {
-                    zoomIn()
-                    handleAndUpdatePhotosUIState(
-                        state.value.photos,
-                        state.value.currentShowingPhotos
-                    )
-                }
+                handleZoomIn()
                 true
             }
 
             R.id.action_zoom_out -> { // -
-                with(timelineViewModel) {
-                    zoomOut()
-                    handleAndUpdatePhotosUIState(
-                        state.value.photos,
-                        state.value.currentShowingPhotos
-                    )
-                }
+                handleZoomOut()
                 true
             }
 
@@ -503,6 +493,26 @@ class PhotosFragment : Fragment() {
             }
 
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun handleZoomOut() {
+        with(timelineViewModel) {
+            zoomOut()
+            handleAndUpdatePhotosUIState(
+                state.value.photos,
+                state.value.currentShowingPhotos
+            )
+        }
+    }
+
+    private fun handleZoomIn() {
+        with(timelineViewModel) {
+            zoomIn()
+            handleAndUpdatePhotosUIState(
+                state.value.photos,
+                state.value.currentShowingPhotos
+            )
         }
     }
 

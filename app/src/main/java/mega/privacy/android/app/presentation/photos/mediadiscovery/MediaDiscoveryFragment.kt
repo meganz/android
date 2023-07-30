@@ -69,6 +69,7 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.app.presentation.photos.view.PhotosZoomGestureDetector
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -295,7 +296,15 @@ class MediaDiscoveryFragment : Fragment() {
                     MediaDiscoveryDialog()
                 }
                 if (uiState.selectedTimeBarTab == TimeBarTab.All) {
-                    PhotosGridView(uiState = uiState, lazyGridState = lazyGridState)
+                    PhotosGridView(
+                        uiState = uiState,
+                        lazyGridState = lazyGridState,
+                        modifier = Modifier
+                            .PhotosZoomGestureDetector(
+                                onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
+                                onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
+                            )
+                    )
                 } else {
                     val dateCards = when (uiState.selectedTimeBarTab) {
                         TimeBarTab.Years -> uiState.yearsCardList
@@ -324,8 +333,13 @@ class MediaDiscoveryFragment : Fragment() {
     )
 
     @Composable
-    fun PhotosGridView(uiState: MediaDiscoveryViewState, lazyGridState: LazyGridState) =
+    fun PhotosGridView(
+        uiState: MediaDiscoveryViewState,
+        lazyGridState: LazyGridState,
+        modifier: Modifier,
+    ) =
         PhotosGridView(
+            modifier = modifier,
             currentZoomLevel = uiState.currentZoomLevel,
             photoDownland = photoDownloaderViewModel::downloadPhoto,
             lazyGridState = lazyGridState,
@@ -568,23 +582,11 @@ class MediaDiscoveryFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_zoom_in -> {
-                mediaDiscoveryGlobalStateViewModel.zoomIn()
-                with(mediaDiscoveryViewModel) {
-                    handlePhotoItems(
-                        sortAndFilterPhotos(state.value.sourcePhotos),
-                        state.value.sourcePhotos
-                    )
-                }
+                handleZoomIn()
             }
 
             R.id.action_zoom_out -> {
-                mediaDiscoveryGlobalStateViewModel.zoomOut()
-                with(mediaDiscoveryViewModel) {
-                    handlePhotoItems(
-                        sortAndFilterPhotos(state.value.sourcePhotos),
-                        state.value.sourcePhotos
-                    )
-                }
+                handleZoomOut()
             }
 
             R.id.action_menu_sort_by -> {
@@ -596,6 +598,26 @@ class MediaDiscoveryFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun handleZoomOut() {
+        mediaDiscoveryGlobalStateViewModel.zoomOut()
+        with(mediaDiscoveryViewModel) {
+            handlePhotoItems(
+                sortAndFilterPhotos(state.value.sourcePhotos),
+                state.value.sourcePhotos
+            )
+        }
+    }
+
+    private fun handleZoomIn() {
+        mediaDiscoveryGlobalStateViewModel.zoomIn()
+        with(mediaDiscoveryViewModel) {
+            handlePhotoItems(
+                sortAndFilterPhotos(state.value.sourcePhotos),
+                state.value.sourcePhotos
+            )
+        }
     }
 
     private fun handleZoomMenuEnableStatus() {

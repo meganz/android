@@ -2,12 +2,16 @@
 
 package mega.privacy.android.app.presentation.photos.view
 
+import mega.privacy.android.core.R as CoreUiR
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -31,6 +35,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -43,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import mega.privacy.android.core.R as CoreUiR
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
@@ -65,6 +70,7 @@ import java.util.Locale
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PhotosGridView(
+    modifier: Modifier = Modifier,
     currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     endSpacing: Dp = 56.dp,
     photoDownland: PhotoDownload,
@@ -87,7 +93,7 @@ internal fun PhotosGridView(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(spanCount),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         state = lazyGridState,
     ) {
@@ -111,6 +117,7 @@ internal fun PhotosGridView(
                         modificationTime = item.modificationTime,
                     )
                 }
+
                 is UIPhoto.PhotoItem -> {
                     val isSelected = item.photo.id in selectedPhotoIds
                     PhotoViewContainer(
@@ -156,9 +163,11 @@ internal fun PhotoViewContainer(
             ZoomLevel.Grid_1 -> modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp)
+
             ZoomLevel.Grid_3 -> modifier
                 .fillMaxSize()
                 .padding(all = 1.5.dp)
+
             ZoomLevel.Grid_5 -> modifier
                 .fillMaxSize()
                 .padding(all = 1.dp)
@@ -305,4 +314,28 @@ private fun dateText(
                 .toInstant()
         )
     )
+}
+
+fun Modifier.PhotosZoomGestureDetector(
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+) = pointerInput(Unit) {
+    awaitEachGesture {
+        awaitFirstDown(requireUnconsumed = false)
+        do {
+            val event = awaitPointerEvent(
+                pass = PointerEventPass.Initial
+            )
+            val canceled = event.changes.any { it.isConsumed }
+            val zoomChange = event.calculateZoom()
+            if (zoomChange != 1.0f) {
+                if (zoomChange > 1.0f) {
+                    onZoomIn()
+                } else {
+                    onZoomOut()
+                }
+                break
+            }
+        } while (!canceled && event.changes.any { it.pressed })
+    }
 }

@@ -8,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -31,6 +32,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUplo
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
+import mega.privacy.android.app.presentation.photos.view.PhotosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -50,6 +52,8 @@ fun PhotosScreen(
     onNavigatePhotosFilter: () -> Unit,
     onNavigateAlbumContent: (UIAlbum) -> Unit,
     onNavigateAlbumPhotosSelection: (AlbumId) -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
 ) {
     val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
     val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
@@ -104,6 +108,11 @@ fun PhotosScreen(
                 },
                 photosGridView = {
                     PhotosGridView(
+                        modifier = Modifier
+                            .PhotosZoomGestureDetector(
+                                onZoomIn = onZoomIn,
+                                onZoomOut = onZoomOut,
+                            ),
                         timelineViewState = timelineViewState,
                         downloadPhoto = photoDownloaderViewModel::downloadPhoto,
                         lazyGridState = timelineLazyGridState,

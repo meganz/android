@@ -46,6 +46,7 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.app.presentation.photos.view.PhotosZoomGestureDetector
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.core.ui.theme.extensions.black_white
@@ -171,7 +172,9 @@ fun MediaDiscoveryScreen(
                         selectedTimeBarTab = uiState.selectedTimeBarTab,
                         onTimeBarTabSelected = { timeBarTab ->
                             viewModel.onTimeBarTabSelected(timeBarTab = timeBarTab)
-                        }
+                        },
+                        onZoomIn = mediaDiscoveryGlobalStateViewModel::zoomIn,
+                        onZoomOut = mediaDiscoveryGlobalStateViewModel::zoomOut,
                     )
                 } else {
                     EmptyView(uiState.currentMediaType)
@@ -383,6 +386,8 @@ private fun MediaDiscoveryContent(
     onPhotoLongPressed: (Photo) -> Unit,
     onCardClicked: (DateCard) -> Unit,
     onTimeBarTabSelected: (TimeBarTab) -> Unit = {},
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -391,6 +396,11 @@ private fun MediaDiscoveryContent(
         Column(modifier = Modifier.fillMaxWidth()) {
             if (selectedTimeBarTab == TimeBarTab.All) {
                 PhotosGridView(
+                    modifier = Modifier
+                        .PhotosZoomGestureDetector(
+                            onZoomIn = onZoomIn,
+                            onZoomOut = onZoomOut,
+                        ),
                     currentZoomLevel = currentZoomLevel,
                     photoDownland = onPhotoDownload,
                     lazyGridState = lazyGridState,

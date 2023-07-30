@@ -42,6 +42,7 @@ const val DATE_FORMAT_MONTH_WITH_DAY = "MMMM"
 
 @Composable
 fun PhotosGridView(
+    modifier: Modifier,
     timelineViewState: TimelineViewState = TimelineViewState(),
     downloadPhoto: PhotoDownload,
     lazyGridState: LazyGridState = rememberLazyGridState(),
@@ -60,7 +61,7 @@ fun PhotosGridView(
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(spanCount),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         state = lazyGridState,
     ) {
