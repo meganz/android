@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -204,49 +205,42 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set start date and time
      *
-     * @param selectedStartDate     Start date and time
-     * @param isDate                True, if is date. False, if not.
+     * @param startDateTime     Start date and time
      */
-    fun onStartDateTimeTap(selectedStartDate: ZonedDateTime, isDate: Boolean) {
-        val nowZonedDateTime: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
-        var newStartZonedDateTime =
-            if (isDate) selectedStartDate.withHour(state.value.startDate.hour)
-                .withMinute(state.value.startDate.minute) else selectedStartDate
+    fun onStartDateTimeTap(startDateTime: ZonedDateTime) {
+        val now = Instant.now().atZone(ZoneOffset.UTC)
+        var selectedStartDateTime = startDateTime
 
-        if (newStartZonedDateTime.isBefore(nowZonedDateTime)) {
-            if (isDate) {
-                return
-            }
-
-            newStartZonedDateTime = newStartZonedDateTime.plus(1, ChronoUnit.DAYS)
+        if (selectedStartDateTime.isBefore(now)) {
+            selectedStartDateTime = selectedStartDateTime.plus(1, ChronoUnit.DAYS)
         }
 
         val newWeekdayList: List<Weekday>? =
             if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Weekly && state.value.rulesSelected.interval == 1) listOf(
                 weekDayMapper(
-                    newStartZonedDateTime.dayOfWeek
+                    selectedStartDateTime.dayOfWeek
                 )
             ) else state.value.rulesSelected.weekDayList
 
         val newMonthDayList: List<Int>? =
             if (state.value.rulesSelected.freq == OccurrenceFrequencyType.Monthly && state.value.rulesSelected.interval == 1) listOf(
-                newStartZonedDateTime.dayOfMonth
+                selectedStartDateTime.dayOfMonth
             ) else state.value.rulesSelected.monthDayList
 
         _state.update { state ->
             val newEndDate =
-                if ((state.endDate.isAfter(newStartZonedDateTime))) state.endDate else newStartZonedDateTime.plus(
+                if ((state.endDate.isAfter(selectedStartDateTime))) state.endDate else selectedStartDateTime.plus(
                     30,
                     ChronoUnit.MINUTES
                 )
 
             state.copy(
-                startDate = newStartZonedDateTime,
+                startDate = selectedStartDateTime,
                 endDate = newEndDate,
                 rulesSelected = state.rulesSelected.copy(
                     weekDayList = newWeekdayList,
                     monthDayList = newMonthDayList,
-                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else newStartZonedDateTime.plusMonths(
+                    until = if (state.rulesSelected.until == 0L) state.rulesSelected.until else selectedStartDateTime.plusMonths(
                         6
                     ).toEpochSecond()
                 )
@@ -259,20 +253,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Set end date and time
      *
-     * @param selectedEndDate   End date and time
-     * @param isDate            True, if is date. False, if not.
+     * @param endDateTime   End date and time
      */
-    fun onEndDateTimeTap(selectedEndDate: ZonedDateTime, isDate: Boolean) {
-        val newEndZonedDateTime = if (isDate) selectedEndDate.withHour(state.value.endDate.hour)
-            .withMinute(state.value.endDate.minute) else selectedEndDate
-
-        if (newEndZonedDateTime.isBefore(state.value.startDate)) {
+    fun onEndDateTimeTap(endDateTime: ZonedDateTime) {
+        if (endDateTime.isBefore(state.value.startDate)) {
             return
         }
 
         _state.update {
             it.copy(
-                endDate = newEndZonedDateTime
+                endDate = endDateTime
             )
         }
     }

@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.meeting.Weekday
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.WeekFields
@@ -53,8 +53,8 @@ data class CreateScheduledMeetingState constructor(
     val chatIdToOpenInfoScreen: Long? = null,
     val buttons: List<ScheduleMeetingAction> = ScheduleMeetingAction.values().asList(),
     val meetingTitle: String = "",
-    val startDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault()),
-    val endDate: ZonedDateTime = Instant.now().atZone(ZoneId.systemDefault())
+    val startDate: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC),
+    val endDate: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC)
         .plus(30, ChronoUnit.MINUTES),
     val rulesSelected: ChatScheduledRules = ChatScheduledRules(),
     val customRecurrenceState: CustomRecurrenceState = CustomRecurrenceState(),
