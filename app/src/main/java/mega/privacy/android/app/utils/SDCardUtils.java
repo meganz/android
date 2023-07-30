@@ -12,6 +12,8 @@ import androidx.documentfile.provider.DocumentFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import kotlin.coroutines.Continuation;
 import mega.privacy.android.app.AndroidCompletedTransfer;
@@ -147,55 +149,56 @@ public class SDCardUtils {
     /**
      * Checks if there are incomplete movements of SD card downloads and tries to complete them.
      */
-    public static void checkSDCardCompletedTransfers() {
+    public static List<CompletedTransfer> checkSDCardCompletedTransfers() {
         MegaApplication app = MegaApplication.getInstance();
         MegaApiJava megaApi = app.getMegaApi();
         LegacyDatabaseHandler dbH = app.getDbH();
         ArrayList<SDTransfer> sdTransfers = dbH.getSdTransfers();
         if (sdTransfers == null || sdTransfers.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
 
-        new Thread(() -> {
-            for (SDTransfer sdtransfer : sdTransfers) {
-                if (megaApi == null) {
-                    return;
-                }
-
-                MegaTransfer transfer = megaApi.getTransferByTag(sdtransfer.getTag());
-                if (transfer != null && transfer.getState() < MegaTransfer.STATE_COMPLETED) {
-                    continue;
-                }
-
-                File originalDownload = new File(sdtransfer.getPath());
-                if (!isFileAvailable(originalDownload)) {
-                    dbH.removeSDTransfer(sdtransfer.getTag());
-                    continue;
-                }
-
-                String appData = sdtransfer.getAppData();
-                String targetPath = getSDCardTargetPath(appData);
-                File finalDownload = new File(targetPath + File.separator + originalDownload.getName());
-                if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
-                    originalDownload.delete();
-                    dbH.removeSDTransfer(sdtransfer.getTag());
-                    continue;
-                }
-
-                Timber.w("Movement incomplete");
-
-                try {
-                    SDCardOperator sdCardOperator = new SDCardOperator(MegaApplication.getInstance());
-                    sdCardOperator.moveDownloadedFileToDestinationPath(originalDownload, targetPath,
-                            getSDCardTargetUri(appData), sdtransfer.getTag());
-                } catch (Exception e) {
-                    Timber.e(e, "Error moving file to the sd card path");
-                }
-
-                AndroidCompletedTransfer androidCompletedTransfer = new AndroidCompletedTransfer(sdtransfer, app);
-                CompletedTransfer completedTransfer = new LegacyCompletedTransferMapper().invoke(androidCompletedTransfer);
-                dbH.addCompletedTransferWithCheck(completedTransfer);
+        ArrayList<CompletedTransfer> completedTransfers = new ArrayList<>();
+        for (SDTransfer sdtransfer : sdTransfers) {
+            if (megaApi == null) {
+                return Collections.emptyList();
             }
-        }).start();
+
+            MegaTransfer transfer = megaApi.getTransferByTag(sdtransfer.getTag());
+            if (transfer != null && transfer.getState() < MegaTransfer.STATE_COMPLETED) {
+                continue;
+            }
+
+            File originalDownload = new File(sdtransfer.getPath());
+            if (!isFileAvailable(originalDownload)) {
+                dbH.removeSDTransfer(sdtransfer.getTag());
+                continue;
+            }
+
+            String appData = sdtransfer.getAppData();
+            String targetPath = getSDCardTargetPath(appData);
+            File finalDownload = new File(targetPath + File.separator + originalDownload.getName());
+            if (finalDownload.exists() && finalDownload.length() == originalDownload.length()) {
+                originalDownload.delete();
+                dbH.removeSDTransfer(sdtransfer.getTag());
+                continue;
+            }
+
+            Timber.w("Movement incomplete");
+
+            try {
+                SDCardOperator sdCardOperator = new SDCardOperator(MegaApplication.getInstance());
+                sdCardOperator.moveDownloadedFileToDestinationPath(originalDownload, targetPath,
+                        getSDCardTargetUri(appData), sdtransfer.getTag());
+            } catch (Exception e) {
+                Timber.e(e, "Error moving file to the sd card path");
+            }
+
+            AndroidCompletedTransfer androidCompletedTransfer = new AndroidCompletedTransfer(sdtransfer, app);
+            CompletedTransfer completedTransfer = new LegacyCompletedTransferMapper().invoke(androidCompletedTransfer);
+            completedTransfers.add(completedTransfer);
+        }
+
+        return completedTransfers;
     }
 }

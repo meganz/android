@@ -20,6 +20,7 @@ import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -59,6 +60,7 @@ internal class MegaLocalRoomFacadeTest {
     private val syncRecordEntityMapper: SyncRecordEntityMapper = mock()
     private val syncStatusIntMapper: SyncStatusIntMapper = mock()
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper = mock()
+    private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
 
     @BeforeAll
     fun setUp() {
@@ -77,6 +79,7 @@ internal class MegaLocalRoomFacadeTest {
             syncStatusIntMapper = syncStatusIntMapper,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             encryptData = encryptData,
+            completedTransferEntityMapper = completedTransferEntityMapper
         )
     }
 

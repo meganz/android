@@ -38,6 +38,7 @@ import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferIfNotExistUseCase
 import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.BroadcastStopTransfersWorkUseCase
@@ -63,6 +64,7 @@ class TransfersManagement @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val areTransfersPausedUseCase: AreTransfersPausedUseCase,
     private val broadcastStopTransfersWorkUseCase: BroadcastStopTransfersWorkUseCase,
+    private val addCompletedTransferIfNotExistUseCase: AddCompletedTransferIfNotExistUseCase,
 ) {
 
     companion object {
@@ -301,7 +303,10 @@ class TransfersManagement @Inject constructor(
         val app = MegaApplication.getInstance()
 
         if (megaApi.rootNode != null) {
-            SDCardUtils.checkSDCardCompletedTransfers()
+            applicationScope.launch {
+                val completedTransfers = SDCardUtils.checkSDCardCompletedTransfers()
+                addCompletedTransferIfNotExistUseCase(completedTransfers)
+            }
         }
 
         if (dbH.transferQueueStatus) {

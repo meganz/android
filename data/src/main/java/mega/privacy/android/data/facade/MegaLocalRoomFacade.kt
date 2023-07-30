@@ -16,12 +16,14 @@ import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferModelMapper
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import javax.inject.Inject
 
@@ -32,6 +34,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val completedTransferDao: CompletedTransferDao,
     private val activeTransferDao: ActiveTransferDao,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
+    private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val activeTransferTotalsMapper: ActiveTransferTotalsMapper,
     private val syncRecordDao: SyncRecordDao,
@@ -99,7 +102,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { contactModelMapper(it) }
     }
 
-    override suspend fun getAllCompletedTransfers(size: Int?) =
+    override fun getAllCompletedTransfers(size: Int?) =
         completedTransferDao.getAllCompletedTransfers()
             .map { list ->
                 list.map { completedTransferModelMapper(it) }
@@ -107,6 +110,10 @@ internal class MegaLocalRoomFacade @Inject constructor(
                     .apply { sortWith(compareByDescending { it.timestamp }) }
                     .let { if (size != null) it.take(size) else it }
             }
+
+    override suspend fun addCompletedTransfer(transfer: CompletedTransfer) {
+        completedTransferDao.insertOrUpdateCompletedTransfer(completedTransferEntityMapper(transfer))
+    }
 
     override suspend fun getCompletedTransfersCount() =
         completedTransferDao.getCompletedTransfersCount()

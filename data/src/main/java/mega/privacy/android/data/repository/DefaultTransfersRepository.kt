@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -349,8 +350,21 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
         withContext(ioDispatcher) {
-            localStorageGateway.addCompletedTransfer(transfer)
+            megaLocalRoomGateway.addCompletedTransfer(transfer)
             appEventGateway.broadcastCompletedTransfer(transfer)
+        }
+
+    override suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>) =
+        withContext(ioDispatcher) {
+            // remove id field before comparison
+            val existingTransfers =
+                megaLocalRoomGateway.getAllCompletedTransfers().firstOrNull()
+                    .orEmpty().map { it.copy(id = null) }
+            transfers.map { it.copy(id = null) }.forEach { transfer ->
+                if (!existingTransfers.any { existingTransfer -> existingTransfer == transfer }) {
+                    megaLocalRoomGateway.addCompletedTransfer(transfer)
+                }
+            }
         }
 
     override suspend fun deleteOldestCompletedTransfers() = withContext(ioDispatcher) {

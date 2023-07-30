@@ -224,21 +224,6 @@ interface DatabaseHandler {
     fun areNotificationsEnabled(handle: String?): String?
 
     /**
-     * Add a completed transfer
-     *
-     * @param transfer the completed transfer to add
-     */
-    fun addCompletedTransfer(transfer: CompletedTransfer)
-
-    /**
-     * Checks if a completed transfer exists before add it to DB.
-     * If so, does nothing. If not, adds the transfer to the DB.
-     *
-     * @param transfer The transfer to check and add.
-     */
-    fun addCompletedTransferWithCheck(transfer: CompletedTransfer)
-
-    /**
      * Gets a completed transfer.
      *
      * @param id the identifier of the transfer to get

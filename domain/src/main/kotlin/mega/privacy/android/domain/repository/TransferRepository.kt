@@ -226,6 +226,13 @@ interface TransferRepository {
     suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
+     * Add completed transfers if not exist
+     *
+     * @param transfers
+     */
+    suspend fun addCompletedTransfersIfNotExist(transfers: List<CompletedTransfer>)
+
+    /**
      * Delete oldest completed transfers
      */
     suspend fun deleteOldestCompletedTransfers()

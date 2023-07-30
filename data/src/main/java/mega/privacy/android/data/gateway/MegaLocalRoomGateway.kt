@@ -109,7 +109,14 @@ interface MegaLocalRoomGateway {
      *
      * @param size the limit size of the list. If null, the limit does not apply
      */
-    suspend fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+    fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+
+    /**
+     * Add a completed transfer
+     *
+     * @param transfer the completed transfer to add
+     */
+    suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
      * Get the completed transfers count

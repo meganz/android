@@ -1863,24 +1863,6 @@ class SqliteDatabaseHandler @Inject constructor(
         return result
     }
 
-    override fun addCompletedTransfer(transfer: CompletedTransfer) {
-        val values = ContentValues().apply {
-            put(KEY_TRANSFER_FILENAME, encrypt(transfer.fileName))
-            put(KEY_TRANSFER_TYPE, encrypt(transfer.type.toString()))
-            put(KEY_TRANSFER_STATE, encrypt(transfer.state.toString()))
-            put(KEY_TRANSFER_SIZE, encrypt(transfer.size))
-            put(KEY_TRANSFER_HANDLE, encrypt(transfer.handle.toString()))
-            put(KEY_TRANSFER_PATH, encrypt(transfer.path))
-            put(KEY_TRANSFER_OFFLINE, encrypt(transfer.isOffline.toString()))
-            put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.timestamp.toString()))
-            put(KEY_TRANSFER_ERROR, encrypt(transfer.error))
-            put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.originalPath))
-            put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.parentHandle.toString()))
-        }
-
-        db.insert(TABLE_COMPLETED_TRANSFERS, null, values)
-    }
-
     /**
      * Deletes the oldest completed transfers
      */
@@ -1960,45 +1942,6 @@ class SqliteDatabaseHandler @Inject constructor(
             id, filename, type, state, size, handle, path,
             offline, timestamp, error, originalPath, parentHandle
         )
-    }
-
-    /**
-     * Checks if a completed transfer exists before add it to DB.
-     * If so, does nothing. If not, adds the transfer to the DB.
-     *
-     * @param transfer The transfer to check and add.
-     */
-    override fun addCompletedTransferWithCheck(transfer: CompletedTransfer) {
-        if (!alreadyExistsAsCompletedTransfer(transfer)) {
-            addCompletedTransfer(transfer)
-        }
-    }
-
-    /**
-     * Checks if a completed transfer exists.
-     *
-     * @param transfer The completed transfer to check.
-     * @return True if the transfer already exists, false otherwise.
-     */
-    private fun alreadyExistsAsCompletedTransfer(transfer: CompletedTransfer): Boolean {
-        val selectQuery = "SELECT * FROM $TABLE_COMPLETED_TRANSFERS " +
-                "WHERE $KEY_TRANSFER_FILENAME = '${encrypt(transfer.fileName)}' " +
-                "AND $KEY_TRANSFER_TYPE = '${encrypt(transfer.type.toString())}' " +
-                "AND $KEY_TRANSFER_STATE = '${encrypt(transfer.state.toString())}' " +
-                "AND $KEY_TRANSFER_SIZE = '${encrypt(transfer.size)}' " +
-                "AND $KEY_TRANSFER_HANDLE = '${encrypt(transfer.handle.toString())}' " +
-                "AND $KEY_TRANSFER_PATH = '${encrypt(transfer.path)}' " +
-                "AND $KEY_TRANSFER_OFFLINE = '${encrypt(transfer.isOffline.toString())}' " +
-                "AND $KEY_TRANSFER_ERROR = '${encrypt(transfer.error)}' " +
-                "AND $KEY_TRANSFER_ORIGINAL_PATH = '${encrypt(transfer.originalPath)}' " +
-                "AND $KEY_TRANSFER_PARENT_HANDLE = '${encrypt(transfer.parentHandle.toString())}'"
-
-        try {
-            return db.rawQuery(selectQuery, null)?.use { it.count > 0 } ?: false
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return false
     }
 
     override fun emptyCompletedTransfers() {

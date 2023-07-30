@@ -45,6 +45,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -507,8 +508,60 @@ class DefaultTransfersRepositoryTest {
         runTest {
             val expected = mock<CompletedTransfer>()
             underTest.addCompletedTransfer(expected)
-            verify(localStorageGateway).addCompletedTransfer(expected)
+            verify(megaLocalRoomGateway).addCompletedTransfer(expected)
             verify(appEventGateway).broadcastCompletedTransfer(expected)
+        }
+
+    @Test
+    fun `test that addCompletedTransfer call correctly when call addCompletedTransfersIfNotExist`() =
+        runTest {
+            val transfer1 = CompletedTransfer(
+                id = 1,
+                fileName = "filename1",
+                type = 1,
+                state = 1,
+                size = "1Kb",
+                handle = 1L,
+                path = "filePath",
+                isOffline = false,
+                timestamp = 123L,
+                error = null,
+                originalPath = "originalFilePath",
+                parentHandle = 2L
+            )
+            val transfer2 = CompletedTransfer(
+                id = 1,
+                fileName = "filename2",
+                type = 1,
+                state = 1,
+                size = "1Kb",
+                handle = 1L,
+                path = "filePath",
+                isOffline = false,
+                timestamp = 123L,
+                error = null,
+                originalPath = "originalFilePath",
+                parentHandle = 2L
+            )
+            val existingTransfer1 = CompletedTransfer(
+                id = 3,
+                fileName = "filename1",
+                type = 1,
+                state = 1,
+                size = "1Kb",
+                handle = 1L,
+                path = "filePath",
+                isOffline = false,
+                timestamp = 123L,
+                error = null,
+                originalPath = "originalFilePath",
+                parentHandle = 2L
+            )
+            whenever(megaLocalRoomGateway.getAllCompletedTransfers())
+                .thenReturn(flowOf(listOf(existingTransfer1)))
+            underTest.addCompletedTransfersIfNotExist(listOf(transfer1, transfer2))
+            verify(megaLocalRoomGateway).addCompletedTransfer(transfer2.copy(id = null))
+            verify(megaLocalRoomGateway, times(0)).addCompletedTransfer(transfer1.copy(id = null))
         }
 
     @Test
