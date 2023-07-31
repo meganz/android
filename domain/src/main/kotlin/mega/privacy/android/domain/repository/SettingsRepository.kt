@@ -19,14 +19,14 @@ interface SettingsRepository {
      *
      * @return true if enabled
      */
-    fun isPasscodeLockPreferenceEnabled(): Boolean
+    suspend fun isPasscodeLockPreferenceEnabled(): Boolean?
 
     /**
      * Set passcode lock enabled/disabled
      *
      * @param enabled
      */
-    fun setPasscodeLockEnabled(enabled: Boolean)
+    suspend fun setPasscodeLockEnabled(enabled: Boolean)
 
     /**
      * Set the passcode lock code

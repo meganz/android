@@ -95,15 +95,19 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-    override fun isPasscodeLockPreferenceEnabled() =
-        databaseHandler.preferences?.passcodeLockEnabled.toBoolean()
+    override suspend fun isPasscodeLockPreferenceEnabled() =
+        withContext(ioDispatcher) {
+            databaseHandler.preferences
+                ?.passcodeLockEnabled
+                ?.toBooleanStrictOrNull()
+        }
 
-    override fun setPasscodeLockEnabled(enabled: Boolean) {
-        megaLocalStorageGateway.setPasscodeLockEnabled(enabled)
+    override suspend fun setPasscodeLockEnabled(enabled: Boolean) {
+        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockEnabled(enabled) }
     }
 
     override suspend fun setPasscodeLockCode(passcodeLockCode: String) =
-        megaLocalStorageGateway.setPasscodeLockCode(passcodeLockCode)
+        withContext(ioDispatcher) { megaLocalStorageGateway.setPasscodeLockCode(passcodeLockCode) }
 
     override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -122,11 +126,13 @@ internal class DefaultSettingsRepository @Inject constructor(
                     MegaError.API_OK -> {
                         continuation.resumeWith(Result.success(request.flag))
                     }
+
                     MegaError.API_ENOENT -> continuation.failWithException(
                         SettingNotFoundException(
                             error.errorCode, error.errorString
                         )
                     )
+
                     else -> continuation.failWithError(
                         error,
                         "onGetContactLinksOptionRequestFinished"
@@ -160,6 +166,7 @@ internal class DefaultSettingsRepository @Inject constructor(
                 MegaError.API_OK -> {
                     continuation.resumeWith(Result.success(accept))
                 }
+
                 else -> continuation.failWithError(error, "onSetContactLinksOptionRequestFinished")
             }
         }

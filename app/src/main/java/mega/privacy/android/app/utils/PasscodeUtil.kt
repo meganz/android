@@ -8,22 +8,25 @@ import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
-import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class PasscodeUtil @Inject constructor(
     @ActivityContext private val context: Context,
-    private val dbH: DatabaseHandler,
+    private val passcodePreferenceWrapper: PasscodePreferenceWrapper,
+    @ApplicationScope private val scope: CoroutineScope,
     private val passcodeManagement: PasscodeManagement,
 ) {
 
@@ -48,7 +51,7 @@ class PasscodeUtil @Inject constructor(
      * @param itemChecked The option to set as selected if after rotation, invalid option otherwise.
      * @return The AlertDialog.
      */
-    fun showRequirePasscodeDialog(itemChecked: Int, context: Context): AlertDialog {
+    suspend fun showRequirePasscodeDialog(itemChecked: Int, context: Context): AlertDialog {
         val dialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         dialogBuilder.setTitle(context.getString(R.string.settings_require_passcode))
@@ -128,7 +131,8 @@ class PasscodeUtil @Inject constructor(
             itemClicked.set(itemChecked)
         }
 
-        val initialRequiredTime = getPasscodeRequireTimeOption(dbH.passcodeRequiredTime)
+        val initialRequiredTime =
+            getPasscodeRequireTimeOption(passcodePreferenceWrapper.getPasscodeTimeOut())
 
         dialogBuilder.setSingleChoiceItems(
             optionsAdapter,
@@ -146,7 +150,13 @@ class PasscodeUtil @Inject constructor(
             context.getString(R.string.general_ok)
         ) { _: DialogInterface, _: Int ->
             if (itemClicked.get() != initialRequiredTime) {
-                dbH.passcodeRequiredTime = getPasscodeRequireTime(itemClicked.get())
+                scope.launch {
+                    passcodePreferenceWrapper.setPasscodeTimeOut(
+                        getPasscodeRequireTime(
+                            itemClicked.get()
+                        )
+                    )
+                }
             }
         }
 
@@ -218,6 +228,7 @@ class PasscodeUtil @Inject constructor(
                     requiredTimeValue
                 )
             )
+
             REQUIRE_PASSCODE_AFTER_1M, REQUIRE_PASSCODE_AFTER_2M, REQUIRE_PASSCODE_AFTER_5M -> removeFormatPlaceholder(
                 context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_minutes,
@@ -225,6 +236,7 @@ class PasscodeUtil @Inject constructor(
                     requiredTimeValue
                 )
             )
+
             else -> context.getString(R.string.action_immediately)
         }
     }
@@ -257,12 +269,13 @@ class PasscodeUtil @Inject constructor(
     }
 
     private fun updatePasscode(enable: Boolean, type: String, passcode: String, requiredTime: Int) {
-        dbH.isPasscodeLockEnabled = enable
-        dbH.passcodeLockType = type
-        dbH.passcodeLockCode = passcode
-
-        if (enable && dbH.passcodeRequiredTime == REQUIRE_PASSCODE_INVALID) {
-            dbH.passcodeRequiredTime = requiredTime
+        scope.launch {
+            passcodePreferenceWrapper.setPasscodeEnabled(enable)
+            passcodePreferenceWrapper.setPasscodeLockType(type)
+            passcodePreferenceWrapper.setPasscode(passcode)
+            if (enable && passcodePreferenceWrapper.getPasscodeTimeOut() == REQUIRE_PASSCODE_INVALID) {
+                passcodePreferenceWrapper.setPasscodeTimeOut(requiredTime)
+            }
         }
     }
 
@@ -271,15 +284,13 @@ class PasscodeUtil @Inject constructor(
      *
      * @return time set for passcode lock
      */
-    fun timeRequiredForPasscode(): Int {
-        val prefs = dbH.preferences
-
-        return if (prefs != null
-            && !isTextEmpty(prefs.passcodeLockEnabled)
-            && prefs.passcodeLockEnabled.toBoolean()
-            && !isTextEmpty(prefs.passcodeLockCode)
+    suspend fun timeRequiredForPasscode(): Int {
+        val enabled = passcodePreferenceWrapper.isPasscodeEnabled()
+        val code = passcodePreferenceWrapper.getPasscode()
+        return if (enabled
+            && code != null
         ) {
-            prefs.passcodeLockRequireTime.toInt()
+            passcodePreferenceWrapper.getPasscodeTimeOut()
         } else REQUIRE_PASSCODE_INVALID
     }
 
@@ -288,21 +299,20 @@ class PasscodeUtil @Inject constructor(
      *
      * @return True if should lock the app, false otherwise.
      */
-    fun shouldLock(): Boolean {
-        val prefs = dbH.preferences
-
-        return if (prefs != null
-            && !isTextEmpty(prefs.passcodeLockEnabled)
-            && prefs.passcodeLockEnabled.toBoolean()
-            && !isTextEmpty(prefs.passcodeLockCode)
-            && prefs.passcodeLockRequireTime.toInt() != REQUIRE_PASSCODE_INVALID
+    suspend fun shouldLock(): Boolean {
+        val enabled = passcodePreferenceWrapper.isPasscodeEnabled()
+        val code = passcodePreferenceWrapper.getPasscode()
+        val timeOut = passcodePreferenceWrapper.getPasscodeTimeOut()
+        return if (enabled
+            && code != null
+            && timeOut != REQUIRE_PASSCODE_INVALID
         ) {
             val currentTime = System.currentTimeMillis()
             val lastPaused = passcodeManagement.lastPause
 
             Timber.d("Time: $currentTime lastPause: $lastPaused")
 
-            currentTime - lastPaused > prefs.passcodeLockRequireTime.toInt()
+            currentTime - lastPaused > timeOut
         } else false
     }
 
@@ -310,8 +320,10 @@ class PasscodeUtil @Inject constructor(
      * Called after resume some activity to check if should lock or not the app.
      */
     fun resume() {
-        if (shouldLock()) {
-            showLockScreen()
+        scope.launch {
+            if (shouldLock()) {
+                showLockScreen()
+            }
         }
     }
 

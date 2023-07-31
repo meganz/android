@@ -68,7 +68,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.gateway.AudioPlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
@@ -79,6 +78,7 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
+import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -200,6 +200,7 @@ class SettingsFragment :
 
                     findPreference<Preference>(KEY_FEATURES_CHAT)?.isEnabled = state.chatEnabled
                     findPreference<Preference>(KEY_FEATURES_CALLS)?.isEnabled = state.callsEnabled
+                    updatePasscodeLockSummary(state.passcodeLock)
                 }
             }
         }
@@ -243,11 +244,13 @@ class SettingsFragment :
 
     private fun refreshSummaries() {
         viewModel.refreshCameraUploadsOn()
-        updatePasscodeLockSummary()
+        viewLifecycleOwner.lifecycleScope.launch {
+            updatePasscodeLockSummary(viewModel.fetchPasscodeEnabled())
+        }
     }
 
-    private fun updatePasscodeLockSummary() {
-        findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (viewModel.passcodeLock) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
+    private fun updatePasscodeLockSummary(enabled: Boolean) {
+        findPreference<Preference>(KEY_PASSCODE_LOCK)?.setSummary(if (enabled) R.string.mute_chat_notification_option_on else R.string.mute_chatroom_notification_option_off)
     }
 
     override fun onPause() {
@@ -264,6 +267,7 @@ class SettingsFragment :
                     CameraUploadsPreferencesActivity::class.java
                 )
             )
+
             KEY_FEATURES_CHAT ->
                 startActivity(
                     Intent(
@@ -279,36 +283,42 @@ class SettingsFragment :
                         SettingsCallsActivity::class.java
                     )
                 )
+
             KEY_STORAGE_DOWNLOAD -> startActivity(
                 Intent(
                     context,
                     DownloadPreferencesActivity::class.java
                 )
             )
+
             KEY_STORAGE_FILE_MANAGEMENT -> requireActivity().startActivity(
                 Intent(
                     context,
                     FileManagementPreferencesActivity::class.java
                 )
             )
+
             KEY_RECOVERY_KEY -> startActivity(
                 Intent(
                     context,
                     ExportRecoveryKeyActivity::class.java
                 )
             )
+
             KEY_PASSCODE_LOCK -> startActivity(
                 Intent(
                     context,
                     PasscodePreferencesActivity::class.java
                 )
             )
+
             KEY_CHANGE_PASSWORD -> startActivity(
                 Intent(
                     context,
                     ChangePasswordActivity::class.java
                 )
             )
+
             KEY_2FA -> if (viewModel.uiState.value.multiFactorAuthChecked) {
                 twoFactorAuthenticationLauncher.launch(Intent(
                     context,
@@ -324,22 +334,28 @@ class SettingsFragment :
                     )
                 )
             }
+
             KEY_QR_CODE_AUTO_ACCEPT -> {
                 viewModel.toggleAutoAcceptPreference()
             }
+
             KEY_HELP_CENTRE -> {
                 launchWebPage(HELP_CENTRE_URL)
             }
+
             KEY_HELP_SEND_FEEDBACK -> showEvaluatedAppDialog()
             KEY_ABOUT_PRIVACY_POLICY -> {
                 launchWebPage(PRIVACY_POLICY_URL)
             }
+
             KEY_ABOUT_TOS -> {
                 launchWebPage(TERMS_OF_SERVICE_URL)
             }
+
             KEY_ABOUT_CODE_LINK -> {
                 launchWebPage(GITHUB_URL)
             }
+
             KEY_ABOUT_APP_VERSION -> {
                 if (++numberOfClicksAppVersion == 5) {
                     numberOfClicksAppVersion = 0
@@ -364,42 +380,49 @@ class SettingsFragment :
                     }
                 }
             }
+
             KEY_ABOUT_SDK_VERSION -> {
                 if (++numberOfClicksSDK == 5) {
                     numberOfClicksSDK = 0
                     toggleLogger()
                 }
             }
+
             KEY_ABOUT_KARERE_VERSION -> {
                 if (++numberOfClicksKarere == 5) {
                     numberOfClicksKarere = 0
                     toggleChatLogger()
                 }
             }
+
             KEY_CANCEL_ACCOUNT -> deleteAccountClicked()
             KEY_ABOUT_COOKIE_POLICY -> {
                 val intent = Intent(context, WebViewActivity::class.java)
                 intent.data = Uri.parse(COOKIES_URI)
                 startActivity(intent)
             }
+
             KEY_COOKIE_SETTINGS -> startActivity(
                 Intent(
                     context,
                     CookiePreferencesActivity::class.java
                 )
             )
+
             KEY_AUDIO_BACKGROUND_PLAY_ENABLED -> {
                 val checked = findPreference<SwitchPreferenceCompat>(
                     KEY_AUDIO_BACKGROUND_PLAY_ENABLED
                 )?.isChecked == true
                 playerServiceViewModelGateway?.toggleBackgroundPlay(checked)
             }
+
             KEY_START_SCREEN -> startActivity(
                 Intent(
                     context,
                     StartScreenPreferencesActivity::class.java
                 )
             )
+
             KEY_HIDE_RECENT_ACTIVITY -> {
                 val checked =
                     findPreference<SwitchPreferenceCompat>(KEY_HIDE_RECENT_ACTIVITY)?.isChecked
@@ -407,6 +430,7 @@ class SettingsFragment :
                     viewModel.hideRecentActivity(checked)
                 }
             }
+
             KEY_MEDIA_DISCOVERY_VIEW -> {
                 val checked =
                     findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isChecked

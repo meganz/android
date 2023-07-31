@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
 import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,6 +45,11 @@ internal class PasscodeUnlockViewModelTest {
             monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCase,
             unlockPasscodeUseCase = unlockPasscodeUseCase,
         )
+    }
+
+    @AfterEach
+    internal fun cleanup() {
+        Mockito.reset(monitorPasscodeAttemptsUseCase)
     }
 
     @AfterAll

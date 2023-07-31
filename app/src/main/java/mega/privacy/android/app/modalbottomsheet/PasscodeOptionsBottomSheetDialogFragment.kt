@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.databinding.BottomSheetPasscodeOptionsBinding
 import mega.privacy.android.app.utils.ColorUtils
@@ -19,7 +21,7 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
         @JvmStatic
         fun newInstance(
-            passcodeType: String
+            passcodeType: String,
         ): PasscodeOptionsBottomSheetDialogFragment {
             val fragment = PasscodeOptionsBottomSheetDialogFragment()
             val args = Bundle()
@@ -37,7 +39,7 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = BottomSheetPasscodeOptionsBinding
             .inflate(LayoutInflater.from(context), null, false)
@@ -54,9 +56,11 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
                 PIN_4 -> {
                     binding.fourDigitsOption
                 }
+
                 PIN_6 -> {
                     binding.sixDigitsOption
                 }
+
                 else -> {
                     binding.alphanumericOption
                 }
@@ -79,10 +83,17 @@ class PasscodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
     }
 
     private fun setSelectedColor(text: TextView) =
-        text.setTextColor(ColorUtils.getThemeColor(requireContext(), com.google.android.material.R.attr.colorSecondary))
+        text.setTextColor(
+            ColorUtils.getThemeColor(
+                requireContext(),
+                com.google.android.material.R.attr.colorSecondary
+            )
+        )
 
     private fun changePasscodeType(type: String) {
-        (requireActivity() as PasscodeLockActivity).setPasscodeType(type)
-        setStateBottomSheetBehaviorHidden()
+        viewLifecycleOwner.lifecycleScope.launch {
+            (requireActivity() as PasscodeLockActivity).setPasscodeType(type)
+            setStateBottomSheetBehaviorHidden()
+        }
     }
 }

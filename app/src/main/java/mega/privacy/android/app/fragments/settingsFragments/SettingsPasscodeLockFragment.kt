@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fragments.settingsFragments
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -8,9 +9,11 @@ import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
 import androidx.biometric.BiometricManager.from
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.PassCodeActivityContract
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FINGERPRINT_ENABLE
@@ -19,7 +22,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_REQUIRE_PASSCODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RESET_PASSCODE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
 import timber.log.Timber
 import java.util.concurrent.Executor
 import javax.inject.Inject
@@ -34,6 +37,10 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
     @Inject
     lateinit var passcodeUtil: PasscodeUtil
+
+    @Inject
+    internal lateinit var passcodePreferencesWrapper: PasscodePreferenceWrapper
+
     private lateinit var requirePasscodeDialog: AlertDialog
 
     private var passcodeSwitch: SwitchPreferenceCompat? = null
@@ -47,6 +54,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
     private lateinit var pinLauncher: ActivityResultLauncher<Boolean>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +90,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         fingerprintSwitch = findPreference(KEY_FINGERPRINT_ENABLE)
         fingerprintSwitch?.setOnPreferenceClickListener {
             if (fingerprintSwitch?.isChecked == false) {
-                dbH.isFingerprintLockEnabled = false
+                viewLifecycleOwner.lifecycleScope.launch {
+                    passcodePreferencesWrapper.setFingerprintLockEnabled(false)
+                }
             } else {
                 showEnableFingerprint()
             }
@@ -96,20 +106,24 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             true
         }
 
-        prefs = dbH.preferences
-
-        if (prefs == null || prefs.passcodeLockEnabled == null
-            || !prefs.passcodeLockEnabled.toBoolean() || isTextEmpty(prefs.passcodeLockCode)
-        ) {
-            disablePasscode()
-        } else {
-            enablePasscode()
-        }
-
         if (savedInstanceState != null
             && savedInstanceState.getBoolean(IS_REQUIRE_PASSCODE_DIALOG_SHOWN, false)
         ) {
             showRequirePasscodeDialog(savedInstanceState.getInt(REQUIRE_PASSCODE_DIALOG_OPTION))
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val passcodeEnabled = passcodePreferencesWrapper.isPasscodeEnabled()
+            val passcode = passcodePreferencesWrapper.getPasscode()
+
+            if (!passcodeEnabled || passcode == null) {
+                disablePasscode()
+            } else {
+                enablePasscode()
+            }
         }
     }
 
@@ -142,8 +156,12 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
             BIOMETRIC_SUCCESS -> {
                 Timber.d("Show fingerprint setting, hardware available and fingerprint enabled.")
                 fingerprintSwitch?.let { preferenceScreen.addPreference(it) }
-                fingerprintSwitch?.isChecked = dbH.isFingerprintLockEnabled
+                viewLifecycleOwner.lifecycleScope.launch {
+                    fingerprintSwitch?.isChecked =
+                        passcodePreferencesWrapper.isFingerPrintLockEnabled()
+                }
             }
+
             else -> {
                 fingerprintSwitch?.let { preferenceScreen.removePreference(it) }
                 Timber.d("Error. Cannot show fingerprint setting: $canAuthenticate")
@@ -177,7 +195,9 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                         result: BiometricPrompt.AuthenticationResult,
                     ) {
                         super.onAuthenticationSucceeded(result)
-                        dbH.isFingerprintLockEnabled = true
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            passcodePreferencesWrapper.setFingerprintLockEnabled(true)
+                        }
                         snackbarCallBack?.showSnackbar(
                             getString(R.string.confirmation_fingerprint_enabled)
                         )
@@ -202,11 +222,14 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     private fun showRequirePasscodeDialog(selectedPosition: Int) {
-        requirePasscodeDialog =
-            passcodeUtil.showRequirePasscodeDialog(selectedPosition, requireContext())
-        requirePasscodeDialog.setOnDismissListener {
-            requirePasscode?.summary =
-                passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val requiredTime = passcodePreferencesWrapper.getPasscodeTimeOut()
+            requirePasscodeDialog =
+                passcodeUtil.showRequirePasscodeDialog(selectedPosition, requireContext())
+            requirePasscodeDialog.setOnDismissListener {
+                requirePasscode?.summary =
+                    passcodeUtil.getRequiredPasscodeText(requiredTime)
+            }
         }
     }
 
@@ -222,7 +245,11 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
         }
 
         setupFingerprintSetting()
-        requirePasscode?.summary = passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val requiredTime = passcodePreferencesWrapper.getPasscodeTimeOut()
+            requirePasscode?.summary =
+                passcodeUtil.getRequiredPasscodeText(requiredTime)
+        }
     }
 
     private fun disablePasscode() {

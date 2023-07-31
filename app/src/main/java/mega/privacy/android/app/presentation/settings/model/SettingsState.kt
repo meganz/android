@@ -19,6 +19,7 @@ package mega.privacy.android.app.presentation.settings.model
  * @property mediaDiscoveryViewState
  * @property email
  * @property accountType
+ * @property passcodeLock
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -37,5 +38,5 @@ data class SettingsState(
     val mediaDiscoveryViewState: Int,
     val email: String,
     val accountType: String,
-) {
-}
+    val passcodeLock: Boolean,
+)

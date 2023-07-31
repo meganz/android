@@ -24,8 +24,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ActivityPasscodeBinding
@@ -38,10 +40,10 @@ import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboardView
+import mega.privacy.android.app.utils.wrapper.PasscodePreferenceWrapper
 import timber.log.Timber
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -82,6 +84,10 @@ class PasscodeLockActivity : BaseActivity() {
 
     @Inject
     lateinit var passcodeManagement: PasscodeManagement
+
+    @Inject
+    lateinit var passcodePreferenceWrapper: PasscodePreferenceWrapper
+
     private lateinit var binding: ActivityPasscodeBinding
     private var passcodeType = PIN_4
 
@@ -115,7 +121,9 @@ class PasscodeLockActivity : BaseActivity() {
                     UNLOCK_MODE -> {
                         if (forgetPasscode) {
                             forgetPasscode = false
-                            initPasscodeScreen()
+                            lifecycleScope.launch {
+                                initPasscodeScreen()
+                            }
                         } else {
                             return
                         }
@@ -148,38 +156,8 @@ class PasscodeLockActivity : BaseActivity() {
 
         setOrUnlockMode = mode == SET_MODE || mode == UNLOCK_MODE
 
-        if (savedInstanceState != null) {
-            secondRound = savedInstanceState.getBoolean(SECOND_ROUND, false)
-
-            if (secondRound) {
-                sbFirst.append(savedInstanceState.getString(SB_FIRST))
-            }
-
-            attempts = savedInstanceState.getInt(ATTEMPTS, 0)
-            passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
-            fingerprintEnabled = savedInstanceState.getBoolean(FINGERPRINT_ENABLED, false)
-            fingerprintSkipped = savedInstanceState.getBoolean(FINGERPRINT_SKIPPED, false)
-            forgetPasscode = savedInstanceState.getBoolean(FORGET_PASSCODE, false)
-            passwordAlreadyTyped = savedInstanceState.getBoolean(PASSWORD_ALREADY_TYPED, false)
-
-            if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
-                askConfirmLogout()
-            }
-        } else {
-            val prefs = dbH.preferences
-
-            passcodeType =
-                if (prefs != null && !isTextEmpty(prefs.passcodeLockType)) prefs.passcodeLockType else PIN_4
-
-            if (mode == UNLOCK_MODE) {
-                fingerprintEnabled = dbH.isFingerprintLockEnabled
-            }
-        }
-
         binding = ActivityPasscodeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        onBackPressedDispatcher.addCallback(this, onBackPressCallback)
 
         if (mode == UNLOCK_MODE) {
             binding.toolbarPasscode.isVisible = false
@@ -193,8 +171,38 @@ class PasscodeLockActivity : BaseActivity() {
                 )
         }
 
-        initPasscodeScreen()
-        setListeners()
+        onBackPressedDispatcher.addCallback(this, onBackPressCallback)
+
+        lifecycleScope.launch {
+            if (savedInstanceState != null) {
+                secondRound = savedInstanceState.getBoolean(SECOND_ROUND, false)
+
+                if (secondRound) {
+                    sbFirst.append(savedInstanceState.getString(SB_FIRST))
+                }
+
+                attempts = savedInstanceState.getInt(ATTEMPTS, 0)
+                passcodeType = savedInstanceState.getString(PASSCODE_TYPE, PIN_4)
+                fingerprintEnabled = savedInstanceState.getBoolean(FINGERPRINT_ENABLED, false)
+                fingerprintSkipped = savedInstanceState.getBoolean(FINGERPRINT_SKIPPED, false)
+                forgetPasscode = savedInstanceState.getBoolean(FORGET_PASSCODE, false)
+                passwordAlreadyTyped = savedInstanceState.getBoolean(PASSWORD_ALREADY_TYPED, false)
+
+                if (savedInstanceState.getBoolean(IS_CONFIRM_LOGOUT_SHOWN, false)) {
+                    askConfirmLogout()
+                }
+            } else {
+                passcodeType = passcodePreferenceWrapper.getPasscodeType()
+
+                if (mode == UNLOCK_MODE) {
+                    fingerprintEnabled = passcodePreferenceWrapper.isFingerPrintLockEnabled()
+                }
+            }
+            initPasscodeScreen()
+            setListeners()
+        }
+
+
     }
 
     override fun onResume() {
@@ -206,16 +214,20 @@ class PasscodeLockActivity : BaseActivity() {
      * Increments the number of failed attempts.
      */
     private fun incrementAttempts() {
-        attempts++
-        dbH.setAttrAttempts(attempts)
+        lifecycleScope.launch {
+            attempts++
+            passcodePreferenceWrapper.setFailedAttemptsCount(attempts)
+        }
     }
 
     /**
      * Resets the number of failed attempts to 0.
      */
     private fun resetAttempts() {
-        attempts = 0
-        dbH.setAttrAttempts(attempts)
+        lifecycleScope.launch {
+            attempts = 0
+            passcodePreferenceWrapper.setFailedAttemptsCount(attempts)
+        }
     }
 
     /**
@@ -267,7 +279,7 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * Sets the whole initial passcode screen.
      */
-    private fun initPasscodeScreen() {
+    private suspend fun initPasscodeScreen() {
         setTitleText()
 
         if (shouldShowFingerprintLock() && !fingerprintSkipped) {
@@ -278,7 +290,7 @@ class PasscodeLockActivity : BaseActivity() {
             binding.passcodeOptionsButton.isVisible = !secondRound
 
             if (mode == UNLOCK_MODE) {
-                attempts = dbH.attributes?.attempts ?: 0
+                attempts = passcodePreferenceWrapper.getFailedAttemptsCount()
                 binding.passcodeOptionsButton.isVisible = false
             }
 
@@ -296,7 +308,7 @@ class PasscodeLockActivity : BaseActivity() {
 
                 binding.passwordField.setOnEditorActionListener { _, actionId, _ ->
                     if (actionId == IME_ACTION_DONE) {
-                        checkPassword()
+                        lifecycleScope.launch { checkPassword() }
                         true
                     } else false
                 }
@@ -511,7 +523,9 @@ class PasscodeLockActivity : BaseActivity() {
 
         binding.forgetPasscodeButton.setOnClickListener {
             forgetPasscode = true
-            initPasscodeScreen()
+            lifecycleScope.launch {
+                initPasscodeScreen()
+            }
         }
 
         binding.passcodeOptionsButton.setOnClickListener {
@@ -539,7 +553,10 @@ class PasscodeLockActivity : BaseActivity() {
 
         when {
             secondRound -> confirmPasscode()
-            mode == UNLOCK_MODE -> confirmUnlockPasscode()
+            mode == UNLOCK_MODE -> lifecycleScope.launch {
+                confirmUnlockPasscode()
+            }
+
             else -> {
                 secondRound = true
                 clearTypedPasscode()
@@ -597,8 +614,8 @@ class PasscodeLockActivity : BaseActivity() {
      * Updates the passcode behaviour, failed attempts and finishes if successful.
      * Shows an error and increments failed attempts if not successful.
      */
-    private fun confirmUnlockPasscode() {
-        if (sbFirst.toString() == dbH.preferences?.passcodeLockCode) {
+    private suspend fun confirmUnlockPasscode() {
+        if (sbFirst.toString() == passcodePreferenceWrapper.getPasscode()) {
             skipPasscode()
         } else {
             sbFirst.clear()
@@ -622,10 +639,10 @@ class PasscodeLockActivity : BaseActivity() {
     /**
      * Checks if the typed password is the same as the current logged in account.
      */
-    private fun checkPassword() {
+    private suspend fun checkPassword() {
         val typedPassword = binding.passwordField.text.toString()
 
-        if (megaApi.checkPassword(typedPassword)) {
+        if (passcodePreferenceWrapper.checkPassword(typedPassword)) {
             skipPasscode()
         } else {
             passwordAlreadyTyped = true
@@ -745,7 +762,7 @@ class PasscodeLockActivity : BaseActivity() {
      *
      * @param passcodeType New passcode type.
      */
-    fun setPasscodeType(passcodeType: String) {
+    suspend fun setPasscodeType(passcodeType: String) {
         this.passcodeType = passcodeType
         initPasscodeScreen()
         clearTypedPasscode()
@@ -832,7 +849,7 @@ class PasscodeLockActivity : BaseActivity() {
 
                         else -> {
                             fingerprintSkipped = true
-                            initPasscodeScreen()
+                            lifecycleScope.launch { initPasscodeScreen() }
                         }
                     }
                 }

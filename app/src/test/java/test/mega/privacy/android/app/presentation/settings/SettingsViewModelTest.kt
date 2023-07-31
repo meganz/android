@@ -74,7 +74,7 @@ class SettingsViewModelTest {
         underTest = SettingsViewModel(
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
-            refreshPasscodeLockPreference = mock(),
+            refreshPasscodeLockPreference = mock { onBlocking { invoke() }.thenReturn(true) },
             areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             areChatLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },
             isCameraUploadsEnabledUseCase = mock { onBlocking { invoke() }.thenReturn(false) },

@@ -109,16 +109,17 @@ class SettingsViewModel @Inject constructor(
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
             email = "",
-            accountType = ""
+            accountType = "",
+            passcodeLock = false,
         )
     }
-
-    val passcodeLock: Boolean
-        get() = refreshPasscodeLockPreference()
 
     init {
         viewModelScope.launch {
             merge(
+                flow { emit(refreshPasscodeLockPreference()) }.map { enabled ->
+                    { state: SettingsState -> state.copy(passcodeLock = enabled) }
+                },
                 flow { emit(isCameraUploadsEnabledUseCase()) }.map { enabled ->
                     { state: SettingsState -> state.copy(cameraUploadsOn = enabled) }
                 },
@@ -162,8 +163,10 @@ class SettingsViewModel @Inject constructor(
                 monitorMediaDiscoveryView()
                     .map { viewState ->
                         { state: SettingsState ->
-                            state.copy(mediaDiscoveryViewState = viewState
-                                ?: MediaDiscoveryViewSettings.INITIAL.ordinal)
+                            state.copy(
+                                mediaDiscoveryViewState = viewState
+                                    ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                            )
                         }
                     },
                 isChatLoggedIn()
@@ -318,4 +321,6 @@ class SettingsViewModel @Inject constructor(
 
     fun getBoolean(key: String?, defValue: Boolean) =
         runBlocking { getBooleanPreference(key, defValue).first() }
+
+    suspend fun fetchPasscodeEnabled() = refreshPasscodeLockPreference()
 }

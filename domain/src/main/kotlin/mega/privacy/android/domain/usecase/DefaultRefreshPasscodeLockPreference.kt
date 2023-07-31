@@ -10,10 +10,11 @@ import javax.inject.Inject
  */
 class DefaultRefreshPasscodeLockPreference @Inject constructor(private val settingsRepository: SettingsRepository) :
     RefreshPasscodeLockPreference {
-    override fun invoke(): Boolean {
-        if (!settingsRepository.isPasscodeLockPreferenceEnabled()) {
+    override suspend fun invoke(): Boolean {
+        if (settingsRepository.isPasscodeLockPreferenceEnabled() == null) {
             settingsRepository.setPasscodeLockEnabled(false)
         }
         return settingsRepository.isPasscodeLockPreferenceEnabled()
+            ?: throw IllegalStateException("Passcode lock preference should not be null after setting it to false.")
     }
 }

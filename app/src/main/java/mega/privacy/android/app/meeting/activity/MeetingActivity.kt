@@ -13,10 +13,12 @@ import androidx.activity.viewModels
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -437,19 +439,23 @@ class MeetingActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        val timeRequired = passcodeUtil.timeRequiredForPasscode()
-        if (timeRequired != REQUIRE_PASSCODE_INVALID) {
-            if (isLockingEnabled) {
-                passcodeManagement.lastPause = System.currentTimeMillis() - timeRequired
-            } else {
-                passcodeUtil.pauseUpdate()
+        lifecycleScope.launch {
+            val timeRequired = passcodeUtil.timeRequiredForPasscode()
+            if (timeRequired != REQUIRE_PASSCODE_INVALID) {
+                if (isLockingEnabled) {
+                    passcodeManagement.lastPause = System.currentTimeMillis() - timeRequired
+                } else {
+                    passcodeUtil.pauseUpdate()
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        isLockingEnabled = passcodeUtil.shouldLock()
+        lifecycleScope.launch {
+            isLockingEnabled = passcodeUtil.shouldLock()
+        }
 
         @Suppress("DEPRECATION")
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or 0x00000010
