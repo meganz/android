@@ -54,7 +54,10 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private val _state = MutableStateFlow(RecurringMeetingInfoState())
     val state: StateFlow<RecurringMeetingInfoState> = _state
 
-    private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
+    /**
+     * Check if it's 24 hour format
+     */
+    val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     /**
      * Monitor connectivity event

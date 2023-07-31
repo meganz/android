@@ -7,12 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetManageMeetingLinkBinding
@@ -54,14 +49,14 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { (chatId, _, _, _, _, _, chatTitle) ->
+        viewLifecycleOwner.collectFlow(viewModel.state) { (chatId, _, _, _, _, _, chatTitle) ->
             if (chatRoomId != chatId)
                 chatRoomId = chatId
 
             title = chatTitle
         }
 
-        collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink) ->
+        viewLifecycleOwner.collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink) ->
             link = meetingLink
         }
     }

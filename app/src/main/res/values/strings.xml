@@ -5040,6 +5040,20 @@
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">This meeting and all its occurrences will be archived and all participants will be notified.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting and all its occurrences will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Update</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Date</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
     <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
     <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting updated</string>
     <!-- Meeting list tooltip description for start meeting fab button -->

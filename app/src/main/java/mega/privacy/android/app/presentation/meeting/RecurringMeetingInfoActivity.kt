@@ -5,13 +5,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
+import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
+import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -22,6 +30,11 @@ import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.TimeZone
 import javax.inject.Inject
 
 /**
@@ -39,6 +52,8 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
     lateinit var getThemeMode: GetThemeMode
     private val viewModel by viewModels<RecurringMeetingInfoViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
+    private var materialDatePicker: MaterialDatePicker<Long>? = null
+    private var materialTimePicker: MaterialTimePicker? = null
 
     /**
      * Perform Activity initialization
@@ -119,6 +134,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                         it.onCancelOccurrenceTap()
                     }
                 },
+                onEditOccurrenceClicked = { scheduledMeetingManagementViewModel.onEditOccurrenceTap() },
                 onConsumeSelectOccurrenceEvent = { scheduledMeetingManagementViewModel.onConsumeSelectOccurrenceEvent() },
                 onResetSnackbarMessage = scheduledMeetingManagementViewModel::onSnackbarMessageConsumed,
                 onCancelOccurrence = {
@@ -131,8 +147,120 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
                     scheduledMeetingManagementViewModel.cancelOccurrenceAndScheduledMeeting()
                     onDismissDialog()
                 },
+                onEditOccurrence = {
+                    scheduledMeetingManagementViewModel.onUpdateScheduledMeetingOccurrenceTap()
+                    onDismissDialog()
+                },
                 onDismissDialog = ::onDismissDialog,
+                onDateTap = ::showDatePicker,
+                onStartTimeTap = { showTimePicker(true) },
+                onEndTimeTap = { showTimePicker(false) },
             )
+        }
+    }
+
+    /**
+     * Show date picker
+     */
+    private fun showDatePicker() {
+        if (materialTimePicker != null || materialDatePicker != null)
+            return
+
+        val currentState = scheduledMeetingManagementViewModel.state.value
+        currentState.editedOccurrence?.let { occurrence ->
+            occurrence.getStartZoneDateTime()?.let { currentDate ->
+                val dateValidator = DateValidatorPointForward.now()
+                val milliseconds = currentDate.toInstant().toEpochMilli()
+                val selection = milliseconds + TimeZone.getDefault().getOffset(milliseconds)
+
+                materialDatePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTheme(R.style.MaterialCalendarTheme)
+                    .setPositiveButtonText(getString(R.string.meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button))
+                    .setNegativeButtonText(getString(R.string.button_cancel))
+                    .setTitleText(getString(R.string.meetings_update_scheduled_meeting_occurrence_calendar_dialog_title))
+                    .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+                    .setSelection(selection)
+                    .setCalendarConstraints(
+                        CalendarConstraints.Builder().setValidator(dateValidator).build()
+                    )
+                    .build()
+                    .apply {
+                        addOnDismissListener {
+                            materialDatePicker = null
+                        }
+                        addOnPositiveButtonClickListener { selection ->
+                            val selectedDate =
+                                ZonedDateTime.from(
+                                    Instant.ofEpochMilli(selection).atZone(ZoneId.systemDefault())
+                                )
+
+                            scheduledMeetingManagementViewModel.onNewStartDate(selectedDate)
+                        }
+                        show(supportFragmentManager, "DatePicker")
+                    }
+            }
+
+        }
+    }
+
+    /**
+     * Show time picker
+     *
+     * @param isStart
+     */
+    private fun showTimePicker(isStart: Boolean) {
+        if (materialTimePicker != null || materialDatePicker != null)
+            return
+
+        val currentState = scheduledMeetingManagementViewModel.state.value
+        currentState.editedOccurrence?.let { occurrence ->
+            val currentDate =
+                if (isStart) occurrence.getStartZoneDateTime() else occurrence.getEndZoneDateTime()
+
+            currentDate?.let { date ->
+                val hourFormatter =
+                    DateTimeFormatter
+                        .ofPattern("HH")
+                        .withZone(ZoneId.systemDefault())
+
+                val minuteFormatter =
+                    DateTimeFormatter
+                        .ofPattern("mm")
+                        .withZone(ZoneId.systemDefault())
+
+                val hourText = hourFormatter.format(date)
+                val minuteText = minuteFormatter.format(date)
+
+                materialTimePicker = MaterialTimePicker.Builder()
+                    .setTheme(R.style.MaterialTimerTheme)
+                    .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
+                    .setTimeFormat(
+                        if (viewModel.is24HourFormat)
+                            TimeFormat.CLOCK_24H
+                        else
+                            TimeFormat.CLOCK_12H
+                    )
+                    .setHour(hourText.toInt())
+                    .setMinute(minuteText.toInt())
+                    .setPositiveButtonText(getString(R.string.general_ok))
+                    .setNegativeButtonText(getString(R.string.button_cancel))
+                    .setTitleText(getString(R.string.meetings_schedule_meeting_enter_time_title_dialog))
+                    .build()
+                    .apply {
+                        addOnDismissListener {
+                            materialTimePicker = null
+                        }
+                        addOnPositiveButtonClickListener {
+                            val selectedTime = currentDate.withHour(hour).withMinute(minute)
+                            if (isStart) {
+                                scheduledMeetingManagementViewModel.onNewStartTime(selectedTime)
+                            } else {
+                                scheduledMeetingManagementViewModel.onNewEndTime(selectedTime)
+                            }
+                        }
+                        show(supportFragmentManager, "TimePicker")
+                    }
+            }
         }
     }
 

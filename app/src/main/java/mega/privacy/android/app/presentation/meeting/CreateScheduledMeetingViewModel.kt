@@ -645,7 +645,9 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                             }
 
                             ScheduledMeetingType.Edition -> {
-                                setChatTitle(id, state.value.meetingTitle)
+                                if (state.value.meetingTitle != state.value.scheduledMeeting?.title) {
+                                    setChatTitle(id, state.value.meetingTitle)
+                                }
                                 setOpenInvite(id, state.value.enabledAllowAddParticipantsOption)
                                 setParticipants(id)
                                 if (state.value.enabledMeetingLinkOption) {

@@ -19,6 +19,28 @@ fun ChatScheduledMeetingOccurr.getDateFormatted(): String? {
 }
 
 /**
+ * Get start [ZonedDateTime]
+ */
+fun ChatScheduledMeetingOccurr.getStartZoneDateTime(): ZonedDateTime? {
+    return startDateTime?.let {
+        ZonedDateTime.from(
+            Instant.ofEpochSecond(it).atZone(ZoneId.of(timezone))
+        )
+    }
+}
+
+/**
+ * Get end [ZonedDateTime]
+ */
+fun ChatScheduledMeetingOccurr.getEndZoneDateTime(): ZonedDateTime? {
+    return endDateTime?.let {
+        ZonedDateTime.from(
+            Instant.ofEpochSecond(it).atZone(ZoneId.of(timezone))
+        )
+    }
+}
+
+/**
  * Get day and month formatted
  */
 fun ChatScheduledMeetingOccurr.getDayAndMonth(): String? {
@@ -27,6 +49,22 @@ fun ChatScheduledMeetingOccurr.getDayAndMonth(): String? {
     }
 
     return null
+}
+
+/**
+ * Get start time formatted
+ */
+fun ChatScheduledMeetingOccurr.getStartTimeFormatted(is24HourFormat: Boolean): String {
+    val startTimestamp = startDateTime ?: return ""
+    return getFormattedHour(Instant.ofEpochSecond(startTimestamp), is24HourFormat)
+}
+
+/**
+ * Get end time formatted
+ */
+fun ChatScheduledMeetingOccurr.getEndTimeFormatted(is24HourFormat: Boolean): String {
+    val endTimestamp = endDateTime ?: return ""
+    return getFormattedHour(Instant.ofEpochSecond(endTimestamp), is24HourFormat)
 }
 
 /**

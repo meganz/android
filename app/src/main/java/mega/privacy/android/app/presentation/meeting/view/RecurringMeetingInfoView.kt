@@ -44,18 +44,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.core.R as CoreUiR
+import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
+import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
+import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.dialog.view.RecurringMeetingOccurrenceBottomSheetView
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
+import mega.privacy.android.core.ui.controls.dialogs.EditOccurrenceDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
@@ -80,11 +85,16 @@ fun RecurringMeetingInfoView(
     onOccurrenceClicked: (ChatScheduledMeetingOccurr) -> Unit,
     onSeeMoreClicked: () -> Unit,
     onCancelOccurrenceClicked: () -> Unit,
+    onEditOccurrenceClicked: () -> Unit,
     onConsumeSelectOccurrenceEvent: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
     onCancelOccurrence: () -> Unit = {},
     onCancelOccurrenceAndMeeting: () -> Unit = {},
+    onEditOccurrence: () -> Unit = {},
     onDismissDialog: () -> Unit = {},
+    onDateTap: () -> Unit,
+    onStartTimeTap: () -> Unit,
+    onEndTimeTap: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val listState = rememberLazyListState()
@@ -159,6 +169,32 @@ fun RecurringMeetingInfoView(
 
     onScrollChange(!firstItemVisible)
 
+    if (managementState.editOccurrenceTapped) {
+        managementState.editedOccurrence?.let {
+            val is24HourFormat = DateFormat.is24HourFormat(LocalContext.current)
+            EditOccurrenceDialog(
+                title = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_title),
+                confirmButtonText = stringResource(id = R.string.meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button),
+                cancelButtonText = stringResource(id = R.string.button_cancel),
+                dateTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_date_section),
+                dateText = it.getDateFormatted() ?: "",
+                startTimeTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_start_time_section),
+                endTimeTitleText = stringResource(id = R.string.meetings_update_scheduled_meeting_occurrence_dialog_end_time_section),
+                startTimeText = it.getStartTimeFormatted(is24HourFormat),
+                endTimeText = it.getEndTimeFormatted(is24HourFormat),
+                onConfirm = onEditOccurrence,
+                onDismiss = onDismissDialog,
+                isConfirmButtonEnabled = managementState.isEditionValid(),
+                isDateEdited = managementState.isDateEdited(),
+                isStartTimeEdited = managementState.isStartTimeEdited(is24HourFormat),
+                isEndTimeEdited = managementState.isEndTimeEdited(is24HourFormat),
+                onDateTap = onDateTap,
+                onStartTimeTap = onStartTimeTap,
+                onEndTimeTap = onEndTimeTap
+            )
+        }
+    }
+
     if (state.occurrencesList.size > 1 && managementState.cancelOccurrenceTapped) {
         managementState.selectedOccurrence?.let { occurrence ->
             CancelScheduledMeetingOccurrenceDialog(
@@ -183,6 +219,7 @@ fun RecurringMeetingInfoView(
         meetingState = state,
         occurrence = managementState.selectedOccurrence,
         onCancelClick = onCancelOccurrenceClicked,
+        onEditClick = onEditOccurrenceClicked
     )
 }
 

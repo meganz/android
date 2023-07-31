@@ -169,8 +169,16 @@ class RecurringMeetingInfoViewTest {
                 onOccurrenceClicked = { },
                 onSeeMoreClicked = { },
                 onCancelOccurrenceClicked = { },
+                onEditOccurrenceClicked = { },
                 onConsumeSelectOccurrenceEvent = { },
                 onResetSnackbarMessage = { },
+                onCancelOccurrence = { },
+                onCancelOccurrenceAndMeeting = { },
+                onEditOccurrence = { },
+                onDismissDialog = { },
+                onDateTap = { },
+                onStartTimeTap = { },
+                onEndTimeTap = { },
             )
         }
     }
@@ -182,15 +190,25 @@ class RecurringMeetingInfoViewTest {
         onSeeMoreClicked: () -> Unit,
     ) {
         composeRule.setContent {
-            RecurringMeetingInfoView(state = uiState,
+            RecurringMeetingInfoView(
+                state = uiState,
                 managementState = managementState,
                 onScrollChange = { },
                 onBackPressed = { },
                 onOccurrenceClicked = { },
                 onSeeMoreClicked = onSeeMoreClicked,
                 onCancelOccurrenceClicked = { },
+                onEditOccurrenceClicked = { },
                 onConsumeSelectOccurrenceEvent = { },
-                onResetSnackbarMessage = { })
+                onResetSnackbarMessage = { },
+                onCancelOccurrence = { },
+                onCancelOccurrenceAndMeeting = { },
+                onEditOccurrence = { },
+                onDismissDialog = { },
+                onDateTap = { },
+                onStartTimeTap = { },
+                onEndTimeTap = { },
+            )
         }
     }
 }

@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getDayAndMonth
+import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
+import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
@@ -35,8 +37,10 @@ import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingOccurre
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.IsChatHistoryEmptyUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
+import mega.privacy.android.domain.usecase.meeting.UpdateOccurrenceUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
@@ -68,6 +72,7 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val updateOccurrenceUseCase: UpdateOccurrenceUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScheduledMeetingManagementState())
     val state: StateFlow<ScheduledMeetingManagementState> = _state
@@ -135,11 +140,14 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     /**
      * Display occurrence's options
      */
-    fun onOccurrenceTap(occurrence: ChatScheduledMeetingOccurr) = _state.update { state ->
-        state.copy(
-            selectedOccurrence = occurrence, selectOccurrenceEvent = triggered
-        )
-    }
+    fun onOccurrenceTap(occurrence: ChatScheduledMeetingOccurr) =
+        _state.update { state ->
+            state.copy(
+                selectedOccurrence = occurrence,
+                editedOccurrence = occurrence,
+                selectOccurrenceEvent = triggered
+            )
+        }
 
     /**
      * Cancel occurrence option selected
@@ -148,12 +156,20 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
         _state.update { state -> state.copy(cancelOccurrenceTapped = true) }
 
     /**
+     * Edit occurrence option selected
+     */
+    fun onEditOccurrenceTap() =
+        _state.update { state -> state.copy(editOccurrenceTapped = true) }
+
+    /**
      * Reset selected occurrence
      */
     fun onResetSelectedOccurrence() = _state.update { state ->
         state.copy(
             selectedOccurrence = null,
-            cancelOccurrenceTapped = false
+            editedOccurrence = null,
+            cancelOccurrenceTapped = false,
+            editOccurrenceTapped = false
         )
     }
 
@@ -313,16 +329,14 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
      *
      * @param chatRoomItem The selected [ChatRoomItem]
      */
-    fun setChatRoomItem(chatRoomItem: ChatRoomItem) {
+    fun setChatRoomItem(chatRoomItem: ChatRoomItem) =
         _state.update { state -> state.copy(chatRoomItem = chatRoomItem) }
-    }
 
     /**
      * Sets chatRoomItem as consumed.
      */
-    fun setOnChatRoomItemConsumed() {
+    fun setOnChatRoomItemConsumed() =
         _state.update { state -> state.copy(chatRoomItem = null) }
-    }
 
     /**
      * Get chat room of the scheduled meeting
@@ -431,6 +445,127 @@ class ScheduledMeetingManagementViewModel @Inject constructor(
     fun scheduledMeetingUpdated() {
         triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_edit_scheduled_meeting_success_snackbar))
     }
+
+    /**
+     * Scheduled meeting occurrence updated
+     */
+    fun onUpdateScheduledMeetingOccurrenceTap() =
+        state.value.editedOccurrence?.let { editedOccurrence ->
+            state.value.selectedOccurrence?.let { selectedOccurrence ->
+                selectedOccurrence.startDateTime?.let { overrides ->
+                    state.value.chatId?.let { id ->
+                        viewModelScope.launch {
+                            runCatching {
+                                updateOccurrenceUseCase(
+                                    chatId = id,
+                                    occurrence = editedOccurrence,
+                                    overrides = overrides
+                                )
+                            }.onSuccess {
+                                triggerSnackbarMessage(getStringFromStringResMapper(R.string.meetings_update_scheduled_meeting_occurrence_success_snackbar))
+                            }.onFailure { exception ->
+                                Timber.e(exception)
+                                triggerSnackbarMessage(getStringFromStringResMapper(R.string.general_text_error))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+    /**
+     * Set start time
+     *
+     * @param newStartTime          Start time
+     */
+    fun onNewStartTime(newStartTime: ZonedDateTime) =
+        state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
+            val newStartZonedDateTime =
+                currentStartZonedDateTime.withHour(newStartTime.hour)
+                    .withMinute(newStartTime.minute)
+
+            if (currentStartZonedDateTime.isEqual(newStartZonedDateTime)) {
+                return@let
+            }
+
+            state.value.editedOccurrence?.getEndZoneDateTime()?.let { currentEndZonedDateTime ->
+                var newEndZonedDateTime = currentEndZonedDateTime
+                if (newStartZonedDateTime.isEqual(currentEndZonedDateTime) || newStartZonedDateTime.isAfter(
+                        currentEndZonedDateTime
+                    )
+                ) {
+                    newEndZonedDateTime = newStartZonedDateTime.plusMinutes(30)
+                }
+
+                _state.update { state ->
+                    state.copy(
+                        editedOccurrence = state.editedOccurrence?.copy(
+                            startDateTime = newStartZonedDateTime.toEpochSecond(),
+                            endDateTime = newEndZonedDateTime.toEpochSecond()
+                        )
+                    )
+                }
+            }
+        }
+
+    /**
+     * Set end time
+     *
+     * @param newEndTime          End time
+     */
+    fun onNewEndTime(newEndTime: ZonedDateTime) =
+        state.value.editedOccurrence?.getEndZoneDateTime()?.let { currentEndZonedDateTime ->
+            val newEndZonedDateTime =
+                currentEndZonedDateTime.withHour(newEndTime.hour)
+                    .withMinute(newEndTime.minute)
+
+            if (currentEndZonedDateTime.isEqual(newEndZonedDateTime)) {
+                return@let
+            }
+
+            state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
+                var newStartZonedDateTime = currentStartZonedDateTime
+                if (newEndZonedDateTime.isEqual(currentStartZonedDateTime) || newEndZonedDateTime.isBefore(
+                        currentStartZonedDateTime
+                    )
+                ) {
+                    newStartZonedDateTime = newEndZonedDateTime.minusMinutes(30)
+                }
+
+                _state.update { state ->
+                    state.copy(
+                        editedOccurrence = state.editedOccurrence?.copy(
+                            startDateTime = newStartZonedDateTime.toEpochSecond(),
+                            endDateTime = newEndZonedDateTime.toEpochSecond()
+                        )
+                    )
+                }
+            }
+        }
+
+    /**
+     * Set start date
+     *
+     * @param newStartDate          Start date
+     */
+    fun onNewStartDate(newStartDate: ZonedDateTime) =
+        state.value.editedOccurrence?.getStartZoneDateTime()?.let { currentStartZonedDateTime ->
+            val newStartZonedDateTime =
+                newStartDate.withHour(currentStartZonedDateTime.hour)
+                    .withMinute(currentStartZonedDateTime.minute)
+
+            if (currentStartZonedDateTime.isEqual(newStartZonedDateTime)) {
+                return@let
+            }
+
+            _state.update { state ->
+                state.copy(
+                    editedOccurrence = state.editedOccurrence?.copy(
+                        startDateTime = newStartZonedDateTime.toEpochSecond(),
+                    )
+                )
+            }
+        }
 
     /**
      * Shares the link to chat

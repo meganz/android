@@ -3,9 +3,13 @@ package mega.privacy.android.app.presentation.meeting.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.extensions.getDateFormatted
+import mega.privacy.android.app.presentation.extensions.getEndTimeFormatted
+import mega.privacy.android.app.presentation.extensions.getStartTimeFormatted
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import java.time.ZonedDateTime
 
 /**
  * Scheduled meeting management state
@@ -20,6 +24,10 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
  * @property enabledMeetingLinkOption       True if is enabled the meeting link option, false otherwise.
  * @property meetingLink                    Meeting link.
  * @property cancelOccurrenceTapped         Indicates if cancel occurrence option was tapped
+ * @property editOccurrenceTapped           Indicates if edit occurrence option was tapped
+ * @property chatRoomItem                   Selected [ChatRoomItem]
+ * @property editedOccurrence               Edited [ChatScheduledMeetingOccurr]
+ * @property editedOccurrenceDate          [ZonedDateTime]
  * @property chatRoomItem                   Selected [ChatRoomItem]
  * @constructor Create empty Scheduled meeting management state
  */
@@ -35,5 +43,45 @@ data class ScheduledMeetingManagementState constructor(
     val enabledMeetingLinkOption: Boolean = true,
     val meetingLink: String? = null,
     val cancelOccurrenceTapped: Boolean = false,
+    val editOccurrenceTapped: Boolean = false,
     val chatRoomItem: ChatRoomItem? = null,
-)
+    val editedOccurrence: ChatScheduledMeetingOccurr? = null,
+    val editedOccurrenceDate: ZonedDateTime? = null,
+) {
+
+    /**
+     * Check if is valid the edition
+     *
+     * @return  true if its valid, false if not
+     */
+    fun isEditionValid(): Boolean =
+        selectedOccurrence != editedOccurrence
+
+    /**
+     * Check if is date edited
+     *
+     * @return  true if its valid, false if not
+     */
+    fun isDateEdited(): Boolean =
+        selectedOccurrence?.getDateFormatted() != editedOccurrence?.getDateFormatted()
+
+    /**
+     * Check if is start time edited
+     *
+     * @return  true if its valid, false if not
+     */
+    fun isStartTimeEdited(is24HourFormat: Boolean): Boolean =
+        selectedOccurrence?.getStartTimeFormatted(is24HourFormat) != editedOccurrence?.getStartTimeFormatted(
+            is24HourFormat
+        )
+
+    /**
+     * Check if is end time edited
+     *
+     * @return  true if its valid, false if not
+     */
+    fun isEndTimeEdited(is24HourFormat: Boolean): Boolean =
+        selectedOccurrence?.getEndTimeFormatted(is24HourFormat) != editedOccurrence?.getEndTimeFormatted(
+            is24HourFormat
+        )
+}

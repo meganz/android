@@ -131,6 +131,9 @@ class ChatViewModel @Inject constructor(
      */
     val state = _state.asStateFlow()
 
+    /**
+     * Check if it's 24 hour format
+     */
     val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
 
     /**

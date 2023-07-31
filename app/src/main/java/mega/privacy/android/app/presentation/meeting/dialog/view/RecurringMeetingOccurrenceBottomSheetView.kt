@@ -62,6 +62,7 @@ internal fun RecurringMeetingOccurrenceBottomSheetView(
     meetingState: RecurringMeetingInfoState?,
     occurrence: ChatScheduledMeetingOccurr?,
     onCancelClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
 ) {
     ModalBottomSheetLayout(
         sheetState = modalSheetState,
@@ -72,7 +73,8 @@ internal fun RecurringMeetingOccurrenceBottomSheetView(
                 coroutineScope = coroutineScope,
                 meetingState = meetingState,
                 occurrence = occurrence,
-                onCancelClick = onCancelClick
+                onCancelClick = onCancelClick,
+                onEditClick = onEditClick
             )
         }
     ) {}
@@ -86,6 +88,7 @@ private fun BottomSheetContent(
     meetingState: RecurringMeetingInfoState?,
     occurrence: ChatScheduledMeetingOccurr?,
     onCancelClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
 ) {
     if (meetingState == null || occurrence == null) {
         return
@@ -144,9 +147,21 @@ private fun BottomSheetContent(
         }
 
         ChatDivider(startPadding = 16.dp)
-
         MenuItem(
-            modifier = Modifier.testTag("cancel_occurrence"),
+            modifier = Modifier.testTag(EDIT_OCCURRENCE_TAG),
+            res = R.drawable.ic_scheduled_meeting_edit,
+            text = R.string.title_edit_profile_info,
+            description = "Edit",
+            tintRed = false,
+            onClick = {
+                coroutineScope.launch { modalSheetState.hide() }
+                onEditClick()
+            }
+        )
+
+        ChatDivider(startPadding = 72.dp)
+        MenuItem(
+            modifier = Modifier.testTag(CANCEL_OCCURRENCE_TAG),
             res = R.drawable.ic_trash,
             text = R.string.general_cancel,
             description = "Cancel",
@@ -202,6 +217,11 @@ private fun MenuItem(
         )
     }
 }
+
+internal const val EDIT_OCCURRENCE_TAG = "recurring_meeting_occurrence_bottom_sheet:edit_occurrence"
+internal const val CANCEL_OCCURRENCE_TAG =
+    "recurring_meeting_occurrence_bottom_sheet:cancel_occurrence"
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Preview
