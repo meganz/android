@@ -56,7 +56,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -544,23 +543,6 @@ class SettingsCameraUploadsViewModelTest {
 
             underTest.changePrimaryFolderPath(
                 testPath,
-                isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
-            )
-            underTest.state.test {
-                assertThat(awaitItem().invalidFolderSelectedTextId).isEqualTo(R.string.error_invalid_folder_selected)
-            }
-        }
-
-    @Test
-    fun `test that the invalid folder selected prompt is shown if the new primary folder path is null`() =
-        runTest {
-            val isPrimaryFolderInSDCard = false
-            val isNewPrimaryFolderPathValidSpy = Mockito.spy(isPrimaryFolderPathValidUseCase)
-
-            setupUnderTest(isPrimaryFolderPathValid = isNewPrimaryFolderPathValidSpy)
-
-            underTest.changePrimaryFolderPath(
-                newPath = null,
                 isPrimaryFolderInSDCard = isPrimaryFolderInSDCard,
             )
             underTest.state.test {
