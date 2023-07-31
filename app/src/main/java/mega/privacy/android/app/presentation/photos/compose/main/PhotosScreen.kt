@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUplo
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
-import mega.privacy.android.app.presentation.photos.view.PhotosZoomGestureDetector
+import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -109,7 +109,7 @@ fun PhotosScreen(
                 photosGridView = {
                     PhotosGridView(
                         modifier = Modifier
-                            .PhotosZoomGestureDetector(
+                            .photosZoomGestureDetector(
                                 onZoomIn = onZoomIn,
                                 onZoomOut = onZoomOut,
                             ),

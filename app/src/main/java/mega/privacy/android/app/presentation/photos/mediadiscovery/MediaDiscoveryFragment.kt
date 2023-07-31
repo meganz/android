@@ -69,7 +69,7 @@ import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.EmptyView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
-import mega.privacy.android.app.presentation.photos.view.PhotosZoomGestureDetector
+import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -300,7 +300,7 @@ class MediaDiscoveryFragment : Fragment() {
                         uiState = uiState,
                         lazyGridState = lazyGridState,
                         modifier = Modifier
-                            .PhotosZoomGestureDetector(
+                            .photosZoomGestureDetector(
                                 onZoomIn = this@MediaDiscoveryFragment::handleZoomIn,
                                 onZoomOut = this@MediaDiscoveryFragment::handleZoomOut,
                             )

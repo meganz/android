@@ -316,7 +316,7 @@ private fun dateText(
     )
 }
 
-fun Modifier.PhotosZoomGestureDetector(
+fun Modifier.photosZoomGestureDetector(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
 ) = pointerInput(Unit) {
