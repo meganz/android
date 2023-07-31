@@ -9,7 +9,9 @@ import mega.privacy.android.domain.exception.PublicNodeException
  *
  * @property shouldLogin            Whether to show login screen
  * @property url                    Url of the file
- * @property fileNode               Current node
+ * @property hasDbCredentials       Whether has db credentials
+ * @property title                  Title of the current node
+ * @property sizeInBytes            Size of the current file node
  * @property previewPath            Path of the preview image
  * @property iconResource           the icon resource that represents this node
  * @property askForDecryptionDialog Whether to show AskForDecryptionDialog
@@ -21,8 +23,10 @@ import mega.privacy.android.domain.exception.PublicNodeException
  */
 data class FileLinkState(
     val shouldLogin: Boolean? = null,
+    val hasDbCredentials: Boolean = false,
     val url: String? = null,
-    val fileNode: TypedFileNode? = null,
+    val title: String = "",
+    val sizeInBytes: Long = 0,
     val previewPath: String? = null,
     val iconResource: Int? = null,
     val askForDecryptionDialog: Boolean = false,
@@ -31,4 +35,14 @@ data class FileLinkState(
     val copyThrowable: Throwable? = null,
     val copySuccess: Boolean = false,
     val fetchPublicNodeError: PublicNodeException? = null,
-)
+) {
+    /**
+     * Creates a copy of this view state with the info that can be extracted directly from typedNode
+     */
+    fun copyWithTypedNode(typedNode: TypedFileNode, iconResource: Int) = this.copy(
+        title = typedNode.name,
+        sizeInBytes = typedNode.size,
+        previewPath = typedNode.previewPath,
+        iconResource = if (typedNode.previewPath == null) iconResource else null
+    )
+}

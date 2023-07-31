@@ -76,8 +76,10 @@ class FileLinkViewModelTest {
         underTest.state.test {
             val initial = awaitItem()
             assertThat(initial.shouldLogin).isNull()
+            assertThat(initial.hasDbCredentials).isFalse()
             assertThat(initial.url).isNull()
-            assertThat(initial.fileNode).isNull()
+            assertThat(initial.title).isEmpty()
+            assertThat(initial.sizeInBytes).isEqualTo(0)
             assertThat(initial.previewPath).isNull()
             assertThat(initial.iconResource).isNull()
             assertThat(initial.askForDecryptionDialog).isFalse()
@@ -98,6 +100,7 @@ class FileLinkViewModelTest {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.shouldLogin).isFalse()
+                assertThat(newValue.hasDbCredentials).isTrue()
             }
         }
 
@@ -111,6 +114,7 @@ class FileLinkViewModelTest {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
                 assertThat(newValue.shouldLogin).isTrue()
+                assertThat(newValue.hasDbCredentials).isTrue()
             }
         }
 
@@ -224,16 +228,20 @@ class FileLinkViewModelTest {
     fun `test that on getting valid public node correct values are set`() = runTest {
         val url = "https://mega.co.nz/abc"
         val expectedPath = "data/cache/xyz.jpg"
+        val title = "abc"
+        val fileSize = 100000L
         val publicNode = mock<TypedFileNode> {
             on { previewPath }.thenReturn(expectedPath)
-            on { name }.thenReturn("abc")
+            on { name }.thenReturn(title)
+            on { size }.thenReturn(fileSize)
         }
 
         whenever(getPublicNodeUseCase(any())).thenReturn(publicNode)
         underTest.state.test {
             underTest.getPublicNode(url)
             val result = expectMostRecentItem()
-            assertThat(result.fileNode).isEqualTo(publicNode)
+            assertThat(result.title).isEqualTo(title)
+            assertThat(result.sizeInBytes).isEqualTo(fileSize)
             assertThat(result.previewPath).isEqualTo(expectedPath)
             assertThat(result.iconResource).isEqualTo(null)
         }

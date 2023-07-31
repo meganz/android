@@ -57,8 +57,9 @@ class FileLinkViewModel @Inject constructor(
      */
     fun checkLoginRequired() {
         viewModelScope.launch {
-            val shouldLogin = hasCredentials() && !rootNodeExistsUseCase()
-            _state.update { it.copy(shouldLogin = shouldLogin) }
+            val hasCredentials = hasCredentials()
+            val shouldLogin = hasCredentials && !rootNodeExistsUseCase()
+            _state.update { it.copy(shouldLogin = shouldLogin, hasDbCredentials = hasCredentials) }
         }
     }
 
@@ -70,11 +71,7 @@ class FileLinkViewModel @Inject constructor(
             .onSuccess { node ->
                 val iconResource = getNodeIcon(node, false)
                 _state.update {
-                    it.copy(
-                        fileNode = node,
-                        previewPath = node.previewPath,
-                        iconResource = if (node.previewPath == null) iconResource else null
-                    )
+                    it.copyWithTypedNode(node, iconResource)
                 }
             }
             .onFailure { exception ->
