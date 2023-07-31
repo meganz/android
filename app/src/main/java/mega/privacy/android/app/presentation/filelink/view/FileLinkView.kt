@@ -30,12 +30,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fileinfo.view.FileInfoHeader
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
+import mega.privacy.android.core.ui.controls.dialogs.LoadingDialog
 import mega.privacy.android.core.ui.controls.snackbars.MegaSnackbar
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -170,6 +172,9 @@ internal fun FileLinkView(
                     onSaveToDeviceClicked = onSaveToDeviceClicked
                 )
             }
+        }
+        viewState.jobInProgressState?.progressMessage?.let {
+            LoadingDialog(text = stringResource(id = it))
         }
     }
 }

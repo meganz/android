@@ -20,11 +20,12 @@ import mega.privacy.android.domain.exception.PublicNodeException
  * @property collisionCheckThrowable Throwable error on collision check
  * @property copySuccess            Whether copy was success or not
  * @property fetchPublicNodeError   Exception while fetching current public node
+ * @property jobInProgressState     indicates if there are any job in progress that needs to be notified
  */
 data class FileLinkState(
     val shouldLogin: Boolean? = null,
     val hasDbCredentials: Boolean = false,
-    val url: String? = null,
+    val url: String = "",
     val title: String = "",
     val sizeInBytes: Long = 0,
     val previewPath: String? = null,
@@ -35,6 +36,7 @@ data class FileLinkState(
     val copyThrowable: Throwable? = null,
     val copySuccess: Boolean = false,
     val fetchPublicNodeError: PublicNodeException? = null,
+    val jobInProgressState: FileLinkJobInProgressState? = FileLinkJobInProgressState.InitialLoading,
 ) {
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode

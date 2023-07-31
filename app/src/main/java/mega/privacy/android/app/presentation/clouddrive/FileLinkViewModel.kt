@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive
 
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +16,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.usecase.LegacyCopyNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -37,7 +39,6 @@ class FileLinkViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
 ) : ViewModel() {
-
 
     private val _state = MutableStateFlow(FileLinkState())
 
@@ -64,6 +65,16 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
+     * Handle intent
+     */
+    fun handleIntent(intent: Intent) {
+        intent.dataString?.let { link ->
+            _state.update { it.copy(url = link) }
+            getPublicNode(link)
+        } ?: Timber.w("url NULL")
+    }
+
+    /**
      * Get node from public link
      */
     fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
@@ -73,8 +84,10 @@ class FileLinkViewModel @Inject constructor(
                 _state.update {
                     it.copyWithTypedNode(node, iconResource)
                 }
+                resetJobInProgressState()
             }
             .onFailure { exception ->
+                resetJobInProgressState()
                 when (exception) {
                     is PublicNodeException.InvalidDecryptionKey -> {
                         if (decryptionIntroduced) {
@@ -98,6 +111,36 @@ class FileLinkViewModel @Inject constructor(
                     }
                 }
             }
+    }
+
+    /**
+     * Get combined url with key for fetching link content
+     */
+    fun decrypt(mKey: String?) {
+        val url = state.value.url
+        mKey?.let { key ->
+            if (key.isEmpty()) return
+            var urlWithKey = ""
+            if (url.contains("#!")) {
+                // old folder link format
+                urlWithKey = if (key.startsWith("!")) {
+                    Timber.d("Decryption key with exclamation!")
+                    url + key
+                } else {
+                    "$url!$key"
+                }
+            } else if (url.contains(Constants.SEPARATOR + "file" + Constants.SEPARATOR)) {
+                // new folder link format
+                urlWithKey = if (key.startsWith("#")) {
+                    Timber.d("Decryption key with hash!")
+                    url + key
+                } else {
+                    "$url#$key"
+                }
+            }
+            Timber.d("File link to import: $urlWithKey")
+            getPublicNode(urlWithKey, true)
+        }
     }
 
     /**
@@ -154,5 +197,19 @@ class FileLinkViewModel @Inject constructor(
      */
     fun resetCollision() {
         _state.update { it.copy(collision = null) }
+    }
+
+    /**
+     * Reset the askForDecryptionKeyDialog boolean
+     */
+    fun resetAskForDecryptionKeyDialog() {
+        _state.update { it.copy(askForDecryptionDialog = false) }
+    }
+
+    /**
+     * Reset the job in progress state value
+     */
+    private fun resetJobInProgressState() {
+        _state.update { it.copy(jobInProgressState = null) }
     }
 }

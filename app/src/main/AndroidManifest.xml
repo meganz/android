@@ -321,6 +321,9 @@
             android:name=".presentation.filelink.FileLinkActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".presentation.filelink.FileLinkComposeActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".OpenPasswordLinkActivity"
             android:configChanges="orientation|screenSize"
             android:excludeFromRecents="true"

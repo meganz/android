@@ -77,7 +77,7 @@ class FileLinkViewModelTest {
             val initial = awaitItem()
             assertThat(initial.shouldLogin).isNull()
             assertThat(initial.hasDbCredentials).isFalse()
-            assertThat(initial.url).isNull()
+            assertThat(initial.url).isEmpty()
             assertThat(initial.title).isEmpty()
             assertThat(initial.sizeInBytes).isEqualTo(0)
             assertThat(initial.previewPath).isNull()
@@ -298,4 +298,14 @@ class FileLinkViewModelTest {
             assertThat(result.fetchPublicNodeError).isNotNull()
         }
     }
+
+    @Test
+    fun `test that askForDecryptionDialog should be reset to false when resetAskForDecryptionKeyDialog is invoked`() =
+        runTest {
+            underTest.state.test {
+                underTest.resetAskForDecryptionKeyDialog()
+                val newValue = expectMostRecentItem()
+                assertThat(newValue.askForDecryptionDialog).isEqualTo(false)
+            }
+        }
 }
