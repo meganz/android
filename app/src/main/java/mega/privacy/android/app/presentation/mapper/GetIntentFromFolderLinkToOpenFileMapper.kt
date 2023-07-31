@@ -152,7 +152,7 @@ class GetIntentFromFolderLinkToOpenFileMapper @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
                 putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
                 putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
-                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
+                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, fileNode.parentId.longValue)
             }
             getLocalFileForNode(fileNode)?.let {
                 val path = it.path
