@@ -516,8 +516,6 @@
     <string name="cam_sync_syncing">Téléversements de l’appareil photo en cours</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Voulez-vous arrêter les Téléversements de l’appareil photo ?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Téléversement des fichiers des dossiers de médias</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Vérification des fichiers à téléverser</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1676,8 +1674,6 @@
     <string name="title_notification_call_in_progress">Appel en cours</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Retourner vers l’appel</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">Sur MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Contacts du téléphone</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2135,8 +2131,6 @@
         <item quantity="many">Choisir des fichiers</item>
         <item quantity="other">Choisir des fichiers</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Inviter %1$s ?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Choisir un dossier</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -2734,21 +2728,21 @@
     <!-- Title of transfer section in Storage -->
     <string name="transfer_label">Transfert</string>
     <!-- Error shown when a Business account user (sub-user or admin) tries to remove a contact which is part of the same Business account. Please, keep the placeholder, it will be replaced with the name or email of the account, for example: Jane Appleseed or ja@mega.nz -->
-    <string name="error_remove_business_contact">Vous ne pouvez pas supprimer %1$s de vos contacts, car ce contact fait parti de votre compte d’entreprise.</string>
+    <string name="error_remove_business_contact">Vous ne pouvez pas supprimer %1$s de vos contacts, car ce contact fait parti de votre compte Pour entreprise.</string>
     <!-- When logging in during the grace period, the administrator of the Business account will be notified that their payment is overdue, indicating that they need to access MEGA using a desktop browser for more information -->
     <string name="grace_period_admin_alert">Un problème est survenu lors de votre dernier paiement. Pour plus de précisions, veuillez accéder à MEGA en utilisant un navigateur pour ordinateur.</string>
     <!-- A dialog title shown to users when their business account is expired. -->
     <string name="expired_business_title">Le compte est désactivé</string>
     <!-- Details shown when a Business account is expired due a payment issue. The account is opened in a view-only mode. -->
-    <string name="expired_admin_business_text">Votre compte d’entreprise a été désactivé pour défaut de paiement. Vous ne pourrez plus accéder aux données stockées dans votre compte. Pour effectuer un paiement et réactiver votre abonnement, connectez-vous à MEGA dans un navigateur.</string>
+    <string name="expired_admin_business_text">Votre compte Pour entreprise a été désactivé pour défaut de paiement. Vous ne pourrez plus accéder aux données stockées dans votre compte. Pour effectuer un paiement et réactiver votre abonnement, connectez-vous à MEGA dans un navigateur.</string>
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Votre compte est actuellement [B]désactivé[/B]. Vous ne pouvez que parcourir vos données.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA ne peut pas accéder à vos données. Cependant, l’administrateur de votre compte d’entreprise peut accéder à vos Téléversements de l’appareil photo.</string>
+    <string name="camera_uploads_business_alert">MEGA ne peut pas accéder à vos données. Cependant, l’administrateur de votre compte Pour entreprise peut accéder à vos Téléversements de l’appareil photo.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Quelque chose a mal tourné</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">Contactez l’administrateur de votre compte d’entreprise pour résoudre la situation et activer votre compte.</string>
+    <string name="expired_user_business_text_2">Contactez l’administrateur de votre compte Pour entreprise pour résoudre la situation et activer votre compte.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">Quand vous vous déconnectez, les fichiers de votre section Hors&#160;ligne sont supprimés de votre appareil.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -2898,9 +2892,9 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Le compte que vous essayez de réinitialiser est bloqué.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Votre compte a été désactivé par votre administrateur. Veuillez contacter l’administrateur de votre compte d’entreprise pour obtenir plus de précisions.</string>
+    <string name="error_business_disabled">Votre compte a été désactivé par votre administrateur. Veuillez contacter l’administrateur de votre compte Pour entreprise pour obtenir plus de précisions.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Votre compte a été supprimé par votre administrateur. Veuillez contacter l’administrateur de votre compte d’entreprise pour plus de précisions.</string>
+    <string name="error_business_removed">Votre compte a été supprimé par votre administrateur. Veuillez contacter l’administrateur de votre compte Pour entreprise pour plus de précisions.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">Modifier</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -5273,4 +5267,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Annuler l’occurrence</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] a mis la réunion à jour[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Cette réunion et toutes ses occurrences seront archivées, ce qui sera signalé à tous les participants.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Cette réunion et toutes ses occurrences seront déplacées dans Réunions antérieures, ce qui sera signalé à tous les participants.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Vous pouvez désormais programmer des réunions uniques ou périodiques</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Vous pouvez commencer la réunion avant l’heure prévue en touchant «&#160;Commencer la réunion&#160;» dans la salle de réunion.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Gérer les réunions récurrentes</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">Vous pouvez afficher, annuler ou modifier n’importe quelle occurrence d’une réunion récurrente en touchant les points sur la droite et sélectionnant «&#160;Occurrences&#160;».</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Envoyez par courriel une invitation pour agenda aux participants afin qu’ils puissent ajouter la réunion à leur agenda.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">La réunion a été mise à jour</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Modifier l’occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Mettre à jour</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Date</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Heure de début</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Sélectionner la date de début</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Heure de fin</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">L’occurrence de la réunion a été mise à jour</string>
 </resources>

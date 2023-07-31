@@ -500,8 +500,6 @@
     <string name="cam_sync_syncing">카메라 업로드 진행중</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">카메라 업로드를 정지하시겠습니까?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">미디어 폴더의 파일을 업로드할 수 없습니다</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">업로드할 파일 확인중</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1608,8 +1606,6 @@
     <string name="title_notification_call_in_progress">진행중인 통화</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">통화로 돌아옴</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">MEGA에서</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">휴대 전화 연락처</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2043,8 +2039,6 @@
     <plurals name="plural_select_file">
         <item quantity="other">파일 선택</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">%1$s님을 초대할까요?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">폴더 선택</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -4823,4 +4817,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">되풀이 항목 취소</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A]님이 [B]회의를 수정하였습니다[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">이 회의와 모든 되풀이는 보관될 것이며 모든 참여자에게 알려질 것입니다.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">이 회의와 모든 되풀이는 지난 회의에 위치할 것이며 모든 참여자에게 알려질 것입니다.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">일회성 회의와 반복 회의를 예약할 수 있습니다.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">회의실에서 “회의 시작”을 탭하여 예정된 시간보다 앞서 회의를 시작할 수 있습니다.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">반복 회의 관리</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">참여자들이 달력에 회의를 추가할 수 있도록 달력 초대를 이메일로 보냅니다.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">회의 수정됨</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">업데이트</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">날짜</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">회의 되풀이 항목 수정됨</string>
 </resources>

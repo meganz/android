@@ -508,8 +508,6 @@
     <string name="cam_sync_syncing">Camera uploads in behandeling</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Wilt u Camera uploads stoppen?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Bestanden uploaden van media mappen</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Bezig met zoeken naar te uploaden bestanden</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1642,8 +1640,6 @@
     <string name="title_notification_call_in_progress">Oproep in behandeling</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Teruggaan naar de oproep</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">Bij MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Telefoon contacten</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2089,8 +2085,6 @@
         <item quantity="one">Kies Bestand</item>
         <item quantity="other">Kies Bestanden</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">%1$s Uitodigen?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Kies map</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -5048,4 +5042,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Gebeurtenis annuleren</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] heeft de vergadering bijgewerkt[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Deze vergadering en alle gebeurtenissen ervan worden gearchiveerd en alle deelnemers worden op de hoogte gebracht.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Deze vergadering en alle gebeurtenissen ervan worden geplaatst onder Eerdere vergaderingen en alle deelnemers worden op de hoogte gebracht.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">U kunt nu éénmalige en terugkerende vergaderingen vooraf plannen.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">U kunt de vergadering voor de geplande tijd starten door in de vergaderruimte op Start vergadering te tikken.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Beheer terugkerende vergaderingen</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">U kunt elk exemplaar van een terugkerende vergadering bekijken, annuleren of bewerken door op de drie stippen aan de rechterkant te tikken en \“Gebeurtenissen\“ te selecteren.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">E-mail een agenda-uitnodiging naar deelnemers zodat ze de vergadering aan hun agenda kunnen toevoegen.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Vergadering bijgewerkt</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Gebeurtenis wijzigen</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Updaten</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Datum</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Begin tijd</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Selecteer start datum</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Eind tijd</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Vergadering gebeurtenis bijgwerkt</string>
 </resources>

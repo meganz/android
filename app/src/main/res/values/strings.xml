@@ -4513,12 +4513,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -5040,6 +5046,18 @@
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">This meeting and all its occurrences will be archived and all participants will be notified.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting and all its occurrences will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping “Start meeting” in the meeting room.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Manage recurring meetings</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting updated</string>
     <!-- Title of the dialog to update a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
     <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
@@ -5054,16 +5072,4 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
-    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
-    <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting updated</string>
-    <!-- Meeting list tooltip description for start meeting fab button -->
-    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
-    <!-- Meeting list tooltip description for schedule meeting item -->
-    <string name="meeting_list_tooltip_sched_description">You can start the meeting before its scheduled time by tapping Start meeting in the meeting room.</string>
-    <!-- Meeting list tooltip title for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_title">Manage recurring meetings</string>
-    <!-- Meeting list tooltip description for recurring meeting item -->
-    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting Occurrences.</string>
-    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
 </resources>

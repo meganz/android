@@ -500,8 +500,6 @@
     <string name="cam_sync_syncing">相機上傳正在進行中</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">您想停用相機上傳功能嗎？</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">正在上傳媒體資料夾中的檔案</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">正在確認要上傳的檔案</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1608,8 +1606,6 @@
     <string name="title_notification_call_in_progress">正在通話中</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">返回通話</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">於MEGA上</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">手機通訊錄</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2043,8 +2039,6 @@
     <plurals name="plural_select_file">
         <item quantity="other">選擇檔案</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">邀請%1$s？</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">選擇資料夾</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -2880,7 +2874,7 @@
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">單獨發送解密金鑰</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">個別匯出連結與解密金鑰。</string>
+    <string name="explanation_send_decryption_key_separately">各別匯出連結與解密金鑰。</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">瞭解更多</string>
     <!-- Label key referring to a link decryption key -->
@@ -3698,7 +3692,7 @@
     <!--Action text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_action">開始對話</string>
     <!--Description text from Recent Chat screen empty view-->
-    <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話記錄，即使是MEGA也不行。</string>
+    <string name="chat_recent_list_empty_description">在任何裝置上與任何人安全而私密的進行對話，沒有人可以讀取您們的對話，即使是MEGA也不行。</string>
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">立即開始會議</string>
     <!-- Label for call option on settings -->
@@ -3820,7 +3814,7 @@
     <!-- Label for upcoming meetings -->
     <string name="meetings_list_upcoming_meeting_label">即將到來的會議</string>
     <!-- Label for recurring meetings -->
-    <string name="meetings_list_recurring_meeting_label">定期會議</string>
+    <string name="meetings_list_recurring_meeting_label">週期性會議</string>
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">每週%s</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
@@ -3926,15 +3920,15 @@
     <!-- Label for scheduled daily meetings -->
     <string name="meetings_list_scheduled_meeting_daily_label">每日%s</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加定期性會議，排定時間：[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加週期性會議，排定時間：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]定期性會議說明[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的定期性會議細節：[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的週期性會議細節：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s更新[/A][B]一個事件：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s更新[/A][B]定期性會議時間[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s更新[/A][B]週期性會議時間[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s取消[/A][B]會議和其所有事件[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
@@ -4650,7 +4644,7 @@
     <!-- Album import rename album title -->
     <string name="album_import_rename_album_title">重新命名相簿</string>
     <!-- Album import rename album description -->
-    <string name="album_import_rename_album_description">您的相簿中已存在名為「%1$s」的相簿。請為您正儲存的相簿輸入一個新名稱。</string>
+    <string name="album_import_rename_album_description">您的相簿中已存在名為「%1$s」的相簿。請為您要儲存的相簿輸入一個新名稱。</string>
     <!-- Album import enter album name -->
     <string name="album_import_enter_album_name">輸入相簿名稱</string>
     <!-- Text only shown, when user has current plan as Pro III. The part of string 'pricing page.' is a hyperlink to Mega pricing webpage - https://mega.io/pricing. The placeholders [A], [/A], [B], [/B] will be replaced with code to show string with correct font and font colour. -->
@@ -4834,4 +4828,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">取消事件</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">此會議和其所有事件將被封存，所有與會者都會收到通知。</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此會議和其所有事件將被放置在過去的會議底下，所有與會者都會收到通知。</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">您可以點擊會議室中的「開始會議」，在預定時間之前開始會議。</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">管理定期性會議</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">會議已更新</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">更新</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">日期</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">會議事件已更新</string>
 </resources>
