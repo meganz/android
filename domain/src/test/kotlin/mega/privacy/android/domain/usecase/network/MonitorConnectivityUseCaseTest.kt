@@ -10,6 +10,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.ConnectivityState
 import mega.privacy.android.domain.repository.NetworkRepository
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -20,7 +21,8 @@ class MonitorConnectivityUseCaseTest {
 
     private val networkRepository = mock<NetworkRepository>()
 
-    private fun setUpUnderTest() {
+    @Before
+    fun setUp() {
         underTest = MonitorConnectivityUseCase(
             networkRepository = networkRepository,
             appScope = CoroutineScope(
@@ -39,7 +41,7 @@ class MonitorConnectivityUseCaseTest {
             )
             on { monitorConnectivityChanges() }.thenReturn(emptyFlow())
         }
-        setUpUnderTest()
+
         underTest().test {
             assertThat(awaitItem()).isTrue()
         }
@@ -56,7 +58,7 @@ class MonitorConnectivityUseCaseTest {
             )
             on { monitorConnectivityChanges() }.thenReturn(connectivityFlow)
         }
-        setUpUnderTest()
+
         underTest().test {
             assertThat(awaitItem()).isFalse()
         }
@@ -73,7 +75,7 @@ class MonitorConnectivityUseCaseTest {
             )
             on { monitorConnectivityChanges() }.thenReturn(connectivityFlow)
         }
-        setUpUnderTest()
+
         underTest().test {
             assertThat(awaitItem()).isFalse()
             connectivityFlow.emit(ConnectivityState.Connected(false))
