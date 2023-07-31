@@ -4,6 +4,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
 import mega.privacy.android.app.presentation.meeting.model.CustomRecurrenceState
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
@@ -38,7 +39,7 @@ class CustomRecurrenceViewTest {
                 customRecurrenceState = CustomRecurrenceState(newRules = getDailyRules()),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_EVERY).assertExists()
@@ -53,7 +54,7 @@ class CustomRecurrenceViewTest {
                 customRecurrenceState = CustomRecurrenceState(newRules = getDailyRules()),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_DAILY).assertExists()
@@ -70,7 +71,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_DAILY).assertDoesNotExist()
@@ -87,7 +88,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_WEEKLY).assertExists()
@@ -104,7 +105,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_WEEKLY).assertDoesNotExist()
@@ -121,7 +122,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_MONTHLY).assertExists()
@@ -138,7 +139,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_OCCURS_MONTHLY).assertDoesNotExist()
@@ -155,7 +156,7 @@ class CustomRecurrenceViewTest {
                 ),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             )
         )
         composeTestRule.onNodeWithTag(TEST_TAG_ENDS).assertExists()
@@ -171,7 +172,7 @@ class CustomRecurrenceViewTest {
                     rulesSelected = getDailyRules(),
                     participantItemList = emptyList(),
                     buttons = ScheduleMeetingAction.values().asList(),
-                    snackBar = null
+                    snackbarMessageContent = consumed()
                 ),
                 onAcceptClicked = mock,
                 onScrollChange = {},
@@ -204,7 +205,7 @@ class CustomRecurrenceViewTest {
                     rulesSelected = ChatScheduledRules(),
                     participantItemList = emptyList(),
                     buttons = ScheduleMeetingAction.values().asList(),
-                    snackBar = null
+                    snackbarMessageContent = consumed()
                 ),
                 onRejectClicked = mock,
                 onScrollChange = {},

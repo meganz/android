@@ -9,15 +9,18 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 
 /**
  * Scheduled meeting management state
- * @property finish                     True, if the activity is to be terminated.
- * @property selectedOccurrence         Current selected [ChatScheduledMeetingOccurr]
- * @property isChatHistoryEmpty         True if chat history only has management messages or false otherwise
- * @property chatId                     Chat ID of the scheduled meeting
- * @property selectOccurrenceEvent      Select [ChatScheduledMeetingOccurr] event
- * @property chatRoom                   [ChatRoom] of the scheduled meeting
- * @property snackbarMessageContent     State to show snackbar message
- * @property cancelOccurrenceTapped     Indicates if cancel occurrence option was tapped
- * @property chatRoomItem               Selected [ChatRoomItem]
+ * @property finish                         True, if the activity is to be terminated.
+ * @property selectedOccurrence             Current selected [ChatScheduledMeetingOccurr]
+ * @property isChatHistoryEmpty             True if chat history only has management messages or false otherwise
+ * @property chatId                         Chat ID of the scheduled meeting
+ * @property selectOccurrenceEvent          Select [ChatScheduledMeetingOccurr] event
+ * @property chatRoom                       [ChatRoom] of the scheduled meeting
+ * @property snackbarMessageContent         State to show snackbar message
+ * @property displayDialog                  Indicates if display confirm dialog or not
+ * @property enabledMeetingLinkOption       True if is enabled the meeting link option, false otherwise.
+ * @property meetingLink                    Meeting link.
+ * @property cancelOccurrenceTapped         Indicates if cancel occurrence option was tapped
+ * @property chatRoomItem                   Selected [ChatRoomItem]
  * @constructor Create empty Scheduled meeting management state
  */
 data class ScheduledMeetingManagementState constructor(
@@ -28,6 +31,9 @@ data class ScheduledMeetingManagementState constructor(
     val selectOccurrenceEvent: StateEvent = consumed,
     val chatRoom: ChatRoom? = null,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
+    val displayDialog: Boolean = false,
+    val enabledMeetingLinkOption: Boolean = true,
+    val meetingLink: String? = null,
     val cancelOccurrenceTapped: Boolean = false,
     val chatRoomItem: ChatRoomItem? = null,
 )

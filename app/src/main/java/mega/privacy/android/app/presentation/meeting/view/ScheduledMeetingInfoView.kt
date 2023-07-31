@@ -72,6 +72,7 @@ import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.core.ui.controls.divider.CustomDivider
@@ -101,6 +102,7 @@ import java.util.Locale
 @Composable
 fun ScheduledMeetingInfoView(
     state: ScheduledMeetingInfoState,
+    managementState: ScheduledMeetingManagementState,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     onEditClicked: () -> Unit,
     onAddParticipantsClicked: () -> Unit,
@@ -156,7 +158,12 @@ fun ScheduledMeetingInfoView(
             item(key = "Scheduled meeting title") { ScheduledMeetingTitleView(state = state) }
 
             items(state.buttons) { button ->
-                ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
+                ActionButton(
+                    state = state,
+                    action = button,
+                    enabledMeetingLinkOption = managementState.enabledMeetingLinkOption,
+                    onButtonClicked = onButtonClicked
+                )
             }
 
             item(key = "Participants") { ParticipantsHeader(state = state) }
@@ -337,14 +344,15 @@ private fun ScheduledMeetingInfoAppBar(
                     )
                 }
             }
-
-            if (state.isHost && state.isEditEnabled) {
-                IconButton(onClick = { onEditClicked() }) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
-                        contentDescription = "Edit Icon",
-                        tint = iconColor
-                    )
+            state.scheduledMeeting?.let { schedMeet ->
+                if (state.isHost && !schedMeet.isPast()) {
+                    IconButton(onClick = { onEditClicked() }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_scheduled_meeting_edit),
+                            contentDescription = "Edit Icon",
+                            tint = iconColor
+                        )
+                    }
                 }
             }
         },
@@ -498,6 +506,7 @@ private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
 @Composable
 private fun ActionButton(
     state: ScheduledMeetingInfoState,
+    enabledMeetingLinkOption: Boolean,
     action: ScheduledMeetingInfoAction,
     onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
 ) {
@@ -512,7 +521,7 @@ private fun ActionButton(
             ScheduledMeetingInfoAction.ShareMeetingLink,
             ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
             -> {
-                if (state.isPublic && state.enabledMeetingLinkOption) {
+                if (state.isPublic && enabledMeetingLinkOption) {
                     if (action == ScheduledMeetingInfoAction.ShareMeetingLink && state.isHost) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -605,7 +614,7 @@ private fun ActionButton(
                     ActionOption(
                         state = state,
                         action = action,
-                        isEnabled = state.enabledMeetingLinkOption,
+                        isEnabled = enabledMeetingLinkOption,
                         hasSwitch = true
                     )
                     CustomDivider(withStartPadding = true)
@@ -1246,6 +1255,7 @@ fun PreviewActionButton() {
             )
         ),
             action = ScheduledMeetingInfoAction.MeetingLink,
+            enabledMeetingLinkOption = true,
             onButtonClicked = {})
     }
 }
@@ -1306,6 +1316,7 @@ fun PreviewScheduledMeetingInfoView() {
                     changes = null
                 )
             ),
+            managementState = ScheduledMeetingManagementState(),
             onButtonClicked = {},
             onEditClicked = {},
             onAddParticipantsClicked = {},

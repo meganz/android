@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.InitialLetterStringId
@@ -768,7 +769,7 @@ private fun PreviewCustomRecurrenceView() {
                 customRecurrenceState = CustomRecurrenceState(),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             ),
             onScrollChange = {},
             onAcceptClicked = {},

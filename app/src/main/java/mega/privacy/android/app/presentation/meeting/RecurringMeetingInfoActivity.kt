@@ -4,15 +4,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -49,33 +46,32 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (finish) ->
-                    if (finish) {
-                        Timber.d("Finish activity")
-                        finish()
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                scheduledMeetingManagementViewModel.state.collect { (finish) ->
-                    if (finish) {
-                        Timber.d("Finish activity")
-                        finish()
-                    }
-                }
-            }
-        }
+        collectFlows()
 
         val chatId = intent.getLongExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         viewModel.setChatId(newChatId = chatId)
         scheduledMeetingManagementViewModel.setChatId(newChatId = chatId)
 
         setContent { View() }
+    }
+
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { (finish) ->
+            if (finish) {
+                Timber.d("Finish activity")
+                finish()
+            }
+
+
+        }
+
+        collectFlow(scheduledMeetingManagementViewModel.state) { (finish) ->
+            if (finish) {
+                Timber.d("Finish activity")
+                finish()
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -89,10 +85,10 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
 
     @Composable
     private fun View() {
-        val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
-        val uiState by viewModel.state.collectAsState()
-        val managementState by scheduledMeetingManagementViewModel.state.collectAsState()
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
         val isCancelSchedMeetingEnabled = runBlocking {
             getFeatureFlagValueUseCase(AppFeatures.CancelSchedMeeting)
         }

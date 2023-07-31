@@ -27,13 +27,11 @@ import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -52,6 +50,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
@@ -104,7 +104,7 @@ internal fun CreateScheduledMeetingView(
     onEndDateClicked: () -> Unit,
     onScrollChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
-    onSnackbarShown: () -> Unit,
+    onResetSnackbarMessage: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
     onDescriptionValueChange: (String) -> Unit,
     onTitleValueChange: (String) -> Unit,
@@ -181,30 +181,22 @@ internal fun CreateScheduledMeetingView(
             }
 
             item(key = "Schedule meeting add description") {
-                if (state.isEditingDescription) {
-                    AddDescriptionButton(state = state, onValueChange = onDescriptionValueChange)
+                if (state.isEditingDescription || state.descriptionText.isNotEmpty()) {
+                    AddDescriptionButton(
+                        description = state.descriptionText,
+                        onValueChange = onDescriptionValueChange
+                    )
                 }
             }
         }
 
-        if (state.snackBar != null) {
-            val msg = if (state.snackBar == R.string.number_of_participants) pluralStringResource(
-                R.plurals.meetings_schedule_meeting_snackbar_adding_participants_success,
-                state.participantItemList.size,
-                state.participantItemList.size
-            ) else
-                stringResource(id = state.snackBar)
-
-            LaunchedEffect(scaffoldState.snackbarHostState) {
-                val s = scaffoldState.snackbarHostState.showSnackbar(
-                    message = msg,
-                    duration = SnackbarDuration.Short
-                )
-
-                if (s == SnackbarResult.Dismissed) {
-                    onSnackbarShown()
-                }
-            }
+        EventEffect(
+            event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage
+        ) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = it,
+                duration = SnackbarDuration.Short
+            )
         }
     }
 
@@ -279,12 +271,12 @@ private fun ScheduledMeetingDateAndTime(
 /**
  * Add description to the scheduled meeting.
  *
- * @param state                 [CreateScheduledMeetingState]
+ * @param description           Description text
  * @param onValueChange         When description changes
  */
 @Composable
 private fun AddDescriptionButton(
-    state: CreateScheduledMeetingState,
+    description: String,
     onValueChange: (String) -> Unit,
 ) {
     Column(
@@ -318,14 +310,15 @@ private fun AddDescriptionButton(
                         .fillMaxSize()
                 ) {
                     GenericDescriptionTextField(
-                        value = state.descriptionText.ifEmpty { "" },
-                        placeholderId = R.string.meetings_schedule_meeting_add_description_label,
-                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label,
+                        value = description.ifEmpty { "" },
+                        charLimit = Constants.MAX_DESCRIPTION_SIZE,
                         onValueChange = { text ->
                             onValueChange(text)
                         },
+                        initiallyFocused = description.isEmpty(),
+                        placeholderId = R.string.meetings_schedule_meeting_add_description_label,
                         charLimitErrorId = R.string.meetings_schedule_meeting_meeting_description_too_long_error,
-                        charLimit = Constants.MAX_DESCRIPTION_SIZE
+                        titleId = R.string.meetings_scheduled_meeting_info_scheduled_meeting_description_label
                     )
                 }
             }
@@ -345,8 +338,7 @@ private fun ActionButton(
         .fillMaxWidth()
         .clickable {
             if ((action != ScheduleMeetingAction.Recurrence && action != ScheduleMeetingAction.EndRecurrence && action != ScheduleMeetingAction.AddParticipants) ||
-                ((action == ScheduleMeetingAction.Recurrence || action == ScheduleMeetingAction.EndRecurrence) && state.scheduledMeetingEnabled) ||
-                (action == ScheduleMeetingAction.AddParticipants && state.allowAddParticipants)
+                ((action == ScheduleMeetingAction.Recurrence || action == ScheduleMeetingAction.EndRecurrence)) || state.allowAddParticipants
             ) {
                 onButtonClicked(action)
             }
@@ -476,7 +468,7 @@ private fun ScheduleMeetingAppBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
-                            tint = if (state.isValidMeetingTitle()) MaterialTheme.colors.secondary
+                            tint = if (state.isValid()) MaterialTheme.colors.secondary
                             else MaterialTheme.colors.grey_alpha_038_white_alpha_038
                         )
                     }
@@ -709,7 +701,7 @@ fun PreviewDiscardMeetingAlertDialog() {
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
             buttons = ScheduleMeetingAction.values().asList(),
-            snackBar = null,
+            snackbarMessageContent = consumed(),
             discardMeetingDialog = true,
         ),
             onKeepEditing = {},
@@ -730,7 +722,7 @@ fun PreviewRecurringMeetingDialog() {
             rulesSelected = ChatScheduledRules(),
             participantItemList = emptyList(),
             buttons = ScheduleMeetingAction.values().asList(),
-            snackBar = null,
+            snackbarMessageContent = consumed(),
             discardMeetingDialog = true,
         ),
             onOptionSelected = {},
@@ -753,7 +745,7 @@ private fun PreviewCreateScheduledMeetingView() {
                 rulesSelected = ChatScheduledRules(),
                 participantItemList = emptyList(),
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null
+                snackbarMessageContent = consumed()
             ),
             onButtonClicked = {},
             onDiscardClicked = {},
@@ -764,7 +756,7 @@ private fun PreviewCreateScheduledMeetingView() {
             onEndDateClicked = {},
             onScrollChange = {},
             onDismiss = {},
-            onSnackbarShown = {},
+            onResetSnackbarMessage = {},
             onDiscardMeetingDialog = {},
             onDescriptionValueChange = { },
             onTitleValueChange = { },

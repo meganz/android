@@ -65,6 +65,14 @@ interface ChatRepository {
     suspend fun setOpenInvite(chatId: Long): Boolean
 
     /**
+     * Update open invite setting.
+     *
+     * @param chatId   The Chat id.
+     * @param isOpenInvite True if non-hosts are allowed to add participants, false otherwise.
+     */
+    suspend fun setOpenInvite(chatId: Long, isOpenInvite: Boolean): ChatRequest
+
+    /**
      * Leave chat
      *
      * @param chatId    The Chat id.
@@ -73,6 +81,14 @@ interface ChatRepository {
     suspend fun leaveChat(
         chatId: Long,
     ): ChatRequest
+
+    /**
+     * Update chat title.
+     *
+     * @param chatId    The Chat id.
+     * @param title     Title.
+     */
+    suspend fun setChatTitle(chatId: Long, title: String): ChatRequest
 
     /**
      * Get chat files folder id if it exists
@@ -122,6 +138,14 @@ interface ChatRepository {
      * @param contactsData      List of contacts to add
      */
     suspend fun inviteToChat(chatId: Long, contactsData: List<String>)
+
+    /**
+     * Invite participant to chat.
+     *
+     * @param chatId            The Chat id.
+     * @param , handle          User handle.
+     */
+    suspend fun inviteParticipantToChat(chatId: Long, handle: Long): ChatRequest
 
     /**
      * Set public chat to private.

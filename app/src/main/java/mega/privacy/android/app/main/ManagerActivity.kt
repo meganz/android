@@ -5715,8 +5715,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onScheduleMeeting() {
-        val scheduleMeetingIntent = Intent(this, CreateScheduledMeetingActivity::class.java)
-        startActivity(scheduleMeetingIntent)
+        startActivity(Intent(this, CreateScheduledMeetingActivity::class.java))
     }
 
     fun showConfirmationRemoveAllSharingContacts(shares: List<MegaNode?>) {

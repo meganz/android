@@ -53,6 +53,7 @@ internal fun ChatRoomItemBottomSheetView(
     onStartMeetingClick: () -> Unit = {},
     onOccurrencesClick: () -> Unit = {},
     onInfoClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
     onClearChatClick: () -> Unit = {},
     onMuteClick: () -> Unit = {},
     onUnmuteClick: () -> Unit = {},
@@ -199,6 +200,17 @@ internal fun ChatRoomItemBottomSheetView(
                     )
                     ChatDivider()
                 }
+
+                if (item.hasPermissions) {
+                    MenuItem(
+                        modifier = Modifier.testTag("edit"),
+                        res = R.drawable.ic_scheduled_meeting_edit,
+                        text = R.string.title_edit_profile_info,
+                        description = "Edit",
+                        onClick = onEditClick
+                    )
+                    ChatDivider()
+                }
             }
 
             MenuItem(
@@ -251,6 +263,7 @@ internal fun ChatRoomItemBottomSheetView(
 
             when {
                 canCancel(item, isCancelSchedMeetingEnabled) -> {
+
                     ChatDivider()
                     MenuItem(
                         modifier = Modifier.testTag("cancel"),

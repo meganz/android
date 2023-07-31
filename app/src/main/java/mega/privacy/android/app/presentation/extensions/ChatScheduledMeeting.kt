@@ -119,6 +119,13 @@ fun ChatScheduledMeeting.getEndDate(): String {
 fun ChatScheduledMeeting.getZoneStartTime(): ZonedDateTime? = startDateTime?.parseUTCDate()
 
 /**
+ * Get ZoneDateTime of end time
+ *
+ * @return [ZonedDateTime]
+ */
+fun ChatScheduledMeeting.getZoneEndTime(): ZonedDateTime? = endDateTime?.parseUTCDate()
+
+/**
  * Check if the scheduled meeting is past
  *
  * True, the scheduled meeting has passed. False, otherwise.

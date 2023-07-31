@@ -161,6 +161,31 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
         }
 
+    override suspend fun setOpenInvite(
+        chatId: Long,
+        isOpenInvite: Boolean,
+    ): ChatRequest = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
+                    if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_EXIST) {
+                        continuation.resumeWith(Result.success(chatRequestMapper(request)))
+                    } else {
+                        continuation.failWithError(error, "onRequestCompleted")
+                    }
+                }
+            )
+
+            megaChatApiGateway.setOpenInvite(
+                chatId,
+                isOpenInvite,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
+
     private fun onRequestSetOpenInviteCompleted(continuation: Continuation<Boolean>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
@@ -181,6 +206,22 @@ internal class ChatRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun setChatTitle(chatId: Long, title: String) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.setChatTitle(
+                chatId,
+                title,
+                listener
+            )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(listener) }
+        }
+    }
 
     private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
@@ -248,6 +289,27 @@ internal class ChatRepositoryImpl @Inject constructor(
             contactsData.forEach { email ->
                 val userHandle = megaApiGateway.getContact(email)?.handle ?: -1
                 megaChatApiGateway.inviteToChat(chatId, userHandle, null)
+            }
+        }
+
+    override suspend fun inviteParticipantToChat(chatId: Long, handle: Long): ChatRequest =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
+                )
+
+                megaChatApiGateway.inviteToChat(
+                    chatId,
+                    handle,
+                    listener
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        listener
+                    )
+                }
             }
         }
 
@@ -374,13 +436,22 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun removeFromChat(chatId: Long, handle: Long): ChatRequest =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.removeFromChat(
-                    chatId, handle,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = onRequestCompleted(continuation)
                 )
+
+                megaChatApiGateway.removeFromChat(
+                    chatId,
+                    handle,
+                    listener
+                )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        listener
+                    )
+                }
             }
         }
 

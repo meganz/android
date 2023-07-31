@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.meeting
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,15 +28,12 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -46,10 +41,7 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
-import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.QueryChatLink
-import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
@@ -72,9 +64,6 @@ import javax.inject.Inject
  * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
  * @property getChatCall                                    [GetChatCall]
  * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
- * @property queryChatLink                                  [QueryChatLink]
- * @property removeChatLink                                 [RemoveChatLink]
- * @property createChatLink                                 [CreateChatLink]
  * @property inviteToChat                                   [InviteToChat]
  * @property leaveChat                                      [LeaveChat]
  * @property removeFromChat                                 [RemoveFromChat]
@@ -87,7 +76,6 @@ import javax.inject.Inject
  * @property chatManagement                                 [ChatManagement]
  * @property startConversationUseCase                       [StartConversationUseCase]
  * @property openOrStartCall                                [OpenOrStartCall]
- * @property monitorChatListItemUpdates                     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
  * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
@@ -104,9 +92,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val queryChatLink: QueryChatLink,
-    private val removeChatLink: RemoveChatLink,
-    private val createChatLink: CreateChatLink,
     private val inviteToChat: InviteToChat,
     private val leaveChat: LeaveChat,
     private val removeFromChat: RemoveFromChat,
@@ -122,7 +107,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
-    private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val cameraGateway: CameraGateway,
     private val deviceGateway: DeviceGateway,
@@ -202,11 +186,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         updateDndSeconds(chatId)
                         updateRetentionTimeSeconds(retentionTime)
 
-                        queryChatLink()
-
                         getChatRoomUpdates(chatId)
                         getScheduledMeetingUpdates()
-                        getChatListItemUpdates()
                     } else {
                         Timber.d("Chat room is not active, finish")
                         finishActivity()
@@ -452,27 +433,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             }
         }
 
-
-    /**
-     * Get chat list item updates
-     */
-    private fun getChatListItemUpdates() =
-        viewModelScope.launch {
-            monitorChatListItemUpdates().collectLatest { item ->
-                when (item.changes) {
-                    ChatListItemChanges.LastMessage -> {
-                        if (item.lastMessageType == ChatRoomLastMessage.PublicHandleCreate ||
-                            item.lastMessageType == ChatRoomLastMessage.PublicHandleDelete
-                        ) {
-                            queryChatLink()
-                        }
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-
     /**
      * Update seconds of Do not disturb mode
      *
@@ -509,69 +469,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 it.copy(retentionTimeSeconds = retentionTime)
             }
         }
-    }
-
-    /**
-     * Check if there is an existing chat-link for an public chat
-     */
-    private fun queryChatLink() =
-        viewModelScope.launch {
-            runCatching {
-                queryChatLink(state.value.chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { request ->
-                Timber.d("Query chat link successfully")
-                _state.update {
-                    it.copy(
-                        enabledMeetingLinkOption = request.text != null,
-                        meetingLink = request.text
-                    )
-                }
-            }
-        }
-
-    /**
-     * Remove chat link
-     */
-    private fun removeChatLink() =
-        viewModelScope.launch {
-            runCatching {
-                removeChatLink(state.value.chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                showSnackBar(R.string.general_text_error)
-            }.onSuccess { _ ->
-                Timber.d("Remove chat link successfully")
-                _state.update { it.copy(enabledMeetingLinkOption = false, meetingLink = null) }
-            }
-        }
-
-    /**
-     * Create chat link
-     */
-    private fun createChatLink() =
-        viewModelScope.launch {
-            runCatching {
-                createChatLink(state.value.chatId)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                showSnackBar(R.string.general_text_error)
-            }.onSuccess { request ->
-                _state.update {
-                    it.copy(
-                        enabledMeetingLinkOption = true,
-                        meetingLink = request.text
-                    )
-                }
-            }
-        }
-
-    /**
-     * Edit scheduled meeting if there is internet connection, shows an error if not.
-     */
-    fun onEditTap() {
-        Timber.d("Edit scheduled meeting")
     }
 
     /**
@@ -817,22 +714,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         }
 
     /**
-     * Create or removed meeting link if there is internet connection, shows an error if not.
-     */
-    fun onMeetingLinkTap() {
-        if (isConnected) {
-            Timber.d("Meeting link option")
-            if (_state.value.enabledMeetingLinkOption) {
-                removeChatLink()
-            } else {
-                createChatLink()
-            }
-        } else {
-            showSnackBar(R.string.check_internet_connection_error)
-        }
-    }
-
-    /**
      * Enable or disable the option Allow non-host add participants to the chat room if there is internet connection, shows an error if not.
      */
     fun onAllowAddParticipantsTap() {
@@ -905,33 +786,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     /**
-     * Shares the link to chat
-     *
-     * @param data       Intent containing the info to share the content to chats.
-     * @param action     Action to perform.
-     */
-    fun sendToChat(
-        data: Intent?,
-        action: (Intent?) -> Unit,
-    ) {
-        data?.putExtra(Constants.EXTRA_LINK, _state.value.meetingLink)
-        action.invoke(data)
-    }
-
-    /**
-     * Copy meeting link to clipboard
-     *
-     * @param clipboard [ClipboardManager]
-     */
-    fun copyMeetingLink(clipboard: ClipboardManager) {
-        _state.value.meetingLink?.let { meetingLink ->
-            val clip = ClipData.newPlainText(Constants.COPIED_TEXT_LABEL, meetingLink)
-            clipboard.setPrimaryClip(clip)
-            showSnackBar(R.string.scheduled_meetings_meeting_link_copied)
-        }
-    }
-
-    /**
      * Update participant permissions
      *
      * @param permission [ChatRoomPermission]
@@ -964,6 +818,12 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
+
+    /**
+     * Scheduled meeting updated
+     */
+    fun scheduledMeetingUpdated() =
+        showSnackBar(R.string.meetings_edit_scheduled_meeting_success_snackbar)
 
     /**
      * Show snackBar with a text

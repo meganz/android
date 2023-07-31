@@ -14,9 +14,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -73,6 +73,7 @@ import javax.inject.Inject
  * @property getThemeMode   [GetThemeMode]
  * @property addContactLauncher
  * @property sendToChatLauncher
+ * @property editSchedMeetLauncher
  */
 @AndroidEntryPoint
 class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
@@ -84,9 +85,11 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<ScheduledMeetingInfoViewModel>()
+    private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
     private lateinit var sendToChatLauncher: ActivityResultLauncher<Unit?>
+    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent?>
 
     private var bottomSheetDialogFragment: BaseBottomSheetDialogFragment? = null
 
@@ -100,7 +103,7 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, meetingLink, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
+                viewModel.state.collect { (chatId, _, finish, openAddContact, dndSecond, _, _, openSendToChat, openRemoveParticipantDialog, selected, openChatRoom, showChangePermissionsDialog, openChatCall) ->
                     if (finish) {
                         Timber.d("Finish activity")
                         finish()
@@ -111,10 +114,6 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
                     }
 
                     enabledChatNotification = dndSecond == null
-
-                    if (link != meetingLink) {
-                        link = meetingLink
-                    }
 
                     if (openSendToChat) {
                         viewModel.openSendToChat(false)
@@ -169,13 +168,29 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        viewModel.setChatId(
-            newChatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE),
-            newScheduledMeetingId = intent.getLongExtra(
-                SCHEDULED_MEETING_ID,
-                MEGACHAT_INVALID_HANDLE
-            )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                scheduledMeetingManagementViewModel.state.collect { (finish, _, _, _, _, _, _, _, _, meetingLink) ->
+                    if (finish) {
+                        Timber.d("Finish activity")
+                        finish()
+                    }
+
+                    if (link != meetingLink) {
+                        link = meetingLink
+                    }
+                }
+            }
+        }
+
+        val chatId = intent.getLongExtra(CHAT_ID, -1)
+        val schedId = intent.getLongExtra(
+            SCHEDULED_MEETING_ID,
+            -1
         )
+
+        viewModel.setChatId(newChatId = chatId, newScheduledMeetingId = schedId)
+        scheduledMeetingManagementViewModel.setChatId(newChatId = chatId)
 
         setContent { ScheduledMeetingInfoView() }
 
@@ -195,11 +210,18 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
         sendToChatLauncher = registerForActivityResult(ChatExplorerActivityContract()) { data ->
             if (data != null) {
-                viewModel.sendToChat(data) { intent ->
+                scheduledMeetingManagementViewModel.sendToChat(data) { intent ->
                     handleActivityResult(intent)
                 }
             }
         }
+
+        editSchedMeetLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    viewModel.scheduledMeetingUpdated()
+                }
+            }
     }
 
     /**
@@ -415,14 +437,17 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
 
     @Composable
     private fun ScheduledMeetingInfoView() {
-        val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
-        val uiState by viewModel.state.collectAsState()
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
+        val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
+
         AndroidTheme(isDark = isDark) {
             ScheduledMeetingInfoView(
                 state = uiState,
+                managementState = managementState,
                 onButtonClicked = ::onActionTap,
-                onEditClicked = { viewModel::onEditTap },
+                onEditClicked = { onEditTap() },
                 onAddParticipantsClicked = { viewModel.onInviteParticipantsTap() },
                 onSeeMoreOrLessClicked = { viewModel.onSeeMoreOrLessTap() },
                 onLeaveGroupClicked = { viewModel.onLeaveGroupTap() },
@@ -441,14 +466,27 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
     }
 
     /**
+     * Edit scheduled meeting if there is internet connection, shows an error if not.
+     */
+    private fun onEditTap() {
+        editSchedMeetLauncher.launch(
+            Intent(
+                this@ScheduledMeetingInfoActivity,
+                CreateScheduledMeetingActivity::class.java
+            ).putExtra(CHAT_ID, chatRoomId)
+        )
+    }
+
+    /**
      * Tap in a button action
      */
     private fun onActionTap(action: ScheduledMeetingInfoAction) {
         when (action) {
-            ScheduledMeetingInfoAction.MeetingLink -> viewModel.onMeetingLinkTap()
+            ScheduledMeetingInfoAction.MeetingLink -> scheduledMeetingManagementViewModel.onMeetingLinkTap()
             ScheduledMeetingInfoAction.ShareMeetingLink,
             ScheduledMeetingInfoAction.ShareMeetingLinkNonHosts,
             -> showGetChatLinkPanel()
+
             ScheduledMeetingInfoAction.ChatNotifications -> onChatNotificationsTap()
             ScheduledMeetingInfoAction.AllowNonHostAddParticipants -> viewModel.onAllowAddParticipantsTap()
             ScheduledMeetingInfoAction.ShareFiles -> openSharedFiles()

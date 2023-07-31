@@ -7,8 +7,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
+import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -58,13 +59,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     lateinit var getThemeMode: GetThemeMode
 
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
+    private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
 
     private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
 
     private var materialTimePicker: MaterialTimePicker? = null
     private var materialDatePicker: MaterialDatePicker<Long>? = null
 
-    private companion object {
+    internal companion object {
         const val CREATE_SCHEDULED_MEETING_TAG = "createScheduledMeetingTag"
         const val CUSTOM_RECURRENCE_TAG = "customRecurrenceTag"
     }
@@ -78,6 +80,14 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         super.onCreate(savedInstanceState)
 
         collectFlows()
+
+        val chatId = intent.getLongExtra(
+            Constants.CHAT_ID,
+            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+        )
+
+        viewModel.getChatRoom(chatId = chatId)
+        scheduledMeetingManagementViewModel.setChatId(newChatId = chatId)
 
         setContent { MainComposeView() }
 
@@ -97,16 +107,20 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
     }
 
     private fun collectFlows() {
-        collectFlow(viewModel.state) { (openAddContact, chatIdToOpenInfoScreen) ->
+        collectFlow(viewModel.state) { (_, openAddContact, chatIdToOpenInfoScreen, finish) ->
+            if (finish) {
+                finishCreateScheduledMeeting(RESULT_OK)
+            }
+
             chatIdToOpenInfoScreen?.let {
-                viewModel.openInfo(null)
+                viewModel.setOnOpenInfoConsumed()
                 Timber.d("Open Scheduled meeting info screen")
                 openScheduledMeetingInfo(it)
             }
 
             openAddContact?.let { shouldOpen ->
                 if (shouldOpen) {
-                    viewModel.removeAddContact()
+                    viewModel.setOnOpenAddContactConsumed()
                     Timber.d("Open Invite participants screen")
                     addContactLauncher.launch(
                         Intent(
@@ -130,6 +144,17 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 }
             }
         }
+
+        collectFlow(scheduledMeetingManagementViewModel.state) { (_, _, _, _, _, _, _, _, _, meetingLink) ->
+            viewModel.updateInitialChatValues(
+                !meetingLink.isNullOrEmpty()
+            )
+        }
+    }
+
+    private fun finishCreateScheduledMeeting(result: Int) {
+        setResult(result)
+        finish()
     }
 
     /**
@@ -137,9 +162,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
      */
     @Composable
     fun MainComposeView() {
-        val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
+        val themeMode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
         val isDark = themeMode.isDarkMode()
-        val uiState by viewModel.state.collectAsState()
+        val uiState by viewModel.state.collectAsStateWithLifecycle()
         navController = rememberNavController()
 
         AndroidTheme(isDark = isDark) {
@@ -164,8 +189,8 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                             )
                         },
                         onDismiss = viewModel::dismissDialog,
-                        onSnackbarShown = viewModel::snackbarShown,
-                        onDiscardMeetingDialog = ::finish,
+                        onResetSnackbarMessage = viewModel::onSnackbarMessageConsumed,
+                        onDiscardMeetingDialog = { finishCreateScheduledMeeting(RESULT_CANCELED) },
                         onDescriptionValueChange = viewModel::onDescriptionChange,
                         onTitleValueChange = viewModel::onTitleChange,
                         onRecurrenceDialogOptionClicked = { optionSelected ->

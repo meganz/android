@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.meeting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -10,12 +12,15 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.extensions.getZoneEndTime
+import mega.privacy.android.app.presentation.extensions.getZoneStartTime
 import mega.privacy.android.app.presentation.extensions.meeting.DropdownType
 import mega.privacy.android.app.presentation.extensions.meeting.MaximumValue
 import mega.privacy.android.app.presentation.extensions.meeting.OccurrenceType
 import mega.privacy.android.app.presentation.extensions.meeting.getUntilZonedDateTime
 import mega.privacy.android.app.presentation.extensions.meeting.isForever
+import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.meeting.mapper.RecurrenceDialogOptionMapper
 import mega.privacy.android.app.presentation.meeting.mapper.WeekDayMapper
 import mega.privacy.android.app.presentation.meeting.model.CreateScheduledMeetingState
@@ -30,13 +35,24 @@ import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.MonthlyRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.CreateChatLink
+import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
+import mega.privacy.android.domain.usecase.RemoveChatLink
+import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.chat.InviteParticipantToChatUseCase
+import mega.privacy.android.domain.usecase.chat.RemoveParticipantFromChatUseCase
+import mega.privacy.android.domain.usecase.chat.SetChatTitleUseCase
+import mega.privacy.android.domain.usecase.chat.SetOpenInviteUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
+import mega.privacy.android.domain.usecase.meeting.UpdateScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
@@ -50,26 +66,46 @@ import javax.inject.Inject
  * CreateScheduledMeetingActivity view model.
  * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
  * @property getVisibleContactsUseCase                  [GetVisibleContactsUseCase]
+ * @property getScheduledMeetingByChat                  [GetScheduledMeetingByChat]
  * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
+ * @property getContactItem                             [GetContactItem]
+ * @property getChatRoomUseCase                         [GetChatRoom]
  * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
+ * @property updateScheduledMeetingUseCase              [UpdateScheduledMeetingUseCase]
  * @property createChatLink                             [CreateChatLink]
+ * @property removeChatLink                             [RemoveChatLink]
  * @property recurrenceDialogOptionMapper               [RecurrenceDialogOptionMapper]
  * @property weekDayMapper                              [WeekDayMapper]
- * @property getFeatureFlagValue                        [GetFeatureFlagValueUseCase]
  * @property deviceGateway                              [DeviceGateway]
+ * @property getStringFromStringResMapper               [GetStringFromStringResMapper]
+ * @property getPluralStringFromStringResMapper         [GetPluralStringFromStringResMapper]
+ * @property setOpenInvite                              [SetOpenInvite]
+ * @property setChatTitle                               [SetChatTitleUseCase]
+ * @property removeParticipantFromChat                  [RemoveParticipantFromChatUseCase]
+ * @property inviteParticipantToChat                    [InviteParticipantToChatUseCase]
  * @property state                                      Current view state as [CreateScheduledMeetingState]
  */
 @HiltViewModel
 class CreateScheduledMeetingViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
+    private val getContactItem: GetContactItem,
+    private val getChatRoomUseCase: GetChatRoom,
     private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
+    private val updateScheduledMeetingUseCase: UpdateScheduledMeetingUseCase,
     private val createChatLink: CreateChatLink,
+    private val removeChatLink: RemoveChatLink,
     private val recurrenceDialogOptionMapper: RecurrenceDialogOptionMapper,
     private val weekDayMapper: WeekDayMapper,
-    private val getFeatureFlagValue: GetFeatureFlagValueUseCase,
     private val deviceGateway: DeviceGateway,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val getPluralStringFromStringResMapper: GetPluralStringFromStringResMapper,
+    private val setOpenInviteUseCase: SetOpenInviteUseCase,
+    private val setChatTitleUseCase: SetChatTitleUseCase,
+    private val removeParticipantFromChat: RemoveParticipantFromChatUseCase,
+    private val inviteParticipantToChat: InviteParticipantToChatUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateScheduledMeetingState())
@@ -95,17 +131,137 @@ class CreateScheduledMeetingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            getFeatureFlagValue(AppFeatures.ScheduleMeeting).let { flag ->
-                _state.update { state ->
-                    state.copy(
-                        scheduledMeetingEnabled = flag,
-                        startDate = state.getInitialStartDate(),
-                        endDate = state.getInitialEndDate()
-                    )
+            _state.update { state ->
+                val initialStartDate = state.getInitialStartDate()
+                val initialEndDate = state.getInitialEndDate()
+                state.copy(
+                    startDate = initialStartDate,
+                    endDate = initialEndDate
+                )
+            }
+        }
+    }
+
+    /**
+     * Get chat room of the scheduled meeting
+     */
+    fun getChatRoom(chatId: Long) {
+        val isEdition = chatId != -1L
+        _state.update { state ->
+            state.copy(
+                type = if (isEdition) ScheduledMeetingType.Edition else ScheduledMeetingType.Creation,
+            )
+        }
+        if (isEdition) {
+            viewModelScope.launch {
+                runCatching {
+                    getChatRoomUseCase(chatId)
+                }.onSuccess { chatRoom ->
+                    chatRoom?.let { chat ->
+                        _state.update {
+                            it.copy(
+                                enabledAllowAddParticipantsOption = chat.isOpenInvite,
+                                initialAllowAddParticipantsOption = chat.isOpenInvite,
+                                numOfParticipants = chat.peerHandlesList.size + 1,
+                            )
+                        }
+                        val list = mutableListOf<ContactItem>()
+                        chat.peerHandlesList.forEach { id ->
+                            runCatching {
+                                getContactItem(UserId(id), isOnline())
+                            }.onSuccess { contactItem ->
+                                contactItem?.let {
+                                    list.add(it)
+                                }
+                            }.onFailure { exception ->
+                                Timber.e(exception)
+                            }
+                        }
+
+                        _state.update {
+                            it.copy(
+                                initialParticipantsList = list,
+                                participantItemList = list
+                            )
+                        }
+
+                        getScheduledMeeting(chat.chatId)
+                    }
+
+                }.onFailure { exception ->
+                    Timber.e(exception)
                 }
             }
         }
     }
+
+    /**
+     * Get scheduled meeting
+     *
+     * @param chatId Chat id.
+     */
+    private fun getScheduledMeeting(chatId: Long) =
+        viewModelScope.launch {
+            runCatching {
+                getScheduledMeetingByChat(chatId)
+            }.onFailure { exception ->
+                Timber.e("Scheduled meeting does not exist $exception")
+            }.onSuccess { scheduledMeetingList ->
+                scheduledMeetingList
+                    ?.firstOrNull { !it.isCanceled && it.parentSchedId == -1L }
+                    ?.let { schedMeet ->
+                        Timber.d("Scheduled meeting recovered")
+                        _state.update { state ->
+                            state.copy(
+                                scheduledMeeting = schedMeet,
+                            )
+                        }
+                        updateInitialScheduledMeetingValues()
+                    }
+            }
+        }
+
+    /**
+     * Setting the initial relays when editing a scheduled meeting
+     */
+    private fun updateInitialScheduledMeetingValues() {
+        state.value.scheduledMeeting?.let {
+            onTitleChange(it.title ?: "")
+            onDescriptionChange(it.description ?: "")
+            val initialStartDate = it.getZoneStartTime()
+            val initialEndDate = it.getZoneEndTime()
+            val sendCalendarInvite = it.flags?.sendEmails
+            _state.update { state ->
+                state.copy(
+                    enabledSendCalendarInviteOption = sendCalendarInvite ?: false,
+                    rulesSelected = it.rules ?: ChatScheduledRules(),
+                    startDate = initialStartDate ?: state.getInitialStartDate(),
+                    endDate = initialEndDate ?: state.getInitialEndDate(),
+                )
+            }
+        }
+    }
+
+    /**
+     * Update initial value of meeting link
+     *
+     * @param hasMeetingLink    True, it it has meeting link. False, if not.
+     */
+    fun updateInitialChatValues(
+        hasMeetingLink: Boolean,
+    ) =
+        when (state.value.type) {
+            ScheduledMeetingType.Edition -> {
+                _state.update { state ->
+                    state.copy(
+                        enabledMeetingLinkOption = hasMeetingLink,
+                        initialMeetingLinkOption = hasMeetingLink,
+                    )
+                }
+            }
+
+            else -> {}
+        }
 
     /**
      * Recurring meeting button clicked
@@ -142,18 +298,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         Timber.d("Add participants to the schedule meeting")
         viewModelScope.launch {
             val contactList = getVisibleContactsUseCase()
-            when {
-                contactList.isEmpty() -> {
-                    _state.update {
-                        it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
-                    }
-                }
-
-                else -> {
-                    _state.update {
-                        it.copy(openAddContact = true)
-                    }
-                }
+            _state.update {
+                it.copy(
+                    addParticipantsNoContactsDialog = contactList.isEmpty(),
+                    openAddContact = contactList.isNotEmpty()
+                )
             }
         }
     }
@@ -185,7 +334,16 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     participantItemList = list,
-                    snackBar = if (list.isEmpty()) null else R.string.number_of_participants
+                )
+            }
+
+            if (state.value.participantItemList.isNotEmpty()) {
+                triggerSnackbarMessage(
+                    getPluralStringFromStringResMapper(
+                        R.plurals.meetings_schedule_meeting_snackbar_adding_participants_success,
+                        state.value.participantItemList.size,
+                        state.value.participantItemList.size,
+                    )
                 )
             }
         }
@@ -302,7 +460,10 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     /**
      * Check if month warning should be shown
      */
-    private fun shouldShownMonthWarning(freq: OccurrenceFrequencyType, dayOfMonth: Int?): Boolean =
+    private fun shouldShownMonthWarning(
+        freq: OccurrenceFrequencyType,
+        dayOfMonth: Int?,
+    ): Boolean =
         dayOfMonth != null && freq == OccurrenceFrequencyType.Monthly && (dayOfMonth == MONTH_WITH_29_DAYS || dayOfMonth == MONTH_WITH_30_DAYS || dayOfMonth == MONTH_WITH_31_DAYS)
 
     /**
@@ -319,12 +480,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         }
 
     /**
-     * Remove open add contact screen
+     * Sets openAddContact as consumed.
      */
-    fun removeAddContact() =
-        _state.update {
-            it.copy(openAddContact = null)
-        }
+    fun setOnOpenAddContactConsumed() = _state.update { state ->
+        state.copy(openAddContact = null)
+    }
 
     /**
      * Allow add participant option
@@ -355,10 +515,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
      *
      * @param text Meeting description
      */
-    fun onDescriptionChange(text: String) =
+    fun onDescriptionChange(text: String) {
         _state.update { state ->
             state.copy(descriptionText = text.ifEmpty { "" })
         }
+    }
 
     /**
      * Title meeting text
@@ -412,50 +573,89 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                     )
                 )
             }
+            val flags = ChatScheduledFlags(
+                sendEmails = state.value.enabledSendCalendarInviteOption,
+                isEmpty = false
+            )
+            val peerList = state.value.getParticipantsIds()
+            val chatId = state.value.scheduledMeeting?.chatId ?: -1L
             viewModelScope.launch {
                 runCatching {
                     _state.value.let { state ->
-                        val flags = ChatScheduledFlags(
-                            sendEmails = state.enabledSendCalendarInviteOption,
-                            isEmpty = false
-                        )
+                        Timber.d("Create or edit scheduled meeting")
+                        when (state.type) {
+                            ScheduledMeetingType.Creation ->
+                                createChatroomAndSchedMeetingUseCase(
+                                    peerList = peerList,
+                                    isMeeting = true,
+                                    publicChat = true,
+                                    title = state.meetingTitle,
+                                    speakRequest = false,
+                                    waitingRoom = false,
+                                    openInvite = state.enabledAllowAddParticipantsOption,
+                                    timezone = ZoneId.systemDefault().id,
+                                    startDate = state.startDate.toEpochSecond(),
+                                    endDate = state.endDate.toEpochSecond(),
+                                    description = state.descriptionText,
+                                    flags = flags,
+                                    rules = state.rulesSelected,
+                                    attributes = null
+                                )
 
-                        Timber.d("Rules selected: ${state.rulesSelected}")
-
-                        createChatroomAndSchedMeetingUseCase(
-                            peerList = state.getParticipantsIds(),
-                            isMeeting = true,
-                            publicChat = true,
-                            title = state.meetingTitle,
-                            speakRequest = false,
-                            waitingRoom = false,
-                            openInvite = state.enabledAllowAddParticipantsOption,
-                            timezone = ZoneId.systemDefault().id,
-                            startDate = state.startDate.toEpochSecond(),
-                            endDate = state.endDate.toEpochSecond(),
-                            description = state.descriptionText,
-                            flags = flags,
-                            rules = state.rulesSelected,
-                            attributes = null
-                        )
+                            ScheduledMeetingType.Edition ->
+                                updateScheduledMeetingUseCase(
+                                    chatId = state.scheduledMeeting?.chatId ?: -1L,
+                                    schedId = state.scheduledMeeting?.schedId ?: -1L,
+                                    timezone = state.scheduledMeeting?.timezone
+                                        ?: ZoneId.systemDefault().id,
+                                    startDate = state.startDate.toEpochSecond(),
+                                    endDate = state.endDate.toEpochSecond(),
+                                    title = state.meetingTitle,
+                                    description = state.descriptionText,
+                                    cancelled = false,
+                                    flags = flags,
+                                    rules = state.rulesSelected
+                                )
+                        }
                     }
                 }.onFailure { exception ->
                     Timber.e(exception)
                     _state.update { state ->
                         state.copy(isCreatingMeeting = false)
                     }
-                }.onSuccess {
-                    Timber.d("Scheduled meeting created")
+                }.onSuccess { request ->
                     _state.update { state ->
                         state.copy(isCreatingMeeting = false)
                     }
 
-                    it.chatHandle?.let { id ->
-                        if (state.value.enabledMeetingLinkOption) {
-                            createMeetingLink(id)
-                        } else {
-                            Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $id")
-                            openInfo(id)
+                    (when (state.value.type) {
+                        ScheduledMeetingType.Creation -> request.chatHandle
+                        ScheduledMeetingType.Edition -> chatId
+                    }).takeIf { it != -1L }?.let { id ->
+                        when (state.value.type) {
+                            ScheduledMeetingType.Creation -> {
+                                if (state.value.enabledMeetingLinkOption) {
+                                    createMeetingLink(id)
+                                }
+
+                                Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $id")
+                                _state.update { state ->
+                                    state.copy(chatIdToOpenInfoScreen = id)
+                                }
+                            }
+
+                            ScheduledMeetingType.Edition -> {
+                                setChatTitle(id, state.value.meetingTitle)
+                                setOpenInvite(id, state.value.enabledAllowAddParticipantsOption)
+                                setParticipants(id)
+                                if (state.value.enabledMeetingLinkOption) {
+                                    createMeetingLink(id)
+                                } else {
+                                    removeMeetingLink(id)
+                                }
+
+                                _state.update { it.copy(finish = true) }
+                            }
                         }
                     }
                 }
@@ -464,14 +664,11 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Open chat room with specific id
-     *
-     * @param chatId Chat Id.
+     * Sets chatIdToOpenInfoScreen as consumed.
      */
-    fun openInfo(chatId: Long?) =
-        _state.update { state ->
-            state.copy(chatIdToOpenInfoScreen = chatId)
-        }
+    fun setOnOpenInfoConsumed() = _state.update { state ->
+        state.copy(chatIdToOpenInfoScreen = null)
+    }
 
     /**
      * Get participants emails
@@ -479,9 +676,91 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     fun getEmails(): ArrayList<String> = ArrayList(_state.value.getParticipantsEmails())
 
     /**
+     * Set open invite
+     *
+     * @param chatId        Chat Id.
+     * @param isEnabled     True, enabled allow non-host add participants. False, otherwise.
+     */
+    private fun setOpenInvite(chatId: Long, isEnabled: Boolean) =
+        viewModelScope.launch {
+            runCatching {
+                setOpenInviteUseCase(chatId, isEnabled)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Set participants
+     *
+     * @param chatId    Chat id
+     */
+    private fun setParticipants(chatId: Long) {
+        val participantsToAdd = state.value.participantItemList.filterNot {
+            state.value.initialParticipantsList.contains(it)
+        }
+        val participantsToRemove = state.value.initialParticipantsList.filterNot {
+            state.value.participantItemList.contains(it)
+        }
+
+        participantsToAdd.takeIf { it.isNotEmpty() }?.forEach {
+            inviteParticipant(chatId, it.handle)
+        }
+
+        participantsToRemove.takeIf { it.isNotEmpty() }?.forEach {
+            removeParticipant(chatId, it.handle)
+        }
+    }
+
+    /**
+     * Invite participant to chat
+     *
+     * @param chatId    Chat id
+     * @param handle    User handle
+     */
+    private fun inviteParticipant(chatId: Long, handle: Long) =
+        viewModelScope.launch {
+            runCatching {
+                inviteParticipantToChat(chatId, handle)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Remove participant from chat
+     *
+     * @param chatId    Chat id
+     * @param handle    User handle
+     */
+    private fun removeParticipant(chatId: Long, handle: Long) =
+        viewModelScope.launch {
+            runCatching {
+                removeParticipantFromChat(chatId, handle)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
+     * Set chat title
+     *
+     * @param chatId    Chat Id.
+     * @param title     Chat title.
+     */
+    private fun setChatTitle(chatId: Long, title: String) =
+        viewModelScope.launch {
+            runCatching {
+                setChatTitleUseCase(chatId, title)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    /**
      * Create meeting link
      *
-     * @param chatId Chat Id.
+     * @param chatId    Chat Id.
      */
     private fun createMeetingLink(chatId: Long) =
         viewModelScope.launch {
@@ -489,10 +768,20 @@ class CreateScheduledMeetingViewModel @Inject constructor(
                 createChatLink(chatId)
             }.onFailure { exception ->
                 Timber.e(exception)
-            }.onSuccess { request ->
-                request.chatHandle?.let { id ->
-                    openInfo(id)
-                }
+            }
+        }
+
+    /**
+     * Remove chat link
+     *
+     * @param chatId    Chat Id.
+     */
+    private fun removeMeetingLink(chatId: Long) =
+        viewModelScope.launch {
+            runCatching {
+                removeChatLink(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
         }
 
@@ -637,7 +926,8 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         val newFreq =
             if (enabled) OccurrenceFrequencyType.Daily else state.value.customRecurrenceState.newRules.freq
         val newWeekdayList = if (enabled) state.value.getWeekdaysList() else null
-        val newInterval = if (enabled) 1 else state.value.customRecurrenceState.newRules.interval
+        val newInterval =
+            if (enabled) 1 else state.value.customRecurrenceState.newRules.interval
         updateCustomRules(
             newFreq = newFreq,
             newInterval = newInterval,
@@ -743,11 +1033,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
             val isWeekdaysSelected =
                 newRules.freq == OccurrenceFrequencyType.Daily && newRules.weekDayList == state.getWeekdaysList()
 
-            val isValidRecurrence = newRules != state.rulesSelected && newRules.interval != -1 && (
-                    (newRules.freq == OccurrenceFrequencyType.Daily) ||
-                            (newRules.freq == OccurrenceFrequencyType.Weekly && !newRules.weekDayList.isNullOrEmpty()) ||
-                            (newRules.freq == OccurrenceFrequencyType.Monthly && newMonthDayOption != -1)
-                    )
+            val isValidRecurrence =
+                newRules != state.rulesSelected && newRules.interval != -1 && (
+                        (newRules.freq == OccurrenceFrequencyType.Daily) ||
+                                (newRules.freq == OccurrenceFrequencyType.Weekly && !newRules.weekDayList.isNullOrEmpty()) ||
+                                (newRules.freq == OccurrenceFrequencyType.Monthly && newMonthDayOption != -1)
+                        )
 
             Timber.d("Check valid recurrence: $isValidRecurrence. Current rules ${state.rulesSelected}, new rules $newRules")
 
@@ -802,9 +1093,20 @@ class CreateScheduledMeetingViewModel @Inject constructor(
         }
 
     /**
-     * Updates state after shown snackBar.
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
      */
-    fun snackbarShown() = _state.update { it.copy(snackBar = null) }
+    private fun triggerSnackbarMessage(message: String) =
+        _state.update { it.copy(snackbarMessageContent = triggered(message)) }
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update {
+            it.copy(snackbarMessageContent = consumed())
+        }
 
     /**
      * Dismiss alert dialogs

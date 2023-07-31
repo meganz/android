@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentManager
@@ -24,6 +25,7 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.data.SnackBarItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingManagementViewModel
@@ -71,6 +73,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     }
 
     private lateinit var permissionsRequest: ActivityResultLauncher<Array<String>>
+    private lateinit var editSchedMeetLauncher: ActivityResultLauncher<Intent?>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -90,6 +93,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                     onStartMeetingClick = ::onStartMeetingClick,
                     onOccurrencesClick = ::onOccurrencesClick,
                     onInfoClick = ::onInfoClick,
+                    onEditClick = ::onEditClick,
                     onClearChatClick = ::onClearChatClick,
                     onMuteClick = { onMuteClick(true) },
                     onUnmuteClick = { onMuteClick(false) },
@@ -105,6 +109,13 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         permissionsRequest = getCallPermissionsRequest()
+        editSchedMeetLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == AppCompatActivity.RESULT_OK) {
+                    scheduledMeetingManagementViewModel.scheduledMeetingUpdated()
+                }
+                dismissAllowingStateLoss()
+            }
 
         scheduledMeetingManagementViewModel.monitorLoadedMessages(chatId)
     }
@@ -120,6 +131,18 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
         startActivity(intent)
         dismissAllowingStateLoss()
+    }
+
+    /**
+     * Edit Scheduled meeting
+     */
+    private fun onEditClick() {
+        editSchedMeetLauncher.launch(
+            Intent(
+                requireContext(),
+                CreateScheduledMeetingActivity::class.java
+            ).putExtra(Constants.CHAT_ID, chatId)
+        )
     }
 
     private fun onInfoClick() {

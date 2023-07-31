@@ -7,6 +7,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementState
 import mega.privacy.android.app.presentation.meeting.view.ScheduledMeetingInfoView
 import mega.privacy.android.app.presentation.meeting.view.formatRetentionTimeInSecondsToString
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -29,7 +30,8 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.meeting_link).assertExists()
     }
@@ -43,6 +45,7 @@ class ScheduledMeetingInfoViewTest {
                 isPublic = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -57,9 +60,9 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 isPublic = true,
-                enabledMeetingLinkOption = true,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState(enabledMeetingLinkOption = true),
         )
         composeRule.onNodeWithText(R.string.meetings_scheduled_meeting_info_share_meeting_link_label)
             .assertExists()
@@ -72,9 +75,9 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 isPublic = true,
-                enabledMeetingLinkOption = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(enabledMeetingLinkOption = true),
             onButtonClicked = onButtonClicked
         )
 
@@ -89,7 +92,8 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -104,6 +108,7 @@ class ScheduledMeetingInfoViewTest {
                 isOpenInvite = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -119,7 +124,8 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.chat_group_chat_info_allow_non_host_participants_option)
             .assertExists()
@@ -133,6 +139,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -147,7 +154,8 @@ class ScheduledMeetingInfoViewTest {
         initComposeRuleContent(
             ScheduledMeetingInfoState(
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.title_chat_shared_files_info)
             .assertExists()
@@ -160,6 +168,7 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -175,8 +184,10 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = false,
                 isPublic = true,
-                enabledMeetingLinkOption = true,
                 scheduledMeeting = getChatScheduledMeeting()
+            ),
+            ScheduledMeetingManagementState(
+                enabledMeetingLinkOption = true,
             )
         )
         composeRule.onNodeWithText(R.string.meetings_scheduled_meeting_info_share_meeting_link_label)
@@ -190,8 +201,10 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = false,
                 isPublic = true,
-                enabledMeetingLinkOption = true,
                 scheduledMeeting = getChatScheduledMeeting()
+            ),
+            ScheduledMeetingManagementState(
+                enabledMeetingLinkOption = true,
             ),
             onButtonClicked = onButtonClicked
         )
@@ -208,7 +221,8 @@ class ScheduledMeetingInfoViewTest {
             ScheduledMeetingInfoState(
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.meetings_info_manage_history_option)
             .assertExists()
@@ -222,6 +236,7 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 scheduledMeeting = getChatScheduledMeeting()
             ),
+            ScheduledMeetingManagementState(),
             onButtonClicked = onButtonClicked
         )
 
@@ -238,7 +253,8 @@ class ScheduledMeetingInfoViewTest {
                 isHost = true,
                 isPublic = false,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.meetings_info_notifications_option)
             .assertExists()
@@ -251,7 +267,8 @@ class ScheduledMeetingInfoViewTest {
                 isHost = false,
                 isOpenInvite = true,
                 scheduledMeeting = getChatScheduledMeeting()
-            )
+            ),
+            ScheduledMeetingManagementState()
         )
         composeRule.onNodeWithText(R.string.add_participants_menu_item)
             .assertExists()
@@ -366,10 +383,12 @@ class ScheduledMeetingInfoViewTest {
 
     private fun initComposeRuleContent(
         state: ScheduledMeetingInfoState,
+        managementState: ScheduledMeetingManagementState,
     ) {
         composeRule.setContent {
             ScheduledMeetingInfoView(
                 state = state,
+                managementState = managementState,
                 onButtonClicked = {},
                 onEditClicked = {},
                 onAddParticipantsClicked = {},
@@ -388,11 +407,13 @@ class ScheduledMeetingInfoViewTest {
 
     private fun initComposeRuleContent(
         state: ScheduledMeetingInfoState,
+        managementState: ScheduledMeetingManagementState,
         onButtonClicked: (ScheduledMeetingInfoAction) -> Unit = {},
     ) {
         composeRule.setContent {
             ScheduledMeetingInfoView(
                 state = state,
+                managementState = managementState,
                 onButtonClicked = onButtonClicked,
                 onEditClicked = {},
                 onAddParticipantsClicked = {},

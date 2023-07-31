@@ -55,13 +55,15 @@ import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
  */
 @Composable
 fun GenericDescriptionTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    value: String,
+    charLimit: Int,
+    onValueChange: (String) -> Unit,
+    initiallyFocused: Boolean = true,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     @StringRes titleId: Int? = null,
-    charLimit: Int,
+
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     visualTransformation: VisualTransformation = VisualTransformation.None,
 ) {
@@ -183,8 +185,10 @@ fun GenericDescriptionTextField(
             }
         }
 
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
+        if (initiallyFocused) {
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
         }
     }
 }
@@ -195,8 +199,8 @@ private fun PreviewGenericDescriptionTextField() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionTextField(
             value = "Description text",
-            onValueChange = { },
-            charLimit = 4000
+            charLimit = 4000,
+            onValueChange = { }
         )
     }
 }

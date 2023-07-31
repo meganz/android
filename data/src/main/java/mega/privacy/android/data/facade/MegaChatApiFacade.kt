@@ -209,6 +209,12 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.leaveChat(chatId, listener)
 
+    override fun setChatTitle(
+        chatId: Long,
+        title: String,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.setChatTitle(chatId, title, listener)
+
     override fun setOpenInvite(
         chatId: Long,
         enabled: Boolean,

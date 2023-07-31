@@ -1,13 +1,19 @@
 package mega.privacy.android.app.presentation.meeting.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import mega.privacy.android.app.presentation.extensions.getZoneEndTime
+import mega.privacy.android.app.presentation.extensions.getZoneStartTime
 import mega.privacy.android.app.presentation.extensions.meeting.DialogOption
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 import java.time.DayOfWeek
@@ -21,8 +27,10 @@ import java.time.temporal.WeekFields
 /**
  * Data class defining the state of [CreateScheduledMeetingViewModel]
  *
+ * @property scheduledMeeting                           [ChatScheduledMeeting].
  * @property openAddContact                             True, if should open Add contact screen. False, if not.
  * @property chatIdToOpenInfoScreen                     Chat id to open the scheduled meeting info screen.
+ * @property finish                         True, if the activity is to be terminated.
  * @property meetingTitle                               Meeting title.
  * @property startDate                                  Start Date.
  * @property endDate                                    End Date.
@@ -32,7 +40,7 @@ import java.time.temporal.WeekFields
  * @property enabledSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
  * @property descriptionText                            Description text
  * @property buttons                                    List of available action buttons.
- * @property snackBar                                   String resource id for showing an snackBar.
+ * @property snackbarMessageContent                     State to show snackbar message.
  * @property discardMeetingDialog                       True if show discard meeting alert dialog, false if not.
  * @property addParticipantsNoContactsDialog            True if show add participants no contacts dialog, false if not.
  * @property numOfParticipants                          Number of participants.
@@ -41,16 +49,22 @@ import java.time.temporal.WeekFields
  * @property isEmptyTitleError                          True, if an attempt has been made to create a meeting without a title. False, if not.
  * @property allowAddParticipants                       True, if can add participants. False, if not.
  * @property recurringMeetingDialog                     True if show recurring meeting dialog, false if not.
- * @property scheduledMeetingEnabled                    True if the flag feature schedule meeting is enabled. False, if not.
  * @property rulesSelected                              [ChatScheduledRules] selected.
  * @property customRecurrenceState                      [CustomRecurrenceState]
  * @property showMonthlyRecurrenceWarning               True, if the text on the monthly recurrence warning should be displayed. False, if not.
  * @property isCreatingMeeting                          True, if the meeting is being created. False, if not.
+ * @property type                                       [ScheduledMeetingType]
+ * @property initialMeetingLinkOption                   True if is enabled the meeting link option, false otherwise.
+ * @property initialAllowAddParticipantsOption          True if is enabled the allow non-hosts to add participants option, false otherwise.
+ * @property initialSendCalendarInviteOption            True if is enabled the send calendar invite option, false otherwise.
+ * @property initialParticipantsList                    List of participants handles.
  * @property weekList                                   List of [Weekday] in the week.
  */
 data class CreateScheduledMeetingState constructor(
+    val scheduledMeeting: ChatScheduledMeeting? = null,
     val openAddContact: Boolean? = null,
     val chatIdToOpenInfoScreen: Long? = null,
+    val finish: Boolean = false,
     val buttons: List<ScheduleMeetingAction> = ScheduleMeetingAction.values().asList(),
     val meetingTitle: String = "",
     val startDate: ZonedDateTime = Instant.now().atZone(ZoneOffset.UTC),
@@ -63,7 +77,7 @@ data class CreateScheduledMeetingState constructor(
     val enabledAllowAddParticipantsOption: Boolean = true,
     val enabledSendCalendarInviteOption: Boolean = false,
     val descriptionText: String = "",
-    val snackBar: Int? = null,
+    val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     val discardMeetingDialog: Boolean = false,
     val addParticipantsNoContactsDialog: Boolean = false,
     val numOfParticipants: Int = 1,
@@ -71,9 +85,13 @@ data class CreateScheduledMeetingState constructor(
     val isEmptyTitleError: Boolean = false,
     val allowAddParticipants: Boolean = true,
     val recurringMeetingDialog: Boolean = false,
-    val scheduledMeetingEnabled: Boolean = false,
     val showMonthlyRecurrenceWarning: Boolean = false,
     val isCreatingMeeting: Boolean = false,
+    val type: ScheduledMeetingType = ScheduledMeetingType.Creation,
+    val initialMeetingLinkOption: Boolean = false,
+    val initialAllowAddParticipantsOption: Boolean = true,
+    val initialSendCalendarInviteOption: Boolean = false,
+    val initialParticipantsList: List<ContactItem> = emptyList(),
     val weekList: List<Weekday> =
         listOf(
             Weekday.Monday,
@@ -87,9 +105,34 @@ data class CreateScheduledMeetingState constructor(
 ) {
     /**
      * Check if it's valid title
+     *
+     * @return True if it's valid, false if not.
      */
-    fun isValidMeetingTitle(): Boolean =
-        meetingTitle.isNotBlank() && isMeetingTitleRightSize()
+    fun isValid(): Boolean =
+        meetingTitle.isNotBlank() && isMeetingTitleRightSize() &&
+                (type == ScheduledMeetingType.Creation || isValidEdition())
+
+    /**
+     * Check if it's valid edition
+     *
+     * @return True if it's valid, false if not.
+     */
+    private fun isValidEdition(): Boolean {
+        scheduledMeeting?.let { schedMeet ->
+            return (schedMeet.title != meetingTitle ||
+                    (schedMeet.description ?: "") != descriptionText ||
+                    initialMeetingLinkOption != enabledMeetingLinkOption ||
+                    initialAllowAddParticipantsOption != enabledAllowAddParticipantsOption ||
+                    initialSendCalendarInviteOption != enabledSendCalendarInviteOption ||
+                    !startDate.isEqual(schedMeet.getZoneStartTime()) ||
+                    !endDate.isEqual(schedMeet.getZoneEndTime()) ||
+                    initialParticipantsList != participantItemList ||
+                    (schedMeet.rules ?: ChatScheduledRules()) != rulesSelected
+                    )
+        }
+
+        return false
+    }
 
     /**
      * Check if meeting title has the right length

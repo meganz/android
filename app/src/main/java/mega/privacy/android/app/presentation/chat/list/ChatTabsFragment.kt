@@ -16,7 +16,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
@@ -132,7 +131,7 @@ class ChatTabsFragment : Fragment() {
             setContent {
                 val mode by getThemeMode().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val chatsTabState by viewModel.getState().collectAsStateWithLifecycle()
-                val managementState by scheduledMeetingManagementViewModel.state.collectAsState()
+                val managementState by scheduledMeetingManagementViewModel.state.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     ChatTabsView(
                         state = chatsTabState,

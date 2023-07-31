@@ -2670,11 +2670,11 @@
     <!-- A message which is shown to sub-users of expired business accounts. -->
     <string name="expired_user_business_text">Your account is currently [B]suspended[/B]. You can only browse your data.</string>
     <!-- Message shown when users with a business account (no administrators of a business account) try to enable the Camera Uploads, to advise them that the administrator do have the ability to view their data. -->
-    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your business account administrator can access your Camera uploads.</string>
+    <string name="camera_uploads_business_alert">MEGA cannot access your data. However, your Business account administrator can access your Camera uploads.</string>
     <!-- General label to alert user that somehting went wrong -->
     <string name="general_something_went_wrong_error">Something went wrong</string>
     <!-- A dialog message which is shown to sub-users of expired business accounts. -->
-    <string name="expired_user_business_text_2">Contact your business account administrator to resolve the issue and activate your account.</string>
+    <string name="expired_user_business_text_2">Contact your Business account administrator to resolve the issue and activate your account.</string>
     <!-- Warning message to alert user about logout in My Account section if has offline files. -->
     <string name="logout_warning_offline">When you log out, files from your Offline section will be deleted from your device.</string>
     <!-- Warning message to alert user about logout in My Account section if has transfers in progress. -->
@@ -2821,9 +2821,9 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">The account you’re trying to reset is blocked.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Your account has been deactivated by your administrator. Please contact your business account administrator for further details.</string>
+    <string name="error_business_disabled">Your account has been deactivated by your administrator. Please contact your Business account administrator for further details.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Your account has been removed by your administrator. Please contact your business account administrator for further details.</string>
+    <string name="error_business_removed">Your account has been removed by your administrator. Please contact your Business account administrator for further details.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">Modify</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -5040,6 +5040,8 @@
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">This meeting and all its occurrences will be archived and all participants will be notified.</string>
     <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
     <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">This meeting and all its occurrences will be placed under Past meetings and all participants will be notified.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting updated</string>
     <!-- Meeting list tooltip description for start meeting fab button -->
     <string name="meeting_list_tooltip_fab_description">You can now schedule one-off and recurring meetings.</string>
     <!-- Meeting list tooltip description for schedule meeting item -->

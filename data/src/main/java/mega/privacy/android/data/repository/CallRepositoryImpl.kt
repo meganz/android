@@ -43,7 +43,6 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [CallRepository]
@@ -97,7 +96,7 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledVideo: Boolean,
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -108,6 +107,8 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -117,7 +118,7 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledVideo: Boolean,
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -129,6 +130,8 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -137,7 +140,7 @@ internal class CallRepositoryImpl @Inject constructor(
         enabledVideo: Boolean,
         enabledAudio: Boolean,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -148,13 +151,15 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledAudio,
                 callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
     override suspend fun hangChatCall(
         callId: Long,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -162,6 +167,8 @@ internal class CallRepositoryImpl @Inject constructor(
             megaChatApiGateway.hangChatCall(
                 callId, callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -169,7 +176,7 @@ internal class CallRepositoryImpl @Inject constructor(
         chatId: Long,
         setOnHold: Boolean,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -179,6 +186,8 @@ internal class CallRepositoryImpl @Inject constructor(
                 setOnHold,
                 callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
@@ -208,38 +217,46 @@ internal class CallRepositoryImpl @Inject constructor(
         since: Long,
     ): List<ChatScheduledMeetingOccurr> =
         withContext(dispatcher) {
-            suspendCoroutine { continuation ->
+            suspendCancellableCoroutine { continuation ->
+                val callback = OptionalMegaChatRequestListenerInterface(
+                    onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
+                        if (error.errorCode == MegaChatError.ERROR_OK) {
+                            val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
+                            request.megaChatScheduledMeetingOccurrList?.let { occursList ->
+                                if (occursList.size() > 0) {
+                                    for (i in 0 until occursList.size()) {
+                                        occurrences.add(
+                                            chatScheduledMeetingOccurrMapper(
+                                                occursList.at(
+                                                    i
+                                                )
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+
+                            continuation.resume(occurrences)
+                        } else {
+                            continuation.failWithError(
+                                error,
+                                "fetchScheduledMeetingOccurrencesByChat"
+                            )
+                        }
+                    }
+                )
+
                 megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
                     chatId,
                     since,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK) {
-                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                request.megaChatScheduledMeetingOccurrList?.let { occursList ->
-                                    if (occursList.size() > 0) {
-                                        for (i in 0 until occursList.size()) {
-                                            occurrences.add(
-                                                chatScheduledMeetingOccurrMapper(
-                                                    occursList.at(
-                                                        i
-                                                    )
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-
-                                continuation.resume(occurrences)
-                            } else {
-                                continuation.failWithError(
-                                    error,
-                                    "fetchScheduledMeetingOccurrencesByChat"
-                                )
-                            }
-                        }
-                    )
+                    callback
                 )
+
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeRequestListener(
+                        callback
+                    )
+                }
             }
         }
 
@@ -300,7 +317,7 @@ internal class CallRepositoryImpl @Inject constructor(
         rules: ChatScheduledRules?,
         attributes: String?,
     ): ChatRequest = withContext(dispatcher) {
-        suspendCoroutine { continuation ->
+        suspendCancellableCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
                 onRequestFinish = onRequestCompleted(continuation)
             )
@@ -322,6 +339,8 @@ internal class CallRepositoryImpl @Inject constructor(
                 attributes,
                 callback
             )
+
+            continuation.invokeOnCancellation { megaChatApiGateway.removeRequestListener(callback) }
         }
     }
 
