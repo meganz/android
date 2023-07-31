@@ -450,7 +450,7 @@ class ChatTabsViewModel @Inject constructor(
     }
 
     /**
-     * On current Meeting tooltip as been dismissed
+     * On current Meeting tooltip has been dismissed
      */
     fun onTooltipDismissed() {
         viewModelScope.launch {

@@ -123,8 +123,8 @@ private fun ListView(
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
     var hasBeenTouched by remember { mutableStateOf(false) }
-    var pendingTooltipShown by remember { mutableStateOf(false) }
-    var recurringTooltipShown by remember { mutableStateOf(false) }
+    var pendingTooltipShown = false
+    var recurringTooltipShown = false
 
     LazyColumn(
         state = listState,

@@ -94,7 +94,7 @@ fun ChatTabsView(
             }
         },
         floatingActionButton = {
-            if (state.tooltipToBeShown == MeetingTooltipItem.CREATE) {
+            if (state.tooltipToBeShown == MeetingTooltipItem.CREATE && pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
                 MegaTooltip(
                     titleText = stringResource(R.string.chat_schedule_meeting),
                     descriptionText = stringResource(R.string.meeting_list_tooltip_fab_description),
