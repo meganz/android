@@ -427,6 +427,7 @@ internal class AlbumImportViewModel @Inject constructor(
                         it.copy(
                             showErrorAccessDialog = true,
                             showImportAlbumDialog = false,
+                            isBackToHome = true,
                         )
                     }
                     return@launch

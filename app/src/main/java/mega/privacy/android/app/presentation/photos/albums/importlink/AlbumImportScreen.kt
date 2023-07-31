@@ -97,7 +97,7 @@ internal fun AlbumImportScreen(
     onSaveToDevice: (List<MegaNode>) -> Unit,
     onNavigateFileExplorer: () -> Unit,
     onUpgradeAccount: () -> Unit,
-    onBack: () -> Unit,
+    onBack: (isBackToHome: Boolean) -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
@@ -123,7 +123,7 @@ internal fun AlbumImportScreen(
 
     if (state.showInputDecryptionKeyDialog) {
         InputDecryptionKeyDialog(
-            onDismiss = onBack,
+            onDismiss = { onBack(false) },
             onDecrypt = { key ->
                 albumImportViewModel.closeInputDecryptionKeyDialog()
                 albumImportViewModel.decryptLink(key)
@@ -133,7 +133,7 @@ internal fun AlbumImportScreen(
 
     if (state.showErrorAccessDialog) {
         ErrorAccessDialog(
-            onDismiss = onBack,
+            onDismiss = { onBack(state.isBackToHome) },
         )
     }
 
@@ -185,7 +185,7 @@ internal fun AlbumImportScreen(
                     if (state.selectedPhotos.isNotEmpty()) {
                         albumImportViewModel.clearSelection()
                     } else {
-                        onBack()
+                        onBack(false)
                     }
                 },
             )

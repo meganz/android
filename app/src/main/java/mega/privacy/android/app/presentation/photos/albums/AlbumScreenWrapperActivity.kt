@@ -13,6 +13,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.main.FileExplorerActivity
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
@@ -200,7 +201,13 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                                 val intent = Intent(this, UpgradeAccountActivity::class.java)
                                 startActivity(intent)
                             },
-                            onBack = ::finish,
+                            onBack = { isBackToHome ->
+                                if (isBackToHome) {
+                                    val intent = Intent(this, ManagerActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                finish()
+                            },
                         )
                     }
 

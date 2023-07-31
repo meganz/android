@@ -22,4 +22,5 @@ internal data class AlbumImportState(
     val importAlbumMessage: String? = null,
     val isAvailableStorageCollected: Boolean = false,
     val showStorageExceededDialog: Boolean = false,
+    val isBackToHome: Boolean = false,
 )
