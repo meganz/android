@@ -49,6 +49,7 @@ fun FileBrowserComposeView(
     onDisputeTakeDownClicked: (String) -> Unit,
     onUpgradeClicked: () -> Unit,
     onDismissClicked: () -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
@@ -77,7 +78,9 @@ fun FileBrowserComposeView(
                 listState = listState,
                 gridState = gridState,
                 onLinkClicked = onLinkClicked,
-                onDisputeTakeDownClicked = onDisputeTakeDownClicked
+                onDisputeTakeDownClicked = onDisputeTakeDownClicked,
+                showMediaDiscoveryButton = uiState.showMediaDiscoveryIcon,
+                onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             )
         }
     } else {

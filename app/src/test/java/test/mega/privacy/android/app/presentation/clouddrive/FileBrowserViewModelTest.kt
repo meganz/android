@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -75,6 +76,7 @@ class FileBrowserViewModelTest {
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase = mock()
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase = mock()
     private val transfersManagement: TransfersManagement = mock()
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -101,7 +103,8 @@ class FileBrowserViewModelTest {
             handleOptionClickMapper = handleOptionClickMapper,
             monitorRefreshSessionUseCase = monitorRefreshSessionUseCase,
             getBandWidthOverQuotaDelayUseCase = getBandWidthOverQuotaDelayUseCase,
-            transfersManagement = transfersManagement
+            transfersManagement = transfersManagement,
+            containsMediaItemUseCase = containsMediaItemUseCase
         )
     }
 

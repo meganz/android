@@ -156,6 +156,9 @@ class FileBrowserComposeFragment : Fragment() {
                         onUpgradeClicked = {
                             fileBrowserViewModel::onBannerDismissClicked
                             (requireActivity() as? ManagerActivity)?.navigateToUpgradeAccount()
+                        },
+                        onEnterMediaDiscoveryClick = {
+                            showMediaDiscovery(isOpenByMDIcon = true)
                         }
                     )
                 }

@@ -33,6 +33,7 @@ import nz.mega.sdk.MegaNode
  * @property showMediaDiscovery shows Media discovery of Folder Node
  * @property shouldShowBannerVisibility
  * @property bannerTime timer
+ * @property showMediaDiscoveryIcon showMediaDiscoveryIcon
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -54,7 +55,8 @@ data class FileBrowserState(
     val isFileBrowserEmpty: Boolean = false,
     val showMediaDiscovery: Boolean = false,
     val shouldShowBannerVisibility: Boolean = false,
-    val bannerTime: Long = 0L
+    val bannerTime: Long = 0L,
+    val showMediaDiscoveryIcon: Boolean = false,
 )
 
 /**

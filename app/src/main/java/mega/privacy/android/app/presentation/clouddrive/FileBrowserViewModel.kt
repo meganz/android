@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaApiJava
@@ -76,7 +77,8 @@ class FileBrowserViewModel @Inject constructor(
     private val handleOptionClickMapper: HandleOptionClickMapper,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val getBandWidthOverQuotaDelayUseCase: GetBandWidthOverQuotaDelayUseCase,
-    private val transfersManagement: TransfersManagement
+    private val transfersManagement: TransfersManagement,
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -236,11 +238,15 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
-            val nodeList =
-                getNodeUiItems(getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle))
+            val typedNodeList = getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle)
+            val nodeList = getNodeUiItems(typedNodeList)
+            val nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList()
+            val hasMediaFile: Boolean = containsMediaItemUseCase(typedNodeList)
+            val isRootNode = getRootFolder()?.handle == _state.value.fileBrowserHandle
             _state.update {
                 it.copy(
-                    nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList(),
+                    showMediaDiscoveryIcon = !isRootNode && hasMediaFile,
+                    nodes = nodes,
                     parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
                     nodesList = nodeList,
                     sortOrder = getCloudSortOrder(),
@@ -270,6 +276,9 @@ class FileBrowserViewModel @Inject constructor(
      * Handles back click of rubbishBinFragment
      */
     fun onBackPressed() {
+        _state.update {
+            it.copy(showMediaDiscoveryIcon = false)
+        }
         _state.value.parentHandle?.let {
             setBrowserParentHandle(it)
             handleStack.takeIf { stack -> stack.isNotEmpty() }?.pop()
@@ -308,7 +317,10 @@ class FileBrowserViewModel @Inject constructor(
                 )
             ) {
                 _state.update { state ->
-                    state.copy(showMediaDiscovery = true)
+                    state.copy(
+                        showMediaDiscovery = true,
+                        showMediaDiscoveryIcon = true
+                    )
                 }
             } else {
                 pushPositionOnStack(lastFirstVisiblePosition)
