@@ -500,8 +500,6 @@
     <string name="cam_sync_syncing">Đang tiến hành Đăng Tải Camêra</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Có chắc muốn ngưng tính năng Đăng Tải Camêra?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Đang tải lên tệp tin từ các thư mục phương tiện số</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Đang kiểm tra các tệp tin cần được tải lên</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -858,7 +856,7 @@
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ của MEGA.</string>
     <!-- Error message shown when opening a folder link or file link which has been corrupt or deformed -->
-    <string name="link_broken">Đường liên kết URL vừa nhập không đúng hoặc bị viết sai. Không thể sử dụng để truy cập được.</string>
+    <string name="link_broken">URL vừa nhập này không đúng hoặc bị viết sai. Đường liên&#160;kết bạn đang cố truy&#160;cập không có tồn&#160;tại.</string>
     <!-- Title of the screen after creating the account. That screen asks the user to confirm the account by checking the email -->
     <string name="confirm_email_text">Đang chờ xác nhận địa chỉ e-mail</string>
     <!-- Text below the title that explains the user should check the email and click the link to confirm the account -->
@@ -1608,8 +1606,6 @@
     <string name="title_notification_call_in_progress">Cuộc gọi đang diễn ra</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Quay trở lại cuộc gọi</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">Trên mạng MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Danh bạ điện thoại</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2043,8 +2039,6 @@
     <plurals name="plural_select_file">
         <item quantity="other">Chọn Tệp</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Mời %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Chọn thư&#160;mục</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -2758,7 +2752,7 @@
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
     <string name="error_business_disabled">Tài khoản nhân viên của bạn đã bị đình chỉ bởi ban quản trị. Xin liên hệ với ban tổng quản lý tài khoản doanh nghiệp của bạn để tìm hiểu lý do.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
-    <string name="error_business_removed">Tài khoản này đã bị xóa bởi ban quản lý. Xin liên hệ trực tiếp với người quản lý tài khoản trong công ty để biết thêm chi tiết.</string>
+    <string name="error_business_removed">Tài&#160;khoản này đã bị xóa bởi ban quản&#160;trị của bạn. Xin liên&#160;hệ trực&#160;tiếp với ban quản trị tài&#160;khoản doanh&#160;nghiệp của bạn để biết thêm chi&#160;tiết.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
     <string name="option_modify_phone_number">Sửa</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -4823,4 +4817,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Hủy&#160;bỏ thời&#160;điểm tái&#160;diễn</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] đã cập&#160;nhật cuộc họp[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Cuộc họp này và các thời&#160;diểm tái&#160;diễn liên&#160;quan sẽ được liệt vào danh&#160;sách bảo&#160;lưu và tất&#160;cả các thành&#160;viên sẽ nhận được thông&#160;báo.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Cuộc họp này và các thời&#160;diểm tái&#160;diễn liên&#160;quan sẽ được liệt vào danh&#160;sách Các cuộc họp trước&#160;đây và tất&#160;cả các thành&#160;viên sẽ nhận được thông&#160;báo.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Bạn giờ đây có thể đặt lịch cuộc họp một&#160;lần và định&#160;kỳ.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Bạn có thể bắt&#160;đầu cuộc họp trước thời&#160;gian dự&#160;kiến ​​bằng cách chạm vào \“Bắt&#160;đầu cuộc họp\“ khi ở trong phòng họp.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Quản&#160;lý các cuộc họp định&#160;kỳ</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">Bạn có thể xem qua, hủy bỏ hoặc chỉnh&#160;sửa bất&#160;kỳ thời&#160;điểm tái&#160;diễn nào của cuộc họp định&#160;kỳ bằng cách chạm vào dấu ba chấm ngay bên phải, sau đó chọn Thời&#160;điểm tái&#160;diễn.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Gửi email lời mời lịch hẹn cho những người tham&#160;gia biết và thêm cuộc họp vào lịch của họ.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Cuộc họp đã được cập&#160;nhật</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Cập nhật</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Ngày</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Thời&#160;điểm tái&#160;diễn cuộc họp đã được cập&#160;nhật</string>
 </resources>

@@ -516,8 +516,6 @@
     <string name="cam_sync_syncing">Subidas de la cámara en curso</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">¿Quieres detener las Subidas de la cámara?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Subiendo archivos multimedia</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Comprobando archivos para la subida</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1676,8 +1674,6 @@
     <string name="title_notification_call_in_progress">Llamada en curso</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Volver a la llamada</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">En MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Contactos del teléfono</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2135,8 +2131,6 @@
         <item quantity="many">Elegir archivos</item>
         <item quantity="other">Elegir archivos</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">¿Invitar a %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Elige carpeta</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -5273,4 +5267,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Cancelar evento</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Esta reunión y todos sus eventos serán archivados y todos los participantes serán notificados.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Esta reunión y todos sus eventos se moverán a  Reuniones anteriores y todos los participantes serán notificados.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Programa reuniones puntuales y periódicas.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Puedes empezar la reunión antes de la hora programada tocando “Empezar reunión” en la sala de reuniones.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Gestionar reuniones periódicas</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Reunión actualizada</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Actualizar</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Fecha</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Evento de la reunión actualizado</string>
 </resources>

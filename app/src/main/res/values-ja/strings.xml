@@ -500,8 +500,6 @@
     <string name="cam_sync_syncing">カメラアップロードが進行中</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">カメラアップロードを停止しますか？</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">メディアフォルダのファイルをアップロード</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">アップロードされるファイルを確認中</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1608,8 +1606,6 @@
     <string name="title_notification_call_in_progress">通話中</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">通話に戻る</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">MEGA上の</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">電話連絡先</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2043,8 +2039,6 @@
     <plurals name="plural_select_file">
         <item quantity="other">ファイルを選択</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">%1$sさんを招待しますか？</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">フォルダを選択</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -4823,4 +4817,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">開催をキャンセル</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]さんがミーティングを更新しました[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">このミーティングとそのすべての開催がアーカイブされ、すべての参加者に通知されます。</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">このミーティングとそのすべての開催は過去のミーティングの下に配置され、すべての参加者に通知されます。</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">1回限りのミーティングや定期的なミーティングをスケジュールできるようになりました。</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">ミーティングルームで「ミーティングを開始」をタップすると、予定時刻より前にミーティングを開始できます。</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">定期的なミーティングを管理する</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">右側の3つの点をタップして「開催」を選択すると、定期的なミーティングの開催を表示、キャンセル、または編集できます。</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">参加者にカレンダーの招待状をメールで送信し、参加者がミーティングをカレンダーに追加できるようにします。</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">ミーティングが更新されました</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">開催の編集</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">更新</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">日付</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">開始時間</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">開始日を選択</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">終了時間</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">ミーティングの開催状況が更新されました</string>
 </resources>

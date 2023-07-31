@@ -524,8 +524,6 @@
     <string name="cam_sync_syncing">Выполняются Загрузки из камеры</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Остановить Загрузки из камеры?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Загрузить файлы или медиапапки</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Проверка файлов для загрузки</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1710,8 +1708,6 @@
     <string name="title_notification_call_in_progress">Идёт звонок</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Вернуться к звонку</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">В MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Телефонные контакты</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2181,8 +2177,6 @@
         <item quantity="many">Выбор файлов</item>
         <item quantity="other">Выбор файлов</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Пригласить %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Выбрать папку</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -3959,7 +3953,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
     <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] трафика</string>
     <!-- Label of storage in My account section. -->
-    <string name="account_storage_label">Хранилище данных</string>
+    <string name="account_storage_label">Хранилище</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
     <string name="account_choose_free_limited_transfer_quota">[A]Ограниченный[/A] трафик</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
@@ -5483,19 +5477,49 @@
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting which chat history is not empty -->
     <string name="meetings_cancel_scheduled_meeting_chat_history_not_empty_success_snackbar">Встреча отменена</string>
     <!-- Title of the confirmation dialog to cancel a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "Cancel the 20 June occurrence?" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Отменить событие %1$s?</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_title">Отменить повторение %1$s?</string>
     <!-- Message of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Только это событие будет отменено. Все остальные события будут продолжаться, как запланировано.</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_message">Только это повторение будет отменено. Все остальные повторения будут продолжаться, как запланировано.</string>
     <!-- Title of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Отменить событие и встречу?</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_dialog_title">Отменить повторение и встречу?</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Это единственное событие регулярной встречи. Если его отменить, встреча также будет отменена.\nОтменённая встреча будет архивирована, и все участники будут уведомлены об этом.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_empty_dialog_message">Это единственное повторение регулярной встречи. Если его отменить, встреча также будет отменена.\nОтменённая встреча будет архивирована, и все участники будут уведомлены об этом.</string>
     <!-- Message of the confirmation dialog to cancel the single occurrence (last occurrence) of a scheduled meeting when the chat history is not empty -->
-    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Это единственное событие регулярной встречи. Если его отменить, встреча также будет отменена.\nОтменённая встреча будет помещена в раздел «Прошлые встречи», и все участники будут уведомлены об этом.</string>
+    <string name="meetings_cancel_scheduled_meeting_last_occurrence_chat_history_not_empty_dialog_message">Это единственное повторение регулярной встречи. Если его отменить, встреча также будет отменена.\nОтменённая встреча будет помещена в раздел «Прошлые встречи», и все участники будут уведомлены об этом.</string>
     <!-- Text of the snackbar displayed when successfully cancelled a scheduled meeting occurrence. Placeholder is to display the occurrence's date, e.g. "20 June occurrence canceled" -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Событие %1$s отменено</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_success_snackbar">Повторение %1$s отменено</string>
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
-    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Отменить событие</string>
+    <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Отменить повторение</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] обновил встречу[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Встреча и все её повторения будут архивированы, а все участники будут уведомлены.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Встреча и все её повторения будут помещены в раздел «Прошлые встречи», и все участники будут уведомлены об этом.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Теперь вы можете планировать разовые и регулярные встречи.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Вы можете начать встречу раньше запланированного времени, нажав «Начать встречу» в комнате встречи.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Управляйте регулярными встречами</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">Вы можете просмотреть, отменить или отредактировать любое повторение регулярной встречи, нажав на три точки справа, а затем выбрав «Повторения».</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Отправьте событие календаря участникам по электронной почте, чтобы они могли добавить встречу в свои календари.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Встреча обновлена</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Изменить повторение</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Обновить</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Дата</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Время начала</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Выберите дату начала</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Время окончания</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Повторение встречи обновлено</string>
 </resources>

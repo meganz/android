@@ -540,8 +540,6 @@
     <string name="cam_sync_syncing">جاري تنفيذ ترفيعات الكاميرا</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">هل تريد إيقاف عمليات ترفيع صور الكاميرا؟</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">رفع ملفات مجلدات الميديا</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">التحقق من الملفات المراد ترفيعها</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1778,8 +1776,6 @@
     <string name="title_notification_call_in_progress">المكالمة قيد التنفيذ</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">الرجوع إلى المكالمة</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">على ميغا MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">جهات اتصال الهاتف</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2273,8 +2269,6 @@
         <item quantity="many">اختر ملفات</item>
         <item quantity="other">اختر ملفات</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">دعوة %1$s؟</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">اختر مجلد</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -5948,4 +5942,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">إلغاء هذا التكرار</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">سيتم أرشفة هذا الاجتماع وجميع تكراراته وسيتم إعلام جميع المشاركين.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">سيتم وضع هذا الاجتماع وجميع تكراراته تحت الاجتماعات السابقة وسيتم إعلام جميع المشاركين.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">يمكنك الآن جدولة اجتماعات لمرة واحدة ومتكررة.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">يمكنك بدء الاجتماع قبل موعده المحدد بالضغط على \“بدء الاجتماع\“ في غرفة الاجتماع.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">إدارة الاجتماعات المتكررة</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Email a calendar invite to participants so they can add the meeting to their calendars.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">تم تحديث الاجتماع</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">تحديث</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">التاريخ</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">تم تحديث تكرار الاجتماع</string>
 </resources>

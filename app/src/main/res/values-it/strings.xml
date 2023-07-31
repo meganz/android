@@ -516,8 +516,6 @@
     <string name="cam_sync_syncing">Caricamenti da fotocamera attivi</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Vuoi fermare i Caricamenti da fotocamera?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Caricamento di file di cartelle media</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Controllo di file da caricare in corso</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1676,8 +1674,6 @@
     <string name="title_notification_call_in_progress">Chiamata in corso</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Ritorna alla chiamata</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">Su MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Contatti telefonici</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2135,8 +2131,6 @@
         <item quantity="many">Scegli file</item>
         <item quantity="other">Scegli file</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Invitare %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Scegli cartella</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -5176,44 +5170,50 @@
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">domenica</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
-    <string name="meetings_custom_recurrence_first_week_monthly_section">First</string>
+    <string name="meetings_custom_recurrence_first_week_monthly_section">Primo/a</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
-    <string name="meetings_custom_recurrence_second_week_monthly_section">Second</string>
+    <string name="meetings_custom_recurrence_second_week_monthly_section">Secondo/a</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">Third</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Terzo/a</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
-    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Fourth</string>
+    <string name="meetings_custom_recurrence_fourth_week_monthly_section">Quarto/a</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
-    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Fifth</string>
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">Quinto/a</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
-        <item quantity="one">First %1$s of every month</item>
-        <item quantity="other">First %1$s of every %2$d months</item>
+        <item quantity="one">Primo/a %1$s di ogni mese</item>
+        <item quantity="many">Primo/a %1$s di ogni %2$d di mesi</item>
+        <item quantity="other">Primo/a %1$s di ogni %2$d mesi</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs second day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_second_day_every_number_of_months_label">
-        <item quantity="one">Second %1$s of every month</item>
-        <item quantity="other">Second %1$s of every %2$d months</item>
+        <item quantity="one">Secondo/a %1$s di ogni mese</item>
+        <item quantity="many">Secondo/a %1$s di ogni %2$d di mesi</item>
+        <item quantity="other">Secondo/a %1$s di ogni %2$d mesi</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs third day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_third_day_every_number_of_months_label">
-        <item quantity="one">Third %1$s of every month</item>
-        <item quantity="other">Third %1$s of every %2$d months</item>
+        <item quantity="one">Terzo/a %1$s di ogni mese</item>
+        <item quantity="many">Terzo/a %1$s di ogni %2$d di mesi</item>
+        <item quantity="other">Terzo/a %1$s di ogni %2$d mesi</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fourth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fourth_day_every_number_of_months_label">
-        <item quantity="one">Fourth %1$s of every month</item>
-        <item quantity="other">Fourth %1$s of every %2$d months</item>
+        <item quantity="one">Quarto/a %1$s di ogni mese</item>
+        <item quantity="many">Quarto/a %1$s di ogni %2$d di mesi</item>
+        <item quantity="other">Quarto/a %1$s di ogni %2$d mesi</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs fifth day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_fifth_day_every_number_of_months_label">
-        <item quantity="one">Fifth %1$s of every month</item>
-        <item quantity="other">Fifth %1$s of every %2$d months</item>
+        <item quantity="one">Quinto/a %1$s di ogni mese</item>
+        <item quantity="many">Quinto/a %1$s di ogni %2$d di mesi</item>
+        <item quantity="other">Quinto/a %1$s di ogni %2$d mesi</item>
     </plurals>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs specific day of the month every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_specific_day_every_number_of_months_label">
-        <item quantity="one">Every month on day %2$d</item>
-        <item quantity="other">Every %1$s months on day %2$d</item>
+        <item quantity="one">Ogni mese il giorno %2$d</item>
+        <item quantity="many">Ogni %1$s di mesi il giorno %2$d</item>
+        <item quantity="other">Ogni %1$s mesi il giorno %2$d</item>
     </plurals>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
     <plurals name="download_started">
@@ -5266,5 +5266,35 @@
     <!-- Confirm button of the confirmation dialog to cancel a scheduled meeting occurrence -->
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Annulla evento</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
-    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] updated the meeting[/B]</string>
+    <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] ha aggiornato il meeting[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">Questo meeting e tutti i suoi eventi verrà archiviato e tutti i partecipanti saranno notificati.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">Questo meeting e tutti i suoi eventi verranno messi in Meeting passati e tutti i partecipanti saranno notificati.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Ora puoi programmare meeting singoli e ricorrenti.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Puoi far partire il meeting prima dell\’orario programmato cliccando su \“Inizia meeting\“ nella stanza del meeting.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Gestisci i meeting ricorrenti</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">Puoi vedere, annullare, o modificare ogni evento di un meeting ricorrente cliccando sui tre puntini a destra e selezionando \“Eventi\“.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Invia un\’email con un invito sul calendario ai partecipanti in modo che possano aggiungere il meeting ai propri calendari.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Meeting aggiornato</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Aggiorna</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Data</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Evento del meeting aggiornato</string>
 </resources>

@@ -524,8 +524,6 @@
     <string name="cam_sync_syncing">Przesyłanie z kamery w toku</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">Czy chcesz wstrzymać Przesyłanie z kamery?</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">Wgrywanie plików</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">Sprawdzanie plików do przesłania</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1710,8 +1708,6 @@
     <string name="title_notification_call_in_progress">Rozmowa w trakcie</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">Powrót do rozmowy</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">Na MEGA</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">Kontakty z telefonu</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2181,8 +2177,6 @@
         <item quantity="many">Wybierz pliki</item>
         <item quantity="other">Wybierz pliki</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">Zaprosić %1$s?</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">Wybierz katalog</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -5498,4 +5492,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">Anuluj zdarzenie</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B] zaktualizował spotkanie[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">To spotkanie i wszystkie jego wystąpienia zostaną zarchiwizowane, a wszyscy uczestnicy zostaną powiadomieni.</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">To spotkanie i wszystkie jego wystąpienia zostaną umieszczone w zakładce Past meetings, a wszyscy uczestnicy zostaną powiadomieni.</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">Możesz teraz planować jednorazowe i cykliczne spotkania.</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">Spotkanie można rozpocząć przed zaplanowanym czasem, dotykając opcji \“Rozpocznij spotkanie\“ w pokoju spotkań.</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">Zarządzaj powtarzającymi się spotkaniami</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">Możesz wyświetlić, anulować lub edytować dowolne wystąpienie spotkania cyklicznego, dotykając trzech kropek po prawej stronie i wybierając \“Wystąpienia\“.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">Wyślij zaproszenie do kalendarza pocztą e-mail, aby uczestnicy mogli dodać spotkanie do swoich kalendarzy.</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">Spotkanie zaktualizowane</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edycja wystąpienia</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">Zaktualizuj</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">Data</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Czas rozpoczęcia</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Wybierz datę rozpoczęcia</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">Czas zakończenia</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Zaktualizowano miejsce spotkania</string>
 </resources>

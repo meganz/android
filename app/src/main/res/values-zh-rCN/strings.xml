@@ -500,8 +500,6 @@
     <string name="cam_sync_syncing">正在进行相机上传</string>
     <!-- confirmation question for cancelling the camera uploads -->
     <string name="cam_sync_cancel_sync">您是否要停止相机上传？</string>
-    <!-- title of the notification when camera upload is enabled -->
-    <string name="settings_camera_notif_title">正在上传媒体文件夹中的文件</string>
     <!-- title of the notification when camera upload is checking files -->
     <string name="settings_camera_notif_checking_title">正在检查待上传的文件</string>
     <!-- title of the notification when camera upload is initializing -->
@@ -1608,8 +1606,6 @@
     <string name="title_notification_call_in_progress">正在通话中</string>
     <!-- Button in the notification shown on the action bar when there is a call in progress -->
     <string name="button_notification_call_in_progress">返回到通话</string>
-    <!-- When it lists contacts of MEGA, the title of list’s header -->
-    <string name="contacts_mega">在MEGA上</string>
     <!-- When it lists contacts of phone, the title of list’s header -->
     <string name="contacts_phone">手机通讯录</string>
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
@@ -2043,8 +2039,6 @@
     <plurals name="plural_select_file">
         <item quantity="other">选择文件</item>
     </plurals>
-    <!-- Title of confirmation dialog of sending invitation to a contact -->
-    <string name="title_confirm_send_invitation">是否确定邀请%1$s？</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="title_share_folder_explorer">选择文件夹</string>
     <!-- Popup message shown if an user try to login while there is still living transfer -->
@@ -4823,4 +4817,34 @@
     <string name="meetings_cancel_scheduled_meeting_occurrence_dialog_confirm_button">取消事件</string>
     <!-- Chat log message when there is an update in the scheduled meeting -->
     <string name="chat_chat_room_message_updated_scheduled_meeting">[A]%1$s[/A][B]已更新会议[/B]</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_empty_dialog_message">此次会议及其所有的事件将被归档，并通知所有参与者。</string>
+    <!-- Message of the confirmation dialog to cancel a recurring scheduled meeting when the chat history is not empty -->
+    <string name="meetings_cancel_recurring_scheduled_meeting_chat_history_not_empty_dialog_message">此次会议及其所有的事件将被放在过去的会议中，并通知所有参与者。</string>
+    <!-- Meeting list tooltip description for start meeting fab button -->
+    <string name="meeting_list_tooltip_fab_description">您现在可以安排单次和定期会议。</string>
+    <!-- Meeting list tooltip description for schedule meeting item -->
+    <string name="meeting_list_tooltip_sched_description">您可以在会议室中点击“开始会议”按钮，即可在预定时间之前开始会议。</string>
+    <!-- Meeting list tooltip title for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_title">管理定期会议</string>
+    <!-- Meeting list tooltip description for recurring meeting item -->
+    <string name="meeting_list_tooltip_recurring_description">You can view, cancel, or edit any occurrence of a recurring meeting by tapping the three dots on the right and selecting “Occurrences”.</string>
+    <!-- Title of the send calendar invite bottom panel in scheduled meeting info -->
+    <string name="scheduled_meetings_send_calendar_invite_panel_title">通过电子邮件向参与者发送日历邀请，以便他们将会议添加到自己的日历中。</string>
+    <!-- Text of the snackbar displayed when successfully edited a scheduled meeting -->
+    <string name="meetings_edit_scheduled_meeting_success_snackbar">会议已更新</string>
+    <!-- Title of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_title">Edit occurrence</string>
+    <!-- Confirm button of the confirmation dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_edit_scheduled_meeting_occurrence_dialog_confirm_button">更新</string>
+    <!-- Title of date section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_date_section">日期</string>
+    <!-- Title of start time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_start_time_section">Start time</string>
+    <!-- Title of the dialog to select new date a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_calendar_dialog_title">Select start date</string>
+    <!-- Title of end time section of the dialog to update a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
+    <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
+    <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">会议事件已更新</string>
 </resources>
