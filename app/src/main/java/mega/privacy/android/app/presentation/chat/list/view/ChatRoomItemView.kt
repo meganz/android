@@ -70,6 +70,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChatRoomItemView(
+    modifier: Modifier = Modifier,
     item: ChatRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
@@ -83,7 +84,7 @@ internal fun ChatRoomItemView(
     var callDuration by remember { mutableStateOf<Long>(0) }
 
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(88.dp)
             .background(MaterialTheme.colors.surface)
@@ -126,7 +127,7 @@ internal fun ChatRoomItemView(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_select_contact),
                 contentDescription = "Selected item",
                 modifier = Modifier
-                    .testTag("selectedImage")
+                    .testTag("chat_room_item:selected_image")
                     .size(40.dp)
                     .constrainAs(avatarImage) {
                         start.linkTo(parent.start, 16.dp)
@@ -138,6 +139,7 @@ internal fun ChatRoomItemView(
             ChatAvatarView(
                 avatars = item.getChatAvatars(),
                 modifier = Modifier
+                    .testTag("chat_room_item:avatar_image")
                     .size(40.dp)
                     .constrainAs(avatarImage) {
                         start.linkTo(parent.start, 16.dp)
@@ -154,6 +156,7 @@ internal fun ChatRoomItemView(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
+                .testTag("chat_room_item:title_text")
                 .constrainAs(titleText) {
                     linkTo(avatarImage.end, parent.end, 16.dp, 74.dp, 72.dp, 0.dp, 0f)
                     top.linkTo(parent.top)
@@ -172,12 +175,14 @@ internal fun ChatRoomItemView(
             val userStatus = if (item is IndividualChatRoomItem) item.userStatus else null
             ChatUserStatusView(
                 userStatus = userStatus,
-                modifier = Modifier.constrainAs(statusIcon) {
-                    start.linkTo(titleText.end, 4.dp)
-                    top.linkTo(titleText.top)
-                    bottom.linkTo(titleText.bottom)
-                    visibility = if (userStatus != null) Visibility.Visible else Visibility.Gone
-                },
+                modifier = Modifier
+                    .testTag("chat_room_item:status_icon")
+                    .constrainAs(statusIcon) {
+                        start.linkTo(titleText.end, 4.dp)
+                        top.linkTo(titleText.top)
+                        bottom.linkTo(titleText.bottom)
+                        visibility = if (userStatus != null) Visibility.Visible else Visibility.Gone
+                    },
             )
 
             Icon(
@@ -185,6 +190,7 @@ internal fun ChatRoomItemView(
                 contentDescription = "Private chat icon",
                 tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                 modifier = Modifier
+                    .testTag("chat_room_item:private_icon")
                     .size(16.dp)
                     .constrainAs(privateIcon) {
                         start.linkTo(statusIcon.end, 4.dp, 4.dp)
@@ -200,6 +206,7 @@ internal fun ChatRoomItemView(
                 contentDescription = "Mute chat icon",
                 tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                 modifier = Modifier
+                    .testTag("chat_room_item:mute_icon")
                     .size(16.dp)
                     .constrainAs(muteIcon) {
                         start.linkTo(privateIcon.end, 2.dp, 4.dp)
@@ -214,6 +221,7 @@ internal fun ChatRoomItemView(
                 contentDescription = "Recurring meeting icon",
                 tint = MaterialTheme.colors.grey_alpha_054_white_alpha_054,
                 modifier = Modifier
+                    .testTag("chat_room_item:recurring_icon")
                     .size(16.dp)
                     .constrainAs(recurringIcon) {
                         start.linkTo(muteIcon.end, 2.dp, 4.dp)
@@ -231,6 +239,7 @@ internal fun ChatRoomItemView(
                 contentDescription = "Ongoing call icon",
                 tint = MaterialTheme.colors.secondary,
                 modifier = Modifier
+                    .testTag("chat_room_item:call_icon")
                     .size(14.dp)
                     .constrainAs(callIcon) {
                         start.linkTo(recurringIcon.end, 2.dp, 4.dp)
@@ -249,6 +258,7 @@ internal fun ChatRoomItemView(
             contentDescription = "Last message audio icon",
             tint = MaterialTheme.colors.textColorSecondary,
             modifier = Modifier
+                .testTag("chat_room_item:last_message_icon")
                 .size(16.dp)
                 .constrainAs(lastMessageIcon) {
                     start.linkTo(parent.start, 72.dp)
@@ -264,6 +274,7 @@ internal fun ChatRoomItemView(
 
         MiddleTextView(
             modifier = Modifier
+                .testTag("chat_room_item:middle_text")
                 .constrainAs(middleText) {
                     linkTo(
                         start = lastMessageIcon.end,
@@ -297,6 +308,7 @@ internal fun ChatRoomItemView(
 
         BottomTextView(
             modifier = Modifier
+                .testTag("chat_room_item:bottom_text")
                 .constrainAs(bottomText) {
                     linkTo(
                         start = parent.start,
@@ -327,7 +339,7 @@ internal fun ChatRoomItemView(
         IconButton(
             onClick = { onItemMoreClick(item) },
             modifier = Modifier
-                .testTag("onItemMore")
+                .testTag("chat_room_item:more_button")
                 .size(24.dp)
                 .constrainAs(moreButton) {
                     end.linkTo(parent.end, 16.dp)
@@ -348,15 +360,17 @@ internal fun ChatRoomItemView(
 
         ChatUnreadCountView(
             count = item.unreadCount,
-            modifier = Modifier.constrainAs(unreadCountIcon) {
-                end.linkTo(moreButton.start, 8.dp)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                visibility = if (!isLoading && item.unreadCount > 0)
-                    Visibility.Visible
-                else
-                    Visibility.Gone
-            },
+            modifier = Modifier
+                .testTag("chat_room_item:unread_count_icon")
+                .constrainAs(unreadCountIcon) {
+                    end.linkTo(moreButton.start, 8.dp)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    visibility = if (!isLoading && item.unreadCount > 0)
+                        Visibility.Visible
+                    else
+                        Visibility.Gone
+                },
         )
 
         LaunchedEffect(hasOngoingCall) {

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
-import android.view.MotionEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,10 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -105,7 +102,6 @@ fun ChatListView(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ListView(
     modifier: Modifier = Modifier,
@@ -122,20 +118,12 @@ private fun ListView(
 ) {
     val listState = rememberLazyListState()
     var selectionEnabled by remember { mutableStateOf(false) }
-    var hasBeenTouched by remember { mutableStateOf(false) }
     var pendingTooltipShown = false
     var recurringTooltipShown = false
 
     LazyColumn(
         state = listState,
-        modifier = modifier
-            .testTag("ListView")
-            .pointerInteropFilter { motionEvent ->
-                if (!hasBeenTouched && motionEvent.action == MotionEvent.ACTION_DOWN) {
-                    hasBeenTouched = true
-                }
-                false
-            },
+        modifier = modifier.testTag("chat_room_list:list")
     ) {
         itemsIndexed(
             items = items,
@@ -143,65 +131,58 @@ private fun ListView(
         ) { index: Int, item: ChatRoomItem ->
             item.header?.takeIf(String::isNotBlank)?.let { header ->
                 if (index != 0) ChatDivider(startPadding = 16.dp)
-                ChatRoomItemHeaderView(text = header)
+                ChatRoomItemHeaderView(
+                    modifier = modifier.testTag("chat_room_list:item_header"),
+                    text = header
+                )
             } ?: run {
                 if (index != 0) ChatDivider()
             }
+
+            val itemView: @Composable () -> Unit = {
+                ChatRoomItemView(
+                    modifier = modifier.testTag("chat_room_list:item"),
+                    item = item,
+                    isSelected = selectionEnabled && selectedIds.contains(item.chatId),
+                    isSelectionEnabled = selectionEnabled,
+                    onItemClick = onItemClick,
+                    onItemMoreClick = onItemMoreClick,
+                    onItemSelected = onItemSelected,
+                )
+            }
+
             when {
                 !pendingTooltipShown && tooltipsToBeShown == MeetingTooltipItem.PENDING
                         && item is ChatRoomItem.MeetingChatRoomItem && item.isPending -> {
                     pendingTooltipShown = true
                     MegaTooltip(
+                        modifier = modifier.testTag("chat_room_list:tooltip_start"),
                         titleText = stringResource(R.string.btn_start_meeting),
                         descriptionText = stringResource(R.string.meeting_list_tooltip_sched_description),
                         actionText = stringResource(R.string.button_permission_info),
                         showOnTop = false,
                         arrowPosition = 0.5f,
                         onDismissed = onTooltipDismissed,
-                    ) {
-                        ChatRoomItemView(
-                            item = item,
-                            isSelected = selectionEnabled && selectedIds.contains(item.chatId),
-                            isSelectionEnabled = selectionEnabled,
-                            onItemClick = onItemClick,
-                            onItemMoreClick = onItemMoreClick,
-                            onItemSelected = onItemSelected,
-                        )
-                    }
+                        content = itemView
+                    )
                 }
 
                 !recurringTooltipShown && tooltipsToBeShown == MeetingTooltipItem.RECURRING
                         && item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() && item.hasPermissions -> {
                     recurringTooltipShown = true
                     MegaTooltip(
+                        modifier = modifier.testTag("chat_room_list:tooltip_recurring"),
                         titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),
                         descriptionText = stringResource(R.string.meeting_list_tooltip_recurring_description),
                         actionText = stringResource(R.string.button_permission_info),
                         showOnTop = false,
                         arrowPosition = 0.5f,
                         onDismissed = onTooltipDismissed,
-                    ) {
-                        ChatRoomItemView(
-                            item = item,
-                            isSelected = selectionEnabled && selectedIds.contains(item.chatId),
-                            isSelectionEnabled = selectionEnabled,
-                            onItemClick = onItemClick,
-                            onItemMoreClick = onItemMoreClick,
-                            onItemSelected = onItemSelected,
-                        )
-                    }
-                }
-
-                else -> {
-                    ChatRoomItemView(
-                        item = item,
-                        isSelected = selectionEnabled && selectedIds.contains(item.chatId),
-                        isSelectionEnabled = selectionEnabled,
-                        onItemClick = onItemClick,
-                        onItemMoreClick = onItemMoreClick,
-                        onItemSelected = onItemSelected,
+                        content = itemView
                     )
                 }
+
+                else -> itemView()
             }
         }
     }
@@ -213,18 +194,18 @@ private fun ListView(
             .collectLatest { onFirstItemVisible(it == 0) }
     }
 
+    LaunchedEffect(items.firstOrNull()) {
+        if (!listState.isScrollInProgress && listState.firstVisibleItemIndex in 1..4) {
+            listState.scrollToItem(0)
+        }
+    }
+
     LaunchedEffect(scrollToTop) {
         listState.animateScrollToItem(0)
     }
 
     LaunchedEffect(selectedIds) {
         selectionEnabled = selectedIds.isNotEmpty()
-    }
-
-    LaunchedEffect(items) {
-        if (!hasBeenTouched) {
-            listState.scrollToItem(0)
-        }
     }
 }
 
@@ -252,6 +233,7 @@ private fun EmptyView(
 
     Column(
         modifier = modifier
+            .testTag("chat_room_list:empty")
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
