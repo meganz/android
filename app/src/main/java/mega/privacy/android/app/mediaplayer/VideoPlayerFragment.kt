@@ -85,8 +85,6 @@ class VideoPlayerFragment : Fragment() {
 
     private var playbackPositionDialog: Dialog? = null
 
-    private var currentMediaPlaySources: MediaPlaySources? = null
-
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             updateLoadingAnimation(state)
@@ -640,8 +638,14 @@ class VideoPlayerFragment : Fragment() {
                 true
             ) == true
         ) {
-            currentMediaPlaySources?.let {
-                viewModel.playSource(it)
+            viewModel.playerSourcesState.value.let {
+                viewModel.playSource(
+                    MediaPlaySources(
+                        it.mediaItems,
+                        viewModel.getPlayingPosition(),
+                        null
+                    )
+                )
             }
         }
     }

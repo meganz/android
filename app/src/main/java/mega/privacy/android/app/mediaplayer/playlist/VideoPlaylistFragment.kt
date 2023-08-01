@@ -267,6 +267,11 @@ class VideoPlaylistFragment : Fragment(), PlaylistItemOperation, DragStartListen
                 if (!CallUtil.participatingInACall()) {
                     getIndexFromPlaylistItems(item)?.let { index ->
                         mediaPlayerGateway.playerSeekTo(index)
+                        with(videoViewModel) {
+                            updateCurrentMediaId(
+                                playlistItemsState.value.first.getOrNull(index)?.nodeHandle.toString()
+                            )
+                        }
                         resetRetryState()
                     }
                 }
