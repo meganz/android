@@ -1,8 +1,12 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.LocalAbsoluteElevation
@@ -25,9 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.GenericTextField
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.utils.composeLet
 
 /**
  * Alert dialog with a text input field and a confirmation button with optional cancel button
@@ -40,6 +43,7 @@ import mega.privacy.android.core.ui.utils.composeLet
  * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
  * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun InputDialog(
     title: String,
@@ -69,7 +73,9 @@ fun InputDialog(
             modifier = modifier,
             title = {
                 Text(
-                    modifier = Modifier.testTag(INPUT_DIALOG_TITLE_TAG),
+                    modifier = Modifier
+                        .testTag(INPUT_DIALOG_TITLE_TAG)
+                        .fillMaxWidth(),
                     text = title,
                     style = MaterialTheme.typography.h6,
                     color = MaterialTheme.colors.onSurface,
@@ -94,19 +100,26 @@ fun InputDialog(
                 }
             },
             onDismissRequest = onDismiss,
-            confirmButton = {
-                TextMegaButton(
-                    modifier = Modifier.testTag(INPUT_DIALOG_CONFIRM_TAG),
-                    text = confirmButtonText,
-                    onClick = { onConfirm(textFieldValue.text) },
-                )
-            },
-            dismissButton = cancelButtonText?.composeLet {
-                TextMegaButton(
-                    modifier = Modifier.testTag(INPUT_DIALOG_CANCEL_TAG),
-                    text = cancelButtonText,
-                    onClick = onDismiss,
-                )
+            buttons = {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextMegaButton(
+                        modifier = Modifier.testTag(INPUT_DIALOG_CONFIRM_TAG),
+                        text = confirmButtonText,
+                        onClick = { onConfirm(textFieldValue.text) },
+                    )
+                    cancelButtonText?.let {
+                        TextMegaButton(
+                            modifier = Modifier.testTag(INPUT_DIALOG_CANCEL_TAG),
+                            text = cancelButtonText,
+                            onClick = onDismiss,
+                        )
+                    }
+                }
             },
             properties = DialogProperties(
                 dismissOnBackPress = dismissOnBackPress,
@@ -121,7 +134,7 @@ internal const val INPUT_DIALOG_TEXT_TAG = "input_dialog:generic_text_field_inpu
 internal const val INPUT_DIALOG_CANCEL_TAG = "input_dialog:button_cancel"
 internal const val INPUT_DIALOG_CONFIRM_TAG = "input_dialog:button_confirm"
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -141,7 +154,7 @@ private fun InputDialogPreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreviewWithError() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -163,7 +176,7 @@ private fun InputDialogPreviewWithError() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun InputDialogPreviewWithLargeButtonText() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
