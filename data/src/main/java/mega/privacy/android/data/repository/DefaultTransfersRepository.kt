@@ -343,10 +343,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorCompletedTransfer(): Flow<CompletedTransfer> =
         appEventGateway.monitorCompletedTransfer
 
-    override suspend fun getAllCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.getAllCompletedTransfers(size)
-        }
+    override fun getAllCompletedTransfers(size: Int?): Flow<List<CompletedTransfer>> =
+        megaLocalRoomGateway.getAllCompletedTransfers(size)
+            .flowOn(ioDispatcher)
 
     override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
         withContext(ioDispatcher) {

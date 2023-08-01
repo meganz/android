@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -63,19 +62,11 @@ class TransfersViewModel @Inject constructor(
      */
     val activeState = _activeState.asStateFlow()
 
-    private val _completedState =
-        MutableStateFlow<CompletedTransfersState>(CompletedTransfersState.Default)
-
     /**
      * Failed transfer
      */
     val failedTransfer = monitorFailedTransfer()
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-
-    /**
-     * The state regarding completed transfers UI
-     */
-    val completedState = _completedState.asStateFlow()
 
     private val _activeTransfers = MutableStateFlow(emptyList<Transfer>())
 
@@ -91,14 +82,19 @@ class TransfersViewModel @Inject constructor(
         .catch { Timber.e(it) }
         .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
-    private var completedTransfers = mutableListOf<CompletedTransfer?>()
+    private val _completedTransfers = MutableStateFlow(emptyList<CompletedTransfer>())
+
+    /**
+     * Completed transfers
+     */
+    val completedTransfers = _completedTransfers.asStateFlow()
+
     private var transferCallback = 0L
     private var currentTab = TransfersTab.NONE
     private var previousTab = TransfersTab.NONE
 
     init {
         getAllActiveTransfers()
-        setCompletedTransfers()
         viewModelScope.launch {
             monitorTransferEventsUseCase()
                 .catch { Timber.e(it) }
@@ -123,7 +119,15 @@ class TransfersViewModel @Inject constructor(
             monitorCompletedTransferEventUseCase()
                 .catch { Timber.e(it) }
                 .collect {
-                    completedTransferFinished(it)
+                    completedTransferFinished()
+                }
+        }
+        viewModelScope.launch {
+            getAllCompletedTransfersUseCase(MAX_TRANSFERS)
+                .catch {
+                    Timber.e(it)
+                }.collect { completedTransfers ->
+                    _completedTransfers.update { completedTransfers }
                 }
         }
     }
@@ -309,29 +313,11 @@ class TransfersViewModel @Inject constructor(
     }
 
     /**
-     * Set the completed transfers
-     */
-    private fun setCompletedTransfers() = viewModelScope.launch {
-        completedTransfers.clear()
-        completedTransfers.addAll(getAllCompletedTransfersUseCase(MAX_TRANSFERS).first())
-        _completedState.update {
-            CompletedTransfersState.TransfersUpdated(completedTransfers.toList())
-        }
-    }
-
-    /**
      * Adds new completed transfer.
      *
      * @param transfer the transfer to add
      */
-    private fun completedTransferFinished(transfer: CompletedTransfer) {
-        completedTransfers.add(0, transfer)
-        if (completedTransfers.size > MAX_TRANSFERS) {
-            completedTransfers.removeAt(completedTransfers.size - 1)
-        }
-        _completedState.update {
-            CompletedTransfersState.TransferFinishUpdated(completedTransfers.toList())
-        }
+    private fun completedTransferFinished() {
         if (currentTab == TransfersTab.COMPLETED_TAB) {
             transfersManagement.setAreFailedTransfers(false)
         }
@@ -346,7 +332,7 @@ class TransfersViewModel @Inject constructor(
     fun completedTransferRemoved(transfer: CompletedTransfer, isRemovedCache: Boolean) =
         viewModelScope.launch(ioDispatcher) {
             if (isRemovedCache) {
-                transfer.originalPath?.let {
+                transfer.originalPath.let {
                     File(it).let { cacheFile ->
                         if (cacheFile.exists()) {
                             if (cacheFile.delete()) {
@@ -358,30 +344,6 @@ class TransfersViewModel @Inject constructor(
                     }
                 }
 
-            }
-            kotlin.runCatching {
-                val index = completedTransfers.indexOfFirst { completedTransfer ->
-                    completedTransfer?.let {
-                        areTheSameTransfer(transfer, it)
-                    } ?: false
-                }
-                if (index != INVALID_POSITION) {
-                    completedTransfers.removeAt(index)
-                    _completedState.update {
-                        CompletedTransfersState.TransferRemovedUpdated(
-                            index,
-                            completedTransfers.toList()
-                        )
-                    }
-                }
-            }.onFailure { exception ->
-                if (exception is ConcurrentModificationException) {
-                    Timber.e("Exception removing completed transfer: ${exception.message}")
-                } else {
-                    Timber.e(exception.message)
-                }
-            }.onSuccess {
-                Timber.d("Completed transfer correctly removed.")
             }
         }
 
@@ -408,8 +370,8 @@ class TransfersViewModel @Inject constructor(
      * Removes all completed transfers.
      */
     fun clearCompletedTransfers() = viewModelScope.launch(ioDispatcher) {
-        dbH.failedOrCancelledTransfers.mapNotNull { transfer ->
-            transfer.originalPath?.let { path -> File(path) }
+        dbH.failedOrCancelledTransfers.map { transfer ->
+            File(transfer.originalPath)
         }.forEach { cacheFile ->
             if (cacheFile.exists()) {
                 if (cacheFile.delete()) {
@@ -419,10 +381,6 @@ class TransfersViewModel @Inject constructor(
                 }
             }
         }
-        completedTransfers.clear()
-        _completedState.update {
-            CompletedTransfersState.ClearTransfersUpdated
-        }
     }
 
     /**
@@ -430,7 +388,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @return [CompletedTransfer] list
      */
-    fun getCompletedTransfers() = completedTransfers
+    fun getCompletedTransfers() = completedTransfers.value
 
     /**
      * Launches the request to change the priority of a transfer.

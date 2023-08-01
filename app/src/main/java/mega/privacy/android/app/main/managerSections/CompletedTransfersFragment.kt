@@ -4,12 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
@@ -63,35 +58,14 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
     }
 
     private fun setupFlow() {
-        viewModel.completedState.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
-        ).onEach { transfersState ->
-            when (transfersState) {
-                is CompletedTransfersState.TransfersUpdated -> {
-                    setEmptyView(transfersState.newTransfers.size)
-                }
-                is CompletedTransfersState.TransferFinishUpdated -> {
-                    setEmptyView(transfersState.newTransfers.size)
-                    adapter.setCompletedTransfers(transfersState.newTransfers)
-                    requireActivity().invalidateOptionsMenu()
-                }
-                is CompletedTransfersState.TransferRemovedUpdated -> {
-                    adapter.removeItemData(transfersState.index, transfersState.newTransfers)
-                    setEmptyView(transfersState.newTransfers.size)
-                }
-                is CompletedTransfersState.ClearTransfersUpdated -> {
-                    adapter.setCompletedTransfers(emptyList())
-                    setEmptyView(0)
-                }
-                else -> {}
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        collectFlow(viewModel.failedTransfer) { isFailed ->
+        viewLifecycleOwner.collectFlow(viewModel.failedTransfer) { isFailed ->
             if (isFailed) {
                 requireActivity().invalidateOptionsMenu()
             }
+        }
+        viewLifecycleOwner.collectFlow(viewModel.completedTransfers) { completedTransfers ->
+            adapter.setCompletedTransfers(completedTransfers)
+            setEmptyView(completedTransfers.size)
         }
     }
 

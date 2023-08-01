@@ -216,7 +216,7 @@ interface TransferRepository {
      *
      * @param size the limit size of the list. If null, the limit does not apply
      */
-    suspend fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+    fun getAllCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
 
     /**
      * Add a completed transfer to local storage

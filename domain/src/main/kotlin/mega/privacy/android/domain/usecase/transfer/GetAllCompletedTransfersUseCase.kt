@@ -17,6 +17,6 @@ class GetAllCompletedTransfersUseCase @Inject constructor(
      *
      * @param size the limit size of the list. If null, the limit does not apply
      */
-    suspend operator fun invoke(size: Int? = null) =
+    operator fun invoke(size: Int? = null) =
         transferRepository.getAllCompletedTransfers(size)
 }

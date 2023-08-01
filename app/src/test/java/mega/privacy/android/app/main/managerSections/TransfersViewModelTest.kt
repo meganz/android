@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -152,26 +153,15 @@ internal class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that when a completed transfer event is received, the completed transfer list state is updated with the added completed transfer`() =
+    fun `test that completedTransfers update correctly when getAllCompletedTransfersUseCase returns value`() =
         runTest {
-            val expected = mock<CompletedTransfer>()
-
-            whenever(getAllCompletedTransfersUseCase(any())).thenReturn(
-                flow { emit(emptyList()) }
-            )
-            whenever(monitorCompletedTransferEventUseCase()).thenReturn(
-                flow { emit(expected) }
-            )
-
-            underTest.completedState.test {
-                assertThat(awaitItem()).isEqualTo(CompletedTransfersState.Default)
-                assertThat(awaitItem()).isEqualTo(CompletedTransfersState.TransfersUpdated(emptyList()))
-                assertThat(awaitItem()).isEqualTo(
-                    CompletedTransfersState.TransferFinishUpdated(
-                        listOf(expected)
-                    )
-                )
+            val completedTransfer = mock<CompletedTransfer>()
+            val completedTransfers = listOf(completedTransfer)
+            whenever(getAllCompletedTransfersUseCase(DatabaseHandler.MAX_TRANSFERS)).thenReturn(flowOf(completedTransfers))
+            initViewModel()
+            advanceUntilIdle()
+            underTest.completedTransfers.test {
+                assertThat(awaitItem()).isEqualTo(completedTransfers)
             }
         }
-
 }
