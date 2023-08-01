@@ -1,8 +1,12 @@
 package mega.privacy.android.core.ui.controls.dialogs
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.LocalAbsoluteElevation
@@ -15,7 +19,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
-import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.preview.CombinedThemeRtlPreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.utils.composeLet
@@ -33,6 +37,7 @@ import mega.privacy.android.core.ui.utils.composeLet
  * @param dismissOnClickOutside if true, the dialog will be dismiss when the user taps outside of the dialog, default to true.
  * @param dismissOnBackPress if true, the dialog will be dismiss when the user does back action, default to true.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MegaAlertDialog(
     text: String,
@@ -49,7 +54,9 @@ fun MegaAlertDialog(
         modifier = modifier,
         title = title?.composeLet {
             Text(
-                modifier = Modifier.testTag(TITLE_TAG),
+                modifier = Modifier
+                    .testTag(TITLE_TAG)
+                    .fillMaxWidth(),
                 text = it,
                 style = MaterialTheme.typography.h6,
                 color = MaterialTheme.colors.onSurface,
@@ -63,19 +70,26 @@ fun MegaAlertDialog(
             )
         },
         onDismissRequest = onDismiss,
-        confirmButton = {
-            TextMegaButton(
-                modifier = Modifier.testTag(CONFIRM_TAG),
-                text = confirmButtonText,
-                onClick = onConfirm,
-            )
-        },
-        dismissButton = cancelButtonText?.composeLet {
-            TextMegaButton(
-                modifier = Modifier.testTag(CANCEL_TAG),
-                text = cancelButtonText,
-                onClick = onDismiss,
-            )
+        buttons = {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextMegaButton(
+                    modifier = Modifier.testTag(CONFIRM_TAG),
+                    text = confirmButtonText,
+                    onClick = onConfirm,
+                )
+                cancelButtonText?.let {
+                    TextMegaButton(
+                        modifier = Modifier.testTag(CANCEL_TAG),
+                        text = cancelButtonText,
+                        onClick = onDismiss,
+                    )
+                }
+            }
         },
         properties = DialogProperties(
             dismissOnBackPress = dismissOnBackPress,
@@ -84,7 +98,7 @@ fun MegaAlertDialog(
     )
 }
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun MegaAlertDialogPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -100,7 +114,7 @@ private fun MegaAlertDialogPreview() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun MegaAlertDialogPreviewLongAction() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
@@ -116,7 +130,7 @@ private fun MegaAlertDialogPreviewLongAction() {
     }
 }
 
-@CombinedThemePreviews
+@CombinedThemeRtlPreviews
 @Composable
 private fun MegaAlertDialogPreviewTitle() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {

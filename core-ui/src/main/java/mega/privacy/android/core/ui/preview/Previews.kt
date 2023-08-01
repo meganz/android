@@ -32,6 +32,17 @@ private annotation class FontScalePreviews
 )
 private annotation class FrenchLocale
 
+/**
+ * Annotation to generate a preview with Arabic locale
+ */
+@Preview(
+    locale = "ar",
+    name = "4-Arabic locale",
+    group = "locales",
+    showBackground = true,
+)
+private annotation class ArabicLocale
+
 
 /**
  * Annotation to generate previews with night and day themes
@@ -50,6 +61,13 @@ private annotation class FrenchLocale
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 annotation class CombinedThemePreviews
+
+/**
+ * Annotation to generate previews with night and day themes and RTL layout
+ */
+@ArabicLocale
+@CombinedThemePreviews
+annotation class CombinedThemeRtlPreviews
 
 /**
  * Annotation to generate previews for views with texts (font scales and locales) and night and day themes
