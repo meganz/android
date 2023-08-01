@@ -332,6 +332,7 @@ import mega.privacy.android.app.components.voiceClip.OnRecordListener;
 import mega.privacy.android.app.components.voiceClip.RecordButton;
 import mega.privacy.android.app.components.voiceClip.RecordView;
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder;
+import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase;
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler;
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler;
@@ -383,6 +384,7 @@ import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContac
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
+import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
@@ -1370,7 +1372,11 @@ public class ChatActivity extends PasscodeActivity
         Intent openLink;
 
         if (isFile) {
-            openLink = new Intent(this, FileLinkActivity.class);
+            if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose)) {
+                openLink = new Intent(this, FileLinkComposeActivity.class);
+            } else {
+                openLink = new Intent(this, FileLinkActivity.class);
+            }
             openLink.setAction(ACTION_OPEN_MEGA_LINK);
         } else {
             openLink = new Intent(this, FolderLinkComposeActivity.class);

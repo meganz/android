@@ -159,7 +159,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ContactVerification(
         "Enable new improved contact verification reminders",
         false,
-    )
+    ),
+
+    /**
+     * To switch into new FileLink compose screen
+     */
+    FileLinkCompose("Enable compose for FileLink", false)
 
     ;
 

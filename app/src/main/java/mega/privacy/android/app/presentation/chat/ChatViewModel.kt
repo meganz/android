@@ -22,6 +22,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -33,6 +34,7 @@ import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorJoinedSuccessfullyUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactLinkUseCase
 import mega.privacy.android.domain.usecase.contact.IsContactRequestSentUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -121,6 +124,7 @@ class ChatViewModel @Inject constructor(
     private val leaveChat: LeaveChat,
     private val getContactLinkUseCase: GetContactLinkUseCase,
     private val isContactRequestSentUseCase: IsContactRequestSentUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChatState())
@@ -187,12 +191,24 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+
+        viewModelScope.launch {
+            val enabledFeatures = setOfNotNull(
+                AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
+            )
+            _state.update { it.copy(enabledFeatureFlags = enabledFeatures) }
+        }
     }
 
     override fun onCleared() {
         rxSubscriptions.clear()
         super.onCleared()
     }
+
+    /**
+     * Check if given feature flag is enabled or not
+     */
+    fun isFeatureEnabled(feature: Feature) = state.value.enabledFeatureFlags.contains(feature)
 
     /**
      * Leave a chat

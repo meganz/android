@@ -23,6 +23,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
@@ -31,6 +32,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
@@ -88,7 +90,6 @@ import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.photos.AlbumLink
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -115,12 +116,6 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
     lateinit var querySignupLinkUseCase: QuerySignupLinkUseCase
 
     /**
-     * getFeatureFlagValueUseCase
-     */
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
-
-    /**
      * MegaChatRequestHandler injection
      */
     @Inject
@@ -130,6 +125,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private var isLoggedIn = false
     private var needsRefreshSession = false
+    private var openFileLink = false
 
     private var url: String? = null
     private val viewModel by viewModels<OpenLinkViewModel>()
@@ -207,14 +203,7 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             // File link
             matchRegexs(url, FILE_LINK_REGEXS) -> {
                 Timber.d("Open link url")
-                startActivity(
-                    Intent(this, FileLinkActivity::class.java)
-                        .putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false))
-                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_OPEN_MEGA_LINK)
-                        .setData(Uri.parse(url))
-                )
-                finish()
+                openFileLink = true
             }
             // Confirmation link
             matchRegexs(url, CONFIRMATION_LINK_REGEXS) -> {
@@ -487,15 +476,38 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun collectFlows() {
         collectFlow(viewModel.state) { openLinkState: OpenLinkState ->
-            if (openLinkState.isLoggedOut) {
-                startActivity(
-                    Intent(this@OpenLinkActivity, LoginActivity::class.java)
-                        .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
-                        .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
-                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_CONFIRM)
-                )
-                finish()
+            when {
+                openLinkState.isLoggedOut -> {
+                    startActivity(
+                        Intent(this@OpenLinkActivity, LoginActivity::class.java)
+                            .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
+                            .putExtra(EXTRA_CONFIRMATION, urlConfirmationLink)
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                            .setAction(ACTION_CONFIRM)
+                    )
+                    finish()
+                }
+
+                openLinkState.enabledFeatureFlags != null -> {
+                    if (openFileLink) {
+                        val intent =
+                            if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose) == true) {
+                                Intent(this@OpenLinkActivity, FileLinkComposeActivity::class.java)
+                            } else {
+                                Intent(this@OpenLinkActivity, FileLinkActivity::class.java)
+                            }.apply {
+                                putExtra(
+                                    OPENED_FROM_CHAT,
+                                    intent.getBooleanExtra(OPENED_FROM_CHAT, false)
+                                )
+                                flags = FLAG_ACTIVITY_CLEAR_TOP
+                                action = ACTION_OPEN_MEGA_LINK
+                                data = Uri.parse(url)
+                            }
+                        startActivity(intent)
+                        finish()
+                    }
+                }
             }
         }
     }

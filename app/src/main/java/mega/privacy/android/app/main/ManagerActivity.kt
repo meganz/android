@@ -185,6 +185,7 @@ import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.inbox.InboxFragment
@@ -1788,7 +1789,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             finish()
             return true
         }
-        managerRedirectIntentMapper(intent)?.let { redirectIntent ->
+        managerRedirectIntentMapper(
+            intent,
+            viewModel.state.value.enabledFlags
+        )?.let { redirectIntent ->
             startActivity(redirectIntent)
             finish()
             return true
@@ -2510,7 +2514,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Constants.ACTION_OPEN_MEGA_LINK -> {
                     Timber.d("ACTION_OPEN_MEGA_LINK")
                     val fileLinkIntent =
-                        Intent(this, FileLinkActivity::class.java)
+                        if (viewModel.state.value.enabledFlags.contains(AppFeatures.FileLinkCompose)) {
+                            Intent(this, FileLinkComposeActivity::class.java)
+                        } else {
+                            Intent(this, FileLinkActivity::class.java)
+                        }
+
                     fileLinkIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     fileLinkIntent.action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
                     intent.dataString?.let {
@@ -5398,7 +5407,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
 
-                val linkType = nodeController.importLink(link)
+                val linkType = nodeController.importLink(link, viewModel.state.value.enabledFlags)
                 if (openLinkError?.visibility == View.VISIBLE) {
                     when (linkType) {
                         Constants.CHAT_LINK -> {

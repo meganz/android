@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import dagger.hilt.android.scopes.ActivityScoped
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.Feature
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,7 +28,7 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
      *
      * @param intent
      */
-    operator fun invoke(intent: Intent): Intent? {
+    operator fun invoke(intent: Intent, enabledFeatureFlags: Set<Feature>): Intent? {
         Timber.d("Handle redirect intent action ${intent.action}")
         return when (intent.action) {
             Constants.ACTION_IMPORT_LINK_FETCH_NODES -> Intent(activity, LoginActivity::class.java)
@@ -36,13 +39,18 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
-            Constants.ACTION_OPEN_MEGA_LINK -> Intent(activity, FileLinkActivity::class.java)
-                .apply {
+            Constants.ACTION_OPEN_MEGA_LINK -> {
+                if (enabledFeatureFlags.contains(AppFeatures.FileLinkCompose)) {
+                    Intent(activity, FileLinkComposeActivity::class.java)
+                } else {
+                    Intent(activity, FileLinkActivity::class.java)
+                }.apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     action = Constants.ACTION_IMPORT_LINK_FETCH_NODES
                     data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
+            }
 
             Constants.ACTION_OPEN_MEGA_FOLDER_LINK -> Intent(activity, LoginActivity::class.java)
                 .apply {

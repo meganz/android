@@ -366,7 +366,8 @@ class ManagerViewModel @Inject constructor(
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
             AppFeatures.FileBrowserCompose.takeIf { getFeatureFlagValueUseCase(it) },
-            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) }
+            AppFeatures.DeviceCenter.takeIf { getFeatureFlagValueUseCase(it) },
+            AppFeatures.FileLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
         )
     }
 

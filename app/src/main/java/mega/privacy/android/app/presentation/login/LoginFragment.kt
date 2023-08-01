@@ -35,12 +35,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
 import mega.privacy.android.app.presentation.filelink.FileLinkActivity
+import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
@@ -273,8 +275,7 @@ class LoginFragment : Fragment() {
                                     }
 
                                     Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                        newIntent =
-                                            Intent(requireContext(), FileLinkActivity::class.java)
+                                        newIntent = getFileLinkIntent()
                                         newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                         intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                         newIntent.data = intentData
@@ -335,7 +336,7 @@ class LoginFragment : Fragment() {
                             }
 
                             Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                                newIntent = Intent(requireContext(), FileLinkActivity::class.java)
+                                newIntent = getFileLinkIntent()
                                 newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                 intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                 newIntent.data = intentData
@@ -643,7 +644,7 @@ class LoginFragment : Fragment() {
                 }
 
                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
-                    intent = Intent(requireContext(), FileLinkActivity::class.java)
+                    intent = getFileLinkIntent()
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intent.data = intentData
                 }
@@ -853,6 +854,14 @@ class LoginFragment : Fragment() {
 
     private fun getFolderLinkIntent(): Intent {
         return Intent(requireContext(), FolderLinkComposeActivity::class.java)
+    }
+
+    private fun getFileLinkIntent(): Intent {
+        return if (viewModel.isFeatureEnabled(AppFeatures.FileLinkCompose)) {
+            Intent(requireContext(), FileLinkComposeActivity::class.java)
+        } else {
+            Intent(requireContext(), FileLinkActivity::class.java)
+        }
     }
 
     private fun onForgotPassword(typedEmail: String?) {
