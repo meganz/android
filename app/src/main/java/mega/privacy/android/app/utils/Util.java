@@ -1182,8 +1182,9 @@ public class Util {
      *
      * @param url    the passed url to be detected
      * @param regexs the array of URL regular expressions
+     * @deprecated use @link{#IsMatchesRegexUseCase} instead.
      */
-
+    @Deprecated()
     public static boolean matchRegexs(String url, String[] regexs) {
         if (url == null) {
             return false;

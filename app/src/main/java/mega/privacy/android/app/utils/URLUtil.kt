@@ -24,6 +24,7 @@ private val whitelistedURL = listOf(
  * Then checks if a URL matches Mega regex pattern, will return true if matches
  * Or, it will check if a URL is whitelisted, will return true if whitelisted
  */
+@Deprecated("Use IsUrlMatchesRegexUseCase and IsUrlWhitelistedUseCase instead")
 fun String?.isURLSanitized(): Boolean =
     !this.isNullOrBlank() &&
             (Util.matchRegexs(this, Constants.MEGA_REGEXS) || whitelistedURL.contains(this))
