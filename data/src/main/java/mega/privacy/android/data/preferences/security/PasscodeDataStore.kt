@@ -55,6 +55,8 @@ internal class PasscodeDataStore(
     private val passcodeEnabledKey = stringPreferencesKey("passcodeEnabled")
     private val passcodeTimeOutKey = stringPreferencesKey("passcodeTimeOutKey")
     private val passcodeLastBackgroundKey = stringPreferencesKey("passcodeLastBackgroundKey")
+    private val passcodeTypeKey = stringPreferencesKey("passcodeTypeKey")
+    private val biometricsEnabledKey = stringPreferencesKey("biometricsEnabledKey")
 
     override fun monitorFailedAttempts() =
         getPreferenceFlow().monitor(failedAttemptsKey)
@@ -132,6 +134,36 @@ internal class PasscodeDataStore(
     override fun monitorLastBackgroundTime() =
         getPreferenceFlow().monitor(passcodeLastBackgroundKey)
             .map { decryptData(it)?.toLongOrNull() }
+
+    override suspend fun setPasscodeType(passcodeType: String?) {
+        val encryptedValue = encryptData(passcodeType)
+        editPreferences {
+            if (encryptedValue == null) {
+                it.remove(passcodeTypeKey)
+            } else {
+                it[passcodeTypeKey] = encryptedValue
+            }
+        }
+    }
+
+    override fun monitorPasscodeType() =
+        getPreferenceFlow().monitor(passcodeTypeKey)
+            .map { decryptData(it) }
+
+    override suspend fun setBiometricsEnabled(enabled: Boolean?) {
+        val encryptedValue = encryptData(enabled?.toString())
+        editPreferences {
+            if (encryptedValue == null) {
+                it.remove(biometricsEnabledKey)
+            } else {
+                it[biometricsEnabledKey] = encryptedValue
+            }
+        }
+    }
+
+    override fun monitorBiometricEnabledState() =
+        getPreferenceFlow().monitor(biometricsEnabledKey)
+            .map { decryptData(it)?.toBooleanStrictOrNull() }
 
 }
 

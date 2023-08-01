@@ -91,4 +91,32 @@ interface PasscodeStoreGateway {
      * @return last background time
      */
     fun monitorLastBackgroundTime(): Flow<Long?>
+
+    /**
+     * Set passcode type
+     *
+     * @param passcodeType
+     */
+    suspend fun setPasscodeType(passcodeType: String?)
+
+    /**
+     * Monitor passcode type
+     *
+     * @return
+     */
+    fun monitorPasscodeType(): Flow<String?>
+
+    /**
+     * Set enable biometrics
+     *
+     * @param enabled
+     */
+    suspend fun setBiometricsEnabled(enabled: Boolean?)
+
+    /**
+     * Monitor biometric enabled state
+     *
+     * @return biometrics enabled state as flow
+     */
+    fun monitorBiometricEnabledState(): Flow<Boolean?>
 }

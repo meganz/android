@@ -39,7 +39,9 @@ internal class PasscodeDatastoreMigration @Inject constructor(
             passcode = null,
             state = false,
             timeOutMilliseconds = null,
-            backgroundUTC = null
+            backgroundUTC = null,
+            passcodeType = null,
+            biometricsEnabled = null,
         )
     }
 
@@ -53,7 +55,9 @@ internal class PasscodeDatastoreMigration @Inject constructor(
             passcode = oldPreferences.passcodeLockCode,
             state = oldPreferences.passcodeLockEnabled.toBoolean(),
             timeOutMilliseconds = oldPreferences.passcodeLockRequireTime.toLongOrNull(),
-            backgroundUTC = null
+            backgroundUTC = null,
+            passcodeType = oldPreferences.passcodeLockType,
+            biometricsEnabled = databaseHandler.isFingerprintLockEnabled,
         )
     }
 
@@ -64,6 +68,8 @@ internal class PasscodeDatastoreMigration @Inject constructor(
         state: Boolean,
         timeOutMilliseconds: Long?,
         backgroundUTC: Long?,
+        passcodeType: String?,
+        biometricsEnabled: Boolean?,
     ) {
         with(this) {
             setPasscodeEnabledState(enabled)
@@ -72,8 +78,8 @@ internal class PasscodeDatastoreMigration @Inject constructor(
             setLockedState(state)
             setPasscodeTimeout(timeOutMilliseconds)
             setLastBackgroundTime(backgroundUTC)
+            setPasscodeType(passcodeType)
+            setBiometricsEnabled(biometricsEnabled)
         }
     }
-
-
 }

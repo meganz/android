@@ -194,4 +194,56 @@ internal class PasscodeDataStoreTest {
 
         verifyBlocking(encryptData) { invoke(null) }
     }
+
+    @Test
+    internal fun `test that passcode type is encrypted`() = runTest {
+        val input = "4"
+
+        underTest.setPasscodeType(input)
+
+        verifyBlocking(encryptData) { invoke(input) }
+    }
+
+    @Test
+    internal fun `test that passcode type is decrypted`() = runTest {
+        val expected = "6"
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
+
+        underTest.monitorPasscodeType().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that null passcode type is encrypted as null`() = runTest {
+        underTest.setPasscodeType(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
+    }
+
+    @Test
+    internal fun `test that biometric enabled state is encrypted`() = runTest {
+        val input = true
+
+        underTest.setBiometricsEnabled(input)
+
+        verifyBlocking(encryptData) { invoke(input.toString()) }
+    }
+
+    @Test
+    internal fun `test that biometric enabled state is decrypted`() = runTest {
+        val expected = true
+        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+
+        underTest.monitorBiometricEnabledState().test {
+            assertThat(awaitItem()).isEqualTo(expected)
+        }
+    }
+
+    @Test
+    internal fun `test that null biometric enabled state is encrypted as null`() = runTest {
+        underTest.setBiometricsEnabled(null)
+
+        verifyBlocking(encryptData) { invoke(null) }
+    }
 }
