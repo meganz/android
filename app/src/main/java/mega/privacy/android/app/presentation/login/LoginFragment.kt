@@ -36,11 +36,11 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.parcelable
+import mega.privacy.android.app.presentation.filelink.FileLinkActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
@@ -455,6 +455,7 @@ class LoginFragment : Fragment() {
             when {
                 intentShareInfo?.isNotEmpty() == true -> {
                     toSharePage()
+                    return
                 }
 
                 Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
