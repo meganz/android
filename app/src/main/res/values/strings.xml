@@ -5072,4 +5072,12 @@
     <string name="meetings_update_scheduled_meeting_occurrence_dialog_end_time_section">End time</string>
     <!-- Text of the snackbar displayed when successfully updated a scheduled meeting occurrence -->
     <string name="meetings_update_scheduled_meeting_occurrence_success_snackbar">Meeting occurrence updated</string>
+    <!-- Header content about secure sharing in approve credentials screen-->
+    <string name="contact_approve_credentials_secure_share_description">We protect your data with zero-knowledge encryption so all the information you store, share, and receive on MEGA is secure. To ensure extra security, we ask you to verify the contacts you share information with or receive data from.</string>
+    <!-- Message of contact verification in approve credentials screen -->
+    <string name="contact_approve_credentials_contact_verify_description">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
+    <!-- Approve button text in approve credentials screen -->
+    <string name="contact_approve_credentials_button_text">Approve</string>
+    <!-- Toolbar title text in approve credentials screen -->
+    <string name="contact_approve_credentials_toolbar_title">Approve credentials</string>
 </resources>

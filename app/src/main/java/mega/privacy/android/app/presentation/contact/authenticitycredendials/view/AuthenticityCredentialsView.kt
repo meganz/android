@@ -41,24 +41,22 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.core.ui.controls.appbar.SimpleTopAppBar
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.dark_grey
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.grey_020
 import mega.privacy.android.core.ui.theme.grey_800
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.theme.yellow_100
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 
 /**
  * Authenticity credentials view.
@@ -85,15 +83,19 @@ fun AuthenticityCredentialsView(
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            SimpleTopAppBar(titleId = R.string.authenticity_credentials_label,
+            SimpleTopAppBar(
+                titleId = R.string.contact_approve_credentials_toolbar_title,
                 elevation = isScrolled,
-                onBackPressed = onBackPressed)
+                onBackPressed = onBackPressed
+            )
         },
         backgroundColor = if (MaterialTheme.colors.isLight) grey_020 else grey_800
     ) { paddingValues ->
-        Column(modifier = Modifier
-            .padding(paddingValues)
-            .verticalScroll(state = scrollState)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(state = scrollState)
+        ) {
             ContactCredentials(state = state, onButtonClicked = onButtonClicked)
             MyCredentials(state = state)
         }
@@ -101,8 +103,10 @@ fun AuthenticityCredentialsView(
         if (state.error != null) {
             val error = stringResource(id = state.error)
             LaunchedEffect(scaffoldState.snackbarHostState) {
-                val s = scaffoldState.snackbarHostState.showSnackbar(message = error,
-                    duration = SnackbarDuration.Long)
+                val s = scaffoldState.snackbarHostState.showSnackbar(
+                    message = error,
+                    duration = SnackbarDuration.Long
+                )
 
                 if (s == SnackbarResult.Dismissed) {
                     onErrorShown()
@@ -129,71 +133,83 @@ fun ContactCredentials(
 ) {
     var isBannerVisible by remember { mutableStateOf(true) }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .background(color = if (MaterialTheme.colors.isLight) white else dark_grey)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colors.surface)
+    ) {
 
-        Column {
+        Column(modifier = Modifier) {
             if (state.showContactVerificationBanner && isBannerVisible) {
-                Box(modifier = Modifier
-                    .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
-                    .fillMaxWidth()
-                    .background(color = yellow_100),
-                    contentAlignment = Alignment.CenterEnd) {
-                    Text(modifier = Modifier.padding(start = 24.dp,
-                        top = 14.dp,
-                        bottom = 14.dp,
-                        end = 48.dp),
+                Row(
+                    modifier = Modifier
+                        .testTag("CONTACT_VERIFICATION_BANNER_VIEW")
+                        .fillMaxWidth()
+                        .background(color = yellow_100),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp, vertical = 12.dp)
+                            .weight(1f),
                         style = MaterialTheme.typography.body2,
                         color = black,
-                        text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label))
-
+                        text = stringResource(id = R.string.shared_items_verify_credentials_verify_person_banner_label)
+                    )
                     IconButton(
                         onClick = { isBannerVisible = false },
-                        modifier = Modifier.padding(start = 310.dp),
                         enabled = true,
                         content = {
-                            Icon(painter = painterResource(id = R.drawable.ic_remove_chat_toolbar),
-                                contentDescription = "")
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_remove_chat_toolbar),
+                                contentDescription = ""
+                            )
                         }
                     )
                 }
             }
 
-            Text(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp),
-                style = MaterialTheme.typography.body2,
-                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-                text = stringResource(id = R.string.shared_items_verify_credentials_header_outgoing))
+            Text(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary),
+                text = stringResource(id = R.string.contact_approve_credentials_secure_share_description),
+            )
 
-            Text(modifier = Modifier.padding(top = 19.dp, start = 72.dp, end = 72.dp),
-                style = MaterialTheme.typography.subtitle1,
-                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-                text = stringResource(id = R.string.label_contact_credentials,
-                    state.contactCredentials?.name ?: ""))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                modifier = Modifier.padding(horizontal = 72.dp),
+                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
+                text = state.contactCredentials?.name ?: ""
+            )
 
-            Text(modifier = Modifier.padding(start = 72.dp, end = 72.dp),
-                style = MaterialTheme.typography.body2,
-                color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                text = state.contactCredentials?.email ?: "")
+            Text(
+                modifier = Modifier.padding(horizontal = 72.dp),
+                style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
+                text = state.contactCredentials?.email ?: ""
+            )
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            CredentialsView(modifier = Modifier.padding(start = 72.dp, end = 24.dp),
-                credentials = state.contactCredentials?.credentials)
+            CredentialsView(
+                modifier = Modifier.padding(start = 72.dp, end = 64.dp),
+                credentials = state.contactCredentials?.credentials
+            )
 
-            Button(onClick = onButtonClicked,
+            Button(
+                onClick = onButtonClicked,
                 modifier = Modifier
                     .padding(start = 72.dp, top = 28.dp, bottom = 32.dp)
                     .alpha(if (state.isVerifyingCredentials) 0.5f else 1f),
-                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)) {
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
+            ) {
                 val actionTextId =
-                    if (state.areCredentialsVerified) R.string.action_reset
-                    else R.string.general_verify
+                    if (state.areCredentialsVerified) R.string.action_reset else R.string.contact_approve_credentials_button_text
 
-                Text(modifier = Modifier.padding(horizontal = 5.dp),
+                Text(
+                    modifier = Modifier,
                     style = MaterialTheme.typography.button,
-                    letterSpacing = 0.sp,
-                    text = stringResource(id = actionTextId))
+                    text = stringResource(id = actionTextId)
+                )
             }
         }
     }
@@ -207,31 +223,32 @@ fun ContactCredentials(
 @Composable
 fun MyCredentials(state: AuthenticityCredentialsState) {
 
-    val credentialsExplanation = stringResource(id = R.string.authenticity_credentials_explanation)
-    val yourCredentials = stringResource(id = R.string.label_your_credentials)
+    Text(
+        modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
+        style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.textColorSecondary),
+        text = stringResource(id = R.string.contact_approve_credentials_contact_verify_description)
+    )
 
-    Text(modifier = Modifier.padding(start = 24.dp, top = 32.dp, end = 24.dp),
-        style = MaterialTheme.typography.body2,
-        color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-        letterSpacing = 0.sp,
-        lineHeight = 15.sp,
-        text = credentialsExplanation)
-
-    Card(modifier = Modifier
-        .padding(start = 50.dp, top = 32.dp, end = 50.dp, bottom = 32.dp),
+    Card(
+        modifier = Modifier
+            .padding(start = 50.dp, top = 32.dp, end = 50.dp, bottom = 32.dp),
         shape = RoundedCornerShape(4.dp),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colors.secondary),
-        backgroundColor = if (MaterialTheme.colors.isLight) white else black) {
+        backgroundColor = if (MaterialTheme.colors.isLight) white else black
+    ) {
         Column {
-            Text(modifier = Modifier
-                .padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
-                text = yourCredentials.uppercase(),
-                color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087)
+            Text(
+                modifier = Modifier
+                    .padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 16.dp),
+                text = stringResource(id = R.string.label_your_credentials),
+                style = MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.textColorPrimary),
+            )
 
-            CredentialsView(modifier = Modifier
-                .padding(start = 24.dp, end = 24.dp),
+            CredentialsView(
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp),
                 credentials = state.myAccountCredentials?.credentials,
-                myCredentials = true)
+                myCredentials = true
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
         }
@@ -256,24 +273,30 @@ fun CredentialsView(
     if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
         Row(modifier = modifier) {
             for (i in 0..4) {
-                CredentialsItem(modifier = Modifier.weight(1f),
+                CredentialsItem(
+                    modifier = Modifier.weight(1f),
                     text = credentials?.get(i) ?: "",
-                    myCredentials = myCredentials)
+                    myCredentials = myCredentials
+                )
             }
         }
         Row(modifier = modifier.padding(top = 12.dp)) {
             for (i in 5..9) {
-                CredentialsItem(modifier = Modifier.weight(1f),
+                CredentialsItem(
+                    modifier = Modifier.weight(1f),
                     text = credentials?.get(i) ?: "",
-                    myCredentials = myCredentials)
+                    myCredentials = myCredentials
+                )
             }
         }
     } else {
         Row(modifier = modifier) {
             credentials?.forEach { item ->
-                CredentialsItem(modifier = Modifier.weight(1f),
+                CredentialsItem(
+                    modifier = Modifier.weight(1f),
                     text = item,
-                    myCredentials = myCredentials)
+                    myCredentials = myCredentials
+                )
             }
         }
     }
@@ -288,26 +311,58 @@ fun CredentialsView(
  */
 @Composable
 fun CredentialsItem(modifier: Modifier, text: String, myCredentials: Boolean) {
-    Text(modifier = modifier,
-        style = if (myCredentials) MaterialTheme.typography.caption else MaterialTheme.typography.subtitle2,
-        fontWeight = if (myCredentials) FontWeight.Normal else FontWeight.Medium,
-        fontSize = if (myCredentials) 13.sp else 14.sp,
-        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-        text = text)
+    Text(
+        modifier = modifier,
+        style = if (myCredentials) MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.textColorPrimary)
+        else MaterialTheme.typography.button.copy(color = MaterialTheme.colors.textColorPrimary),
+        text = text
+    )
 }
 
 /**
  * Authenticity credentials preview.
  */
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewAuthenticityCredentialsView")
+@CombinedThemePreviews
 @Composable
-fun PreviewAuthenticityCredentialsView() {
+fun PreviewAuthenticityCredentialsView(
+    @PreviewParameter(BooleanProvider::class) showContactVerificationBanner: Boolean,
+) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        AuthenticityCredentialsView(state = AuthenticityCredentialsState(),
+        AuthenticityCredentialsView(state = AuthenticityCredentialsState(
+            contactCredentials = AccountCredentials.ContactCredentials(
+                credentials = listOf(
+                    "A01B",
+                    "A02B",
+                    "A03B",
+                    "A04B",
+                    "A05B",
+                    "A06B",
+                    "A07B",
+                    "A08B",
+                    "A09B",
+                    "A10B",
+                ), email = "abc@mega.nz", name = "User name"
+            ),
+            myAccountCredentials = AccountCredentials.MyAccountCredentials(
+                credentials = listOf(
+                    "A01B",
+                    "A02B",
+                    "A03B",
+                    "A04B",
+                    "A05B",
+                    "A06B",
+                    "A07B",
+                    "A08B",
+                    "A09B",
+                    "A10B",
+                )
+            ),
+            showContactVerificationBanner = showContactVerificationBanner,
+        ),
             onButtonClicked = { },
             onBackPressed = { },
             onScrollChange = { },
             onErrorShown = {})
     }
 }
+

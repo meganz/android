@@ -5,7 +5,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.model.AuthenticityCredentialsState
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.view.AuthenticityCredentialsView
@@ -59,14 +58,14 @@ class AuthenticityCredentialsViewTest {
     @Test
     fun test_that_toolbar_title_is_show() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(R.string.authenticity_credentials_label).assertExists()
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_toolbar_title)
+            .assertExists()
     }
 
     @Test
     fun test_that_contact_credentials_label_is_show() {
         initComposeRuleContent()
-        val label = InstrumentationRegistry.getInstrumentation().targetContext
-            .getString(R.string.label_contact_credentials, userName)
+        val label = userName
         composeTestRule.onNodeWithText(label).assertExists()
     }
 
@@ -87,7 +86,8 @@ class AuthenticityCredentialsViewTest {
     @Test
     fun test_that_verify_button_is_show() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(R.string.general_verify).assertExists()
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+            .assertExists()
         composeTestRule.onNodeWithText(R.string.action_reset).assertDoesNotExist()
     }
 
@@ -95,32 +95,37 @@ class AuthenticityCredentialsViewTest {
     fun test_that_verify_button_performs_action() {
         val onButtonClicked = mock<() -> Unit>()
         initComposeRuleContent(onButtonClicked = onButtonClicked)
-        composeTestRule.onNodeWithText(R.string.general_verify).performClick()
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+            .performClick()
 
         verify(onButtonClicked).invoke()
     }
 
     @Test
     fun test_that_reset_button_is_show() {
-        initComposeRuleContent(AuthenticityCredentialsState(
-            contactCredentials = contactCredentials,
-            areCredentialsVerified = true,
-            myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
-        ))
-        composeTestRule.onNodeWithText(R.string.general_verify).assertDoesNotExist()
+        initComposeRuleContent(
+            AuthenticityCredentialsState(
+                contactCredentials = contactCredentials,
+                areCredentialsVerified = true,
+                myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
+            )
+        )
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_button_text)
+            .assertDoesNotExist()
         composeTestRule.onNodeWithText(R.string.action_reset).assertExists()
     }
 
     @Test
     fun test_that_explanation_label_is_show() {
         initComposeRuleContent()
-        composeTestRule.onNodeWithText(R.string.authenticity_credentials_explanation).assertExists()
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_contact_verify_description)
+            .assertExists()
     }
 
     @Test
     fun test_that_your_credentials_label_is_shown() {
         initComposeRuleContent()
-        val label = fromId(R.string.label_your_credentials).uppercase()
+        val label = fromId(R.string.label_your_credentials)
         composeTestRule.onNodeWithText(label).assertExists()
     }
 
@@ -135,26 +140,30 @@ class AuthenticityCredentialsViewTest {
     @Test
     fun test_that_error_is_displayed_if_present() {
         val error = R.string.check_internet_connection_error
-        initComposeRuleContent(AuthenticityCredentialsState(
-            contactCredentials = contactCredentials,
-            myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
-            error = error,
-        ))
+        initComposeRuleContent(
+            AuthenticityCredentialsState(
+                contactCredentials = contactCredentials,
+                myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
+                error = error,
+            )
+        )
 
         composeTestRule.onNodeWithText(error).assertExists()
     }
 
     @Test
     fun test_that_contact_verification_text_views_exists() {
-        initComposeRuleContent(AuthenticityCredentialsState(
-            contactCredentials = contactCredentials,
-            myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
-            showContactVerificationBanner = true,
-            ))
+        initComposeRuleContent(
+            AuthenticityCredentialsState(
+                contactCredentials = contactCredentials,
+                myAccountCredentials = AccountCredentials.MyAccountCredentials(myCredentials),
+                showContactVerificationBanner = true,
+            )
+        )
         composeTestRule.onNodeWithTag("CONTACT_VERIFICATION_BANNER_VIEW").assertExists()
-        composeTestRule.onNodeWithText(R.string.shared_items_verify_credentials_verify_person_banner_label)
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_secure_share_description)
             .assertExists()
-        composeTestRule.onNodeWithText(R.string.authenticity_credentials_label)
+        composeTestRule.onNodeWithText(R.string.contact_approve_credentials_toolbar_title)
             .assertExists()
     }
 
