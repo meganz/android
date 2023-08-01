@@ -95,6 +95,7 @@ private val dateFormatter by lazy {
 @Composable
 internal fun CreateScheduledMeetingView(
     state: CreateScheduledMeetingState,
+    isWaitingRoomEnabled: Boolean = false,
     onButtonClicked: (ScheduleMeetingAction) -> Unit = {},
     onDiscardClicked: () -> Unit,
     onAcceptClicked: () -> Unit,

@@ -19,9 +19,11 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
 import mega.privacy.android.domain.entity.meeting.RecurrenceDialogOption
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
@@ -46,8 +49,9 @@ import javax.inject.Inject
 /**
  * Activity which shows scheduled meeting info screen.
  *
- * @property passCodeFacade [PasscodeCheck]
- * @property getThemeMode   [GetThemeMode]
+ * @property passCodeFacade         [PasscodeCheck]
+ * @property getThemeMode           [GetThemeMode]
+ * @property getFeatureFlagUseCase  [getFeatureFlagUseCase]
  */
 @AndroidEntryPoint
 class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
@@ -57,6 +61,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
+
+    @Inject
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel by viewModels<CreateScheduledMeetingViewModel>()
     private val scheduledMeetingManagementViewModel by viewModels<ScheduledMeetingManagementViewModel>()
@@ -166,6 +173,9 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
         val isDark = themeMode.isDarkMode()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
         navController = rememberNavController()
+        val isWaitingRoomEnabled = runBlocking {
+            getFeatureFlagUseCase(AppFeatures.WaitingRoomSettings)
+        }
 
         AndroidTheme(isDark = isDark) {
             NavHost(
@@ -175,6 +185,7 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 composable(CREATE_SCHEDULED_MEETING_TAG) {
                     CreateScheduledMeetingView(
                         state = uiState,
+                        isWaitingRoomEnabled = isWaitingRoomEnabled,
                         onButtonClicked = ::onActionTap,
                         onDiscardClicked = viewModel::onDiscardMeetingTap,
                         onAcceptClicked = viewModel::onScheduleMeetingTap,

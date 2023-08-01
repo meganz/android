@@ -112,7 +112,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
         false
     ),
 
-
     /**
      * Sets the MegaApi::setSecureFlag
      */
@@ -152,6 +151,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
      * Meeting notification settings
      */
     MeetingNotificationSettings("Enable Meeting notification settings", false),
+
+    /**
+     * Meeting notification settings
+     */
+    WaitingRoomSettings("Enable Waiting room settings", false),
 
     /**
      * File sharing contact verification

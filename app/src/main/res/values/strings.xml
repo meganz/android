@@ -5080,4 +5080,10 @@
     <string name="contact_approve_credentials_button_text">Approve</string>
     <!-- Toolbar title text in approve credentials screen -->
     <string name="contact_approve_credentials_toolbar_title">Approve credentials</string>
+    <!-- Title of option to set waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_label">Waiting room</string>
+    <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_waiting_room_description">Only users admitted by the host can join the meeting.</string>
+    <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
+    <string name="meetings_schedule_meeting_waiting_room_warning">Participants added by non-hosts during calls won’t be sent to the waiting room.[A] Learn more[/A]</string>
 </resources>
