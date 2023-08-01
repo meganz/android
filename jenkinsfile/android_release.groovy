@@ -114,6 +114,10 @@ pipeline {
                 }
             }
         }
+        cleanup {
+            // delete whole workspace after each build, to save Jenkins storage
+            cleanWs(cleanWhenFailure: true)
+        }
     }
     stages {
         stage('Load Common Script') {
@@ -350,18 +354,6 @@ pipeline {
                             nativeDebugSymbolFilesPattern: "archive/${NATIVE_SYMBOLS_FILE}",
                             recentChangeList: common.getRecentChangeList(release_notes),
                             releaseName: common.readAppVersion1()
-                }
-            }
-        }
-        stage('Clean up') {
-            steps {
-                script {
-                    BUILD_STEP = 'Clean Up'
-
-                    common.printWorkspaceSize("workspace size before clean:")
-                    common.cleanAndroid()
-                    common.cleanSdk()
-                    common.printWorkspaceSize("workspace size after clean:")
                 }
             }
         }
