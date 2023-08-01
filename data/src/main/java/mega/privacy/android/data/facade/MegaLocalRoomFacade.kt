@@ -2,6 +2,7 @@ package mega.privacy.android.data.facade
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
@@ -43,6 +44,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val encryptData: EncryptData,
+    private val decryptData: DecryptData,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.insertOrUpdateContact(contactEntityMapper(contact))
@@ -242,4 +244,13 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun getSyncRecordByNewPath(path: String) =
         syncRecordDao.getSyncRecordByNewPath(encryptData(path).toString())
             ?.let { syncRecordModelMapper(it) }
+
+    override suspend fun getAllTimestampsOfSyncRecord(
+        isSecondary: Boolean,
+        syncRecordType: Int,
+    ): List<Long> =
+        syncRecordDao.getAllTimestampsByIsSecondaryAndSyncType(
+            encryptData(isSecondary.toString()).toString(),
+            syncRecordType
+        ).mapNotNull { decryptData(it)?.toLongOrNull() }
 }

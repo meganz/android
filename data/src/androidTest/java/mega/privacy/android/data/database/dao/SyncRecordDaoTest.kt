@@ -238,6 +238,19 @@ class SyncRecordDaoTest {
             Truth.assertThat(syncRecordDao.getAllSyncRecords().size).isEqualTo(9)
         }
 
+    @Test
+    fun test_that_getAllTimestampsByIsSecondaryAndSyncType_returns_the_corresponding_items() =
+        runTest {
+            val entities = generateEntities(0)
+            entities.forEach { syncRecordDao.insertOrUpdateSyncRecord(it) }
+            Truth.assertThat(
+                syncRecordDao.getAllTimestampsByIsSecondaryAndSyncType(
+                    secondary = "false",
+                    syncType = 2
+                ).size
+            ).isEqualTo(5)
+        }
+
 
     private fun generateEntities(state: Int = 0) = (1..10).map {
         val entity = SyncRecordEntity(

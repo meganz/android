@@ -20,10 +20,12 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
         timestampType: SyncTimeStamp,
     ) {
         if (timestampType.isPrimary || isSecondaryFolderEnabled()) {
-            setMaxTimeStamp(timestamp,
+            setMaxTimeStamp(
+                timestamp,
                 timestampType.isPrimary,
                 timestampType.syncRecordType,
-                timestampType)
+                timestampType
+            )
         }
     }
 
@@ -35,7 +37,7 @@ class DefaultUpdateCameraUploadTimeStamp @Inject constructor(
     ) {
         val maxTimeStamp =
             timestamp ?: cameraUploadRepository.getMaxTimestamp(
-                !isPrimary,
+                isSecondary = !isPrimary,
                 syncRecordType
             )
         updateTimeStamp(maxTimeStamp, timestampType)

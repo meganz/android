@@ -24,8 +24,10 @@ class DefaultUpdateCameraUploadTimeStampTest {
     @Before
     fun setUp() {
         underTest =
-            DefaultUpdateCameraUploadTimeStamp(cameraUploadRepository = cameraUploadRepository,
-                isSecondaryFolderEnabled = isSecondaryFolderEnabled)
+            DefaultUpdateCameraUploadTimeStamp(
+                cameraUploadRepository = cameraUploadRepository,
+                isSecondaryFolderEnabled = isSecondaryFolderEnabled
+            )
     }
 
     @Test
@@ -79,10 +81,14 @@ class DefaultUpdateCameraUploadTimeStampTest {
                 }
             verify(cameraUploadRepository).setSyncTimeStamp(timestamp, SyncTimeStamp.PRIMARY_PHOTO)
             verify(cameraUploadRepository).setSyncTimeStamp(timestamp, SyncTimeStamp.PRIMARY_VIDEO)
-            verify(cameraUploadRepository, never()).setSyncTimeStamp(timestamp,
-                SyncTimeStamp.SECONDARY_PHOTO)
-            verify(cameraUploadRepository, never()).setSyncTimeStamp(timestamp,
-                SyncTimeStamp.SECONDARY_VIDEO)
+            verify(cameraUploadRepository, never()).setSyncTimeStamp(
+                timestamp,
+                SyncTimeStamp.SECONDARY_PHOTO
+            )
+            verify(cameraUploadRepository, never()).setSyncTimeStamp(
+                timestamp,
+                SyncTimeStamp.SECONDARY_VIDEO
+            )
         }
 
     @Test
@@ -93,24 +99,32 @@ class DefaultUpdateCameraUploadTimeStampTest {
         val timestamp = 100L
         val testParameters = mapOf(
             SyncTimeStamp.PRIMARY_PHOTO to {
-                setExpectationsForSpecificMaxValueOnly(timestamp,
+                setExpectationsForSpecificMaxValueOnly(
+                    timestamp,
                     false,
-                    SyncRecordType.TYPE_PHOTO)
+                    SyncRecordType.TYPE_PHOTO
+                )
             },
             SyncTimeStamp.PRIMARY_VIDEO to {
-                setExpectationsForSpecificMaxValueOnly(timestamp,
+                setExpectationsForSpecificMaxValueOnly(
+                    timestamp,
                     false,
-                    SyncRecordType.TYPE_VIDEO)
+                    SyncRecordType.TYPE_VIDEO
+                )
             },
             SyncTimeStamp.SECONDARY_PHOTO to {
-                setExpectationsForSpecificMaxValueOnly(timestamp,
+                setExpectationsForSpecificMaxValueOnly(
+                    timestamp,
                     true,
-                    SyncRecordType.TYPE_PHOTO)
+                    SyncRecordType.TYPE_PHOTO
+                )
             },
             SyncTimeStamp.SECONDARY_VIDEO to {
-                setExpectationsForSpecificMaxValueOnly(timestamp,
+                setExpectationsForSpecificMaxValueOnly(
+                    timestamp,
                     true,
-                    SyncRecordType.TYPE_VIDEO)
+                    SyncRecordType.TYPE_VIDEO
+                )
             },
         )
         testParameters.forEach { (type, setExpectation) ->

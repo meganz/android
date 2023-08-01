@@ -399,15 +399,15 @@ class DefaultCameraUploadRepositoryTest {
             }
 
         @Test
-        fun `test that the maximal time stamp is retrieved`() = runTest {
-            val testTimeStamp = 1000L
+        fun `test that the maximum time stamp is retrieved`() = runTest {
+            val testTimeStamps = listOf(1000L, 999L, 1L)
 
             whenever(
-                localStorageGateway.getMaxTimestamp(
+                megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
                     isSecondary = any(),
                     syncRecordType = any(),
                 )
-            ).thenReturn(testTimeStamp)
+            ).thenReturn(testTimeStamps)
             whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
 
             assertThat(
@@ -416,7 +416,29 @@ class DefaultCameraUploadRepositoryTest {
                     syncRecordType = SyncRecordType.TYPE_ANY,
                 )
             ).isEqualTo(
-                testTimeStamp
+                1000L
+            )
+        }
+
+        @Test
+        fun `test that the zero is returned when time stamps are empty`() = runTest {
+            val testTimeStamps = emptyList<Long>()
+
+            whenever(
+                megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
+                    isSecondary = any(),
+                    syncRecordType = any(),
+                )
+            ).thenReturn(testTimeStamps)
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+
+            assertThat(
+                underTest.getMaxTimestamp(
+                    isSecondary = false,
+                    syncRecordType = SyncRecordType.TYPE_ANY,
+                )
+            ).isEqualTo(
+                0L
             )
         }
 

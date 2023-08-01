@@ -93,4 +93,10 @@ internal interface SyncRecordDao {
         originalPath: String?,
         secondary: String,
     )
+
+    @Query("SELECT sync_timestamp FROM ${MegaDatabaseConstant.TABLE_SYNC_RECORDS} WHERE sync_secondary = :secondary AND sync_type = :syncType")
+    suspend fun getAllTimestampsByIsSecondaryAndSyncType(
+        secondary: String,
+        syncType: Int,
+    ): List<String>
 }

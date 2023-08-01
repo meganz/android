@@ -275,4 +275,9 @@ interface MegaLocalRoomGateway {
      * @return sync record
      */
     suspend fun getSyncRecordByNewPath(path: String): SyncRecord?
+
+    /**
+     * Get all syncRecord timestamps
+     */
+    suspend fun getAllTimestampsOfSyncRecord(isSecondary: Boolean, syncRecordType: Int): List<Long>
 }

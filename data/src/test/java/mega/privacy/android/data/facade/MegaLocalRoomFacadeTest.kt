@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
@@ -52,6 +53,7 @@ internal class MegaLocalRoomFacadeTest {
     private val completedTransferDao = mock<CompletedTransferDao>()
     private val completedTransferModelMapper = mock<CompletedTransferModelMapper>()
     private val encryptData = mock<EncryptData>()
+    private val decryptData = mock<DecryptData>()
     private val activeTransferDao = mock<ActiveTransferDao>()
     private val activeTransferTotalsMapper = mock<ActiveTransferTotalsMapper>()
     private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
@@ -79,6 +81,7 @@ internal class MegaLocalRoomFacadeTest {
             syncStatusIntMapper = syncStatusIntMapper,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             encryptData = encryptData,
+            decryptData = decryptData,
             completedTransferEntityMapper = completedTransferEntityMapper
         )
     }
@@ -382,6 +385,25 @@ internal class MegaLocalRoomFacadeTest {
                 isSecondary.toString()
             )
         }
+
+    @Test
+    fun `test that getAllTimestampsOfSyncRecord returns correctly`() = runTest {
+        val secondary = false
+        val syncType = 2
+        val timeStamps = (1L..10L).map {
+            whenever(decryptData(it.toString())).thenReturn(it.toString())
+            it.toString()
+        }
+        whenever(encryptData(secondary.toString())).thenReturn(secondary.toString())
+        whenever(
+            syncRecordDao.getAllTimestampsByIsSecondaryAndSyncType(
+                secondary.toString(),
+                syncType
+            )
+        ).thenReturn(timeStamps)
+        val actual = underTest.getAllTimestampsOfSyncRecord(secondary, syncType)
+        assertThat(actual).isEqualTo((1L..10L).map { it })
+    }
 
     private fun provideDoesFileNameExistParameters() = Stream.of(
         Arguments.of(true, 1, true),

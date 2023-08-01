@@ -413,10 +413,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         syncRecordType: SyncRecordType,
     ): Long =
         withContext(ioDispatcher) {
-            localStorageGateway.getMaxTimestamp(
+            megaLocalRoomGateway.getAllTimestampsOfSyncRecord(
                 isSecondary,
                 syncRecordTypeIntMapper(syncRecordType)
-            )
+            ).maxOrNull() ?: 0L
         }
 
     override suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord> =
