@@ -148,7 +148,8 @@ private fun ListView(
                 if (index != 0) ChatDivider()
             }
             when {
-                !pendingTooltipShown && tooltipsToBeShown == MeetingTooltipItem.PENDING && item is ChatRoomItem.MeetingChatRoomItem && item.isPending -> {
+                !pendingTooltipShown && tooltipsToBeShown == MeetingTooltipItem.PENDING
+                        && item is ChatRoomItem.MeetingChatRoomItem && item.isPending -> {
                     pendingTooltipShown = true
                     MegaTooltip(
                         titleText = stringResource(R.string.btn_start_meeting),
@@ -169,7 +170,8 @@ private fun ListView(
                     }
                 }
 
-                !recurringTooltipShown && tooltipsToBeShown == MeetingTooltipItem.RECURRING && item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() -> {
+                !recurringTooltipShown && tooltipsToBeShown == MeetingTooltipItem.RECURRING
+                        && item is ChatRoomItem.MeetingChatRoomItem && item.isRecurring() && item.hasPermissions -> {
                     recurringTooltipShown = true
                     MegaTooltip(
                         titleText = stringResource(R.string.meeting_list_tooltip_recurring_title),

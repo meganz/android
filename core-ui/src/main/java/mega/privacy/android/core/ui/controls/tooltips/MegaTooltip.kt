@@ -13,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.skydoves.balloon.BalloonAnimation
@@ -23,6 +25,8 @@ import com.skydoves.balloon.compose.BalloonWindow
 import com.skydoves.balloon.compose.rememberBalloonBuilder
 import com.skydoves.balloon.compose.setBackgroundColor
 import kotlinx.coroutines.delay
+import mega.privacy.android.core.ui.controls.text.MegaSpannedText
+import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.dark_blue_tooltip_white
 import mega.privacy.android.core.ui.theme.extensions.white_black
@@ -80,14 +84,19 @@ fun MegaTooltip(
                     color = MaterialTheme.colors.white_black,
                     style = MaterialTheme.typography.body2medium,
                 )
-                Text(
-                    text = descriptionText,
-                    color = MaterialTheme.colors.white_black,
-                    style = MaterialTheme.typography.caption,
+                MegaSpannedText(
+                    value = descriptionText,
+                    baseStyle = MaterialTheme.typography.caption.copy(
+                        color = MaterialTheme.colors.white_black,
+                    ),
+                    styles = mapOf(
+                        SpanIndicator('A') to SpanStyle(fontWeight = FontWeight.Bold)
+                    )
                 )
                 Text(
                     text = actionText,
                     color = MaterialTheme.colors.white_black,
+                    fontWeight = FontWeight.Bold,
                     textDecoration = TextDecoration.Underline,
                     style = MaterialTheme.typography.caption,
                     modifier = Modifier
