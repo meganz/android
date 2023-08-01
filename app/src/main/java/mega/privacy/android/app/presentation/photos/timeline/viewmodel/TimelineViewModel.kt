@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
-import android.Manifest
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -36,7 +35,6 @@ import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
@@ -115,18 +113,7 @@ class TimelineViewModel @Inject constructor(
                 }.collectLatest { photos ->
                     Timber.v("TimelineViewModel photos flow=>" + photos.size)
                     if (getFeatureFlagValueUseCase(AppFeatures.RememberTimelinePreferences)) {
-                        val latestPreferences = getTimelineFilterPreferencesUseCase()?.let {
-                            timelinePreferencesMapper(it)
-                        }
-
-                        latestPreferences?.let {
-                            val rememberPreferences: RememberPreferences =
-                                it[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences
-
-                            if (rememberPreferences.value) {
-                                setInitialCUFilter(it)
-                            }
-                        }
+                        handleTimelinePhotosUseCase()
                     }
                     val showingPhotos = filterMedias(photos)
                     handleAndUpdatePhotosUIState(
@@ -139,6 +126,26 @@ class TimelineViewModel @Inject constructor(
             monitorCameraUploadProgress().collectLatest {
                 updateCameraUploadProgressIfNeeded(progress = it.first, pending = it.second)
             }
+        }
+    }
+
+    private suspend fun handleTimelinePhotosUseCase() {
+        runCatching {
+            getTimelineFilterPreferencesUseCase()
+        }.onSuccess { timelineFilterPreferences ->
+            val latestPreferences = timelineFilterPreferences?.let {
+                timelinePreferencesMapper(it)
+            }
+            latestPreferences?.let {
+                val rememberPreferences: RememberPreferences =
+                    it[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value] as RememberPreferences
+
+                if (rememberPreferences.value) {
+                    setInitialCUFilter(it)
+                }
+            }
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
@@ -438,6 +445,7 @@ class TimelineViewModel @Inject constructor(
                 }
                 updateSelectedTimeBarState(TimeBarTab.Months, monthsCardList.indexOf(photo))
             }
+
             is DateCard.MonthsCard -> {
                 val daysCardList = _state.value.daysCardPhotos
                 val photo = daysCardList.find {
@@ -445,6 +453,7 @@ class TimelineViewModel @Inject constructor(
                 }
                 updateSelectedTimeBarState(TimeBarTab.Days, daysCardList.indexOf(photo))
             }
+
             is DateCard.DaysCard -> {
                 val photosList = _state.value.photosListItems
                 val photo = photosList.find {
@@ -463,12 +472,15 @@ class TimelineViewModel @Inject constructor(
             TimeBarTab.Years -> {
                 updateSelectedTimeBarState(TimeBarTab.Years)
             }
+
             TimeBarTab.Months -> {
                 updateSelectedTimeBarState(TimeBarTab.Months)
             }
+
             TimeBarTab.Days -> {
                 updateSelectedTimeBarState(TimeBarTab.Days)
             }
+
             TimeBarTab.All -> {
                 updateSelectedTimeBarState(TimeBarTab.All)
             }

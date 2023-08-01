@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadPublicNodePreview
 import mega.privacy.android.domain.usecase.DownloadPublicNodeThumbnail
 import mega.privacy.android.domain.usecase.DownloadThumbnail
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
@@ -64,10 +65,16 @@ class PhotoDownloaderViewModel @Inject constructor(
     private suspend fun downloadPhotoCover(
         photoCover: PhotoCover,
     ) {
-        if (photoCover.isPreview) {
-            photoCover.callback(downloadPublicNodePreview(photoCover.photo.id))
-        } else {
-            photoCover.callback(downloadPublicNodeThumbnail(photoCover.photo.id))
+        runCatching {
+            if (photoCover.isPreview) {
+                downloadPublicNodePreview(photoCover.photo.id)
+            } else {
+                downloadPublicNodeThumbnail(photoCover.photo.id)
+            }
+        }.onSuccess {
+            photoCover.callback(it)
+        }.onFailure {
+            Timber.e(it)
         }
     }
 
