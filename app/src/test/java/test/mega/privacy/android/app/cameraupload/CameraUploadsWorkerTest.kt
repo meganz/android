@@ -90,8 +90,8 @@ import mega.privacy.android.domain.usecase.transfer.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelAllUploadTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
-import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.StartUploadUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import org.junit.After
 import org.junit.Before

@@ -16,6 +16,8 @@ import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.shockwave.pdfium.PdfiumCore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +35,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.VideoDownSampling
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.data.extensions.isVoiceClipTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.transfers.model.mapper.LegacyCompletedTransferMapper
@@ -69,6 +70,7 @@ import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
+import mega.privacy.android.domain.usecase.transfer.chatuploads.IsThereAnyChatUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -90,7 +92,7 @@ import javax.inject.Inject
  * Service which should be only used for chat uploads.
  */
 @AndroidEntryPoint
-class ChatUploadService : Service(), MegaRequestListenerInterface,
+class ChatUploadService : LifecycleService(), MegaRequestListenerInterface,
     MegaChatRequestListenerInterface {
 
     @MegaApi
@@ -102,10 +104,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var dbH: LegacyDatabaseHandler
-
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
 
     @Inject
     lateinit var transfersManagement: TransfersManagement
@@ -136,6 +134,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var monitorTransferEventsUseCase: MonitorTransferEventsUseCase
+
+    @Inject
+    lateinit var isThereAnyChatUploadUseCase: IsThereAnyChatUploadUseCase
 
     private var isForeground = false
     private var canceled = false
@@ -193,7 +194,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         startForeground()
 
-        monitorPausedTransfersJob = sharingScope.launch {
+        monitorPausedTransfersJob = lifecycleScope.launch {
             monitorPausedTransfersUseCase().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 delay(TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
@@ -201,7 +202,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             }
         }
 
-        monitorTransferEventsJob = sharingScope.launch {
+        monitorTransferEventsJob = lifecycleScope.launch {
             monitorTransferEventsUseCase()
                 .filter {
                     it.transfer.transferType == TransferType.TYPE_UPLOAD && it.transfer.isChatUpload()
@@ -284,9 +285,13 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         super.onDestroy()
     }
 
-    override fun onBind(intent: Intent?): IBinder? = null
+    override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
+        return null
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         Timber.d("Flags: $flags, Start ID: $startId")
         canceled = false
 
@@ -312,7 +317,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         if (intent == null) return
 
         if (intent.action != null && intent.action == Constants.ACTION_RESTART_SERVICE) {
-            sharingScope.launch {
+            lifecycleScope.launch {
                 getTransferDataUseCase()?.let { transferData ->
                     var voiceClipsInProgress = 0
 
@@ -460,7 +465,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         val pendingMsg = pendingMsgs[0]
         val file = File(pendingMsg.getFilePath())
 
-        sharingScope.launch {
+        lifecycleScope.launch {
             chatPreferencesGateway
                 .getChatImageQualityPreference().collectLatest { imageQuality ->
                     val shouldCompressImage = MimeTypeList.typeForName(file.name).isImage
@@ -659,7 +664,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
         if (fileExplorerUpload) {
             fileExplorerUpload = false
-            sharingScope.launch {
+            lifecycleScope.launch {
                 broadcastTransfersFinishedUseCase(
                     TransfersFinishedState(
                         type = TransferFinishType.FILE_EXPLORER_CHAT_UPLOAD,
@@ -685,7 +690,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
     fun updateProgressDownsampling(percentage: Int, key: String) {
         mapVideoDownsampling!![key] = percentage
-        updateProgressNotification()
+        lifecycleScope.launch { updateProgressNotification() }
     }
 
     fun finishDownsampling(returnedFile: String, success: Boolean, idPendingMessage: Long) {
@@ -745,7 +750,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     }
 
     @SuppressLint("NewApi")
-    private fun updateProgressNotification(pausedTransfers: Boolean = false) {
+    private suspend fun updateProgressNotification(pausedTransfers: Boolean = false) {
         var progressPercent: Long = 0
         val transfers: Collection<Transfer> = mapProgressTransfers.values
 
@@ -831,7 +836,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                     R.string.upload_service_notification_paused,
                     inProgress, totalUploads
                 )
-            } else if (thereAreChatUploads() || videosCompressed == mapVideoDownsampling!!.size) {
+            } else if (isThereAnyChatUploadUseCase() || videosCompressed == mapVideoDownsampling!!.size) {
                 getString(
                     R.string.upload_service_notification,
                     inProgress,
@@ -929,7 +934,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         }
     }
 
-    private fun onTransferStart(transfer: Transfer) = with(transfer) {
+    private suspend fun onTransferStart(transfer: Transfer) = with(transfer) {
         Timber.d("onTransferStart: $nodeHandle appData: $appData")
 
         if (!isVoiceClip()) {
@@ -955,13 +960,13 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         }
     }
 
-    private fun onTransferUpdate(transfer: Transfer) = with(transfer) {
+    private suspend fun onTransferUpdate(transfer: Transfer) = with(transfer) {
         Timber.d("onTransferUpdate: $nodeHandle")
 
         if (canceled) {
             Timber.w("Transfer cancel: $nodeHandle")
             releaseLocks()
-            sharingScope.launch {
+            lifecycleScope.launch {
                 runCatching { cancelTransferByTagUseCase(tag) }
                     .onFailure { Timber.w("Exception canceling transfer: $it") }
             }
@@ -1000,7 +1005,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             ?.onFailure { err -> Timber.e(err, "EXCEPTION") }
     }
 
-    private fun onTransferTemporaryError(transfer: Transfer, e: MegaException?) {
+    private suspend fun onTransferTemporaryError(transfer: Transfer, e: MegaException?) {
         Timber.w("Handle: ${transfer.nodeHandle}. Upload Temporary Error: ${e?.errorString}__${e?.errorCode}".trimIndent())
 
         when (e?.errorCode) {
@@ -1425,7 +1430,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         Timber.d("onRequestStart: ${request.name}")
 
         if (request.type == MegaRequest.TYPE_COPY) {
-            updateProgressNotification()
+            lifecycleScope.launch { updateProgressNotification() }
         } else if (request.type == MegaRequest.TYPE_SET_ATTR_FILE) {
             Timber.d("TYPE_SET_ATTR_FILE")
         }
@@ -1623,28 +1628,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         }
 
         mNotificationManager!!.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, notification)
-    }
-
-    /**
-     * Checks if there are chat uploads in progress, regardless of the voice clips.
-     * @return True if there are chat uploads in progress, false otherwise.
-     */
-    private fun thereAreChatUploads(): Boolean {
-        @Suppress("DEPRECATION")
-        if (megaApi.numPendingUploads > 0) {
-            val transferData = megaApi.getTransferData(null) ?: return false
-
-            for (i in 0 until transferData.numUploads) {
-                val transfer = megaApi.getTransferByTag(transferData.getUploadTag(i)) ?: continue
-                val data = transfer.appData
-
-                if (data?.contains(Constants.APP_DATA_CHAT) == true && !transfer.isVoiceClipTransfer()) {
-                    return true
-                }
-            }
-        }
-
-        return false
     }
 
     /**

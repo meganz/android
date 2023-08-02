@@ -1,24 +1,23 @@
-package mega.privacy.android.domain.usecase.transfer
+package mega.privacy.android.domain.usecase.transfer.uploads
 
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.HasPendingUploads
 import javax.inject.Inject
 
 /**
  * Use case for resetting the number of uploads.
  *
- * @property hasPendingUploads [HasPendingUploads]
+ * @property isThereAnyPendingUploadsUseCase [IsThereAnyPendingUploadsUseCase]
  * @property transferRepository [TransferRepository]
  */
 class ResetTotalUploadsUseCase @Inject constructor(
-    private val hasPendingUploads: HasPendingUploads,
+    private val isThereAnyPendingUploadsUseCase: IsThereAnyPendingUploadsUseCase,
     private val transferRepository: TransferRepository,
 ) {
     /**
      * Invoke.
      */
     suspend operator fun invoke() {
-        if (!hasPendingUploads()) {
+        if (!isThereAnyPendingUploadsUseCase()) {
             transferRepository.resetTotalUploads()
         }
     }

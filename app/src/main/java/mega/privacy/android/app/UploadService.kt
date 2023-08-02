@@ -79,8 +79,8 @@ import mega.privacy.android.domain.usecase.transfer.GetTransferDataUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorStopTransfersWorkUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfer.ResetTotalUploadsUseCase
 import mega.privacy.android.domain.usecase.transfer.uploads.GetCurrentUploadSpeedUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.ResetTotalUploadsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError

@@ -23,19 +23,19 @@ import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
-import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetNumPendingDownloadsNonBackgroundUseCase
 import mega.privacy.android.domain.usecase.transfer.IsCompletedTransfersEmptyUseCase
+import mega.privacy.android.domain.usecase.transfer.uploads.GetNumPendingUploadsUseCase
 import javax.inject.Inject
 
 /**
  * ViewModel for managing transfers data.
  *
  * @property getNumPendingDownloadsNonBackgroundUseCase    [GetNumPendingDownloadsNonBackgroundUseCase]
- * @property getNumPendingUploads                   [GetNumPendingUploads]
+ * @property getNumPendingUploadsUseCase                   [GetNumPendingUploadsUseCase]
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmptyUseCase       [IsCompletedTransfersEmptyUseCase]
  * @property areAllTransfersPaused                  [AreAllTransfersPaused]
@@ -45,7 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingDownloadsNonBackgroundUseCase: GetNumPendingDownloadsNonBackgroundUseCase,
-    private val getNumPendingUploads: GetNumPendingUploads,
+    private val getNumPendingUploadsUseCase: GetNumPendingUploadsUseCase,
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmptyUseCase: IsCompletedTransfersEmptyUseCase,
     private val areAllTransfersPaused: AreAllTransfersPaused,
@@ -109,7 +109,7 @@ class TransfersManagementViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackgroundUseCase()
-            val numPendingUploads = getNumPendingUploads()
+            val numPendingUploads = getNumPendingUploadsUseCase()
             val areTransfersPaused = areAllTransfersPaused()
             _state.update {
                 it.copy(
