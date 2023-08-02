@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class AddContactsAdapter extends RecyclerView.Adapter<AddContactsAdapter.
         EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
-        RelativeLayout itemLayout;
+        ConstraintLayout itemLayout;
     }
 
     ViewHolderChips holder = null;
@@ -73,7 +74,7 @@ public class AddContactsAdapter extends RecyclerView.Adapter<AddContactsAdapter.
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout = (ConstraintLayout) v.findViewById(R.id.item_layout_chip);
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);

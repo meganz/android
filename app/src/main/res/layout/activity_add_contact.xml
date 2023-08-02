@@ -1,17 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/relative_container_add_contact"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/relative_container_add_contact"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:fitsSystemWindows="true"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
 
 	<com.google.android.material.appbar.MaterialToolbar
 		android:id="@+id/add_contact_toolbar"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:minHeight="?attr/actionBarSize" />
+
 
 	<LinearLayout
 		android:id="@+id/add_contacts_container"
@@ -20,11 +22,23 @@
 		android:orientation="vertical"
 		android:layout_below="@+id/add_contact_toolbar">
 
+
 		<LinearLayout
 			android:id="@+id/container_linear_layout"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical">
+
+			<TextView
+				android:id="@+id/text_warning_message"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="@color/yellow_100_yellow_700_alpha_015"
+				android:padding="8dp"
+				android:visibility="gone"
+				android:text="@string/contact_share_file_to_unverified_contact_warning_message"
+				android:textAppearance="@style/TextAppearance.Mega.Caption.13sp.Grey87Yellow700"
+				tools:visibility="visible"/>
 
 			<RelativeLayout
 				android:id="@+id/layout_type_mail"
@@ -446,5 +460,4 @@
 		android:layout_alignParentBottom="true"
 		android:layout_margin="16dp"
 		android:src="@drawable/ic_send_white" />
-
 </RelativeLayout>

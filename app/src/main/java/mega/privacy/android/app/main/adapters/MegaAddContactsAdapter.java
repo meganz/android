@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -60,7 +61,7 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
         EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
-        RelativeLayout itemLayout;
+        ConstraintLayout itemLayout;
 
     }
 

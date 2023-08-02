@@ -79,6 +79,7 @@ import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuItemCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -116,6 +117,7 @@ import mega.privacy.android.app.main.adapters.PhoneContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
+import mega.privacy.android.app.main.tasks.AddContactViewModel;
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.psa.PsaWebBrowser;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
@@ -135,7 +137,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaSet;
 import nz.mega.sdk.MegaSetElement;
 import nz.mega.sdk.MegaShare;
-import nz.mega.sdk.MegaSync;
 import nz.mega.sdk.MegaUser;
 import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
@@ -148,6 +149,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     @Inject
     DatabaseHandler dbH;
 
+    private AddContactViewModel viewModel;
     private static final int SCAN_QR_FOR_ADD_CONTACTS = 1111;
     public static final String EXTRA_MEGA_CONTACTS = "mega_contacts";
     public static final String EXTRA_CONTACTS = "extra_contacts";
@@ -193,6 +195,9 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     private RecyclerView addedContactsRecyclerView;
     private RelativeLayout containerAddedContactsRecyclerView;
     private LinearLayoutManager mLayoutManager;
+
+    private TextView mWarningMessage;
+
     private String inputString = "";
     private String savedInputString = "";
 
@@ -295,6 +300,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private boolean onlyCreateGroup;
     private boolean waitingForPhoneContacts;
+
+    private boolean isContactVerificationOn;
 
     private final Observer<Boolean> fabChangeObserver = isShow -> {
         if (isShow) {
@@ -1037,7 +1044,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             addedContactsRecyclerView.setAdapter(adapterContacts);
         } else {
             if (adapterShare == null) {
-                adapterShare = new ShareContactsAdapter(addContactActivity, addedContactsShare);
+                adapterShare = new ShareContactsAdapter(addContactActivity, addedContactsShare, isContactVerificationOn);
             } else {
                 adapterShare.setContacts(addedContactsShare);
             }
@@ -1540,7 +1547,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return;
         }
-
+        viewModel = new ViewModelProvider(this).get(AddContactViewModel.class);
         if (getIntent() != null) {
             contactType = getIntent().getIntExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA);
             emailsContactsSelected = getIntent().getStringArrayListExtra(INTENT_EXTRA_KEY_CONTACTS_SELECTED);
@@ -1578,6 +1585,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         display.getMetrics(outMetrics);
 
         megaApi.addGlobalListener(this);
+
+        isContactVerificationOn = viewModel.getContactFeatureEnabledFromFlag();
 
         addContactActivity = this;
 
@@ -1640,6 +1649,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         scanQRButton.setOnClickListener(this);
         scanQRButton.setVisibility(View.GONE);
         addContactsLayout = (LinearLayout) findViewById(R.id.add_contacts_container);
+        mWarningMessage = (TextView) findViewById(R.id.text_warning_message);
         addedContactsRecyclerView = (RecyclerView) findViewById(R.id.contact_adds_recycler_view);
         containerAddedContactsRecyclerView = (RelativeLayout) findViewById(R.id.contacts_adds_container);
         containerAddedContactsRecyclerView.setVisibility(View.GONE);
@@ -1986,6 +1996,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             addedContactsShare.add(contact);
         }
         adapterShare.setContacts(addedContactsShare);
+        mWarningMessage.setVisibility(checkForUnVerifiedContacts() && isContactVerificationOn ? View.VISIBLE : View.GONE);
         if (adapterShare.getItemCount() - 1 >= 0) {
             mLayoutManager.scrollToPosition(adapterShare.getItemCount() - 1);
         }
@@ -2211,6 +2222,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         setRecyclersVisibility();
         refreshKeyboard();
         setSearchVisibility();
+        mWarningMessage.setVisibility(checkForUnVerifiedContacts() && isContactVerificationOn ? View.VISIBLE : View.GONE);
     }
 
     public void showSnackbar(String message) {
@@ -3500,5 +3512,17 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                 }, Timber::e);
 
         composite.add(chatSubscription);
+    }
+
+    private boolean checkForUnVerifiedContacts() {
+        for (ShareContactInfo info : addedContactsShare) {
+            if (!info.isMegaContact()) {
+                return true;
+            } else {
+                boolean isVerified = megaApi.areCredentialsVerified(info.getMegaContactAdapter().getMegaUser());
+                if (!isVerified) return true;
+            }
+        }
+        return false;
     }
 }

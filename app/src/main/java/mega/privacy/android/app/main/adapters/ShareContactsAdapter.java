@@ -12,8 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -35,11 +35,13 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     private MegaApiAndroid megaApi;
     private Context context;
 
-    public ShareContactsAdapter(Context _context, ArrayList<ShareContactInfo> _contacts) {
+    private boolean isContactVerificationOn;
+
+    public ShareContactsAdapter(Context _context, ArrayList<ShareContactInfo> _contacts, boolean isContactVerificationOn) {
         this.contacts = _contacts;
         this.context = _context;
         this.positionClicked = -1;
-
+        this.isContactVerificationOn = isContactVerificationOn;
         if (megaApi == null) {
             megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
         }
@@ -54,8 +56,9 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         EmojiTextView textViewName;
         ImageView deleteIcon;
         RoundedImageView avatar;
-        RelativeLayout itemLayout;
+        ConstraintLayout itemLayout;
 
+        ImageView verifiedIcon;
     }
 
     ViewHolderChips holder = null;
@@ -71,7 +74,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chip_avatar, parent, false);
 
         holder = new ViewHolderChips(v);
-        holder.itemLayout = (RelativeLayout) v.findViewById(R.id.item_layout_chip);
+        holder.itemLayout = (ConstraintLayout) v.findViewById(R.id.item_layout_chip);
         holder.itemLayout.setOnClickListener(this);
 
         holder.textViewName = v.findViewById(R.id.name_chip);
@@ -79,7 +82,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
         holder.avatar = (RoundedImageView) v.findViewById(R.id.rounded_avatar);
         holder.deleteIcon = (ImageView) v.findViewById(R.id.delete_icon_chip);
         holder.itemLayout.setTag(holder);
-
+        holder.verifiedIcon = (ImageView) v.findViewById(R.id.verified_icon);
         v.setTag(holder);
 
         return holder;
@@ -88,7 +91,7 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
     @Override
     public void onBindViewHolder(ShareContactsAdapter.ViewHolderChips holder, int position) {
         Timber.d("Position: %s", position);
-
+        holder.verifiedIcon.setVisibility(View.GONE);
         ShareContactInfo contact = (ShareContactInfo) getItem(position);
         String[] s;
         if (contact.isPhoneContact()) {
@@ -123,6 +126,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
                     } else {
                         holder.textViewName.setText(contact.getMegaContactAdapter().getFullName());
                     }
+                   holder.verifiedIcon.setVisibility(
+                                megaApi.areCredentialsVerified(contact.getMegaContactAdapter().getMegaUser()) && isContactVerificationOn ? View.VISIBLE : View.GONE);
                 }
             }
         } else {
