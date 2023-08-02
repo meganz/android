@@ -587,6 +587,14 @@ class VideoPlayerViewModel @Inject constructor(
      */
     private suspend fun buildPlayerSource(intent: Intent?): Boolean {
         if (intent == null || !intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
+            Timber.d(
+                "buildPlayerSource error: " +
+                        if (intent == null) {
+                            "intent is null"
+                        } else {
+                            "rebuild playlist is false"
+                        }
+            )
             _retryState.update { false }
             return false
         }
@@ -595,6 +603,14 @@ class VideoPlayerViewModel @Inject constructor(
         val uri = intent.data
 
         if (type == INVALID_VALUE || uri == null) {
+            Timber.d(
+                "buildPlayerSource error: " +
+                        if (type == INVALID_VALUE) {
+                            "type = $type"
+                        } else {
+                            "type = $type uri is null"
+                        }
+            )
             _retryState.update { false }
             return false
         }
@@ -604,12 +620,14 @@ class VideoPlayerViewModel @Inject constructor(
 
         val firstPlayHandle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE)
         if (firstPlayHandle == INVALID_HANDLE) {
+            Timber.d("buildPlayerSource error: firstPlayHandle = $firstPlayHandle")
             _retryState.update { false }
             return false
         }
 
         val firstPlayNodeName = intent.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
         if (firstPlayNodeName == null) {
+            Timber.d("buildPlayerSource error: firstPlayNodeName is null")
             _retryState.update { false }
             return false
         }
@@ -643,6 +661,7 @@ class VideoPlayerViewModel @Inject constructor(
         }
 
         if (firstPlayUri == null) {
+            Timber.d("buildPlayerSource error: firstPlayUri is null")
             _retryState.update { false }
             return false
         }
@@ -1174,6 +1193,7 @@ class VideoPlayerViewModel @Inject constructor(
      */
     internal fun onPlayerError() {
         playerRetry++
+        Timber.d("playerRetry: $playerRetry")
         _retryState.update { playerRetry <= MAX_RETRY }
     }
 
