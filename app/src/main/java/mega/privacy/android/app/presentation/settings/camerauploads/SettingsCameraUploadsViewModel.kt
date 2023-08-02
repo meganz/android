@@ -272,7 +272,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun restoreSecondaryTimestampsAndSyncRecordProcess() {
         viewModelScope.launch {
-            restoreSecondaryTimestamps()
+            runCatching {
+                restoreSecondaryTimestamps()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 
@@ -351,17 +355,29 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     /**
      * Resets all Timestamps and cleans the Cache Directory
      */
-    fun resetTimestampsAndCacheDirectory() = viewModelScope.launch {
-        resetCameraUploadTimeStamps(clearCamSyncRecords = true)
-        clearCacheDirectory()
+    fun resetTimestampsAndCacheDirectory() {
+        viewModelScope.launch {
+            runCatching {
+                resetCameraUploadTimeStamps(clearCamSyncRecords = true)
+                clearCacheDirectory()
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     /**
      * Call several Use Cases to disable Media Uploads
      */
-    fun disableMediaUploads() = viewModelScope.launch {
-        resetMediaUploadTimeStamps()
-        disableMediaUploadSettings()
+    fun disableMediaUploads() {
+        runCatching {
+            viewModelScope.launch {
+                resetMediaUploadTimeStamps()
+                disableMediaUploadSettings()
+            }
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     /**

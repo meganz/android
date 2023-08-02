@@ -49,15 +49,12 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.exception.LocalStorageException
-import mega.privacy.android.domain.exception.UnknownException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
-import java.io.IOException
 import java.util.Queue
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
@@ -233,29 +230,20 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
-    override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) {
-        try {
-            withContext(ioDispatcher) {
-                when (type) {
-                    SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
-                    SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
-                    SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
-                        timeStamp
-                    )
+    override suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp) =
+        withContext(ioDispatcher) {
+            when (type) {
+                SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.setPhotoTimeStamp(timeStamp)
+                SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.setVideoTimeStamp(timeStamp)
+                SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
+                    timeStamp
+                )
 
-                    SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
-                        timeStamp
-                    )
-                }
+                SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
+                    timeStamp
+                )
             }
-        } catch (e: IOException) {
-            Timber.e(e)
-            throw LocalStorageException(e.message, e.cause)
-        } catch (e: Exception) {
-            Timber.e(e)
-            throw UnknownException(e.message, e.cause)
         }
-    }
 
     override suspend fun doCredentialsExist(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.doCredentialsExist()

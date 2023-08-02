@@ -20,15 +20,19 @@ class DefaultRestoreSecondaryTimestamps @Inject constructor(
             val camSyncTimestamp = settingsRepository.getSecondaryFolderPhotoSyncTime()
             if (!camSyncTimestamp.isNullOrEmpty()) {
                 runCatching {
-                    cameraUploadRepository.setSyncTimeStamp(camSyncTimestamp.toLong(),
-                        SyncTimeStamp.SECONDARY_PHOTO)
+                    cameraUploadRepository.setSyncTimeStamp(
+                        camSyncTimestamp.toLong(),
+                        SyncTimeStamp.SECONDARY_PHOTO
+                    )
                 }
             }
             val camVideoSyncTimestamp = settingsRepository.getSecondaryFolderVideoSyncTime()
             if (!camVideoSyncTimestamp.isNullOrEmpty()) {
                 runCatching {
-                    cameraUploadRepository.setSyncTimeStamp(camVideoSyncTimestamp.toLong(),
-                        SyncTimeStamp.SECONDARY_VIDEO)
+                    cameraUploadRepository.setSyncTimeStamp(
+                        camVideoSyncTimestamp.toLong(),
+                        SyncTimeStamp.SECONDARY_VIDEO
+                    )
                 }
             }
         } else {
