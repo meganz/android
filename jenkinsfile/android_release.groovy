@@ -279,7 +279,7 @@ pipeline {
                                 "GMS_AAB_INPUT=${gmsAabInput}",
                                 "GMS_AAB_OUTPUT=${gmsAabOutput}"
                         ]) {
-                            sh('jarsigner -sigalg SHA1withRSA -digestalg SHA1 -keystore ${ANDROID_PRD_GMS_AAB_KEYSTORE} -storepass "${ANDROID_PRD_GMS_AAB_PASSWORD}" -signedjar ${GMS_AAB_OUTPUT} ${GMS_AAB_INPUT} megaandroid-upload')
+                            sh('jarsigner -keystore ${ANDROID_PRD_GMS_AAB_KEYSTORE} -storepass "${ANDROID_PRD_GMS_AAB_PASSWORD}" -signedjar ${GMS_AAB_OUTPUT} ${GMS_AAB_INPUT} megaandroid-upload')
                         }
                         println("Finish signing GMS AAB. ($gmsAabOutput) generated!")
                     }
